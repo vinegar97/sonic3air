@@ -157,7 +157,7 @@ function void Spring.SharedInit()
 		u32[A0 + 0x0c] = (competition_mode.active) ? 0x023912 : 0x023772
 
 	#if STANDALONE
-		// Make in springs in HPZ just a little bit stronger
+		// Make springs in HPZ just a little bit stronger
 		if (global.zone_act == 0x1601)
 		{
 			u16[A0 + 0x30] = -0x0ac0

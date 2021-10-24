@@ -595,12 +595,22 @@ function void fn02ea50()
 	//  - 0x18, 0x32, 0x37 = "Ring Bonus"
 	//  - 0x19, 0x33, 0x38 = "Perfect"
 	//  - 0x1a, 0x34, 0x39 = "Continue"
+	//  - 0x12			   = "Super" / "Hyper"
 	//  - 0x13			   = "Sonic"
-	//  - 0x14			   = "Miles" (not verified)
+	//  - 0x14			   = "Miles"
 	//  - 0x15			   = "Tails"
-	//  - 0x16			   = "Knuckles" (not verified)
+	//  - 0x16			   = "Knuckles"
+	//  - 0x22			   = "Special Stage"
 	//  - 0x23			   = "got a"
 	//  - 0x24			   = "Chaos Emerald"
+	//  - 0x25			   = "ll" (with 0x23 = "got all")
+	//  - 0x26			   = "s" (with 0x24 = "Chaos Emeralds", with 0x30 = "Super Emeralds")
+	//  - 0x27, 0x2c	   = "Now"
+	//  - 0x28, 0x35	   = "Be"
+	//  - 0x29, 0x2a, 0x2b = character continue icons
+	//  - 0x2d, 0x3a	   = "Can"
+	//  - 0x2e			   = "Can Go To"
+	//  - 0x2f			   = "Hidden Palace"
 	//  - 0x30			   = "Super Emerald"
 
 	if (!fn02de04())

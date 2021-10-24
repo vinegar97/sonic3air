@@ -134,7 +134,7 @@ define rings.around.first.state	= u16[0xffffee4a]	// RAM address of dynamic stat
 // Regular zones:
 //  0x00 = AIZ - Angel Island
 //  0x01 = HCZ - Hydrocity
-//  0x02 = MGC - Marble Garden
+//  0x02 = MGZ - Marble Garden
 //  0x03 = CNZ - Carnival Night
 //  0x05 = ICZ - IceCap
 //  0x06 = LBZ - Launch Base
