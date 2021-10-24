@@ -808,7 +808,7 @@ function void ItemEffect.ApplyInvincibility()
 		u8[A1 + 0x35] = 150			// "char.invinc.countdown", decreases every 8 frames
 		if (!level.boss_encounter && u8[A1 + 0x2c] > 12)	// Check "char.drown_countdown"
 		{
-			playMusic(0x2c)
+			playMusic(MUSIC_INVINCIBLE)
 		}
 
 		if (u8[A0 + 0x43] == 0)
@@ -882,7 +882,7 @@ function void ItemEffect.ApplySuperTransformation()
 #if STANDALONE
 	chooseFittingMusic()	// Usually switches to super theme
 #else
-	playMusic(0x2c)
+	playMusic(MUSIC_INVINCIBLE)
 #endif
 }
 

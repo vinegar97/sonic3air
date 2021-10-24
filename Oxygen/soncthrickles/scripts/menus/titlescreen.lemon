@@ -289,7 +289,7 @@ function void TitleScreen()
 #endif
 
 	Kosinski.addToDecompressionQueue(0x351c86, 0xffff0000)
-	playMusic(0x25)
+	playMusic(MUSIC_TITLESCREEN)
 
 	// While loop: Intro sequence with Sonic running towards the camera
 	while (true)

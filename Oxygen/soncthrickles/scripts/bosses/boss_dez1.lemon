@@ -15,7 +15,7 @@ function void fn07ddb4()
 	if (InitBoss(0x07ddbe))
 		return
 
-	objA0.value26 = 0x2e
+	objA0.value26 = MUSIC_MINIBOSS_2
 	StartBossFight()
 
 #if STANDALONE

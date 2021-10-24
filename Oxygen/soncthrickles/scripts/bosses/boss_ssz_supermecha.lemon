@@ -29,7 +29,7 @@ function void fn07b996()
 	objA0.flags2a = 0
 	objA0.flags38 = 0
 	objA0.flags38 |= 0x50
-	playMusic(0x1a)
+	playMusic(MUSIC_DDZ)
 
 	spawnChildObjects(0x07d492)
 

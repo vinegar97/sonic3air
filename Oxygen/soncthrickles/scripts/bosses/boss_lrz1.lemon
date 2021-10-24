@@ -18,7 +18,7 @@ function void fn0784f0()
 	objA0.update_address = 0x078522
 	objA0.countdown_callback = 0x078528
 	A1 = 0x0784e8
-	objA0.value26 = 0x2e
+	objA0.value26 = MUSIC_MINIBOSS_2
 	StartBossFight()
 
 	// Manipulate target value for move_area.left

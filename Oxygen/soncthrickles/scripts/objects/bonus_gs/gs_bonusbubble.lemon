@@ -291,7 +291,7 @@ function void fn0611d6()
 
 	D0 = 4
 	fn061254()
-	playMusic(0x3e)
+	playMusic(SFX_FIRESHIELD)
 }
 
 
@@ -306,7 +306,7 @@ function void fn061200()
 
 	D0 = 6
 	fn061254()
-	playMusic(0x3f)
+	playMusic(SFX_BUBBLESHIELD)
 }
 
 
@@ -321,7 +321,7 @@ function void fn06122a()
 
 	D0 = 5
 	fn061254()
-	playMusic(0x41)
+	playMusic(SFX_LIGHTNINGSHIELD)
 }
 
 

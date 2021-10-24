@@ -168,7 +168,7 @@ function void fn072ffa()
 	if (InitBoss(0x073004))
 		return
 
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 
 	level.bossarea.left -= getScreenExtend()
@@ -287,7 +287,7 @@ function void fn07305a()
 	}
 	else if (u16[A0 + 0x48] == 120)
 	{
-		playMusic(0x30)
+		playMusic(MUSIC_BIGARMS)
 		level.boss_encounter = 2	// Usually only 0 or 1, but we're using a value of 2 here for "chooseFittingMusic"
 	}
 

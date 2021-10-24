@@ -26,7 +26,7 @@ function void fn06e488()
 	objA0.countdown_callback = 0x06e4be
 
 	A1 = 0x06e476
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 
 	requestLoadingPatterns(0x6e)

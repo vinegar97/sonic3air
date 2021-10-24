@@ -364,7 +364,7 @@ function void DataSelect.setup()
 	A0 = A1 - 0x08c0
 	copyMemory(A1, A0, 0x540)
 
-	playMusic(0x2f)
+	playMusic(MUSIC_DATASELECT)
 	u32[0xffffef44] = 0x00c890
 	global.frame_state = 0x1e
 	waitForNextFrame()

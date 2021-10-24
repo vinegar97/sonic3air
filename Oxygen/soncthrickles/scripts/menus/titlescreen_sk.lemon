@@ -99,7 +99,7 @@ function void TitleScreen_SK()
 	u32[0xffffb04a] = 0x5770
 	u32[0xffffb094] = 0x5856
 
-	playMusic(0x25)
+	playMusic(MUSIC_TITLESCREEN)
 
 	lives_counter = 3
 	global.demo_countdown = (global.region_code & 0x40) ? 900 : 1080

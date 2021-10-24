@@ -23,7 +23,7 @@ function void fn06aeb6()
 	if (InitBoss(0x06aecc))
 		return
 
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 
 #if STANDALONE

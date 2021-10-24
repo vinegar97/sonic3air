@@ -74,15 +74,47 @@ define u8 CONTROL_ABC	= 0x70	// Any of the three buttons
 // Music and sound effects                               //
 //-------------------------------------------------------//
 
+define u8 MUSIC_AIZ1			= 0x01
+define u8 MUSIC_AIZ2			= 0x02
+define u8 MUSIC_HCZ1			= 0x03
+define u8 MUSIC_HCZ2			= 0x04
+define u8 MUSIC_MGZ1			= 0x05
+define u8 MUSIC_MGZ2			= 0x06
+define u8 MUSIC_CNZ1			= 0x07
+define u8 MUSIC_CNZ2			= 0x08
+define u8 MUSIC_FBZ1			= 0x09
+define u8 MUSIC_FBZ2			= 0x0a
+define u8 MUSIC_ICZ1			= 0x0b
+define u8 MUSIC_ICZ2			= 0x0c
+define u8 MUSIC_LBZ1			= 0x0d
+define u8 MUSIC_LBZ2			= 0x0e
+define u8 MUSIC_MHZ1			= 0x0f
+define u8 MUSIC_MHZ2			= 0x10
+define u8 MUSIC_SOZ1			= 0x11
+define u8 MUSIC_SOZ2			= 0x12
+define u8 MUSIC_LRZ1			= 0x13
+define u8 MUSIC_LRZ2			= 0x14
+define u8 MUSIC_SSZ				= 0x15
+define u8 MUSIC_DEZ1			= 0x16
+define u8 MUSIC_DEZ2			= 0x17
 define u8 MUSIC_MINIBOSS		= 0x18
 define u8 MUSIC_MAINBOSS		= 0x19
+define u8 MUSIC_DDZ				= 0x1a
+define u8 MUSIC_TITLESCREEN		= 0x25
+define u8 MUSIC_ENDING			= 0x26
 define u8 MUSIC_GAMEOVER		= 0x27
+define u8 MUSIC_CONTINUE		= 0x28
 define u8 MUSIC_LEVELCLEAR		= 0x29
 define u8 MUSIC_EXTRALIFE		= 0x2a
 define u8 MUSIC_CHAOSEMERALD	= 0x2b
+define u8 MUSIC_INVINCIBLE		= 0x2c
+define u8 MUSIC_COMPETITIONMENU	= 0x2d
 define u8 MUSIC_MINIBOSS_2		= 0x2e	// Identical to 0x18
+define u8 MUSIC_DATASELECT		= 0x2f
+define u8 MUSIC_BIGARMS			= 0x30
 define u8 MUSIC_DROWNING		= 0x31
 define u8 MUSIC_GAMECLEAR		= 0x32
+define u8 MUSIC_CREDITSMEDLEY	= 0xdc
 
 define u8 SFX_RING				= 0x33	// Alternating between left and right channel
 define u8 SFX_RING_ALT			= 0x34	// Alternative ring sfx, not alternating

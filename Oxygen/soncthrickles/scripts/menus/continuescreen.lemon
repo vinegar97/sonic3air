@@ -221,7 +221,7 @@ function void fn05c2e0()
 
 	VDP.Config.setActiveDisplay(true)
 
-	playMusic(0x28)
+	playMusic(MUSIC_CONTINUE)
 	Menu.FadeInAfterInit()
 
 	while (true)

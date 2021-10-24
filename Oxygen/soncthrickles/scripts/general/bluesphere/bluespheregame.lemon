@@ -181,7 +181,7 @@ function void fn04c97e()
 	UpdateGameObjects()
 	RenderSprites()
 
-	playMusic(0x28)
+	playMusic(MUSIC_CONTINUE)
 
 	VDP.Config.setActiveDisplay(true)
 
@@ -1468,7 +1468,7 @@ function void fn04da7e()
 	UpdateGameObjects()
 	RenderSprites()
 
-	playMusic(0x29)
+	playMusic(MUSIC_LEVELCLEAR)
 	VDP.Config.setActiveDisplay(true)
 
 	BlueSpheres.FadeIn()
@@ -1533,7 +1533,7 @@ function void fn04da7e()
 	super.active = 0
 	super.palettefx.state = 0
 	global.characters = CHARS_SONIC_ALONE
-	playMusic(0x2c)
+	playMusic(MUSIC_INVINCIBLE)
 
 	VDP.Config.setActiveDisplay(true)
 

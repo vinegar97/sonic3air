@@ -704,7 +704,7 @@ function void fn064310()
 	objA0.mapping_offset = 0x066f36
 	objA0.animation.sprite = 2
 	objA0.flags38 |= 0x10
-	level.default_music.u8 = 0x14
+	level.default_music.u8 = MUSIC_LRZ2
 
 	if (allocDynamicObjectStd())
 	{

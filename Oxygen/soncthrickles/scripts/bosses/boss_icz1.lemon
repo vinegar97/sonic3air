@@ -40,7 +40,7 @@ function void fn071162()
 //# address-hook(0x07117e) end(0x0711aa)
 function void fn07117e()
 {
-	u8[A0 + 0x26] = 0x2e
+	objA0.value26 = MUSIC_MINIBOSS_2
 	StartBossFight()
 
 	#if STANDALONE

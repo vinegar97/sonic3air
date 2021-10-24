@@ -917,7 +917,7 @@ function void PlayMusicAfterLevelResults()
 #endif
 	if (u8[0xffffb02b] & char.bonus.INVINCIBLE)
 	{
-		playMusic(0x2c)
+		playMusic(MUSIC_INVINCIBLE)
 	}
 	else
 	{

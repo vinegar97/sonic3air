@@ -23,7 +23,7 @@ function void fn07f06c()
 	objA0.countdown_callback = 0x07f0d2
 
 	A1 = 0x07f0c6
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 	u8[0xfffffab8] = 0
 
@@ -245,7 +245,7 @@ function void fn07f29a()
 
 	objA0.update_address = 0x07f2dc
 	level.boss_encounter = 0
-	playMusic(0x17)
+	playMusic(MUSIC_DEZ2)
 
 	screenmover_target.right = 0x3620
 	if (allocDynamicObjectStd())

@@ -100,7 +100,7 @@ function void CompetitionMode.MainMenu()
 	RenderSprites()
 	CompetitionMode.drawBackground(0x30)
 
-	playMusic(0x2d)
+	playMusic(MUSIC_COMPETITIONMENU)
 	global.frame_state = 0x1e
 	waitForNextFrame()
 
@@ -437,7 +437,7 @@ function void CompetitionMode.StageSelect()
 	objA0.mapping_offset = 0x20a6e4
 	objA0.sprite_attributes += 0xc29f
 	objA0.position.x.u16 = 0xb0 + getScreenExtend()
-	playMusic(0x2d)
+	playMusic(MUSIC_COMPETITIONMENU)
 
 	global.frame_state = 0x1e
 	waitForNextFrame()
@@ -855,7 +855,7 @@ function void fn00b2cc()
 	RenderSprites()
 	CompetitionMode.drawBackground(0x00)
 
-	playMusic(0x2d)
+	playMusic(MUSIC_COMPETITIONMENU)
 	global.frame_state = 0x1e
 	waitForNextFrame()
 
@@ -1343,7 +1343,7 @@ function void fn00b74e()
 	RenderSprites()
 	CompetitionMode.drawBackground(0x00)
 
-	playMusic(0x28)
+	playMusic(MUSIC_CONTINUE)
 	global.frame_state = 0x1e
 	waitForNextFrame()
 
@@ -1728,7 +1728,7 @@ function void fn00bc08()
 	UpdateGameObjects()
 	RenderSprites()
 	CompetitionMode.drawBackground(0x00)
-	playMusic(0x28)
+	playMusic(MUSIC_CONTINUE)
 
 	global.frame_state = 0x1e
 	waitForNextFrame()

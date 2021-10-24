@@ -49,7 +49,7 @@ function void fn073906()
 	boss.remaining_hits = 8
 	objA0.countdown_callback = 0x073960
 	A1 = 0x0738ce
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 
 #if STANDALONE

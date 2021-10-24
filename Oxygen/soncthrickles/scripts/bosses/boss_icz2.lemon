@@ -31,7 +31,7 @@ function void fn071bce()
 	objA0.countdown_callback = 0x071c0e
 
 	A1 = 0x071bc6
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 
 	#if STANDALONE

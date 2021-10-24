@@ -651,7 +651,7 @@ function void fn0639c8()
 
 	objA0.position.x.u16 = camera.position.x.u16 + 0x0110
 	objA0.position.y.u16 = camera.position.y.u16 - 0x60
-	playMusic(0x19)
+	playMusic(MUSIC_MAINBOSS)
 
 	spawnChildObjects(0x0919d0)
 

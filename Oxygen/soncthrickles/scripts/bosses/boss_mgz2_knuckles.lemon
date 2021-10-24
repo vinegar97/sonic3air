@@ -17,9 +17,9 @@ function void fn06c698()
 
 #if STANDALONE
 	// Use main boss music
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 #else
-	objA0.value26 = 0x2e
+	objA0.value26 = MUSIC_MINIBOSS_2
 #endif
 	StartBossFight()
 

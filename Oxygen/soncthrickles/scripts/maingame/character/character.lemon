@@ -3198,7 +3198,7 @@ function bool Character.performSuperTransformation()
 #if STANDALONE
 	chooseFittingMusic()	// Usually switches to super theme
 #else
-	playMusic(0x2c)
+	playMusic(MUSIC_INVINCIBLE)
 #endif
 
 #if STANDALONE
@@ -3780,7 +3780,7 @@ function void chooseFittingMusic()
 		else if (level.boss_encounter == 2)
 		{
 			// LBZ 2 Big Arms fight
-			playMusic(0x30)
+			playMusic(MUSIC_BIGARMS)
 		}
 		else if (level.boss_encounter == 3)
 		{
@@ -3794,7 +3794,7 @@ function void chooseFittingMusic()
 	}
 	else if (u8[0xffffb000 + 0x2b] & char.bonus.INVINCIBLE)
 	{
-		playMusic(0x2c)		// Invincibility Theme
+		playMusic(MUSIC_INVINCIBLE)		// Invincibility Theme
 	}
 	else
 	{
@@ -3810,7 +3810,7 @@ function void chooseFittingMusic()
 	}
 	else if (super.active || (u8[A1 + 0x2b] & char.bonus.INVINCIBLE))
 	{
-		playMusic(0x2c)
+		playMusic(MUSIC_INVINCIBLE)
 	}
 	else
 	{

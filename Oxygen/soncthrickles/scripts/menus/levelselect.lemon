@@ -132,7 +132,7 @@ function void LevelSelect.init()
 	copyMemory(0xfffffcc0, 0xfffffc40, 0x20)
 	zeroMemory(0xfffffc40, 0x20)
 
-	playMusic(0x2f)
+	playMusic(MUSIC_DATASELECT)
 
 	global.demo_countdown = 1799	// 30 seconds (minus one frame)
 	competition_mode.active = 0
