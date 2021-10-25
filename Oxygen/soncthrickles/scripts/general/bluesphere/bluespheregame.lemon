@@ -1701,7 +1701,7 @@ function void fn04df86()
 	if (global.characters == CHARS_SONIC_ALONE)
 	{
 		objA0.mapping_offset = 0x146620
-		objA0.state = 0x13
+		objA0.state = char.state.WIN_POSE
 
 		objA0.update_address = 0x04dfee
 		fn04dfee()
@@ -1711,7 +1711,7 @@ function void fn04df86()
 	if (global.characters == CHARS_TAILS_ALONE)
 	{
 		objA0.mapping_offset = 0x148eb8
-		objA0.state = 0x13
+		objA0.state = char.state.WIN_POSE
 		objA0.sprite_attributes = 0x86a0
 
 		objA0.update_address = 0x04dffe
@@ -1721,7 +1721,7 @@ function void fn04df86()
 #endif
 	{
 		objA0.mapping_offset = 0x14a8d6
-		objA0.state = 0x24
+		objA0.state = char.state.KNUX_WIN_POSE_BS
 		copyMemory(0xfffffc80, 0x0a8afc, 0x20)
 
 		objA0.update_address = 0x04e000
@@ -1926,7 +1926,7 @@ function void fn04e1c4()
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
-	objA0.state = 0x13
+	objA0.state = char.state.WIN_POSE
 
 	objA0.update_address = 0x04e202
 	fn04e202()
@@ -1939,7 +1939,7 @@ function void fn04e202()
 	if (super.active)
 	{
 		objA0.mapping_offset = 0x146816
-		objA0.state = 0x1f
+		objA0.state = char.state.TRANSFORMING
 		objA0.update_address = 0x04e222
 		u16[A0 + 0x30] = 0x14
 	}
@@ -2023,7 +2023,7 @@ function void fn04e2b8()
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
-	objA0.state = 0x24
+	objA0.state = char.state.KNUX_WIN_POSE_BS
 
 	objA0.update_address = 0x04e2f0
 	fn04e2f0()

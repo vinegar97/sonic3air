@@ -245,7 +245,7 @@ function void fn018466()
 				A0 = A2
 				Character.LandingOnGroundNoSpindash()
 
-				objA0.state = 0x17
+				objA0.state = char.state.DROWNED
 				objA0.flags2a |= 0x02
 				u8[A0 + 0x0a] |= 0x80
 				objA0.velocity.y = 0
