@@ -1,4 +1,7 @@
 {
+
+	// ----- HUD ----- //
+
 	// HUD texts
 	"hud_text_score":	  { "File": "hud_text_sprites.png", "Rect": "0,0,40,12" },
 	"hud_text_time":	  { "File": "hud_text_sprites.png", "Rect": "0,12,40,12" },
@@ -56,8 +59,10 @@
 	"hud_char_minutes": { "File": "hud_text_sprites.png", "Rect": "88,108,8,12" },
 	"hud_char_seconds": { "File": "hud_text_sprites.png", "Rect": "96,108,8,12" },
 
-	// Knuckles continue sprite
-	"continue_icon_knuckles": { "File": "hud_text_sprites.png", "Rect": "0,82,20,24" },
+	// Continue icons
+	"continue_icon_sonic":    { "File": "hud_text_sprites.png", "Rect": "0,82,20,24",  "Center": "12,24" },
+	"continue_icon_tails":    { "File": "hud_text_sprites.png", "Rect": "20,82,20,24", "Center": "10,24" },
+	"continue_icon_knuckles": { "File": "hud_text_sprites.png", "Rect": "40,82,20,24", "Center": "9,24" },
 
 	// Character icon for lives
 	"hud_lives_icon_sonic":    { "File": "hud_life_sprites.png", "Rect": "0,16,48,16" },
