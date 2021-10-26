@@ -100,6 +100,7 @@ define u8 MUSIC_DEZ2			= 0x17
 define u8 MUSIC_MINIBOSS		= 0x18
 define u8 MUSIC_MAINBOSS		= 0x19
 define u8 MUSIC_DDZ				= 0x1a
+define u8 MUSIC_KNUCKLES		= 0x1f
 define u8 MUSIC_TITLESCREEN		= 0x25
 define u8 MUSIC_ENDING			= 0x26
 define u8 MUSIC_GAMEOVER		= 0x27

@@ -578,7 +578,7 @@ function void initializeMainGame()
 		u8 musicId
 		if (global.zone_act == 0x0001 && checkpoint.number == 3)
 		{
-			musicId = 0x01
+			musicId = MUSIC_AIZ1
 		}
 		else if (isKnucklesIntro)
 		{
@@ -587,7 +587,7 @@ function void initializeMainGame()
 			Audio.playAudio("1f", AudioContext.CONTEXT_MUSIC)
 			musicId = 0
 		#else
-			musicId = 0x1f
+			musicId = MUSIC_KNUCKLES
 		#endif
 		}
 		else

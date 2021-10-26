@@ -61,7 +61,7 @@ function void fn0622e4()
 	objA0.countdown_callback = 0x06233e
 
 	A1 = 0x062296
-	objA0.value26 = 0x1f
+	objA0.value26 = MUSIC_KNUCKLES
 	fn085d70()
 
 	level.bossarea.left -= getScreenExtend() * 2
