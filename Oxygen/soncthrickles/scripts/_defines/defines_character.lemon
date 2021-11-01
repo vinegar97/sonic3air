@@ -86,7 +86,7 @@ define u8 char.state.SPINDASH			=  0x09
 define u8 char.state.PULLEY				=  0x0b
 define u8 char.state.BALANCING2			=  0x0c		// More panicky version of balancing
 define u8 char.state.BRAKING			=  0x0d
-define u8 char.state.GRABBED			=  0x0e		// used when the spider badnik in flying battery pick u the player character
+define u8 char.state.GRABBED			=  0x0e		// used when the spider badnik in flying battery pick up the player character
 define u8 char.state.LIFTED				=  0x0f		// Rotating while free falling, being lifted by propeller, etc.
 define u8 char.state.STRAIGHTJUMP		=  0x10		// Straight jump e.g. from a vertical spring
 define u8 char.state.HOLDING_ON			=  0x11		// Holding vertically, used on HCZ breakable bars and in MHZ 2 post-boss cutscene
@@ -105,7 +105,7 @@ define u8 char.state.DISAPPEARED		=  0x1c		// Used directly after entering a Gia
 define u8 char.state.TRANSFORMING		=  0x1f		// Super or hyper transformation
 
 
-// character-specific state constants
+// character specific state constants
 define u8 char.state.SONIC_WHISTLE		=  0x0a		// actually unused
 define u8 char.state.SONIC_DROPDASH		=  0x20		// Sonic with charged drop dash (only in standalone!)
 define u8 char.state.SONIC_HANGON		=  0x22		// Sonic hanging with Tails

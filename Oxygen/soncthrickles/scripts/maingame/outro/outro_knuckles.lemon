@@ -113,7 +113,7 @@ function void fn05e80a()
 
 	#if STANDALONE
 		// Play outro music (not the medley, but the music before that; it's SSZ in the original)
-		playMusic(0x26)
+		playMusic(MUSIC_ENDING)
 	#else
 		PlayMusicAfterLevelResults()
 	#endif

@@ -758,7 +758,7 @@ function void fn05dfee()
 
 	fn06001e()
 
-	playMusic(0xdc)
+	playMusic(MUSIC_CREDITSMEDLEY)
 
 #if STANDALONE
 	// Reset frame counter so we can use it to get the current credits music playback position
@@ -920,7 +920,7 @@ function void fn05e1c2()
 
 	if (outro.ending_type != 2)
 	{
-		playMusic(0xdc)
+		playMusic(MUSIC_CREDITSMEDLEY)
 
 	#if STANDALONE
 		// Reset frame counter so we can use it to get the current credits music playback position

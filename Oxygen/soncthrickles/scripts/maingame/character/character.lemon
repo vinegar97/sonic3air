@@ -443,7 +443,7 @@ function void Character.UpdateNormalState.Tails()
 
 	if (u8[0xfffff7c9] != 0)
 	{
-		if (char.state == 0)
+		if (char.state == char.state.RUNNING)
 			char.state = char.state.former
 	}
 
@@ -3790,7 +3790,7 @@ function void chooseFittingMusic()
 	}
 	else if (super.active || super.active.tails)
 	{
-		playMusic(0xf0)		// Super Theme
+		playMusic(MUSIC_SUPER)		// Super Theme
 	}
 	else if (u8[0xffffb000 + 0x2b] & char.bonus.INVINCIBLE)
 	{

@@ -596,7 +596,7 @@ function void initializeMainGame()
 			// Check if this is the S/T outro
 			if (global.zone_act == 0x0d01)
 			{
-				playMusic(0x26)		// Play Sonic 3 credits (instead of Sky Sanctuary)
+				playMusic(MUSIC_ENDING)		// Play Sonic 3 credits (instead of Sky Sanctuary)
 			}
 			else
 			{

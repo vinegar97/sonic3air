@@ -833,11 +833,11 @@ function void fn085b44()
 		{
 			if (camera.position.x.u16 < 0x0400)
 			{
-				objA0.subtype2c = 0xf2		// Sonic 1 boss music
+				objA0.subtype2c = MUSIC_BOSS_S1		// Sonic 1 boss music
 			}
 			else if (camera.position.x.u16 < 0x1800)
 			{
-				objA0.subtype2c = 0xf3		// Sonic 2 boss music
+				objA0.subtype2c = MUSIC_BOSS_S2		// Sonic 2 boss music
 			}
 		}
 		else if (objA0.subtype2c == MUSIC_MINIBOSS_2)
@@ -853,9 +853,9 @@ function void fn085b44()
 			{
 				u8 option = Game.getSetting(SETTING_AUDIO_HPZ_MUSIC)
 				if (option == 0)
-					objA0.subtype2c = 0xf6		// Enforce mini-boss theme from S3
+					objA0.subtype2c = MUSIC_MINIBOSS_FORCED_S3		// Enforce mini-boss theme from S3
 				else
-					objA0.subtype2c = 0xf7		// Enforce mini-boss theme from S&K
+					objA0.subtype2c = MUSIC_MINIBOSS_FORCED_SK		// Enforce mini-boss theme from S&K
 			}
 		}
 	#endif
@@ -889,7 +889,7 @@ function void PlayMusicAfterLevelResults()
 	// Special handling for LRZ 2 boss
 	if (global.zone_act == 0x1600)
 	{
-		D0.u8 = 0x14
+		D0.u8 = MUSIC_LRZ2
 	}
 	else
 #endif
@@ -906,11 +906,11 @@ function void PlayMusicAfterLevelResults()
 		if (global.zone_act == 0x0a01 || global.zone_act == 0x0d01)
 		{
 			// TODO: Is this part still used / needed?
-			playMusic(0x26)		// Play Sonic 3 credits (instead of Sky Sanctuary)
+			playMusic(MUSIC_ENDING)		// Play Sonic 3 credits (instead of Sky Sanctuary)
 		}
 		else
 		{
-			playMusic(0xf0)		// Super Theme
+			playMusic(MUSIC_SUPER)		// Super Theme
 		}
 	}
 	else

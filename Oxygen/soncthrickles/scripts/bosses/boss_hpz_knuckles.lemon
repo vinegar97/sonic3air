@@ -13,11 +13,11 @@ function u8 BossHPZKnuckles.chooseMusicTrack()
 {
 	u8 option = Game.getSetting(SETTING_AUDIO_HPZ_MUSIC)
 	if (option == 0)
-		return 0xf4		// Knuckles' theme from S3
+		return MUSIC_KNUCKLES_FORCED_S3		// Knuckles' theme from S3
 	else if (option == 1)
-		return 0xf5		// Knuckles' theme from S&K
+		return MUSIC_KNUCKLES_FORCED_SK		// Knuckles' theme from S&K
 	else if (option == 2)
-		return 0xf6		// Mini-boss theme from S3
+		return MUSIC_MINIBOSS_FORCED_S3		// Mini-boss theme from S3
 	return MUSIC_KNUCKLES		// Fallback value, should not get reached
 }
 #endif
