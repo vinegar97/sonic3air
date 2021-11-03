@@ -1,0 +1,28 @@
+name: Nintendo Switch
+
+on:
+  push:
+    branches: [ gha-switch ]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    container: devkitpro/devkita64:20210726
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v1
+    - name: make clean
+      run: make PLATFORM=Switch clean
+      working-directory: Oxygen/soncthrickles/source/_make
+    - name: make 
+      run: make PLATFORM=Switch
+      working-directory: Oxygen/soncthrickles/source/_make
+    - name: Create directory structure
+      working-directory: Oxygen/soncthrickles/source/_make
+      run: |
+        mkdir -p bin/Switch/sd/switch/sonic3air
+        mv bin/Switch/sonic3air.nro bin/Switch/sd/switch/sonic3air/
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        path: Oxygen/soncthrickles/source/_make/bin/Switch/sd
