@@ -240,15 +240,11 @@ function void fn010868()
 	{
 		char.velocity.y -= 0x28
 	}
-	Character.UpdateRotationInAir()
 
-	push(A6)
-	push(A5)
-	push(A4)
+	Character.UpdateRotationInAir()
+	pushA456()
 	Character.CheckCollision()
-	A4 = pop()
-	A5 = pop()
-	A6 = pop()
+	popA456()
 }
 
 
@@ -569,13 +565,9 @@ function void fn01335a()
 	}
 
 	Character.UpdateRotationInAir()
-	push(A6)
-	push(A5)
-	push(A4)
+	pushA456()
 	Character.CheckCollision()
-	A4 = pop()
-	A5 = pop()
-	A6 = pop()
+	popA456()
 }
 
 
@@ -618,15 +610,11 @@ function void fn01348c()
 	{
 		char.velocity.y -= 0x28
 	}
-	Character.UpdateRotationInAir()
 
-	push(A6)
-	push(A5)
-	push(A4)
+	Character.UpdateRotationInAir()
+	pushA456()
 	Character.CheckCollision()
-	A4 = pop()
-	A5 = pop()
-	A6 = pop()
+	popA456()
 }
 
 

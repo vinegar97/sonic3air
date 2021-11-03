@@ -87,7 +87,7 @@ function void Standalone.playAudio(u8 sfxId)
 	}
 
 	// Clear music for level results, emerald jingle, drowning music and outro music
-	if (sfxId == MUSIC_LEVELCLEAR || sfxId == MUSIC_EMERALD || sfxId == MUSIC_DROWNING || sfxId == MUSIC_CREDITSMEDLEY)
+	if (sfxId == MUSIC_LEVELCLEAR || sfxId == MUSIC_CHAOSEMERALD || sfxId == MUSIC_DROWNING || sfxId == MUSIC_CREDITSMEDLEY)
 	{
 		Audio.stopChannel(0)
 	}
