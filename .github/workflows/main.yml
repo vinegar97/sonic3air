@@ -172,11 +172,15 @@ jobs:
 
       - name: Move artifacts
         run: |
-          mkdir artifacts
-          move ./Oxygen/soncthrickles/bin/Debug_x86d/* ./artifacts 
+          mkdir artifacts/Debug_x86d
+          mkdir artifacts/Release_x86
+          mkdir artifacts/Release-Enduser_x86
+          move ./Oxygen/soncthrickles/bin/Debug_x86d/* ./artifacts/Debug_x86d
+          move ./Oxygen/soncthrickles/bin/Release_x86/* ./artifacts/Release_x86
+          move ./Oxygen/soncthrickles/bin/Release-Enduser_x86/* ./artifacts/Release-Enduser_x86
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v1.0.0  
+        uses: actions/upload-artifact@v1.0.0
         with:
-          name: air_debug_x86
+          name: air_x86
           path: artifacts
