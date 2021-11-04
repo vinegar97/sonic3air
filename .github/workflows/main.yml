@@ -157,38 +157,18 @@ jobs:
         run: |
           msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
           msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-      #   msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-      #   msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-
-      - name: Move framework_backup
-        run: |
-          mkdir framework_backup/include
-          mkdir framework_backup/lib
-          Copy-item -Path ./framework/include/* -Destination ./framework_backup/include
-          Copy-item -Path ./framework/lib/* -Destination ./framework_backup/lib
-
-      - name: Upload framework_backup
-        uses: actions/upload-artifact@v1.0.0  
-        with:
-          name: framework_backup
-          path: framework_backup
-      
+      #    msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+      #    msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
 
       - name: Build Sonic 3 A.I.R.
-        continue-on-error: true
+      # continue-on-error: true
         run: |
           msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-      #   msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-      #   msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release-Enduser /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-      #   msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-      #   msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-      #   msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release-Enduser /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-
-      - name: Upload librmx
-        uses: actions/upload-artifact@v1.0.0  
-        with:
-          name: librmx
-          path: librmx
+          msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+          msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release-Enduser /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+      #    msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+      #    msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+      #    msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release-Enduser /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
 
       - name: Move artifacts
         run: |
