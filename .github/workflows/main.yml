@@ -132,9 +132,7 @@ jobs:
       - name: Creating output directories...
         run: |
           mkdir framework/include/ogg
-
           mkdir framework/lib/x86/libogg
-
           mkdir framework/bin/x86
 
       - name: Copying includes...
@@ -446,9 +444,7 @@ jobs:
       - name: Creating output directories...
         run: |
           mkdir framework/include/ogg
-
           mkdir framework/lib/x86/libogg
-
           mkdir framework/bin/x86
 
       - name: Copying includes...
