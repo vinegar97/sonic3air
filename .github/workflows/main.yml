@@ -1,4 +1,4 @@
-name: Build Sonic 3 A.I.R.
+name: Build Sonic 3 A.I.R. - Windows
 
 # Controls when the workflow will run
 on:
@@ -24,27 +24,14 @@ jobs:
       - name: Build libogg
         run: |
           msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-       #   msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=DebugDLL /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-       #   msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=ReleaseDLL /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-       #   msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=DebugDLL /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-       #   msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=ReleaseDLL /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
 
       - name: Creating output directories...
         run: |
           mkdir framework/include/ogg
 
           mkdir framework/lib/x86d/libogg
-          mkdir framework/lib/x86/libogg
-          mkdir framework/lib/x64d/libogg
-          mkdir framework/lib/x64/libogg
 
-          mkdir framework/bin/x86
           mkdir framework/bin/x86d
-          mkdir framework/bin/x64
-          mkdir framework/bin/x64d
 
       - name: Copying includes...
         run: |
@@ -53,25 +40,16 @@ jobs:
       - name: Copying LIBs...
         run: |
           Copy-item -Path ./framework/external/ogg-vorbis/libogg/win32/VS2015/Win32/Debug/*.lib -Destination ./framework/lib/x86d/libogg/
-          Copy-item -Path ./framework/external/ogg-vorbis/libogg/win32/VS2015/Win32/Release/*.lib -Destination ./framework/lib/x86/libogg/
-          Copy-item -Path ./framework/external/ogg-vorbis/libogg/win32/VS2015/x64/Debug/*.lib -Destination ./framework/lib/x64d/libogg/
-          Copy-item -Path ./framework/external/ogg-vorbis/libogg/win32/VS2015/x64/Release/*.lib -Destination ./framework/lib/x64/libogg/
 
       - name: Build libvorbis
         run: |
           msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
 
       - name: Creating output directories...
         run: |
           mkdir framework/include/vorbis
 
           mkdir framework/lib/x86d/libvorbis
-          mkdir framework/lib/x86/libvorbis
-          mkdir framework/lib/x64d/libvorbis
-          mkdir framework/lib/x64/libvorbis
 
       - name: Copying includes...
         run: |
@@ -80,26 +58,17 @@ jobs:
       - name: Copying LIBs...
         run: |
           Copy-item -Path ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/Win32/Debug/*.lib -Destination ./framework/lib/x86d/libvorbis/
-          Copy-item -Path ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/Win32/Release/*.lib -Destination ./framework/lib/x86/libvorbis/
-          Copy-item -Path ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/x64/Debug/*.lib -Destination ./framework/lib/x64d/libvorbis/
-          Copy-item -Path ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/x64/Release/*.lib -Destination ./framework/lib/x64/libvorbis/
 
       - name: Build SDL
         continue-on-error: true
         run: |
           msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
 
       - name: Creating output directories...
         run: |
           mkdir framework/include/sdl
 
           mkdir framework/lib/x86d/sdl
-          mkdir framework/lib/x86/sdl
-          mkdir framework/lib/x64d/sdl
-          mkdir framework/lib/x64/sdl
 
       - name: Copying includes...
         run: |
@@ -108,20 +77,11 @@ jobs:
       - name: Copying LIBs...
         run: |
           Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Debug/SDL2.lib -Destination ./framework/lib/x86d/sdl/
-          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Release/SDL2.lib -Destination ./framework/lib/x86/sdl/
           Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Debug/SDL2main.lib -Destination ./framework/lib/x86d/sdl/
-          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Release/SDL2main.lib -Destination ./framework/lib/x86/sdl/
-          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/x64/Debug/SDL2.lib -Destination ./framework/lib/x64d/sdl/
-          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/x64/Release/SDL2.lib -Destination ./framework/lib/x64/sdl/
-          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/x64/Debug/SDL2main.lib -Destination ./framework/lib/x64d/sdl/
-          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/x64/Release/SDL2main.lib -Destination ./framework/lib/x64/sdl/
 
       - name: Build zlib
         run: |
           msbuild ./framework/external/zlib/_vstudio/zlib.sln /p:Configuration=Debug /p:Platform=x86 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./framework/external/zlib/_vstudio/zlib.sln /p:Configuration=Release /p:Platform=x86 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./framework/external/zlib/_vstudio/zlib.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./framework/external/zlib/_vstudio/zlib.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
 
       - name: Creating output directories...
         run: |
@@ -129,13 +89,7 @@ jobs:
           mkdir framework/include/minizip
 
           mkdir framework/lib/x86d/zlib
-          mkdir framework/lib/x86/zlib
-          mkdir framework/lib/x64d/zlib
-          mkdir framework/lib/x64/zlib
           mkdir framework/lib/x86d/minizip
-          mkdir framework/lib/x86/minizip
-          mkdir framework/lib/x64d/minizip
-          mkdir framework/lib/x64/minizip
 
       - name: Copying includes...
         run: |
@@ -145,42 +99,241 @@ jobs:
       - name: Copying LIBs...
         run: |
           Copy-item -Path ./framework/external/zlib/lib/Debug_x86/zlib.lib -Destination ./framework/lib/x86d/zlib/
-          Copy-item -Path ./framework/external/zlib/lib/Release_x86/zlib.lib -Destination ./framework/lib/x86/zlib/
-          Copy-item -Path ./framework/external/zlib/lib/Debug_x64/zlib.lib -Destination ./framework/lib/x64d/zlib/
-          Copy-item -Path ./framework/external/zlib/lib/Release_x64/zlib.lib -Destination ./framework/lib/x64/zlib/
           Copy-item -Path ./framework/external/zlib/lib/Debug_x86/minizip.lib -Destination ./framework/lib/x86d/minizip/
-          Copy-item -Path ./framework/external/zlib/lib/Release_x86/minizip.lib -Destination ./framework/lib/x86/minizip/
-          Copy-item -Path ./framework/external/zlib/lib/Debug_x64/minizip.lib -Destination ./framework/lib/x64d/minizip/
-          Copy-item -Path ./framework/external/zlib/lib/Release_x64/minizip.lib -Destination ./framework/lib/x64/minizip/
 
       - name: Build librmx
         run: |
           msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-      #    msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-      #    msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
 
       - name: Build Sonic 3 A.I.R.
-      # continue-on-error: true
         run: |
           msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release-Enduser /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-      #    msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-      #    msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-      #    msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release-Enduser /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
 
       - name: Move artifacts
         run: |
           mkdir artifacts/Debug_x86d
-          mkdir artifacts/Release_x86
-          mkdir artifacts/Release-Enduser_x86
           move ./Oxygen/soncthrickles/bin/Debug_x86d/* ./artifacts/Debug_x86d
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: air_debug_x86
+          path: artifacts
+
+  windows-air_release_x86:
+    runs-on: windows-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Build libogg
+        run: |
+          msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+
+      - name: Creating output directories...
+        run: |
+          mkdir framework/include/ogg
+
+          mkdir framework/lib/x86/libogg
+
+          mkdir framework/bin/x86
+
+      - name: Copying includes...
+        run: |
+          Copy-item -Path ./framework/external/ogg-vorbis/libogg/include/ogg/* -Destination ./framework/include/ogg/
+
+      - name: Copying LIBs...
+        run: |
+          Copy-item -Path ./framework/external/ogg-vorbis/libogg/win32/VS2015/Win32/Release/*.lib -Destination ./framework/lib/x86/libogg/
+
+      - name: Build libvorbis
+        run: |
+          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+
+      - name: Creating output directories...
+        run: |
+          mkdir framework/include/vorbis
+
+          mkdir framework/lib/x86/libvorbis
+
+      - name: Copying includes...
+        run: |
+          Copy-item -Path ./framework/external/ogg-vorbis/libvorbis/include/vorbis/* -Destination ./framework/include/vorbis/
+
+      - name: Copying LIBs...
+        run: |
+          Copy-item -Path ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/Win32/Release/*.lib -Destination ./framework/lib/x86/libvorbis/
+
+      - name: Build SDL
+        continue-on-error: true
+        run: |
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+
+      - name: Creating output directories...
+        run: |
+          mkdir framework/include/sdl
+
+          mkdir framework/lib/x86/sdl
+
+      - name: Copying includes...
+        run: |
+          Copy-item -Path ./framework/external/sdl/SDL2/include/* -Destination ./framework/include/sdl/
+
+      - name: Copying LIBs...
+        run: |
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Release/SDL2.lib -Destination ./framework/lib/x86/sdl/
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Release/SDL2main.lib -Destination ./framework/lib/x86/sdl/
+
+      - name: Build zlib
+        run: |
+          msbuild ./framework/external/zlib/_vstudio/zlib.sln /p:Configuration=Release /p:Platform=x86 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+
+      - name: Creating output directories...
+        run: |
+          mkdir framework/include/zlib
+          mkdir framework/include/minizip
+
+          mkdir framework/lib/x86/zlib
+          mkdir framework/lib/x86/minizip
+
+      - name: Copying includes...
+        run: |
+          Copy-item -Path ./framework/external/zlib/zlib/*.h -Destination ./framework/include/zlib/
+          Copy-item -Path ./framework/external/zlib/zlib/contrib/minizip/*.h -Destination ./framework/include/minizip/
+
+      - name: Copying LIBs...
+        run: |
+          Copy-item -Path ./framework/external/zlib/lib/Release_x86/zlib.lib -Destination ./framework/lib/x86/zlib/
+          Copy-item -Path ./framework/external/zlib/lib/Release_x86/minizip.lib -Destination ./framework/lib/x86/minizip/
+
+      - name: Build librmx
+        run: |
+          msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+
+      - name: Build Sonic 3 A.I.R.
+        run: |
+          msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+
+      - name: Move artifacts
+        run: |
+          mkdir artifacts/Release_x86
           move ./Oxygen/soncthrickles/bin/Release_x86/* ./artifacts/Release_x86
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: air_release_x86
+          path: artifacts
+
+  windows-air_release-enduser_x86:
+    runs-on: windows-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Build libogg
+        run: |
+          msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+
+      - name: Creating output directories...
+        run: |
+          mkdir framework/include/ogg
+
+          mkdir framework/lib/x86/libogg
+
+          mkdir framework/bin/x86
+
+      - name: Copying includes...
+        run: |
+          Copy-item -Path ./framework/external/ogg-vorbis/libogg/include/ogg/* -Destination ./framework/include/ogg/
+
+      - name: Copying LIBs...
+        run: |
+          Copy-item -Path ./framework/external/ogg-vorbis/libogg/win32/VS2015/Win32/Release/*.lib -Destination ./framework/lib/x86/libogg/
+
+      - name: Build libvorbis
+        run: |
+          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+
+      - name: Creating output directories...
+        run: |
+          mkdir framework/include/vorbis
+
+          mkdir framework/lib/x86/libvorbis
+
+      - name: Copying includes...
+        run: |
+          Copy-item -Path ./framework/external/ogg-vorbis/libvorbis/include/vorbis/* -Destination ./framework/include/vorbis/
+
+      - name: Copying LIBs...
+        run: |
+          Copy-item -Path ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/Win32/Release/*.lib -Destination ./framework/lib/x86/libvorbis/
+
+      - name: Build SDL
+        continue-on-error: true
+        run: |
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+
+      - name: Creating output directories...
+        run: |
+          mkdir framework/include/sdl
+
+          mkdir framework/lib/x86/sdl
+
+      - name: Copying includes...
+        run: |
+          Copy-item -Path ./framework/external/sdl/SDL2/include/* -Destination ./framework/include/sdl/
+
+      - name: Copying LIBs...
+        run: |
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Release/SDL2.lib -Destination ./framework/lib/x86/sdl/
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Release/SDL2main.lib -Destination ./framework/lib/x86/sdl/
+
+      - name: Build zlib
+        run: |
+          msbuild ./framework/external/zlib/_vstudio/zlib.sln /p:Configuration=Release /p:Platform=x86 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+
+      - name: Creating output directories...
+        run: |
+          mkdir framework/include/zlib
+          mkdir framework/include/minizip
+
+          mkdir framework/lib/x86/zlib
+          mkdir framework/lib/x86/minizip
+
+      - name: Copying includes...
+        run: |
+          Copy-item -Path ./framework/external/zlib/zlib/*.h -Destination ./framework/include/zlib/
+          Copy-item -Path ./framework/external/zlib/zlib/contrib/minizip/*.h -Destination ./framework/include/minizip/
+
+      - name: Copying LIBs...
+        run: |
+          Copy-item -Path ./framework/external/zlib/lib/Release_x86/zlib.lib -Destination ./framework/lib/x86/zlib/
+          Copy-item -Path ./framework/external/zlib/lib/Release_x86/minizip.lib -Destination ./framework/lib/x86/minizip/
+
+      - name: Build librmx
+        run: |
+          msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+
+      - name: Build Sonic 3 A.I.R.
+        run: |
+          msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release-Enduser /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+
+      - name: Move artifacts
+        run: |
+          mkdir artifacts/Release-Enduser_x86
           move ./Oxygen/soncthrickles/bin/Release-Enduser_x86/* ./artifacts/Release-Enduser_x86
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v1.0.0
         with:
-          name: air_x86
+          name: air_release-enduser_x86
           path: artifacts
