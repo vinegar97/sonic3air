@@ -4,6 +4,7 @@ name: Build Sonic 3 A.I.R. - Windows
 on:
   push:
     branches:
+      - main
       - Actions_test
 
   # Allows you to run this workflow manually from the Actions tab
