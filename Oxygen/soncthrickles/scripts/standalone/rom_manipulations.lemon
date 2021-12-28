@@ -13,6 +13,11 @@
 function void ApplyROMManipulations()
 {
 	ROMManipulation.RepairSpriteMappings()
+
+#if COAL
+	ROMManipulation.RepairAnimations()
+#endif
+
 	ROMManipulation.CutsceneKnucklesPalette()
 	ROMManipulation.AIZ2.StartPosition()
 	ROMManipulation.AIZ2.BlimpSequenceBombs()
@@ -38,11 +43,36 @@ function void ROMManipulation.RepairSpriteMappings()
 	// Fix for slight offset in Super Sonic transformation sprites (0xd5 and 0xd6)
 	s16[0x148160] = -0x0e
 	s16[0x148174] = -0x0e
+	
+#if COAL
+	// Fix for pattern pointer to the correct location in Super Sonic's unused idle sprite frame
+	u8[0x1484f1] = 0x16
+	u8[0x1484f7] = 0x16
+	u8[0x1484fd] = 0x16
+	u8[0x148507] = 0x16
+#endif
 
 	// Fix for the HCZ blow fish ("Pointdexter")
 	s8[0x360e8e] = -0x08
 	s8[0x360e9a] = -0x08
 }
+
+
+#if COAL
+function void ROMManipulation.RepairAnimations()
+{
+	// apply changes to Super Sonic's idle animation to use the unused frame
+	u8[0x012c45] = 0x4e	// change where the pointer leads to an otherwise empty area
+
+	// add the actual animation
+	u8[0x012c88] = 0x07
+	u32[0x012c89] = 0xbabbbcbb
+
+	// fix Tails' rolling animation to not play backwards
+	u32[0x015b18] = 0x01989796
+	u32[0x015b1d] = 0x00989796
+}
+#endif
 
 
 function void ROMManipulation.CutsceneKnucklesPalette()
