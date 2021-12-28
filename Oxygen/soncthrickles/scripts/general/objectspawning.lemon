@@ -729,7 +729,7 @@ function void spawnSimpleChildObjects(u32 address)
 //# address-hook(0x084220) end(0x084256)
 function void SpawnSimpleChildObjects()
 {
-	// Very commonly child spawning function, spawns multiple of the same but with different subtypes.
+	// Very commonly used child spawning function, spawns multiple of the same but with different subtypes.
 	// Stored data, shared for all children:
 	//  - Update routine
 

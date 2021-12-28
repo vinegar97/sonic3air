@@ -364,11 +364,11 @@ function void renderNextObject()
 			}
 		}
 
-		D3.u16 = u16[A0 + 0x16] - 1
+		D3.u16 = u16[A0 + 0x16] - 1	// number of child sprites
 		if (D3.s16 < 0)
-			return
+			return	// skip if none
 
-		A0 += 0x18
+		A0 += 0x18	// start of child sprite data (u8[A0 = 0x05] = map frame)
 
 	#if STANDALONE
 		while (D3.s16 >= 0)
@@ -376,15 +376,16 @@ function void renderNextObject()
 		while (D3.s16 >= 0 && D7.s16 >= 0)
 	#endif
 		{
-			D0.u16 = u16[A0]
-			D1.u16 = u16[A0 + 2]
+			D0.u16 = u16[A0]	// child sprite x position
+			D1.u16 = u16[A0 + 2]	// child sprite y position
 			if (D6 & render_flag.WORLD)
 			{
 				D0.u16 = (D0.u16 + 0x80 - cameraX)
 				D1.u16 = (D1.u16 + 0x80 - cameraY) & level.height.bitmask
 			}
-			D4 = u16(u8[A0 + 5]) * 2
-			A0 += 6
+
+			D4 = u16(u8[A0 + 5]) * 2	// child sprite map frame id
+			A0 += 6	// to next child sprite (?)
 
 			A1 = tableLookupAddress(A2, D4.u16)
 			D4.u16 = u16[A1] - 1
@@ -425,14 +426,13 @@ function void renderNextObject()
 		}
 
 		objA0.render_flags |= render_flag.VISIBLE
-	#if !STANDALONE
-		if (D7.s16 < 0)
-			return
-	#endif
 
 	#if STANDALONE
 		Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
 		if (Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))
+			return
+	#else
+		if (D7.s16 < 0)
 			return
 	#endif
 

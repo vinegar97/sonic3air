@@ -1246,7 +1246,8 @@ function void UpdateKnucklesGlide()
 		char.velocity.x = (dx * char.groundspeed) >> 8
 		char.velocity.y += (char.velocity.y >= 0x80) ? -0x20 : 0x20
 
-		if (level.vertical_wrap != 0xff00)
+		// drastically reduce glide speed around the top boundary of level
+		if (level.vertical_wrap != 0xff00)	// ...but only if vertical wrap is disabled
 		{
 			D0.s16 = level.vertical_wrap + 0x10
 			if (D0.s16 > s16(char.position.y.u16))
