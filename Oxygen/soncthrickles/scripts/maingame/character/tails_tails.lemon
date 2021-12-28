@@ -40,7 +40,7 @@ function void TailsTails.Update()
 	objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
 
 	D0 = u8[A2 + 0x20]
-	if ((u8[A2 + 0x2a] & 0x20) && u8[0xfffff7c9] == 0)
+	if ((u8[A2 + 0x2a] & char.flag.PUSHING) && u8[0xfffff7c9] == 0)
 	{
 		if (u8[A2 + 0x22] >= 0xa9 && u8[A2 + 0x22] <= 0xac)	// range of Tails' pushing animation frames
 		{
