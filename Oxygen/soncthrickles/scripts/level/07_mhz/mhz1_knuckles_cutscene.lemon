@@ -226,7 +226,7 @@ function void fn062cf8()
 	objA1.position.x.u16 = D0.u16
 	u8[0xfffffab8] = 0x04
 	u8[A1 + 0x04] &= ~render_flag.FLIP_X
-	u8[A1 + 0x2a] &= ~0x01
+	u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 	player1.control_override = 0xff
 	control.player1 = 0
 	StopObjectA1()
@@ -238,7 +238,7 @@ function void fn062cf8()
 //# address-hook(0x062d2c) end(0x062d3c)
 function void fn062d2c()
 {
-	if (u8[A1 + 0x2a] & 0x02)
+	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 		return
 
 	u8[0xfffffab8] = 0x06
@@ -335,7 +335,7 @@ function void fn062ddc()
 			if (D0.u16 > objA1.position.x.u16)
 				return
 
-			u8[A1 + 0x20] = 0x08
+			u8[A1 + 0x20] = char.state.COWERING
 			StopObjectA1()
 		}
 		else if (s8[A1 + 0x04] >= 0)

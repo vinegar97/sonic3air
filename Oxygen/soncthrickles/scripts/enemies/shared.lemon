@@ -1692,7 +1692,7 @@ function void fn086334()
 		--objA0.countdown_value
 		D0.u16 = 0x4808
 	}
-	if (u8[0xffffb02a] & 0x20)
+	if (u8[0xffffb02a] & char.flag.PUSHING)
 	{
 		objA0.countdown_value = 0x1f
 		D0.u16 = 0x4848

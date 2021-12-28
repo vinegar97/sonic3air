@@ -86,7 +86,7 @@ define u8 char.state.SPINDASH			=  0x09
 define u8 char.state.PULLEY				=  0x0b
 define u8 char.state.BALANCING2			=  0x0c		// More panicky version of balancing
 define u8 char.state.BRAKING			=  0x0d
-define u8 char.state.GRABBED			=  0x0e		// used when the spider badnik in flying battery pick up the player character
+define u8 char.state.GRABBED			=  0x0e		// Used when the spider badnik in flying battery picks up the player character
 define u8 char.state.LIFTED				=  0x0f		// Rotating while free falling, being lifted by propeller, etc.
 define u8 char.state.STRAIGHTJUMP		=  0x10		// Straight jump e.g. from a vertical spring
 define u8 char.state.HOLDING_ON			=  0x11		// Holding vertically, used on HCZ breakable bars and in MHZ 2 post-boss cutscene
@@ -94,7 +94,7 @@ define u8 char.state.HOLDING_ON			=  0x11		// Holding vertically, used on HCZ br
 define u8 char.state.WIN_POSE			=  0x13
 define u8 char.state.HANGING			=  0x14
 define u8 char.state.BREATHE			=  0x15
-define u8 char.state.DIED_GREY			=  0x16		// actually unused
+define u8 char.state.DIED_GREY			=  0x16		// Actually unused
 define u8 char.state.DROWNED			=  0x17
 define u8 char.state.DIED				=  0x18
 define u8 char.state.GOT_HURT_PANIC		=  0x19		// With animated arms, used only in certain places (e.g. after snowboarding)
@@ -106,10 +106,11 @@ define u8 char.state.TRANSFORMING		=  0x1f		// Super or hyper transformation
 
 
 // character specific state constants
-define u8 char.state.SONIC_WHISTLE		=  0x0a		// actually unused
+define u8 char.state.SONIC_WHISTLE		=  0x0a		// Actually unused
 define u8 char.state.SONIC_DROPDASH		=  0x20		// Sonic with charged drop dash (only in standalone!)
 define u8 char.state.SONIC_HANGON		=  0x22		// Sonic hanging with Tails
 
+define u8 char.state.TAILS_RUNNING3		=  0x1f
 define u8 char.state.TAILS_FLYDOWN		=  0x20		// Tails flying down
 define u8 char.state.TAILS_FLYUP		=  0x21		// Tails flying up
 define u8 char.state.TAILS_CARRYDOWN	=  0x22		// Tails flying down, carrying other player
@@ -125,7 +126,7 @@ define u8 char.state.KNUX_FLYCLIMB		=  0x20		// Knuckles flying or climbing
 define u8 char.state.KNUX_FALLING		=  0x21		// Knuckles falling after flight
 define u8 char.state.KNUX_STANDUP		=  0x22		// Knuckles standing up after flying (when sliding)
 define u8 char.state.KNUX_STANDUP2		=  0x23		// Knuckles standing up after flying and falling
-define u8 char.state.KNUX_WIN_POSE_BS	=  0x24		// Knuckles' win pose during the result screen for blue Sphere mode
+define u8 char.state.KNUX_WIN_POSE_BS	=  0x24		// Knuckles' win pose during the result screen for Blue Sphere mode
 
 // Animation
 define char.animation.sprite	=  u8[A0 + 0x22]	// Currently shown animation sprite
@@ -153,9 +154,9 @@ define u8 char.flag.UNDERWATER		=  0x40			// Under water
 
 // Bonus effects
 define char.bonus_effect				=  u8[A0 + 0x2b]
-define u8 char.bonus.ANY_SHIELD			=  0x01
+define u8 char.bonus.ANY_SHIELD			=  0x01	// also sometimes used for classic shield in standalone
 define u8 char.bonus.INVINCIBLE			=  0x02
-define u8 char.bonus.SPEED_UP			=  0x04
+define u8 char.bonus.SPEED_UP			=  0x04	// also used for slow shoes in competition mode
 define u8 char.bonus.SHIELD_FIRE		=  0x10
 define u8 char.bonus.SHIELD_LIGHTNING	=  0x20
 define u8 char.bonus.SHIELD_BUBBLE		=  0x40

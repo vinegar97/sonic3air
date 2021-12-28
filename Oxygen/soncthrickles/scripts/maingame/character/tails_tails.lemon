@@ -42,9 +42,9 @@ function void TailsTails.Update()
 	D0 = u8[A2 + 0x20]
 	if ((u8[A2 + 0x2a] & 0x20) && u8[0xfffff7c9] == 0)
 	{
-		if (u8[A2 + 0x22] >= 0xa9 && u8[A2 + 0x22] <= 0xac)
+		if (u8[A2 + 0x22] >= 0xa9 && u8[A2 + 0x22] <= 0xac)	// range of Tails' pushing animation frames
 		{
-			D0 = 4
+			D0 = 4	// set appropriate tail animation manually, because char.state isn't actually set for character pushing animation
 		}
 	}
 	if (u8[A0 + 0x34] != D0.u8)
@@ -93,7 +93,7 @@ function void fn0161fa()
 	objA0.box_size.y = 0x18
 	objA0.render_flags = 0x04
 
-	u32[A0] = 0x016232
+	objA0.update_address = 0x016232
 	fn016232()
 }
 

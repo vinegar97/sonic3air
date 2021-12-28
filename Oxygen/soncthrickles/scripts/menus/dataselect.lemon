@@ -159,7 +159,7 @@ function void fn00c97a()
 	A3 = 0xffffb128
 	D7.u16 = 0xd220
 	A0 = 0xffffe6ac
-	D6 = 7
+	D6 = 7	// number of save slots
 
 	while (D6.s16 >= 0)
 	{
@@ -200,8 +200,9 @@ function void fn00c97a()
 		}
 		else
 		{
-			D0.u8 = u8[A3 + 0x3e]
-			fn00ca14()
+			// lives digits
+			D0.u8 = u8[A3 + 0x3e]	// get lives data from save file
+			fn00ca14()	// render lives digits
 
 			D0.u16 = D7.u16 + 6
 			fn00c87e()
@@ -209,8 +210,9 @@ function void fn00c97a()
 			D2 = 1
 			fn001506()
 
-			D0.u8 = u8[A3 + 0x3f]
-			fn00ca14()
+			// continues digits
+			D0.u8 = u8[A3 + 0x3f] 	// get continues data from save file
+			fn00ca14()	// render continues digits
 
 			D0.u16 = D7.u16 + 0x0306
 			fn00c87e()
@@ -239,9 +241,13 @@ function void fn00ca14()
 	}
 
 	A1 = 0xffffeeea		// Start address of vertical scroll offsets, looks like we're abusing this for something else here
-	D1.u16 = (D1.u16 == 0) ? 0x28 : (D1.u16 << 2)
+
+	// render second digit (10, 20, etc)
+	D1.u16 = (D1.u16 == 0) ? 0x28 : (D1.u16 << 2)	// don't render zero for second digit
 	u16[A1] = u16[0x00ca4c + D1.s16]
 	u16[A1 + 0x04] = u16[0x00ca4e + D1.s16]
+	
+	// render first digit (1, 2, etc)
 	D0.u16 = D0.u8 * 4
 	u16[A1 + 0x02] = u16[0x00ca4c + D0.s16]
 	u16[A1 + 0x06] = u16[0x00ca4e + D0.s16]
@@ -292,13 +298,15 @@ function void DataSelect.setup()
 
 	A1 = 0x00db1c
 	D0.u16 = 0xcc06
-	fn00d9f4()
+	fn00d9f4()	// render "NO" label
 
+	// A1 = 0x00db1f
 	D0.u16 = 0xcc0c
-	fn00d9f4()
+	fn00d9f4()	// render "SAVE" label
 
+	// A1 = 0x00db24
 	D0.u16 = 0xccec
-	fn00d9f4()
+	fn00d9f4()	// render "DELETE" label
 
 	A0 = 0x39d4a4
 	A1 = 0xffff0000

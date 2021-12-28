@@ -1272,14 +1272,7 @@ function void fn00b74e()
 	global.level_started = 0
 	u16[0xffffeee8] = 30
 
-	// A0 = 0x39d2a2
-	// A1 = 0xffff0000
-	// D0.u16 = 0x01
 	Enigma.decompress(0x39d2a2, 0xffff0000, 0x01)
-
-	// A0 = 0x20ae62
-	// A1 = 0xffff1000
-	// D0.u16 = 0xa34a
 	Enigma.decompress(0x20ae62, 0xffff1000, 0xa34a)
 
 	A0 = 0x00bbac

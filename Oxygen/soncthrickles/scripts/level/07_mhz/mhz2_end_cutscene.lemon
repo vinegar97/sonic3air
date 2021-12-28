@@ -36,12 +36,12 @@ function void fn08639c()
 	if (D0.u16 < objA1.position.x.u16)
 	{
 		u8[A1 + 0x04] |= render_flag.FLIP_X
-		u8[A1 + 0x2a] |= 0x01
+		u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 	}
 	else
 	{
 		u8[A1 + 0x04] &= ~render_flag.FLIP_X
-		u8[A1 + 0x2a] &= ~0x01
+		u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 	}
 }
 
@@ -384,9 +384,9 @@ function void fn07646e()
 	objA0.update_address = 0x076492
 	A1 = 0xffffb04a
 	u8[A1 + 0x2e] = 0x81
-	u8[A1 + 0x20] = 0x20
+	u8[A1 + 0x20] = char.state.TAILS_FLYDOWN
 	u8[A1 + 0x04] &= ~render_flag.FLIP_X
-	u8[A1 + 0x2a] &= ~0x01
+	u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 }
 
 

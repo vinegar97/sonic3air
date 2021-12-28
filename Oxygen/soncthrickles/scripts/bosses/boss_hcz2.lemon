@@ -1203,9 +1203,9 @@ function void fn06bada()
 function void fn06bb02()
 {
 	u8[A0 + D4.s16] = 0
-	u8[A2 + 0x2a] |= 0x02
+	u8[A2 + 0x2a] |= char.flag.IN_AIR
 	u8[A2 + 0x2e] = 0
-	u8[A2 + 0x20] = 0x02
+	u8[A2 + 0x20] = char.state.ROLLING
 	u16[A2 + 0x1a] = -0x200
 }
 

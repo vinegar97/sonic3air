@@ -22,6 +22,10 @@ define u16 CHARS_SONIC_ALONE	 = 1
 define u16 CHARS_TAILS_ALONE	 = 2
 define u16 CHARS_KNUCKLES_ALONE	 = 3
 
+#if STANDALONE
+define u16 CHARS_KNUCKLES_AND_TAILS	 = 4
+#endif
+
 // Character abilities
 define u8 DROPDASH_FULLCHARGE	 = 0x15
 
@@ -100,7 +104,16 @@ define u8 MUSIC_DEZ2			= 0x17
 define u8 MUSIC_MINIBOSS		= 0x18
 define u8 MUSIC_MAINBOSS		= 0x19
 define u8 MUSIC_DDZ				= 0x1a
+define u8 MUSIC_GLOWINGSPHERES	= 0x1b
+define u8 MUSIC_SPECIALSTAGE	= 0x1c
+define u8 MUSIC_SLOTMACHINE		= 0x1d
+define u8 MUSIC_GUMBALLMACHINE	= 0x1e
 define u8 MUSIC_KNUCKLES		= 0x1f
+define u8 MUSIC_ALZ				= 0x20
+define u8 MUSIC_BPZ				= 0x21
+define u8 MUSIC_DPZ				= 0x22
+define u8 MUSIC_CGZ				= 0x23
+define u8 MUSIC_EMZ				= 0x24
 define u8 MUSIC_TITLESCREEN		= 0x25
 define u8 MUSIC_ENDING			= 0x26
 define u8 MUSIC_GAMEOVER		= 0x27
@@ -118,6 +131,7 @@ define u8 MUSIC_GAMECLEAR		= 0x32
 
 define u8 MUSIC_CREDITSMEDLEY	= 0xdc
 
+#if STANDALONE
 // the following only applies in standalone
 define u8 MUSIC_SUPER			= 0xf0	// Super transformation theme
 define u8 MUSIC_BOSS_S1			= 0xf2	// Boss theme from Sonic 1
@@ -126,6 +140,7 @@ define u8 MUSIC_KNUCKLES_FORCED_S3			= 0xf4	// forced to play the Sonic 3 versio
 define u8 MUSIC_KNUCKLES_FORCED_SK			= 0xf5	// forced to play the Sonic & Knuckles version of Knuckles' theme, regardless of menu setting
 define u8 MUSIC_MINIBOSS_FORCED_S3			= 0xf6	// forced to play the Sonic 3 version of the miniboss theme, regardless of menu setting
 define u8 MUSIC_MINIBOSS_FORCED_SK			= 0xf7	// forced to play the Sonic & Knuckles version of the miniboss theme, regardless of menu setting
+#endif
 
 define u8 SFX_RING				= 0x33	// Alternating between left and right channel
 define u8 SFX_RING_ALT			= 0x34	// Alternative ring sfx, not alternating

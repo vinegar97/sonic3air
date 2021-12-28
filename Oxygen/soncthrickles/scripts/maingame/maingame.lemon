@@ -814,7 +814,7 @@ function void SetGlobalCharacters()
 		global.characters = levelselect.characters
 	#if STANDALONE
 		// Handle Knuckles & Tails
-		useKnucklesAndTails = (global.characters == 4)
+		useKnucklesAndTails = (global.characters == CHARS_KNUCKLES_AND_TAILS)
 		global.characters = min(global.characters, 3)
 	#endif
 	}
@@ -1780,8 +1780,8 @@ function void fn0067ee()
 		objA1.state = char.state.FALLING_PANIC
 		if (global.characters == CHARS_KNUCKLES_ALONE)
 		{
-			u16[A1 + 0x20] = 0x2121
-			u8[A1 + 0x23] = 1
+			objA1.state.both = 0x2121
+			objA1.animation.frame = 1
 			objA1.animation.timer = 0	// This is A0 instead of A1 in original, thanks to Clownacy (https://forums.sonicretro.org/index.php?showtopic=30778&view=findpost&p=893997)
 		}
 		objA1.flags2a |= char.flag.IN_AIR
@@ -2101,7 +2101,7 @@ function void InitializeGameCharacters()
 function void fn006bd8()
 {
 	// Only used in competition mode
-	D1 = (D0.u8 == 1) ? 0x013102 : 0x0105c4
+	D1 = (D0.u8 == CHARACTER_TAILS) ? 0x013102 : 0x0105c4
 }
 
 

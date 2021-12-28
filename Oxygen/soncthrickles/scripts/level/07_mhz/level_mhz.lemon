@@ -1368,8 +1368,8 @@ function void fn05560c()
 
 function void fn0556b8()
 {
-	if (u8[A1 + 0x20] == 5)
-		u8[A1 + 0x20] = 0
+	if (u8[A1 + 0x20] == char.state.STANDING)
+		u8[A1 + 0x20] = char.state.RUNNING
 
 	// Check against left / right movement bounds
 	D0.u16 += 0x18

@@ -570,7 +570,7 @@ function void fn076e94()
 	u16[A2 + 0x10] = D0.u16
 	u16[A1] = 0
 	u8[A2 + 0x04] &= ~render_flag.FLIP_X
-	u8[A2 + 0x2a] &= ~0x01
+	u8[A2 + 0x2a] &= ~char.flag.FACING_LEFT
 	u16[A2 + 0x18] = 0
 	u16[A2 + 0x1a] = 0
 	u16[A2 + 0x1c] = 0

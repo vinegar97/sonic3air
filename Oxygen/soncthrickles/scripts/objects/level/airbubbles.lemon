@@ -283,8 +283,8 @@ function void fn02fbb2()
 	if (D0.u16 <= D1.u16 || D0.u16 > D1.u16 + 0x10)
 		return
 
-	if (u8[A1 + 0x2b] & 0x40)
-		return
+	if (u8[A1 + 0x2b] & char.bonus.SHIELD_BUBBLE)
+		return	// ignore if player has a bubble shield
 
 	// Collect bubble
 	UpdateMusicOnWaterTransition()
@@ -294,7 +294,7 @@ function void fn02fbb2()
 	objA1.velocity.x = 0
 	objA1.velocity.y = 0
 	u16[A1 + 0x1c] = 0
-	u8[A1 + 0x20] = 0x15
+	u8[A1 + 0x20] = char.state.BREATHE
 	u16[A1 + 0x32] = 0x23
 	u8[A1 + 0x40] = 0
 	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)

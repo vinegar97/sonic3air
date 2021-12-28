@@ -223,7 +223,7 @@ function bool LevelSelect.innerUpdate()
 		global.characters = levelselect.characters
 	#if STANDALONE
 		// Handle Knuckles & Tails
-		useKnucklesAndTails = (global.characters == 4)
+		useKnucklesAndTails = (global.characters == CHARS_KNUCKLES_AND_TAILS)
 		global.characters = min(global.characters, 3)
 	#endif
 

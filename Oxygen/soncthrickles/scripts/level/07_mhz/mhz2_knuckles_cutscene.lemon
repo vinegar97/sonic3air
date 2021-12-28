@@ -132,7 +132,7 @@ function void fn0631a4()
 		if (player != 0 && u32[A1] != 0)
 		{
 			u8[A1 + 0x2e] = 0x81
-			u8[A1 + 0x20] = 0x05
+			u8[A1 + 0x20] = char.state.STANDING
 			StopObjectA1()
 
 		#if STANDALONE
@@ -375,11 +375,11 @@ function void fn065e62()
 //# address-hook(0x065e72)
 function void fn065e72()
 {
-	u8[A1 + 0x20] = 0x05
+	u8[A1 + 0x20] = char.state.STANDING
 	if (objA0.animation.frame >= 0x0c)
 	{
 		u8[A1 + 0x04] |= render_flag.FLIP_Y
-		u8[A1 + 0x20] = 0
+		u8[A1 + 0x20] = char.state.RUNNING
 		u8[A1 + 0x2e] = 0x83
 
 		D0 = (global.framecounter & 0x02) ? 2 : 0

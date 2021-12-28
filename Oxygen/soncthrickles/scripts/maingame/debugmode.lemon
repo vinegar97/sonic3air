@@ -28,7 +28,7 @@ function void DebugMode.BaseUpdate()
 function void DebugMode.Enter()
 {
 	debug_mode.state += 0x200
-	u32[0xffffffca] = u32[A0 + 0x0c]
+	u32[0xffffffca] = char.mapping_offset
 	if (char.base_state < 0x06)
 	{
 		u16[0xffffffce] = char.sprite_attributes
@@ -234,9 +234,9 @@ function void DebugMode.ResetSonic()
 	objA1.velocity.x = 0
 	objA1.velocity.y = 0
 	u16[A1 + 0x1c] = 0
-	u8[A1 + 0x20] = 0
-	u8[A1 + 0x2a] &= 0x01
-	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x20] = char.state.RUNNING
+	u8[A1 + 0x2a] &= char.flag.FACING_LEFT
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	u8[A1 + 0x2e] = 0
 	u8[A1 + 0x3d] = 0
 }

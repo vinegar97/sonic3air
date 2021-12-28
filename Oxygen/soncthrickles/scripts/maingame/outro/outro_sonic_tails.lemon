@@ -254,7 +254,7 @@ function void fn05da74()
 		u32[A1 + 0x0c] = (global.characters != CHARS_TAILS_ALONE) ? 0x146620 : 0x148eb8
 	}
 
-	u8[A1 + 0x20] = 0x05
+	u8[A1 + 0x20] = char.state.STANDING
 	u8[A1 + 0x2e] = 0x83
 	fn05fd88()
 	fn05db2c()
@@ -933,10 +933,10 @@ function void fn05e1c2()
 
 	A1 = 0xffffb000
 	u8[A1 + 0x04] |= render_flag.FLIP_X
-	u8[A1 + 0x2a] |= 0x01
+	u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 	u8[A1 + 0x0a] &= ~0x80
 	u8[A1 + 0x2e] = 0x83
-	u8[A1 + 0x20] = 0x05
+	u8[A1 + 0x20] = char.state.STANDING
 	if (global.characters == CHARS_TAILS_ALONE)
 	{
 		A2 = 0xffffcc0a
@@ -979,7 +979,7 @@ function void fn05e288()
 
 	A1 = 0xffffb000
 	u8[A1 + 0x22] = 0x58
-	u8[A1 + 0x20] = 0
+	u8[A1 + 0x20] = char.state.RUNNING
 	UpdatePlayer1SpritePatterns()
 }
 
@@ -998,7 +998,7 @@ function void fn05e2c2()
 
 	A1 = 0xffffb000
 	u8[A1 + 0x04] &= ~render_flag.FLIP_X
-	u8[A1 + 0x2a] &= ~0x01
+	u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 	u8[A1 + 0x2e] = 0x81
 	u16[A1 + 0x20] = 0x0200
 	u32[0xffffcc0a] = 0
@@ -1108,7 +1108,7 @@ function void fn05e412()
 		{
 			objA0.base_state = 0x0c
 			u8[A1 + 0x2e] = 0x81
-			u8[A1 + 0x20] = 0
+			u8[A1 + 0x20] = char.state.RUNNING
 			u16[A1 + 0x18] = 0x0800
 			u16[A1 + 0x1c] = 0x0800
 		}
@@ -1996,13 +1996,13 @@ function void fn08648c()
 	global.move.speedcap = 0x800
 	global.move.acceleration = 0x18
 	global.move.deceleration = 0xc0
-	u8[0xffffb020] = 0x1f
+	u8[0xffffb020] = char.state.TRANSFORMING
 
 	if (global.characters == CHARS_TAILS_ALONE)
 	{
 		super.active = 0
 		super.active.tails = 0x01
-		u8[0xffffb020] = 0x29
+		u8[0xffffb020] = char.state.TAILS_TRANSFORM
 		u16[0xfffffec0] = 0x800
 		u16[0xfffffec2] = 0x18
 		u16[0xfffffec4] = 0xc0

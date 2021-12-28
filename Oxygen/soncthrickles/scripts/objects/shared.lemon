@@ -515,7 +515,7 @@ function void fn08598a()
 //# translated(0x0859ce) end(0x0859d6)
 function bool fn0859ce()
 {
-	D2.u8 = u8[A2 + 0x03]	// D2 assigment is needed
+	D2.u8 = u8[A2 + 0x03]	// D2 assignment is needed
 	if (D2.u8 == 0)
 	{
 		fn0859fc()
@@ -682,16 +682,16 @@ function void fn08594e()
 	{
 		objA0.flags2a &= ~0x08
 		A1 = 0xffffb000
-		u8[A1 + 0x2a] &= ~0x08
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 
 	if (objA0.flags2a & 0x10)
 	{
 		objA0.flags2a &= ~0x10
 		A1 = 0xffffb04a
-		u8[A1 + 0x2a] &= ~0x08
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 }
 
@@ -942,9 +942,9 @@ function void stopCharacterWinPose(u32 address)
 //# address-hook(0x085b8e) end(0x085ba6)
 function void StopCharacterWinPose()
 {
-	u16[A1 + 0x20] = 0x0505
-	u8[A1 + 0x23] = 0
-	u8[A1 + 0x24] = 0
+	objA1.state.both = 0x0505
+	objA1.animation.frame = 0
+	objA1.animation.timer = 0
 	objA1.flags2a &= ~char.flag.IN_AIR
 	u8[A1 + 0x2e] = 0
 
@@ -966,11 +966,8 @@ function void fn085c00()
 
 	objA0.update_address = 0x085c1a
 
-	A1 = 0xffffb000
-	StopCharacterWinPose()
-
-	A1 = 0xffffb04a
-	StopCharacterWinPose()
+	stopCharacterWinPose(0xffffb000)
+	stopCharacterWinPose(0xffffb04a)
 }
 
 
@@ -1320,7 +1317,7 @@ function void fn01e0a2()
 			if (u8[A1 + 0x20] != char.state.WIN_POSE)
 		#endif
 			{
-				u8[A1 + 0x20] = 0x00
+				u8[A1 + 0x20] = char.state.RUNNING
 				u8[A1 + 0x21] = 0x01
 			}
 		}
@@ -1587,8 +1584,8 @@ function void fn01e36c()
 		}
 	}
 
-	u8[A1 + 0x2a] &= ~0x08
-	u8[A1 + 0x2a] |= 0x02
+	objA1.flags2a &= ~char.flag.ON_OBJECT
+	objA1.flags2a |= char.flag.IN_AIR
 	objA0.flags2a &= ~bit
 	D4 = 0
 }

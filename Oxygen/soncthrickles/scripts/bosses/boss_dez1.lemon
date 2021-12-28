@@ -641,7 +641,7 @@ function void fn07e384()
 	{
 		objA0.update_address = 0x07e3ca
 		u8[A1 + 0x2e] = 0x83
-		u8[A1 + 0x20] = 0
+		u8[A1 + 0x20] = char.state.RUNNING
 		StopObjectA1()
 
 		u8[A1 + 0x04] &= ~render_flag.FLIP_X
@@ -699,7 +699,7 @@ function void fn07e420()
 		A1 = 0xffffb000
 		u8[A1 + 0x04] &= ~render_flag.FLIP_X
 		objA1.state = char.state.STANDING
-		u8[A1 + 0x21] = 0x00
+		objA1.state.former = char.state.RUNNING
 		objA1.flags2a &= ~char.flag.FACING_LEFT
 	}
 	fn07e44c()

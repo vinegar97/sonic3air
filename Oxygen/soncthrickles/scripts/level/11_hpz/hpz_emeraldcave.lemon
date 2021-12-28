@@ -278,12 +278,12 @@ function void fn090b84()
 	if (u8[A2] != 0)
 	{
 		u8[A1 + 0x04] |= render_flag.FLIP_X
-		u8[A1 + 0x2a] |= 0x01
+		u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 	}
 	else
 	{
 		u8[A1 + 0x04] &= ~render_flag.FLIP_X
-		u8[A1 + 0x2a] &= ~0x01
+		u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 	}
 
 	D0 = u8[A2 + 0x01] + u8[A1 + 0x38]

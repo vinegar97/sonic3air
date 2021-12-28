@@ -18,9 +18,6 @@ define u8 SPRITE_FLAG_WORLDSPACE	 = 0x20
 define u8 SPRITE_FLAG_PRIO			 = 0x40
 define u8 SPRITE_FLAG_NO_GLOBAL_TINT = 0x80
 
-define u16 CHAR_ANIMSPRITE_SONIC_DROPDASH = 0x100
-define u16 CHAR_ANIMSPRITE_SONIC_PEELOUT  = 0x102
-
 
 function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 {
@@ -265,7 +262,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Cutscene Sonic in intro
 		if (objA0.update_address == 0x067472)
 		{
-			Standalone.drawCharacterSprite(0, 0, px, py, false)
+			Standalone.drawCharacterSprite(CHARACTER_SONIC, 0, px, py, false)
 			return true
 		}
 
@@ -408,7 +405,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// (Super) Sonic in Blue Sphere mini-game Perfect screen
 		if (objA0.update_address == 0x04e222 || objA0.update_address == 0x04e23a)
 		{
-			Standalone.drawCharacterSprite(0, 0, px, py, false)
+			Standalone.drawCharacterSprite(CHARACTER_SONIC, 0, px, py, false)
 			return true
 		}
 	}

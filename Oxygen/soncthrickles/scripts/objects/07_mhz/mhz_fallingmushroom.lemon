@@ -79,8 +79,8 @@ function void fn01e580()
 		if (D1.s16 <= 0)
 		{
 			A1 = 0xffffb000
-			u8[A1 + 0x2a] &= ~0x08
-			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			objA0.flags2a &= ~0x08
 		}
 	}
@@ -92,8 +92,8 @@ function void fn01e580()
 		if (D1.s16 <= 0)
 		{
 			A1 = 0xffffb04a
-			u8[A1 + 0x2a] &= ~0x08
-			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			objA0.flags2a &= ~0x10
 		}
 	}

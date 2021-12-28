@@ -582,7 +582,7 @@ function void fn056ec2()
 	if (objA0.flags2a & 0x08)
 	{
 		A1 = 0xffffb000
-		if ((u8[A1 + 0x2b] & 0x10) == 0)
+		if ((u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE) == 0)
 		{
 			DamageCharacter()
 		}
@@ -1619,8 +1619,8 @@ function void fn059f3c()
 
 function void fn059f82()
 {
-	if (u8[A1 + 0x20] == 5)
-		u8[A1 + 0x20] = 0
+	if (u8[A1 + 0x20] == char.state.STANDING)
+		u8[A1 + 0x20] = char.state.RUNNING
 
 	D0.u16 += 0x10
 	if (objA1.position.x.u16 < D0.u16)

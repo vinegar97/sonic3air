@@ -287,7 +287,7 @@ function void fn0611d6()
 	u32[0xffffcce8] = 0x0195a6
 	u16[0xffffcd2a] = A1.u16
 	u8[A1 + 0x2b] &= 0x8e
-	u8[A1 + 0x2b] |= 0x01
+	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 
 	D0 = 4
 	fn061254()
@@ -302,7 +302,7 @@ function void fn061200()
 	u32[0xffffcce8] = 0x0198be
 	u16[0xffffcd2a] = A1.u16
 	u8[A1 + 0x2b] &= 0x8e
-	u8[A1 + 0x2b] |= 0x01
+	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 
 	D0 = 6
 	fn061254()
@@ -317,7 +317,7 @@ function void fn06122a()
 	u32[0xffffcce8] = 0x0196c2
 	u16[0xffffcd2a] = A1.u16
 	u8[A1 + 0x2b] &= 0x8e
-	u8[A1 + 0x2b] |= 0x01
+	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 
 	D0 = 5
 	fn061254()

@@ -431,9 +431,9 @@ function void fn04cef8()
 	u16[0xffffb1d0] = 0xc0
 	u8[0xffffffa1] = 0x01
 	bluespheregame.menu_selection = 0
-	u32[0xffffbd4c] = 0x04d64e
-	u32[0xffffbd96] = 0x04d64e
-	u8[0xffffbd9a] |= 0x01
+	u32[0xffffbd4c] = 0x04d64e	// first bumper cursor
+	u32[0xffffbd96] = 0x04d64e	// second bumper cursor
+	u8[0xffffbd9a] |= render_flag.FLIP_X	// flip second bumper
 
 	if (bluespheregame.fully_unlocked != 0)
 	{
@@ -566,7 +566,7 @@ function void fn04d09e()
 {
 	if (bluespheregame.fully_unlocked != 0)
 	{
-		if (bluespheregame.menu_selection == 0) != (u8[0xffffffab] == 0)
+		if (bluespheregame.menu_selection == 0) != (u8[0xffffffab] == 0)	// i suppose this works as an Xclusive OR conditional?
 		{
 			D1 = (bluespheregame.current_stage + 1) & 0x07ffffff
 			fn04d13a()
@@ -921,11 +921,11 @@ function void fn04d3ce()
 	D0.u16 = u16[A0 + 0x30] + 1
 	D0 = u32(D0.u16) * 0x4a
 	A1 += D0.u16
-	u16[A1 + 0x0a] = 0x854e
+	objA1.sprite_attributes = 0x854e
 
 	D1.u8 = control.pad1.pressed
 #if STANDALONE
-	D1.u8 ^= 0x03	// Reverse up/down, it just feels wrong otherwise
+	D1.u8 ^= CONTROL_UP | CONTROL_DOWN	// Reverse up/down, it just feels wrong otherwise
 #endif
 	if (D1 & CONTROL_UP)
 	{
@@ -958,7 +958,7 @@ function void fn04d3ce()
 		D0.u16 = u16[A0 + 0x30] + 1
 		D0 = u32(D0.u16) * 0x4a
 		A1 += D0.u16
-		u16[A1 + 0x0a] = 0x8562
+		objA1.sprite_attributes = 0x8562
 	}
 
 	if (control.pad1.pressed & CONTROL_DPAD)
@@ -1168,9 +1168,9 @@ function void fn04d64e()
 		objA0.sprite_attributes = 0xc598
 #endif
 
-	objA0.position.x.u16 = ((objA0.render_flags & 0x01) ? 0x140 : 0x100) + getScreenExtend()
+	objA0.position.x.u16 = ((objA0.render_flags & render_flag.FLIP_X) ? 0x140 : 0x100) + getScreenExtend()
 	objA0.position.y.u16 = (bluespheregame.fully_unlocked == 0) ? 0xbe : 0x0126
-	u32[A0 + 0x30] = (objA0.render_flags & 0x01) ? 0x04d7b2 : 0x04d7a6
+	u32[A0 + 0x30] = (objA0.render_flags & render_flag.FLIP_X) ? 0x04d7b2 : 0x04d7a6
 	objA0.sprite_priority = 0
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x08
@@ -1185,7 +1185,7 @@ function void fn04d6b8()
 {
 #if STANDALONE
 	// Do the following only once in total, i.e. only for the right object
-	if (objA0.render_flags & 0x01)
+	if (objA0.render_flags & render_flag.FLIP_X)
 	{
 		if (levelselect.characters == CHARS_TAILS_ALONE)
 		{
@@ -1287,7 +1287,7 @@ function void fn04d6b8()
 #if STANDALONE
 	if (control.pad1.pressed & CONTROL_B || Input.buttonPressed(BUTTON_BACK))
 	{
-		if ((objA0.render_flags & 0x01) == 0)		// Only consider first of the two objects
+		if ((objA0.render_flags & render_flag.FLIP_X) == 0)		// Only consider first of the two objects
 		{
 			if (bluespheregame.menu_selection == 1)
 			{

@@ -1016,8 +1016,8 @@ function void fn064ca6()
 	A1 = 0xffffb000
 	player1.control_override = 0
 	u8[A1 + 0x2e] = 0x83
-	u8[A1 + 0x22] = (u8[A1 + 0x38] == 1) ? 0xb0 : 0xc4
-	u8[A1 + 0x20] = 7
+	u8[A1 + 0x22] = (u8[A1 + 0x38] == CHARACTER_TAILS) ? 0xb0 : 0xc4
+	u8[A1 + 0x20] = char.state.LOOKING_UP
 	control.player1 = 0
 	StopObjectA1()
 	UpdatePlayer1SpritePatterns()

@@ -305,7 +305,7 @@ function void fn077966()
 	objA0.velocity.x = objA1.velocity.x
 	objA0.velocity.y = 0
 
-	if (u8[A1 + 0x38] != 0x02)
+	if (u8[A1 + 0x38] != CHARACTER_KNUCKLES)
 	{
 		objA0.update_address = 0x0779c0
 		objA1.state = char.state.GOT_HURT
@@ -1127,7 +1127,7 @@ function void fn0780be()
 			return
 		}
 
-		if (u8[A1 + 0x20] != 0x02 && u8[A1 + 0x38] == CHARACTER_KNUCKLES && u8[A1 + 0x2f] != 0x01)
+		if (u8[A1 + 0x20] != char.state.ROLLING && u8[A1 + 0x38] == CHARACTER_KNUCKLES && u8[A1 + 0x2f] != 0x01)
 		{
 			return
 		}
@@ -1174,7 +1174,7 @@ function void fn078136()
 		objA0.flags2a &= ~bit
 	}
 
-	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	if (u8[A1 + 0x34] == 0)
 	{
 		objA0.flags2a &= 0x9f

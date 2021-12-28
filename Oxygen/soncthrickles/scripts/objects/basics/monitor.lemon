@@ -813,12 +813,12 @@ function void ItemEffect.ApplyInvincibility()
 
 		if (u8[A0 + 0x43] == 0)
 		{
-			u32[0xffffcd7c] = 0x0187f0
+			u32[0xffffcd7c] = 0x0187f0	// invincibility stars
 			u16[0xffffcdbe] = A1.u16
 		}
 		else
 		{
-			u32[0xffffcea4] = 0x0187f0
+			u32[0xffffcea4] = 0x0187f0	// invincibility stars
 			u16[0xffffcee6] = A1.u16
 		}
 	}
@@ -837,7 +837,7 @@ function void ItemEffect.ApplySuperTransformation()
 	global.move.speedcap = 0x800
 	global.move.acceleration = 0x18
 	global.move.deceleration = 0xc0
-	u8[0xffffb020] = 0x1f
+	u8[0xffffb020] = char.state.TRANSFORMING
 
 	if (isMainCharacter(CHARACTER_SONIC))
 	{
@@ -859,7 +859,7 @@ function void ItemEffect.ApplySuperTransformation()
 	#else
 		super.active.tails = 1
 	#endif
-		u8[0xffffb020] = 0x29
+		u8[0xffffb020] = char.state.TAILS_TRANSFORM
 		u16[0xfffffec0] = 0x800
 		u16[0xfffffec2] = 0x18
 		u16[0xfffffec4] = 0xc0
@@ -876,7 +876,7 @@ function void ItemEffect.ApplySuperTransformation()
 
 	u8[0xffffb02e] = 0x81
 	u8[0xffffb035] = 0
-	u8[A1 + 0x2b] |= 0x02
+	u8[A1 + 0x2b] |= char.bonus.INVINCIBLE
 
 	playSound(0x9f)
 #if STANDALONE

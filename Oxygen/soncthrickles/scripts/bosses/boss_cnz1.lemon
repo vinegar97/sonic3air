@@ -779,7 +779,7 @@ function void fn06e19a()
 
 function bool fn06e1a8()
 {
-	if (objA1.velocity.y >= 0 || u8[A1 + 0x20] != 0x02)
+	if (objA1.velocity.y >= 0 || u8[A1 + 0x20] != char.state.ROLLING)
 		return false
 
 	D0.u16 = objA0.position.x.u16

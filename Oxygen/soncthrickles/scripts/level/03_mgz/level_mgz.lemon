@@ -1651,16 +1651,16 @@ function void fn0569dc()
 	push(D7)
 
 	A1 = 0xffffb000
-	if (u8[A1 + 0x2a] & 0x08)
+	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
 	{
-		A0 = 0xffff0000 + u16[A1 + 0x42]
+		A0 = 0xffff0000 + char.object_standing_on
 		fn01e580()
 	}
 
 	A1 = 0xffffb04a
-	if (u8[A1 + 0x2a] & 0x08)
+	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
 	{
-		A0 = 0xffff0000 + u16[A1 + 0x42]
+		A0 = 0xffff0000 + char.object_standing_on
 		fn01e580()
 	}
 

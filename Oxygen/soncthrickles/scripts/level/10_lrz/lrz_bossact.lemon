@@ -186,7 +186,7 @@ function void fn059fdc()
 	if (objA0.flags2a & 0x08)
 	{
 		A1 = 0xffffb000
-		if (!level.results_done && (u8[A1 + 0x2b] & 0x10) == 0 && !level.capsule_opened)
+		if (!level.results_done && (u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE) == 0 && !level.capsule_opened)
 		{
 			DamageCharacter()
 		}

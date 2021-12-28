@@ -105,7 +105,7 @@ function void fn01f7ce()
 
 	if ((objA0.flags2a & (1 << D6.u8)) == 0)
 	{
-		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
 			s16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
 			s16 dy = objA1.position.y.u16 - objA0.position.y.u16
@@ -116,7 +116,7 @@ function void fn01f7ce()
 					LetSonicClimbOnObject()
 
 					u32[A2] = 0
-					u8[A1 + 0x20] = 0
+					u8[A1 + 0x20] = char.state.RUNNING
 					u8[A1 + 0x2e] |= 0x42
 					if (A1 == 0xffffb000)
 					{
@@ -143,7 +143,7 @@ function void fn01f7ce()
 		D0.u16 = abs(s16[A1 + 0x1c])
 		if (D0.u16 >= 0x600)
 		{
-			if ((u8[A1 + 0x2a] & 0x02) == 0)
+			if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 			{
 				D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x90
 				if (D0.s16 >= 0 && D0.u16 <= 0x130)
@@ -202,7 +202,7 @@ function void fn01f8b4()
 //# address-hook(0x01f914) end(0x01f994)
 function void fn01f914()
 {
-	if ((u8[A1 + 0x2a] & 0x08) == 0)
+	if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0)
 		return
 
 	D0 = s32(s16[A1 + 0x1c]) << 8

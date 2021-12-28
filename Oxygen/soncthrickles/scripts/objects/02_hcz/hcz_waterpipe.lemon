@@ -325,8 +325,8 @@ function void fn0302e6()
 	// Thank to Fred Bronze for pointing out that this is not needed at all! (https://s3unlocked.blogspot.de/2017/12/sonic-eraser.html)
 	if (!Game.getSetting(SETTING_HCZ_WATERPIPE))
 	{
-		u8[0xffffb020] = 0x1c
-		u8[0xffffb06a] = 0x1c
+		u8[0xffffb020] = char.state.DISAPPEARED
+		u8[0xffffb06a] = char.state.DISAPPEARED
 	}
 
 	objA0.update_address = 0x030338
@@ -360,8 +360,8 @@ function void fn030338()
 	u16[0xffffb05e] -= 8
 	if (u16[A0 + 0x30] <= 0x28)
 	{
-		u8[0xffffb020] = 0x1a
-		u8[0xffffb06a] = 0x1a
+		u8[0xffffb020] = char.state.GOT_HURT
+		u8[0xffffb06a] = char.state.GOT_HURT
 		objA0.update_address = 0x03041a
 
 		playSound(0x57)

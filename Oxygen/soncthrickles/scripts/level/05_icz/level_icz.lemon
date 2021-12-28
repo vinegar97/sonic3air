@@ -529,7 +529,7 @@ function void fn039bee()
 	{
 		s16[A2 + 0x18] = -0x200
 		s16[A2 + 0x1a] = -0x400
-		u8[A2 + 0x20] = 0x19
+		u8[A2 + 0x20] = char.state.GOT_HURT_PANIC
 		u8[A2 + 0x2a] |= char.flag.IN_AIR
 		u8[A2 + 0x2e] = 0
 
