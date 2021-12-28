@@ -2884,9 +2884,17 @@ function void SonicPressedJumpInMidAir()
 
 	if (super.active)
 	{
+	#if COAL
+		if ((super.active == 0x01 && Game.getSetting(SETTING_SUPERDASH)) || super.active & 0x80)
+	#else
 		if (super.active & 0x80)	// Hyper
+	#endif
 		{
-			Character.ClearEnemiesOnScreen()
+		#if COAL
+			if (super.active & 0x80)	// Hyper
+		#endif
+				Character.ClearEnemiesOnScreen()
+
 
 			camera.locktime.player1 = 0x2000
 			ClearPositionBackup()
@@ -5041,7 +5049,11 @@ function void Character.OnCollisionWithDynamicObject()
 			bool movingUp = (objA1.render_flags & render_flag.FLIP_Y) ? (vy > 0) : (vy < 0)
 			if (movingUp)
 			{
+			#if COAL
+				if (char.flags & char.flag.IN_AIR && Game.getSetting(SETTING_MONITOR_BOUNCE) == 0) || (Game.getSetting(SETTING_MONITOR_BOUNCE) == 2)		// this fixes the check to properly run monitor bounce behaviour
+			#else
 				if (u8[A1 + 0x2a] & char.flag.IN_AIR)
+			#endif
 				{
 					if ((objA1.render_flags & render_flag.FLIP_Y) == 0)
 					{

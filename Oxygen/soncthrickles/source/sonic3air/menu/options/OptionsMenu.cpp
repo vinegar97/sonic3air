@@ -78,10 +78,12 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::TAILS_FLIGHT_CANCEL,		SharedDatabase::Setting::SETTING_CANCEL_FLIGHT);
 		setupOptionEntry(option::NO_CONTROL_LOCK,			SharedDatabase::Setting::SETTING_NO_CONTROL_LOCK);
 		setupOptionEntry(option::HYPER_TAILS,				SharedDatabase::Setting::SETTING_HYPER_TAILS);
+		setupOptionEntry(option::MONITOR_BOUNCE,			SharedDatabase::Setting::SETTING_MONITOR_BOUNCE);
 		setupOptionEntry(option::SHIELD_TYPES,				SharedDatabase::Setting::SETTING_SHIELD_TYPES);
 		setupOptionEntry(option::BUBBLE_SHIELD_BOUNCE,		SharedDatabase::Setting::SETTING_BUBBLE_SHIELD_BOUNCE);
 		setupOptionEntry(option::SUPER_CANCEL,				SharedDatabase::Setting::SETTING_SUPER_CANCEL);
 		setupOptionEntry(option::INSTA_SHIELD,				SharedDatabase::Setting::SETTING_INSTA_SHIELD);
+		setupOptionEntry(option::SUPERDASH,					SharedDatabase::Setting::SETTING_SUPERDASH);
 		setupOptionEntry(option::LEVEL_LAYOUTS,				SharedDatabase::Setting::SETTING_LEVELLAYOUTS);
 		setupOptionEntry(option::CAMERA_OUTRUN,				SharedDatabase::Setting::SETTING_CAMERA_OUTRUN);
 		setupOptionEntry(option::EXTENDED_CAMERA,			SharedDatabase::Setting::SETTING_EXTENDED_CAMERA);
@@ -537,6 +539,10 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.addOption("Only Super Tails", 0)
 			.addOption("Super & Hyper Tails", 1);
 
+		entries.addEntry("Air Dash:", option::SUPERDASH)
+			.addOption("Only Hyper Sonic", 0)
+			.addOption("Super & Hyper Sonic", 1);
+
 		entries.addEntry("Super Cancel:", option::SUPER_CANCEL)
 			.addOption("Off", 0)
 			.addOption("On", 1);
@@ -582,6 +588,11 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.addOption("Enabled", 1);
 
 		titles[entries.size()] = "Game Variety";
+
+		entries.addEntry("Monitor Behaviour:", option::MONITOR_BOUNCE)
+			.addOption("Classic", 0)
+			.addOption("Sonic & Knuckles", 1)
+			.addOption("Sonic Mania", 2);
 
 		entries.addEntry("Shields:", option::SHIELD_TYPES)
 			.addOption("Classic Shield", 0)

@@ -35,6 +35,11 @@ define u32  SETTING_LEVELRESULT_SCORE		= 0x00001201	// Increasingly faster count
 define u32  SETTING_HYPER_TAILS				= 0x00001301	// Split up Super Tails into Super form (without flickies) and Hyper form (as usual)
 define u32  SETTING_SHIELD_TYPES			= 0x00001401	// Shields: 0 = Classic, 1 = Elemental, 2 = All shields, 3 = Upgrading
 
+#if COAL
+define u32  SETTING_MONITOR_BOUNCE			= 0x00001501	// restore the monitor object's bouncing behaviour from previous games
+define u32  SETTING_SUPERDASH				= 0x00001601	// Airdash move for Super Sonic
+#endif
+
 // Level-specific gameplay settings
 define u32  SETTING_AIZ_BLIMPSEQUENCE		= 0x00010101	// Different pattern for AIZ 2 blimp bombing
 define u32  SETTING_AIZ_INTRO_KNUCKLES		= 0x00010301	// AIZ 1 intro for Knuckles -- under construction, so it's off for now
