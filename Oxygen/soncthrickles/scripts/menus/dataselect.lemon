@@ -336,6 +336,12 @@ function void DataSelect.setup()
 	copyMemory(0xfffffc80, 0x39d262, 0x20)
 	copyMemory(0xfffffca0, 0x00ca78, 0x40)
 
+#if COAL
+	loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+
 	A0 = 0xffffb000
 	A1 = 0x00d13e
 	D0 = 0x0b

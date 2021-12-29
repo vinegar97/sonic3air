@@ -86,6 +86,12 @@ function void fn05e70e()
 	copyMemory(0xfffffca0, 0x0a8a3c, 0x20)
 	u32[0xfffffcaa] = 0xee0088
 
+#if COAL
+	loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+
 	Kosinski.addToDMAQueue(0x163b9a, 0x6200)
 	Kosinski.addToDMAQueue(0x163418, 0x3c60)
 	Kosinski.addToDMAQueue(0x162914, 0x4dc0)

@@ -394,6 +394,12 @@ function void CompetitionMode.StageSelect()
 	copyMemory(0xfffffc80, 0x39d282, 0x20)
 	copyMemory(0xfffffca0, 0x20a55e, 0x60)
 
+#if COAL
+	loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+
 	A0 = 0xffffb000
 	A1 = (u8[0xfffff600] & 0x80) ? 0x00b282 : 0x00b1f0
 	D0.u16 = u16[(A1+=2)-2]
@@ -817,6 +823,12 @@ function void fn00b2cc()
 
 	copyMemory(0xfffffc80, 0x39d282, 0x20)
 	copyMemory(0xfffffca0, 0x20a55e, 0x60)
+
+#if COAL
+	loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
 
 #if STANDALONE
 	u16[0xffffe000] = getScreenExtend()
@@ -1309,6 +1321,12 @@ function void fn00b74e()
 	copyMemory(0xfffffca0, 0x20a55e, 0x40)
 	copyMemory(0xfffffce0, 0x20ad84, 0x20)
 
+#if COAL
+	loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+
 	A0 = 0xffffb000
 	A1 = 0x00bb4a
 	D0.u16 = u16[(A1+=2)-2]
@@ -1341,6 +1359,9 @@ function void fn00b74e()
 	waitForNextFrame()
 
 	VDP.Config.setActiveDisplay(true)
+#if COAL
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
 	Menu.FadeInAfterInit()
 
 	while (true)
@@ -1699,6 +1720,12 @@ function void fn00bc08()
 	copyMemory(0xfffffca0, 0x20a55e, 0x40)
 	copyMemory(0xfffffce0, 0x20b26c, 0x20)
 
+#if COAL
+	loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+
 	A0 = 0xffffb000
 	A1 = 0x00bf58
 	D0.u16 = u16[(A1+=2)-2]
@@ -1726,6 +1753,9 @@ function void fn00bc08()
 	global.frame_state = 0x1e
 	waitForNextFrame()
 	VDP.Config.setActiveDisplay(true)
+#if COAL
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
 	Menu.FadeInAfterInit()
 
 	while (true)

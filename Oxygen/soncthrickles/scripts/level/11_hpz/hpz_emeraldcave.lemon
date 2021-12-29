@@ -91,6 +91,12 @@ function void fn090964()
 	copyMemory(0xfffffca0, A1, 0x20)
 	copyMemory(0xfffffcc0, 0x0669f2, 0x40)
 
+#if COAL
+	loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+
 	u32[0xfffffce2] = 0x06a00660
 
 	if (allocDynamicObjectStd())

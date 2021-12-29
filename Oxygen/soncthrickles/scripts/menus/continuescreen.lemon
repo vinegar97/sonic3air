@@ -183,6 +183,12 @@ function void fn05c2e0()
 
 	copyMemory(0xfffffc80, 0x05cbca, 0x80)
 
+#if COAL
+	loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+
 	A1 = 0x05cb9e
 	D2.u16 = 0x0292
 	D6.u16 = 0x8347

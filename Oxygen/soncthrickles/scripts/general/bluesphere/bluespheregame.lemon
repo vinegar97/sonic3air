@@ -1439,6 +1439,12 @@ function void fn04da7e()
 
 	copyMemory(0xfffffc80, 0x04de08, 0x80)
 
+#if COAL
+	loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+
 	Kosinski.decompress(0x15bac0, 0xffff0000)
 	Kosinski.decompress(0x15c130, A1)
 	updateSpritePattern(0xffff0000, 0x3b80, A1.u16 >> 1)
@@ -1505,6 +1511,12 @@ function void fn04da7e()
 	copyMemory(0xfffffca0, 0x0a8afc, 0x20)
 	copyMemory(0xfffffcc0, 0x04de68, 0x20)
 	copyMemory(0xfffffce0, 0x060aba, 0x20)
+
+#if COAL
+	loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
 
 	Nemesis.loadDataToVRAM(0x189c7c, 0x0000)
 
