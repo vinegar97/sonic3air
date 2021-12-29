@@ -335,6 +335,7 @@ function void renderNextObject()
 
 		objA0.render_flags |= render_flag.VISIBLE	// Set visibility flag
 
+	#if !COAL
 	#if STANDALONE
 		Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
 		if (Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))
@@ -343,24 +344,33 @@ function void renderNextObject()
 		if (D7.s16 < 0)
 			return
 	#endif
+	#endif
 
 		A2 = objA0.mapping_offset
 		D5.u16 = objA0.sprite_attributes
-		if (objA0.animation.sprite != 0)
-		{
-			A1 = tableLookupAddress(A2, s16(objA0.animation.sprite) * 2)
-			D4.u16 = u16[A1] - 1
-			A1 += 2
-			if (D4.s16 >= 0)
-			{
-				u16 backup = D6.u16
-				writeToSpriteTableCompound(renderQueue)
-				D6.u16 = backup
 
-			#if !STANDALONE
-				if (D7.s16 < 0)
-					return
-			#endif
+	#if COAL
+		Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+		if (!Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))
+	#endif
+
+		{
+			if (objA0.animation.sprite != 0)
+			{
+				A1 = tableLookupAddress(A2, s16(objA0.animation.sprite) * 2)
+				D4.u16 = u16[A1] - 1
+				A1 += 2
+				if (D4.s16 >= 0)
+				{
+					u16 backup = D6.u16
+					writeToSpriteTableCompound(renderQueue)
+					D6.u16 = backup
+
+				#if !STANDALONE
+					if (D7.s16 < 0)
+						return
+				#endif
+				}
 			}
 		}
 
@@ -383,6 +393,15 @@ function void renderNextObject()
 				D0.u16 = (D0.u16 + 0x80 - cameraX)
 				D1.u16 = (D1.u16 + 0x80 - cameraY) & level.height.bitmask
 			}
+
+		#if COAL
+			Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+			if (Standalone.onWriteToSpriteTableCompound(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue, D3.u16))
+			{
+				--D3.u16
+				continue
+			}
+		#endif
 
 			D4 = u16(u8[A0 + 5]) * 2	// child sprite map frame id
 			A0 += 6	// to next child sprite (?)
@@ -427,6 +446,7 @@ function void renderNextObject()
 
 		objA0.render_flags |= render_flag.VISIBLE
 
+	#if !COAL
 	#if STANDALONE
 		Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
 		if (Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))
@@ -435,20 +455,29 @@ function void renderNextObject()
 		if (D7.s16 < 0)
 			return
 	#endif
+	#endif
 
 		A1 = objA0.mapping_offset
 		D4 = 0
-		if ((objA0.render_flags & 0x20) == 0)
-		{
-			A1 = tableLookupAddress(A1, s16(objA0.animation.sprite) * 2)
-			D4.u16 = u16[A1] - 1
-			A1 += 2
-			if (D4.s16 < 0)
-				return
-		}
 
-		D5.u16 = objA0.sprite_attributes
-		writeToSpriteTable(renderQueue)
+	#if COAL
+		Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+		if (!Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))
+	#endif
+
+		{
+			if ((objA0.render_flags & 0x20) == 0)
+			{
+				A1 = tableLookupAddress(A1, s16(objA0.animation.sprite) * 2)
+				D4.u16 = u16[A1] - 1
+				A1 += 2
+				if (D4.s16 < 0)
+					return
+			}
+
+			D5.u16 = objA0.sprite_attributes
+			writeToSpriteTable(renderQueue)
+		}
 	}
 }
 
@@ -663,6 +692,10 @@ function void RenderSprites_CompetitionMode()
 		A5 += 0x80
 	}
 
+#if COAL
+	Renderer.clearSpriteTag()
+#endif
+
 	while (D7.s16 >= 0)
 	{
 		u16[A6] = 0
@@ -743,12 +776,21 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 
 		D1.u16 = D1.u16 + 0x80 - D3.u16
 		objA0.render_flags |= render_flag.VISIBLE	// Set visibility flag
+
+	#if !COAL
 		if (D7.s16 < 0)
 			return
+	#endif
 
 		D5.u16 = objA0.sprite_attributes
 		A2 = objA0.mapping_offset
 		D4 = objA0.animation.sprite
+
+	#if COAL
+		Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+		if (!Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))
+	#endif
+
 		if (D4.u8 != 0)
 		{
 			A1 = tableLookupAddress(A2, D4.u16 * 2)
@@ -759,8 +801,11 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 				D3.u16 = D6.u16
 				writeToSpriteTableCompound(renderQueue)
 				D6.u16 = D3.u16
+
+			#if !COAL
 				if (D7.s16 < 0)
 					return
+			#endif
 			}
 		}
 
@@ -768,11 +813,26 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 		if (D3.s16 >= 0)
 		{
 			A0 += 0x18
+
+		#if COAL
+			while (D3.s16 >= 0)
+		#else
 			while (D3.s16 >= 0 && D7.s16 >= 0)
+		#endif
 			{
 				D0.u16 = (u16[A0]   - u16[A3]   + 0x80) & u16[0xffffeea8]
 				D1.u16 = (u16[A0+2] - u16[A3+4] + 0x80) & level.height.bitmask
 				D1.u16 += offsetY
+
+			#if COAL
+				Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+				if (Standalone.onWriteToSpriteTableCompound(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue, D3.u16))
+				{
+					--D3.u16
+					continue
+				}
+			#endif
+
 				D4 = u8[A0+5]
 				A0 += 6
 
@@ -811,21 +871,31 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 		D1.u16 += offsetY
 
 		objA0.render_flags |= 0x80
+	#if !COAL
 		if (D7.s16 >= 0)
+	#endif
 		{
 			A1 = objA0.mapping_offset
 			D4 = 0
-			if ((D6 & 0x20) == 0)
-			{
-				D4.u16 = u16(objA0.animation.sprite) * 2
-				A1 += u16[A1 + D4.u16]
-				D4.u16 = u16[(A1+=2)-2] - 1
-			}
 
-			if (D4.s16 >= 0)
+		#if COAL
+			Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+			if (!Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))
+		#endif
+
 			{
-				D5.u16 = objA0.sprite_attributes
-				writeToSpriteTable(renderQueue)
+				if ((D6 & 0x20) == 0)
+				{
+					D4.u16 = u16(objA0.animation.sprite) * 2
+					A1 += u16[A1 + D4.u16]
+					D4.u16 = u16[(A1+=2)-2] - 1
+				}
+
+				if (D4.s16 >= 0)
+				{
+					D5.u16 = objA0.sprite_attributes
+					writeToSpriteTable(renderQueue)
+				}
 			}
 		}
 	}

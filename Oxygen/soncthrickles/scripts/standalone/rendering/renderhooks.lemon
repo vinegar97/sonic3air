@@ -568,6 +568,23 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 }
 
 
+#if COAL
+function bool Standalone.onWriteToSpriteTableCompound(s16 px, s16 py, u16 renderQueue, u16 spriteCounter)
+{
+	// This function gets called when rendering an object's that uses multiple sprites.
+	//  -> useful for cases like in the Data Select screen, where the cursor arrow and character sprite and portrait seem to all be handled by the same single object
+	//  -> note that a majority of an object's conventional data are out of reach here due to how the renderer function works
+	//  -> although you still have objA0.mapping_offset in A2, and objA0.sprite_attributes in D5.u16
+
+	u8 gameMode = global.game_mode & 0x7f
+	bool prioFlag = (D5.u16 & 0x8000) != 0
+	u8 atex = ((D5.u16 >> 9) & 0x30)
+
+	return false
+}
+#endif
+
+
 function bool Standalone.onDrawVdpSprite(s16 px, s16 py, u8 size, u16 index, u16 renderQueue)
 {
 	// Explosion of bosses

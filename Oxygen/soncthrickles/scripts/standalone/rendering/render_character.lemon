@@ -75,6 +75,11 @@ function void Standalone.drawCharacterSpriteDirect(u8 character, s16 px, s16 py,
 			u32 tableAddress  = (character == CHARACTER_SONIC) ? (super.active ? 0x148378 : 0x148182) : (character == CHARACTER_TAILS) ? 0x14a08a : 0x14bd0a
 			u32 mappingOffset = (character == CHARACTER_SONIC) ? (super.active ? 0x146816 : 0x146620) : (character == CHARACTER_TAILS) ? 0x148eb8 : 0x14a8d6		// Not really necessary here, we could also use "char.mapping_offset"
 
+		// #if COAL
+			// u64 category = (character == CHARACTER_SONIC) ? (super.active ? "character_supersonic" : "character_sonic") : (character == CHARACTER_TAILS) ? "character_tails" : "character_knuckles"
+			// Renderer.extractCustomSprite(key, category, animationSprite, atex)
+		// #endif
+
 			key = Renderer.setupCustomCharacterSprite(sourceBase, tableAddress, mappingOffset, animationSprite, 0x00)
 		}
 	}
@@ -129,6 +134,10 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 	u8 flags = (char.render_flags & 0x03)
 	u8 angle = 0
 	u64 key = 0
+#if COAL
+	key = Standalone.getModdedAnimationSpriteKey(character, animationSpriteEx)	// ask modded scripts
+#endif
+
 	u8 rotationMode = 0
 
 	if (variant < 2)
@@ -146,6 +155,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 				{
 					animationSpriteEx = CHAR_ANIMSPRITE_SONIC_PEELOUT + (level.framecounter & 0x03)
 
+				// #if !COAL
 					if (!Game.getSetting(SETTING_SMOOTH_ROTATION))
 					{
 						angle = (animationSprite - 0x21) / 4 * 0xe0
@@ -153,6 +163,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 							angle = -angle
 						animationSprite = 0x21 + (animationSprite - 0x21) % 4
 					}
+				// #endif
 				}
 			}
 		}
@@ -217,7 +228,11 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 				oldRotationPlayer2 = angle
 		}
 
+#if COAL
+		if (animationSpriteEx >= 0x100 && key == 0)
+#else
 		if (animationSpriteEx >= 0x100)
+#endif
 		{
 			// Special handling for Drop Dash & Super Peel-Out
 			if (animationSpriteEx >= CHAR_ANIMSPRITE_SONIC_PEELOUT)
@@ -245,6 +260,57 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 			{
 				key = stringformat("character_knuckles_0x%02x", animationSprite)
 			}
+
+		#if COAL
+		}
+			if ((Renderer.hasCustomSprite(key) == 0) && !Game.getSetting(SETTING_SMOOTH_ROTATION))
+			{
+				// use modded sprites to make new rotated versions if respective ones don't exist
+				if (animationSprite >= 0x01 && animationSprite <= 0x20)
+				{
+					// walking animation
+					angle = (animationSprite - 0x01) / 8 * 0xe0
+					if (char.flags & char.flag.FACING_LEFT)
+						angle = -angle
+					animationSprite = 0x01 + (animationSprite - 0x01) % 8
+				}
+				else if (animationSprite >= 0x21 && animationSprite <= 0x30)
+				{
+					// running animation
+					angle = (animationSprite - 0x21) / 4 * 0xe0
+					if (char.flags & char.flag.FACING_LEFT)
+						angle = -angle
+					animationSprite = 0x21 + (animationSprite - 0x21) % 4
+				}
+				else if (animationSprite >= 0x78 && animationSprite <= 0x7f)
+				{
+					// swinging animation
+					angle = (animationSprite - 0x78) / 1 * 0xe0
+					if (char.flags & char.flag.FACING_LEFT)
+						angle = -angle
+					animationSprite = 0x78
+				}
+				else if (character == CHARACTER_TAILS && animationSprite >= 0xc3 && animationSprite <= 0xca)
+				{
+					// Tails' fastest run animation
+					angle = (animationSprite - 0xc3) / 2 * 0xe0
+					if (char.flags & char.flag.FACING_LEFT)
+						angle = -angle
+					animationSprite = 0xc3 + (animationSprite - 0xc3) % 2
+				}
+
+				if ((Renderer.hasCustomSprite(stringformat("%s_0x%02x", substring(key, 0, strlen(key) - 5), animationSprite)) == 0)/*  && bool force_rataion = false */)
+				{
+					angle = 0
+					animationSprite = char.animation.sprite
+				}
+				else
+				{
+					key = stringformat("%s_0x%02x", substring(key, 0, strlen(key) - 5), animationSprite)
+				}
+			}
+		{
+		#endif
 
 			if (!Renderer.hasCustomSprite(key))
 			{
@@ -281,6 +347,30 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 		}
 
 		key = stringformat("character_tails_tails_0x%02x", animationSprite)
+
+	#if COAL
+		if ((Renderer.hasCustomSprite(key) == 0) && !Game.getSetting(SETTING_SMOOTH_ROTATION))
+		{
+			if (animationSprite >= 0x05 && animationSprite <= 0x14)
+			{
+				angle = (animationSprite - 0x05) / 4 * 0xe0
+				if (char.flags & char.flag.FACING_LEFT)
+					angle = -angle
+				animationSprite = 0x05 + (animationSprite - 0x05) % 4
+			}
+
+			if ((Renderer.hasCustomSprite(stringformat("%s_0x%02x", substring(key, 0, strlen(key) - 5), animationSprite)) == 0)/*  && bool force_rataion = false */)
+			{
+				angle = 0
+				animationSprite = char.animation.sprite
+			}
+			else
+			{
+				key = stringformat("%s_0x%02x", substring(key, 0, strlen(key) - 5), animationSprite)
+			}
+		}
+	#endif
+
 		if (!Renderer.hasCustomSprite(key))
 		{
 			key = Renderer.setupCustomCharacterSprite(0x336620, 0x344d74, 0x344bb8, animationSprite, 0x00)
@@ -291,6 +381,11 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 	u8 atex = (char.sprite_attributes >> 9) & 0x30
 	if (EXTENDED_CHARACTER_PALETTES)
 		atex = 0x40 + character * 0x20
+
+// #if COAL
+	// u64 category = (variant < 2) ? ((character == CHARACTER_SONIC) ? (super.active ? "character_supersonic" : "character_sonic") : (character == CHARACTER_TAILS) ? "character_tails" : "character_knuckles") : "character_tails_tails"
+	// Renderer.extractCustomSprite(key, category, animationSprite, atex)
+// #endif
 
 	if (char.sprite_attributes & 0x8000)
 		flags |= SPRITE_FLAG_PRIO

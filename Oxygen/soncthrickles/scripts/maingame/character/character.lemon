@@ -710,7 +710,12 @@ function void partialUpdateCharacterOnGround()
 //# address-hook(0x011036) end(0x01105e)
 function void Character.UpdateSonicRollingInAir()
 {
+#if COAL
+	UpdateSonicJumpMoves()
+#else
 	Character.updateJumpMoves()
+#endif
+
 	Character.UpdateControlInAir()
 	Character.CheckAgainstMoveBorders()
 	Character.UpdateMovement()
