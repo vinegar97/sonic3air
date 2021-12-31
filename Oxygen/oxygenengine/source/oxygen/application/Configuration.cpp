@@ -267,6 +267,7 @@ bool Configuration::loadConfiguration(const std::wstring& filename)
 	// This does not get read from the file, but defined by code
 	mPreprocessorDefinitions.clear();
 	mPreprocessorDefinitions.setDefinition("STANDALONE");
+	mPreprocessorDefinitions.setDefinition("COAL");
 
 	// Load project path
 	if (rootHelper.tryReadString("LoadProject", mProjectPath))
