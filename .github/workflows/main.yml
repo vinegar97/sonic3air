@@ -547,7 +547,8 @@ jobs:
           msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
           msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
           msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          ./framework/external/ogg-vorbis/copy_libogg.bat
+          shell: cmd
+          call ./framework/external/ogg-vorbis/copy_libogg.bat
 
       - name: Build libvorbis
         run: |
@@ -555,4 +556,5 @@ jobs:
           msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
           msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
           msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-          ./framework/external/ogg-vorbis/copy_libvorbis.bat
+          shell: cmd
+          call ./framework/external/ogg-vorbis/copy_libvorbis.bat
