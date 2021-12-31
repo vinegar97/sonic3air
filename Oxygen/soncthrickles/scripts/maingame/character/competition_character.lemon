@@ -17,7 +17,10 @@ function void CompetitionMode.Character.BaseUpdate(u32 mainRoutineTableAddress)
 		A4 = 0xfffff760
 		A5 = 0xffffee2c
 		A6 = 0xffffcc54
+	#if !COAL
+		// the check actually breaks semitransparency on the opponent's screen and does nothing else, exclude it
 		if (u8[0xffffb082] == char.character)
+	#endif
 		{
 			char.render_flags ^= 0x08
 		}
@@ -33,7 +36,10 @@ function void CompetitionMode.Character.BaseUpdate(u32 mainRoutineTableAddress)
 		A4 = 0xfffffec0
 		A5 = 0xffffee2e
 		A6 = 0xffffcc9e
+	#if !COAL
+		// the check actually breaks semitransparency on the opponent's screen and does nothing else, exclude it
 		if (u8[0xffffb038] == char.character)
+	#endif
 		{
 			char.render_flags ^= 0x10
 		}

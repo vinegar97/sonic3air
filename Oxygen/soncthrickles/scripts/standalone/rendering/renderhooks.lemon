@@ -67,11 +67,95 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		{
 			return Standalone.drawCharacterSprite(char.character, drawCharacterVariant, px, py, false)
 		}
+	#if COAL
+		else
+		{
+			// Useful in cases like Blue Sphere's results and perfect screen, and Knuckles in Sonic's ending
+			u8 character = (char.mapping_offset == 0x146620) ? CHARACTER_SONIC : (char.mapping_offset == 0x148eb8) ? CHARACTER_TAILS : (char.mapping_offset == 0x14a8d6) ? CHARACTER_KNUCKLES : 0xff
+
+			if (character != 0xff)
+				return Standalone.drawCharacterSprite(character, 0, px, py, false)
+		}
+	#endif
 	}
+
+#if COAL
+	if (gameMode == 0x14)
+	{
+		// Continue screen after a game over
+
+		if (char.mapping_offset == 0x05cc4a)
+		{
+			// Characters in continue screen
+			u64 key = 0
+			u8 atex = 0
+			
+			if (char.animation.sprite >= 0x05)
+			{
+				key = stringformat("character_tails_continue_0x%02x", char.animation.frame)
+				atex = 0x60
+			}
+			else if (char.animation.sprite >= 0x02)
+			{
+				key = stringformat("character_knuckles_continue_0x%02x", char.animation.frame)
+				atex = 0x80
+			}
+			else if (char.animation.sprite >= 0x00)
+			{
+				key = stringformat("character_sonic_continue_0x%02x", char.animation.frame)
+				atex = 0x40
+			}
+
+			if (Renderer.hasCustomSprite(key))
+			{
+				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+				return true
+			}
+		}
+	}
+	else
+#endif
 
 	if (gameMode == 0x0c || gameMode == 0x08)
 	{
 		// Main game or rolling demo
+
+	#if COAL
+		if (char.mapping_offset == 0x24178a)
+		{
+			// characters in ending 
+
+			u64 key = 0
+			u8 atex = 0
+			
+			if (char.animation.sprite >= 0x0e)
+			{
+				key = stringformat("character_knuckles_ending_0x%02x", char.animation.frame)
+				atex = 0x80
+			}
+			else if (char.animation.sprite >= 0x0a)
+			{
+				key = stringformat("character_tails_ending_0x%02x", char.animation.frame)
+				atex = 0x60
+			}
+			else if (char.animation.sprite >= 0x05)
+			{
+				key = stringformat("character_tails_tails_ending_0x%02x", char.animation.frame)
+				atex = 0x60
+			}
+			else if (char.animation.sprite >= 0x01)
+			{
+				key = stringformat("character_sonic_ending_0x%02x", char.animation.frame)
+				atex = 0x40
+			}
+
+			if (Renderer.hasCustomSprite(key))
+			{
+				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+				return true
+			}
+		}
+	#endif
 
 		// Sonic on the snowboard in ICZ 1
 		if (objA0.update_address == 0x03943a || objA0.update_address == 0x0394a0 || objA0.update_address == 0x0395fe)
@@ -408,6 +492,15 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			Standalone.drawCharacterSprite(CHARACTER_SONIC, 0, px, py, false)
 			return true
 		}
+
+	#if COAL
+		// Tails in Blue Sphere mini-game Perfect screen
+		if (char.mapping_offset == 0x04e2a2)
+		{
+			Standalone.drawCharacterSpriteDirect(CHARACTER_TAILS, px, py, 0xa6, char.render_flags, 0x60, renderQueue)
+			return true
+		}
+	#endif
 	}
 	//else if (gameMode == 0x34)
 	{
@@ -526,8 +619,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		return true
 	}
 
-/*
-	// TODO: Seems like the arrows are part of this graphics as well...?
+#if COAL
 	if (objA0.update_address == 0x00d30c || objA0.update_address == 0x00d42c)
 	{
 		if (objA0.animation.sprite == 4)
@@ -563,7 +655,8 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			return true
 		}
 	}
-*/
+#endif
+
 	return false
 }
 
@@ -571,8 +664,8 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 #if COAL
 function bool Standalone.onWriteToSpriteTableCompound(s16 px, s16 py, u16 renderQueue, u16 spriteCounter)
 {
-	// This function gets called when rendering an object's that uses multiple sprites.
-	//  -> useful for cases like in the Data Select screen, where the cursor arrow and character sprite and portrait seem to all be handled by the same single object
+	// This function gets called when rendering an object that uses multiple sprites.
+	//  -> useful for cases like in the Data Select screen, where the cursor arrows and character sprite and portrait seem to all be handled by the same single object
 	//  -> note that a majority of an object's conventional data are out of reach here due to how the renderer function works
 	//  -> although you still have objA0.mapping_offset in A2, and objA0.sprite_attributes in D5.u16
 

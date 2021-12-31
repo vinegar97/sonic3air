@@ -75,10 +75,8 @@ function void Standalone.drawCharacterSpriteDirect(u8 character, s16 px, s16 py,
 			u32 tableAddress  = (character == CHARACTER_SONIC) ? (super.active ? 0x148378 : 0x148182) : (character == CHARACTER_TAILS) ? 0x14a08a : 0x14bd0a
 			u32 mappingOffset = (character == CHARACTER_SONIC) ? (super.active ? 0x146816 : 0x146620) : (character == CHARACTER_TAILS) ? 0x148eb8 : 0x14a8d6		// Not really necessary here, we could also use "char.mapping_offset"
 
-		// #if COAL
 			// u64 category = (character == CHARACTER_SONIC) ? (super.active ? "character_supersonic" : "character_sonic") : (character == CHARACTER_TAILS) ? "character_tails" : "character_knuckles"
 			// Renderer.extractCustomSprite(key, category, animationSprite, atex)
-		// #endif
 
 			key = Renderer.setupCustomCharacterSprite(sourceBase, tableAddress, mappingOffset, animationSprite, 0x00)
 		}
@@ -382,10 +380,8 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 	if (EXTENDED_CHARACTER_PALETTES)
 		atex = 0x40 + character * 0x20
 
-// #if COAL
 	// u64 category = (variant < 2) ? ((character == CHARACTER_SONIC) ? (super.active ? "character_supersonic" : "character_sonic") : (character == CHARACTER_TAILS) ? "character_tails" : "character_knuckles") : "character_tails_tails"
 	// Renderer.extractCustomSprite(key, category, animationSprite, atex)
-// #endif
 
 	if (char.sprite_attributes & 0x8000)
 		flags |= SPRITE_FLAG_PRIO
