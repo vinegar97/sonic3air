@@ -543,6 +543,7 @@ jobs:
 
       - name: Build libogg
         run: |
+        shell: pwsh
           msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
           msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
           msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
@@ -552,6 +553,7 @@ jobs:
 
       - name: Build libvorbis
         run: |
+        shell: pwsh
           msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
           msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
           msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Debug /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
