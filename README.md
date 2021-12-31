@@ -34,7 +34,7 @@ External libraries and code used in this project:
 * libogg & libvorbis - in ["framework/external/ogg-vorbis"](framework/external/ogg-vorbis)
 * zlib incl. minizip - in ["framework/external/zlib"](framework/external/zlib)
 * jsoncpp - in ["librmx/source/rmxbase/jsoncpp"](librmx/source/rmxbase/jsoncpp)
-* GLEW - in "[librmx/source/rmxmedia/glew"](librmx/source/rmxmedia/glew)
+* GLEW - in ["librmx/source/rmxmedia/glew"](librmx/source/rmxmedia/glew)
 * Sound chip emulation related code from Genesis Plus GX - in ["Oxygen/oxygenengine/source/oxygen/simulation/sound"](Oxygen/oxygenengine/source/oxygen/simulation/sound)
 * Discord Game SDK - in ["Oxygen/soncthrickles/source/external/discord_game_sdk"](Oxygen/soncthrickles/source/external/discord_game_sdk)
 * xBRZ upscaler shader code - in ["Oxygen/oxygenengine/data/shader"](Oxygen/oxygenengine/data/shader) and once more in ["Oxygen/soncthrickles/data/shader"](Oxygen/soncthrickles/data/shader)
