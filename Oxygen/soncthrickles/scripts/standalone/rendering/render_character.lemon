@@ -126,7 +126,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 
 	u8 animationSprite = char.animation.sprite
 	u16 animationSpriteEx = Standalone.getModdedAnimationSpriteEx(character, animationSprite)
-	u8 flags = (char.render_flags & 0x03)
+	u8 flags = (char.render_flags & (SPRITE_FLAG_FLIP_X | SPRITE_FLAG_FLIP_Y))
 	u8 angle = 0
 	u64 key = 0
 	u8 rotationMode = 0
