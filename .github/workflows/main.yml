@@ -549,9 +549,8 @@ jobs:
           msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
 
       - name: Copy libogg
-        run: |
         shell: cmd
-          call ./framework/external/ogg-vorbis/copy_libogg.bat
+        run: call ./framework/external/ogg-vorbis/copy_libogg.bat
 
       - name: Build libvorbis
         run: |
@@ -561,6 +560,5 @@ jobs:
           msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Release /p:Platform=x64 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
 
       - name: Copy libvorbis
-        run: |
         shell: cmd
-          call ./framework/external/ogg-vorbis/copy_libvorbis.bat
+        run: call .\framework\external\ogg-vorbis\copy_libvorbis.bat
