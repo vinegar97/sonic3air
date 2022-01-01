@@ -164,6 +164,9 @@ function void fn04c97e()
 	{
 		A1 = 0x04cc36
 		levelselect.characters = CHARS_SONIC_ALONE
+	#if COAL
+		levelselect.characters = CHARS_SONIC_AND_TAILS
+	#endif
 		scrolloffset.y.both = 0xfff0fff8
 	}
 
@@ -266,12 +269,49 @@ function void fn04cb1a()
 	A1 = (u8[0xffffffab] == 0) ? 0x04cb36 : 0x04cbb6
 	copyMemory(A2, A1, 0x80)
 
+#if COAL
+	if (levelselect.characters == CHARS_SONIC_AND_TAILS)
+	{
+		// Manipulate the palette for Sonic & Tails
+		copyMemory(A2 + 0x00, 0x04cb96, 0x10)	// Manipulate the palette for Sonic
+		BlueSphereGame.applyTailsPalette(A2 + 0x20)	// Manipulate the palette for Tails
+	}
+
+	if (levelselect.characters == CHARS_SONIC_ALONE)
+	{
+		// Manipulate the palette for Sonic
+		copyMemory(A2 + 0x00, 0x04cb96, 0x10)
+		copyMemory(A2 + 0x60, 0x04cb96, 0x10)
+	}
+
+	if (levelselect.characters == CHARS_TAILS_ALONE)
+	{
+		// Manipulate the palette for Tails
+		BlueSphereGame.applyTailsPalette(A2 - 0x40)
+		BlueSphereGame.applyTailsPalette(A2 + 0x20)
+	}
+
+	if (levelselect.characters == CHARS_KNUCKLES_ALONE)
+	{
+		// Manipulate the palette for Knuckles
+		copyMemory(A2 + 0x00, 0x04cb36, 0x10)
+		copyMemory(A2 + 0x60, 0x04cb36, 0x10)
+	}
+
+	if (levelselect.characters == CHARS_KNUCKLES_AND_TAILS)
+	{
+		// Manipulate the palette for Knuckles & Tails
+		copyMemory(A2 + 0x00, 0x04cb36, 0x10)	// Manipulate the palette for Knuckles
+		BlueSphereGame.applyTailsPalette(A2 + 0x20)	// Manipulate the palette for Tails
+	}
+#else
 #if STANDALONE
 	if (levelselect.characters == CHARS_TAILS_ALONE)
 	{
 		// Manipulate the palette for Tails
 		BlueSphereGame.applyTailsPalette(A2)
 	}
+#endif
 #endif
 }
 
@@ -515,6 +555,11 @@ function void fn04cf82()
 		global.stage_type = 0
 		bluespheres.minigame_mode = 1
 		global.characters = levelselect.characters
+	#if COAL
+		// Handle Knuckles & Tails
+		useKnucklesAndTails = (global.characters == CHARS_KNUCKLES_AND_TAILS)
+		global.characters = min(global.characters, 3)
+	#endif
 		lives_counter = 0x03
 		global.sk_bluespheres = 0
 		global.next_bluespheres = 0
@@ -1162,10 +1207,15 @@ function void fn04d648()
 function void fn04d64e()
 {
 	objA0.mapping_offset = 0x04d926
+
+#if COAL
+	objA0.sprite_attributes = (objA0.render_flags & render_flag.FLIP_X) == 0 ? 0x8598 : 0xe598
+#else
 	objA0.sprite_attributes = (levelselect.characters == CHARS_KNUCKLES_ALONE) ? 0x8598 : 0xe598
 #if STANDALONE
 	if (levelselect.characters == CHARS_TAILS_ALONE)
 		objA0.sprite_attributes = 0xc598
+#endif
 #endif
 
 	objA0.position.x.u16 = ((objA0.render_flags & render_flag.FLIP_X) ? 0x140 : 0x100) + getScreenExtend()
@@ -1183,6 +1233,7 @@ function void fn04d64e()
 //# address-hook(0x04d6b8) end(0x04d7a0)
 function void fn04d6b8()
 {
+#if !COAL
 #if STANDALONE
 	// Do the following only once in total, i.e. only for the right object
 	if (objA0.render_flags & render_flag.FLIP_X)
@@ -1196,6 +1247,7 @@ function void fn04d6b8()
 		// Render the BG logo in the right colors again
 		Renderer.drawCustomSprite("sklogo", getScreenWidth() / 2, 40 - scrolloffset.y.planeB, 0x00, 0, 0x1700)
 	}
+#endif
 #endif
 
 	if (bluespheregame.fully_unlocked != 0)
@@ -1313,6 +1365,45 @@ function void fn04d6b8()
 
 	if (control.pad1.pressed & CONTROL_ABC)
 	{
+	#if COAL
+		if (objA0.render_flags & render_flag.FLIP_X)
+			levelselect.characters = (levelselect.characters >= 4) ? 0 : levelselect.characters++
+
+		if (levelselect.characters == CHARS_SONIC_AND_TAILS)
+		{
+			// Manipulate the palette for Sonic & Tails
+			copyMemory(0xfffffc00 + 0x00, 0x04cb96, 0x10)	// Manipulate the palette for Sonic
+			BlueSphereGame.applyTailsPalette(0xfffffc00 + 0x20)	// Manipulate the palette for Tails
+		}
+
+		if (levelselect.characters == CHARS_SONIC_ALONE)
+		{
+			// Manipulate the palette for Sonic
+			copyMemory(0xfffffc00 + 0x00, 0x04cb96, 0x10)
+			copyMemory(0xfffffc00 + 0x60, 0x04cb96, 0x10)
+		}
+
+		if (levelselect.characters == CHARS_TAILS_ALONE)
+		{
+			// Manipulate the palette for Tails
+			BlueSphereGame.applyTailsPalette(0xfffffc00 - 0x40)
+			BlueSphereGame.applyTailsPalette(0xfffffc00 + 0x20)
+		}
+
+		if (levelselect.characters == CHARS_KNUCKLES_ALONE)
+		{
+			// Manipulate the palette for Knuckles
+			copyMemory(0xfffffc00 + 0x00, 0x04cb36, 0x10)
+			copyMemory(0xfffffc00 + 0x60, 0x04cb36, 0x10)
+		}
+
+		if (levelselect.characters == CHARS_KNUCKLES_AND_TAILS)
+		{
+			// Manipulate the palette for Knuckles & Tails
+			copyMemory(0xfffffc00 + 0x00, 0x04cb36, 0x10)	// Manipulate the palette for Knuckles
+			BlueSphereGame.applyTailsPalette(0xfffffc00 + 0x20)	// Manipulate the palette for Tails
+		}
+	#else
 		D0.u16 = objA0.sprite_attributes
 		if (D0.u16 == 0x8598)
 		{
@@ -1332,6 +1423,7 @@ function void fn04d6b8()
 			levelselect.characters = CHARS_KNUCKLES_ALONE
 			objA0.sprite_attributes = 0x8598
 		}
+	#endif
 	}
 
 	DrawObject()
@@ -1467,6 +1559,12 @@ function void fn04da7e()
 	bluespheregame.menu_selection = 1
 	u32[0xffffb000] = 0x04def8
 	u32[0xffffb04a] = 0x04df86
+
+#if COAL
+	if (getNumPlayers() >= 2)
+		u32[0xffffb094] = 0x04df86	// spawn a second player if needed
+#endif
+
 	u32[0xffffb1bc] = 0x04d03e
 	u16[0xffffb1d0] = 0x90
 	u32[0xffffb862] = 0x04e012
@@ -1710,7 +1808,31 @@ function void fn04df86()
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
 
+#if COAL
+	if (getNumPlayers() >= 2)
+		objA0.position.x.u16 += (A0 == 0xffffb04a) ? 0x10 : -0x10 // Shift characters left or right if there's two
+
+	if (A0 != 0xffffb04a)
+	{
+		// Second character can only ever be Tails...
+		if (isSecondCharacter(CHARACTER_TAILS))
+		{
+			objA0.position.y.u16 += 0x04
+			
+			objA0.mapping_offset = 0x148eb8
+			objA0.state = char.state.WIN_POSE
+			objA0.sprite_attributes = 0x86a0
+
+			objA0.update_address = 0x04dffe
+			fn04dffe()
+		}
+		return
+	}
+
+	if (isMainCharacter(CHARACTER_SONIC))
+#else
 	if (global.characters == CHARS_SONIC_ALONE)
+#endif
 	{
 		objA0.mapping_offset = 0x146620
 		objA0.state = char.state.WIN_POSE
