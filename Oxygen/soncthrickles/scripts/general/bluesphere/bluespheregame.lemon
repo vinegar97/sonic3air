@@ -1003,7 +1003,11 @@ function void fn04d3ce()
 		D0.u16 = u16[A0 + 0x30] + 1
 		D0 = u32(D0.u16) * 0x4a
 		A1 += D0.u16
+	#if COAL
+		objA1.sprite_attributes = 0xa562	// Make highlighted digits use the second palette line
+	#else
 		objA1.sprite_attributes = 0x8562
+	#endif
 	}
 
 	if (control.pad1.pressed & CONTROL_DPAD)

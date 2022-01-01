@@ -1,0 +1,4 @@
+{
+	// change the the red digit tiles to use the same colours, but from the second palette line
+	"General/Blue Sphere/Kosinski Art/Normal Text.bin": { "File": "BlueSphere.bin", "RomInject": "0x1897de" }
+}
