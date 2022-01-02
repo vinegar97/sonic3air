@@ -434,7 +434,11 @@ function void fn08167c()
 
 	if (global.super_emeralds != 7)
 	{
+	#if COAL
+		u32[0xffffcd7c] = 0x08242a		// Super Sonic stars in Doomsday Zone
+	#else
 		u32[0xffffcbc0] = 0x08242a		// Super Sonic stars in Doomsday Zone
+	#endif
 	}
 	else
 	{

@@ -3150,7 +3150,12 @@ function bool Character.performSuperTransformation()
 		else
 		{
 			super.active = 1
+
+		#if COAL
+			u32[0xffffcd7c] = 0x019156		// Super Sonic stars
+		#else
 			u32[0xffffcbc0] = 0x019156		// Super Sonic stars
+		#endif
 		}
 	}
 	else if (char.character == CHARACTER_TAILS)
@@ -3180,7 +3185,12 @@ function bool Character.performSuperTransformation()
 		else
 		{
 			super.active = 1
+
+		#if COAL
+			u32[0xffffcd7c] = 0x019156		// Super Knuckles stars
+		#else
 			u32[0xffffcbc0] = 0x019156		// Super Knuckles stars
+		#endif
 		}
 	}
 
