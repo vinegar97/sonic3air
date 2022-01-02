@@ -40,6 +40,19 @@ function void fn0191a4()
 		return
 	}
 
+#if COAL
+	if (objA0.state != 0)
+	{
+		// scatter sparks when airdashing
+		objA0.state = 0
+		objA0.position.x.u16 = u16[0xffffb010]
+		objA0.position.y.u16 = u16[0xffffb014]
+
+		D2 = 2
+		Effects.CreateSparks()
+	}
+#endif
+
 #if STANDALONE
 	// Sonic charging a Super Peel-Out right now?
 	if (u8[0xffffb03d] == 0x80)
