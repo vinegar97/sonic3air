@@ -36,3 +36,8 @@ function void fn00f3a4()
 {
 	CheckStaticCollisionVerticalShort()
 }
+
+function void fn01cdb2()
+{
+	PathSwapperCompetitionMode_UpdateVertical()
+}

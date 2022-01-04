@@ -331,6 +331,7 @@ function void fn065efe()
 }
 
 
+//# address-hook(0x065f2e) end(0x065f84)
 function void fn065f2e()
 {
 	if ((objA0.flags38 & (1 << D2.u8)) == 0)
