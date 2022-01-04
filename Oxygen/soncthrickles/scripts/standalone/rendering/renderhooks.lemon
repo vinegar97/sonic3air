@@ -120,7 +120,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Monitor
 		if (objA0.update_address >= 0x01d566 && objA0.update_address <= 0x01d61e)
 		{
-			u8 flags = ((objA0.render_flags & 0x02) ? SPRITE_FLAG_FLIP_Y : 0) | ((objA0.sprite_attributes & 0x8000) ? SPRITE_FLAG_PRIO : 0)
+			u8 flags = ((objA0.render_flags & render_flag.FLIP_Y) ? SPRITE_FLAG_FLIP_Y : 0) | (prioFlag ? SPRITE_FLAG_PRIO : 0)
 			if (objA0.animation.sprite == 11)
 			{
 				if (Game.getSetting(SETTING_MONITOR_STYLE))
@@ -137,12 +137,12 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				if (Game.getSetting(SETTING_MONITOR_STYLE))
 				{
 					Renderer.drawCustomSprite("monitor_s2_intact", px, py, 0x00, flags, renderQueue)
-					py += (objA0.render_flags & 0x02) ? 2 : -2
+					py += (objA0.render_flags & render_flag.FLIP_Y) ? 2 : -2
 				}
 				else
 				{
 					Renderer.drawCustomSprite("monitor_s3_intact", px, py, 0x00, flags, renderQueue)
-					py += (objA0.render_flags & 0x02) ? 5 : -5
+					py += (objA0.render_flags & render_flag.FLIP_Y) ? 5 : -5
 				}
 
 				if (objA0.animation.sprite <= 1)
@@ -177,7 +177,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			u64 key = Monitor.getIconSpriteKey(objA0.state)
 			if (key != 0)
 			{
-				u8 flags = ((objA0.render_flags & 0x02) ? SPRITE_FLAG_FLIP_Y : 0) | ((objA0.sprite_attributes & 0x8000) ? SPRITE_FLAG_PRIO : 0)
+				u8 flags = ((objA0.render_flags & render_flag.FLIP_Y) ? SPRITE_FLAG_FLIP_Y : 0) | (prioFlag ? SPRITE_FLAG_PRIO : 0)
 				u8 alpha = 255
 				if (objA0.base_state == 0x04)
 				{
@@ -233,12 +233,12 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				key = "eggrobo_fbz_02"
 			else
 				key = "eggrobo_fbz_03"
-			Renderer.drawCustomSprite(key, px, py, 0x00, (objA0.render_flags & 0x01) | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+			Renderer.drawCustomSprite(key, px, py, 0x00, (objA0.render_flags & render_flag.FLIP_X) | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
 			return true
 		}
 
 		// Tornado in outro, when flying left
-		if (objA0.update_address == 0x05ea52 && char.render_flags & 0x01)
+		if (objA0.update_address == 0x05ea52 && char.render_flags & render_flag.FLIP_X)
 		{
 			// Render additional sprite on top
 			Renderer.drawCustomSprite("tornado_text_sonic", px-16, py-6, 0, 0x00, renderQueue + 1)
@@ -429,11 +429,11 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			else
 			{
 				if (character == CHARACTER_SONIC)
-					key = Renderer.setupCustomCharacterSprite(0x0aaa7c, 0x0abe14, objA0.mapping_offset, objA0.animation.sprite, 0x00)
+					key = Renderer.setupCustomCharacterSprite(0x0aaa7c, 0x0abe14, objA0.mapping_offset, objA0.animation.sprite, atex)
 				else if (character == CHARACTER_TAILS)
-					key = Renderer.setupCustomCharacterSprite(0x28f95a, 0x2908d2, objA0.mapping_offset, objA0.animation.sprite, 0x10)
+					key = Renderer.setupCustomCharacterSprite(0x28f95a, 0x2908d2, objA0.mapping_offset, objA0.animation.sprite, atex)
 				else
-					key = Renderer.setupCustomCharacterSprite(0x0abf22, 0x0ad31a, objA0.mapping_offset, objA0.animation.sprite, 0x00)
+					key = Renderer.setupCustomCharacterSprite(0x0abf22, 0x0ad31a, objA0.mapping_offset, objA0.animation.sprite, atex)
 			}
 			Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
 			return true
