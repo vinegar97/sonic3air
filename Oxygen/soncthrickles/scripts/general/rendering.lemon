@@ -438,7 +438,7 @@ function void renderNextObject()
 
 		A1 = objA0.mapping_offset
 		D4 = 0
-		if ((objA0.render_flags & 0x20) == 0)
+		if ((objA0.render_flags & render_flag.STATIC_MAPPIMG) == 0)
 		{
 			A1 = tableLookupAddress(A1, s16(objA0.animation.sprite) * 2)
 			D4.u16 = u16[A1] - 1

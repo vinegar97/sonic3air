@@ -97,7 +97,7 @@ function void fn020c38()
 	A3 = u32[A0 + 0x0c]
 	A3.u16 += u16[A3 + D0.s16]
 	D1.u16 = u16[(A3+=2)-2]
-	objA0.render_flags |= 0x20
+	objA0.render_flags |= render_flag.STATIC_MAPPIMG
 	D5.u8 = objA0.render_flags
 	A1 = A0
 
