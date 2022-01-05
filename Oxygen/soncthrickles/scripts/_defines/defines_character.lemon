@@ -35,6 +35,8 @@ define char.render_flags		=  u8[A0 + 0x04]
 define u8 render_flag.FLIP_X	=  0x01		// Flipped horizontally
 define u8 render_flag.FLIP_Y	=  0x02		// Flipped vertically
 define u8 render_flag.WORLD		=  0x04		// Usually set, so the object is positioned in world, not on screen
+define u8 render_flag.COMPETITION_P1_SCREEN	=  0x08		// indicates sprites that belong on the top half / player 1's side of the screen in competition mode
+define u8 render_flag.COMPETITION_P2_SCREEN	=  0x10		// indicates sprites that belong on the bottom half / player 2's side of the screen in competition mode
 define u8 render_flag.COMPOUND	=  0x40		// Used for multiple child object rendering
 define u8 render_flag.VISIBLE	=  0x80		// Object visible on screen if set
 

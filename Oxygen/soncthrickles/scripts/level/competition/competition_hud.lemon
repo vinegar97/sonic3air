@@ -29,13 +29,13 @@ function void fn03703a()
 			return
 		}
 
-		objA0.render_flags |= 0x10
+		objA0.render_flags |= render_flag.COMPETITION_P2_SCREEN
 		u32[A0] = 0x0370b4
 		fn0370b4()
 	}
 	else
 	{
-		objA0.render_flags |= 0x08
+		objA0.render_flags |= render_flag.COMPETITION_P1_SCREEN
 		u32[A0] = 0x037092
 		fn037092()
 	}
@@ -74,7 +74,7 @@ function void fn03713a()
 	u32[A0] = 0x03716c
 	if (competition_mode.multiplay == 0)
 	{
-		objA0.render_flags |= 0x08
+		objA0.render_flags |= render_flag.COMPETITION_P1_SCREEN
 	}
 	fn03716c()
 }
@@ -137,7 +137,7 @@ function void fn0371be()
 		if (D0.u8 < u8[0xfffffedc])
 		{
 			objA0.state = (competition_mode.multiplay == 0) ? 3 : 4
-			objA0.render_flags |= 0x08
+			objA0.render_flags |= render_flag.COMPETITION_P1_SCREEN
 			objA0.value3a = 0x02
 			u16[0xffffeee8] = 0x78
 			if (competition_mode.multiplay != 0 && u8[0xffffff8b] == 0)
@@ -153,7 +153,7 @@ function void fn0371be()
 			if (D0.u8 < u8[0xfffffedd])
 			{
 				objA0.state = 0x06
-				objA0.render_flags &= ~0x08
+				objA0.render_flags &= ~render_flag.COMPETITION_P1_SCREEN
 				u16[0xffffeee8] = 0x78
 				u8[0xfffffec7] = 0x80
 			}
@@ -165,7 +165,7 @@ function void fn0371be()
 		else if (D0.u8 < u8[0xfffffedd])
 		{
 			objA0.state = 0x04
-			objA0.render_flags |= 0x10
+			objA0.render_flags |= render_flag.COMPETITION_P2_SCREEN
 			objA0.value3a = 0x02
 			u16[0xffffeee8] = (u8[0xffffff8b] != 0) ? 0x78 : 0x0168
 			u8[0xfffffec7] = 0x80
@@ -256,7 +256,7 @@ function void fn0373a4()
 	if (D0.u8 < u8[0xfffffedc] && s8[0xfffffe1e] >= 0)
 	{
 		objA0.state = 0x05
-		objA0.render_flags |= 0x08
+		objA0.render_flags |= render_flag.COMPETITION_P1_SCREEN
 		hud.dirty.timer = 0x80
 		u16[0xffffeee8] = 0x78
 		playSound(0x6a)
@@ -266,7 +266,7 @@ function void fn0373a4()
 	if (D0.u8 < u8[0xfffffedd] && s8[0xfffffec7] >= 0)
 	{
 		objA0.state = 0x05
-		objA0.render_flags |= 0x10
+		objA0.render_flags |= render_flag.COMPETITION_P2_SCREEN
 		u8[0xfffffec7] = 0x80
 		u16[0xffffeee8] = 0x78
 		playSound(0x6a)
@@ -374,7 +374,7 @@ function void fn037c8e()
 	objA0.box_size.y = 0x10
 	objA0.position.x.u16 = 0xc8
 	objA0.position.y.u16 = 0x90
-	objA0.render_flags |= 0x08
+	objA0.render_flags |= render_flag.COMPETITION_P1_SCREEN
 
 	A1 = 0x037e8e
 	A2 = 0xffff7000
@@ -424,7 +424,7 @@ function void fn037d00()
 	objA0.box_size.y = 0x10
 	objA0.position.x.u16 = 0xc8
 	objA0.position.y.u16 = 0x90
-	objA0.render_flags |= 0x10
+	objA0.render_flags |= render_flag.COMPETITION_P2_SCREEN
 
 	copyMemory(0xffff7080, 0x037e8e, 0x34)
 
@@ -568,13 +568,13 @@ function void fn037ec2()
 			return
 		}
 
-		objA0.render_flags |= 0x10
+		objA0.render_flags |= render_flag.COMPETITION_P2_SCREEN
 		u32[A0] = 0x037f42
 		fn037f42()
 	}
 	else
 	{
-		objA0.render_flags |= 0x08
+		objA0.render_flags |= render_flag.COMPETITION_P1_SCREEN
 		u32[A0] = 0x037f1a
 		fn037f1a()
 	}

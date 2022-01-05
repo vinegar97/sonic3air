@@ -19,7 +19,7 @@ function void CompetitionMode.Character.BaseUpdate(u32 mainRoutineTableAddress)
 		A6 = 0xffffcc54
 		if (u8[0xffffb082] == char.character)
 		{
-			char.render_flags ^= 0x08
+			char.render_flags ^= render_flag.COMPETITION_P1_SCREEN
 		}
 
 		if (debug_mode.state != 0)
@@ -35,7 +35,7 @@ function void CompetitionMode.Character.BaseUpdate(u32 mainRoutineTableAddress)
 		A6 = 0xffffcc9e
 		if (u8[0xffffb038] == char.character)
 		{
-			char.render_flags ^= 0x10
+			char.render_flags ^= render_flag.COMPETITION_P2_SCREEN
 		}
 	}
 

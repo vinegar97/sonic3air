@@ -711,13 +711,13 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 	{
 		objA0.render_flags &= ~render_flag.VISIBLE		// Reset visibility flag
 		D6.u8 = objA0.render_flags
-		if (D6 & 0x10)
+		if (D6 & render_flag.COMPETITION_P2_SCREEN)
 			return
 	}
 	else
 	{
 		D6.u8 = objA0.render_flags
-		if (D6 & 0x08)
+		if (D6 & render_flag.COMPETITION_P1_SCREEN)
 			return
 	}
 	u16 offsetY = splitScreenIndex * 0x70
