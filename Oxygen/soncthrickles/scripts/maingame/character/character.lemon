@@ -38,13 +38,10 @@ function void Character.BaseUpdate.Sonic()
 		//	- 0x0125ac	-> char.base_state = 0x0c	-> Character.UpdateDrownedState.Sonic()	-> Sonic died by drowning
 		call tableLookupAddress(0x010aec, char.base_state)
 	}
-	else
+	else if (updateDebugModeRegular())
 	{
-		if (updateDebugModeRegular())
-		{
-			UpdateSonicSpritePatterns()
-			DrawObject()
-		}
+		UpdateSonicSpritePatterns()
+		DrawObject()
 	}
 }
 
@@ -67,13 +64,10 @@ function void Character.BaseUpdate.Tails()
 		//  - 0x015810	-> char.base_state = 0x0c	-> Character.UpdateDrownedState.Tails()	-> Tails died by drowning
 		call tableLookupAddress(0x0136bc, char.base_state)
 	}
-	else
+	else if (updateDebugModeRegular())
 	{
-		if (updateDebugModeRegular())
-		{
-			UpdateTailsSpritePatterns()
-			DrawObject()
-		}
+		UpdateTailsSpritePatterns()
+		DrawObject()
 	}
 }
 
@@ -96,13 +90,10 @@ function void Character.BaseUpdate.Knuckles()
 		//  - 0x017cea	-> char.base_state = 0x0c	-> Character.UpdateDrownedState.Knuckles()	-> Knuckles died by drowning
 		call tableLookupAddress(0x01649c, char.base_state)
 	}
-	else
+	else if (updateDebugModeRegular())
 	{
-		if (updateDebugModeRegular())
-		{
-			UpdateKnucklesSpritePatterns()
-			DrawObject()
-		}
+		UpdateKnucklesSpritePatterns()
+		DrawObject()
 	}
 }
 
@@ -710,7 +701,7 @@ function void partialUpdateCharacterOnGround()
 //# address-hook(0x011036) end(0x01105e)
 function void Character.UpdateSonicRollingInAir()
 {
-	Character.updateJumpMoves()
+	UpdateSonicJumpMoves()
 	Character.UpdateControlInAir()
 	Character.CheckAgainstMoveBorders()
 	Character.UpdateMovement()
@@ -2896,7 +2887,7 @@ function void SonicPressedJumpInMidAir()
 
 			playSound(SFX_SPINDASH_RELEASE)
 
-			u8 input = control.player1.state & 0x0f	// Only directions
+			u8 input = control.player1.state & CONTROL_DPAD	// Only directions
 			if (input != 0 && input < 0x0b)		// Not left and right at the same time
 			{
 				// Perform Hyper Dash
@@ -4470,7 +4461,7 @@ function void Character.updateUprightOnGroundInner()
 			D5.u16 = 0x0c
 		}
 
-		if ((input_state & 0x0c) == 0)	// No left or right
+		if ((input_state & (CONTROL_LEFT | CONTROL_RIGHT)) == 0)	// No left or right pressed
 		{
 			if (char.groundspeed != 0)
 			{
@@ -4682,7 +4673,7 @@ function void Character.CheckForStartRolling()
 
 	if ((char.bonus_effect & char.bonus.INFINITE_INERTIA) == 0)
 	{
-		if ((input_state & 0x0c) == 0)	// No left or right pressed
+		if ((input_state & (CONTROL_LEFT | CONTROL_RIGHT)) == 0)	// No left or right pressed
 		{
 			if (input_state & CONTROL_DOWN)
 			{
