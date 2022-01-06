@@ -4343,7 +4343,7 @@ function void PressedRightWhileUprightOnGround()
 
 
 //# address-hook(0x011060) end(0x01134c)
-function void Character.UpdateUprightOnGroundInner()
+function void UpdateSonicUprightOnGroundInner()
 {
 	Character.updateUprightOnGroundInner()
 }

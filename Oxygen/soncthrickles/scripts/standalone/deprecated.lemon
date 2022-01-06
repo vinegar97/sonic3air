@@ -41,3 +41,8 @@ function void fn01cdb2()
 {
 	PathSwapperCompetitionMode_UpdateVertical()
 }
+
+function void Character.UpdateUprightOnGroundInner()
+{
+	UpdateSonicUprightOnGroundInner()
+}

@@ -222,7 +222,7 @@ function void fn0107f6()
 		return
 
 	Character.UpdateUprightSlopeEffect()
-	Character.UpdateUprightOnGroundInner()
+	UpdateSonicUprightOnGroundInner()
 	fn0108e6()
 	UpdateMovementStraightSimple()
 
