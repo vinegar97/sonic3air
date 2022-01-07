@@ -6135,47 +6135,6 @@ function void SonicHurtCheckForStateChange()
 }
 
 
-function void Character.HurtCheckForStateChange()
-{
-	if (!global.passing_floor)
-	{
-		if (global.inv_gravity == 0)
-		{
-			if (s16(char.position.y.u16) > s16(move_area.bottom.current + getScreenHeight()))
-			{
-				Character.Die()
-				return
-			}
-		}
-		else
-		{
-			if (s16(char.position.y.u16) <= s16(level.vertical_wrap))
-			{
-				Character.Die()
-				return
-			}
-		}
-	}
-
-	pushA456()
-	Character.CheckCollision()
-	popA456()
-
-	if ((char.flags & char.flag.IN_AIR) == 0)
-	{
-		char.velocity.x = 0
-		char.velocity.y = 0
-		char.groundspeed = 0
-		char.control_flags = 0
-		char.state = char.state.RUNNING
-		char.sprite_priority = 0x100
-		char.base_state = 0x02		// Back to normal state
-		char.invuln.countdown = 120
-		char.spindash = 0
-	}
-}
-
-
 //# address-hook(0x0125e0) end(0x0125fc)
 function void SonicUpdateAnimationHurt()
 {
@@ -6298,6 +6257,47 @@ function void KnucklesUpdateAnimationHurt()
 	if (global.inv_gravity)
 		char.render_flags ^= render_flag.FLIP_Y
 	UpdateKnucklesSpritePatterns()
+}
+
+
+function void Character.HurtCheckForStateChange()
+{
+	if (!global.passing_floor)
+	{
+		if (global.inv_gravity == 0)
+		{
+			if (s16(char.position.y.u16) > s16(move_area.bottom.current + getScreenHeight()))
+			{
+				Character.Die()
+				return
+			}
+		}
+		else
+		{
+			if (s16(char.position.y.u16) <= s16(level.vertical_wrap))
+			{
+				Character.Die()
+				return
+			}
+		}
+	}
+
+	pushA456()
+	Character.CheckCollision()
+	popA456()
+
+	if ((char.flags & char.flag.IN_AIR) == 0)
+	{
+		char.velocity.x = 0
+		char.velocity.y = 0
+		char.groundspeed = 0
+		char.control_flags = 0
+		char.state = char.state.RUNNING
+		char.sprite_priority = 0x100
+		char.base_state = 0x02		// Back to normal state
+		char.invuln.countdown = 120
+		char.spindash = 0
+	}
 }
 
 
