@@ -39,6 +39,10 @@ function void CompetitionMode.Character.BaseUpdate(u32 mainRoutineTableAddress)
 		}
 	}
 
+	// Targets:
+	//  - 0x0122be, 0x01569c	-> char.base_state = 0x04	-> Character.UpdateGotHurtState.*()		-> Character just got hurt
+	//  - 0x012390, 0x01578e	-> char.base_state = 0x06	-> Character.UpdateDiedState.*()		-> Character died
+	//  - 0x01257c, 0x0157e0	-> char.base_state = 0x08	-> Character.UpdateRestartDelay()		-> Completely inactive after death
 	call tableLookupAddress(mainRoutineTableAddress, char.base_state)
 }
 
@@ -162,11 +166,11 @@ function void fn010740()
 	if ((char.control_flags & 0x01) == 0)
 	{
 		// Targets:
-		//  - 0x0107f6	-> (char.flags & 0x06) = 0x00
-		//  - 0x010868	-> (char.flags & 0x06) = 0x02
-		//  - 0x010896	-> (char.flags & 0x06) = 0x04
-		//  - 0x0108b8	-> (char.flags & 0x06) = 0x06
-		call tableLookupAddress(0x0107ee, char.flags & 0x06)
+		//  - 0x0107f6	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00
+		//  - 0x010868	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR
+		//  - 0x010896	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING
+		//  - 0x0108b8	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)
+		call tableLookupAddress(0x0107ee, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 	}
 
 	if (level.vertical_wrap == 0xff00)
@@ -237,8 +241,10 @@ function void fn010868()
 	UpdateSonicJumpMoves()
 	Character.UpdateControlInAir()
 	UpdateMovementSimple()
-	if (char.flags & 0x40)
+
+	if (char.flags & char.flag.UNDERWATER)
 	{
+		// Gravity
 		char.velocity.y -= 0x28
 	}
 
@@ -252,7 +258,7 @@ function void fn010868()
 //# address-hook(0x010896) end(0x0108b6)
 function void fn010896()
 {
-	if (u8[A0 + 0x3d] == 0)
+	if (char.spindash == 0)
 	{
 		if (Character.CheckStartJump())
 			return
@@ -279,14 +285,15 @@ function void fn0108e6()
 {
 	if (s8[A0 + 0x2b] >= 0 && abs(char.groundspeed) >= 0x80)
 	{
-		if ((control.player1.state & 0x0c) == 0 && (control.player1.state & CONTROL_DOWN) && (char.flags & 0x04) == 0)
+		// Start rolling
+		if ((control.player1.state & (CONTROL_LEFT | CONTROL_RIGHT)) == 0 && (control.player1.state & CONTROL_DOWN) && (char.flags & char.flag.ROLLING) == 0)
 		{
-			char.flags |= 0x04
+			char.flags |= char.flag.ROLLING
 			char.hitbox_extends.x = 3
 			char.hitbox_extends.y = 7
-			char.state = 0x02
+			char.state = char.state.ROLLING
 			char.position.y.u16 += 4
-			playSound(0x3c)
+			playSound(SFX_ROLL)
 			if (char.groundspeed == 0)
 			{
 				char.groundspeed = 0x0200
@@ -299,15 +306,16 @@ function void fn0108e6()
 //# address-hook(0x01094c) end(0x010a12)
 function void fn01094c()
 {
-	if (u8[A0 + 0x3d] == 0)
+	if (char.spindash == 0)
 	{
-		if ((char.state == 0x08) && (control.player1.pressed & CONTROL_ABC))
+		if ((char.state == char.state.COWERING) && (control.player1.pressed & CONTROL_ABC))
 		{
-			char.state = 0x09
-			playSound(0xab)
+			// Start spindash
+			char.state = char.state.SPINDASH
+			playSound(SFX_SPINDASH_CHARGE)
 			signalMultiReturn()
 
-			u8[A0 + 0x3d] = 0x01
+			char.spindash = 0x01
 			char.spindash_charge = 0
 			if (char.drown_countdown >= 12)
 			{
@@ -324,21 +332,24 @@ function void fn01094c()
 		return
 	}
 
+	// Release spindash!
 	char.hitbox_extends.x = 3
 	char.hitbox_extends.y = 7
-	char.state = 0x02
+	char.state = char.state.ROLLING
 	char.position.y.u16 += 4
-	u8[A0 + 0x3d] = 0
+	char.spindash = 0
 
 	D0 = u8[A0 + 0x3e] * 2
 	char.groundspeed = u16[0x010a14 + D0.u16]
 	A1 = (A0 == 0xffffb000) ? 0xffffee24 : 0xffffee28
 	u16[A1] = 0x2000 - (((u16(char.groundspeed) - 0x0800) * 2) & 0x1f00)
-	if (char.flags & 0x01)
+	if (char.flags & char.flag.FACING_LEFT)
 	{
 		char.groundspeed = -char.groundspeed
 	}
-	char.flags |= 0x04
+	char.flags |= char.flag.ROLLING
+
+	// Tell dust cloud object to disappear again
 	u8[A6 + 0x20] = 0
 	playSound(SFX_SPINDASH_RELEASE)
 
@@ -349,6 +360,7 @@ function void fn01094c()
 //# address-hook(0x010a38) end(0x010a7a)
 function void fn010a38()
 {
+	// Update spindash
 	if (char.spindash_charge != 0)
 	{
 		char.spindash_charge -= char.spindash_charge >> 5
@@ -358,11 +370,10 @@ function void fn010a38()
 
 	if (control.player1.pressed & CONTROL_ABC)
 	{
+		// Charge up
 		char.state.both = 0x0900
-		playSound(0xab)
-		char.spindash_charge += 0x0200
-		if (char.spindash_charge >= 0x0800)
-			char.spindash_charge = 0x0800
+		playSound(SFX_SPINDASH_CHARGE)
+		char.spindash_charge = min(char.spindash_charge + 0x200, 0x800)
 	}
 
 	fn010a80()
@@ -374,17 +385,7 @@ function void fn010a80()
 {
 	signalMultiReturn()
 
-	if (u16[A5] != 0x60)
-	{
-		if (u16[A5] < 0x60)
-		{
-			u16[A5] += 2
-		}
-		else
-		{
-			u16[A5] -= 2
-		}
-	}
+	centerCameraYOffset()
 	Character.UpdateRotationOnGround_partial()
 }
 
@@ -495,11 +496,11 @@ function void fn013274()
 	if ((char.control_flags & 0x01) == 0)
 	{
 		// Targets:
-		//  - 0x013336	-> (char.flags & 0x06) = 0x00
-		//  - 0x01335a	-> (char.flags & 0x06) = 0x02
-		//  - 0x01346a	-> (char.flags & 0x06) = 0x04
-		//  - 0x01348c	-> (char.flags & 0x06) = 0x06
-		call tableLookupAddress(0x01332e, char.flags & 0x06)
+		//  - 0x013336	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00
+		//  - 0x01335a	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR
+		//  - 0x01346a	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING
+		//  - 0x01348c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)
+		call tableLookupAddress(0x01332e, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 	}
 
 	if (level.vertical_wrap == 0xff00)
@@ -553,8 +554,9 @@ function void fn01335a()
 		UpdateTailsJumpMoves()
 		Character.UpdateControlInAir()
 		UpdateMovementSimple()
-		if (char.flags & 0x40)
+		if (char.flags & char.flag.UNDERWATER)
 		{
+			// Gravity
 			char.velocity.y -= 0x28
 		}
 	}
@@ -587,7 +589,7 @@ function void fn0133ae()
 //# address-hook(0x01346a) end(0x01348a)
 function void fn01346a()
 {
-	if (u8[A0 + 0x3d] == 0)
+	if (char.spindash == 0)
 	{
 		if (Character.CheckStartJump())
 			return
@@ -607,8 +609,9 @@ function void fn01348c()
 	UpdateTailsJumpMoves()
 	Character.UpdateControlInAir()
 	UpdateMovementSimple()
-	if (char.flags & 0x40)
+	if (char.flags & char.flag.UNDERWATER)
 	{
+		// Gravity
 		char.velocity.y -= 0x28
 	}
 
@@ -624,14 +627,15 @@ function void fn0134ba()
 {
 	if (s8[A0 + 0x2b] >= 0 && abs(char.groundspeed) >= 0x80)
 	{
-		if ((control.tails.state & 0x0c) == 0 && (control.tails.state & CONTROL_DOWN) && (char.flags & 0x04) == 0)
+		// Start rolling
+		if ((control.tails.state & (CONTROL_LEFT | CONTROL_RIGHT)) == 0 && (control.tails.state & CONTROL_DOWN) && (char.flags & char.flag.ROLLING) == 0)
 		{
-			char.flags |= 0x04
+			char.flags |= char.flag.ROLLING
 			char.hitbox_extends.x = 3
 			char.hitbox_extends.y = 7
-			char.state = 0x02
+			char.state = char.state.ROLLING
 			char.position.y.u16 += 4
-			playSound(0x3c)
+			playSound(SFX_ROLL)
 			if (char.groundspeed == 0)
 			{
 				char.groundspeed = 0x0200
@@ -644,15 +648,16 @@ function void fn0134ba()
 //# address-hook(0x013520) end(0x0135ec)
 function void fn013520()
 {
-	if (u8[A0 + 0x3d] == 0)
+	if (char.spindash == 0)
 	{
-		if ((char.state == 0x08) && (control.tails.pressed & CONTROL_ABC))
+		if ((char.state == char.state.COWERING) && (control.tails.pressed & CONTROL_ABC))
 		{
-			char.state = 0x09
-			playSound(0xab)
+			// Start spindash
+			char.state = char.state.SPINDASH
+			playSound(SFX_SPINDASH_CHARGE)
 			signalMultiReturn()
 
-			u8[A0 + 0x3d] = 0x01
+			char.spindash = 0x01
 			char.spindash_charge = 0
 			if (char.drown_countdown >= 12)
 			{
@@ -670,21 +675,24 @@ function void fn013520()
 		return
 	}
 
+	// Release spindash!
 	char.hitbox_extends.x = 3
 	char.hitbox_extends.y = 7
-	char.state = 0x02
+	char.state = char.state.ROLLING
 	char.position.y.u16 += 4
-	u8[A0 + 0x3d] = 0
+	char.spindash = 0
 
 	D0 = u8[A0 + 0x3e] * 2
 	char.groundspeed = u16[0x0135ee + D0.u16]
 	A1 = (A0 == 0xffffb000) ? 0xffffee24 : 0xffffee28
 	u16[A1] = 0x2000 - (((u16(char.groundspeed) - 0x0800) * 2) & 0x1f00)
-	if (char.flags & 0x01)
+	if (char.flags & char.flag.FACING_LEFT)
 	{
 		char.groundspeed = -char.groundspeed
 	}
-	char.flags |= 0x04
+	char.flags |= char.flag.ROLLING
+
+	// Tell dust cloud object to disappear again
 	u8[A6 + 0x20] = 0
 #if STANDALONE
 	playSound(SFX_SPINDASH_RELEASE)
@@ -699,6 +707,7 @@ function void fn013520()
 //# address-hook(0x013600) end(0x01365a)
 function void fn013600()
 {
+	// Update spindash
 	if (char.spindash_charge != 0)
 	{
 		char.spindash_charge -= char.spindash_charge >> 5
@@ -708,11 +717,10 @@ function void fn013600()
 
 	if (control.tails.pressed & CONTROL_ABC)
 	{
+		// Charge up
 		char.state.both = 0x0900
-		playSound(0xab)
-		char.spindash_charge += 0x0200
-		if (char.spindash_charge >= 0x0800)
-			char.spindash_charge = 0x0800
+		playSound(SFX_SPINDASH_CHARGE)
+		char.spindash_charge = min(char.spindash_charge + 0x200, 0x800)
 	}
 
 	fn013648()
@@ -724,16 +732,6 @@ function void fn013648()
 {
 	signalMultiReturn()
 
-	if (u16[A5] != 0x60)
-	{
-		if (u16[A5] < 0x60)
-		{
-			u16[A5] += 2
-		}
-		else
-		{
-			u16[A5] -= 2
-		}
-	}
+	centerCameraYOffset()
 	Character.UpdateRotationOnGround_partial()
 }
