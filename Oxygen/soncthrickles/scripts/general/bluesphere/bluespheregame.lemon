@@ -1211,15 +1211,13 @@ function void fn04d648()
 function void fn04d64e()
 {
 	objA0.mapping_offset = 0x04d926
-
-#if COAL
-	objA0.sprite_attributes = (objA0.render_flags & render_flag.FLIP_X) == 0 ? 0x8598 : 0xe598
-#else
 	objA0.sprite_attributes = (levelselect.characters == CHARS_KNUCKLES_ALONE) ? 0x8598 : 0xe598
 #if STANDALONE
 	if (levelselect.characters == CHARS_TAILS_ALONE)
 		objA0.sprite_attributes = 0xc598
 #endif
+#if COAL
+	objA0.sprite_attributes = (objA0.render_flags & render_flag.FLIP_X) == 0 ? 0x8598 : 0xe598
 #endif
 
 	objA0.position.x.u16 = ((objA0.render_flags & render_flag.FLIP_X) ? 0x140 : 0x100) + getScreenExtend()
