@@ -389,14 +389,7 @@ function void Character.UpdateNormalState.Tails()
 	{
 		// Character is not directly controllable (but may be indirectly via an object, like when hanging on a pole or similar)
 		char.double_jump_state = 0
-		if (tails.carrying)
-		{
-			A1 = 0xffffb000
-			objA1.flags2a |= char.flag.IN_AIR
-			u8[A1 + 0x2e] = 0
-			tails.carrying = 0
-			tails.catch_timeout = 0
-		}
+		Tails.CheckDropSonic()
 	}
 	else
 	{
@@ -554,14 +547,8 @@ function void Character.UpdateKnucklesUprightOnGround()
 
 function void Character.updateUprightOnGround()
 {
-	if (char.character == CHARACTER_TAILS && tails.carrying)
-	{
-		A1 = 0xffffb000
-		objA1.flags2a |= char.flag.IN_AIR
-		u8[A1 + 0x2e] = 0
-		tails.carrying = 0
-		tails.catch_timeout = 0
-	}
+	if (char.character == CHARACTER_TAILS)
+		Tails.CheckDropSonic()
 
 	if (Character.UpdateSpindash())
 		return
@@ -605,14 +592,8 @@ function void Character.UpdateKnucklesRollingOnGround()
 
 function void updateCharacterRollingOnGround()
 {
-	if (char.character == CHARACTER_TAILS && tails.carrying)
-	{
-		A1 = 0xffffb000
-		u8[A1 + 0x2e] = 0
-		objA1.flags2a |= char.flag.IN_AIR
-		tails.carrying = 0
-		tails.catch_timeout = 0
-	}
+	if (char.character == CHARACTER_TAILS)
+		Tails.CheckDropSonic()
 
 	if (char.spindash == 0)
 	{
@@ -728,14 +709,7 @@ function void Character.UpdateSonicUprightInAir()
 //# address-hook(0x0149a2) end(0x0149e2)
 function void Character.UpdateTailsRollingInAir()
 {
-	if (tails.carrying)
-	{
-		A1 = 0xffffb000
-		u8[A1 + 0x2e] = 0
-		objA1.flags2a |= char.flag.IN_AIR
-		tails.carrying = 0
-		tails.catch_timeout = 0
-	}
+	Tails.CheckDropSonic()
 
 	updateTailsInAir_shared()
 }
@@ -825,15 +799,7 @@ function bool UpdateTailsFlight_innerA()
 	// Cancel flight ("Tails Drop"): Stop flying and roll into a ball again
 	else if (Game.getSetting(SETTING_CANCEL_FLIGHT) && (control.tails.state & CONTROL_DOWN) && (control.tails.state & CONTROL_ABC))
 	{
-		if (tails.carrying)
-		{
-			A1 = 0xffffb000
-			objA1.state = char.state.ROLLING		// Player 1 should also roll in this case
-			u8[A1 + 0x2e] = 0
-			objA1.flags2a |= char.flag.IN_AIR
-			tails.carrying = 0
-			tails.catch_timeout = 0
-		}
+		Tails.CheckDropSonic()
 
 		char.double_jump_state = 0
 		char.state = char.state.ROLLING
@@ -1106,6 +1072,23 @@ function void Tails.CheckCatchSonic()
 			playSound(0x4a)
 			u8[A2] = 1
 		}
+	}
+}
+
+
+function void Tails.CheckDropSonic()
+{
+	if (tails.carrying)
+	{
+		A1 = 0xffffb000
+	#if STANDALONE
+		if (objA0.state = char.state.ROLLING)
+			objA1.state = char.state.ROLLING		// Player 1 should also roll in this case
+	#endif
+		u8[A1 + 0x2e] = 0
+		objA1.flags2a |= char.flag.IN_AIR
+		tails.carrying = 0
+		tails.catch_timeout = 0
 	}
 }
 
@@ -6105,12 +6088,8 @@ function void Character.updateBonusEffects()
 //# address-hook(0x0122be) end(0x012312)
 function void Character.UpdateGotHurtState.Sonic()
 {
-	if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-	{
-		debug_mode.state = 1
-		player1.control_override = 0
+	if (debugModeRescue())
 		return
-	}
 
 	UpdateMovementStraight()
 	char.velocity.y += (char.flags & char.flag.UNDERWATER) ? 0x10 : 0x30
@@ -6159,22 +6138,11 @@ function void Character.UpdateGotHurtState.Tails()
 	// Tails is first player?
 	if (global.characters == CHARS_TAILS_ALONE)
 	{
-		if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-		{
-			debug_mode.state = 1
-			player1.control_override = 0
+		if (debugModeRescue())
 			return
-		}
 	}
 
-	if (tails.carrying)
-	{
-		A1 = 0xffffb000
-		u8[A1 + 0x2e] = 0
-		objA1.flags2a |= char.flag.IN_AIR
-		tails.carrying = 0
-		tails.catch_timeout = 0
-	}
+	Tails.CheckDropSonic()
 
 	UpdateMovementStraight()
 	char.velocity.y += (char.flags & char.flag.UNDERWATER) ? 0x10 : 0x30
@@ -6220,12 +6188,8 @@ function void TailsUpdateAnimationHurt()
 //# address-hook(0x017bb6) end(0x017c0a)
 function void Character.UpdateGotHurtState.Knuckles()
 {
-	if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-	{
-		debug_mode.state = 1
-		player1.control_override = 0
+	if (debugModeRescue())
 		return
-	}
 
 	UpdateMovementStraight()
 	char.velocity.y += (char.flags & char.flag.UNDERWATER) ? 0x10 : 0x30
@@ -6309,15 +6273,8 @@ function void Character.HurtCheckForStateChange()
 //# address-hook(0x012390) end(0x0123bc)
 function void Character.UpdateDiedState.Sonic()
 {
-	if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-	{
-		debug_mode.state = 1
-		player1.control_override = 0
-	#if STANDALONE
-		char.invuln.countdown = 120
-	#endif
+	if (debugModeRescue())
 		return
-	}
 
 	Character.CheckDiedStateEnd()
 	Character.UpdateMovement()
@@ -6332,25 +6289,11 @@ function void Character.UpdateDiedState.Tails()
 {
 	if (global.characters == CHARS_TAILS_ALONE)
 	{
-		if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-		{
-			debug_mode.state = 1
-			player1.control_override = 0
-		#if STANDALONE
-			char.invuln.countdown = 120
-		#endif
+		if (debugModeRescue())
 			return
-		}
 	}
 
-	if (tails.carrying)
-	{
-		A1 = 0xffffb000
-		u8[A1 + 0x2e] = 0
-		objA1.flags2a |= char.flag.IN_AIR
-		tails.carrying = 0
-		tails.catch_timeout = 0
-	}
+	Tails.CheckDropSonic()
 
 	Character.CheckDiedStateEnd()
 	Character.UpdateMovement()
@@ -6363,15 +6306,8 @@ function void Character.UpdateDiedState.Tails()
 //# address-hook(0x017c88) end(0x017cb4)
 function void Character.UpdateDiedState.Knuckles()
 {
-	if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-	{
-		debug_mode.state = 1
-		player1.control_override = 0
-	#if STANDALONE
-		char.invuln.countdown = 120
-	#endif
+	if (debugModeRescue())
 		return
-	}
 
 	Character.CheckDiedStateEnd()
 	Character.UpdateMovement()
@@ -6554,23 +6490,12 @@ function void Character.UpdateDrownedState.shared()
 {
 	if (char.character == CHARACTER_TAILS)
 	{
-		if (tails.carrying)
-		{
-			A1 = 0xffffb000
-			objA1.flags2a |= char.flag.IN_AIR
-			u8[A1 + 0x2e] = 0
-			tails.carrying = 0
-			tails.catch_timeout = 0
-		}
+		Tails.CheckDropSonic()
 	}
 	else
 	{
-		if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-		{
-			debug_mode.state = 1
-			player1.control_override = 0
+		if (debugModeRescue())
 			return
-		}
 	}
 
 	UpdateMovementStraight()
