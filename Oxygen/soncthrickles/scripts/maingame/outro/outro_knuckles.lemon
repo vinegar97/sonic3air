@@ -300,9 +300,20 @@ function void fn05ea1a()
 function void fn05eb9e()
 {
 	// Knuckles
-	objA0.mapping_offset = 0x060486
-	objA0.sprite_attributes = 0x826e
-	objA0.animation.sprite = 0x12
+#if COAL
+	if (isSecondCharacter(CHARACTER_TAILS))
+	{
+		objA0.mapping_offset = 0x06036e
+		objA0.sprite_attributes = 0x81e3
+		objA0.animation.sprite = 0x0c
+	}
+	else
+#endif
+	{
+		objA0.mapping_offset = 0x060486
+		objA0.sprite_attributes = 0x826e
+		objA0.animation.sprite = 0x12
+	}
 }
 
 
@@ -434,6 +445,10 @@ function void fn05ecb4()
 	{
 		++offset
 	}
+#if COAL
+	if ((offset == 0x06 || offset == 0x08) && isSecondCharacter(CHARACTER_TAILS))
+		offset = 0x00
+#endif
 	objA0.animation.sprite = u8[0x05ed0e + offset]
 
 #if STANDALONE
