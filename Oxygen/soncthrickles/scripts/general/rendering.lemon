@@ -466,7 +466,7 @@ function void renderNextObject()
 	#endif
 
 		{
-			if ((objA0.render_flags & 0x20) == 0)
+			if ((objA0.render_flags & render_flag.STATIC_MAPPIMG) == 0)
 			{
 				A1 = tableLookupAddress(A1, s16(objA0.animation.sprite) * 2)
 				D4.u16 = u16[A1] - 1
@@ -744,13 +744,13 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 	{
 		objA0.render_flags &= ~render_flag.VISIBLE		// Reset visibility flag
 		D6.u8 = objA0.render_flags
-		if (D6 & 0x10)
+		if (D6 & render_flag.COMPETITION_P2_SCREEN)
 			return
 	}
 	else
 	{
 		D6.u8 = objA0.render_flags
-		if (D6 & 0x08)
+		if (D6 & render_flag.COMPETITION_P1_SCREEN)
 			return
 	}
 	u16 offsetY = splitScreenIndex * 0x70

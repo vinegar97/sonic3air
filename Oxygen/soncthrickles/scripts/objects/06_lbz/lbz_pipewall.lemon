@@ -232,7 +232,7 @@ function void fn0275f2()
 	A3 = objA0.mapping_offset + u16[A3 + D0.s16]
 	D1.u16 = u16[(A3+=2)-2] - 1		// Only "A3 += 2" seems relevant here
 	D1 = 3
-	objA0.render_flags |= 0x20
+	objA0.render_flags |= render_flag.STATIC_MAPPIMG
 	D4 = objA0.update_address
 	D5.u8 = objA0.render_flags
 	A1 = A0

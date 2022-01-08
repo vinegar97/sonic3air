@@ -18,7 +18,7 @@ function void fn019156()
 	updateSpritePattern(0x18bd44, 0xf380, 0x01a0)
 
 	objA0.mapping_offset = 0x0192de
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
@@ -123,7 +123,7 @@ function void fn019236()
 			return
 
 		objA1.update_address = 0x0192c0
-		u8[A1 + 0x04] = 0x84
+		u8[A1 + 0x04] = (render_flag.VISIBLE | render_flag.WORLD)
 		u8[A1 + 0x06] = 0x08
 		u8[A1 + 0x07] = 0x08
 		u16[A1 + 0x08] = 0x0380

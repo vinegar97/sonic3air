@@ -71,9 +71,9 @@ function void fn063d1a()
 		u16[A1 + 0x2e] = 0x78
 		u8[A1 + 0x27] = u8[A0 + 0x27]
 
-		u8[A1 + 0x26] = 0x1f
+		objA1.value26 = MUSIC_KNUCKLES
 	#if STANDALONE
-		u8[A1 + 0x26] = BossHPZKnuckles.chooseMusicTrack()
+		objA1.value26 = BossHPZKnuckles.chooseMusicTrack()
 	#endif
 	}
 

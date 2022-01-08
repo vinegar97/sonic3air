@@ -33,15 +33,15 @@
 //  - 0xffffcb2c = Underwater handler object for S/K
 //  - 0xffffcb76 = Underwater handler object for Tails
 //  - 0xffffcbc0 = After-images effect
-//  - 0xffffcc0a = Tails' tails
+//  - 0xffffcc0a = Tails' tails, also used for Super form stars
 //  - 0xffffcc54 = Dust cloud / water splash effect for S/K
 //  - 0xffffcc9e = Dust cloud / water splash effect for Tails
 //  - 0xffffcce8 = Shield
 //  - 0xffffcd32 = Shield (secondary slot, whatever this is used for...?)
-//  - 0xffffcd7c = Invincibility effect; also used for first Super Flicky (for Hyper Tails)
-//  - 0xffffcdc6 = 2nd Super Flicky
-//  - 0xffffce10 = 3rd Super Flicky
-//  - 0xffffce5a = 4th Super Flicky
+//  - 0xffffcd7c = Invincibility effect; also used for first Super Flicky (for Hyper Tails) and first Hyper form star
+//  - 0xffffcdc6 = 2nd Super Flicky / Hyper form star
+//  - 0xffffce10 = 3rd Super Flicky / Hyper form star
+//  - 0xffffce5a = 4th Super Flicky / Hyper form star
 //  - 0xffffcea4 = Another invincibility effect...?
 //  - 0xffffcf82 = HCZ waves effect
 

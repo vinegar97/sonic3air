@@ -348,3 +348,21 @@ function bool updateDebugModeInput(bool playingAsTails)
 	}
 	return false
 }
+
+
+function bool debugModeRescue()
+{
+	// Get character out of damage state and into object placement mode
+	if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
+	{
+		debug_mode.state = 1
+		player1.control_override = 0
+	#if STANDALONE
+		char.invuln.countdown = 120
+	#endif
+		return true
+	}
+
+	return false
+}
+
