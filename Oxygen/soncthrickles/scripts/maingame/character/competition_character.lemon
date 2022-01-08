@@ -46,9 +46,11 @@ function void CompetitionMode.Character.BaseUpdate(u32 mainRoutineTableAddress)
 	}
 
 	// Targets:
-	//  - 0x0122be, 0x01569c	-> char.base_state = 0x04	-> Character.UpdateGotHurtState.*()		-> Character just got hurt
-	//  - 0x012390, 0x01578e	-> char.base_state = 0x06	-> Character.UpdateDiedState.*()		-> Character died
-	//  - 0x01257c, 0x0157e0	-> char.base_state = 0x08	-> Character.UpdateRestartDelay()		-> Completely inactive after death
+	//  - 0x010628, 0x013166	-> char.base_state = 0x00	-> CompetitionMode.Character.Initialization.*()		-> Initialization
+	//  - 0x010740, 0x013274	-> char.base_state = 0x02	-> CompetitionMode.Character.UpdateNormalState.*()	-> In normal state
+	//  - 0x0122be, 0x01569c	-> char.base_state = 0x04	-> Character.UpdateGotHurtState.*()					-> Character just got hurt
+	//  - 0x012390, 0x01578e	-> char.base_state = 0x06	-> Character.UpdateDiedState.*()					-> Character died
+	//  - 0x01257c, 0x0157e0	-> char.base_state = 0x08	-> Character.UpdateRestartDelay()					-> Completely inactive after death
 	call tableLookupAddress(mainRoutineTableAddress, char.base_state)
 }
 

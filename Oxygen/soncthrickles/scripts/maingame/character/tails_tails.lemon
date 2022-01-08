@@ -76,7 +76,7 @@ function void TailsTails.UpdateSpritePatterns()
 // Competition mode
 
 //# address-hook(0x016022) end(0x01604e)
-function void fn016022()
+function void CompetitionMode.TailsTails.UpdateSpritePatterns()
 {
 	u16 targetInVRAM = (A0 == 0xffffcc0a) ? 0xd600 : 0xd200
 	updateMultipleSpritePatterns(0x33d5e0, 0x2a024c, targetInVRAM, objA0.animation.sprite)
@@ -84,7 +84,7 @@ function void fn016022()
 
 
 //# address-hook(0x0161fa) end(0x01622c)
-function void fn0161fa()
+function void CompetitionMode.TailsTails.Init()
 {
 	objA0.mapping_offset = 0x2a00a4
 	objA0.sprite_attributes = (A0 == 0xffffcc0a) ? 0x06b0 : 0x0690
@@ -94,12 +94,12 @@ function void fn0161fa()
 	objA0.render_flags = 0x04
 
 	objA0.update_address = 0x016232
-	fn016232()
+	CompetitionMode.TailsTails.Update()
 }
 
 
 //# address-hook(0x016232) end(0x01629a)
-function void fn016232()
+function void CompetitionMode.TailsTails.Update()
 {
 	A2 = 0xffff0000 + u16[A0 + 0x30]
 	objA0.value26 = u8[A2 + 0x26]
@@ -121,7 +121,7 @@ function void fn016232()
 	}
 
 	A1 = 0x0162c2
-	fn015cd6()
-	fn016022()
+	CompetitionMode.UpdateTailsAnimation_inner()
+	CompetitionMode.TailsTails.UpdateSpritePatterns()
 	DrawObject()
 }

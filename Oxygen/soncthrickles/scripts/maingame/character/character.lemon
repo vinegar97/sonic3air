@@ -6148,8 +6148,8 @@ function void SonicUpdateAnimationHurt()
 	}
 	else
 	{
-		fn012d36()
-		fn01309a()
+		CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
+		CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
 	}
 }
 
@@ -6201,8 +6201,8 @@ function void TailsUpdateAnimationHurt()
 	}
 	else
 	{
-		fn015cd0()
-		fn016050()
+		CompetitionMode.Character.UpdateAnimation.Tails()
+		CompetitionMode.Character.UpdateSpritePatterns.Tails()
 	}
 }
 
