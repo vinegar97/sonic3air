@@ -40,6 +40,11 @@ function void fn061d4c()
 
 function void CutsceneKnuckles.loadPalette()
 {
+#if COAL
+	if (EXTENDED_CHARACTER_PALETTES)
+		return
+#endif
+
 	loadPaletteLine1(0x066912)
 
 	// When using EXTENDED_CHARACTER_PALETTES:
