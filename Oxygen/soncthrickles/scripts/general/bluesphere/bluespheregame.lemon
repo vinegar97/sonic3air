@@ -1368,8 +1368,16 @@ function void fn04d6b8()
 	if (control.pad1.pressed & CONTROL_ABC)
 	{
 	#if COAL
+		u8 maxCharacterSelection = 3
+
+		// Knuckles & Tails
+		if (Game.isSecretUnlocked(SECRET_KNUX_AND_TAILS))
+		{
+			maxCharacterSelection = 4
+		}
+
 		if (objA0.render_flags & render_flag.FLIP_X)
-			levelselect.characters = (levelselect.characters >= 4) ? 0 : levelselect.characters++
+			levelselect.characters = (levelselect.characters >= maxCharacterSelection) ? 0 : levelselect.characters++
 
 		if (levelselect.characters == CHARS_SONIC_AND_TAILS)
 		{
