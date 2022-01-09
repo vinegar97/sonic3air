@@ -53,6 +53,7 @@ function void Character.BaseUpdate.Tails()
 	A5 = 0xffffee2e		// Address of camera.yoffset.tails
 	A6 = 0xffffcc9e		// Base address of dust cloud object for Tails
 
+	// Check for debug mode
 	if (debug_mode.state == 0 || global.characters != CHARS_TAILS_ALONE)	// Maybe a check if it's second player Tails?
 	{
 		// Targets:
@@ -79,6 +80,7 @@ function void Character.BaseUpdate.Knuckles()
 	A5 = 0xffffee2c		// Address of camera.yoffset.player
 	A6 = 0xffffcc54		// Base address of dust cloud object
 
+	// Check for debug mode
 	if (debug_mode.state == 0)
 	{
 		// Targets:
@@ -2767,7 +2769,7 @@ function void Character.updateJumpMoves()
 				// Handle drop dash
 				//  -> Can only be charged if there is no shield active (only exception: drop dash charge started already, when shield gets active -- this reflects Sonic Mania's behavior)
 				//  -> But can be charged if invincible (incl. Super / Hyper Sonic)
-				bool chargeDropDash = (control.player1.state & CONTROL_ABC) && ((char.bonus_effect & 0x70) == 0 || (char.bonus_effect & char.bonus.INVINCIBLE) || sonic.dropdash_counter > 0) && char.double_jump_state
+				bool chargeDropDash = (control.player1.state & CONTROL_ABC) && ((char.bonus_effect & char.bonus.ELEMENTAL_SHIELDS) == 0 || (char.bonus_effect & char.bonus.INVINCIBLE) || sonic.dropdash_counter > 0) && char.double_jump_state
 				if (chargeDropDash)
 				{
 					if (sonic.dropdash_counter < DROPDASH_FULLCHARGE)
@@ -6287,6 +6289,7 @@ function void Character.UpdateDiedState.Sonic()
 //# address-hook(0x01578e) end(0x0157da)
 function void Character.UpdateDiedState.Tails()
 {
+	// Tails is first player?
 	if (global.characters == CHARS_TAILS_ALONE)
 	{
 		if (debugModeRescue())
