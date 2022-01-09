@@ -286,7 +286,7 @@ function void fn0611d6()
 	A1 = 0xffffb000
 	u32[0xffffcce8] = 0x0195a6
 	u16[0xffffcd2a] = A1.u16
-	u8[A1 + 0x2b] &= 0x8e
+	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 
 	D0 = 4
@@ -301,7 +301,7 @@ function void fn061200()
 	A1 = 0xffffb000
 	u32[0xffffcce8] = 0x0198be
 	u16[0xffffcd2a] = A1.u16
-	u8[A1 + 0x2b] &= 0x8e
+	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 
 	D0 = 6
@@ -316,7 +316,7 @@ function void fn06122a()
 	A1 = 0xffffb000
 	u32[0xffffcce8] = 0x0196c2
 	u16[0xffffcd2a] = A1.u16
-	u8[A1 + 0x2b] &= 0x8e
+	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 
 	D0 = 5
@@ -330,6 +330,6 @@ function void fn061254()
 {
 	u8[A1 + 0x2b] |= (1 << D0.u8)
 	A2 = 0xfffffe47
-	u8[A2] &= 0x8f
+	u8[A2] &= ~char.bonus.ELEMENTAL_SHIELDS
 	u8[A2] |= (1 << D0.u8)
 }

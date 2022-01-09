@@ -752,7 +752,7 @@ function void ItemEffect.ApplySpeedUp()
 function void ItemEffect.applyShield(u8 shieldType, u32 updateRoutine, u8 soundId)
 {
 	++u16[A2]
-	u8[A1 + 0x2b] &= ~0x71
+	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | shieldType)
 	playMusic(soundId)
 

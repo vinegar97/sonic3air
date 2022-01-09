@@ -5245,7 +5245,7 @@ function void Character.GettingHurt()
 			spilledRings = true
 
 			// Should be unnecessary, but make sure all shield flags are cleared
-			char.bonus_effect &= 0x8e
+			char.bonus_effect &= ~char.bonus.ALL_SHIELDS
 		}
 	}
 	else
@@ -5256,7 +5256,7 @@ function void Character.GettingHurt()
 	#endif
 		{
 			// Lose shield
-			char.bonus_effect &= 0x8e
+			char.bonus_effect &= ~char.bonus.ALL_SHIELDS
 		}
 	}
 

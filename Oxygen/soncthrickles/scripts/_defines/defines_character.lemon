@@ -79,7 +79,10 @@ define char.state.both			= u16[A0 + 0x20]
 
 // State constants
 define u8 char.state.RUNNING			=  0x00		// Also used for hanging on horizontal poles in MHZ
+define u8 char.state.RUNNING2			=  0x01
 define u8 char.state.ROLLING			=  0x02		// For both rolling on ground and jumping
+define u8 char.state.ROLLING2			=  0x03		// Identical to 0x02
+define u8 char.state.PUSHING			=  0x04
 define u8 char.state.STANDING			=  0x05
 define u8 char.state.BALANCING1			=  0x06
 define u8 char.state.LOOKING_UP			=  0x07
@@ -163,6 +166,8 @@ define u8 char.bonus.SPEED_UP			=  0x04	// also used for slow shoes in competiti
 define u8 char.bonus.SHIELD_FIRE		=  0x10
 define u8 char.bonus.SHIELD_LIGHTNING	=  0x20
 define u8 char.bonus.SHIELD_BUBBLE		=  0x40
+define u8 char.bonus.ELEMENTAL_SHIELDS	=  0x70
+define u8 char.bonus.ALL_SHIELDS		=  0x71
 define u8 char.bonus.INFINITE_INERTIA	=  0x80
 
 // Drowning countdown
