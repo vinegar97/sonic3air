@@ -40,9 +40,11 @@ function void CompetitionMode.Character.BaseUpdate(u32 mainRoutineTableAddress)
 	}
 
 	// Targets:
-	//  - 0x0122be, 0x01569c	-> char.base_state = 0x04	-> Character.UpdateGotHurtState.*()		-> Character just got hurt
-	//  - 0x012390, 0x01578e	-> char.base_state = 0x06	-> Character.UpdateDiedState.*()		-> Character died
-	//  - 0x01257c, 0x0157e0	-> char.base_state = 0x08	-> Character.UpdateRestartDelay()		-> Completely inactive after death
+	//  - 0x010628, 0x013166	-> char.base_state = 0x00	-> CompetitionMode.Character.Initialization.*()		-> Initialization
+	//  - 0x010740, 0x013274	-> char.base_state = 0x02	-> CompetitionMode.Character.UpdateNormalState.*()	-> In normal state
+	//  - 0x0122be, 0x01569c	-> char.base_state = 0x04	-> Character.UpdateGotHurtState.*()					-> Character just got hurt
+	//  - 0x012390, 0x01578e	-> char.base_state = 0x06	-> Character.UpdateDiedState.*()					-> Character died
+	//  - 0x01257c, 0x0157e0	-> char.base_state = 0x08	-> Character.UpdateRestartDelay()					-> Completely inactive after death
 	call tableLookupAddress(mainRoutineTableAddress, char.base_state)
 }
 
@@ -51,14 +53,14 @@ function void CompetitionMode.Character.BaseUpdate(u32 mainRoutineTableAddress)
 // Sonic, Knuckles
 
 //# address-hook(0x0105c4) end(0x010618)
-function void fn0105c4()
+function void CompetitionMode.Character.BaseUpdate.Sonic_Knuckles()
 {
 	CompetitionMode.Character.BaseUpdate(0x01061c)
 }
 
 
 //# address-hook(0x010628) end(0x01073c)
-function void fn010628()
+function void CompetitionMode.Character.Initialization.Sonic_Knuckles()
 {
 	char.base_state += 0x02
 	char.hitbox_extends.x = 5
@@ -130,12 +132,12 @@ function void fn010628()
 	char.drown_countdown = 30
 	ClearPositionBackup()
 
-	fn010740()
+	CompetitionMode.Character.UpdateNormalState.Sonic_Knuckles()
 }
 
 
 //# address-hook(0x010740) end(0x0107ec)
-function void fn010740()
+function void CompetitionMode.Character.UpdateNormalState.Sonic_Knuckles()
 {
 	if (A0 == 0xffffb04a)
 		debugWatch(A0 + 0x04, 1)
@@ -184,8 +186,8 @@ function void fn010740()
 	char.angle_sensor_2 = u8[0xfffff76a]
 	if ((char.control_flags & 0x02) == 0)
 	{
-		fn012d36()
-		fn01309a()
+		CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
+		CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
 	}
 
 	D0.u8 = char.control_flags & 0xa0
@@ -197,7 +199,7 @@ function void fn010740()
 
 
 //# address-hook(0x0107f6) end(0x010866)
-function void fn0107f6()
+function void CompetitionMode.Character.UpdateUprightOnGround.Sonic_Knuckles()
 {
 	if ((control.player1.pressed & CONTROL_ABC) == 0)
 	{
@@ -218,7 +220,7 @@ function void fn0107f6()
 		}
 	}
 
-	fn01094c()
+	CompetitionMode.Character.UpdateSpindash.Sonic_Knuckles()
 	if (checkForMultiReturn())
 		return
 
@@ -227,7 +229,7 @@ function void fn0107f6()
 
 	Character.UpdateUprightSlopeEffect()
 	UpdateSonicUprightOnGroundInner()
-	fn0108e6()
+	CompetitionMode.Character.CheckForStartRolling.Sonic_Knuckles()
 	UpdateMovementStraightSimple()
 
 	Character.UpdateRotationOnGround_partial()
@@ -236,7 +238,7 @@ function void fn0107f6()
 
 
 //# address-hook(0x010868) end(0x010894)
-function void fn010868()
+function void CompetitionMode.Character.UpdateUprightInAir.Sonic_Knuckles()
 {
 	UpdateSonicJumpMoves()
 	Character.UpdateControlInAir()
@@ -256,7 +258,7 @@ function void fn010868()
 
 
 //# address-hook(0x010896) end(0x0108b6)
-function void fn010896()
+function void CompetitionMode.Character.UpdateRollingOnGround.Sonic_Knuckles()
 {
 	if (char.spindash == 0)
 	{
@@ -273,15 +275,15 @@ function void fn010896()
 
 
 //# address-hook(0x0108b8) end(0x0108e4)
-function void fn0108b8()
+function void CompetitionMode.Character.UpdateRollingInAir.Sonic_Knuckles()
 {
-	// This is exactly the same as "fn010868", so just call this one
-	fn010868()
+	// This is exactly the same as "CompetitionMode.Character.UpdateUprightInAir.Sonic_Knuckles()", so just call this one
+	CompetitionMode.Character.UpdateUprightInAir.Sonic_Knuckles()
 }
 
 
 //# address-hook(0x0108e6) end(0x01094a)
-function void fn0108e6()
+function void CompetitionMode.Character.CheckForStartRolling.Sonic_Knuckles()
 {
 	if (s8[A0 + 0x2b] >= 0 && abs(char.groundspeed) >= 0x80)
 	{
@@ -304,7 +306,7 @@ function void fn0108e6()
 
 
 //# address-hook(0x01094c) end(0x010a12)
-function void fn01094c()
+function void CompetitionMode.Character.UpdateSpindash.Sonic_Knuckles()
 {
 	if (char.spindash == 0)
 	{
@@ -353,7 +355,7 @@ function void fn01094c()
 	u8[A6 + 0x20] = 0
 	playSound(SFX_SPINDASH_RELEASE)
 
-	fn010a80()
+	CompetitionMode.centerCameraYOffset.Sonic_Knuckles()
 }
 
 
@@ -376,12 +378,12 @@ function void fn010a38()
 		char.spindash_charge = min(char.spindash_charge + 0x200, 0x800)
 	}
 
-	fn010a80()
+	CompetitionMode.centerCameraYOffset.Sonic_Knuckles()
 }
 
 
 //# address-hook(0x010a80) end(0x010a92)
-function void fn010a80()
+function void CompetitionMode.centerCameraYOffset.Sonic_Knuckles()
 {
 	signalMultiReturn()
 
@@ -394,14 +396,14 @@ function void fn010a80()
 // Tails
 
 //# address-hook(0x013102) end(0x013156)
-function void fn013102()
+function void CompetitionMode.Character.BaseUpdate.Tails()
 {
 	CompetitionMode.Character.BaseUpdate(0x01315a)
 }
 
 
 //# address-hook(0x013166) end(0x01326e)
-function void fn013166()
+function void CompetitionMode.Character.Initialization.Tails()
 {
 	char.base_state += 0x02
 	char.hitbox_extends.x = 5
@@ -461,12 +463,12 @@ function void fn013166()
 	tails.control_counter = 600
 	tails.respawn_counter = 0
 
-	fn013274()
+	CompetitionMode.Character.UpdateNormalState.Tails()
 }
 
 
 //# address-hook(0x013274) end(0x01332c)
-function void fn013274()
+function void CompetitionMode.Character.UpdateNormalState.Tails()
 {
 	if (debug_mode.enabled != 0 && A0 == 0xffffb000 && (control.pad1.pressed & CONTROL_B))
 	{
@@ -514,8 +516,8 @@ function void fn013274()
 	char.angle_sensor_2 = u8[0xfffff76a]
 	if ((char.control_flags & 0x02) == 0)
 	{
-		fn015cd0()
-		fn016050()
+		CompetitionMode.Character.UpdateAnimation.Tails()
+		CompetitionMode.Character.UpdateSpritePatterns.Tails()
 	}
 
 	D0.u8 = char.control_flags & 0xa0
@@ -527,9 +529,9 @@ function void fn013274()
 
 
 //# address-hook(0x013336) end(0x013358)
-function void fn013336()
+function void CompetitionMode.Character.UpdateUprightOnGround.Tails()
 {
-	fn013520()
+	CompetitionMode.Character.UpdateSpindash.Tails()
 	if (checkForMultiReturn())
 		return
 
@@ -538,7 +540,7 @@ function void fn013336()
 
 	Character.UpdateUprightSlopeEffect()
 	UpdateTailsUprightOnGroundInner()
-	fn0134ba()
+	CompetitionMode.Character.CheckForStartRolling.Tails()
 	UpdateMovementStraightSimple()
 
 	Character.UpdateRotationOnGround_partial()
@@ -547,7 +549,7 @@ function void fn013336()
 
 
 //# address-hook(0x01335a) end(0x0133ac)
-function void fn01335a()
+function void CompetitionMode.Character.UpdateUprightInAir.Tails()
 {
 	if (char.double_jump_state == 0)
 	{
@@ -587,7 +589,7 @@ function void fn0133ae()
 
 
 //# address-hook(0x01346a) end(0x01348a)
-function void fn01346a()
+function void CompetitionMode.Character.UpdateRollingOnGround.Tails()
 {
 	if (char.spindash == 0)
 	{
@@ -604,7 +606,7 @@ function void fn01346a()
 
 
 //# address-hook(0x01348c) end(0x0134b8)
-function void fn01348c()
+function void CompetitionMode.Character.UpdateRollingInAir.Tails()
 {
 	UpdateTailsJumpMoves()
 	Character.UpdateControlInAir()
@@ -623,7 +625,7 @@ function void fn01348c()
 
 
 //# address-hook(0x0134ba) end(0x01351e)
-function void fn0134ba()
+function void CompetitionMode.Character.CheckForStartRolling.Tails()
 {
 	if (s8[A0 + 0x2b] >= 0 && abs(char.groundspeed) >= 0x80)
 	{
@@ -646,7 +648,7 @@ function void fn0134ba()
 
 
 //# address-hook(0x013520) end(0x0135ec)
-function void fn013520()
+function void CompetitionMode.Character.UpdateSpindash.Tails()
 {
 	if (char.spindash == 0)
 	{
@@ -700,7 +702,7 @@ function void fn013520()
 	playSound(0xfb)
 #endif
 
-	fn013648()
+	CompetitionMode.centerCameraYOffset.Tails()
 }
 
 
@@ -723,12 +725,12 @@ function void fn013600()
 		char.spindash_charge = min(char.spindash_charge + 0x200, 0x800)
 	}
 
-	fn013648()
+	CompetitionMode.centerCameraYOffset.Tails()
 }
 
 
 //# address-hook(0x013648) end(0x01365a)
-function void fn013648()
+function void CompetitionMode.centerCameraYOffset.Tails()
 {
 	signalMultiReturn()
 

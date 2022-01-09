@@ -91,9 +91,7 @@ function void fn073960()
 {
 	objA0.base_state = 0x04
 
-	A2 = 0x07418a
-	SpawnChildObjectChain()
-
+	spawnChildObjectChain(0x07418a)
 	spawnChildObjects(0x07415a)
 }
 

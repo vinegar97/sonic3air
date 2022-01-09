@@ -105,8 +105,7 @@ function void fn089064()
 
 	if (D2.u16 != 0 && objA0.animation.sprite == 8 && u8[A0 + 0x04] & 0x80)
 	{
-		A2 = 0x089150
-		SpawnProjectileChildObjectsInDir()
+		spawnProjectileChildObjectsInDir(0x089150)
 	}
 }
 

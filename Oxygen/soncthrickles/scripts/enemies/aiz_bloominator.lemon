@@ -85,8 +85,7 @@ function void fn086dc6()
 		return
 
 	playSound(0x4d)
-	A2 = 0x086e2a
-	SpawnProjectileChildObjects()
+	spawnProjectileChildObjects(0x086e2a)
 	if (_equal())
 	{
 		++objA0.value39

@@ -88,8 +88,7 @@ function void fn06852c()
 	// Trigger AIZ 1 transition cutscene
 	objA0.countdown_callback = 0x06857a
 
-	A2 = 0x06906a
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x06906a)
 
 	loadPaletteLine1(0x06917c)
 

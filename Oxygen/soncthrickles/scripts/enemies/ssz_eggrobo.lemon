@@ -223,8 +223,7 @@ function void fn091712()
 	{
 		objA0.update_address = 0x09173a
 		objA0.countdown_value = 0x5f
-		A2 = 0x0919de
-		SpawnChildObjectsInDir()
+		spawnChildObjectsInDir(0x0919de)
 	}
 	fn084920()
 }

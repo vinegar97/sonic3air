@@ -367,8 +367,7 @@ function void fn0628e0()
 
 	CutsceneKnuckles.loadPalette()
 
-	A2 = 0x066592
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x066592)
 }
 
 

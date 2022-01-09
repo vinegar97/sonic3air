@@ -34,8 +34,7 @@ function void StarPointer.Update()
 	D4.u16 = u16[0x08be6c + D0.s16]
 	fn085416()
 
-	A2 = 0x08bfa0
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x08bfa0)
 }
 
 

@@ -322,8 +322,7 @@ function void fn090436()
 			objA0.flags38 ^= 0x02
 			if (objA0.flags38 & 0x02)
 			{
-				A2 = 0x090658
-				SpawnIdenticalChildObjects()
+				spawnIdenticalChildObjects(0x090658)
 			}
 		}
 
