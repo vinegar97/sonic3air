@@ -606,6 +606,21 @@ function void ItemEffect.UpdateDefault()
 }
 
 
+//# address-hook(0x01db2e) end(0x01db36)
+function void fn01db2e()
+{
+	--s16[A0 + 0x24]
+	if (s16[A0 + 0x24] < 0)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		DrawObject()
+	}
+}
+
+
 //# address-hook(0x01d820) end(0x01d878)
 function void ItemEffect.UpdateDefaultInternal()
 {
@@ -676,6 +691,14 @@ function void ItemEffect.ApplyExtraLifePlayer1()
 }
 
 
+//# address-hook(0x01d890) end(0x01d892)
+function void ItemEffect.ApplyRobotnik()
+{
+	++u16[A2]
+	DamageCharacter()
+}
+
+
 //# address-hook(0x01d8ac) end(0x01d906)
 function void ItemEffect.ApplyExtraRings()
 {
@@ -693,21 +716,13 @@ function void ItemEffect.ApplyExtraRings()
 		}
 		else
 		{
-			fn01d890()
+			ItemEffect.ApplyRobotnik()
 		}
 	}
 	else
 	{
 		playMusic(SFX_RING)
 	}
-}
-
-
-//# address-hook(0x01d890) end(0x01d892)
-function void fn01d890()
-{
-	++u16[A2]
-	DamageCharacter()
 }
 
 
@@ -752,7 +767,7 @@ function void ItemEffect.ApplySpeedUp()
 function void ItemEffect.applyShield(u8 shieldType, u32 updateRoutine, u8 soundId)
 {
 	++u16[A2]
-	u8[A1 + 0x2b] &= ~0x71
+	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | shieldType)
 	playMusic(soundId)
 
@@ -904,19 +919,4 @@ function void ItemEffect.ApplySuperTransformation()
 #else
 	playMusic(MUSIC_INVINCIBLE)
 #endif
-}
-
-
-//# address-hook(0x01db2e) end(0x01db36)
-function void fn01db2e()
-{
-	--s16[A0 + 0x24]
-	if (s16[A0 + 0x24] < 0)
-	{
-		UnloadObject()
-	}
-	else
-	{
-		DrawObject()
-	}
 }

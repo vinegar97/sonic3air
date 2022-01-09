@@ -1952,10 +1952,10 @@ function void RestoreShield()
 	}
 
 	// Restore shield
-	u8 shieldMask = 0x70
+	u8 shieldMask = char.bonus.ELEMENTAL_SHIELDS
 #if STANDALONE
 	if (Game.getSetting(SETTING_SHIELD_TYPES) != 1)
-		shieldMask = 0x71	// Support classic shield
+		shieldMask = char.bonus.ALL_SHIELDS	// Support classic shield
 #endif
 	A1 = 0xffffb000
 	u8 shieldFlags = global.shields_backup_1 & shieldMask
@@ -1968,21 +1968,21 @@ function void RestoreShield()
 
 	if (shieldFlags & char.bonus.SHIELD_FIRE)
 	{
-		u8[A1 + 0x2b] &= ~0x71
+		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_FIRE)
 		u32[0xffffcce8] = 0x0195a6
 		u16[0xffffcd2a] = A1.u16
 	}
 	else if (shieldFlags & char.bonus.SHIELD_LIGHTNING)
 	{
-		u8[A1 + 0x2b] &= ~0x71
+		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_LIGHTNING)
 		u32[0xffffcce8] = 0x0196c2
 		u16[0xffffcd2a] = A1.u16
 	}
 	else if (shieldFlags & char.bonus.SHIELD_BUBBLE)
 	{
-		u8[A1 + 0x2b] &= ~0x71
+		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_BUBBLE)
 		u32[0xffffcce8] = 0x0198be
 		u16[0xffffcd2a] = A1.u16
@@ -1990,7 +1990,7 @@ function void RestoreShield()
 #if STANDALONE
 	else if ((Game.getSetting(SETTING_SHIELD_TYPES) != 1) && (shieldFlags & char.bonus.ANY_SHIELD))
 	{
-		u8[A1 + 0x2b] &= ~0x71
+		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 		u32[0xffffcce8] = 0x0194ce
 		u16[0xffffcd2a] = A1.u16

@@ -11,12 +11,12 @@
 // Characters                                            //
 //-------------------------------------------------------//
 
-// Single characters
+// Single characters (see char.character)
 define u8 CHARACTER_SONIC	 	 = 0
 define u8 CHARACTER_TAILS	 	 = 1
 define u8 CHARACTER_KNUCKLES 	 = 2
 
-// Character combinations
+// Character combinations (see global.characters)
 define u16 CHARS_SONIC_AND_TAILS = 0
 define u16 CHARS_SONIC_ALONE	 = 1
 define u16 CHARS_TAILS_ALONE	 = 2

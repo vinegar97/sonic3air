@@ -119,14 +119,14 @@ function void FireShield.Update()
 	// Lost shield?
 	if ((u8[A2 + 0x2b] & char.bonus.ANY_SHIELD) == 0)
 	{
-		u8[A2 + 0x2b] &= ~0x71
+		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		objA0.update_address = 0x0194ce
 		return
 	}
 
 	if (u8[A2 + 0x2a] & char.flag.UNDERWATER)
 	{
-		u8[A2 + 0x2b] &= ~0x71
+		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		if (allocDynamicObjectStd())
 		{
 			objA1.update_address = 0x01e68e
@@ -200,14 +200,14 @@ function void LightningShield.Update()
 	// Lost shield?
 	if ((u8[A2 + 0x2b] & char.bonus.ANY_SHIELD) == 0)
 	{
-		u8[A2 + 0x2b] &= ~0x71
+		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		objA0.update_address = 0x0194ce
 		return
 	}
 
 	if (u8[A2 + 0x2a] & char.flag.UNDERWATER)
 	{
-		u8[A2 + 0x2b] &= ~0x71
+		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		if (global.fade_timer != 0)
 		{
 			objA0.update_address = 0x0194ce
@@ -356,7 +356,7 @@ function void BubbleShield.Update()
 	// Lost shield?
 	if ((u8[A2 + 0x2b] & char.bonus.ANY_SHIELD) == 0)
 	{
-		u8[A2 + 0x2b] &= ~0x71
+		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		objA0.update_address = 0x0194ce
 		return
 	}

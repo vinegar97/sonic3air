@@ -196,8 +196,7 @@ function void fn088d02()
 	if (D2.u16 != 0 && objA0.animation.sprite == 4)
 	{
 		playSound(0x4d)
-		A2 = 0x088e32
-		SpawnProjectileChildObjectsInDir()
+		spawnProjectileChildObjectsInDir(0x088e32)
 	}
 }
 

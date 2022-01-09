@@ -167,11 +167,11 @@ function void fn00c97a()
 		u16 characters = u16[A3 + 0x34]
 		if (!saveGameSlotUsed)
 		{
-			characters = 0
+			characters = CHARS_SONIC_AND_TAILS
 		}
-		else if (characters == 0)	// Handle Sonic & Tails - show Sonic's icons
+		else if (characters == CHARS_SONIC_AND_TAILS)	// Handle Sonic & Tails - show Sonic's icons
 		{
-			characters = 1
+			characters = CHARS_SONIC_ALONE
 		}
 	#if STANDALONE
 		else

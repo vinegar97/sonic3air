@@ -257,8 +257,7 @@ function void fn08ff72()
 {
 	playSound(0x97)
 
-	A2 = 0x090040
-	SpawnChildObjectsInDir()
+	spawnChildObjectsInDir(0x090040)
 	if (_equal())
 	{
 		u16[A0 + 0x44] = A1.u16

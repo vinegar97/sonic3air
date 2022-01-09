@@ -92,8 +92,7 @@ function void fn08fb76()
 	objA0.base_state = 0
 #endif
 
-	A2 = 0x08fbd6
-	SpawnProjectileChildObjects()
+	spawnProjectileChildObjects(0x08fbd6)
 }
 
 
