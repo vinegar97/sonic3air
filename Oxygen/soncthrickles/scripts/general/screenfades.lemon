@@ -33,6 +33,54 @@ function u16 makeExtendedPackedColor(u16 color)
 #endif
 
 
+//# address-hook(0x003b80) end(0x003b94)
+function void SetPaletteFadedOut()
+{
+	if (global.zone_act == 0x0d01 || global.zone_act == 0x1701)
+	{
+	#if STANDALONE
+		// Avoid brief glitches while fading in from white into the HPZ emerald cave
+		if (global.zone_act == 0x1701)
+		{
+			palette_fade.range = 0x003f
+		}
+	#endif
+
+		SetPaletteToWhite()
+	}
+	else
+	{
+		SetPaletteToBlack()
+	}
+}
+
+
+//# address-hook(0x003b94) end(0x003bb6)
+function void SetPaletteToBlack()
+{
+	zeroMemory(0xfffffc00 + u32(palette_fade.offset), (palette_fade.count + 1) * 2)
+	if (level.water_present)
+		zeroMemory(0xfffff080 + u32(palette_fade.offset), (palette_fade.count + 1) * 2)
+
+#if STANDALONE
+	if (EXTENDED_CHARACTER_PALETTES && palette_fade.range < 0x2000)
+	{
+		zeroMemory(0x802000, 0x180)
+		if (level.water_present)
+		{
+			zeroMemory(0x802300, 0x180)
+		}
+	}
+
+	globalComponentTintColorR = 0
+	globalComponentTintColorG = 0
+	globalComponentTintColorB = 0
+	globalComponentAddedColorR = 0
+	globalComponentAddedColorG = 0
+	globalComponentAddedColorB = 0
+#endif
+}
+
 
 //# address-hook(0x003b14) end(0x003b52)
 function void FadeInPalette()
@@ -124,48 +172,6 @@ function void FadeInColor()
 	}
 	A0 += 2
 	A1 += 2
-}
-
-
-//# address-hook(0x003b80) end(0x003bb6)
-function void SetPaletteFadedOut()
-{
-	if (global.zone_act == 0x0d01 || global.zone_act == 0x1701)
-	{
-	#if STANDALONE
-		// Avoid brief glitches while fading in from white into the HPZ emerald cave
-		if (global.zone_act == 0x1701)
-		{
-			palette_fade.range = 0x003f
-		}
-	#endif
-
-		SetPaletteToWhite()
-	}
-	else
-	{
-		zeroMemory(0xfffffc00 + u32(palette_fade.offset), (palette_fade.count + 1) * 2)
-		if (level.water_present)
-			zeroMemory(0xfffff080 + u32(palette_fade.offset), (palette_fade.count + 1) * 2)
-
-	#if STANDALONE
-		if (EXTENDED_CHARACTER_PALETTES && palette_fade.range < 0x2000)
-		{
-			zeroMemory(0x802000, 0x180)
-			if (level.water_present)
-			{
-				zeroMemory(0x802300, 0x180)
-			}
-		}
-
-		globalComponentTintColorR = 0
-		globalComponentTintColorG = 0
-		globalComponentTintColorB = 0
-		globalComponentAddedColorR = 0
-		globalComponentAddedColorG = 0
-		globalComponentAddedColorB = 0
-	#endif
-	}
 }
 
 
