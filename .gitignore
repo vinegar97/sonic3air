@@ -54,15 +54,59 @@ bin/
 /framework/external/sdl/SDL2/VisualC/tests/loopwave/sample.wav
 /framework/external/sdl/SDL2/VisualC/tests/testoverlay2/moose.dat
 
+# Ogg/Vorbis Visual Studio generated files
+/framework/external/ogg-vorbis/libvorbis/out
+/framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbisdec/Win32
+/framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbisdec/x64
+/framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbisenc/Win32
+/framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbisenc/x64
+
+# build includes
+/framework/include/
+
+# librmx
+/librmx/build/_vstudio/rmxbase_x64/rmxbase.lib.recipe
+/librmx/build/_vstudio/rmxbase_x86/rmxbase.lib.recipe
+/librmx/build/_vstudio/rmxbase_x86d/rmxbase.lib.recipe
+/librmx/build/_vstudio/rmxext_oggvorbis_x64/rmxext_oggvorbis.lib.recipe
+/librmx/build/_vstudio/rmxext_oggvorbis_x86/rmxext_oggvorbis.lib.recipe
+/librmx/build/_vstudio/rmxext_oggvorbis_x86d/rmxext_oggvorbis.lib.recipe
+/librmx/build/_vstudio/rmxmedia_x64/rmxmedia.lib.recipe
+/librmx/build/_vstudio/rmxmedia_x86/rmxmedia.lib.recipe
+/librmx/build/_vstudio/rmxmedia_x86d/rmxmedia.lib.recipe
+/librmx/build/_vstudio/rmxTest_x64/rmxTest.exp
+/librmx/build/_vstudio/rmxTest_x86/rmx_test.vcxproj.FileListAbsolute.txt
+/librmx/build/_vstudio/rmxTest_x86/rmxTest.exe.recipe
+/librmx/build/_vstudio/rmxTest_x86/rmxTest.exp
+/librmx/build/_vstudio/rmxTest_x86/rmxTest.iobj
+/librmx/build/_vstudio/rmxTest_x86/rmxTest.ipdb
+/librmx/build/_vstudio/rmxTest_x86d/rmx_test.vcxproj.FileListAbsolute.txt
+/librmx/build/_vstudio/rmxTest_x86d/rmxTest.exe.recipe
+/librmx/build/_vstudio/rmxTest_x86d/rmxTest.exp
+
+
 # Oxygen
 /Oxygen/oxygenengine/OxygenApp
+/Oxygen/oxygenengine/build/_vstudio/tmp
+/Oxygen/oxygenengine/crashdump.dmp
+/Oxygen/oxygenengine/palette_dump.bmp
+/Oxygen/oxygenengine/screenshot.bmp
 /Oxygen/soncthrickles/Sonic3AIR
 /Oxygen/soncthrickles/source/_cmake/build/*
 /Oxygen/soncthrickles/___internal/analysis/*
+/Oxygen/soncthrickles/build/_vstudio/tmp
+/Oxygen/soncthrickles/build/_vstudio/lib/Release-Enduser_x86
+/Oxygen/soncthrickles/build/_vstudio/lib/Release-Enduser_x64
+/Oxygen/soncthrickles/_master_image_template/data
 /Oxygen/soncthrickles/saves/scripts.bin
 /Oxygen/soncthrickles/saves/rec
 /Oxygen/soncthrickles/enginedata.bin
 /Oxygen/soncthrickles/gamedata.bin
+/Oxygen/soncthrickles/crashdump.dmp
+/Oxygen/soncthrickles/palette_dump.bmp
+/Oxygen/soncthrickles/screenshot.bmp
+/Oxygen/lemonscript/build/_vstudio/tmp
+/Oxygen/_MASTER/
 
 # Xcode
 /Oxygen/soncthrickles/build/_xcode/sonic3air.xcodeproj/project.xcworkspace/xcuserdata/*
