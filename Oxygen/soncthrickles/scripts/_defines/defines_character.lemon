@@ -25,9 +25,9 @@
 
 
 // Update addresses for characters:
-//  0x00010a94 = Sonic
-//  0x0001365c = Tails
-//  0x00016444 = Knuckles
+//  0x010a94 = Sonic
+//  0x01365c = Tails
+//  0x016444 = Knuckles
 define char.update_address		= u32[A0]
 
 // Render flags
