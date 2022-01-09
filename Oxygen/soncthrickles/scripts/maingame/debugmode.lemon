@@ -28,10 +28,10 @@ function void DebugMode.BaseUpdate()
 function void DebugMode.Enter()
 {
 	debug_mode.state += 0x200
-	u32[0xffffffca] = char.mapping_offset
+	debug_mode.backup.mapping_offset = char.mapping_offset
 	if (char.base_state < 0x06)
 	{
-		u16[0xffffffce] = char.sprite_attributes
+		debug_mode.backup.sprite_attributes = char.sprite_attributes
 	}
 	D0.u16 = level.height.bitmask
 	u16[0xffffb014] &= D0.u16
@@ -216,8 +216,8 @@ function void DebugMode.EvaluateInput()
 	#endif
 
 		A1 = 0xffffb000
-		objA1.mapping_offset = u32[0xffffffca]
-		objA1.sprite_attributes = u16[0xffffffce]
+		objA1.mapping_offset = debug_mode.backup.mapping_offset
+		objA1.sprite_attributes = debug_mode.backup.sprite_attributes
 		DebugMode.ResetSonic()
 		u8[A1 + 0x1e] = 0x13
 		u8[A1 + 0x1f] = 0x09

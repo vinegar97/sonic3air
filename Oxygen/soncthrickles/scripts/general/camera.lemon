@@ -449,7 +449,7 @@ function void UpdateCameraPositionX_CompMode()
 		D0.u16 = objA0.position.x.u16
 	}
 
-	D2.u16 = u16[0xffffeea8]
+	D2.u16 = level.width.bitmask
 	D0.u16 = ((D0.u16 - u16[A1]) & D2.u16) - (getScreenWidth() / 2 - 0x10)
 	if (D0.s16 < 0)
 	{

@@ -47,9 +47,9 @@ function void CompetitionMode.MainMenu()
 	u16[0xfffffb00] = 0
 	u32[0xfffffbfc] = 0xfffffb00
 	level.framecounter = 0
-	if (competition_mode.mode >= 0x03)
+	if (competition_mode.menu.game_mode >= 0x03)
 	{
-		competition_mode.mode = 0
+		competition_mode.menu.game_mode = 0
 	}
 
 	Enigma.decompress(0x39d2a2, 0xffff0000, 0x6001)
@@ -141,12 +141,12 @@ function void CompetitionMode.MainMenu()
 
 		if (D0.u8 & 0xf0)
 		{
-			D2 = competition_mode.mode * 2
+			D2 = competition_mode.menu.game_mode * 2
 			call 0x00aa28 + D2.s16
 			break
 		}
 
-		D1.u8 = competition_mode.mode
+		D1.u8 = competition_mode.menu.game_mode
 		if (D0.u16 & CONTROL_UP)
 		{
 			playSound(0x5b)
@@ -162,7 +162,7 @@ function void CompetitionMode.MainMenu()
 			if (D1.u8 > 3)
 				D1 = 0
 		}
-		competition_mode.mode = D1.u8
+		competition_mode.menu.game_mode = D1.u8
 	}
 }
 
@@ -206,8 +206,8 @@ function void fn00aa2e()
 //# address-hook(0x00aa36) end(0x00aa52)
 function void fn00aa36()
 {
-	u8[0xffffff8b] = 0
-	u8[0xffffff8a] = u8[0xffffef4e]
+	competition_mode.game_mode = 0
+	competition_mode.item_flag = competition_mode.menu.items_toggle
 	competition_mode.multiplay = (control.pad2.pressed & 0xe0) ? 0xff : 0x00
 	global.game_mode = 0x3c
 	fn00aa8e()
@@ -217,8 +217,8 @@ function void fn00aa36()
 //# address-hook(0x00aa54) end(0x00aa72)
 function void fn00aa54()
 {
-	u8[0xffffff8b] = 0x03
-	u8[0xffffff8a] = u8[0xffffef4e]
+	competition_mode.game_mode = 0x03
+	competition_mode.item_flag = competition_mode.menu.items_toggle
 	competition_mode.multiplay = (control.pad2.pressed & 0xe0) ? 0xff : 0x00
 	global.game_mode = 0x40
 	fn00aa8e()
@@ -253,7 +253,7 @@ function void fn00aa8e()
 //# address-hook(0x00aaa6) end(0x00aad8)
 function void fn00aaa6()
 {
-	D1.u8 = competition_mode.mode
+	D1.u8 = competition_mode.menu.game_mode
 	if (D0.u16 & 0x01)
 	{
 		playSound(0x5b)
@@ -269,7 +269,7 @@ function void fn00aaa6()
 		if (D1.u8 > 3)
 			D1 = 0
 	}
-	competition_mode.mode = D1.u8
+	competition_mode.menu.game_mode = D1.u8
 
 	// TODO: Resolve this... it's actually a "continue" in the main menu loop
 	//  -> This whole function should be removed as soon as it's not referenced any more
@@ -287,7 +287,7 @@ function void fn00aadc()
 	if (D0.s8 >= 0)
 	{
 		objA0.sprite_attributes &= 0x9fff
-		D1.u16 = (D0.u8 == competition_mode.mode) ? 0x4000 : 0x2000
+		D1.u16 = (D0.u8 == competition_mode.menu.game_mode) ? 0x4000 : 0x2000
 		objA0.sprite_attributes |= D1.u16
 	}
 	DrawObject()
@@ -297,16 +297,16 @@ function void fn00aadc()
 //# address-hook(0x00ab00) end(0x00ab46)
 function void fn00ab00()
 {
-	if (competition_mode.mode <= 0x01)
+	if (competition_mode.menu.game_mode <= 0x01)
 	{
 		D0.u16 = (control.pad1.pressed | control.pad2.pressed) & 0x0c
 		if (D0.u16 != 0)
 		{
-			u8[0xffffef4e] = (u8[0xffffef4e] == 0) ? 0xff : 0x00
+			competition_mode.menu.items_toggle = (competition_mode.menu.items_toggle == 0) ? 0xff : 0x00
 			playSound(0x5b)
 		}
 
-		objA0.position.x.u16 = ((u8[0xffffef4e] == 0) ? 0x015c : 0x017c) + getScreenExtend()
+		objA0.position.x.u16 = ((competition_mode.menu.items_toggle == 0) ? 0x015c : 0x017c) + getScreenExtend()
 		if (level.framecounter.low & 0x08)
 		{
 			DrawObject()
@@ -533,11 +533,11 @@ function void CompetitionMode.StageSelect()
 		{
 			if ((D2.u8 & CONTROL_UP) == 0)
 			{
-				if (competition_mode.stage != 0x04)
+				if (competition_mode.menu.stage != 0x04)
 				{
 					playSound(0x5b)
-					++competition_mode.stage
-					if (competition_mode.stage != 0x01 && competition_mode.stage != 0x04)
+					++competition_mode.menu.stage
+					if (competition_mode.menu.stage != 0x01 && competition_mode.menu.stage != 0x04)
 					{
 						s16[0xffffeee6] = 0x48
 						continue
@@ -546,11 +546,11 @@ function void CompetitionMode.StageSelect()
 			}
 			else
 			{
-				if (competition_mode.stage != 0)
+				if (competition_mode.menu.stage != 0)
 				{
 					playSound(0x5b)
-					--competition_mode.stage
-					if (competition_mode.stage != 0x00 && competition_mode.stage != 0x03)
+					--competition_mode.menu.stage
+					if (competition_mode.menu.stage != 0x00 && competition_mode.menu.stage != 0x03)
 					{
 						s16[0xffffeee6] = -0x48
 						continue
@@ -565,7 +565,7 @@ function void CompetitionMode.StageSelect()
 
 	// Start now
 	playSound(0x63)
-	global.zone = u8[0x00af1e + competition_mode.stage]
+	global.zone = u8[0x00af1e + competition_mode.menu.stage]
 	global.act = 0
 	fn00c104()
 	global.game_mode = 0x0c
@@ -580,7 +580,7 @@ function void fn00af24()
 {
 	if (u16[0xffffe000] == 0xffa8 + getScreenExtend() && u16[0xffffeee6] == 0)
 	{
-		objA0.position.y.u16 = u32(competition_mode.stage) * 0x48 + (0xac - scrolloffset.y.planeA)
+		objA0.position.y.u16 = u32(competition_mode.menu.stage) * 0x48 + (0xac - scrolloffset.y.planeA)
 		if (level.framecounter.low & 0x08)
 		{
 			DrawObject()
@@ -594,11 +594,11 @@ function void fn00af58()
 {
 	if (u16[0xffffe000] == 0xffa8 + getScreenExtend() && u16[0xffffeee6] == 0)
 	{
-		objA0.position.y.u16 = u32(competition_mode.stage) * 0x48 + (0xa8 - scrolloffset.y.planeA)
-		objA0.animation.sprite = competition_mode.stage + 0x06
+		objA0.position.y.u16 = u32(competition_mode.menu.stage) * 0x48 + (0xa8 - scrolloffset.y.planeA)
+		objA0.animation.sprite = competition_mode.menu.stage + 0x06
 		DrawObject()
 
-		A1 = 0x20a5be + competition_mode.stage * 0x20
+		A1 = 0x20a5be + competition_mode.menu.stage * 0x20
 		copyMemory(0xfffffc40, A1, 0x20)
 	}
 	else
@@ -611,7 +611,7 @@ function void fn00af58()
 //# address-hook(0x00afb2) end(0x00afc6)
 function void fn00afb2()
 {
-	D0 = clamp(s8(competition_mode.stage) - 1, 0, 2)
+	D0 = clamp(s8(competition_mode.menu.stage) - 1, 0, 2)
 }
 
 

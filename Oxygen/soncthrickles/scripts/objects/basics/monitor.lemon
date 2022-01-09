@@ -754,9 +754,9 @@ function void ItemEffect.ApplySpeedUp()
 	}
 	else
 	{
-		u16[0xfffffec0] = 0xc00
-		u16[0xfffffec2] = 0x18
-		u16[0xfffffec4] = 0x80
+		global.move.speedcap.tails = 0xc00
+		global.move.acceleration.tails = 0x18
+		global.move.deceleration.tails = 0x80
 	}
 #endif
 
@@ -875,9 +875,9 @@ function void ItemEffect.ApplySuperTransformation()
 		super.active.tails = 1
 	#endif
 		u8[0xffffb020] = char.state.TAILS_TRANSFORM
-		u16[0xfffffec0] = 0x800
-		u16[0xfffffec2] = 0x18
-		u16[0xfffffec4] = 0xc0
+		global.move.speedcap.tails = 0x800
+		global.move.acceleration.tails = 0x18
+		global.move.deceleration.tails = 0xc0
 		u32[0xffffcd7c] = 0x01a170		// Super Flickies (the first one spawns the others)
 	}
 	else

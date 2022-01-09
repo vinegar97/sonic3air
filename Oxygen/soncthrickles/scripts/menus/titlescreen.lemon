@@ -87,7 +87,7 @@ function void fn00440c()
 			D3.u16 = A1.u16 >> 1
 		}
 
-		u16 targetInVRAM = (u8[0xffffffbc] == 0) ? 0 : 0x6000
+		u16 targetInVRAM = (titleintro.buffer == 0) ? 0 : 0x6000
 		updateSpritePattern(0xffff0000, targetInVRAM, D3.u16)
 	}
 
@@ -98,7 +98,7 @@ function void fn00440c()
 	A1 = 0xffff8000
 	A0 = u32[A2]
 	A2 += 4
-	D0.u16 = (u8[0xffffffbc] == 0 || D7.u16 < 7) ? 0 : 0x0300
+	D0.u16 = (titleintro.buffer == 0 || D7.u16 < 7) ? 0 : 0x0300
 	Enigma.Decompress()
 	if (D7.u16 < 7)
 	{
@@ -114,7 +114,7 @@ function void fn00440c()
 #if !STANDALONE
 	set_status_register(0x2700)
 #endif
-	copyRectToVRAM(0xffff8000, (u8[0xffffffbc] == 0) ? 0xc000 : 0xe000, 0x28, 0x1c)
+	copyRectToVRAM(0xffff8000, (titleintro.buffer == 0) ? 0xc000 : 0xe000, 0x28, 0x1c)
 #if !STANDALONE
 	set_status_register(0x2300)
 #endif
@@ -276,7 +276,7 @@ function void TitleScreen()
 
 	outro.wait_time = 0
 	u16[0xfffff662] = 0
-	u8[0xffffffbc] = 0xff
+	titleintro.buffer = 0xff
 	titleintro.frames = 0
 	titleintro.animstep = 1
 	D0 = 1
@@ -431,12 +431,12 @@ function void TitleScreen()
 			ring_counter = 0
 			timer.alldata = 0
 			player.score = 0
-			u16[0xfffffed0] = 0
-			u32[0xfffffed2] = 0
-			u32[0xfffffed6] = 0
+			ring_counter.player2 = 0
+			timer.alldata.player2 = 0
+			player2.score = 0
 			continues_counter = 0
 			player.next_life_score = 5000
-			u32[0xffffffc4] = 5000
+			player2.next_life_score = 5000
 
 			playSound(MUSIC_CTRL_FADEOUT)
 
@@ -521,11 +521,11 @@ function void TitleScreen()
 	ring_counter = 0
 	timer.alldata = 0
 	player.score = 0
-	u16[0xfffffed0] = 0
-	u32[0xfffffed2] = 0
-	u32[0xfffffed6] = 0
+	ring_counter.player2 = 0
+	timer.alldata.player2 = 0
+	player2.score = 0
 	player.next_life_score = 5000
-	u32[0xffffffc4] = 5000
+	player2.next_life_score = 5000
 }
 
 
@@ -632,8 +632,8 @@ function void fn004352()
 	{
 		copyMemory(0xfffffc00, 0xfffffc80, 0x40)
 
-		u8[0xffffffbc] ^= 0xff
-		if (u8[0xffffffbc] != 0)
+		titleintro.buffer ^= 0xff
+		if (titleintro.buffer != 0)
 		{
 			VDP.Config.setNameTableBasePlaneA(0xc000)
 			VDP.Config.setNameTableBasePlaneB(0xc000)

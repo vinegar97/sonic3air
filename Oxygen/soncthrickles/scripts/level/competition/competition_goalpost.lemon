@@ -22,15 +22,15 @@ function void fn036be0()
 	u16[A0 + 0x30] = objA0.position.x.u16
 	objA0.value32 = objA0.position.y.u16
 	u16[A0 + 0x38] = u16(objA0.subtype2c) * 8 - 0x14
-	u8[0xfffffeda] = 0x05
+	competition_mode.laps = 0x05
 	u16[0xfffffedc] = 0
 	u16[0xffffeee6] = 0
 	hud.dirty.timer = 0
 	timer.alldata = 0
-	u8[0xfffffec7] = 0
-	u32[0xfffffed2] = 0
+	hud.dirty.timer.player2 = 0
+	timer.alldata.player2 = 0
 	ring_counter = 0
-	u16[0xfffffed0] = 0
+	ring_counter.player2 = 0
 
 	fn036f5a()
 
@@ -138,8 +138,8 @@ function void fn036d3e()
 		u16[0xfffffedc] = 0
 		hud.dirty.timer = 0
 		timer.alldata = 0
-		u8[0xfffffec7] = 0
-		u32[0xfffffed2] = 0
+		hud.dirty.timer.player2 = 0
+		timer.alldata.player2 = 0
 		player1.control_override = 0
 		player2.control_override = 0
 		fn036f5a()
@@ -263,8 +263,8 @@ function void fn036dfc()
 function void fn036f5a()
 {
 	zeroMemory(0xffff7828, 0x30)
-	u32[0xffffee52] = 0
-	u32[0xffffee56] = 0
+	competition_mode.time_record.player1 = 0
+	competition_mode.time_record.player2 = 0
 	u8[0xffffee5a] = 0xff
 }
 
@@ -299,7 +299,7 @@ function void fn036f76()
 //# address-hook(0x036faa) end(0x036fd8)
 function void fn036faa()
 {
-	if (u8[0xffffff8a] != 0)
+	if (competition_mode.item_flag != 0)
 		return
 
 	A4 = 0x036fda + D0.u16

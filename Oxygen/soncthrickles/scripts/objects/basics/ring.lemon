@@ -204,7 +204,7 @@ function void fn01a67a()
 #endif
 
 	A1 = A0
-	D5 = (u8[A0 + 0x3f] == 0) ? ring_counter : u16[0xfffffed0]
+	D5 = (u8[A0 + 0x3f] == 0) ? ring_counter : ring_counter.player2
 	D5.u16 = min(D5.u16, maxRings) - 1
 	D4.u16 = 0x288
 	SpillRings()

@@ -5199,7 +5199,7 @@ function void Character.GettingHurt()
 		// It's the second player
 		if (competition_mode.active)
 		{
-			rings = u16[0xfffffed0]
+			rings = ring_counter.player2
 		}
 		else
 		{
@@ -5461,7 +5461,7 @@ function void Character.Die_noSound()
 	char.groundspeed = 0
 	char.state = char.state.DIED
 
-	u16[0xffffffce] = char.sprite_attributes
+	debug_mode.backup.sprite_attributes = char.sprite_attributes
 	u8[A0 + 0x0a] |= 0x80
 }
 
@@ -6370,7 +6370,7 @@ function void Character.CheckDiedStateEnd()
 			char.position.y.u16 = u16[0xfffffe4e]
 			char.sprite_attributes = u16[0xfffffe56]
 			u16[A0 + 0x46] = u16[0xfffffe58]
-			u16[0xfffffed0] = 0
+			ring_counter.player2 = 0
 			u8[0xfffff74b] = 1
 		}
 
@@ -6442,7 +6442,7 @@ function void Character.CheckDiedStateEnd()
 				u16[0xffffb0d2] = A0.u16
 				char.spindash_charge = 0
 				hud.dirty.timer = 0
-				u8[0xfffffec7] = 0
+				hud.dirty.timer.player2 = 0
 				playMusic(MUSIC_GAMEOVER)
 
 				// Load patterns for time/game over

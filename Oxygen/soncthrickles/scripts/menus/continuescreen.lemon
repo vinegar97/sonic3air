@@ -252,11 +252,11 @@ function void fn05c2e0()
 	ring_counter = 0
 	timer.alldata = 0
 	player.score = 0
-	u16[0xfffffed0] = 0
-	u32[0xfffffed2] = 0
-	u32[0xfffffed6] = 0
+	ring_counter.player2 = 0
+	timer.alldata.player2 = 0
+	player2.score = 0
 	player.next_life_score = 5000
-	u32[0xffffffc4] = 5000
+	player2.next_life_score = 5000
 	--continues_counter
 	u8[0xffffef56] = 0xff
 	fn00c532()

@@ -1457,7 +1457,7 @@ function void fn01c746()
 	{
 		D0.u16 = 0x015a
 		level.vertical_wrap = D0.u16
-		u16[0xffffee10] = D0.u16
+		move_area.top.target = D0.u16
 		camera.update_routine += 2
 	}
 }

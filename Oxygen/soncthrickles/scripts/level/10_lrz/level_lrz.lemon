@@ -999,10 +999,10 @@ function void fn059b18()
 function void fn059b1c()
 {
 	// Reset ring counter and time to LRZ 2 values after entering  LRZ boss act
-	D0.u16 = u16[0xffffef5e]
+	D0.u16 = level.backup.rings
 	if (D0.u16 != 0)
 	{
-		u16[0xffffef5e] = 0
+		level.backup.rings = 0
 		ring_counter = D0.u16
 		hud.dirty.rings = 0x01
 	}
@@ -1012,10 +1012,10 @@ function void fn059b1c()
 	extra_lives_granted = (ring_counter / 100) << 1
 #endif
 
-	D0 = u32[0xffffef60]
+	D0 = level.backup.timer.alldata
 	if (D0 != 0)
 	{
-		u32[0xffffef60] = 0
+		level.backup.timer.alldata = 0
 		timer.alldata = D0
 		hud.dirty.timer = 0xff
 	}

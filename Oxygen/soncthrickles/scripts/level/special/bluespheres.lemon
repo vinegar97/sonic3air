@@ -812,7 +812,7 @@ function void fn00903e()
 	}
 
 	objA0.animation.timer = D0.u8
-	if (u8[0xffffe432] & 0x80)
+	if (bluesphere.jumping_flags.player1 & 0x80)
 	{
 		A1 = 0x0091f6
 		if (bluespheres.movement_speed == 0)
@@ -826,30 +826,30 @@ function void fn00903e()
 	}
 
 	objA0.animation.sprite = u8[A1 + D0.s16]
-	if ((u8[0xffffe432] & 0x80) == 0 && u8[0xffffe44c] == 0 && (control.pad1.pressed & CONTROL_ABC))
+	if ((bluesphere.jumping_flags.player1 & 0x80) == 0 && u8[0xffffe44c] == 0 && (control.pad1.pressed & CONTROL_ABC))
 	{
-		u8[0xffffe432] = 1
+		bluesphere.jumping_flags.player1 = 1
 	}
 
 	D0.u8 = bluespheres.direction & 0x3f
 	if (D0.u8 == 0)
 	{
-		if (u8[0xffffe432] == 1)
+		if (bluesphere.jumping_flags.player1 == 1)
 		{
 			u32[A0 + 0x40] = 0xfff00000
-			u8[0xffffe432] = 0x80
+			bluesphere.jumping_flags.player1 = 0x80
 			bluespheres.next_direction = 0
 			playSound(0x62)
 		}
 
-		if (u8[0xffffe432] & 0x80)
+		if (bluesphere.jumping_flags.player1 & 0x80)
 		{
 			D0 = u32[A0 + 0x3c] + u32[A0 + 0x40]
 			if (D0.s32 >= 0)
 			{
 				D0 = 0
 				u32[A0 + 0x40] = 0
-				u8[0xffffe432] = 0
+				bluesphere.jumping_flags.player1 = 0
 			}
 
 			u32[A0 + 0x40] += bluespheres.current_gamespeed << 4
@@ -953,7 +953,7 @@ function void fn00927a()
 	objA0.animation.timer = D0.u8
 
 	A1 = 0x0091e8
-	if (u8[0xffffe440] != 0)
+	if (bluesphere.jumping_flags.player2 != 0)
 	{
 		A1 = 0x009204
 		D1.u16 = bluespheres.movement_speed
@@ -972,17 +972,17 @@ function void fn00927a()
 		if ((bluespheres.direction & 0x3f) == 0)
 		{
 			u32[A0 + 0x40] = 0xffe80000
-			u8[0xffffe440] = 0x81
+			bluesphere.jumping_flags.player2 = 0x81
 			playSound(0xb1)
 		}
 	}
 
 	fn00937c()
 	D0.u16 &= 0x70
-	if (D0.u16 != 0 && u8[0xffffe440] == 0)
+	if (D0.u16 != 0 && bluesphere.jumping_flags.player2 == 0)
 	{
 		u32[A0 + 0x40] = 0xfff00000
-		u8[0xffffe440] = 0x80
+		bluesphere.jumping_flags.player2 = 0x80
 		playSound(0x62)
 	}
 
@@ -993,7 +993,7 @@ function void fn00927a()
 		{
 			D0 = 0
 			u32[A0 + 0x40] = 0
-			u8[0xffffe440] = 0
+			bluesphere.jumping_flags.player2 = 0
 		}
 		D1.s32 = s16(bluespheres.current_gamespeed) << 4
 		u32[A0 + 0x40] += D1
@@ -1019,7 +1019,7 @@ function void fn00937c()
 	D0.u16 = posbackup.offset.player1
 	A1 = 0xffffe500 + D0.s16
 	u16[A1] = control.pad1
-	u8[A1 + 0x02] = u8[0xffffe432]
+	u8[A1 + 0x02] = bluesphere.jumping_flags.player1
 	u8[0xffffee27] += 4
 	D0.u8 = control.pad2.state & 0x7f
 	if (D0.u8 != 0)
@@ -1217,7 +1217,7 @@ function void fn009580()
 	D2 = 0
 	if (bluespheres.next_direction != 0 && D3.u16 == 0)
 	{
-		if ((u8[0xffffe432] & 0x80) == 0)
+		if ((bluesphere.jumping_flags.player1 & 0x80) == 0)
 		{
 			bluespheres.direction += bluespheres.next_direction
 			if ((bluespheres.direction & 0x3f) != 0)
@@ -1310,7 +1310,7 @@ function void fn009580()
 		}
 	}
 
-	if (u8[0xffffe432] == 0x81)
+	if (bluesphere.jumping_flags.player1 == 0x81)
 	{
 		D2.s16 *= 2
 	}
@@ -1322,7 +1322,7 @@ function void fn009580()
 	bluespheres.position.x -= D0 >> 16
 	bluespheres.position.y -= D1 >> 16
 
-	if ((u8[0xffffe432] & 0x80) == 0 && u8[0xffffe44c] == 0)
+	if ((bluesphere.jumping_flags.player1 & 0x80) == 0 && u8[0xffffe44c] == 0)
 	{
 		fn00972e()
 	}
@@ -1459,13 +1459,13 @@ function void fn00972e()
 	else if (D2.u8 == 5)
 	{
 		// Yellow spring sphere
-		if (u8[0xffffe44c] == 0 && (u8[0xffffe432] & 0x80) == 0)
+		if (u8[0xffffe44c] == 0 && (bluesphere.jumping_flags.player1 & 0x80) == 0)
 		{
 			D0.u8 = bluespheres.direction & 0x3f
 			if (D0.u8 == 0)
 			{
 				u32[A0 + 0x40] = 0xffe80000
-				u8[0xffffe432] = 0x81
+				bluesphere.jumping_flags.player1 = 0x81
 				playSound(0xb1)
 			}
 		}
@@ -2465,7 +2465,7 @@ function void fn02df64()
 	gfx.plane_update_routine = 0
 	hud.dirty.timer = 0
 	global.fade_timer = 0
-	u16[0xffffef6a] = global.zone_act
+	bluesphere.backup.zone_act = global.zone_act
 
 	addPatternLoadingCue(0x02e310)
 
@@ -2640,7 +2640,7 @@ function void fn02df64()
 			break
 	}
 
-	global.zone_act = u16[0xffffef6a]
+	global.zone_act = bluesphere.backup.zone_act
 }
 
 

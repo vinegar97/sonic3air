@@ -75,7 +75,7 @@ function void fn23a63c()
 	u16[0xffffeeba] = D0.u16
 
 	A1 = 0x23a928 + global.zone * 0x10
-	u16[0xffffeea8] = u16[(A1+=2)-2]
+	level.width.bitmask = u16[(A1+=2)-2]
 	level.height.bitmask = u16[(A1+=2)-2]
 	level.height.tilemask = u16[(A1+=2)-2]
 	level.chunksize.bitmask = u16[(A1+=2)-2]
@@ -94,7 +94,7 @@ function void fn23a68a()
 {
 	fn23a03c()
 
-	D2.u16 = u16[0xffffeea8] + 1
+	D2.u16 = level.width.bitmask + 1
 	D3.u16 = D2.u16
 	D2.u16 >>= 1
 	A1 = 0xffffeeb4
@@ -163,7 +163,7 @@ function void fn23a6de()
 	u16[0xffffeed6] = D0.u16
 	u16[0xffffeed8] = D0.u16
 
-	D0 = ((u8[0xfffffeda] + 1) << 8) - 0x70
+	D0 = ((competition_mode.laps + 1) << 8) - 0x70
 	u16[0xffffeeda] = u32(0x900000) / D0.u16
 
 	fn23a752()

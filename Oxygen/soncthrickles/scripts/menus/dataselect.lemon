@@ -56,11 +56,11 @@ function void fn00c110()
 	ring_counter = 0
 	timer.alldata = 0
 	player.score = 0
-	u16[0xfffffed0] = 0
-	u32[0xfffffed2] = 0
-	u32[0xfffffed6] = 0
+	ring_counter.player2 = 0
+	timer.alldata.player2 = 0
+	player2.score = 0
 	player.next_life_score = 5000
-	u32[0xffffffc4] = 5000
+	player2.next_life_score = 5000
 }
 
 
@@ -733,13 +733,13 @@ function void DataSelect.sharedNewGameStartup()
 function void fn00d30c()
 {
 	u8[A0 + 0x1d] = 0x0f
-	objA0.animation.sprite = u16[0xffffef4c] + 4
+	objA0.animation.sprite = dataselect.nosave_characters + 4
 
 	if (dataselect.slot_selected == 0 && u16[0xffffb078] == 0 && u16[0xffffeee4] == 0)
 	{
 		if (control.pad1.pressed & DataSelect.CONTROLS_ACCEPT)
 		{
-			levelselect.characters = u16[0xffffef4c]
+			levelselect.characters = dataselect.nosave_characters
 
 			DataSelect.sharedNewGameStartup()
 
@@ -750,9 +750,9 @@ function void fn00d30c()
 			return
 		}
 
-		D0.u16 = u16[0xffffef4c]
+		D0.u16 = dataselect.nosave_characters
 		fn00d6d0()
-		u16[0xffffef4c] = D0.u16
+		dataselect.nosave_characters = D0.u16
 
 		objA0.animation.sprite = D0.u8 + 4
 		u16[A0 + 0x16] = 1

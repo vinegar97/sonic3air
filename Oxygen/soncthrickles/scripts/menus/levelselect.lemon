@@ -241,7 +241,7 @@ function bool LevelSelect.innerUpdate()
 			global.sk_bluespheres = 0
 		#if STANDALONE
 			player.next_life_score = 5000
-			u32[0xffffffc4] = 5000
+			player2.next_life_score = 5000
 		#endif
 
 			if (D0.u16 == 0x4000 || D0.u16 == 0x4001)
@@ -322,13 +322,13 @@ function void LevelSelect.startGame()
 	ring_counter = 0
 	timer.alldata = 0
 	player.score = 0
-	u16[0xfffffed0] = 0
-	u32[0xfffffed2] = 0
-	u32[0xfffffed6] = 0
+	ring_counter.player2 = 0
+	timer.alldata.player2 = 0
+	player2.score = 0
 	continues_counter = 0
 	global.rolling_demo = 0
 	player.next_life_score = 5000
-	u32[0xffffffc4] = 5000
+	player2.next_life_score = 5000
 	u16[0xffffff8a] = 0
 	competition_mode.active = 0
 }
@@ -389,13 +389,13 @@ function bool fn007d6c()
 	ring_counter = 0
 	timer.alldata = 0
 	player.score = 0
-	u16[0xfffffed0] = 0
-	u32[0xfffffed2] = 0
-	u32[0xfffffed6] = 0
+	ring_counter.player2 = 0
+	timer.alldata.player2 = 0
+	player2.score = 0
 	continues_counter = 0
 	global.rolling_demo = 0
 	player.next_life_score = 5000
-	u32[0xffffffc4] = 5000
+	player2.next_life_score = 5000
 
 	playSound(MUSIC_CTRL_FADEOUT)
 

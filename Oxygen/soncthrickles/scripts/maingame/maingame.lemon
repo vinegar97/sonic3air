@@ -704,8 +704,8 @@ function void initializeMainGame()
 		ring_counter = 0
 		timer.alldata = 0
 		extra_lives_granted = 0
-		u16[0xfffffed0] = 0
-		u32[0xfffffed2] = 0
+		ring_counter.player2 = 0
+		timer.alldata.player2 = 0
 	#if STANDALONE
 		if (!Game.getSetting(SETTING_MAINTAIN_SHIELDS))
 	#endif
@@ -1228,21 +1228,21 @@ function void fn01bc60()
 
 	move_area.left = minX
 	move_area.right = maxX
-	u16[0xffffee0c] = minX
-	u16[0xffffee0e] = maxX
+	move_area.left.target = minX
+	move_area.right.target = maxX
 	u16[0xffffee1c] = minX
 	u16[0xffffee1e] = maxX
 
 	level.vertical_wrap = minY
 	move_area.bottom.current = maxY
-	u16[0xffffee10] = minY
+	move_area.top.target = minY
 	move_area.bottom.target = maxY
 	u16[0xffffee20] = minY
 	u16[0xffffee22] = maxY
 
 	camera.yoffset.player = 0x60
 	camera.yoffset.tails = 0x60
-	u16[0xffffeea8] = 0xffff
+	level.width.bitmask = 0xffff
 	level.height.bitmask = 0xffff
 	SetupCharacterAtStartPosition()
 }
@@ -1275,7 +1275,7 @@ function void SetupCharacterAtStartPosition()
 				u16[0xffffb010] = 0x0040
 				u16[0xffffb014] = 0x0420
 				move_area.left = 0
-				u16[0xffffee0c] = 0
+				move_area.left.target = 0
 				u16[0xffffee1c] = 0
 			}
 		#if STANDALONE
@@ -1330,10 +1330,10 @@ function void SetupCharacterAtStartPosition()
 				camera.position.x.u16 = 0x36f0
 				camera.position.y.u16 = 0x0200
 				move_area.left  = 0x35a0
-				u16[0xffffee0c] = 0x35a0
+				move_area.left.target = 0x35a0
 				u16[0xffffee1c] = 0x35a0
 				level.vertical_wrap = 0x0200
-				u16[0xffffee10] = 0x0200
+				move_area.top.target = 0x0200
 				u16[0xffffee20] = 0x0200
 				u16[0xffffee60] = 0x36f0
 				u16[0xffffee64] = 0x0200
@@ -1350,10 +1350,10 @@ function void SetupCharacterAtStartPosition()
 					camera.position.x.u16 = 0x36f0
 					camera.position.y.u16 = 0x0200
 					move_area.left  = 0x35a0
-					u16[0xffffee0c] = 0x35a0
+					move_area.left.target = 0x35a0
 					u16[0xffffee1c] = 0x35a0
 					level.vertical_wrap = 0x0200
-					u16[0xffffee10] = 0x0200
+					move_area.top.target = 0x0200
 					u16[0xffffee20] = 0x0200
 					u16[0xffffee60] = 0x36f0
 					u16[0xffffee64] = 0x0200
@@ -1378,7 +1378,7 @@ function void SetupCharacterAtStartPosition()
 			if (!isMainCharacter(CHARACTER_KNUCKLES) && global.lock_on_state == 0)
 			{
 				move_area.left  = 0x00c0
-				u16[0xffffee0c] = 0x00c0
+				move_area.left.target = 0x00c0
 				u16[0xffffee1c] = 0x00c0
 				D1.u16 = 0x0160
 			}

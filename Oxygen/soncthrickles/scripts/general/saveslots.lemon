@@ -218,7 +218,7 @@ function void InitSaveSlots()
 	}
 #endif
 
-	u16[0xffffef4c] = 0
+	dataselect.nosave_characters = 0
 	dataselect.slot_selected = 1
 }
 

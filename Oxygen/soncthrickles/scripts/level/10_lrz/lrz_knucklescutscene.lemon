@@ -211,8 +211,8 @@ function void fn063c14()
 		return
 
 	level.skip_titlecard = 0xff
-	u16[0xffffef5e] = ring_counter
-	u32[0xffffef60] = timer.alldata
+	level.backup.rings = ring_counter
+	level.backup.timer.alldata = timer.alldata
 	global.shields_backup_2 = u8[0xffffb02b]
 	D0.u16 = 0x1600
 	TriggerNextZone()

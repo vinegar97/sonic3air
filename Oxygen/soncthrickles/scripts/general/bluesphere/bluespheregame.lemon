@@ -13,8 +13,15 @@
 //-------------------------------------------------------//
 
 define bluespheregame.fully_unlocked	=  u8[0xffffffa0]	// Set to 1 if S&K is locked-on to Sonic 1 (or when played in S3AIR)
+define bluespheregame.menu_flags		=  u8[0xffffffa1]	// bit 0x01 reflects which page the menu is on (0 for initial "NOWAY!" screen, 1 for stage start screen), bit 0x80 is set when entering a code
+define bluespheregame.stage_parts.all	= u32[0xffffffa2]	// stores identifying information of the four quarters that the current stage is made from
+define bluespheregame.stage_parts.part1	=  u8[0xffffffa2]
+define bluespheregame.stage_parts.part2	=  u8[0xffffffa3]
+define bluespheregame.stage_parts.part3	=  u8[0xffffffa4]
+define bluespheregame.stage_parts.part4	=  u8[0xffffffa5]
 define bluespheregame.current_stage		= u32[0xffffffa6]	// Starting with 0, so it's the shown level number minus one
 define bluespheregame.menu_selection	=  u8[0xffffffaa]
+define bluespheregame.enable_progress	=  u8[0xffffffab]	// set to 0xff when not locked on with Sonic 1 or when a level code is used, enables level progression in the full game mode
 define bluespheregame.shown_difficulty	=  u8[0xffffffac]	// Shown difficulty in results after perfect (counts up in the screen)
 define bluespheregame.difficulty_level	=  u8[0xffffffad]	// Actual difficulty
 
@@ -46,7 +53,7 @@ function void BlueSphereGame()
 	call 0x0010ae
 #endif
 
-	u8[0xffffffa1] = 0
+	bluespheregame.menu_flags = 0
 	global.game_mode = 0x2c
 
 	while (true)
@@ -96,10 +103,10 @@ function void fn04c8e4()
 
 function void BlueSphere.setGeneratedStage(u32 number)
 {
-	u8[0xffffffa2] = number & 0x7f
-	u8[0xffffffa3] = (number * 3 + 1) % 0x7f
-	u8[0xffffffa4] = (number * 5 + 2) % 0x7e
-	u8[0xffffffa5] = (number * 7 + 3) % 0x7d
+	bluespheregame.stage_parts.part1 = number & 0x7f
+	bluespheregame.stage_parts.part2 = (number * 3 + 1) % 0x7f
+	bluespheregame.stage_parts.part3 = (number * 5 + 2) % 0x7e
+	bluespheregame.stage_parts.part4 = (number * 7 + 3) % 0x7d
 }
 
 
@@ -160,7 +167,7 @@ function void fn04c97e()
 	CopyRectToVRAM()
 
 	A1 = 0x04cc62
-	if (u8[0xffffffa1] == 0)
+	if (bluespheregame.menu_flags == 0)
 	{
 		A1 = 0x04cc36
 		levelselect.characters = CHARS_SONIC_ALONE
@@ -242,7 +249,7 @@ function void fn04cca6()
 		{
 			// No match
 			bluespheregame.fully_unlocked = 0
-			u8[0xffffffab] = 0xff
+			bluespheregame.enable_progress = 0xff
 			fn04cd18()
 			return
 		}
@@ -251,11 +258,11 @@ function void fn04cca6()
 
 	// Matched one of the signatures
 	bluespheregame.fully_unlocked = 1
-	if (u8[0xffffffa1] == 0)
+	if (bluespheregame.menu_flags == 0)
 	{
-		u8[0xffffffab] = 0
+		bluespheregame.enable_progress = 0
 		bluespheregame.current_stage = 0
-		u32[0xffffffa2] = 0x010203
+		bluespheregame.stage_parts.all = 0x00010203
 	}
 }
 
@@ -263,7 +270,7 @@ function void fn04cca6()
 //# address-hook(0x04cb1a) end(0x04cb34)
 function void fn04cb1a()
 {
-	A1 = (u8[0xffffffab] == 0) ? 0x04cb36 : 0x04cbb6
+	A1 = (bluespheregame.enable_progress == 0) ? 0x04cb36 : 0x04cbb6
 	copyMemory(A2, A1, 0x80)
 
 #if STANDALONE
@@ -374,7 +381,7 @@ function void fn04cd18()
 //# address-hook(0x04ceaa) end(0x04ceb0)
 function void fn04ceaa()
 {
-	if (u8[0xffffffa1] != 0)
+	if (bluespheregame.menu_flags != 0)
 	{
 		fn04cef8()
 	}
@@ -429,7 +436,7 @@ function void fn04cef8()
 	objA0.update_address = 0x04cf82
 	u32[0xffffb1bc] = 0x04d03e
 	u16[0xffffb1d0] = 0xc0
-	u8[0xffffffa1] = 0x01
+	bluespheregame.menu_flags = 0x01
 	bluespheregame.menu_selection = 0
 	u32[0xffffbd4c] = 0x04d64e	// first bumper cursor
 	u32[0xffffbd96] = 0x04d64e	// second bumper cursor
@@ -479,7 +486,7 @@ function void fn04cf82()
 			}
 		}
 
-		if ((u8[0xffffffa1] & 0x80) == 0)
+		if ((bluespheregame.menu_flags & 0x80) == 0)
 		{
 			if (control.pad1.pressed & CONTROL_UP)
 			{
@@ -499,7 +506,7 @@ function void fn04cf82()
 
 					if (bluespheregame.menu_selection == 2)
 					{
-						u8[0xffffffa1] |= 0x80
+						bluespheregame.menu_flags |= 0x80
 						control.pad1.pressed = 0
 					}
 				}
@@ -566,7 +573,7 @@ function void fn04d09e()
 {
 	if (bluespheregame.fully_unlocked != 0)
 	{
-		if (bluespheregame.menu_selection == 0) != (u8[0xffffffab] == 0)	// i suppose this works as an Xclusive OR conditional?
+		if (bluespheregame.menu_selection == 0) != (bluespheregame.enable_progress == 0)	// i suppose this works as an Xclusive OR conditional?
 		{
 			D1 = (bluespheregame.current_stage + 1) & 0x07ffffff
 			fn04d13a()
@@ -577,7 +584,7 @@ function void fn04d09e()
 		}
 	}
 
-	D1 = u32[0xffffffa2]
+	D1 = bluespheregame.stage_parts.all
 	D1.u8 <<= 1
 	D1.u16 <<= 1
 	D1 = (D1 << 16) + (D1 >> 16)
@@ -869,7 +876,7 @@ function void fn04d362()
 
 	A2 = 0xffffe400
 	u32[A2] = bluespheregame.current_stage
-	if (u8[0xffffffab] != 0)
+	if (bluespheregame.enable_progress != 0)
 	{
 		u32[A2] += 0x07654321
 	}
@@ -879,7 +886,7 @@ function void fn04d362()
 	fn04d5a0()
 
 	D0.u16 = D4.u16 & 0x3f
-	if (u8[0xffffffab] != 0)
+	if (bluespheregame.enable_progress != 0)
 	{
 		D0.u16 |= 0x40
 	}
@@ -906,7 +913,7 @@ function void fn04d362()
 //# address-hook(0x04d3ce) end(0x04d482)
 function void fn04d3ce()
 {
-	if ((u8[0xffffffa1] & 0x80) == 0)
+	if ((bluespheregame.menu_flags & 0x80) == 0)
 	{
 		u16[A0 + 0x30] = 0
 		return
@@ -952,7 +959,7 @@ function void fn04d3ce()
 			u16[A0 + 0x30] = 0
 	}
 
-	if (u8[0xffffffa1] & 0x80)
+	if (bluespheregame.menu_flags & 0x80)
 	{
 		A1 = A0
 		D0.u16 = u16[A0 + 0x30] + 1
@@ -1006,12 +1013,12 @@ function void fn04d488()
 	else
 	{
 		// Code is valid
-		u8[0xffffffab] = 0
+		bluespheregame.enable_progress = 0
 		if (D2.u16 != 0)
 		{
 			D1 -= 0x07654321
 			D1 &= 0x07ffffff
-			u8[0xffffffab] = 0xff
+			bluespheregame.enable_progress = 0xff
 		}
 
 		bluespheregame.current_stage = D1
@@ -1029,7 +1036,7 @@ function void fn04d488()
 		playSound(0x63)
 	}
 
-	u8[0xffffffa1] &= 0x7f
+	bluespheregame.menu_flags &= ~0x80
 	bluespheregame.menu_selection = 1
 }
 
@@ -1102,7 +1109,7 @@ function void fn04d5e4()
 //# address-hook(0x04d5ec) end(0x04d5f4)
 function void fn04d5ec()
 {
-	if ((u8[0xffffffa1] & 0x80) == 0)
+	if ((bluespheregame.menu_flags & 0x80) == 0)
 	{
 		DrawObject()
 	}
@@ -1121,7 +1128,7 @@ function void fn04d5fa()
 //# address-hook(0x04d602) end(0x04d60a)
 function void fn04d602()
 {
-	if (u8[0xffffffa1] & 0x80)
+	if (bluespheregame.menu_flags & 0x80)
 	{
 		DrawObject()
 	}
@@ -1353,7 +1360,7 @@ function void fn04d986()
 		u16[A1 + 0x0a] = 0x20fe
 		u16[A1 + 0x10] = u16[(A2+=2)-2] + getScreenExtend()
 		u16[A1 + 0x14] = u16[(A2+=2)-2]
-		if (u8[0xffffffa1] != 0 && bluespheregame.fully_unlocked != 0)
+		if (bluespheregame.menu_flags != 0 && bluespheregame.fully_unlocked != 0)
 		{
 			u16[A1 + 0x14] -= 0x10
 		}

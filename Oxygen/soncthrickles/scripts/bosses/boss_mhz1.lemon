@@ -159,7 +159,7 @@ function void fn075356()
 	objA0.animation.sprite = 5
 	objA0.countdown_value = 0x4f
 	objA0.countdown_callback = 0x0753a4
-	u16[0xffffee0e] = 0x6000
+	move_area.right.target = 0x6000
 	screenmover_target.right = 0x6000
 
 	if (allocDynamicObjectStd())
