@@ -1238,8 +1238,7 @@ function void fn064f20()
 		u8[A0 + 0x28] = 0x0f
 		u8[A0 + 0x29] = 0xff
 
-		A2 = 0x066624
-		SpawnIdenticalChildObjects()
+		spawnIdenticalChildObjects(0x066624)
 	}
 
 	fn066348()

@@ -65,9 +65,7 @@ function void fn08dd52()
 
 	u32[A0 + 0x30] = 0x08dfce
 	spawnChildObjects(0x08dfae)
-
-	A2 = 0x08dfb6
-	SpawnChildObjectChain()
+	spawnChildObjectChain(0x08dfb6)
 
 	D0.u16 = 0x0200
 	objA0.value3e = D0.u16

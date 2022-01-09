@@ -468,8 +468,7 @@ function void fn070a46()
 	}
 	u16[A0 + 0x44] = u16[A1 + 0x46]
 
-	A2 = 0x070efc
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x070efc)
 	fn070a76()
 }
 

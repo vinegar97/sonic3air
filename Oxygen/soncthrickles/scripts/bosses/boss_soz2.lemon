@@ -48,12 +48,8 @@ function void fn07767c()
 	copyMemory(0xfffffc60, 0x0784c0, 0x20)
 
 	spawnChildObjects(0x0782fa)
-
-	A2 = 0x078320
-	SpawnChildObjectHierarchy()
-
-	A2 = 0x078326
-	SpawnChildObjectHierarchy()
+	spawnChildObjectHierarchy(0x078320)
+	spawnChildObjectHierarchy(0x078326)
 }
 
 

@@ -151,8 +151,7 @@ function void fn07a32c()
 	{
 		objA0.base_state = 0x06
 		objA0.flags38 |= 0x40
-		A2 = 0x07a684
-		SpawnUniqueChildObjectHierarchy()
+		spawnUniqueChildObjectHierarchy(0x07a684)
 	}
 }
 

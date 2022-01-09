@@ -73,9 +73,7 @@ function void fn08cb9e()
 	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)
 
 	spawnChildObjects(0x06817c)
-
-	A2 = 0x08d254
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x08d254)
 }
 
 
@@ -275,8 +273,7 @@ function void fn08cdb8()
 	move_area.right = 0x3ea0
 	move_area.left = 0x3c00
 
-	A2 = 0x08d25c
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x08d25c)
 
 	fn08d116()
 	fn08d0ea()
@@ -718,8 +715,7 @@ function void fn08cd4c()
 function void fn08cd5c()
 {
 	objA0.update_address = 0x08cd6c
-	A2 = 0x08d25c
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x08d25c)
 }
 
 

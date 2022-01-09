@@ -497,6 +497,68 @@ function void spawnChildObjects(u32 address)
 #endif
 }
 
+function void spawnProjectileChildObjects(u32 address)
+{
+	A2 = address
+	SpawnProjectileChildObjects()
+}
+
+function void spawnIdenticalChildObjects(u32 address)
+{
+	A2 = address
+	SpawnIdenticalChildObjects()
+}
+
+function void spawnChildObjectChain(u32 address)
+{
+	A2 = address
+	SpawnChildObjectChain()
+}
+
+function void spawnProjectileChildObjectsInDir(u32 address)
+{
+	A2 = address
+	SpawnProjectileChildObjectsInDir()
+}
+
+function void spawnSimpleChildObjects(u32 address)
+{
+	A2 = address
+	SpawnSimpleChildObjects()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnSimpleChildObjects")
+			ROMDataAnalyser.addKeyValue("count", stringformat("%d", u16[address] + 1))
+			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", u32[address + 2]))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
+}
+
+function void spawnChildObjectHierarchy(u32 address)
+{
+	A2 = address
+	SpawnChildObjectHierarchy()
+}
+
+function void spawnUniqueChildObjectHierarchy(u32 address)
+{
+	A2 = address
+	SpawnUniqueChildObjectHierarchy()
+}
+
+function void spawnChildObjectsInDir(u32 address)
+{
+	A2 = address
+	SpawnChildObjectsInDir()
+}
+
 //# address-hook(0x084060) end(0x0840ae)
 function void SpawnChildObjects()
 {
@@ -705,26 +767,6 @@ function void SpawnProjectileChildObjectsInDir()
 	_setZeroFlagByValue(false)
 }
 
-
-function void spawnSimpleChildObjects(u32 address)
-{
-	A2 = address
-	SpawnSimpleChildObjects()
-
-#if STANDALONE
-	if (ROMDataAnalyser.isEnabled())
-	{
-		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
-		{
-			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
-			ROMDataAnalyser.addKeyValue("function", "SpawnSimpleChildObjects")
-			ROMDataAnalyser.addKeyValue("count", stringformat("%d", u16[address] + 1))
-			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", u32[address + 2]))
-			ROMDataAnalyser.endEntry()
-		}
-	}
-#endif
-}
 
 //# address-hook(0x084220) end(0x084256)
 function void SpawnSimpleChildObjects()

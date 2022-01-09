@@ -43,8 +43,7 @@ function void fn08e670()
 	objA0.countdown_value = objA0.subtype2c - 1
 	u16[A0 + 0x3a] = objA0.subtype2c * 2 - 1
 
-	A2 = 0x08ea5a
-	SpawnChildObjectChain()
+	spawnChildObjectChain(0x08ea5a)
 }
 
 

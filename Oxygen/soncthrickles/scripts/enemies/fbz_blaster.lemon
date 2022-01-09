@@ -138,9 +138,7 @@ function void fn08957a()
 	objA0.countdown_callback = 0x08956a
 
 	spawnChildObjects(0x089726)
-
-	A2 = 0x08972e
-	SpawnProjectileChildObjectsInDir()
+	spawnProjectileChildObjectsInDir(0x08972e)
 }
 
 
@@ -154,8 +152,7 @@ function void fn0895a4()
 	fn0845a0()
 	if (D2.u16 != 0 && objA0.animation.frame == 6)
 	{
-		A2 = 0x089746
-		SpawnProjectileChildObjectsInDir()
+		spawnProjectileChildObjectsInDir(0x089746)
 	}
 }
 

@@ -41,8 +41,7 @@ function void fn08e1aa()
 	if (fn084fa4())
 		return
 
-	A2 = 0x08e402
-	SpawnChildObjectsInDir()
+	spawnChildObjectsInDir(0x08e402)
 }
 
 

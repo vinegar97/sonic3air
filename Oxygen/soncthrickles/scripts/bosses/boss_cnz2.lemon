@@ -91,9 +91,7 @@ function void fn06e4f2()
 	}
 
 	spawnChildObjects(0x06edcc)
-
-	A2 = 0x06edd4
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x06edd4)
 }
 
 

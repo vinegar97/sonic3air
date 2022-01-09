@@ -69,8 +69,7 @@ function void fn06fd38()
 		u8[A1 + 0x2c] = 0x49
 	}
 
-	A2 = 0x0703c8
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x0703c8)
 }
 
 
@@ -89,8 +88,7 @@ function void fn06fdc0()
 	if ((objA0.flags38 & 0x80) == 0)
 	{
 		objA0.flags38 |= 0x80
-		A2 = 0x0703e4
-		SpawnIdenticalChildObjects()
+		spawnIdenticalChildObjects(0x0703e4)
 	}
 }
 

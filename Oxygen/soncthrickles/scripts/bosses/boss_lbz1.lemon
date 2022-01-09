@@ -41,12 +41,8 @@ function void fn072400()
 	loadPaletteLine1(0x07299a)
 
 	spawnChildObjects(0x07296e)
-
-	A2 = 0x072976
-	SpawnChildObjectChain()
-
-	A2 = 0x07297c
-	SpawnChildObjectChain()
+	spawnChildObjectChain(0x072976)
+	spawnChildObjectChain(0x07297c)
 }
 
 
@@ -673,8 +669,7 @@ function void fn08d02e()
 function void fn08d046()
 {
 	objA0.update_address = 0x08d056
-	A2 = 0x08d25c
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x08d25c)
 }
 
 

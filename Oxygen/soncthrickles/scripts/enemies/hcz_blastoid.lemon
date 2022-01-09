@@ -58,8 +58,7 @@ function void fn087976()
 	if (D2.s16 > 0 && objA0.animation.sprite == 1 && u8[A0 + 0x04] & 0x80)
 	{
 		playSound(0x4d)
-		A2 = 0x0879f8
-		SpawnProjectileChildObjectsInDir()
+		spawnProjectileChildObjectsInDir(0x0879f8)
 	}
 }
 
