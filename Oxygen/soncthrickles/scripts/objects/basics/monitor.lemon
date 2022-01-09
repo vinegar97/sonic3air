@@ -834,9 +834,25 @@ function void ItemEffect.ApplySuperTransformation()
 	super.palettefx.timer = 0x0f
 	super.active = 1
 	super.ring_dec.frames = 60
+
+#if COAL
+	u32 backupA0 = A0
+	A0 = A1
+	if (A0 == 0xffffb000 && global.characters != CHARS_TAILS_ALONE)
+	{
+		setSpeedCapProperties(0xfffff760, true)
+	}
+	else
+	{
+		setSpeedCapProperties(0xfffffec0, true)
+	}
+	A0 = backupA0
+#else
 	global.move.speedcap = 0x800
 	global.move.acceleration = 0x18
 	global.move.deceleration = 0xc0
+#endif
+
 	u8[0xffffb020] = char.state.TRANSFORMING
 
 	if (isMainCharacter(CHARACTER_SONIC))
@@ -844,9 +860,11 @@ function void ItemEffect.ApplySuperTransformation()
 		// Sonic
 		u32[0xffffb00c] = 0x146816		// "char.mapping_offset"
 		super.active = 0xff
+	#if !COAL
 		global.move.speedcap = 0xa00
 		global.move.acceleration = 0x30
 		global.move.deceleration = 0x100
+	#endif
 		u32[0xffffcd7c] = 0x019348		// Hyper Sonic stars
 		u32[0xffffcbc0] = 0x01a494		// After-images effect
 	}
@@ -860,9 +878,11 @@ function void ItemEffect.ApplySuperTransformation()
 		super.active.tails = 1
 	#endif
 		u8[0xffffb020] = char.state.TAILS_TRANSFORM
+	#if !COAL
 		u16[0xfffffec0] = 0x800
 		u16[0xfffffec2] = 0x18
 		u16[0xfffffec4] = 0xc0
+	#endif
 		u32[0xffffcd7c] = 0x01a170		// Super Flickies (the first one spawns the others)
 	}
 	else
