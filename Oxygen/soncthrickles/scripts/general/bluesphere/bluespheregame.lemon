@@ -1888,6 +1888,19 @@ function void fn04e160()
 	if (allocDynamicObjectStd())
 	{
 		D1 = (bluespheregame.shown_difficulty - 1) * 4
+		// Targets:
+		//  - 0x04e1c4	-> D1.u16 = 0	-> Sonic in perfect screen
+		//  - 0x04e264	-> D1.u16 = 1	-> Tails in perfect screen
+		//  - 0x04e2b8	-> D1.u16 = 2	-> Knuckles in perfect screen
+		//  - 0x05fb56	-> D1.u16 = 3	-> Robotnik in perfect screen
+		//  - 0x07cfa4	-> D1.u16 = 4	-> Mecha Sonic in perfect screen
+		//  - 0x0680a4	-> D1.u16 = 5	-> Egg Robo and the Egg Mobile in Perfect screen
+		//  - 0x02cd26	-> D1.u16 = 6	-> Chickens in perfect screen
+		//  - 0x02cd9a	-> D1.u16 = 7	-> Squirrels in perfect screen
+		//  - 0x02ce2c	-> D1.u16 = 8	-> Rabbits in perfect screen
+		//  - 0x07cff0	-> D1.u16 = 9	-> Master Emerald in perfect screen
+		//  - 0x05face	-> D1.u16 = 10	-> Sonic & Knuckles Logo in perfect screen
+		//  - 0x04e24c	-> D1.u16 = 11	-> Sonic going Super at MAX difficulty
 		u32[A1] = u32[0x04e17a + D1.u16]
 	}
 }
@@ -2158,7 +2171,7 @@ function void fn068118()
 
 
 
-// Animals in Perfect screen
+// Chickens in Perfect screen
 
 //# address-hook(0x02cd26) end(0x02cd30)
 function void fn02cd26()
@@ -2203,6 +2216,8 @@ function void fn02cd84()
 }
 
 
+// Squirrels in Perfect screen
+
 //# address-hook(0x02cd9a) end(0x02cda4)
 function void fn02cd9a()
 {
@@ -2244,6 +2259,8 @@ function void fn02cdea()
 	DrawObject()
 }
 
+
+// Rabbits in Perfect screen
 
 //# address-hook(0x02ce2c) end(0x02ce36)
 function void fn02ce2c()
