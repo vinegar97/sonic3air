@@ -186,3 +186,8 @@ function void fn013648()
 {
 	CompetitionMode.centerCameraYOffset.Tails()
 }
+
+function void fn01d890()
+{
+	ItemEffect.ApplyRobotnik()
+}
