@@ -368,7 +368,7 @@ function void renderNextObject()
 		if (D3.s16 < 0)
 			return	// skip if none
 
-		A0 += 0x18	// start of child sprite data (u8[A0 = 0x05] = map frame)
+		A0 += 0x18	// start of child sprite data (u8[A0 + 0x05] = map frame)
 
 	#if STANDALONE
 		while (D3.s16 >= 0)

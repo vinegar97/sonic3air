@@ -55,6 +55,10 @@ function void SetPaletteFadedOut()
 }
 
 
+//-------------------------------------------------------//
+// Fade Colors in from and out of black screen           //
+//-------------------------------------------------------//
+
 //# address-hook(0x003b94) end(0x003bb6)
 function void SetPaletteToBlack()
 {
@@ -85,6 +89,8 @@ function void SetPaletteToBlack()
 //# address-hook(0x003b14) end(0x003b52)
 function void FadeInPalette()
 {
+	// Fading from a black screen to the target palette
+
 	// Go through primary (k==0) and secondary (k==1) palette
 	u8 numPalettes = (level.water_present != 0) ? 2 : 1
 	for (u8 k = 0; k < numPalettes; ++k)
@@ -268,14 +274,14 @@ function void FadeOutColor()
 }
 
 
+//-------------------------------------------------------//
+// Fade Colors in from and out of white screen           //
+//-------------------------------------------------------//
+
 //# address-hook(0x003c62) end(0x003c80)
 function void SetPaletteToWhite()
 {
-	for (u8 i = 0; i <= palette_fade.count; ++i)
-	{
-		u8 offset = palette_fade.offset + i*2
-		u16[0xfffffc00 + offset] = 0x0eee
-	}
+	fillMemory_u16(0xfffffc00 + u32(palette_fade.offset), (palette_fade.count + 1) * 2, 0x0eee)
 	u16[0xffffface] = 0
 
 #if STANDALONE

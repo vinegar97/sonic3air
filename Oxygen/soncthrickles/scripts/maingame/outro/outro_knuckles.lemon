@@ -423,10 +423,10 @@ function void fn05ecb4()
 	{
 		++offset	// Knuckles with Master Emerald
 	}
-	offset *= 2
+	offset *= 2	// From here, first byte is the plane pilot, second pilot is character standing on the wings
 	if (objA0.subtype2c != 0)
 	{
-		++offset
+		++offset	// Get offset of sprite for character on wings
 	}
 	objA0.animation.sprite = u8[0x05ed0e + offset]
 
@@ -987,7 +987,7 @@ function void fn05ff6e()
 	objA0.countdown_value = 3
 	A1 = 0xffff0000 + u16[A0 + 0x30]
 	D0.u16 = u16[A0 + 0x3a]
-	fadeColorsToWhiteUniform(A1, D0.u16 + 1)
+	fadeColorsToWhiteUniform(A1, D0.u16 + 1)	// Fade logo palette to white
 
 	--objA0.value39
 	if (s8[A0 + 0x39] < 0)
@@ -1011,7 +1011,7 @@ function void fn05ffa6()
 	A1 = 0xffff0000 + u16[A0 + 0x30]
 	A2 = 0xffff0000 + objA0.value32
 	D0.u16 = u16[A0 + 0x3a]
-	fadeColorsTowardsTargetUniform(A1, A2, u16[A0 + 0x3a] + 1)
+	fadeColorsTowardsTargetUniform(A1, A2, D0.u16 + 1)	// Fade logo palette back to it's original colors
 
 	--objA0.value39
 	if (s8[A0 + 0x39] < 0)

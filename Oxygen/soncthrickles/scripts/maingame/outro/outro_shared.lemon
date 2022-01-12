@@ -795,7 +795,7 @@ function void fn05f94c()
 
 	A1 = 0x060b3a
 	A2 = (global.characters == CHARS_KNUCKLES_ALONE) ? 0xfffffc00 : 0xfffffc20
-	copyMemory(A2, 0x060b3a, 0x10)
+	copyMemory(A2, A1, 0x10)
 
 	Kosinski.addToDMAQueue(0x165826, 0x76c0)
 }

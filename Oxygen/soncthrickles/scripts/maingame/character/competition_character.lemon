@@ -184,7 +184,7 @@ function void CompetitionMode.Character.UpdateNormalState.Sonic_Knuckles()
 
 	char.angle_sensor_1 = u8[0xfffff768]
 	char.angle_sensor_2 = u8[0xfffff76a]
-	if ((char.control_flags & 0x02) == 0)
+	if ((char.control_flags & 0x02) == 0)	// Hanging flag
 	{
 		CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
 		CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
@@ -514,7 +514,7 @@ function void CompetitionMode.Character.UpdateNormalState.Tails()
 
 	char.angle_sensor_1 = u8[0xfffff768]
 	char.angle_sensor_2 = u8[0xfffff76a]
-	if ((char.control_flags & 0x02) == 0)
+	if ((char.control_flags & 0x02) == 0)	// Hanging flag
 	{
 		CompetitionMode.Character.UpdateAnimation.Tails()
 		CompetitionMode.Character.UpdateSpritePatterns.Tails()
