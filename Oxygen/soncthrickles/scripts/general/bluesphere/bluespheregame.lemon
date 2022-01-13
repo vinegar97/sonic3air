@@ -267,6 +267,9 @@ function void fn04cca6()
 function void fn04cb1a()
 {
 	A1 = (u8[0xffffffab] == 0) ? 0x04cb36 : 0x04cbb6
+#if COAL
+	A1 = (bluespheregame.fully_unlocked != 0) ? 0x04cb36 : 0x04cbb6
+#endif
 	copyMemory(A2, A1, 0x80)
 
 #if COAL
@@ -470,6 +473,12 @@ function void fn04cef8()
 	u32[0xffffb1bc] = 0x04d03e
 	u16[0xffffb1d0] = 0xc0
 	u8[0xffffffa1] = 0x01
+/* #if COAL
+	if (bluespheregame.fully_unlocked == 0)
+		copyMemory(0xfffffc20, 0x04cbd6, 0x20)	// load purple palette line for blue sphere title, typically used when locked on with single-stage games
+	else
+		copyMemory(0xfffffc20, 0x04cb56, 0x20)	// proper colors for characters
+#endif */
 	bluespheregame.menu_selection = 0
 	u32[0xffffbd4c] = 0x04d64e	// first bumper cursor
 	u32[0xffffbd96] = 0x04d64e	// second bumper cursor
