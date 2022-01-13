@@ -350,6 +350,11 @@ function void fn0085b0()
 		bluespheres.position.y = u16[A2+4]
 		bluespheres.rings_remaining = u16[A2+6]
 
+	#if COAL
+		if (CHEAT_PERFECT_BLUE_SPHERE)
+			bluespheres.rings_remaining = 0
+	#endif
+
 		A1 = u32[0x0088ba + global.next_bluespheres * 0x10]
 		if (useSKLayouts)
 		{
@@ -409,6 +414,12 @@ function void fn0085b0()
 		{
 			u16 type = u8[0xffffffa2 + quarter] & 0x7f
 			bluespheres.rings_remaining += u8[0xffff0000 + type]
+
+		#if COAL
+			if (CHEAT_PERFECT_BLUE_SPHERE)
+				bluespheres.rings_remaining = 0
+		#endif
+
 			u16[0xffffffac] += u8[0xffff0080 + type]				// Affects the difficulty (stored in upper byte)
 
 			A2 = 0xffff0100 + (type << 8)

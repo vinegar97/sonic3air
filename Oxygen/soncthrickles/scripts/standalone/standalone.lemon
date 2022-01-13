@@ -23,6 +23,9 @@ define bool MODIFICATION_TOGETHERNESS		  = 0	// Allows player 2 to instantly mov
 
 // Cheats
 define bool CHEAT_ONE_BLUE_SPHERE			  = 0	// If set, only a single blue sphere has to be collected in the special stages
+#if COAL
+define bool CHEAT_PERFECT_BLUE_SPHERE			  = 0	// If set, automatically grants a perfect bonus in special stages
+#endif
 
 // Debugging stuff
 define bool DEBUG_DISABLE_HUD				  = 0
