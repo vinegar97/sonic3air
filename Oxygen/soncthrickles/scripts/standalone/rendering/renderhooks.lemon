@@ -79,52 +79,14 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 	#endif
 	}
 
-#if COAL
-	if (gameMode == 0x14)
-	{
-		// Continue screen after a game over
-
-		if (char.mapping_offset == 0x05cc4a)
-		{
-			// Characters in continue screen
-			u64 key = 0
-			u8 atex = 0
-			
-			if (char.animation.sprite >= 0x05)
-			{
-				key = stringformat("character_tails_continue_0x%02x", char.animation.frame)
-				atex = 0x60
-			}
-			else if (char.animation.sprite >= 0x02)
-			{
-				key = stringformat("character_knuckles_continue_0x%02x", char.animation.frame)
-				atex = 0x80
-			}
-			else if (char.animation.sprite >= 0x00)
-			{
-				key = stringformat("character_sonic_continue_0x%02x", char.animation.frame)
-				atex = 0x40
-			}
-
-			if (Renderer.hasCustomSprite(key))
-			{
-				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
-				return true
-			}
-		}
-	}
-	else
-#endif
-
 	if (gameMode == 0x0c || gameMode == 0x08)
 	{
 		// Main game or rolling demo
 
 	#if COAL
+		// Characters in ending 
 		if (char.mapping_offset == 0x24178a)
 		{
-			// characters in ending 
-
 			u64 key = 0
 			u8 atex = 0
 			
@@ -484,6 +446,41 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			//}
 		}
 	}
+#if COAL
+	else if (gameMode == 0x14)
+	{
+		// Continue screen after a game over
+
+		// Characters in continue screen
+		if (char.mapping_offset == 0x05cc4a)
+		{
+			u64 key = 0
+			u8 atex = 0
+			
+			if (char.animation.sprite >= 0x05)
+			{
+				key = stringformat("character_tails_continue_0x%02x", char.animation.frame)
+				atex = 0x60
+			}
+			else if (char.animation.sprite >= 0x02)
+			{
+				key = stringformat("character_knuckles_continue_0x%02x", char.animation.frame)
+				atex = 0x80
+			}
+			else if (char.animation.sprite >= 0x00)
+			{
+				key = stringformat("character_sonic_continue_0x%02x", char.animation.frame)
+				atex = 0x40
+			}
+
+			if (Renderer.hasCustomSprite(key))
+			{
+				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+				return true
+			}
+		}
+	}
+#endif
 	else if (gameMode == 0x2c)
 	{
 		// (Super) Sonic in Blue Sphere mini-game Perfect screen
