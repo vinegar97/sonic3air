@@ -406,6 +406,17 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			if (objA0.update_address == 0x0837b2)
 			{
 				u8 customAtex = (objA0.animation.sprite == 2) ? 0x80 : 0xff		// Use Knuckles' palette when needed
+			#if COAL
+				customAtex = (objA0.animation.sprite == 0) ? 0x40 : (objA0.animation.sprite == 1) ? 0x60 : customAtex	// Use appropriate character palette
+				
+				u64 key = (objA0.animation.sprite == 0) ? "signpost_sonic" : (objA0.animation.sprite == 1) ? "signpost_tails" : (objA0.animation.sprite == 2) ? "signpost_knuckles" : 0
+
+				if (Renderer.hasCustomSprite(key))
+				{
+					Renderer.drawCustomSprite(key, px, py, customAtex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+					return true
+				}
+			#endif
 				Standalone.renderWithStandardPacking(px, py, 0x083b42, customAtex, renderQueue)
 				return true
 			}
