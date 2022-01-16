@@ -79,6 +79,51 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 	#endif
 	}
 
+#if COAL
+	// Character sprites on or in the Tornado plane
+	if (char.mapping_offset == 0x06036e || char.mapping_offset == 0x060486)
+	{
+		u64 key = 0
+		u8 atex = 0
+		u8 character = 0xff
+		u8 variant = 0xff
+
+		if (char.mapping_offset == 0x06036e && char.animation.sprite == 0x0c)
+			variant = 0
+
+		if (char.mapping_offset == 0x060486)
+		{
+			if (char.animation.sprite == 0x0a || char.animation.sprite == 0x0b || char.animation.sprite == 0x12)
+				variant = 0
+
+			if (char.animation.sprite == 0x0c || char.animation.sprite == 0x0d || char.animation.sprite == 0x13)
+				variant = 1
+
+			if (char.animation.sprite == 0x0e || char.animation.sprite == 0x0f)
+				variant = 2
+		}
+
+		if (variant != 0xff)
+			character = (variant >= 2) ? getMainCharacter() : (isSecondCharacter(CHARACTER_TAILS) || isMainCharacter(CHARACTER_SONIC)) ? CHARACTER_TAILS : CHARACTER_SONIC
+
+		if (character != 0xff)
+			atex = 0x40 + character * 0x20
+
+		if (variant == 0)
+			key = (character == CHARACTER_TAILS) ? "tornado_pilot_tails" : "tornado_pilot_sonic"
+		else if (variant == 1)
+			key = (character == CHARACTER_TAILS) ? "tornado_pilot_small_tails" : "tornado_pilot_small_sonic"
+		else if (variant == 2)
+			key = (character == CHARACTER_TAILS) ? "tornado_leader_small_tails" : "tornado_leader_small_sonic"
+
+		if (Renderer.hasCustomSprite(key))
+		{
+			Renderer.drawCustomSprite(key, px, py, atex, (objA0.render_flags & render_flag.FLIP_X) | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+			return true
+		}
+	}
+#endif
+
 	if (gameMode == 0x0c || gameMode == 0x08)
 	{
 		// Main game or rolling demo
