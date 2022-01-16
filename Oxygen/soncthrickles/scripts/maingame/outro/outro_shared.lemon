@@ -982,3 +982,31 @@ function void fn06008a()
 	D0.u16 = u16[(A2+=2)-2]
 	objA0.value42 = D0.u16
 }
+
+
+#if COAL
+function void loadEndPosePalette()
+{
+	u8 character = getMainCharacter()
+	u64 paletteKey = (character == CHARACTER_SONIC) ? "endpose_palette_sonic" : (character == CHARACTER_TAILS) ? "endpose_palette_tails" : "endpose_palette_knuckles"
+	u8 line = (outro.ending_type + 2) / 2
+
+	if (character == CHARACTER_TAILS)
+		line = min(line, 1)
+
+	if (character == CHARACTER_KNUCKLES)
+		line--
+
+	u16 numColors = System.loadExternalPaletteData(paletteKey, line, 0x800000, 0x20)
+	if (numColors > 0)
+	{
+		u32 dest = 0x802000 + character * 0x40
+		for (u16 i = 0; i < numColors; ++i)
+		{
+			u16[dest + i * 2] = packColor(u32[0x800000 + i * 4])
+		}
+	}
+	/* UpdatePaletteEffects.SuperForm() */
+}
+#endif
+

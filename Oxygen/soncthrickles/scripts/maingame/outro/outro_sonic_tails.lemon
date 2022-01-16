@@ -1071,6 +1071,10 @@ function void fn05e3c0()
 //# address-hook(0x05e3ee) end(0x05e40c)
 function void fn05e3ee()
 {
+#if COAL
+	loadEndPosePalette()
+#endif
+
 	--objA0.countdown_value
 	if (objA0.countdown_value < 0)
 	{
@@ -1158,6 +1162,10 @@ function void fn05e474()
 //# address-hook(0x05e4b6) end(0x05e4dc)
 function void fn05e4b6()
 {
+#if COAL
+	loadEndPosePalette()
+#endif
+
 	objA0.position.x.u16 -= 8
 	if (objA0.position.x.u16 <= 0x0160 + getScreenExtend())
 	{

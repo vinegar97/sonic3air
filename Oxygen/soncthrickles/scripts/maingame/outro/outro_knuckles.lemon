@@ -486,7 +486,9 @@ function void fn05ef68()
 {
 	objA0.update_address = 0x05f144
 	objA0.countdown_value = 0x01ff
+#if !COAL
 	super.palettefx.state = 0
+#endif
 
 	D0.u16 = (global.characters & 0x03) - 2
 	D1 = 0
@@ -641,6 +643,10 @@ function void fn05f480()
 	u32[A0 + 0x30] = 0x0602ca
 
 	copyMemory(0xfffffc00, 0x060bea, 0x20)
+
+#if COAL
+	loadEndPosePalette()
+#endif
 
 	if (outro.ending_type > 0)
 	{
@@ -1118,6 +1124,8 @@ function void fn08555e()
 	}
 
 #if COAL
+	super.palettefx.state = 0
+
 	A1 = 0x802000
 	D0.u16 = 0xc0
 	while (D0.s16 >= 0)

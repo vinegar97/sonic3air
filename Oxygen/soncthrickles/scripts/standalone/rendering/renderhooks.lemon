@@ -122,6 +122,51 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			return true
 		}
 	}
+
+	// Character end poses
+	if (char.mapping_offset == 0x0607e6 || char.mapping_offset == 0x060a4c)
+	{
+		u64 key = 0
+		u8 atex = 0
+
+		if (char.mapping_offset == 0x0607e6)
+		{
+			atex = 0x20
+
+			if (char.animation.sprite >= 0x03)
+				key = stringformat("endpose_tails_0x%02x", char.animation.sprite - 0x03)
+			if (char.animation.sprite == 0x02)
+				key = "endpose_supersonic"
+			else // if (char.animation.sprite <= 0x01)
+				key = stringformat("endpose_sonic_0x%02x", char.animation.sprite - 0x00)
+		}
+
+		if (char.mapping_offset == 0x060a4c)
+		{
+			// atex = 0x00 
+			key = stringformat("endpose_knuckles_0x%02x", char.animation.sprite)
+		}
+
+		if (Renderer.hasCustomSprite(key))
+		{
+			// Check if there's also a custom palette
+			u8 character = getMainCharacter()
+			u64 paletteKey = (character == CHARACTER_SONIC) ? "endpose_palette_sonic" : (character == CHARACTER_TAILS) ? "endpose_palette_tails" : (character == CHARACTER_KNUCKLES) ? "endpose_palette_knuckles" : 0
+			u8 line = (outro.ending_type + 2) / 2
+
+			if (character == CHARACTER_TAILS)
+				line = min(line, 1)
+
+			if (character == CHARACTER_KNUCKLES)
+				line--
+
+			if (System.hasExternalPaletteData(paletteKey, line))
+				atex = 0x40 + character * 0x20
+
+			Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+			return true
+		}
+	}
 #endif
 
 	if (gameMode == 0x0c || gameMode == 0x08)
