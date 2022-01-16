@@ -45,6 +45,21 @@ function void ROMManipulation.RepairSpriteMappings()
 	s16[0x148174] = -0x0e
 	
 #if COAL
+	// Fix for slight offset in Super Sonic standing sprites (0xa1 and 0xa2)
+	s16[0x1480f4] = -0x17	// Originally -0x18
+	s16[0x1480fa] = -0x0f	// Originally -0x10
+	s16[0x14810e] = -0x17	// Originally -0x18
+	s16[0x148114] = -0x0f	// Originally -0x10
+	s16[0x148128] = -0x17	// Originally -0x18
+
+	// Tweak for Super Sonic pushing sprites to add a little vertical motion (0xb7 and 0xb9)
+	u8[0x1480ae] = 0xe4	// Originally 0xe5
+	u8[0x1480b4] = 0xec	// Originally 0xed
+	u8[0x1480ba] = 0x0c	// Originally 0x0d
+	u8[0x1480d6] = 0xe4	// Originally 0xe5
+	u8[0x1480dc] = 0xec	// Originally 0xed
+	u8[0x1480e2] = 0x0c	// Originally 0x0d
+
 	// Fix for pattern pointer to the correct location in Super Sonic's unused idle sprite frame
 	u8[0x1484f1] = 0x16
 	u8[0x1484f7] = 0x16
