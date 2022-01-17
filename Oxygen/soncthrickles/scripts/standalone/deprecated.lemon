@@ -191,3 +191,8 @@ function void fn01d890()
 {
 	ItemEffect.ApplyRobotnik()
 }
+
+function void fn01d6c2()
+{
+	MonitorIntact.CheckBlocking.player2()
+}

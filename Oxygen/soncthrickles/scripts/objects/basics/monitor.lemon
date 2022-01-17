@@ -242,7 +242,7 @@ function void MonitorIntact.BaseUpdate()
 	//  - 0x01d57e	-> state = 0x00		-> Initialization
 	//  - 0x01d5dc	-> state = 0x02		-> Regular update
 	//  - 0x01d716	-> state = 0x04		-> Gets opened
-	call tableLookupAddress(0x01d574, u8[A0 + 0x05])
+	call tableLookupAddress(0x01d574, objA0.base_state)
 }
 
 
@@ -324,7 +324,7 @@ function void MonitorIntact.UpdateDefault()
 	D3.u16 = height
 	D4.u16 = objA0.position.x.u16
 	D6 = 4
-	fn01d6c2()
+	MonitorIntact.CheckBlocking.player2()
 
 	AddAsDynamicObject()
 
@@ -409,7 +409,7 @@ function void MonitorIntact.CheckBlocking()
 			canOpenMonitor = true
 		}
 	#if STANDALONE
-		else if (u8[A1 + 0x38] == CHARACTER_SONIC && objA1.state == char.state.SONIC_DROPDASH)
+		else if (Game.getSetting(SETTING_DROPDASH) && u8[A1 + 0x38] == CHARACTER_SONIC && objA1.state == char.state.SONIC_DROPDASH)
 		{
 			canOpenMonitor = true
 		}
@@ -430,13 +430,14 @@ function void MonitorIntact.CheckBlocking()
 
 
 //# address-hook(0x01d6c2) end(0x01d6da)
-function void fn01d6c2()
+function void MonitorIntact.CheckBlocking.player2()
 {
 	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
 		if (competition_mode.active == 0 || u8[A1 + 0x20] != 2)
 		{
+			// Block character movement
 			fn01df90()
 		}
 	}
