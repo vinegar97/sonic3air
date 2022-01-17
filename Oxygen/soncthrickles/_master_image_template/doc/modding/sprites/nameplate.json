@@ -1,0 +1,12 @@
+{
+	"nameplate_sonic": { "File": "nameplate_sonic.bmp", "Rect": "8,8,72,16", "Center": "-1,0" },
+	"nameplate_sonic_super": { "File": "nameplate_sonic.bmp", "Rect": "88,8,80,16", "Center": "0,0" },
+	"nameplate_sonic_hyper": { "File": "nameplate_sonic.bmp", "Rect": "176,8,80,16", "Center": "0,0" },
+	"nameplate_miles": { "File": "nameplate_tails.bmp", "Rect": "80,8,72,16", "Center": "-6,0" },
+	"nameplate_tails": { "File": "nameplate_tails.bmp", "Rect": "8,8,64,16", "Center": "-1,0" },
+	"nameplate_tails_super": { "File": "nameplate_tails.bmp", "Rect": "160,8,80,16", "Center": "0,0" },
+	"nameplate_tails_hyper": { "File": "nameplate_tails.bmp", "Rect": "248,8,80,16", "Center": "0,0" },
+	"nameplate_knuckles": { "File": "nameplate_knuckles.bmp", "Rect": "8,8,120,16", "Center": "-4,0" },
+	"nameplate_knuckles_super": { "File": "nameplate_knuckles.bmp", "Rect": "136,8,80,16", "Center": "0,0" },
+	"nameplate_knuckles_hyper": { "File": "nameplate_knuckles.bmp", "Rect": "224,8,80,16", "Center": "0,0" }
+}

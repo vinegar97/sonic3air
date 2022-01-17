@@ -2546,6 +2546,12 @@ function void fn02df64()
 	copyMemory(0xfffffc00, 0x02e318, 0x80)
 	copyMemory(0xfffffc80, 0x02e318, 0x80)
 
+#if COAL
+	loadCharacterPalette(CHARACTER_SONIC,    0x802000, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x802040, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802080, 0)
+#endif
+
 #if STANDALONE
 	globalComponentTintColorR = 0xff
 	globalComponentTintColorG = 0xff

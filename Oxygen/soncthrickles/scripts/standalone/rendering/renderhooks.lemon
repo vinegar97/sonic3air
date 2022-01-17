@@ -167,6 +167,45 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			return true
 		}
 	}
+
+	if (objA0.mapping_offset == 0x02f26a)
+	{
+		u64 key = 0
+		u8 character = getMainCharacter()
+		u8 atex = 0x40 + character * 0x20
+
+		if (objA0.animation.sprite == 0x12)
+		{
+			if (character == CHARACTER_KNUCKLES)
+				key = (global.super_emeralds < 7) ? "nameplate_knuckles_super" : "nameplate_knuckles_hyper"
+			else if (character == CHARACTER_TAILS)
+				key = (global.super_emeralds < 7) ? "nameplate_tails_super" : "nameplate_tails_hyper"
+			else // if (character == CHARACTER_SONIC)
+				key = (global.super_emeralds < 7) ? "nameplate_sonic_super" : "nameplate_sonic_hyper"
+		}
+		if (objA0.animation.sprite == 0x13)
+		{
+			key = "nameplate_sonic"
+		}
+		if (objA0.animation.sprite == 0x14)
+		{
+			key = "nameplate_miles"
+		}
+		if (objA0.animation.sprite == 0x15)
+		{
+			key = "nameplate_tails"
+		}
+		if (objA0.animation.sprite == 0x16)
+		{
+			key = "nameplate_knuckles"
+		}
+
+		if (Renderer.hasCustomSprite(key))
+		{
+			Renderer.drawCustomSprite(key, px, py, atex, SPRITE_FLAG_PRIO, renderQueue)
+			return true
+		}
+	}
 #endif
 
 	if (gameMode == 0x0c || gameMode == 0x08)
