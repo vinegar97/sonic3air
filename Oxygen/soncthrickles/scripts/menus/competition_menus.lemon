@@ -230,7 +230,7 @@ function void fn00aa74()
 {
 	if (control.pad1.pressed & 0xe0)
 	{
-		u16[0xffffff8a] = 0xffff
+		u16[0xffffff8a] = 0xffff	// items off, set game mode to time attack
 		competition_mode.multiplay = 0
 		global.game_mode = 0xc0
 		fn00aa8e()
@@ -299,7 +299,7 @@ function void fn00ab00()
 {
 	if (competition_mode.menu.game_mode <= 0x01)
 	{
-		D0.u16 = (control.pad1.pressed | control.pad2.pressed) & 0x0c
+		D0.u16 = (control.pad1.pressed | control.pad2.pressed) & (CONTROL_LEFT | CONTROL_RIGHT)
 		if (D0.u16 != 0)
 		{
 			competition_mode.menu.items_toggle = (competition_mode.menu.items_toggle == 0) ? 0xff : 0x00

@@ -2478,11 +2478,13 @@ function void fn02df64()
 	}
 	else if (isMainCharacter(CHARACTER_TAILS))
 	{
+	#if STANDALONE
 		if (Game.getSetting(SETTING_HYPER_TAILS))
 		{
 			A1 = (global.super_emeralds < 7) ? 0x15b374 : 0x15b678
 		}
 		else
+	#endif
 		{
 			A1 = 0x15b374
 		}

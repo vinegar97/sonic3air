@@ -297,7 +297,7 @@ function void fn018f9c()
 {
 	objA0.base_state += 0x02
 	objA0.mapping_offset = 0x01910c
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x10
 	objA0.sprite_attributes = 0x07e0

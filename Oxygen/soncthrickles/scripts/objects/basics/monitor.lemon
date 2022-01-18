@@ -395,7 +395,8 @@ function void fn01d63a()
 //# address-hook(0x01d696) end(0x01d6be)
 function void MonitorIntact.CheckBlocking()
 {
-	if ((objA0.flags2a >> D6.u8) & 1)
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		fn01d6dc()
 	}
@@ -435,7 +436,12 @@ function void MonitorIntact.CheckBlocking.player2()
 	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
-		if (competition_mode.active == 0 || u8[A1 + 0x20] != 2)
+		bool canOpenMonitor = false
+		if (competition_mode.active && objA1.state == char.state.ROLLING)
+		{
+			canOpenMonitor = true
+		}
+		if (!canOpenMonitor)
 		{
 			// Block character movement
 			fn01df90()
