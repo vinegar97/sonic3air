@@ -67,7 +67,7 @@ function void Standalone.playAudio(u8 sfxId)
 	}
 	else if (sfxId <= 0x2b)
 	{
-		soundRegType = (sfxId == 0x26 || sfxId == 0x28) ? SoundRegType.TYPE_MUSIC : SoundRegType.TYPE_JINGLE
+		soundRegType = (sfxId == MUSIC_ENDING || sfxId == MUSIC_CONTINUE) ? SoundRegType.TYPE_MUSIC : SoundRegType.TYPE_JINGLE
 	}
 	else if (sfxId <= 0x30)
 	{
@@ -104,7 +104,7 @@ function void Standalone.playAudio(u8 sfxId)
 	else
 	{
 		// Hard-coded handling of special sfx IDs
-		if (sfxId == 0x1c)
+		if (sfxId == MUSIC_SPECIALSTAGE)
 		{
 			// Special Stage
 			if (true)	// TODO: Add option to disable the speedup, of course for both music and gameplay
@@ -142,7 +142,7 @@ function void Standalone.playAudio(u8 sfxId)
 			// Outro music
 			if (Game.getSetting(SETTING_AUDIO_OUTRO) == 0)
 			{
-				soundKey = 0x15			// Sky Sanctuary
+				soundKey = MUSIC_SSZ			// Sky Sanctuary
 			}
 			else if (Game.getSetting(SETTING_AUDIO_OUTRO) == 2)
 			{
@@ -201,7 +201,7 @@ function void Standalone.playAudio(u8 sfxId)
 		else if (sfxId == MUSIC_MINIBOSS || sfxId == MUSIC_MINIBOSS_2)
 		{
 			// Mini-boss music
-			soundKey = 0x18
+			soundKey = MUSIC_MINIBOSS
 			if (Game.getSetting(SETTING_AUDIO_MINIBOSS_THEME) == 0)
 			{
 				soundKey = "2e_sonic3"
@@ -218,7 +218,7 @@ function void Standalone.playAudio(u8 sfxId)
 			alternatingRingSoundState = !alternatingRingSoundState
 			if (!alternatingRingSoundState)
 			{
-				soundKey = 0x34
+				soundKey = SFX_RING_ALT
 			}
 		}
 		else if (sfxId == MUSIC_SUPER)
@@ -254,7 +254,7 @@ function void Standalone.playAudio(u8 sfxId)
 			else if (configOption == 4)
 			{
 				// S&K invincibility theme
-				soundKey = 0x2c
+				soundKey = MUSIC_INVINCIBLE
 			}
 			else
 			{
@@ -283,7 +283,7 @@ function void Standalone.playAudio(u8 sfxId)
 		else if (sfxId == MUSIC_KNUCKLES_FORCED_SK)
 		{
 			// Knuckles' Theme (S&K version enforced)
-			soundKey = 0x1f
+			soundKey = MUSIC_KNUCKLES
 			soundRegType = SoundRegType.TYPE_MUSIC
 		}
 		else if (sfxId == MUSIC_MINIBOSS_FORCED_S3)
@@ -295,7 +295,7 @@ function void Standalone.playAudio(u8 sfxId)
 		else if (sfxId == MUSIC_MINIBOSS_FORCED_SK)
 		{
 			// Mini-boss music (S&K version enforced)
-			soundKey = 0x18
+			soundKey = MUSIC_MINIBOSS
 			soundRegType = SoundRegType.TYPE_MUSIC
 		}
 		else if (sfxId == 0xf8)
