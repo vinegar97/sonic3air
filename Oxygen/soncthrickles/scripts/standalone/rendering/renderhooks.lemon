@@ -525,19 +525,57 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			}
 
 			// Giant Ring
+		#if COAL
+			if (objA0.mapping_offset == 0x0619e0)
+		#else
 			if (objA0.update_address == 0x061682)
+		#endif
 			{
 				Standalone.renderWithStandardPacking(px, py, 0x0619b2, 0xff, renderQueue)
 				return true
 			}
 
+		#if COAL
+			// Giant Ring Warp Flash
+			if (objA0.mapping_offset == 0x061b28)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x0619ba, 0xff, renderQueue)
+				return true
+			}
+
+			// SSZ Death Egg Cloud
+			if (objA0.mapping_offset == 0x066cd6)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x066692, 0xff, renderQueue)
+				return true
+			}
+
+			// HCZ Miniboss Splash
+			if (objA0.mapping_offset == 0x362c24)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x06ade4, 0xff, renderQueue)
+				return true
+			}
+
+			// Mecha Sonic
+			if (objA0.mapping_offset == 0x1853aa)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x07d4d6, 0xff, renderQueue)
+				return true
+			}
+		#endif
+
 			// Signpost
+		#if COAL
+			if (objA0.mapping_offset == 0x083b9e)
+		#else
 			if (objA0.update_address == 0x0837b2)
+		#endif
 			{
 				u8 customAtex = (objA0.animation.sprite == 2) ? 0x80 : 0xff		// Use Knuckles' palette when needed
 			#if COAL
 				customAtex = (objA0.animation.sprite == 0) ? 0x40 : (objA0.animation.sprite == 1) ? 0x60 : customAtex	// Use appropriate character palette
-				
+
 				u64 key = (objA0.animation.sprite == 0) ? "signpost_sonic" : (objA0.animation.sprite == 1) ? "signpost_tails" : (objA0.animation.sprite == 2) ? "signpost_knuckles" : 0
 
 				if (Renderer.hasCustomSprite(key))
@@ -551,7 +589,11 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			}
 
 			// AIZ Rhinobot
+		#if COAL
+			if (objA0.mapping_offset == 0x3615a8)
+		#else
 			if (objA0.update_address == 0x086e5c)
+		#endif
 			{
 				Standalone.renderWithStandardPacking(px, py, 0x087132, 0xff, renderQueue)
 				return true
@@ -578,12 +620,86 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				return true
 			}
 
+		#if COAL
+			// MGZ Bubbles
+			if (objA0.mapping_offset == 0x361c68)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x088436, 0xff, renderQueue)
+				return true
+			}
+
+			// CNZ Clamer
+			if (objA0.mapping_offset == 0x361abc)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x089168, 0xff, renderQueue)
+				return true
+			}
+
+			// ICZ Penguinator
+			if (objA0.mapping_offset == 0x361e90)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x08be02, 0xff, renderQueue)
+				return true
+			}
+
+			// LBZ Flybot767
+			if (objA0.mapping_offset == 0x36065a)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x08cb22, 0xff, renderQueue)
+				return true
+			}
+
+			// MHZ Butterdroid
+			if (objA0.mapping_offset == 0x08e12e)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x08e11c, 0xff, renderQueue)
+				return true
+			}
+
+			// MHZ Cluckoid
+			if (objA0.mapping_offset == 0x08e546)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x08e410, 0xff, renderQueue)
+				return true
+			}
+
+			// SOZ Ghosts
+			if (objA0.mapping_offset == 0x1872b6)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x08f67a, 0xff, renderQueue)
+				return true
+			}
+
+			// LRZ Fireworm
+			if (objA0.mapping_offset == 0x08fabe)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x08fa38, 0xff, renderQueue)
+				return true
+			}
+		#endif
+
 			//// CNZ Balloon
 			//if (objA0.update_address == 0x031754)		// TODO: This still does not work (except for the red balloon, but not even its cord)
 			//{
 			//	Standalone.renderWithKosinskiCompression(px, py, 0x37060e, 0xff, renderQueue, 0xae80)
 			//	return true
 			//}
+
+		#if COAL
+			u32 sourceBase    = (objA0.update_address == 0x01952a) ? 0x18c084 : (objA0.update_address == 0x019602) ? 0x18c704 : (objA0.update_address == 0x019732) ? 0x18e8a4 : (objA0.update_address == 0x019922) ? 0x18f984 : 0
+			u32 tableAddress  = (objA0.update_address == 0x01952a) ? 0x01a154 : (objA0.update_address == 0x019602) ? 0x21886c : (objA0.update_address == 0x019732) ? 0x218a80 : (objA0.update_address == 0x019922) ? 0x218bfc : 0
+			u32 mappingOffset = (objA0.update_address == 0x01952a) ? 0x01a0d0 : (objA0.update_address == 0x019602) ? 0x019ac6 : (objA0.update_address == 0x019732) ? 0x019dc8 : (objA0.update_address == 0x019922) ? 0x019f82 : 0
+
+			if (mappingOffset != 0)
+			{
+				u8 atex = (objA0.sprite_attributes >> 9) & 0x30
+				u64 key = Renderer.setupCustomCharacterSprite(sourceBase, tableAddress, mappingOffset, objA0.animation.sprite, atex)
+				// u64 category = stringformat("0x%06x", mappingOffset)
+				// Renderer.extractCustomSprite(key, category, objA0.animation.sprite, atex)
+				Renderer.drawCustomSprite(key, px, py, atex, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+				return true
+			}
+		#endif
 		}
 	}
 #if COAL
@@ -1068,6 +1184,8 @@ function u64 Standalone.renderWithStandardPacking(s16 px, s16 py, u32 patternRom
 	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
 	u64 key = Renderer.setupCustomObjectSprite(u32[patternRomAddress], u32[patternRomAddress + 4], objA0.mapping_offset, objA0.animation.sprite, 0x00)
 	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	// u64 category = stringformat("0x%06x", patternRomAddress)
+	// Renderer.extractCustomSprite(key, category, objA0.animation.sprite, atex)
 	Renderer.drawCustomSprite(key, px, py, atex, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
 	return key
 }
@@ -1078,6 +1196,8 @@ function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patter
 	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
 	u64 key = Renderer.setupKosinskiCompressedSprite(patternRomAddress, objA0.mapping_offset, objA0.animation.sprite, 0x00)
 	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	// u64 category = stringformat("0x%06x", patternRomAddress)
+	// Renderer.extractCustomSprite(key, category, objA0.animation.sprite, atex)
 	Renderer.drawCustomSprite(key, px, py, atex, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
 	return key
 }
@@ -1091,6 +1211,8 @@ function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patter
 	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
 	u64 key = Renderer.setupKosinskiCompressedSprite(patternRomAddress, objA0.mapping_offset, objA0.animation.sprite, 0x00, originalVramAddress / 0x20 - objA0.sprite_attributes)
 	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	// u64 category = stringformat("0x%06x", patternRomAddress)
+	// Renderer.extractCustomSprite(key, category, objA0.animation.sprite, atex)
 	Renderer.drawCustomSprite(key, px, py, atex, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
 	return key
 }
