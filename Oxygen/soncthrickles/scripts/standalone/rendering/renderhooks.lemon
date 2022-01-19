@@ -81,25 +81,25 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 
 #if COAL
 	// Character sprites on or in the Tornado plane
-	if (char.mapping_offset == 0x06036e || char.mapping_offset == 0x060486)
+	if (objA0.mapping_offset == 0x06036e || objA0.mapping_offset == 0x060486)
 	{
 		u64 key = 0
 		u8 atex = 0
 		u8 character = 0xff
 		u8 variant = 0xff
 
-		if (char.mapping_offset == 0x06036e && char.animation.sprite == 0x0c)
+		if (objA0.mapping_offset == 0x06036e && objA0.animation.sprite == 0x0c)
 			variant = 0
 
-		if (char.mapping_offset == 0x060486)
+		if (objA0.mapping_offset == 0x060486)
 		{
-			if (char.animation.sprite == 0x0a || char.animation.sprite == 0x0b || char.animation.sprite == 0x12)
+			if (objA0.animation.sprite == 0x0a || objA0.animation.sprite == 0x0b || objA0.animation.sprite == 0x12)
 				variant = 0
 
-			if (char.animation.sprite == 0x0c || char.animation.sprite == 0x0d || char.animation.sprite == 0x13)
+			if (objA0.animation.sprite == 0x0c || objA0.animation.sprite == 0x0d || objA0.animation.sprite == 0x13)
 				variant = 1
 
-			if (char.animation.sprite == 0x0e || char.animation.sprite == 0x0f)
+			if (objA0.animation.sprite == 0x0e || objA0.animation.sprite == 0x0f)
 				variant = 2
 		}
 
@@ -124,27 +124,27 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 	}
 
 	// Character end poses
-	if (char.mapping_offset == 0x0607e6 || char.mapping_offset == 0x060a4c)
+	if (objA0.mapping_offset == 0x0607e6 || objA0.mapping_offset == 0x060a4c)
 	{
 		u64 key = 0
 		u8 atex = 0
 
-		if (char.mapping_offset == 0x0607e6)
+		if (objA0.mapping_offset == 0x0607e6)
 		{
 			atex = 0x20
 
-			if (char.animation.sprite >= 0x03)
-				key = stringformat("endpose_tails_0x%02x", char.animation.sprite - 0x03)
-			if (char.animation.sprite == 0x02)
+			if (objA0.animation.sprite >= 0x03)
+				key = stringformat("endpose_tails_0x%02x", objA0.animation.sprite - 0x03)
+			if (objA0.animation.sprite == 0x02)
 				key = "endpose_supersonic"
-			else // if (char.animation.sprite <= 0x01)
-				key = stringformat("endpose_sonic_0x%02x", char.animation.sprite - 0x00)
+			else // if (objA0.animation.sprite <= 0x01)
+				key = stringformat("endpose_sonic_0x%02x", objA0.animation.sprite - 0x00)
 		}
 
-		if (char.mapping_offset == 0x060a4c)
+		if (objA0.mapping_offset == 0x060a4c)
 		{
 			// atex = 0x00 
-			key = stringformat("endpose_knuckles_0x%02x", char.animation.sprite)
+			key = stringformat("endpose_knuckles_0x%02x", objA0.animation.sprite)
 		}
 
 		if (Renderer.hasCustomSprite(key))
@@ -214,29 +214,29 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 
 	#if COAL
 		// Characters in ending 
-		if (char.mapping_offset == 0x24178a)
+		if (objA0.mapping_offset == 0x24178a)
 		{
 			u64 key = 0
 			u8 atex = 0
 			
-			if (char.animation.sprite >= 0x0e)
+			if (objA0.animation.sprite >= 0x0e)
 			{
-				key = stringformat("character_knuckles_ending_0x%02x", char.animation.frame)
+				key = stringformat("character_knuckles_ending_0x%02x", objA0.animation.frame)
 				atex = 0x80
 			}
-			else if (char.animation.sprite >= 0x0a)
+			else if (objA0.animation.sprite >= 0x0a)
 			{
-				key = stringformat("character_tails_ending_0x%02x", char.animation.frame)
+				key = stringformat("character_tails_ending_0x%02x", objA0.animation.frame)
 				atex = 0x60
 			}
-			else if (char.animation.sprite >= 0x05)
+			else if (objA0.animation.sprite >= 0x05)
 			{
-				key = stringformat("character_tails_tails_ending_0x%02x", char.animation.frame)
+				key = stringformat("character_tails_tails_ending_0x%02x", objA0.animation.frame)
 				atex = 0x60
 			}
-			else if (char.animation.sprite >= 0x01)
+			else if (objA0.animation.sprite >= 0x01)
 			{
-				key = stringformat("character_sonic_ending_0x%02x", char.animation.frame)
+				key = stringformat("character_sonic_ending_0x%02x", objA0.animation.frame)
 				atex = 0x40
 			}
 
