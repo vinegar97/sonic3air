@@ -225,7 +225,7 @@ function void SpecialStage()
 
 	global.demo_countdown = 60
 	palette_fade.range = 0x003f
-	u16[0xfffff794] = 0
+	global.fadeout_countdown = 0
 
 	while (true)
 	{
@@ -256,10 +256,10 @@ function void SpecialStage()
 		LoadRequiredSpritePatterns()
 		Kosinski.ProcessModules()
 
-		--u16[0xfffff794]
-		if (s16[0xfffff794] < 0)
+		--global.fadeout_countdown
+		if (s16(global.fadeout_countdown) < 0)
 		{
-			u16[0xfffff794] = 2
+			global.fadeout_countdown = 2
 			FadePaletteToWhite()
 		}
 
@@ -468,7 +468,7 @@ function void fn0087da()
 		D0.u16 = u16[0xffffe420]
 		if (D0.u16 >= 0x10)
 		{
-			if (s8[0xffffe42a] >= 0)
+			if (bluespheres.next_direction >= 0)
 				return
 
 			D0.u16 = u8[0xffffe42f]
@@ -812,7 +812,7 @@ function void fn00903e()
 	}
 
 	objA0.animation.timer = D0.u8
-	if (bluesphere.jumping_flags.player1 & 0x80)
+	if (bluespheres.jumping_flags.player1 & 0x80)
 	{
 		A1 = 0x0091f6
 		if (bluespheres.movement_speed == 0)
@@ -826,30 +826,30 @@ function void fn00903e()
 	}
 
 	objA0.animation.sprite = u8[A1 + D0.s16]
-	if ((bluesphere.jumping_flags.player1 & 0x80) == 0 && u8[0xffffe44c] == 0 && (control.pad1.pressed & CONTROL_ABC))
+	if ((bluespheres.jumping_flags.player1 & 0x80) == 0 && u8[0xffffe44c] == 0 && (control.pad1.pressed & CONTROL_ABC))
 	{
-		bluesphere.jumping_flags.player1 = 1
+		bluespheres.jumping_flags.player1 = 1
 	}
 
 	D0.u8 = bluespheres.direction & 0x3f
 	if (D0.u8 == 0)
 	{
-		if (bluesphere.jumping_flags.player1 == 1)
+		if (bluespheres.jumping_flags.player1 == 1)
 		{
 			u32[A0 + 0x40] = 0xfff00000
-			bluesphere.jumping_flags.player1 = 0x80
+			bluespheres.jumping_flags.player1 = 0x80
 			bluespheres.next_direction = 0
 			playSound(0x62)
 		}
 
-		if (bluesphere.jumping_flags.player1 & 0x80)
+		if (bluespheres.jumping_flags.player1 & 0x80)
 		{
 			D0 = u32[A0 + 0x3c] + u32[A0 + 0x40]
 			if (D0.s32 >= 0)
 			{
 				D0 = 0
 				u32[A0 + 0x40] = 0
-				bluesphere.jumping_flags.player1 = 0
+				bluespheres.jumping_flags.player1 = 0
 			}
 
 			u32[A0 + 0x40] += bluespheres.current_gamespeed << 4
@@ -953,7 +953,7 @@ function void fn00927a()
 	objA0.animation.timer = D0.u8
 
 	A1 = 0x0091e8
-	if (bluesphere.jumping_flags.player2 != 0)
+	if (bluespheres.jumping_flags.player2 != 0)
 	{
 		A1 = 0x009204
 		D1.u16 = bluespheres.movement_speed
@@ -967,33 +967,33 @@ function void fn00927a()
 
 	fn009402()
 
-	if (u8[A0 + 0x44] == 0x05 && u8[0xffffe44c] == 0 && s8[0xffffe440] >= 0)
+	if (u8[A0 + 0x44] == 0x05 && u8[0xffffe44c] == 0 && s8(bluespheres.jumping_flags.player2) >= 0)
 	{
 		if ((bluespheres.direction & 0x3f) == 0)
 		{
 			u32[A0 + 0x40] = 0xffe80000
-			bluesphere.jumping_flags.player2 = 0x81
+			bluespheres.jumping_flags.player2 = 0x81
 			playSound(0xb1)
 		}
 	}
 
 	fn00937c()
 	D0.u16 &= 0x70
-	if (D0.u16 != 0 && bluesphere.jumping_flags.player2 == 0)
+	if (D0.u16 != 0 && bluespheres.jumping_flags.player2 == 0)
 	{
 		u32[A0 + 0x40] = 0xfff00000
-		bluesphere.jumping_flags.player2 = 0x80
+		bluespheres.jumping_flags.player2 = 0x80
 		playSound(0x62)
 	}
 
-	if (s8[0xffffe440] < 0)
+	if (s8(bluespheres.jumping_flags.player2) < 0)
 	{
 		D0 = u32[A0 + 0x3c] + u32[A0 + 0x40]
 		if (D0.s32 >= 0)
 		{
 			D0 = 0
 			u32[A0 + 0x40] = 0
-			bluesphere.jumping_flags.player2 = 0
+			bluespheres.jumping_flags.player2 = 0
 		}
 		D1.s32 = s16(bluespheres.current_gamespeed) << 4
 		u32[A0 + 0x40] += D1
@@ -1019,7 +1019,7 @@ function void fn00937c()
 	D0.u16 = posbackup.offset.player1
 	A1 = 0xffffe500 + D0.s16
 	u16[A1] = control.pad1
-	u8[A1 + 0x02] = bluesphere.jumping_flags.player1
+	u8[A1 + 0x02] = bluespheres.jumping_flags.player1
 	u8[0xffffee27] += 4
 	D0.u8 = control.pad2.state & 0x7f
 	if (D0.u8 != 0)
@@ -1217,7 +1217,7 @@ function void fn009580()
 	D2 = 0
 	if (bluespheres.next_direction != 0 && D3.u16 == 0)
 	{
-		if ((bluesphere.jumping_flags.player1 & 0x80) == 0)
+		if ((bluespheres.jumping_flags.player1 & 0x80) == 0)
 		{
 			bluespheres.direction += bluespheres.next_direction
 			if ((bluespheres.direction & 0x3f) != 0)
@@ -1242,7 +1242,7 @@ function void fn009580()
 	D2.s16 = bluespheres.movement_speed
 	if (u8[0xffffe44c] == 0)
 	{
-		if (u8[0xffffe42b] == 0)
+		if (bluespheres.hitting_bumper == 0)
 		{
 			if (D1 & CONTROL_UP)
 			{
@@ -1281,7 +1281,7 @@ function void fn009580()
 			}
 		}
 
-		if (u8[0xffffe42b] != 0)
+		if (bluespheres.hitting_bumper != 0)
 		{
 			D0.u16 = (bluespheres.direction & 0x40) ? bluespheres.position.x : bluespheres.position.y
 			if ((D0.u16 & 0xe0) == 0)
@@ -1291,7 +1291,7 @@ function void fn009580()
 				D1.u16 = (D1.u16 << 5) | D0.u16
 				if (D1.u16 != u16[0xffffe44e])
 				{
-					u8[0xffffe42b] = 0
+					bluespheres.hitting_bumper = 0
 					bluespheres.movement_speed = (bluespheres.movement_speed >= 0) ? -bluespheres.current_gamespeed : bluespheres.current_gamespeed
 					return
 				}
@@ -1299,7 +1299,7 @@ function void fn009580()
 
 			if (bluespheres.movement_speed == 0)
 			{
-				u8[0xffffe42b] = 0
+				bluespheres.hitting_bumper = 0
 				bluespheres.going_forward = 1
 				bluespheres.movement_speed = (bluespheres.movement_speed >= 0) ? -bluespheres.current_gamespeed : bluespheres.current_gamespeed
 			}
@@ -1310,7 +1310,7 @@ function void fn009580()
 		}
 	}
 
-	if (bluesphere.jumping_flags.player1 == 0x81)
+	if (bluespheres.jumping_flags.player1 == 0x81)
 	{
 		D2.s16 *= 2
 	}
@@ -1322,7 +1322,7 @@ function void fn009580()
 	bluespheres.position.x -= D0 >> 16
 	bluespheres.position.y -= D1 >> 16
 
-	if ((bluesphere.jumping_flags.player1 & 0x80) == 0 && u8[0xffffe44c] == 0)
+	if ((bluespheres.jumping_flags.player1 & 0x80) == 0 && u8[0xffffe44c] == 0)
 	{
 		fn00972e()
 	}
@@ -1370,11 +1370,11 @@ function void fn00972e()
 	}
 	else if (D2.u8 == 3)
 	{
-		// Running into bumber
-		if (u8[0xffffe42b] == 0)
+		// Running into bumper
+		if (bluespheres.hitting_bumper == 0)
 		{
 			u16[0xffffe44e] = D1.u16
-			u8[0xffffe42b] = 1
+			bluespheres.hitting_bumper = 1
 			bluespheres.going_forward = 0
 			playSound(0xaa)
 		}
@@ -1459,13 +1459,13 @@ function void fn00972e()
 	else if (D2.u8 == 5)
 	{
 		// Yellow spring sphere
-		if (u8[0xffffe44c] == 0 && (bluesphere.jumping_flags.player1 & 0x80) == 0)
+		if (u8[0xffffe44c] == 0 && (bluespheres.jumping_flags.player1 & 0x80) == 0)
 		{
 			D0.u8 = bluespheres.direction & 0x3f
 			if (D0.u8 == 0)
 			{
 				u32[A0 + 0x40] = 0xffe80000
-				bluesphere.jumping_flags.player1 = 0x81
+				bluespheres.jumping_flags.player1 = 0x81
 				playSound(0xb1)
 			}
 		}
@@ -1710,7 +1710,7 @@ function void fn009b62()
 		u8[A1 + D1.s16] = (global.sk_bluespheres) ? 0x0d : 0x0b
 		u16[0xffffe44e] = D1.u16
 		u16[0xffffe428] = 0x0800
-		u8[0xffffe44d] = 0x78
+		bluespheres.emerald_jingle_countdown = 0x78
 
 		D0 = (bluespheres.minigame_mode == 0) ? global.next_bluespheres : u8[0xffffffa4]
 		A1 = 0x009d1e + (D0.s16 & 0x07) * 8
@@ -1723,9 +1723,9 @@ function void fn009b62()
 	{
 		if (kosinski.waiting_modules == 0)
 		{
-			u16[0xffffe44a] = 0
-			--u8[0xffffe44d]
-			if (u8[0xffffe44d] == 0)
+			bluespheres.lifted_height = 0
+			--bluespheres.emerald_jingle_countdown
+			if (bluespheres.emerald_jingle_countdown == 0)
 			{
 				++u8[0xffffe44c]
 				playMusic(0x2b)
@@ -1802,7 +1802,7 @@ function void fn009d9e()
 {
 	A1 = 0xffffe487
 	--static_rings.animtimer
-	if (s8[0xfffffeb2] < 0)
+	if (s8(static_rings.animtimer) < 0)
 	{
 		static_rings.animtimer = 7
 		static_rings.animframe += 0x10
@@ -2465,7 +2465,7 @@ function void fn02df64()
 	gfx.plane_update_routine = 0
 	hud.dirty.timer = 0
 	global.fade_timer = 0
-	bluesphere.backup.zone_act = global.zone_act
+	bluespheres.backup.zone_act = global.zone_act
 
 	addPatternLoadingCue(0x02e310)
 
@@ -2617,10 +2617,10 @@ function void fn02df64()
 		waitForNextFrame()
 
 		++level.framecounter
-		D1.u16 = u16[0xffffe666] + 1
+		D1.u16 = emerald.animframe + 1
 		if (D1.u16 >= 3)
 			D1 = 0
-		u16[0xffffe666] = D1.u16
+		emerald.animframe = D1.u16
 
 		UpdateGameObjects()
 		if (global.lock_on_state == 0 && global.sk_bluespheres)
@@ -2642,7 +2642,7 @@ function void fn02df64()
 			break
 	}
 
-	global.zone_act = bluesphere.backup.zone_act
+	global.zone_act = bluespheres.backup.zone_act
 }
 
 

@@ -186,8 +186,8 @@ define char.double_jump_state	=  u8[A0 + 0x2f]	// Usually 0, except shield power
 define char.hlock_countdown		= u16[A0 + 0x32]	// Countdown to 0 e.g. after hitting a horizontal spring to shortly ignore left/right controls
 
 // Bonus countdowns
-define char.invuln.countdown	=  u8[A0 + 0x34]	// Short invulnerablity time after getting hit, in frames
-define char.invinc.countdown	=  u8[A0 + 0x35]	// Incibility time, gets decreased every 8 frames
+define char.invuln.countdown	=  u8[A0 + 0x34]	// Short invulnerability time after getting hit, in frames
+define char.invinc.countdown	=  u8[A0 + 0x35]	// Invincibility time, gets decreased every 8 frames
 define char.speedup.countdown	=  u8[A0 + 0x36]
 define char.protection_flag		=  u8[A0 + 0x37]	// 0x80 is set by objects preventing Sonic from damage (like MGZ spinning top)
 

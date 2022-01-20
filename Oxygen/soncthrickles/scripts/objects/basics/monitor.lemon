@@ -693,7 +693,7 @@ function void ItemEffect.UpdateDefaultInternal()
 //# address-hook(0x01d898) end(0x01d8a6)
 function void ItemEffect.ApplyExtraLifePlayer1()
 {
-	++u16[0xfffffecc]
+	++player.item_count
 	gainExtraLife()
 }
 
@@ -712,7 +712,7 @@ function void ItemEffect.ApplyExtraRings()
 	++u16[A2]
 
 	ring_counter = min(ring_counter + 10, 999)
-	u16[0xfffffec8] = min(u16[0xfffffec8] + 10, 999)
+	player.total_rings = min(player.total_rings + 10, 999)
 	hud.dirty.rings |= 0x01
 
 	if (checkForExtraLifeByRings())

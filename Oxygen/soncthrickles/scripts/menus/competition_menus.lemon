@@ -412,12 +412,12 @@ function void CompetitionMode.StageSelect()
 		--D0.s16
 	}
 
-	D0 = u32(u8[0xffffffea]) * 0x55
+	D0 = u32(competition_mode.character.player1) * 0x55
 	D0.u8 += 0x40
 	u8[0xffffb0c2] = D0.u8
-	if (s8[0xfffff600] >= 0)
+	if (s8(global.game_mode) >= 0)
 	{
-		D0 = u32(u8[0xffffffeb]) * 0x55
+		D0 = u32(competition_mode.character.player2) * 0x55
 		D0.u8 += 0x40
 		u8[0xffffb234] = D0.u8
 	}
@@ -644,7 +644,7 @@ function void fn00b006()
 
 	D0 = 0xc004 + ((u32(D0.u16) * 0x48 + 0x20) << 4)
 	D7.u16 = D0.u16
-	if (s8[0xfffff600] < 0)
+	if (s8(global.game_mode) < 0)
 	{
 		D0.u16 += 0x0300
 	}
@@ -840,9 +840,9 @@ function void fn00b2cc()
 		--D0.s16
 	}
 
-	D0 = u32(u8[0xffffffea]) * 0x55
+	D0 = u32(competition_mode.character.player1) * 0x55
 	u8[0xffffb0c2] = 0x40 + D0.u8
-	D0 = u32(u8[0xffffffeb]) * 0x55
+	D0 = u32(competition_mode.character.player2) * 0x55
 	u8[0xffffb234] = 0x40 + D0.u8
 
 	fn01aa6e()
@@ -1420,7 +1420,7 @@ function void fn00b9a6()
 	// Character icon
 	objA0.mapping_offset = 0x3a1aee
 	objA0.sprite_attributes = 0xa5c9
-	objA0.animation.sprite = (objA0.flags2e == 0) ? u8[0xffffffea] : u8[0xffffffeb]
+	objA0.animation.sprite = (objA0.flags2e == 0) ? competition_mode.character.player1 : competition_mode.character.player2
 	fn00b4f6()
 }
 
@@ -1817,7 +1817,7 @@ function void fn00bef8()
 //# address-hook(0x00bf3e) end(0x00bf56)
 function void fn00bf3e()
 {
-	if (u8[0xffffee5a] != objA0.flags2e || (level.framecounter.low & 0x08))
+	if (competition_mode.timeattack.new_record != objA0.flags2e || (level.framecounter.low & 0x08))
 	{
 		DrawObject()
 	}

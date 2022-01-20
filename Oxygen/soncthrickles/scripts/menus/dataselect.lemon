@@ -50,7 +50,7 @@ function void fn00c110()
 {
 	lives_counter = 3
 	continues_counter = 0
-	u8[0xfffffec6] = 3
+	unused.lives_counter.player2 = 3
 	checkpoint.number = 0
 	global.stage_type = 0
 	ring_counter = 0
@@ -60,7 +60,7 @@ function void fn00c110()
 	timer.alldata.player2 = 0
 	player2.score = 0
 	player.next_life_score = 5000
-	player2.next_life_score = 5000
+	unused.player2.next_life_score = 5000
 }
 
 
@@ -415,20 +415,20 @@ function void DataSelect.update()
 		RenderSprites()
 
 		A0 = 0xfffffc42
-		++u16[0xffffe666]
-		if (u16[0xffffe666] >= 3)
-			u16[0xffffe666] = 0
+		++emerald.animframe
+		if (emerald.animframe >= 3)
+			emerald.animframe = 0
 
 	#if STANDALONE
 		if (Game.getSetting(SETTING_GFX_ANTIFLICKER) >= 1)
 		{
 			// This version is a bit less flickery
 			copyMemory(A0, 0x00ca9a, 0x1e)
-			if (u16[0xffffe666] != 0)
+			if (emerald.animframe != 0)
 			{
 				for (u8 i = 0; i < 0x1e; i += 2)
 				{
-					u16 weight = abs(s16[0xffffe666] - 2) + 1
+					u16 weight = abs(s16(emerald.animframe) - 2) + 1
 
 					// Mix color with white
 					u16 r = u16[A0+i] & 0x0e
@@ -443,7 +443,7 @@ function void DataSelect.update()
 		}
 		else
 	#endif
-		if (u16[0xffffe666] == 0)
+		if (emerald.animframe == 0)
 		{
 			fillMemory_u16(A0, 0x1e, 0x0eee)
 		}

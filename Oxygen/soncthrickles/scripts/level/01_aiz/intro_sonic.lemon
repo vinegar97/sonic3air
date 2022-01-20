@@ -65,7 +65,7 @@ function void fn0674ac()
 	//  -> Can be used to change the "distance" to the beach
 	//  -> In widescreen, we take a bit more time than usual
 	u16[0xffffeeb6] = 0xe918 - getScreenExtend() * 3
-	u8[0xfffff766] = 0xff
+	char.animation.Sprite.Backup = 0xff
 
 	A1 = 0xffffb000
 	u8[A1 + 0x22] = 0		// char.animation.sprite

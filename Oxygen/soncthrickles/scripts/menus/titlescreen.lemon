@@ -427,7 +427,7 @@ function void TitleScreen()
 		{
 			global.game_mode = 0x0c
 			lives_counter = 3
-			u8[0xfffffec6] = 3
+			unused.lives_counter.player2 = 3
 			ring_counter = 0
 			timer.alldata = 0
 			player.score = 0
@@ -436,7 +436,7 @@ function void TitleScreen()
 			player2.score = 0
 			continues_counter = 0
 			player.next_life_score = 5000
-			player2.next_life_score = 5000
+			unused.player2.next_life_score = 5000
 
 			playSound(MUSIC_CTRL_FADEOUT)
 
@@ -445,7 +445,7 @@ function void TitleScreen()
 			global.game_mode = 0x4c
 
 		#else
-			D0 = u8[0xffffff86]
+			D0 = titlescreen.selection
 			if (D0.u8 == 0)
 			{
 				// Data Select
@@ -517,7 +517,7 @@ function void TitleScreen()
 
 	global.rolling_demo = 1
 	lives_counter = 3
-	u8[0xfffffec6] = 3
+	unused.lives_counter.player2 = 3
 	ring_counter = 0
 	timer.alldata = 0
 	player.score = 0
@@ -525,7 +525,7 @@ function void TitleScreen()
 	timer.alldata.player2 = 0
 	player2.score = 0
 	player.next_life_score = 5000
-	player2.next_life_score = 5000
+	unused.player2.next_life_score = 5000
 }
 
 
@@ -538,7 +538,7 @@ function void fn0007ba()
 	fn004352()
 	fn000c50()
 
-	u16[0xfffff748] = control.pad1
+	titlescreen.backup.control.pad1 = control.pad1
 	fn0017d8()
 
 	if (global.demo_countdown != 0)
@@ -782,8 +782,8 @@ function void fn004a5c()
 	objA0.position.y.u16 = 0x0140
 	objA0.mapping_offset = 0x004c9c
 	objA0.sprite_attributes = 0xc680
-	u8[0xffffff86] &= 0x01
-	objA0.animation.sprite = u8[0xffffff86]
+	titlescreen.selection &= 0x01
+	objA0.animation.sprite = titlescreen.selection
 
 	objA0.update_address = 0x004a88
 	fn004a88()
@@ -793,7 +793,7 @@ function void fn004a5c()
 //# address-hook(0x004a88) end(0x004ade)
 function void fn004a88()
 {
-	D2 = u8[0xffffff86]
+	D2 = titlescreen.selection
 
 	D0.u8 = control.pad1.pressed | control.pad2.pressed
 	if (D0 & CONTROL_UP)
@@ -819,7 +819,7 @@ function void fn004a88()
 	}
 
 	objA0.animation.sprite = D2.u8
-	u8[0xffffff86] = D2.u8
+	titlescreen.selection = D2.u8
 
 	if ((D0.u8 & 0x03) != 0)
 	{

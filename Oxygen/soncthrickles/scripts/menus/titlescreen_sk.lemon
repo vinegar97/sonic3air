@@ -26,6 +26,7 @@ function void TitleScreen_SK()
 	Enigma.decompress(0x0cba68, 0xffff7400, 0x849c)
 	if ((global.region_code & 0x80) == 0)
 	{
+		// Hide the trademark symbol
 		D0.u16 = 0xa49c
 		u16[0xffff775c] = D0.u16
 		u16[0xffff775e] = D0.u16
@@ -205,7 +206,7 @@ function void TitleScreen_SK()
 
 		global.game_mode = 0x0c
 		lives_counter = 3
-		u8[0xfffffec6] = 3
+		unused.lives_counter.player2 = 3
 		ring_counter = 0
 		timer.alldata = 0
 		player.score = 0
@@ -214,13 +215,13 @@ function void TitleScreen_SK()
 		player2.score = 0
 		continues_counter = 0
 		player.next_life_score = 5000
-		player2.next_life_score = 5000
+		unused.player2.next_life_score = 5000
 
 		playSound(MUSIC_CTRL_FADEOUT)
 
 	#if !STANDALONE
 		// Is this even possible...?
-		if (u8[0xffffff86] >= 0x02)
+		if (titlescreen.selection >= 0x02)
 		{
 			// Level Select
 			global.game_mode = 0x28
@@ -228,7 +229,7 @@ function void TitleScreen_SK()
 		}
 	#endif
 
-		levelselect.characters = u8[0xffffff86] * 2 + 1
+		levelselect.characters = titlescreen.selection * 2 + 1
 		D0.u16 = 0x0700
 		global.zone_act = D0.u16
 		global.zone_act.apparent = D0.u16
@@ -301,7 +302,7 @@ function void TitleScreen_SK()
 
 	global.rolling_demo = 1
 	lives_counter = 3
-	u8[0xfffffec6] = 3
+	unused.lives_counter.player2 = 3
 	ring_counter = 0
 	timer.alldata = 0
 	player.score = 0
@@ -309,7 +310,7 @@ function void TitleScreen_SK()
 	timer.alldata.player2 = 0
 	player2.score = 0
 	player.next_life_score = 5000
-	player2.next_life_score = 5000
+	unused.player2.next_life_score = 5000
 }
 
 
@@ -784,8 +785,8 @@ function void fn005ae4()
 	u16[(A2+=2)-2] = objA0.position.y.u16
 	u16[(A2+=2)-2] = 0
 
-	u8[0xffffff86] &= 0x01
-	objA0.value26 = (u8[0xffffff86] >> 1) + (u8[0xffffff86] << 7)
+	titlescreen.selection &= 0x01
+	objA0.value26 = (titlescreen.selection >> 1) + (titlescreen.selection << 7)
 	u8[A0 + 0x27] = 0x08
 
 	objA0.update_address = 0x005b42
@@ -796,7 +797,7 @@ function void fn005ae4()
 //# address-hook(0x005b42) end(0x005c0a)
 function void fn005b42()
 {
-	D2 = u8[0xffffff86]
+	D2 = titlescreen.selection
 	D0.u8 = objA0.value26 & 0x7f
 	if (D0.u8 == 0)
 	{
@@ -822,7 +823,7 @@ function void fn005b42()
 				D2 = 0
 			}
 		}
-		u8[0xffffff86] = D2.u8
+		titlescreen.selection = D2.u8
 
 		if (D0.u8 & 0x03)
 		{
@@ -885,7 +886,7 @@ function void fn005c10()
 	objA0.position.y.u16 = 0x014c
 	objA0.mapping_offset = 0x005ed8
 	objA0.sprite_attributes = 0x8462
-	D0.u8 = u8[0xffffff86]
+	D0.u8 = titlescreen.selection
 	objA0.state = D0.u8
 	objA0.state.former = D0.u8
 	objA0.animation.frame = 1
@@ -898,7 +899,7 @@ function void fn005c10()
 //# address-hook(0x005c42) end(0x005c54)
 function void fn005c42()
 {
-	objA0.state = u8[0xffffff86]
+	objA0.state = titlescreen.selection
 
 	Object.animationUpdate(0x005c5a)
 	DrawObject()
@@ -906,7 +907,7 @@ function void fn005c42()
 
 
 
-// No idea what this is
+// Trademark
 
 //# address-hook(0x005c70) end(0x005c9c)
 function void fn005c70()
@@ -927,7 +928,7 @@ function void fn005c70()
 //# address-hook(0x005ca2) end(0x005cae)
 function void fn005ca2()
 {
-	if (s8[0xffffffd8] < 0)
+	if (s8(global.region_code) < 0)
 	{
 		DrawObject()
 	}
@@ -1196,7 +1197,7 @@ function void fn000c00()
 {
 	// Fades the background to blue
 	fn000c50()
-	u16[0xfffff748] = control.pad1
+	titlescreen.backup.control.pad1 = control.pad1
 	fn0017d8()
 	if (global.demo_countdown != 0)
 	{

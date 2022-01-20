@@ -1825,7 +1825,7 @@ function void fn05fcb4()
 {
 	super.palettefx.state = 0xff
 	super.palettefx.frame = 0
-	u8[0xfffff668] = 0
+	super.palettefx.frame.tails = 0
 	super.active.tails = 0x01
 }
 

@@ -282,7 +282,7 @@ function void FadeOutColor()
 function void SetPaletteToWhite()
 {
 	fillMemory_u16(0xfffffc00 + u32(palette_fade.offset), (palette_fade.count + 1) * 2, 0x0eee)
-	u16[0xffffface] = 0
+	global.fadein_countdown = 0
 
 #if STANDALONE
 	globalComponentTintColorR = 0
@@ -300,11 +300,11 @@ function void FadeInFromWhite()
 {
 	// Fading from a white screen to the target palette
 
-	--u16[0xffffface]
-	if (s16[0xffffface] >= 0)
+	--global.fadein_countdown
+	if (s16(global.fadein_countdown) >= 0)
 		return
 
-	u16[0xffffface] = 2
+	global.fadein_countdown = 2
 
 	// Go through primary (k==0), and possibly secondary (k==1) palette
 	u8 numPalettes = (level.water_present != 0) ? 2 : 1

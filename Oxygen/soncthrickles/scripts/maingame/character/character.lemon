@@ -198,7 +198,7 @@ function void Character.Initialization.shared(u8 character)
 		u32[0xffffcc0a] = 0x0160a6
 		u16[0xffffcc3a] = A0.u16
 
-		u8[0xfffff746] = checkpoint.number
+		checkpoint.number.backup.tails = checkpoint.number
 	}
 	else
 	{
@@ -3195,7 +3195,7 @@ function void Character.cancelSuperTransformation()
 	super.active.tails = 0
 	super.palettefx.state = 2
 	super.palettefx.frame = 30
-	u8[0xfffff766] = 0xff
+	char.animation.Sprite.Backup = 0xff
 
 	if (char.character == CHARACTER_SONIC)
 	{
@@ -3452,8 +3452,7 @@ function void CollectLevelRing()
 //# address-hook(0x01a596) end(0x01a5e8)
 function void CollectRing()
 {
-	if (u16[0xfffffec8] < 999)	// This is a different ring counter I guess?
-		++u16[0xfffffec8]
+	player.total_rings = min(++player.total_rings, 999)	// This is a different ring counter I guess?
 
 	if (ring_counter < 999)
 	{

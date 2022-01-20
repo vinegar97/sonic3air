@@ -158,11 +158,11 @@ function void TitleCard.Appear()
 	{
 		timer.alldata = 0
 		ring_counter = 0
-		u16[0xfffffec8] = 0
+		player.total_rings = 0
 		extra_lives_granted = 0
 		timer.alldata.player2 = 0
 		ring_counter.player2 = 0
-		u16[0xfffffeca] = 0
+		unused.player2.total_rings = 0
 		hud.dirty.timer = 0xff
 		hud.dirty.rings = 0xff
 		u8[0xffffb02c] = 30

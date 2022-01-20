@@ -210,7 +210,7 @@ function bool updateTailsAssist()
 //# address-hook(0x013a10) end(0x013b24)
 function void Character.TailsAI.Init()
 {
-	if (u8[0xfffff746] == 0)	// This is some checkpoint number backup for Tails
+	if (checkpoint.number.backup.tails == 0)	// This is some checkpoint number backup for Tails
 	{
 		if (global.zone_act == 0x0100 || global.zone_act == 0x0200 || global.zone_act == 0x0600 || global.zone_act == 0x0900 || global.zone_act == 0x1600)
 		{

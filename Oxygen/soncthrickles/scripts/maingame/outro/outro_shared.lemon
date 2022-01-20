@@ -549,12 +549,14 @@ function void fn05f20a()
 
 	copyMemory(0xfffffca0, 0x060ada, 0x20)
 
+	// Attatch "& Knuckles"
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05f526
 		u16[A1 + 0x46] = A0.u16
 	}
 
+	// Attatch trademark
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05f4fa
@@ -565,13 +567,14 @@ function void fn05f20a()
 
 
 
-// "Sonic the Hedgehog 3 & Knuckles" logo in the best ending final screen
+// Object to create the full "Sonic the Hedgehog 3 & Knuckles" logo in the best ending final screen
 
 //# address-hook(0x05f26c) end(0x05f2dc)
 function void fn05f26c()
 {
 	setupObjectAttributesFull(0x060154)
 
+	// "Sonic the Hedgehog 3"
 	objA0.update_address = 0x05f1f6
 	if (objA0.subtype2c != 0)
 	{
@@ -585,12 +588,15 @@ function void fn05f26c()
 
 	copyMemory(0xfffffca0, 0x060ada, 0x20)
 
+	// Attatch trademark
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05f4fa
 		u16[A1 + 0x46] = A0.u16
 		u8[A1 + 0x2c] = 0x04
 	}
+
+	// Attatch "& Knuckles"
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05f546
@@ -731,13 +737,14 @@ function void fn05f46a()
 
 
 
-// Logo "& Knuckles"
+// Trademark
 
 //# address-hook(0x05f4fa) end(0x05f51c)
 function void fn05f4fa()
 {
 	if ((global.region_code & 0x80) == 0)
 	{
+		// Hide the trademark symbol
 		fn05ec36()
 		return
 	}
@@ -753,7 +760,7 @@ function void fn05f4fa()
 
 
 
-// Trademark?
+// "& Knuckles" logo
 
 //# address-hook(0x05f526) end(0x05f540)
 function void fn05f526()

@@ -45,7 +45,7 @@ function void fn03703a()
 //# address-hook(0x037092) end(0x0370ae)
 function void fn037092()
 {
-	D0.u8 = min(s8[0xfffffedc], s8[0xfffffeda]) % 10
+	D0.u8 = min(s8(competition_mode.current_lap.player1), s8(competition_mode.laps)) % 10
 	objA0.animation.sprite = D0.u8
 	DrawObject()
 }
@@ -54,7 +54,7 @@ function void fn037092()
 //# address-hook(0x0370b4) end(0x0370d0)
 function void fn0370b4()
 {
-	D0.u8 = min(s8[0xfffffedd], s8[0xfffffeda]) % 10
+	D0.u8 = min(s8(competition_mode.current_lap.player2), s8(competition_mode.laps)) % 10
 	objA0.animation.sprite = D0.u8
 	DrawObject()
 }
@@ -184,11 +184,11 @@ function void fn0371be()
 
 	if (competition_mode.game_mode != 0)
 	{
-		if (s8[0xfffffe1e] < 0)
+		if (s8(hud.dirty.timer) < 0)
 		{
 			if (competition_mode.multiplay != 0)
 			{
-				if (s8[0xfffffec7] >= 0)
+				if (s8(hud.dirty.timer.player2) >= 0)
 				{
 					jump 0x037306
 				}
@@ -197,7 +197,7 @@ function void fn0371be()
 			if (s16[0xffffeee8] < 0)
 			{
 				global.game_mode = 0x40
-				if (s8[0xffffff8b] < 0)
+				if (s8(competition_mode.game_mode) < 0)
 				{
 					global.game_mode = 0x50
 				}
@@ -206,7 +206,7 @@ function void fn0371be()
 		return
 	}
 
-	if (s8[0xfffffe1e] < 0 || competition_mode.current_lap.player1 != competition_mode.laps)
+	if (s8(hud.dirty.timer) < 0 || competition_mode.current_lap.player1 != competition_mode.laps)
 	{
 		--u16[0xffffeee8]
 		if (s16[0xffffeee8] >= 0)
@@ -226,11 +226,11 @@ function void fn0371be()
 	A1 = 0xffff7800
 	u32[A1 + D0.s16] = competition_mode.time_record.player1
 	u32[A1 + D0.s16 + 0x14] = competition_mode.time_record.player2
-	if (s8[0xfffffe1e] >= 0)
+	if (s8(hud.dirty.timer) >= 0)
 	{
 		u32[A1 + D0.s16] = 0x093b63
 	}
-	if (s8[0xfffffec7] >= 0)
+	if (s8(hud.dirty.timer.player2) >= 0)
 	{
 		u32[A1 + D0.s16 + 0x14] = 0x093b63
 	}
@@ -253,7 +253,7 @@ function void fn0371be()
 function void fn0373a4()
 {
 	D0.u8 = competition_mode.laps
-	if (D0.u8 < competition_mode.current_lap.player1 && s8[0xfffffe1e] >= 0)
+	if (D0.u8 < competition_mode.current_lap.player1 && s8(hud.dirty.timer) >= 0)
 	{
 		objA0.state = 0x05
 		objA0.render_flags |= render_flag.COMPETITION_P1_SCREEN
@@ -263,7 +263,7 @@ function void fn0373a4()
 	}
 
 	D0.u8 = competition_mode.laps
-	if (D0.u8 < competition_mode.current_lap.player2 && s8[0xfffffec7] >= 0)
+	if (D0.u8 < competition_mode.current_lap.player2 && s8(hud.dirty.timer.player2) >= 0)
 	{
 		objA0.state = 0x05
 		objA0.render_flags |= render_flag.COMPETITION_P2_SCREEN
@@ -292,8 +292,8 @@ function void fn037406()
 //# address-hook(0x037430) end(0x0374b6)
 function void fn037430()
 {
-	if (s8[0xffffff8b] >= 0)
-		return
+	if (s8(competition_mode.game_mode) >= 0)
+		return // only execute this in time attack mode
 
 	// Update Time Attack records
 	A1 = 0xffffe600 + ((global.zone - 0x0e) << 4)
@@ -302,25 +302,25 @@ function void fn037430()
 	{
 		u8[A1 + 0x0e] = u8[A1 + 0x0d]
 		u8[A1 + 0x0d] = u8[A1 + 0x0c]
-		u8[A1 + 0x0c] = u8[0xffffffea]
+		u8[A1 + 0x0c] = competition_mode.character.player1
 		u32[A1 + 0x08] = u32[A1 + 0x04]
 		u32[A1 + 0x04] = u32[A1]
 		u32[A1] = D0
-		u8[0xffffee5a] = 0
+		competition_mode.timeattack.new_record = 0
 	}
 	else if (D0 < u32[A1 + 0x04])
 	{
 		u8[A1 + 0x0e] = u8[A1 + 0x0d]
-		u8[A1 + 0x0d] = u8[0xffffffea]
+		u8[A1 + 0x0d] = competition_mode.character.player1
 		u32[A1 + 0x08] = u32[A1 + 0x04]
 		u32[A1 + 0x04] = D0
-		u8[0xffffee5a] = 0x01
+		competition_mode.timeattack.new_record = 0x01
 	}
 	else if (D0 < u32[A1 + 0x08])
 	{
-		u8[A1 + 0x0e] = u8[0xffffffea]
+		u8[A1 + 0x0e] = competition_mode.character.player1
 		u32[A1 + 0x08] = D0
-		u8[0xffffee5a] = 0x02
+		competition_mode.timeattack.new_record = 0x02
 	}
 
 	fn00c3c2()
@@ -376,14 +376,7 @@ function void fn037c8e()
 	objA0.position.y.u16 = 0x90
 	objA0.render_flags |= render_flag.COMPETITION_P1_SCREEN
 
-	A1 = 0x037e8e
-	A2 = 0xffff7000
-	D0.u16 = 0x19
-	while (D0.s16 >= 0)
-	{
-		u16[(A2+=2)-2] = u16[(A1+=2)-2]
-		--D0.s16
-	}
+	copyMemory(0xffff7000, 0x037e8e, 0x34)
 
 	u32[A0] = 0x037cdc
 	fn037cdc()
@@ -584,7 +577,7 @@ function void fn037ec2()
 //# address-hook(0x037f1a) end(0x037f3c)
 function void fn037f1a()
 {
-	if (u8[0xffffb02b] & 0x04)
+	if (u8[0xffffb02b] & char.bonus.SPEED_UP)
 	{
 		objA0.animation.sprite = (global.move.speedcap == 0x0c00) ? 1 : 2
 	}
@@ -599,7 +592,7 @@ function void fn037f1a()
 //# address-hook(0x037f42) end(0x037f64)
 function void fn037f42()
 {
-	if (u8[0xffffb075] & 0x04)
+	if (u8[0xffffb075] & char.bonus.SPEED_UP)
 	{
 		objA0.animation.sprite = (global.move.speedcap.tails == 0x0c00) ? 1 : 2
 	}

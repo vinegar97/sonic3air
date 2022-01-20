@@ -248,7 +248,7 @@ function void fn05c2e0()
 
 	global.game_mode = 0x0c
 	lives_counter = 3
-	u8[0xfffffec6] = 3
+	unused.lives_counter.player2 = 3
 	ring_counter = 0
 	timer.alldata = 0
 	player.score = 0
@@ -256,7 +256,7 @@ function void fn05c2e0()
 	timer.alldata.player2 = 0
 	player2.score = 0
 	player.next_life_score = 5000
-	player2.next_life_score = 5000
+	unused.player2.next_life_score = 5000
 	--continues_counter
 	u8[0xffffef56] = 0xff
 	fn00c532()
@@ -366,7 +366,7 @@ function void fn05c5ac()
 	objA0.base_state += 2
 	objA0.mapping_offset = 0x146620
 	objA0.sprite_attributes = 0x0680
-	u8[0xfffff766] = 0
+	char.animation.Sprite.Backup = 0
 	objA0.animation.sprite = 0x5a
 	objA0.animation.timer = 0x06
 }
@@ -578,7 +578,7 @@ function void fn05c7b2()
 	objA0.mapping_offset = 0x148eb8
 	objA0.sprite_attributes = 0x06a0
 	objA0.sprite_priority = 0x0280
-	u8[0xfffff7de] = 0
+	char.animation.Sprite.Backup.tails = 0
 	objA0.state.both = 0x0500
 	u16[A0 + 0x22] = 0xad00
 	objA0.countdown_value = 0x27

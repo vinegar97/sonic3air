@@ -265,7 +265,7 @@ function void fn036f5a()
 	zeroMemory(0xffff7828, 0x30)
 	competition_mode.time_record.player1 = 0
 	competition_mode.time_record.player2 = 0
-	u8[0xffffee5a] = 0xff
+	competition_mode.timeattack.new_record = 0xff
 }
 
 

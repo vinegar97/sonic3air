@@ -122,6 +122,11 @@ define move_area.right			= u16[0xffffee16]	// Right border where character can m
 define level.vertical_wrap		= u16[0xffffee18]	// 0xff00 if vertical wrap is used
 define move_area.bottom.current	= u16[0xffffee1a]	// Bottom border where camera (and character) can move (minus screen height, usually 224)
 
+define move_area.left.player2			= u16[0xffffee1c]	// Left border where character can move (minus 0x10 = 16)
+define move_area.right.player2			= u16[0xffffee1e]	// Right border where character can move (plus 0x128 = 296)
+define level.vertical_wrap.player2		= u16[0xffffee20]	// 0xff00 if vertical wrap is used
+define move_area.bottom.current.player2	= u16[0xffffee22]	// Bottom border where camera (and character) can move (minus screen height, usually 224)
+
 define camera.locktime.player1	= u16[0xffffee24]	// Set e.g. when spindashing to hold camera in place for some frames
 define posbackup.offset.player1 = u16[0xffffee26]	// Offset to be added to 0xffffe500 for next position backup, and to 0xffffe400 for state backup; this offset is always between 0x00 and 0xfc
 define camera.locktime.player2	= u16[0xffffee28]	// Set e.g. when spindashing to hold camera in place for some frames
@@ -169,9 +174,12 @@ define global.zone.apparent		=  u8[0xffffee4e]	// Same as global.zone
 define global.act.apparent		=  u8[0xffffee4f]	// Same as global.act, except for burnt AIZ 1 and last part of ICZ 1 - then this is still 0, though global.act is 1 already
 define global.zone_act.apparent	= u16[0xffffee4e]
 
+define global.fadeout_countdown	= u16[0xfffff794]
+define global.fadein_countdown	= u16[0xffffface]
 define global.fade_timer		= s16[0xffffee50]
 define competition_mode.time_record.player1		= u32[0xffffee52]	// stores a backup of player 1's time record after a completed run
 define competition_mode.time_record.player2		= u32[0xffffee56]	// stores a backup of player 2's time record after a completed run
+define competition_mode.timeattack.new_record	=  u8[0xffffee5a]	// 0xff: no new record, 0x00: 1st place, 0x01: 2nd place, 0x02: 3rd place
 define competition_mode.lap_count.player1		=  u8[0xffffee5c]	// Stores how many laps has player 1 completed
 define competition_mode.lap_count.player2		=  u8[0xffffee5d]	// Stores how many laps has player 2 completed
 define level.skip_titlecard		=  u8[0xffffee5e]	// If set (to 0xff), this will skip the title card in the next level loading
@@ -185,6 +193,13 @@ define camera.position.x.frac	= u16[0xffffee7a]
 define camera.position.y		= u32[0xffffee7c]
 define camera.position.y.u16	= u16[0xffffee7c]
 define camera.position.y.frac	= u16[0xffffee7e]
+
+define camera.position.x.player2		= u32[0xffffee60]
+define camera.position.x.u16.player2	= u16[0xffffee60]
+define camera.position.x.frac.player2	= u16[0xffffee62]
+define camera.position.y.player2		= u32[0xffffee64]
+define camera.position.y.u16.player2	= u16[0xffffee64]
+define camera.position.y.frac.player2	= u16[0xffffee66]
 
 // Foreground scroll position (used for world rendering) -- basically a copy of camera position
 define camera.foreground.x		= u32[0xffffee80]
@@ -204,6 +219,20 @@ define camera.background.y.u16	= u16[0xffffee90]
 define camera.background.y.frac	= u16[0xffffee92]
 define camera.background.x.old	= u16[0xffffee94]
 define camera.background.y.old	= u16[0xffffee96]
+
+define camera.foreground.x.player2		= u32[0xffffee68]
+define camera.foreground.x.u16.player2	= u16[0xffffee68]
+define camera.foreground.x.frac.player2	= u16[0xffffee6a]
+define camera.foreground.y.player2		= u32[0xffffee6c]
+define camera.foreground.y.u16.player2	= u16[0xffffee6c]
+define camera.foreground.y.frac.player2	= u16[0xffffee6e]
+
+define camera.background.x.player2		= u32[0xffffee70]
+define camera.background.x.u16.player2	= u16[0xffffee70]
+define camera.background.x.frac.player2	= u16[0xffffee72]
+define camera.background.y.player2		= u32[0xffffee74]
+define camera.background.y.u16.player2	= u16[0xffffee74]
+define camera.background.y.frac.player2	= u16[0xffffee76]
 
 define gfx.plane_update_routine = u16[0xffffeea6]
 
@@ -244,10 +273,6 @@ define level.backup.timer.seconds		=  u8[0xffffef62]
 define level.backup.timer.frames		=  u8[0xffffef63]
 define level.despawn_position.y	= u16[0xffffef64]	// Only really used in Glowing Spheres
 define camera.hyper_knux_shake	= u16[0xffffef66]	// Set to 0x14 when Hyper Knuckles glides into a wall fast enough, then counting down
-define bluesphere.backup.zone_act	= u16[0xffffef6a]	// stores current zone and act while in a special stage
-define bluesphere.backup.zone		=  u8[0xffffef6a]	// stores current zone while in a special stage
-define bluesphere.backup.act		=  u8[0xffffef6b]	// stores current act while in a special stage
-
 define global.pause_disabled	= u16[0xffffef72]	// Only used in outro
 define global.pause_disabled.u8	=  u8[0xffffef72]
 
@@ -299,6 +324,10 @@ define control.pad1.pressed		=  u8[0xfffff605]
 define control.pad2				= u16[0xfffff606]
 define control.pad2.state		=  u8[0xfffff606]
 define control.pad2.pressed		=  u8[0xfffff607]
+
+define titlescreen.backup.control.pad1			= u16[0xfffff748]
+define titlescreen.backup.control.pad1.state	=  u8[0xfffff748]
+define titlescreen.backup.control.pad1.pressed	=  u8[0xfffff749]
 
 // Deprecated old names for the "control.pad2" defines (left in for compatibility with existing mods)
 //  -> They are somewhat misleading, as these are mostly used in the same way as first controller's "control.pad1", but not "control.player1" (thanks to Veenee)
@@ -402,6 +431,10 @@ define knuckles.preventclimbing	=  u8[0xfffff74f]	// Flag 0x80 is set in situati
 define global.move.speedcap		= u16[0xfffff760]	// Speed cap for normal running for S/K (common value is 0x0600)
 define global.move.acceleration	= u16[0xfffff762]	// Acceleration for S/K (common value is 0x000c)
 define global.move.deceleration	= u16[0xfffff764]	// Deceleration for S/K (common value is 0x0080)
+
+define char.animation.Sprite.Backup		=  u8[0xfffff766]
+define char.animation.Sprite.Backup.tails		=  u8[0xfffff7de]
+define char.animation.Sprite.Backup.tails_tails		=  u8[0xfffff7df]
 
 define dynobjects.routine		=  u8[0xfffff76c]
 define dynobjects.areastart.x	= u16[0xfffff76e]	// Left camera border chunk position-x
@@ -521,6 +554,7 @@ define timer.minutes			=  u8[0xfffffe23]
 define timer.seconds			=  u8[0xfffffe24]
 define timer.frames				=  u8[0xfffffe25]	// Frames inside current second
 define player.score				= u32[0xfffffe26]	// Score * 0.1
+define unused.lives_counter.player2	=  u8[0xfffffec6]	// Unused leftover from Sonic 2
 define hud.dirty.timer.player2	=  u8[0xfffffec7]	// If zero, time is stopped; usual value is 0x01
 define ring_counter.player2		= u16[0xfffffed0]
 define timer.alldata.player2	= u32[0xfffffed2]
@@ -528,14 +562,14 @@ define timer.minutes.player2	=  u8[0xfffffed3]
 define timer.seconds.player2	=  u8[0xfffffed4]
 define timer.frames.player2		=  u8[0xfffffed5]	// Frames inside current second
 define player2.score			= u32[0xfffffed6]	// Score * 0.1
+
 define competition_mode.laps		=  u8[0xfffffeda]	// Total number of laps in competition mode (usually set to 5)
 define competition_mode.current_lap.player1		= u8[0xfffffedc]	// Number of lap that player 1 is currently on
 define competition_mode.current_lap.player2		= u8[0xfffffedd]	// Number of lap that player 2 is currently on
 define competition_mode.item_flag		= u8[0xffffff8a]	// Toggles items spawn in Competition mode
 define competition_mode.game_mode		= u8[0xffffff8b]	// 0 = grand prix, 3 = match race, -1 = time attack
-define bluesphere.jumping_flags.player1			= u8[0xffffe432]	// 0x80: forced spring jump, 0x01: manual player jump
-define bluesphere.jumping_flags.player2			= u8[0xffffe440]	// 0x80: forced spring jump, 0x01: manual player jump
 
+define checkpoint.number.backup.tails			=  u8[0xfffff746]	// Starpost number of last checkpoint for Tails (gets reset after act)
 define checkpoint.number			=  u8[0xfffffe2a]	// Starpost number of last checkpoint (gets reset after act)
 define checkpoint.number.backup		=  u8[0xfffffe2b]	// Starpost number of last actually passed checkpoint (not reset after act)
 define checkpoint.zone_act			= u16[0xfffffe2c]
@@ -565,9 +599,14 @@ define level.backup.zone_act	= u16[0xfffffe4a]
 define oscillating_number_flags = u16[0xfffffe6e]
 // 0xfffffe70 ... 0xfffffeaf  -> 16 oscillating numbers, each consisting of two u16
 
+define emerald.animframe	= u16[0xffffe666]	// Animation frame 0..2, flickers on frame 0
 
+define slotmachine.goalblock.animtimer		= u8[0xfffffeb0]
+define slotmachine.goalblock.animframe		= u8[0xfffffeb1]
 define static_rings.animtimer	=  u8[0xfffffeb2]	// Timer counting down between animation frames
 define static_rings.animframe	=  u8[0xfffffeb3]	// Animation frame 0..3
+define slotmachine.peppermintblock.animtimer	=  u8[0xfffffeb4]
+define slotmachine.peppermintblock.animframe	=  u8[0xfffffeb5]
 
 define spilled_rings.speed		=  u8[0xfffffeb6]	// This is both animation speed and a countdown until spilled rings vanish
 define spilled_rings.animframe	=  u8[0xfffffeb7]	// Animation frame 0..3
@@ -576,6 +615,10 @@ define spilled_rings.progress	= u16[0xfffffeb8]	// Grows faster at first, slower
 define global.move.speedcap.tails		= u16[0xfffffec0]	// Speed cap for normal running for Tails (common value is 0x0600)
 define global.move.acceleration.tails	= u16[0xfffffec2]	// Acceleration for Tails (common value is 0x000c)
 define global.move.deceleration.tails	= u16[0xfffffec4]	// Deceleration for Tails (common value is 0x0080)
+define player.total_rings				= u16[0xfffffec8]	// Total number of rings collected in a level, including lost rings. resets when warping out in any way
+define unused.player2.total_rings		= u16[0xfffffeca]	// Unused leftover from Sonic 2
+define player.item_count				= u16[0xfffffecc]	// Total number of items (monitors broken or extra lives through giant rings) consumed in a level. resets when warping out in any way
+define unused.player2.item_count		= u16[0xfffffece]	// Unused leftover from Sonic 2
 
 define level.total_rings		= u16[0xffffff04]	// All rings in stage (except in monitors or just lost by character)
 
@@ -603,6 +646,7 @@ define kosinski.decompr_words	= u16[0xffffff62]	// Half of the number of bytes o
 
 define levelselect.selection		= u16[0xffffff82]
 define levelselect.soundtest		= u16[0xffffff84]	// Selected piece in sound test (only up to 0xff)
+define titlescreen.selection		=  u8[0xffffff86]
 
 define results.total_bonus			= u16[0xffffff8e]
 define level.default_music			= u16[0xffffff90]
@@ -634,7 +678,7 @@ define titleintro.frames		=  u8[0xffffffbd]	// Frame countdown until next animat
 define titleintro.animstep		= s16[0xffffffbe]	// Animation image number
 
 define player.next_life_score		= u32[0xffffffc0]	// Score value * 0.1 when next extra life will be granted (some multiple of 5000)
-define player2.next_life_score		= u32[0xffffffc4]	// Score value * 0.1 when next extra life will be granted (some multiple of 5000)
+define unused.player2.next_life_score		= u32[0xffffffc4]	// Unused leftover from Sonic 2
 
 define debug_mode.backup.mapping_offset		= u32[0xffffffca]	// Stores a copy of the player's mapping offset before entering debug mode
 define debug_mode.backup.sprite_attributes	= u16[0xffffffce]	// Stores a copy of the player's sprite attributes before entering debug mode
@@ -648,6 +692,8 @@ define levelselect.unlocked		=  u8[0xffffffe0]	// If set, level select can be en
 define pausecheats.unlocked		=  u8[0xffffffe1]	// If set, in game pause you can use A to reset game
 define debug_mode.unlocked		=  u8[0xffffffe2]	// If set, debug mode can be entered from level select by pressing A when starting a level
 define competition_mode.active	= u16[0xffffffe8]
+define competition_mode.character.player1	= u8[0xffffffea]	// 0 = Sonic, 1 = Tails, 2 = Knuckles (see CHARACTER_* constants)
+define competition_mode.character.player2	= u8[0xffffffeb]	// 0 = Sonic, 1 = Tails, 2 = Knuckles (see CHARACTER_* constants)
 
 // [0xfffffff0] = Start of IRQ table (12 bytes, at least that gets written in fn000304)
 // There are two entries, each consisting of:

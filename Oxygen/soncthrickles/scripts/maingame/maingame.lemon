@@ -234,7 +234,7 @@ function void GameMode.MainGame()
 
 	global.demo_countdown = 60
 	palette_fade.range = 0x003f
-	u16[0xfffff794] = 0
+	global.fadeout_countdown = 0
 
 	while (global.demo_countdown != 0)
 	{
@@ -249,10 +249,10 @@ function void GameMode.MainGame()
 		DynamicObjectsLoading()
 		Kosinski.ProcessModules()
 
-		--u16[0xfffff794]
-		if (s16[0xfffff794] < 0)
+		--global.fadeout_countdown
+		if (s16(global.fadeout_countdown) < 0)
 		{
-			u16[0xfffff794] = 2
+			global.fadeout_countdown = 2
 			FadeOutPalette()
 		}
 	}
@@ -731,10 +731,10 @@ function void initializeMainGame()
 	unused.teleport_timer = 0
 	unused.teleport_active = 0
 #endif
-	u16[0xfffffec8] = 0
-	u16[0xfffffeca] = 0
-	u16[0xfffffecc] = 0
-	u16[0xfffffece] = 0
+	player.total_rings = 0
+	unused.player2.total_rings = 0
+	player.item_count = 0
+	unused.player2.item_count = 0
 	u16[0xfffffede] = 0
 	u8[0xfffffe65] = 0
 	super.active = 0
@@ -1230,15 +1230,15 @@ function void fn01bc60()
 	move_area.right = maxX
 	move_area.left.target = minX
 	move_area.right.target = maxX
-	u16[0xffffee1c] = minX
-	u16[0xffffee1e] = maxX
+	move_area.left.player2 = minX
+	move_area.right.player2 = maxX
 
 	level.vertical_wrap = minY
 	move_area.bottom.current = maxY
 	move_area.top.target = minY
 	move_area.bottom.target = maxY
-	u16[0xffffee20] = minY
-	u16[0xffffee22] = maxY
+	level.vertical_wrap.player2 = minY
+	move_area.bottom.current.player2 = maxY
 
 	camera.yoffset.player = 0x60
 	camera.yoffset.tails = 0x60
@@ -1276,7 +1276,7 @@ function void SetupCharacterAtStartPosition()
 				u16[0xffffb014] = 0x0420
 				move_area.left = 0
 				move_area.left.target = 0
-				u16[0xffffee1c] = 0
+				move_area.left.player2 = 0
 			}
 		#if STANDALONE
 			else if (isMainCharacter(CHARACTER_KNUCKLES) && (Game.getSetting(SETTING_AIZ_INTRO_KNUCKLES) != 0 || Game.isTimeAttack()))
@@ -1331,12 +1331,12 @@ function void SetupCharacterAtStartPosition()
 				camera.position.y.u16 = 0x0200
 				move_area.left  = 0x35a0
 				move_area.left.target = 0x35a0
-				u16[0xffffee1c] = 0x35a0
+				move_area.left.player2 = 0x35a0
 				level.vertical_wrap = 0x0200
 				move_area.top.target = 0x0200
-				u16[0xffffee20] = 0x0200
-				u16[0xffffee60] = 0x36f0
-				u16[0xffffee64] = 0x0200
+				level.vertical_wrap.player2 = 0x0200
+				camera.position.x.u16.player2 = 0x36f0
+				camera.position.y.u16.player2 = 0x0200
 				return
 			}
 		#if STANDALONE
@@ -1351,12 +1351,12 @@ function void SetupCharacterAtStartPosition()
 					camera.position.y.u16 = 0x0200
 					move_area.left  = 0x35a0
 					move_area.left.target = 0x35a0
-					u16[0xffffee1c] = 0x35a0
+					move_area.left.player2 = 0x35a0
 					level.vertical_wrap = 0x0200
 					move_area.top.target = 0x0200
-					u16[0xffffee20] = 0x0200
-					u16[0xffffee60] = 0x36f0
-					u16[0xffffee64] = 0x0200
+					level.vertical_wrap.player2 = 0x0200
+					camera.position.x.u16.player2 = 0x36f0
+					camera.position.y.u16.player2 = 0x0200
 					return
 				}
 			}
@@ -1379,7 +1379,7 @@ function void SetupCharacterAtStartPosition()
 			{
 				move_area.left  = 0x00c0
 				move_area.left.target = 0x00c0
-				u16[0xffffee1c] = 0x00c0
+				move_area.left.player2 = 0x00c0
 				D1.u16 = 0x0160
 			}
 		}
@@ -1426,11 +1426,11 @@ function void SetupCharacterAtStartPosition()
 	}
 
 	camera.position.x.u16 = D1.u16
-	u16[0xffffee60] = D1.u16
+	camera.position.x.u16.player2 = D1.u16
 
 	D0.s16 = clamp(D0.s16 - 96, 0, s16(move_area.bottom.current))
 	camera.position.y.u16 = D0.u16
-	u16[0xffffee64] = D0.u16
+	camera.position.y.u16.player2 = D0.u16
 }
 
 
@@ -2029,22 +2029,22 @@ function void InitializeGameCharacters()
 
 	if (competition_mode.active)
 	{
-		D0.u8 = u8[0xffffffea]
+		D0.u8 = competition_mode.character.player1
 		fn006bd8()
 
 		u32[0xffffb000] = D1
-		u8[0xffffb038] = u8[0xffffffea]
+		u8[0xffffb038] = competition_mode.character.player1
 		u16[0xffffb05a] = u16[0xffffb010]
 		u16[0xffffb05e] = u16[0xffffb014]
 		u32[0xffffcc54] = 0x018f86
 
 		if (competition_mode.multiplay)
 		{
-			D0.u8 = u8[0xffffffeb]
+			D0.u8 = competition_mode.character.player2
 			fn006bd8()
 
 			u32[0xffffb04a] = D1
-			u8[0xffffb082] = u8[0xffffffeb]
+			u8[0xffffb082] = competition_mode.character.player2
 			u32[0xffffcc9e] = 0x018f86
 		}
 
@@ -2317,12 +2317,12 @@ function void AddScore()
 function void AddRings()
 {
 	ring_counter = min(ring_counter + D0.u16, 999)
-	u16[0xfffffec8] = min(u16[0xfffffec8] + D0.u16, 999)
+	player.total_rings = min(player.total_rings + D0.u16, 999)
 	hud.dirty.rings |= 0x01
 
 	if (checkForExtraLifeByRings())
 	{
-		++u16[0xfffffecc]
+		++player.item_count
 		gainExtraLife()
 	}
 	else

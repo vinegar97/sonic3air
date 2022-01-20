@@ -1495,7 +1495,7 @@ function void fn04da7e()
 
 	if (bluespheres.rings_remaining != 0)
 	{
-		if (s8[0xffffffab] >= 0 && bluespheregame.fully_unlocked != 0)
+		if (s8(bluespheregame.enable_progress) >= 0 && bluespheregame.fully_unlocked != 0)
 		{
 			// Next stage
 			BlueSphereGame.advanceStages(1)
@@ -1557,11 +1557,11 @@ function void fn04da7e()
 		Kosinski.ProcessModules()
 		UpdatePaletteEffects.SuperForm()
 
-		if ((bluespheregame.shown_difficulty == u8[0xffffffad]) && control.pad1.pressed != 0)
+		if ((bluespheregame.shown_difficulty == bluespheregame.difficulty_level) && control.pad1.pressed != 0)
 			break
 	}
 
-	if (s8[0xffffffab] >= 0 && bluespheregame.fully_unlocked != 0)
+	if (s8(bluespheregame.enable_progress) >= 0 && bluespheregame.fully_unlocked != 0)
 	{
 		// Advance 10 stages
 		BlueSphereGame.advanceStages(10)
@@ -1970,7 +1970,7 @@ function void fn04e202()
 //# address-hook(0x04e222) end(0x04e234)
 function void fn04e222()
 {
-	if (s8[0xfffff65f] < 0)
+	if (s8(super.palettefx.state) < 0)
 	{
 		--u16[A0 + 0x30]
 		if (s16[A0 + 0x30] < 0)
@@ -2357,6 +2357,7 @@ function void fn05face()
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0xa0
 
+	// Attatch trademark
 	if (allocDynamicObjectStd())
 	{
 		u32[A1] = 0x05fb1a
@@ -2372,11 +2373,14 @@ function void fn05fb14()
 }
 
 
+// Trademark
+
 //# address-hook(0x05fb1a) end(0x05fb52)
 function void fn05fb1a()
 {
 	if ((global.region_code & 0x80) == 0)
 	{
+		// Hide the trademark symbol
 		fn05ec36()
 		return
 	}

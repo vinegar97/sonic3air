@@ -185,7 +185,7 @@ function void fn02e512()
 		if (isMainCharacter(CHARACTER_TAILS) && !Game.getSetting(SETTING_HYPER_TAILS))
 		{
 			// Tails
-			if (bluesphere.backup.zone != 4 && bluesphere.backup.zone < 7)
+			if (bluespheres.backup.zone != 4 && bluespheres.backup.zone < 7)
 			{
 				global.game_mode = 0x0c
 				return
@@ -197,7 +197,7 @@ function void fn02e512()
 			// Sonic, Knuckles (or Tails if using Hyper Tails setting)
 			if (global.lock_on_state == 0)
 			{
-				if (bluesphere.backup.zone == 4 || bluesphere.backup.zone >= 7)
+				if (bluespheres.backup.zone == 4 || bluespheres.backup.zone >= 7)
 				{
 					objA0.base_state = 0x0a
 				}
@@ -678,7 +678,7 @@ function void fn02eaa6()
 	{
 		UnloadObject()
 	}
-	else if (u16[0xffffe666] != 0)
+	else if (emerald.animframe != 0)
 	{
 		DrawObject()
 	}
