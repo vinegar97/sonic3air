@@ -7,6 +7,8 @@
 */
 
 
+define objA0.dustcloud.animation.sprite.backup		= u8[A0 + 0x34]
+define objA0.dustcloud.targetInVRAM		= u16[A0 + 0x40]
 
 //-------------------------------------------------------//
 // Water splash effect & Spindash dust cloud             //
@@ -34,7 +36,7 @@ function void fn018b54()
 	objA0.box_size.x = 0x10
 	objA0.sprite_attributes = 0x07e0
 	objA0.value42 = 0xb000
-	u16[A0 + 0x40] = 0xfc00
+	objA0.dustcloud.targetInVRAM = 0xfc00
 
 	if (A0 != 0xffffcc54)
 	{
@@ -44,7 +46,7 @@ function void fn018b54()
 		{
 			objA0.sprite_attributes = 0x07f0
 			objA0.value42 = 0xb04a
-			u16[A0 + 0x40] = 0xfe00
+			objA0.dustcloud.targetInVRAM = 0xfe00
 		}
 	}
 
@@ -265,13 +267,13 @@ function void fn018d6a()
 //# address-hook(0x018d70) end(0x018dbe)
 function void fn018d70()
 {
-	if (u8[A0 + 0x34] != objA0.animation.sprite)
+	if (objA0.dustcloud.animation.sprite.backup != objA0.animation.sprite)
 	{
-		u8[A0 + 0x34] = objA0.animation.sprite
+		objA0.dustcloud.animation.sprite.backup = objA0.animation.sprite
 
 		u32 sourceBase   = D6
 		u32 tableAddress = 0x018ee2
-		u16 targetInVRAM = u16[A0 + 0x40]
+		u16 targetInVRAM = objA0.dustcloud.targetInVRAM
 		updateMultipleSpritePatterns(sourceBase, tableAddress, targetInVRAM, objA0.animation.sprite)
 	}
 }

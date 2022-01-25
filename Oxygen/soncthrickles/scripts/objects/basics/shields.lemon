@@ -7,6 +7,10 @@
 */
 
 
+define objA0.shield.animation.sprite.backup		= u8[A0 + 0x34]
+define objA0.shield.art_offset			= u32[A0 + 0x38]
+define objA0.shield.pattern_offset		= u32[A0 + 0x3c]
+define objA0.shield.targetInVRAM		= u16[A0 + 0x40]
 
 //-------------------------------------------------------//
 // No shield / Insta-Shield (also Classic Shield)        //
@@ -16,8 +20,8 @@
 function void InstaShield.Init()
 {
 	objA0.mapping_offset = 0x01a0d0
-	u32[A0 + 0x3c] = 0x01a154
-	u32[A0 + 0x38] = 0x18c084
+	objA0.shield.pattern_offset = 0x01a154
+	objA0.shield.art_offset = 0x18c084
 	Shield.sharedInit()
 
 	objA0.update_address = 0x01952a
@@ -32,11 +36,11 @@ function void Shield.sharedInit()
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
 	objA0.sprite_attributes = 0x079c
-	u16[A0 + 0x40] = 0xf380
+	objA0.shield.targetInVRAM = 0xf380
 	if (u8[0xffffb00a] & 0x80)
 		u8[A0 + 0x0a] |= 0x80
 	objA0.state.both = 0x01
-	u8[A0 + 0x34] = 0xff
+	objA0.shield.animation.sprite.backup = 0xff
 }
 
 
@@ -79,13 +83,13 @@ function void InstaShield.Update()
 //# address-hook(0x01999a) end(0x0199e8)
 function void Shield.SharedSpriteUpdate()
 {
-	if (u8[A0 + 0x34] != objA0.animation.sprite)
+	if (objA0.shield.animation.sprite.backup != objA0.animation.sprite)
 	{
-		u8[A0 + 0x34] = objA0.animation.sprite
+		objA0.shield.animation.sprite.backup = objA0.animation.sprite
 
-		u32 sourceBase   = u32[A0 + 0x38]
-		u32 tableAddress = u32[A0 + 0x3c]
-		u16 targetInVRAM = u16[A0 + 0x40]
+		u32 sourceBase   = objA0.shield.art_offset
+		u32 tableAddress = objA0.shield.pattern_offset
+		u16 targetInVRAM = objA0.shield.targetInVRAM
 		updateMultipleSpritePatterns(sourceBase, tableAddress, targetInVRAM, objA0.animation.sprite)
 	}
 }
@@ -100,8 +104,8 @@ function void Shield.SharedSpriteUpdate()
 function void FireShield.Init()
 {
 	objA0.mapping_offset = 0x019ac6
-	u32[A0 + 0x38] = 0x18c704
-	u32[A0 + 0x3c] = 0x019ce6
+	objA0.shield.art_offset = 0x18c704
+	objA0.shield.pattern_offset = 0x019ce6
 	Shield.sharedInit()
 
 	objA0.update_address = 0x019602
@@ -181,8 +185,8 @@ function void LightningShield.Init()
 	}
 
 	objA0.mapping_offset = 0x019dc8
-	u32[A0 + 0x38] = 0x18e8a4
-	u32[A0 + 0x3c] = 0x019efa
+	objA0.shield.art_offset = 0x18e8a4
+	objA0.shield.pattern_offset = 0x019efa
 	Shield.sharedInit()
 
 	objA0.update_address = 0x019732
@@ -335,8 +339,8 @@ function void LightningShield.ResetWaterPalette()
 function void BubbleShield.Init()
 {
 	objA0.mapping_offset = 0x019f82
-	u32[A0 + 0x38] = 0x18f984
-	u32[A0 + 0x3c] = 0x01a076
+	objA0.shield.art_offset = 0x18f984
+	objA0.shield.pattern_offset = 0x01a076
 	Shield.sharedInit()
 
 	A1 = 0xffff0000 + u16[A0 + 0x42]
