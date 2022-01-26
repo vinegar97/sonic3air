@@ -230,7 +230,10 @@ function void fn00aa74()
 {
 	if (control.pad1.pressed & 0xe0)
 	{
+		// competition_mode.item_flag = 0xff
+		// competition_mode.game_mode = 0xff
 		u16[0xffffff8a] = 0xffff	// items off, set game mode to time attack
+
 		competition_mode.multiplay = 0
 		global.game_mode = 0xc0
 		fn00aa8e()

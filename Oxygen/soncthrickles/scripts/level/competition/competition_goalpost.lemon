@@ -23,7 +23,11 @@ function void fn036be0()
 	objA0.value32 = objA0.position.y.u16
 	u16[A0 + 0x38] = u16(objA0.subtype2c) * 8 - 0x14
 	competition_mode.laps = 0x05
+
+	// competition_mode.current_lap.player1 = 0
+	// competition_mode.current_lap.player2 = 0
 	u16[0xfffffedc] = 0
+
 	u16[0xffffeee6] = 0
 	hud.dirty.timer = 0
 	timer.alldata = 0

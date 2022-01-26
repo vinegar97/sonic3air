@@ -423,7 +423,7 @@ function void fn05ecb4()
 	{
 		++offset	// Knuckles with Master Emerald
 	}
-	offset *= 2	// From here, first byte is the plane pilot, second pilot is character standing on the wings
+	offset *= 2	// From here, first byte is the plane pilot, second byte is character standing on the wings
 	if (objA0.subtype2c != 0)
 	{
 		++offset	// Get offset of sprite for character on wings

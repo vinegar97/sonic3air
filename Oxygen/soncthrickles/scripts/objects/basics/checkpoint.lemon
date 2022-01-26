@@ -100,7 +100,7 @@ function void fn02d028()
 				u8[A1 + 0x07] = 8
 				u16[A1 + 0x08] = 0x200
 				u16[A1 + 0x0a] = u16[A0 + 0x0a]
-				u32[A1 + 0x0c] = u32[A0 + 0x0c]
+				objA1.mapping_offset = objA0.mapping_offset
 				u8[A1 + 0x22] = 2
 				u16[A1 + 0x30] = objA0.position.x.u16
 				u16[A1 + 0x32] = objA0.position.y.u16 - 0x14

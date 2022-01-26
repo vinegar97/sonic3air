@@ -1891,7 +1891,11 @@ function void fn016fa8()
 {
 	char.animation.timer = 0x20
 	char.animation.frame = 0
+
+	// char.state = char.state.KNUX_FLYCLIMB
+	// char.state.former = char.state.KNUX_FLYCLIMB
 	char.state.both = 0x2020
+
 	char.flags &= ~(char.flag.FACING_LEFT | char.flag.PUSHING)
 
 	D0 = u8(knuckles.glide_direction + 0x10) >> 5
@@ -3195,7 +3199,7 @@ function void Character.cancelSuperTransformation()
 	super.active.tails = 0
 	super.palettefx.state = 2
 	super.palettefx.frame = 30
-	char.animation.Sprite.Backup = 0xff
+	char.animation.sprite.backup = 0xff
 
 	if (char.character == CHARACTER_SONIC)
 	{
@@ -3848,7 +3852,11 @@ function bool Character.UpdateSpindash()
 			if (input_pressed & CONTROL_ABC)
 			{
 				// Charge up
+
+				// char.state = char.state.SPINDASH
+				// char.state.former = char.state.RUNNING
 				char.state.both = 0x0900
+
 				char.spindash_charge = min(char.spindash_charge + 0x200, 0x800)
 				playSound(SFX_SPINDASH_CHARGE)
 			}

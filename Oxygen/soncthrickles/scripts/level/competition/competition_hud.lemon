@@ -126,7 +126,7 @@ function void fn0371be()
 
 	if (objA0.value3a == 0x01)
 	{
-		D0 = 0x093b63
+		D0 = 0x093b63	// That's 9 minutes 59 seconds 99 frames
 		if (D0 <= competition_mode.time_record.player1 || D0 <= competition_mode.time_record.player2)
 		{
 			objA0.value3a = 0x02

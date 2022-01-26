@@ -28,7 +28,7 @@ function void CollapsingCliff.Init()
 	else
 	{
 		// Angel Island Zone
-		u32[A0 + 0x0c] = (global.zone_act == 0x0001) ? 0x21e7ac : 0x21e6c8
+		objA0.mapping_offset = (global.zone_act == 0x0001) ? 0x21e7ac : 0x21e6c8
 		u32[A0 + 0x30] = 0x020cb6
 		u32[A0 + 0x3c] = 0x020e9e
 		objA0.box_size.x = 0x3c

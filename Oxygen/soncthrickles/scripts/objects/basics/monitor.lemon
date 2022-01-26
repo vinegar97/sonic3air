@@ -676,6 +676,7 @@ function void ItemEffect.UpdateDefaultInternal()
 #endif
 	{
 		// Targets:
+		//  - 0x01d890	-> objA0.base_state = 0x00
 		//  - 0x01d898	-> objA0.base_state = 0x01
 		//  - 0x01d890	-> objA0.base_state = 0x02
 		//  - 0x01d8ac	-> objA0.base_state = 0x03

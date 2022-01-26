@@ -366,7 +366,7 @@ function void fn05c5ac()
 	objA0.base_state += 2
 	objA0.mapping_offset = 0x146620
 	objA0.sprite_attributes = 0x0680
-	char.animation.Sprite.Backup = 0
+	char.animation.sprite.backup = 0
 	objA0.animation.sprite = 0x5a
 	objA0.animation.timer = 0x06
 }
@@ -578,7 +578,7 @@ function void fn05c7b2()
 	objA0.mapping_offset = 0x148eb8
 	objA0.sprite_attributes = 0x06a0
 	objA0.sprite_priority = 0x0280
-	char.animation.Sprite.Backup.tails = 0
+	char.animation.sprite.backup.tails = 0
 	objA0.state.both = 0x0500
 	u16[A0 + 0x22] = 0xad00
 	objA0.countdown_value = 0x27

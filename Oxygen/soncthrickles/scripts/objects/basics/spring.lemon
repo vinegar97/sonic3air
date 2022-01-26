@@ -154,7 +154,7 @@ function void Spring.SharedInit()
 	{
 		// Yellow spring
 		u16[A0 + 0x30] = -0x0a00
-		u32[A0 + 0x0c] = (competition_mode.active) ? 0x023912 : 0x023772
+		objA0.mapping_offset = (competition_mode.active) ? 0x023912 : 0x023772
 
 	#if STANDALONE
 		// Make springs in HPZ just a little bit stronger

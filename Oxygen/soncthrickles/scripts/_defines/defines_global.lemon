@@ -255,7 +255,7 @@ define level.display_routine	= u16[0xffffeed2]
 // Vertical scroll offsets (2x 20 interleaved words for foreground and background, covering the 320 pixels of original screen width)
 
 define competition_mode.menu.game_mode			=  u8[0xffffef48]	// 0 for Grand Prix, 1 for Match Race, 2 for Time Attack
-define competition_mode.menu.stage			=  u8[0xffffef4a]	// 0 for ALZ, 1 for BPZ, etc. (always 0 in Grand Prix!)
+define competition_mode.menu.stage			=  u8[0xffffef4a]	// 0 for ALZ, 1 for BPZ, etc.
 define competition_mode.menu.items_toggle	=  u8[0xffffef4e]	// toggles items spawn in competition mode, 0xff is off
 
 define competition_mode.mode		=  u8[0xffffef48]	// (DPERACATED) 0 for Grand Prix, 1 for Match Race, 2 for Time Attack
@@ -432,9 +432,9 @@ define global.move.speedcap		= u16[0xfffff760]	// Speed cap for normal running f
 define global.move.acceleration	= u16[0xfffff762]	// Acceleration for S/K (common value is 0x000c)
 define global.move.deceleration	= u16[0xfffff764]	// Deceleration for S/K (common value is 0x0080)
 
-define char.animation.Sprite.Backup		=  u8[0xfffff766]
-define char.animation.Sprite.Backup.tails		=  u8[0xfffff7de]
-define char.animation.Sprite.Backup.tails_tails		=  u8[0xfffff7df]
+define char.animation.sprite.backup		=  u8[0xfffff766]
+define char.animation.sprite.backup.tails		=  u8[0xfffff7de]
+define char.animation.sprite.backup.tails_tails		=  u8[0xfffff7df]
 
 define dynobjects.routine		=  u8[0xfffff76c]
 define dynobjects.areastart.x	= u16[0xfffff76e]	// Left camera border chunk position-x

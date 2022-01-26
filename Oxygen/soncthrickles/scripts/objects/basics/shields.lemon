@@ -284,7 +284,7 @@ function void Effects.CreateSparks()
 		objA1.update_address = 0x019874
 		u8[A1 + 0x04] = render_flag.WORLD
 		u16[A1 + 0x0a] = u16[A0 + 0x0a]
-		u32[A1 + 0x0c] = u32[A0 + 0x0c]
+		objA1.mapping_offset = objA0.mapping_offset
 		u8[A1 + 0x06] = 0x08
 		u8[A1 + 0x07] = 0x08
 		u16[A1 + 0x08] = 0x80

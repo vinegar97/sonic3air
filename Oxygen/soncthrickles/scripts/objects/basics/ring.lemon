@@ -183,6 +183,7 @@ function void fn01a64a()
 function void fn01a662()
 {
 	// Targets:
+	//  - 0x01a67a	-> objA0.base_state = 0x00
 	//  - 0x01a7e8	-> objA0.base_state = 0x02
 	//  - 0x01a7c2	-> objA0.base_state = 0x04
 	//  - 0x01a7d6	-> objA0.base_state = 0x06
