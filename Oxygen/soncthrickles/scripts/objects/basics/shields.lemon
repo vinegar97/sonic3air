@@ -11,6 +11,8 @@ define objA0.shield.animation.sprite.backup		= u8[A0 + 0x34]
 define objA0.shield.art_offset			= u32[A0 + 0x38]
 define objA0.shield.pattern_offset		= u32[A0 + 0x3c]
 define objA0.shield.targetInVRAM		= u16[A0 + 0x40]
+define objA0.shield.character_address		= u16[A0 + 0x42]
+define objA1.shield.character_address		= u16[A1 + 0x42]
 
 //-------------------------------------------------------//
 // No shield / Insta-Shield (also Classic Shield)        //
@@ -47,7 +49,7 @@ function void Shield.sharedInit()
 //# address-hook(0x01952a) end(0x0195a4)
 function void InstaShield.Update()
 {
-	A2 = 0xffff0000 + u16[A0 + 0x42]
+	A2 = 0xffff0000 + objA0.shield.character_address
 	if ((u8[A2 + 0x2b] & char.bonus.INVINCIBLE) == 0)
 	{
 		objA0.position.x.u16 = u16[A2 + 0x10]
@@ -116,7 +118,7 @@ function void FireShield.Init()
 //# address-hook(0x019602) end(0x0196c0)
 function void FireShield.Update()
 {
-	A2 = 0xffff0000 + u16[A0 + 0x42]
+	A2 = 0xffff0000 + objA0.shield.character_address
 	if ((u8[A2 + 0x2b] & char.bonus.INVINCIBLE) || (u8[A2 + 0x20] == char.state.DISAPPEARED))
 		return
 
@@ -197,7 +199,7 @@ function void LightningShield.Init()
 //# address-hook(0x019732) end(0x01980a)
 function void LightningShield.Update()
 {
-	A2 = 0xffff0000 + u16[A0 + 0x42]
+	A2 = 0xffff0000 + objA0.shield.character_address
 	if ((u8[A2 + 0x2b] & char.bonus.INVINCIBLE) || (u8[A2 + 0x20] == char.state.DISAPPEARED))
 		return
 
@@ -282,12 +284,12 @@ function void Effects.CreateSparks()
 			break
 
 		objA1.update_address = 0x019874
-		u8[A1 + 0x04] = render_flag.WORLD
-		u16[A1 + 0x0a] = u16[A0 + 0x0a]
+		objA1.render_flags = render_flag.WORLD
+		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.mapping_offset = objA0.mapping_offset
-		u8[A1 + 0x06] = 0x08
-		u8[A1 + 0x07] = 0x08
-		u16[A1 + 0x08] = 0x80
+		objA1.box_size.y = 0x08
+		objA1.box_size.x = 0x08
+		objA1.sprite_priority = 0x80
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		objA1.velocity.x = u16[A2]
@@ -343,7 +345,7 @@ function void BubbleShield.Init()
 	objA0.shield.pattern_offset = 0x01a076
 	Shield.sharedInit()
 
-	A1 = 0xffff0000 + u16[A0 + 0x42]
+	A1 = 0xffff0000 + objA0.shield.character_address
 	UpdateMusicOnWaterTransition()
 	objA0.update_address = 0x019922
 	BubbleShield.Update()
@@ -353,7 +355,7 @@ function void BubbleShield.Init()
 //# address-hook(0x019922) end(0x019998)
 function void BubbleShield.Update()
 {
-	A2 = 0xffff0000 + u16[A0 + 0x42]
+	A2 = 0xffff0000 + objA0.shield.character_address
 	if ((u8[A2 + 0x2b] & char.bonus.INVINCIBLE) || (u8[A2 + 0x20] == char.state.DISAPPEARED))
 		return
 
@@ -396,13 +398,13 @@ function void fn0187f0()
 	for (u8 i = 0; i < 4; ++i)
 	{
 		objA1.update_address = 0x0188e8
-		u8[A1 + 0x04] = (render_flag.COMPOUND | render_flag.WORLD)
-		u8[A1 + 0x07] = 0x10
-		u16[A1 + 0x08] = 0x80
-		u16[A1 + 0x0a] = 0x079c
-		u32[A1 + 0x0c] = 0x018aea
+		objA1.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
+		objA1.box_size.x = 0x10
+		objA1.sprite_priority = 0x80
+		objA1.sprite_attributes = 0x079c
+		objA1.mapping_offset = 0x018aea
 		u16[A1 + 0x16] = 2
-		u16[A1 + 0x42] = objA0.value42
+		objA1.shield.character_address = objA0.value42
 		u8[A1 + 0x36] = D2.u8
 		u32[A1 + 0x30] = u32[(A2+=4)-4]
 		u16[A1 + 0x34] = u16[(A2+=2)-2]
@@ -425,7 +427,7 @@ function void fn018868()
 		return
 	}
 
-	A1 = 0xffff0000 + u16[A0 + 0x42]
+	A1 = 0xffff0000 + objA0.shield.character_address
 	if ((u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
 	{
 		UnloadObject()
@@ -436,7 +438,7 @@ function void fn018868()
 	if (objA1.state == char.state.DISAPPEARED)
 		return
 
-	if (u16[A1 + 0x0a] & 0x8000)
+	if (objA1.sprite_attributes & 0x8000)
 		objA0.sprite_attributes |= 0x8000
 	else
 		objA0.sprite_attributes &= 0x7fff
@@ -487,7 +489,7 @@ function void fn0188e8()
 		return
 	}
 
-	A1 = 0xffff0000 + u16[A0 + 0x42]
+	A1 = 0xffff0000 + objA0.shield.character_address
 	if ((u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
 	{
 		UnloadObject()
