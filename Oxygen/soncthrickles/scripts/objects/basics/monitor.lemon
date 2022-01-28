@@ -7,6 +7,8 @@
 */
 
 
+define objA0.monitor.character_address		= u16[A0 + 0x42]
+define objA1.monitor.character_address		= u16[A1 + 0x42]
 
 //-------------------------------------------------------//
 // Monitor (a.k.a. Item Box)                             //
@@ -514,7 +516,7 @@ function void MonitorIntact.Opening()
 		u8[A1 + 0x20] = objA0.state
 	#endif
 		u8[A1 + 0x2a] = objA0.flags2a
-		u16[A1 + 0x42] = objA0.value42
+		objA1.monitor.character_address = objA0.monitor.character_address
 	}
 
 	if (allocDynamicObjectAfterA0())
@@ -588,7 +590,7 @@ function void ItemEffect.Init()
 	//  - 0x01dba3	-> D0 = 0x0c
 	A1 = tableLookupAddress(0x01dba2, D0 * 2)
 	A1 += 2
-	u32[A0 + 0x0c] = A1
+	objA0.mapping_offset = A1
 
 #if STANDALONE
 	u8[A0 + 0x49] = objA0.state		// Backup original
@@ -665,7 +667,7 @@ function void ItemEffect.UpdateDefaultInternal()
 	objA0.base_state += 2
 	u16[A0 + 0x24] = 0x1d
 
-	A1 = 0xffff0000 + u16[A0 + 0x42]
+	A1 = 0xffff0000 + objA0.monitor.character_address
 	A2 = (A1 == 0xffffb000) ? 0xfffffecc : 0xfffffece
 #if STANDALONE
 	if (objA0.state == 0x0b)	// Classic Shield
