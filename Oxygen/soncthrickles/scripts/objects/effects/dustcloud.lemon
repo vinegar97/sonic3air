@@ -9,6 +9,8 @@
 
 define objA0.dustcloud.animation.sprite.backup		= u8[A0 + 0x34]
 define objA0.dustcloud.targetInVRAM		= u16[A0 + 0x40]
+define objA0.dustcloud.character_address		= u16[A0 + 0x42]
+define objA1.dustcloud.character_address		= u16[A1 + 0x42]
 
 //-------------------------------------------------------//
 // Water splash effect & Spindash dust cloud             //
@@ -35,7 +37,7 @@ function void fn018b54()
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x10
 	objA0.sprite_attributes = 0x07e0
-	objA0.value42 = 0xb000
+	objA0.dustcloud.character_address = 0xb000
 	objA0.dustcloud.targetInVRAM = 0xfc00
 
 	if (A0 != 0xffffcc54)
@@ -45,7 +47,7 @@ function void fn018b54()
 		if (global.characters != CHARS_TAILS_ALONE)
 		{
 			objA0.sprite_attributes = 0x07f0
-			objA0.value42 = 0xb04a
+			objA0.dustcloud.character_address = 0xb04a
 			objA0.dustcloud.targetInVRAM = 0xfe00
 		}
 	}
@@ -57,7 +59,7 @@ function void fn018b54()
 //# address-hook(0x018baa) end(0x018bba)
 function void fn018baa()
 {
-	A2 = 0xffff0000 + u16[A0 + 0x42]
+	A2 = 0xffff0000 + objA0.dustcloud.character_address
 
 	// Targets:
 	//  - 0x018c94	-> objA0.state = 0x00  -> Inactive (though the target function still does stuff)
@@ -201,9 +203,9 @@ function void fn018cb2()
 //# address-hook(0x018cb6) end(0x018d68)
 function void fn018cb6()
 {
-	A2 = 0xffff0000 + u16[A0 + 0x42]
+	A2 = 0xffff0000 + objA0.dustcloud.character_address
 	D1 = 0x10
-	if (u8[A2 + 0x20] != 0x0d)
+	if (u8[A2 + 0x20] != char.state.BRAKING)
 	{
 		bool b = true
 		if (u8[A2 + 0x38] == 2)
@@ -228,6 +230,7 @@ function void fn018cb6()
 		{
 			if (allocDynamicObjectStd())
 			{
+				// Spawn skidding dust
 				objA1.update_address = objA0.update_address
 				objA1.position.x.u16 = u16[A2 + 0x10]
 				objA1.position.y.u16 = u16[A2 + 0x14]
@@ -239,15 +242,15 @@ function void fn018cb6()
 					D1.s16 = -D1.s16
 
 				objA1.position.y.u16 += D1.u16
-				u8[A1 + 0x04] = objA0.render_flags
+				objA1.render_flags = objA0.render_flags
 				u8[A1 + 0x05] += 2
-				u8[A1 + 0x07] = 4
-				u16[A1 + 0x08] = 0x80
-				u16[A1 + 0x0a] = (u16[A0 + 0x0a] & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
-				u32[A1 + 0x0c] = u32[A0 + 0x0c]
+				objA1.box_size.x = 4
+				objA1.sprite_priority = 0x80
+				objA1.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+				objA1.mapping_offset = objA0.mapping_offset
 				u8[A1 + 0x20] = 3
 				u8[A1 + 0x2a] = 0
-				u16[A1 + 0x42] = objA0.value42
+				objA1.dustcloud.character_address = objA0.dustcloud.character_address
 			}
 		}
 	}
@@ -303,10 +306,10 @@ function void fn018f9c()
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x10
 	objA0.sprite_attributes = 0x07e0
-	objA0.value42 = 0xb000
+	objA0.dustcloud.character_address = 0xb000
 	if (A0.u16 != 0xcc54)
 	{
-		objA0.value42 = 0xb04a
+		objA0.dustcloud.character_address = 0xb04a
 	}
 	fn018fd2()
 }
@@ -315,7 +318,7 @@ function void fn018f9c()
 //# address-hook(0x018fd2) end(0x018fe2)
 function void fn018fd2()
 {
-	A2 = 0xffff0000 + objA0.value42
+	A2 = 0xffff0000 + objA0.dustcloud.character_address
 
 	// Targets:
 	//  - 0x018fee	-> objA0.state = 0x00
@@ -385,8 +388,8 @@ function void fn019060()
 //# address-hook(0x019064) end(0x0190f0)
 function void fn019064()
 {
-	A2 = 0xffff0000 + objA0.value42
-	if (u8[A2 + 0x20] != 0x0d)
+	A2 = 0xffff0000 + objA0.dustcloud.character_address
+	if (u8[A2 + 0x20] != char.state.BRAKING)
 	{
 		objA0.base_state = 0x02
 		u8[A0 + 0x36] = 0
@@ -400,18 +403,19 @@ function void fn019064()
 		u8[A0 + 0x36] = 0x03
 		if (allocDynamicObjectStd())
 		{
-			u32[A1] = u32[A0]
-			u8[A1 + 0x04] = objA0.render_flags
+			// Spawn skidding dust
+			objA1.update_address = objA0.update_address
+			objA1.render_flags = objA0.render_flags
 			u8[A1 + 0x05] += 0x02
-			u8[A1 + 0x07] = 0x04
-			u16[A1 + 0x08] = 0x80
-			u16[A1 + 0x0a] = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
-			u32[A1 + 0x0c] = objA0.mapping_offset
+			objA1.box_size.x = 0x04
+			objA1.sprite_priority = 0x80
+			objA1.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+			objA1.mapping_offset = objA0.mapping_offset
 			u16[A1 + 0x10] = u16[A2 + 0x10]
 			u16[A1 + 0x14] = u16[A2 + 0x14] + 0x0c
 			u8[A1 + 0x20] = 0x03
 			u8[A1 + 0x2a] = 0
-			u16[A1 + 0x42] = objA0.value42
+			objA1.dustcloud.character_address = objA0.dustcloud.character_address
 		}
 	}
 }
