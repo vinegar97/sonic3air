@@ -1975,21 +1975,21 @@ function void RestoreShield()
 		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_FIRE)
 		u32[0xffffcce8] = 0x0195a6
-		u16[0xffffcd2a] = A1.u16
+		u16[0xffffcce8 + 0x42] = A1.u16
 	}
 	else if (shieldFlags & char.bonus.SHIELD_LIGHTNING)
 	{
 		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_LIGHTNING)
 		u32[0xffffcce8] = 0x0196c2
-		u16[0xffffcd2a] = A1.u16
+		u16[0xffffcce8 + 0x42] = A1.u16
 	}
 	else if (shieldFlags & char.bonus.SHIELD_BUBBLE)
 	{
 		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_BUBBLE)
 		u32[0xffffcce8] = 0x0198be
-		u16[0xffffcd2a] = A1.u16
+		u16[0xffffcce8 + 0x42] = A1.u16
 	}
 #if STANDALONE
 	else if ((Game.getSetting(SETTING_SHIELD_TYPES) != 1) && (shieldFlags & char.bonus.ANY_SHIELD))
@@ -1997,7 +1997,7 @@ function void RestoreShield()
 		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 		u32[0xffffcce8] = 0x0194ce
-		u16[0xffffcd2a] = A1.u16
+		u16[0xffffcce8 + 0x42] = A1.u16
 	}
 #endif
 }
@@ -2063,7 +2063,7 @@ function void InitializeGameCharacters()
 		u32[0xffffb000] = 0x010a94
 		u32[0xffffcc54] = 0x018b3e
 		u32[0xffffcce8] = 0x0194ce
-		u16[0xffffcd2a] = 0xb000
+		u16[0xffffcce8 + 0x42] = 0xb000
 
 		// Also spawn Tails if needed
 		spawnSecondPlayerTails = (global.characters == CHARS_SONIC_AND_TAILS)

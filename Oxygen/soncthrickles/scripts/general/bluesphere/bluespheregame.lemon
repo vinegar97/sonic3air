@@ -440,7 +440,7 @@ function void fn04cef8()
 	bluespheregame.menu_selection = 0
 	u32[0xffffbd4c] = 0x04d64e	// first bumper cursor
 	u32[0xffffbd96] = 0x04d64e	// second bumper cursor
-	u8[0xffffbd9a] |= render_flag.FLIP_X	// flip second bumper
+	u8[0xffffbd96 + 0x04] |= render_flag.FLIP_X	// flip second bumper
 
 	if (bluespheregame.fully_unlocked != 0)
 	{

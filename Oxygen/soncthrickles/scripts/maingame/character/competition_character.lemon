@@ -442,7 +442,7 @@ function void CompetitionMode.Character.Initialization.Tails()
 			checkpoint.sprite_attr = char.sprite_attributes
 			checkpoint.layer_flags = char.layer_flags
 			u32[0xffffcbc0] = 0x0161fa
-			u16[0xffffcbf0] = A0.u16
+			u16[0xffffcbc0 + 0x30] = A0.u16
 		}
 		else
 		{
@@ -456,7 +456,7 @@ function void CompetitionMode.Character.Initialization.Tails()
 			u16[0xfffffe56] = char.sprite_attributes
 			u16[0xfffffe58] = char.layer_flags
 			u32[0xffffcc0a] = 0x0161fa
-			u16[0xffffcc3a] = A0.u16
+			u16[0xffffcc0a + 0x30] = A0.u16
 		}
 	}
 

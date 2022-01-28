@@ -41,7 +41,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			// Player 2
 			drawCharacterVariant = 1
 		}
-		else if (A0 == 0xffffcc0a && u16[0xffffcc3a] != 0)
+		else if (A0 == 0xffffcc0a && u16[0xffffcc0a + 0x30] != 0)
 		{
 			// Tails' tails
 			drawCharacterVariant = 2

@@ -196,7 +196,7 @@ function void Character.Initialization.shared(u8 character)
 
 		// Init Tails' tails object
 		u32[0xffffcc0a] = 0x0160a6
-		u16[0xffffcc3a] = A0.u16
+		u16[0xffffcc0a + 0x30] = A0.u16
 
 		checkpoint.number.backup.tails = checkpoint.number
 	}
@@ -2872,7 +2872,7 @@ function void SonicPressedJumpInMidAir()
 			ClearPositionBackup()
 
 			char.double_jump_state = 1
-			u8[0xffffcd9c] = 1
+			u8[0xffffcd7c + 0x20] = 1
 
 			playSound(SFX_SPINDASH_RELEASE)
 
@@ -2904,7 +2904,7 @@ function void SonicPressedJumpInMidAir()
 	}
 	else if (char.bonus_effect & char.bonus.SHIELD_FIRE)
 	{
-		u8[0xffffcd08] = 1		// That's 0x20 inside the shield object at 0xffffcce8
+		u8[0xffffcce8 + 0x20] = 1		// That's 0x20 inside the shield object at 0xffffcce8
 		char.double_jump_state = 1
 
 		s16 vx = 0x800
@@ -2920,7 +2920,7 @@ function void SonicPressedJumpInMidAir()
 	}
 	else if (char.bonus_effect & char.bonus.SHIELD_LIGHTNING)
 	{
-		u8[0xffffcd08] = 1
+		u8[0xffffcce8 + 0x20] = 1
 		char.double_jump_state = 1
 
 		char.velocity.y = -0x580
@@ -2929,7 +2929,7 @@ function void SonicPressedJumpInMidAir()
 	}
 	else if (char.bonus_effect & char.bonus.SHIELD_BUBBLE)
 	{
-		u8[0xffffcd08] = 1
+		u8[0xffffcce8 + 0x20] = 1
 		char.double_jump_state = 1
 
 	#if STANDALONE
@@ -2959,7 +2959,7 @@ function void SonicPressedJumpInMidAir()
 		// Insta-Shield
 		if ((char.bonus_effect & char.bonus.ANY_SHIELD) == 0)
 		{
-			u8[0xffffcd08] = 1
+			u8[0xffffcce8 + 0x20] = 1
 			char.double_jump_state = 1
 			playSound(SFX_INSTASHIELD)
 		}
@@ -3661,14 +3661,14 @@ function void Character.checkForWaterSurface()
 		if (char.character == CHARACTER_TAILS)
 		{
 			u32[0xffffcb76] = 0x018164
-			u8[0xffffcba2] = 0x81
-			u32[0xffffcbb6] = A0
+			u8[0xffffcb76 + 0x2c] = 0x81
+			u32[0xffffcb76 + 0x40] = A0
 		}
 		else
 		{
 			u32[0xffffcb2c] = 0x018164
-			u8[0xffffcb58] = 0x81
-			u32[0xffffcb6c] = A0
+			u8[0xffffcb2c + 0x2c] = 0x81
+			u32[0xffffcb2c + 0x40] = A0
 		}
 
 		if (controlFlag)
@@ -5955,7 +5955,7 @@ function void SonicLandingBubbleBounce()
 	s8 dy = char.hitbox_extends.y - char.hitbox.default.y
 	char.position.y.u16 += (global.inv_gravity) ? dy : -dy
 
-	u8[0xffffcd08] = 2
+	u8[0xffffcce8 + 0x20] = 2
 	playSound(SFX_BUBBLEBOUNCE)
 }
 

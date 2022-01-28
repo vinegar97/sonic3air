@@ -89,7 +89,7 @@ function void fn04b9ce()
 		// Tails' tails object
 		objA0.sprite_attributes = 0x06a0
 		u32[0xffffcc0a] = 0x0160a6
-		u16[0xffffcc3a] = A0.u16
+		u16[0xffffcc0a + 0x30] = A0.u16
 	}
 
 	slotmachine.rotation.full = 0
