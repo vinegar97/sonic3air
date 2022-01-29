@@ -435,7 +435,7 @@ function void fn04cef8()
 {
 	objA0.update_address = 0x04cf82
 	u32[0xffffb1bc] = 0x04d03e
-	u16[0xffffb1d0] = 0xc0
+	u16[0xffffb1bc + 0x14] = 0xc0
 	bluespheregame.menu_flags = 0x01
 	bluespheregame.menu_selection = 0
 	u32[0xffffbd4c] = 0x04d64e	// first bumper cursor
@@ -444,11 +444,11 @@ function void fn04cef8()
 
 	if (bluespheregame.fully_unlocked != 0)
 	{
-		u16[0xffffb1d0] = 0xb0
+		u16[0xffffb1bc + 0x14] = 0xb0
 		u32[0xffffb534] = 0x04d2f4
-		u16[0xffffb548] = 0x0144
+		u16[0xffffb534 + 0x14] = 0x0144
 		u32[0xffffb8f6] = 0x04d302
-		u16[0xffffb90a] = 0x0144
+		u16[0xffffb8f6 + 0x14] = 0x0144
 		u32[0xffffbd02] = 0x04d610
 		bluespheregame.menu_selection = 1
 	}
@@ -457,7 +457,7 @@ function void fn04cef8()
 		if (bluespheres.blue_remaining == 0 && bluespheres.rings_remaining == 0)
 		{
 			u32[0xffffb8f6] = 0x04d302
-			u16[0xffffb90a] = 0x0144
+			u16[0xffffb8f6 + 0x14] = 0x0144
 		}
 	}
 }
@@ -1469,7 +1469,7 @@ function void fn04da7e()
 	u32[0xffffb000] = 0x04def8
 	u32[0xffffb04a] = 0x04df86
 	u32[0xffffb1bc] = 0x04d03e
-	u16[0xffffb1d0] = 0x90
+	u16[0xffffb1bc + 0x14] = 0x90
 	u32[0xffffb862] = 0x04e012
 
 	UpdateGameObjects()

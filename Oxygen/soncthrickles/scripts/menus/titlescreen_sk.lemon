@@ -137,8 +137,8 @@ function void TitleScreen_SK()
 				fn005972()
 
 				u32[0xffffb04a] = 0x005802
-				u16[0xffffb078] = 0x0140
-				u16[0xffffb07c] = 0x70
+				u16[0xffffb04a + 0x2e] = 0x0140
+				u16[0xffffb04a + 0x32] = 0x70
 				u16[0xffffeec0] = 0x03
 
 				camera.screenshake.state = 0
@@ -460,7 +460,7 @@ function void fn00571e()
 	Kosinski.addToDMAQueue(0x0d5cc6, 0x8c40)
 
 	u32[0xffffb0de] = 0x58a8
-	u8[0xffffb102] = 0x1e
+	u8[0xffffb0de + 0x24] = 0x1e
 	objA0.update_address = 0x00576e
 }
 

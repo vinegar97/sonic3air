@@ -38,7 +38,7 @@ function void GameMode.MainGame()
 		SetPaletteFadedOut()
 
 		global.fade_timer = 0x16
-		u16[0xffffb27e] = 0x16
+		u16[0xffffb250 + 0x2e] = 0x16
 		control.pad1 = 0x7f00
 		control.pad2 = 0x7f00
 		checkpoint.number &= 0x7f
@@ -692,7 +692,7 @@ function void initializeMainGame()
 	{
 		u32[0xffffcf82] = 0x01f202
 		u32[0xffffb172] = 0x0383bc		// HCZ run-on-water handler
-		u8[0xffffb19e] = 1
+		u8[0xffffb172 + 0x2c] = 1
 	}
 	else if (global.zone == 0x07)
 	{
@@ -2014,8 +2014,8 @@ function void InitializeGameCharacters()
 		if (global.zone_act == 0x1400)
 		{
 			u32[0xffffb172] = 0x049eee
-			u16[0xffffb182] = 0x78
-			u16[0xffffb186] = 0xf30
+			u16[0xffffb172 + 0x10] = 0x78
+			u16[0xffffb172 + 0x14] = 0xf30
 			ring_counter = checkpoint.rings
 			extra_lives_granted = checkpoint.lives_granted
 			hud.dirty.rings = 1

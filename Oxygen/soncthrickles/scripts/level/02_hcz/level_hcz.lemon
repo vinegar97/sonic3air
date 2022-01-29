@@ -176,7 +176,7 @@ function void fn050c4c()
 		fn04f8f8()
 
 		u32[0xffffb172] = 0x0383bc		// HCZ run-on-water handler
-		u8[0xffffb19e] = 0x01
+		u8[0xffffb172 + 0x2c] = 0x01
 
 		u32 backupD7 = D7
 		u32 backupA0 = A0

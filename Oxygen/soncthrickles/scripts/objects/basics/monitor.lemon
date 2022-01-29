@@ -839,12 +839,12 @@ function void ItemEffect.ApplyInvincibility()
 		if (u8[A0 + 0x43] == 0)
 		{
 			u32[0xffffcd7c] = 0x0187f0	// invincibility stars
-			u16[0xffffcdbe] = A1.u16
+			u16[0xffffcd7c + 0x42] = A1.u16
 		}
 		else
 		{
 			u32[0xffffcea4] = 0x0187f0	// invincibility stars
-			u16[0xffffcee6] = A1.u16
+			u16[0xffffcea4 + 0x42] = A1.u16
 		}
 	}
 }
