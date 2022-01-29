@@ -402,10 +402,10 @@ function void fn069588()
 		if (getNumPlayers() >= 2)
 		{
 			// Make Tails stop next to Sonic
-			if (u16[0xffffb05a] > u16[0xffffb010] + 0x10)
+			if (u16[0xffffb04a + 0x10] > u16[0xffffb000 + 0x10] + 0x10)
 			{
-				u16[0xffffb062] = 0
-				u16[0xffffb066] = 0
+				u16[0xffffb04a + 0x18] = 0
+				u16[0xffffb04a + 0x1c] = 0
 			}
 		}
 	#endif
@@ -433,7 +433,7 @@ function void fn0695ae()
 {
 	// Checks when to fade over to HCZ1
 	D0.u16 = u16[0xfffffa86] + 0x01e6
-	if (D0.u16 <= u16[0xffffb014])
+	if (D0.u16 <= u16[0xffffb000 + 0x14])
 	{
 		D0.u16 = 0x0100
 		TriggerNextZone()

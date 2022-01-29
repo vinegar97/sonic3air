@@ -156,7 +156,7 @@ function void fn0837d8()
 	if (fn084fa4())
 		return
 
-	if (u8[0xffffb00a] & 0x80)
+	if (u8[0xffffb000 + 0x0a] & 0x80)
 		u8[A0 + 0x0a] |= 0x80
 
 	level.signpost.address = A0.u16
@@ -316,7 +316,7 @@ function void fn083938()
 function void fn0839a2()
 {
 	setupObjectAttributesFull(0x083b22)
-	if (u8[0xffffb00a] & 0x80)
+	if (u8[0xffffb000 + 0x0a] & 0x80)
 		u8[A0 + 0x0a] |= 0x80
 
 	objA0.update_address = 0x0839ea
@@ -351,7 +351,7 @@ function void fn083a24()
 {
 	setupObjectAttributesFull(0x083b16)
 	objA0.update_address = 0x083a40
-	if (u8[0xffffb00a] & 0x80)
+	if (u8[0xffffb000 + 0x0a] & 0x80)
 		u8[A0 + 0x0a] |= 0x80
 
 	fn083a40()

@@ -50,7 +50,7 @@ function void VerticalPole.Update()
 	{
 		camera.use_forced_target = true
 		camera.forced_target.x = objA0.position.x.u16
-		camera.forced_target.y = u16[0xffffb014]
+		camera.forced_target.y = u16[0xffffb000 + 0x14]
 	}
 
 #if STANDALONE

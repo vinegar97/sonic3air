@@ -29,8 +29,8 @@ function void fn0273e4()
 //# address-hook(0x027424) end(0x027590)
 function void fn027424()
 {
-	u16[A0 + 0x30] = u16[0xffffb018]
-	objA0.value32 = u16[0xffffb062]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x18]
+	objA0.value32 = u16[0xffffb04a + 0x18]
 
 	D1.u16 = 0x1b
 	D2.u16 = 0x20
@@ -75,14 +75,14 @@ function void fn027424()
 		if (objA0.flags2a & 0x40)	// Isn't this always true here?
 		{
 			objA0.flags2a &= ~0x40
-			u8[0xffffb074] &= ~0x20
+			u8[0xffffb04a + 0x2a] &= ~0x20
 		}
 	}
 
 	if (objA0.flags2a & 0x20)
 	{
 		objA0.flags2a &= ~0x20
-		u8[0xffffb02a] &= ~0x20
+		u8[0xffffb000 + 0x2a] &= ~0x20
 	}
 	objA1.velocity.x = D1.u16
 

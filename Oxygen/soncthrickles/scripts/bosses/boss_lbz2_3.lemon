@@ -446,7 +446,7 @@ function void fn074640()
 	objA0.velocity.y = -0x600
 	objA0.countdown_value = 0x3f
 
-	if (u8[0xffffb02b] & char.bonus.INVINCIBLE)
+	if (u8[0xffffb000 + 0x2b] & char.bonus.INVINCIBLE)
 	{
 		// Handling primarily for Super forms
 		A1 = 0xffffb000
@@ -701,7 +701,7 @@ function void fn0748f4()
 //# address-hook(0x07490a) end(0x074950)
 function void fn07490a()
 {
-	if (u16[0xffffb010] >= 0x4510)
+	if (u16[0xffffb000 + 0x10] >= 0x4510)
 	{
 		objA0.update_address = 0x074952
 
@@ -741,7 +741,7 @@ function void fn074952()
 		UpdatePlayer1SpritePatterns()
 	}
 
-	if (u16[0xffffb014] < level.bossarea.top + 0x0200)
+	if (u16[0xffffb000 + 0x14] < level.bossarea.top + 0x0200)
 		return
 
 	D0.u16 = 0x0700
@@ -1094,7 +1094,7 @@ function void fn074c34()
 	}
 	else
 	{
-		u8[0xffffb02e] = 0
+		u8[0xffffb000 + 0x2e] = 0
 		UnloadObject()
 	}
 }
@@ -1402,8 +1402,8 @@ function void fn074fd2()
 
 #if STANDALONE
 		// Release main character if he was grabbed (can happen if second character makes the final hit)
-		if (u8[0xffffb02e] & 0x81)
-			u8[0xffffb02e] &= ~0x81
+		if (u8[0xffffb000 + 0x2e] & 0x81)
+			u8[0xffffb000 + 0x2e] &= ~0x81
 
 		bool isKnucklesFight = (camera.position.y.u16 < 0x0500)
 		if (!isKnucklesFight)

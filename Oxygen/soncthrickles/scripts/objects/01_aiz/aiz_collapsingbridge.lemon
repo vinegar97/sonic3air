@@ -298,9 +298,9 @@ function void fn02b452()
 	if (objA0.flags2a & 0x08)
 	{
 		objA0.flags2a &= ~0x08
-		u8[0xffffb02a] &= ~0x08
-		u8[0xffffb02a] |= 0x02
-		u8[0xffffb020] = char.state.FALLING_PANIC
+		u8[0xffffb000 + 0x2a] &= ~0x08
+		u8[0xffffb000 + 0x2a] |= 0x02
+		u8[0xffffb000 + 0x20] = char.state.FALLING_PANIC
 
 	#if STANDALONE
 		// Give player back controls (done here instead of "fn065c56")
@@ -311,9 +311,9 @@ function void fn02b452()
 	if (objA0.flags2a & 0x10)
 	{
 		objA0.flags2a &= ~0x10
-		u8[0xffffb074] &= ~0x08
-		u8[0xffffb074] |= 0x02
-		u8[0xffffb06a] = char.state.FALLING_PANIC
+		u8[0xffffb04a + 0x2a] &= ~0x08
+		u8[0xffffb04a + 0x2a] |= 0x02
+		u8[0xffffb04a + 0x20] = char.state.FALLING_PANIC
 	}
 
 	UnloadObject()

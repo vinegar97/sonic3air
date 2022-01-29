@@ -333,8 +333,8 @@ function void fn090c16()
 {
 	objA0.update_address = 0x090c34
 	player1.camera_lock = 0
-	u8[0xffffb02e] = 0
-	u8[0xffffb078] = 0
+	u8[0xffffb000 + 0x2e] = 0
+	u8[0xffffb04a + 0x2e] = 0
 }
 
 
@@ -374,7 +374,7 @@ function void fn090c34()
 			checkpoint.number = level.backup.checkpoint | 0x80
 			global.zone_act   = level.backup.zone_act
 			global.zone_act.apparent = u16[0xffffff9c]
-			global.shields_backup_2 = u8[0xffffb02b]
+			global.shields_backup_2 = u8[0xffffb000 + 0x2b]
 		}
 	}
 }

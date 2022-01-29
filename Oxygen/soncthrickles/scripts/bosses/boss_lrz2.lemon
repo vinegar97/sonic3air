@@ -377,7 +377,7 @@ function void fn079ac4()
 
 	#if STANDALONE
 		// Experimental: Target bomb right at character (makes things a bit more interesting)
-		//D1.u16 = u16[0xffffb010] - camera.position.x.u16
+		//D1.u16 = u16[0xffffb000 + 0x10] - camera.position.x.u16
 	#endif
 
 		objA0.position.x.u16 = 0x0a00 + D1.u16		// Note: 0x0a00 is camera.position.x.u16 here

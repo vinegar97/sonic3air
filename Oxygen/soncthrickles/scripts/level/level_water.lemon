@@ -21,7 +21,7 @@ function void UpdateWater()
 		return
 	}
 
-	if (u8[0xffffee30] == 0 && u8[0xffffb005] < 0x06)
+	if (u8[0xffffee30] == 0 && u8[0xffffb000 + 0x05] < 0x06)
 	{
 		fn006f4a()
 		UpdateWaterSurfaceLevel()

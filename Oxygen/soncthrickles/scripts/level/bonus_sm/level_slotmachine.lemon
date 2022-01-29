@@ -1608,13 +1608,13 @@ function void fn01aa56()
 #if STANDALONE
 	// Reposition the ring to prevent a small graphics glitch that happens in the original
 	//  (when the player moves out of the center, the ring effect would start to move)
-	if (u16[0xffffb010] != 0x460 || u16[0xffffb014] != 0x430)
+	if (u16[0xffffb000 + 0x10] != 0x460 || u16[0xffffb000 + 0x14] != 0x430)
 	{
 		u8 angle = slotmachine.rotation.u8 & 0xfc
 		s32 sine   = lookupSin(angle)
 		s32 cosine = lookupCos(angle)
-		s16 bx = 0x460 - u16[0xffffb010]
-		s16 by = 0x430 - u16[0xffffb014]
+		s16 bx = 0x460 - u16[0xffffb000 + 0x10]
+		s16 by = 0x430 - u16[0xffffb000 + 0x14]
 		objA0.position.x.u16 = camera.foreground.x.u16 + getScreenWidth() / 2 + s16[A0 + 0x46] + ((bx * cosine - by * sine) >> 8)
 		objA0.position.y.u16 = camera.foreground.y.u16 + getScreenHeight() / 2 + s16[A0 + 0x48] + ((bx * sine + by * cosine) >> 8)
 	}

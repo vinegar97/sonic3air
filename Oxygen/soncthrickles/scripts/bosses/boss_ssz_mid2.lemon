@@ -146,7 +146,7 @@ function void fn07a800()
 		objA0.value26 += 2
 		s16[0xfffffafa] = 0
 
-		D0.u16 = u16[0xffffb010]
+		D0.u16 = u16[0xffffb000 + 0x10]
 		if (D0.u16 >= u16[0xfffffaf0])
 		{
 			s16[0xfffffaf8] = SSZ_MidBoss2.getHorizontalMovementSpeed()
@@ -590,7 +590,7 @@ function void fn07ac06()
 		return
 	}
 
-	if (u8[0xffffb005] == 0x04 || u8[0xffffb04f] == 0x04)
+	if (u8[0xffffb000 + 0x05] == 0x04 || u8[0xffffb04a + 0x05] == 0x04)
 	{
 		A1 = 0xfffffa82
 		D0.u8 = u8[A1 + 0x02] & 0x0f
@@ -750,7 +750,7 @@ function void fn07ae22()
 		objA0.state = 0x02
 		objA0.velocity.y = -0x400
 
-		D0.u16 = u16[0xffffb010] - objA0.position.x.u16
+		D0.u16 = u16[0xffffb000 + 0x10] - objA0.position.x.u16
 		if (objA0.position.x.u16 < 0x16a0)
 		{
 			D1.u16 = 0x80
@@ -974,7 +974,7 @@ function void fn07b02a()
 //# address-hook(0x07b0a8) end(0x07b0c0)
 function void fn07b0a8()
 {
-	D0.u16 = u16[0xffffb010] - objA0.position.x.u16
+	D0.u16 = u16[0xffffb000 + 0x10] - objA0.position.x.u16
 	if (D0.s16 < 0)
 		objA0.render_flags &= ~0x01
 	else

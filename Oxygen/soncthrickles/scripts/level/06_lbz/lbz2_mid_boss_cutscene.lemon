@@ -85,12 +85,12 @@ function void LBZ2MidBossCutscene.stopTailsFromSuicide()
 		RespawnTails()
 		A0 = backupA0
 	}
-	else if (u16[0xffffb05a] >= 0x3bb0)
+	else if (u16[0xffffb04a + 0x10] >= 0x3bb0)
 	{
-		u16[0xffffb05a] = 0x3bb0
-		u16[0xffffb05e] = min(u16[0xffffb05e], 0x0630)
-		u16[0xffffb062] = 0
-		u16[0xffffb066] = 0
+		u16[0xffffb04a + 0x10] = 0x3bb0
+		u16[0xffffb04a + 0x14] = min(u16[0xffffb04a + 0x14], 0x0630)
+		u16[0xffffb04a + 0x18] = 0
+		u16[0xffffb04a + 0x1c] = 0
 		tails.ai_routine = 0x0a
 	}
 }
@@ -711,12 +711,12 @@ function void fn05480c()
 //# address-hook(0x0549c6) end(0x054a92)
 function void fn0549c6()
 {
-	if (u8[0xffffb005] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= 0x06)
 		return
 
 	if (player1.camera_lock)
 	{
-		D0.u16 = u16[0xffffb010] - camera.position.x.u16 - getScreenWidth() / 2
+		D0.u16 = u16[0xffffb000 + 0x10] - camera.position.x.u16 - getScreenWidth() / 2
 		if (D0.s16 >= 0)
 		{
 			camera.position.x.u16 += D0.u16

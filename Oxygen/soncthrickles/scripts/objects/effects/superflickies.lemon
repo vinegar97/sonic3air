@@ -43,8 +43,8 @@ function void fn01a19c()
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x08
 	objA0.sprite_attributes = 0x8680
-	objA0.position.x.u16 = u16[0xffffb010] - 0xc0
-	objA0.position.y.u16 = u16[0xffffb014] - 0xc0
+	objA0.position.x.u16 = u16[0xffffb000 + 0x10] - 0xc0
+	objA0.position.y.u16 = u16[0xffffb000 + 0x14] - 0xc0
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 
@@ -59,9 +59,9 @@ function void fn01a1f4()
 	// Update routine for a single flicky
 	if (super.active.tails == 0)
 	{
-		u16[0xffffb05a] = 0
-		u16[0xffffb05e] = 0
-		u8[0xffffb06a] = 0
+		u16[0xffffb04a + 0x10] = 0
+		u16[0xffffb04a + 0x14] = 0
+		u8[0xffffb04a + 0x20] = 0
 		if (u8[A0 + 0x30] != 0)
 		{
 			A1 = 0xffff0000 + objA0.value42
@@ -113,8 +113,8 @@ function void fn01a228()
 function void fn01a276()
 {
 	// Flickies fly away again when Tails returns to normal form
-	D2.u16 = u16[0xffffb010] - 0xc0
-	D3.u16 = u16[0xffffb014] - 0xc0
+	D2.u16 = u16[0xffffb000 + 0x10] - 0xc0
+	D3.u16 = u16[0xffffb000 + 0x14] - 0xc0
 	if (objA0.render_flags & render_flag.VISIBLE)
 	{
 		fn01a228()
@@ -149,8 +149,8 @@ function void fn01a292()
 			LookupSinCos()
 			D0.s16 >>= 3
 			D1.s16 >>= 4
-			D2.u16 = u16[0xffffb010]
-			D3.u16 = u16[0xffffb014] - 0x20
+			D2.u16 = u16[0xffffb000 + 0x10]
+			D3.u16 = u16[0xffffb000 + 0x14] - 0x20
 			if (global.inv_gravity)
 				D3.u16 += 0x40
 			D2.u16 += D0.u16
@@ -216,9 +216,9 @@ function void fn01a31e()
 		u8[A1 + 0x29] |= 0x02
 	}
 
-	u16[0xffffb05a] = objA0.position.x.u16
-	u16[0xffffb05e] = objA0.position.y.u16
-	u8[0xffffb06a] = 2
+	u16[0xffffb04a + 0x10] = objA0.position.x.u16
+	u16[0xffffb04a + 0x14] = objA0.position.y.u16
+	u8[0xffffb04a + 0x20] = 2
 }
 
 

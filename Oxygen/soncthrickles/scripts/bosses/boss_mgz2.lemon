@@ -327,7 +327,7 @@ function void fn06c5c4()
 	UpdateMovementStraightSimple()
 	if ((objA0.flags2a & 0x40) == 0)
 	{
-		D0.u16 = u16[0xffffb010]
+		D0.u16 = u16[0xffffb000 + 0x10]
 		if (D0.u16 < objA0.position.x.u16)
 		{
 			fn0847e6()

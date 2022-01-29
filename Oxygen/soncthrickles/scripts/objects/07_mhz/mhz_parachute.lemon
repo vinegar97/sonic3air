@@ -64,13 +64,13 @@ function void fn03f51c()
 		objA0.position.x.u16 = 0x7f00
 		if (u8[A0 + 0x30] != 0)
 		{
-			u16[0xffffb042] = 0
-			u8[0xffffb02e] = 0
+			u16[0xffffb000 + 0x42] = 0
+			u8[0xffffb000 + 0x2e] = 0
 		}
 		if (u8[A0 + 0x31] != 0)
 		{
-			u16[0xffffb08c] = 0
-			u8[0xffffb078] = 0
+			u16[0xffffb04a + 0x42] = 0
+			u8[0xffffb04a + 0x2e] = 0
 		}
 	}
 
@@ -89,13 +89,13 @@ function void fn03f572()
 		objA0.position.x.u16 = 0x7f00
 		if (u8[A0 + 0x30] != 0)
 		{
-			u16[0xffffb042] = 0
-			u8[0xffffb02e] = 0
+			u16[0xffffb000 + 0x42] = 0
+			u8[0xffffb000 + 0x2e] = 0
 		}
 		if (u8[A0 + 0x31] != 0)
 		{
-			u16[0xffffb08c] = 0
-			u8[0xffffb078] = 0
+			u16[0xffffb04a + 0x42] = 0
+			u8[0xffffb04a + 0x2e] = 0
 		}
 	}
 

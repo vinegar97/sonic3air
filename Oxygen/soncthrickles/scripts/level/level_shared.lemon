@@ -201,7 +201,7 @@ function void UpdateScreenShake()
 {
 	camera.screenshake.prev_offset = camera.screenshake.offset
 	D1 = 0
-	if (u8[0xffffb005] < 0x06 && camera.screenshake.state != 0)
+	if (u8[0xffffb000 + 0x05] < 0x06 && camera.screenshake.state != 0)
 	{
 		if ((camera.screenshake.state & 0x8000) == 0)
 		{
@@ -361,7 +361,7 @@ function void TriggerNextZone()
 
 	if (Game.getSetting(SETTING_MAINTAIN_SHIELDS))
 	{
-		global.shields_backup_1 = u8[0xffffb02b] & 0x71
+		global.shields_backup_1 = u8[0xffffb000 + 0x2b] & 0x71
 	}
 #endif
 

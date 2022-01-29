@@ -34,7 +34,7 @@ function void DebugMode.Enter()
 		debug_mode.backup.sprite_attributes = char.sprite_attributes
 	}
 	D0.u16 = level.height.bitmask
-	u16[0xffffb014] &= D0.u16
+	u16[0xffffb000 + 0x14] &= D0.u16
 	camera.position.y.u16 &= D0.u16
 	player1.camera_lock = 0
 	u16[0xfffff7c8] = 0
@@ -324,7 +324,7 @@ function bool updateDebugModeInput(bool playingAsTails)
 
 		#if STANDALONE
 			// Stop vertical movement to make things better controllable
-			s16[0xffffb01a] = 0
+			s16[0xffffb000 + 0x1a] = 0
 		#endif
 	}
 

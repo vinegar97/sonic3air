@@ -520,7 +520,7 @@ function void fn076e5c()
 	{
 		objA1.update_address = 0x0863c0
 	}
-	if (u16[0xffffb010] >= 0x43a0)
+	if (u16[0xffffb000 + 0x10] >= 0x43a0)
 	{
 		objA0.flags38 |= 0x08
 	}

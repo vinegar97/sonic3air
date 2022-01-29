@@ -78,8 +78,8 @@ function void fn0400f0()
 				// Fix for bug when Tails carries other player and gets caught by the quicksand
 				if (u8[A1 + 0x38] == CHARACTER_TAILS && tails.carrying)
 				{
-					u8[0xffffb02a] |= char.flag.IN_AIR
-					u8[0xffffb02e] = 0
+					u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
+					u8[0xffffb000 + 0x2e] = 0
 				}
 			#endif
 			}

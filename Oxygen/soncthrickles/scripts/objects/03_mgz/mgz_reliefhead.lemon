@@ -51,10 +51,10 @@ function void fn03438e()
 {
 	if (u8[A0 + 0x34] == 0)
 	{
-		D0.u16 = u16[0xffffb010] - objA0.position.x.u16 + u16[A0 + 0x30]
+		D0.u16 = u16[0xffffb000 + 0x10] - objA0.position.x.u16 + u16[A0 + 0x30]
 		if (D0.u16 < 0xc0)
 		{
-			D0.u16 = u16[0xffffb014] - objA0.position.y.u16 + 0x80
+			D0.u16 = u16[0xffffb000 + 0x14] - objA0.position.y.u16 + 0x80
 			if (D0.u16 < 0xc0)
 			{
 				if (objA0.state == 0)

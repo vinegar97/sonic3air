@@ -29,7 +29,7 @@ function void fn04808e()
 //# address-hook(0x0480d4) end(0x04819c)
 function void fn0480d4()
 {
-	D0.u16 = u16[0xffffb014] - objA0.position.y.u16
+	D0.u16 = u16[0xffffb000 + 0x14] - objA0.position.y.u16
 	if (D0.s16 >= 0)
 	{
 		if (D0.s16 >= 0x20 && u16[A0 + 0x34] != objA0.value32)

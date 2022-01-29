@@ -210,7 +210,7 @@ function void fn02ca7c()
 //# address-hook(0x02cae4)
 function void fn02cae4()
 {
-	D0.u16 = objA0.position.x.u16 - u16[0xffffb010]
+	D0.u16 = objA0.position.x.u16 - u16[0xffffb000 + 0x10]
 	if (D0.s16 >= 0)
 	{
 		D0.u16 -= 0x180

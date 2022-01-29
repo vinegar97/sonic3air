@@ -182,8 +182,8 @@ function void Character.Initialization.shared(u8 character)
 		}
 		else
 		{
-			char.sprite_attributes = 0x06a0 | (u16[0xffffb00a] & 0x8000)
-			char.layer_flags = u16[0xffffb046]
+			char.sprite_attributes = 0x06a0 | (u16[0xffffb000 + 0x0a] & 0x8000)
+			char.layer_flags = u16[0xffffb000 + 0x46]
 		}
 
 		super.active.tails = 0
@@ -988,8 +988,8 @@ function void Tails.UpdateCarrySonic()
 					A2 = backupA2
 				}
 
-				s16[0xffffb018] = char.velocity.x
-				s16[0xffffb01a] = char.velocity.y
+				s16[0xffffb000 + 0x18] = char.velocity.x
+				s16[0xffffb000 + 0x1a] = char.velocity.y
 				tails.carried_velocity_x = char.velocity.x
 				tails.carried_velocity_y = char.velocity.y
 
@@ -1060,7 +1060,7 @@ function void Tails.CheckCatchSonic()
 		return
 
 	// Also no grabbing if player 1 is standing on the ground and Tails not manually controlled
-	if ((u8[0xffffb02a] & char.flag.IN_AIR) == 0 && tails.control_counter == 0)
+	if ((u8[0xffffb000 + 0x2a] & char.flag.IN_AIR) == 0 && tails.control_counter == 0)
 		return
 #endif
 
@@ -2818,7 +2818,7 @@ function bool onCharacterPressedJumpInMidAir(u8 input_state, u8 input_pressed)
 		if (Game.getSetting(SETTING_TAILS_ASSIST_MODE) != 0 && (input_state & CONTROL_UP))
 		{
 			// Tails must be AI controlled and not too far away
-			if (tails.control_counter == 0 && tails.ai_routine == 0x06 && abs(s16[0xffffb05a] - s16[0xffffb010]) < 0xc0 && abs(s16[0xffffb05e] - s16[0xffffb014] + 0x40) < 0x80)
+			if (tails.control_counter == 0 && tails.ai_routine == 0x06 && abs(s16[0xffffb04a + 0x10] - s16[0xffffb000 + 0x10]) < 0xc0 && abs(s16[0xffffb04a + 0x14] - s16[0xffffb000 + 0x14] + 0x40) < 0x80)
 			{
 				// Tails must not already be flying already, and ready for flying
 				if (u8[0xffffb04a + 0x20] == char.state.ROLLING && u8[0xffffb04a + 0x40] == 1)	// char.jumping must be set
@@ -5011,7 +5011,7 @@ function void Character.OnCollisionWithDynamicObject()
 		{
 			// Collect ring, but only after 30 invulnerability frames
 			//  -> Remember that the "char.invuln.countdown" timer starts at 120
-			u8 timer = competition_mode.active ? char.invuln.countdown : u8[0xffffb034]
+			u8 timer = competition_mode.active ? char.invuln.countdown : u8[0xffffb000 + 0x34]
 			if (timer < 90)
 			{
 				u8[A1 + 0x05] = 0x04
@@ -5594,13 +5594,13 @@ function void fn01059c()
 	{
 		if (isMainCharacter(CHARACTER_KNUCKLES))
 		{
-			u16[0xffffb05a] = objA1.position.x.u16
-			u16[0xffffb05e] = objA1.position.y.u16
+			u16[0xffffb04a + 0x10] = objA1.position.x.u16
+			u16[0xffffb04a + 0x14] = objA1.position.y.u16
 		}
 
 		// Why is this done with Tails in the original, or was it meant for Knuckles as main character only?
-		u8[0xffffb06a] = char.state.ROLLING
-		u8[0xffffb074] |= char.flag.IN_AIR
+		u8[0xffffb04a + 0x20] = char.state.ROLLING
+		u8[0xffffb04a + 0x2a] |= char.flag.IN_AIR
 	}
 }
 

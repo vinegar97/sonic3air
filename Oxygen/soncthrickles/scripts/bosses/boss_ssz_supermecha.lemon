@@ -1805,7 +1805,7 @@ function void fn07d1b6()
 //# address-hook(0x07d1ea) end(0x07d214)
 function void fn07d1ea()
 {
-	D0.u16 = u16[0xffffb010] - move_area.left
+	D0.u16 = u16[0xffffb000 + 0x10] - move_area.left
 	D3.u8 = (D0.u16 >= 0xf0) ? 0xff : 0x00
 	D2 = (D0.u16 >= 0xf0) ? 4 : 1
 	if (D0.u16 >= 0x50)

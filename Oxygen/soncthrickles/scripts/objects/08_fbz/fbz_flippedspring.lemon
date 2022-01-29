@@ -26,7 +26,7 @@ function void fn03cb3a()
 //# address-hook(0x03cb66) end(0x03cbc8)
 function void fn03cb66()
 {
-	D0.u16 = u16[0xffffb014] - objA0.position.y.u16
+	D0.u16 = u16[0xffffb000 + 0x14] - objA0.position.y.u16
 	if (D0.s16 >= 0)
 	{
 		if (D0.s16 >= 0x20)

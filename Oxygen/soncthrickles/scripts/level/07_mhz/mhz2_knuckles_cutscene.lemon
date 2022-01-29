@@ -195,7 +195,7 @@ function void fn063280()
 		objA1.update_address = 0x06338e
 	}
 
-	if (u8[0xffffb04e] & 0x80)
+	if (u8[0xffffb04a + 0x04] & 0x80)
 	{
 		if (allocDynamicObjectStd())
 		{

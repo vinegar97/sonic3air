@@ -301,8 +301,8 @@ function void fn024356()
 		fn02438a()
 	}
 
-	u8[A0 + 0x3e] = u8[0xffffb02a]
-	u8[A0 + 0x3f] = u8[0xffffb074]
+	u8[A0 + 0x3e] = u8[0xffffb000 + 0x2a]
+	u8[A0 + 0x3f] = u8[0xffffb04a + 0x2a]
 }
 
 

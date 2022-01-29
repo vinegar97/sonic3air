@@ -1531,7 +1531,7 @@ function void fn04da7e()
 	fn04dea2()
 
 	u32[0xffffb04a] = 0x04d03e
-	u16[0xffffb05e] = 0xc0
+	u16[0xffffb04a + 0x14] = 0xc0
 	u32[0xffffb3c2] = 0x04e0a4
 
 	UpdateGameObjects()

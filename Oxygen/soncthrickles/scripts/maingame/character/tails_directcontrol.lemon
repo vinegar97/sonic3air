@@ -84,7 +84,7 @@ function void fn016340()
 		}
 	}
 
-	if (s8[0xffffb004] >= 0 && u8[0xffffb005] == 0x02)
+	if (s8[0xffffb000 + 0x04] >= 0 && u8[0xffffb000 + 0x05] == 0x02)
 	{
 		A1 = 0xffffb04a
 	#if STANDALONE

@@ -132,7 +132,7 @@ function void fn08b9fa()
 function void fn08ba1c()
 {
 	objA0.value3a = objA0.flags2a
-	u32 backup = u16[0xffffb01a] + (u32(u16[0xffffb064]) << 16)
+	u32 backup = u16[0xffffb000 + 0x1a] + (u32(u16[0xffffb04a + 0x1a]) << 16)
 
 	D1 = 0x23
 	D2 = 0x14

@@ -441,7 +441,7 @@ function void fn062640()
 //# address-hook(0x062678) end(0x0626ac)
 function void fn062678()
 {
-	D0.u16 = u16[0xffffb010]
+	D0.u16 = u16[0xffffb000 + 0x10]
 	if (D0.u16 >= objA0.position.x.u16)
 	{
 		fn0851d8()
@@ -511,8 +511,8 @@ function void fn062778()
 
 	// Knuckles despawns
 	u8[0xfffffaa9] = 0
-	u8[0xffffb02e] = 0		// Reset control_flags
-	u8[0xffffb078] = 0
+	u8[0xffffb000 + 0x2e] = 0		// Reset control_flags
+	u8[0xffffb04a + 0x2e] = 0
 	screenmover_target.right = 0x3b60 + getScreenExtend() * 2
 
 	spawnSimpleChildObjects(0x084b00)

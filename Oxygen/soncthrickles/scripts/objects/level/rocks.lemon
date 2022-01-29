@@ -105,10 +105,10 @@ function void Rocks.Init()
 function void Rocks.Update()
 {
 	u16[A0 + 0x38] = score.bonus_counter
-	u8[A0 + 0x32] = u8[0xffffb020]
-	u8[A0 + 0x33] = u8[0xffffb06a]
-	objA0.value3a = u8[0xffffb02a]
-	objA0.value3b = u8[0xffffb074]
+	u8[A0 + 0x32] = u8[0xffffb000 + 0x20]
+	u8[A0 + 0x33] = u8[0xffffb04a + 0x20]
+	objA0.value3a = u8[0xffffb000 + 0x2a]
+	objA0.value3b = u8[0xffffb04a + 0x2a]
 
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
@@ -347,8 +347,8 @@ function void fn01fcf2()
 //# address-hook(0x01fd08) end(0x01ff1a)
 function void fn01fd08()
 {
-	u16[A0 + 0x30] = u16[0xffffb018]
-	u16[A0 + 0x36] = u16[0xffffb062]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x18]
+	u16[A0 + 0x36] = u16[0xffffb04a + 0x18]
 
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
@@ -533,15 +533,15 @@ function void fn01ff1e()
 	if (objA0.flags2a & 0x08)
 	{
 		objA0.flags2a &= ~0x08
-		u8[0xffffb02a] |= char.flag.IN_AIR
-		u8[0xffffb02a] &= ~char.flag.ON_OBJECT
+		u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
+		u8[0xffffb000 + 0x2a] &= ~char.flag.ON_OBJECT
 	}
 
 	if (objA0.flags2a & 0x10)
 	{
 		objA0.flags2a &= ~0x10
-		u8[0xffffb074] |= char.flag.IN_AIR
-		u8[0xffffb074] &= ~char.flag.ON_OBJECT
+		u8[0xffffb04a + 0x2a] |= char.flag.IN_AIR
+		u8[0xffffb04a + 0x2a] &= ~char.flag.ON_OBJECT
 	}
 }
 
@@ -552,8 +552,8 @@ function void fn01ff1e()
 //# address-hook(0x01ff48) end(0x01fffe)
 function void fn01ff48()
 {
-	u16[A0 + 0x30] = u16[0xffffb01a]
-	u16[A0 + 0x36] = u16[0xffffb064]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x1a]
+	u16[A0 + 0x36] = u16[0xffffb04a + 0x1a]
 
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y

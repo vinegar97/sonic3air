@@ -39,7 +39,7 @@ function void DynamicRing.Update()
 		DynamicRing.UpdateAttraction()
 
 		// Lost lightning shield?
-		if ((u8[0xffffb02b] & char.bonus.SHIELD_LIGHTNING) == 0)
+		if ((u8[0xffffb000 + 0x2b] & char.bonus.SHIELD_LIGHTNING) == 0)
 		{
 			objA0.update_address = 0x01a64a
 			objA0.base_state = 0x02
@@ -108,7 +108,7 @@ function void DynamicRing.FadeOut()
 //# address-hook(0x01a938) end(0x01a98c)
 function void DynamicRing.UpdateAttraction()
 {
-	s16 dx = u16[0xffffb010] - objA0.position.x.u16
+	s16 dx = u16[0xffffb000 + 0x10] - objA0.position.x.u16
 	if (dx < 0)
 	{
 		D1.s16 = -0x30
@@ -127,7 +127,7 @@ function void DynamicRing.UpdateAttraction()
 	}
 	objA0.velocity.x += D1.s16
 
-	s16 dy = u16[0xffffb014] - objA0.position.y.u16
+	s16 dy = u16[0xffffb000 + 0x14] - objA0.position.y.u16
 	#if STANDALONE
 		// Consider level wrap for ring collection
 		if (level.vertical_wrap == 0xff00)
@@ -140,7 +140,7 @@ function void DynamicRing.UpdateAttraction()
 			{
 				objA0.position.y.u16 -= level.height.bitmask
 			}
-			dy = u16[0xffffb014] - objA0.position.y.u16
+			dy = u16[0xffffb000 + 0x14] - objA0.position.y.u16
 		}
 	#endif
 	if (dy < 0)

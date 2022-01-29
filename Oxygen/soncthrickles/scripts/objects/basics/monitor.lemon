@@ -199,7 +199,7 @@ function bool Monitor.enforceClassicShield()
 	}
 	else if (setting == 3)
 	{
-		return (u8[0xffffb02b] & char.bonus.ANY_SHIELD) == 0
+		return (u8[0xffffb000 + 0x2b] & char.bonus.ANY_SHIELD) == 0
 	}
 	return false
 }
@@ -484,19 +484,19 @@ function void MonitorIntact.Opening()
 {
 	if ((objA0.flags2a & 0x28) != 0)
 	{
-		u8[0xffffb02a] &= ~(char.flag.PUSHING | char.flag.ON_OBJECT)
+		u8[0xffffb000 + 0x2a] &= ~(char.flag.PUSHING | char.flag.ON_OBJECT)
 	#if !STANDALONE
 		// No idea why this is added in the original code
 		//  -> It just leads to the bug that you often get stopped by the second monitor if spindashing into multiple monitors next to each other
-		u8[0xffffb02a] |= char.flag.IN_AIR
+		u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
 	#endif
 	}
 
 	if ((objA0.flags2a & 0x50) != 0)
 	{
-		u8[0xffffb074] &= ~(char.flag.PUSHING | char.flag.ON_OBJECT)
+		u8[0xffffb04a + 0x2a] &= ~(char.flag.PUSHING | char.flag.ON_OBJECT)
 	#if !STANDALONE
-		u8[0xffffb074] |= char.flag.IN_AIR
+		u8[0xffffb04a + 0x2a] |= char.flag.IN_AIR
 	#endif
 	}
 
@@ -862,12 +862,12 @@ function void ItemEffect.ApplySuperTransformation()
 	global.move.speedcap = 0x800
 	global.move.acceleration = 0x18
 	global.move.deceleration = 0xc0
-	u8[0xffffb020] = char.state.TRANSFORMING
+	u8[0xffffb000 + 0x20] = char.state.TRANSFORMING
 
 	if (isMainCharacter(CHARACTER_SONIC))
 	{
 		// Sonic
-		u32[0xffffb00c] = 0x146816		// "char.mapping_offset"
+		u32[0xffffb000 + 0x0c] = 0x146816		// "char.mapping_offset"
 		super.active = 0xff
 		global.move.speedcap = 0xa00
 		global.move.acceleration = 0x30
@@ -884,7 +884,7 @@ function void ItemEffect.ApplySuperTransformation()
 	#else
 		super.active.tails = 1
 	#endif
-		u8[0xffffb020] = char.state.TAILS_TRANSFORM
+		u8[0xffffb000 + 0x20] = char.state.TAILS_TRANSFORM
 		global.move.speedcap.tails = 0x800
 		global.move.acceleration.tails = 0x18
 		global.move.deceleration.tails = 0xc0
@@ -899,8 +899,8 @@ function void ItemEffect.ApplySuperTransformation()
 	#endif
 	}
 
-	u8[0xffffb02e] = 0x81
-	u8[0xffffb035] = 0
+	u8[0xffffb000 + 0x2e] = 0x81
+	u8[0xffffb000 + 0x35] = 0
 	u8[A1 + 0x2b] |= char.bonus.INVINCIBLE
 
 	playSound(0x9f)

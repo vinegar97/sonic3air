@@ -149,7 +149,7 @@ function void fn049fe4()
 			level.restart.u8 = 1
 			checkpoint.rings = ring_counter
 			checkpoint.lives_granted = extra_lives_granted
-			global.shields_backup_1 = u8[0xffffb02b] & 0x71
+			global.shields_backup_1 = u8[0xffffb000 + 0x2b] & 0x71
 		}
 	}
 }

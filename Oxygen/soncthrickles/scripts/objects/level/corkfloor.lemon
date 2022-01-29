@@ -23,8 +23,8 @@
 //# address-hook(0x02a618) end(0x02a6d0)
 function void CorkFloor.Init()
 {
-	u16[A0 + 0x30] = u16[0xffffb01a]
-	u16[A0 + 0x32] = u16[0xffffb064]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x1a]
+	u16[A0 + 0x32] = u16[0xffffb04a + 0x1a]
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
 	D3.u16 = D2.u16 + 1
@@ -215,8 +215,8 @@ function void fn02a3d0()
 function void fn02a502()
 {
 	u16[A0 + 0x38] = score.bonus_counter
-	u8[A0 + 0x34] = u8[0xffffb020]
-	u8[A0 + 0x36] = u8[0xffffb06a]
+	u8[A0 + 0x34] = u8[0xffffb000 + 0x20]
+	u8[A0 + 0x36] = u8[0xffffb04a + 0x20]
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
 	D3.u16 = D2.u16 + 1
@@ -316,8 +316,8 @@ function void fn02a58e()
 function void fn02a6d4()
 {
 	u16[A0 + 0x38] = score.bonus_counter
-	u8[A0 + 0x34] = u8[0xffffb020]
-	u8[A0 + 0x36] = u8[0xffffb06a]
+	u8[A0 + 0x34] = u8[0xffffb000 + 0x20]
+	u8[A0 + 0x36] = u8[0xffffb04a + 0x20]
 	A2 = 0x02a894
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
@@ -334,7 +334,7 @@ function void fn02a6d4()
 		bool goto02a762 = false
 		if (u8[A0 + 0x34] == 0x02)
 		{
-			if (s8[A0 + 0x2c] < 0 || u8[0xffffb046] == 0x0e)
+			if (s8[A0 + 0x2c] < 0 || u8[0xffffb000 + 0x46] == 0x0e)
 			{
 				goto02a762 = true
 			}
@@ -342,11 +342,11 @@ function void fn02a6d4()
 
 		if (!goto02a762)
 		{
-			u8[0xffffb046] = 0x0c
-			u8[0xffffb047] = 0x0d
+			u8[0xffffb000 + 0x46] = 0x0c
+			u8[0xffffb000 + 0x47] = 0x0d
 			if (u8[A0 + 0x36] == 0x02)
 			{
-				if (s8[A0 + 0x2c] < 0 || u8[0xffffb090] == 0x0e)
+				if (s8[A0 + 0x2c] < 0 || u8[0xffffb04a + 0x46] == 0x0e)
 				{
 					goto02a762 = true
 				}
@@ -367,8 +367,8 @@ function void fn02a6d4()
 		}
 		else
 		{
-			u8[0xffffb090] = 0x0c
-			u8[0xffffb091] = 0x0d
+			u8[0xffffb04a + 0x46] = 0x0c
+			u8[0xffffb04a + 0x47] = 0x0d
 			DrawOrUnloadObject()
 		}
 	}
@@ -386,7 +386,7 @@ function void fn02a6d4()
 
 			if (u8[A0 + 0x36] == 0x02)
 			{
-				if (s8[A0 + 0x2c] < 0 || u8[0xffffb090] == 0x0e)
+				if (s8[A0 + 0x2c] < 0 || u8[0xffffb04a + 0x46] == 0x0e)
 				{
 					A1 = 0xffffb04a
 					fn02a7b6()
@@ -394,14 +394,14 @@ function void fn02a6d4()
 				}
 			}
 
-			u8[0xffffb090] = 0x0c
-			u8[0xffffb091] = 0x0d
+			u8[0xffffb04a + 0x46] = 0x0c
+			u8[0xffffb04a + 0x47] = 0x0d
 		}
 		else
 		{
 			if (u8[A0 + 0x34] == 0x02)
 			{
-				if (s8[A0 + 0x2c] < 0 || u8[0xffffb046] == 0x0e)
+				if (s8[A0 + 0x2c] < 0 || u8[0xffffb000 + 0x46] == 0x0e)
 				{
 					A1 = 0xffffb000
 					fn02a7b6()
@@ -410,8 +410,8 @@ function void fn02a6d4()
 				}
 			}
 
-			u8[0xffffb046] = 0x0c
-			u8[0xffffb047] = 0x0d
+			u8[0xffffb000 + 0x46] = 0x0c
+			u8[0xffffb000 + 0x47] = 0x0d
 		}
 		DrawOrUnloadObject()
 	}

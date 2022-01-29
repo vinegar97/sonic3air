@@ -26,8 +26,8 @@ function void InitLevelTiles.ICZ1()
 			if (allocDynamicObjectStd())
 			{
 				objA1.update_address = 0x053ad4
-				u16[0xffffb010] = 0x3640
-				u16[0xffffb014] = 0x0660
+				u16[0xffffb000 + 0x10] = 0x3640
+				u16[0xffffb000 + 0x14] = 0x0660
 				camera.foreground.x.u16 = 0x35a0
 				camera.position.x.u16 = 0x35a0
 				camera.foreground.y.u16 = 0x05fb
@@ -650,10 +650,10 @@ function void ICZ1.TransitionToOutdoorArea()
 
 		D0.u16 = 0x6880
 		D1.u16 = 0xff00
-		u16[0xffffb010] -= D0.u16
-		u16[0xffffb014] -= D1.u16
-		u16[0xffffb05a] -= D0.u16
-		u16[0xffffb05e] -= D1.u16
+		u16[0xffffb000 + 0x10] -= D0.u16
+		u16[0xffffb000 + 0x14] -= D1.u16
+		u16[0xffffb04a + 0x10] -= D0.u16
+		u16[0xffffb04a + 0x14] -= D1.u16
 		fn04f3b0()
 		fn04f3a0()
 

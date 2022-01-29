@@ -61,7 +61,7 @@ function void fn062528()
 
 	control.player1 = 0
 	player1.control_override = 0xff
-	u8[0xffffb02e] = 0x80
+	u8[0xffffb000 + 0x2e] = 0x80
 	fn065dd6()
 
 #if STANDALONE
@@ -88,7 +88,7 @@ function void fn06254e()
 function void fn06256c()
 {
 	control.player1 = 0x0808
-	if (u16[0xffffb010] < 0x4760)
+	if (u16[0xffffb000 + 0x10] < 0x4760)
 		return
 
 	objA0.base_state = 0x06

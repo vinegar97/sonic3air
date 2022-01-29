@@ -83,7 +83,7 @@ function void fn038464()
 //# address-hook(0x0384b2) end(0x03852e)
 function void RunOnWaterHandler.Update()
 {
-	objA0.position.x.u16 = u16[0xffffb010]
+	objA0.position.x.u16 = u16[0xffffb000 + 0x10]
 	objA0.position.y.u16 = water.height.current
 	fn038534()
 

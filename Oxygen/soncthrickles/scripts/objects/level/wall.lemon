@@ -159,8 +159,8 @@ function void fn02131c()
 //# address-hook(0x021568) end(0x021690)
 function void fn021568()
 {
-	u16[A0 + 0x30] = u16[0xffffb018]
-	objA0.value32 = u16[0xffffb062]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x18]
+	objA0.value32 = u16[0xffffb04a + 0x18]
 
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
@@ -238,10 +238,10 @@ function void fn021568()
 		if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
 		{
 			// Prevent slope glitch here for player 1
-			if ((u8[0xffffb02a] & char.flag.ON_OBJECT) && u16[0xffffb042] == A0.u16)
+			if ((u8[0xffffb000 + 0x2a] & char.flag.ON_OBJECT) && u16[0xffffb000 + 0x42] == A0.u16)
 			{
-				u8[0xffffb02a] &= ~char.flag.ON_OBJECT
-				u8[0xffffb02a] |= char.flag.IN_AIR
+				u8[0xffffb000 + 0x2a] &= ~char.flag.ON_OBJECT
+				u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
 			}
 		}
 	#endif
@@ -298,7 +298,7 @@ function void fn02165a()
 	if (global.zone == 0x02)
 	{
 		// Needed in MGZ to prevent Knuckles from a complete stop, when he uses a spinning top to break the wall
-		u8[0xffffb037] &= ~0x40
+		u8[0xffffb000 + 0x37] &= ~0x40
 	}
 #endif
 }
@@ -375,8 +375,8 @@ function void fn02172e()
 {
 	// Used for the MGZ wall variant that is only breakable by spinning top
 
-	u16[A0 + 0x30] = u16[0xffffb018]
-	objA0.value32 = u16[0xffffb062]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x18]
+	objA0.value32 = u16[0xffffb04a + 0x18]
 
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
@@ -453,8 +453,8 @@ function void fn0217ee()
 //# address-hook(0x021818) end(0x021936)
 function void fn021818()
 {
-	u16[A0 + 0x30] = u16[0xffffb018]
-	objA0.value32 = u16[0xffffb062]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x18]
+	objA0.value32 = u16[0xffffb04a + 0x18]
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
 	D3.u16 = D2.u16 + 1

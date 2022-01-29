@@ -71,7 +71,7 @@ function void fn0821fc()
 	if (D0.u8 == 0x20)
 	{
 		D1 = 0
-		D2.u16 = objA0.position.y.u16 - u16[0xffffb014]
+		D2.u16 = objA0.position.y.u16 - u16[0xffffb000 + 0x14]
 		D3.u8 = (D2.s16 < 0) ? 0xff : 0x00
 		D2.u16 = abs(D2.s16)
 		if (D2.u16 >= 0x10)

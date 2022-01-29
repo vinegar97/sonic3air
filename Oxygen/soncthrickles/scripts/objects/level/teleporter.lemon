@@ -361,7 +361,7 @@ function void fn045b94()
 	if (global.characters == CHARS_KNUCKLES_ALONE)
 	{
 		// Knuckles' HPZ teleporter
-		if (camera.position.y.u16 >= 0x0240 || u16[0xffffb010] < 0x0b00)
+		if (camera.position.y.u16 >= 0x0240 || u16[0xffffb000 + 0x10] < 0x0b00)
 			return
 
 		playMusic(MUSIC_CTRL_FADEOUT)

@@ -26,8 +26,8 @@ function void fn041702()
 //# address-hook(0x04172e) end(0x0417a4)
 function void fn04172e()
 {
-	u8[A0 + 0x30] = u8[0xffffb020]
-	u8[A0 + 0x31] = u8[0xffffb06a]
+	u8[A0 + 0x30] = u8[0xffffb000 + 0x20]
+	u8[A0 + 0x31] = u8[0xffffb04a + 0x20]
 	D1.u16 = 0x23
 	D2.u16 = 0x10
 	D3.u16 = 0x11

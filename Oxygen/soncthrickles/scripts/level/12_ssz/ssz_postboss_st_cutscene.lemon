@@ -368,7 +368,7 @@ function void fn0581f2()
 function void fn05821e()
 {
 	D0.u16 = objA0.position.y.u16 - 0x24
-	if (D0.u16 >= u16[0xffffb014])
+	if (D0.u16 >= u16[0xffffb000 + 0x14])
 	{
 		fn0583a0()
 	}
@@ -404,7 +404,7 @@ function void fn058260()
 		if (D1.u8 != 0)
 		{
 			D0.u16 -= 0x2c
-			if (D0.u16 < u16[0xffffb014])
+			if (D0.u16 < u16[0xffffb000 + 0x14])
 			{
 				DrawObject()
 			}
@@ -426,7 +426,7 @@ function void fn058260()
 		D0.u16 -= 0x1c
 	}
 
-	if (D0.u16 >= u16[0xffffb014])
+	if (D0.u16 >= u16[0xffffb000 + 0x14])
 	{
 		++objA0.animation.sprite
 		if (allocDynamicObjectAfterA0())
@@ -466,7 +466,7 @@ function void fn0582d8()
 		if (D1.u8 != 0)
 		{
 			D0.u16 -= 0x2c
-			if (D0.u16 < u16[0xffffb014])
+			if (D0.u16 < u16[0xffffb000 + 0x14])
 			{
 				DrawObject()
 			}
@@ -488,7 +488,7 @@ function void fn0582d8()
 		D0.u16 -= 0x1c
 	}
 
-	if (D0.u16 >= u16[0xffffb014])
+	if (D0.u16 >= u16[0xffffb000 + 0x14])
 	{
 		++objA0.animation.sprite
 		if (allocDynamicObjectAfterA0())
@@ -538,7 +538,7 @@ function void fn058360()
 function void fn05838c()
 {
 	D0.u16 = objA0.position.y.u16 - 0x24
-	if (D0.u16 < u16[0xffffb014])
+	if (D0.u16 < u16[0xffffb000 + 0x14])
 	{
 		DrawObject()
 	}
@@ -597,7 +597,7 @@ function void fn0583d2()
 	}
 	else
 	{
-		D0.u16 = u16[0xffffb014]
+		D0.u16 = u16[0xffffb000 + 0x14]
 		if (D0.u16 >= 0x4000)
 			D0.u16 = 0x05c0
 		D0.u16 += 0x0198

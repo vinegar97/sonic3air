@@ -31,8 +31,8 @@ function void fn08b370()
 //# address-hook(0x08b384) end(0x08b3a4)
 function void fn08b384()
 {
-	objA0.value3a = u8[0xffffb020]
-	objA0.value3b = u8[0xffffb06a]
+	objA0.value3a = u8[0xffffb000 + 0x20]
+	objA0.value3b = u8[0xffffb04a + 0x20]
 
 	D1 = 0x23
 	D2 = 0x10

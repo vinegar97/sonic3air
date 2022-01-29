@@ -278,8 +278,8 @@ function void fn056caa()
 
 		D0.u16 = 0x2c00
 		D1 = 0
-		u16[0xffffb010] -= D0.u16
-		u16[0xffffb05a] -= D0.u16
+		u16[0xffffb000 + 0x10] -= D0.u16
+		u16[0xffffb04a + 0x10] -= D0.u16
 		fn04f3b0()
 
 		camera.position.x.u16 -= D0.u16
@@ -365,8 +365,8 @@ function void fn056dca()
 {
 	// This function changes the level.scrolling_routine depending on the player's position
 	A1 = 0x056f88
-	D0.u16 = u16[0xffffb010]
-	D1.u16 = u16[0xffffb014]
+	D0.u16 = u16[0xffffb000 + 0x10]
+	D1.u16 = u16[0xffffb000 + 0x14]
 	D2 = 0
 	for (u8 i = 0; i < 3; ++i)
 	{
@@ -1571,7 +1571,7 @@ function void fn059f00()
 	if (camera.position.x.u16 >= 0x0bbf - (getScreenWidth() - 320))
 	{
 		D2 = 0
-		if (u16[0xffffb010] >= 0x0c50)
+		if (u16[0xffffb000 + 0x10] >= 0x0c50)
 		{
 			move_area.left = 0x0a00
 			move_area.right = 0x0bc0

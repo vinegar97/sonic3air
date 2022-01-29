@@ -91,7 +91,7 @@ function void fn0634ca()
 		return
 
 	objA0.countdown_value = 0xef
-	u8[0xffffb02e] = 0x83
+	u8[0xffffb000 + 0x2e] = 0x83
 
 #if STANDALONE
 	Game.startSkippableCutscene()
@@ -316,11 +316,11 @@ function void fn06364e()
 	{
 		u32 backupA0 = A0
 
-		u16[0xffffb010] = objA0.position.x.u16
-		u16[0xffffb014] = objA0.position.y.u16
-		s16[0xffffb018] = objA0.velocity.x
-		s16[0xffffb01c] = objA0.velocity.x
-		u8[0xffffb02e] = 0
+		u16[0xffffb000 + 0x10] = objA0.position.x.u16
+		u16[0xffffb000 + 0x14] = objA0.position.y.u16
+		s16[0xffffb000 + 0x18] = objA0.velocity.x
+		s16[0xffffb000 + 0x1c] = objA0.velocity.x
+		u8[0xffffb000 + 0x2e] = 0
 
 		// Give Knuckles another update, to make sure he's rendered this frame at all
 		A0 = 0xffffb000

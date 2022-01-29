@@ -26,7 +26,7 @@ function void fn053ad4()
 	objA0.position.x.u16 = 0x3640
 	objA0.position.y.u16 = 0x0670
 	objA0.animation.sprite = 0x1a
-	objA0.value3e = u16[0xffffb014]
+	objA0.value3e = u16[0xffffb000 + 0x14]
 	u16[A0 + 0x3c] = A1.u16
 
 	objA1.update_address = 0x0459b4

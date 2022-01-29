@@ -39,7 +39,7 @@ function void Shield.sharedInit()
 	objA0.box_size.y = 0x18
 	objA0.sprite_attributes = 0x079c
 	objA0.shield.targetInVRAM = 0xf380
-	if (u8[0xffffb00a] & 0x80)
+	if (u8[0xffffb000 + 0x0a] & 0x80)
 		u8[A0 + 0x0a] |= 0x80
 	objA0.state.both = 0x01
 	objA0.shield.animation.sprite.backup = 0xff

@@ -627,7 +627,7 @@ function void fn05c814()
 //# address-hook(0x05c82c) end(0x05c832)
 function void fn05c82c()
 {
-	u8[0xffffcc0e] &= ~0x04
+	u8[0xffffcc0a + 0x04] &= ~0x04
 	UnloadObject()
 }
 

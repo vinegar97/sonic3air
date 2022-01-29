@@ -64,7 +64,7 @@ function void fn042028()
 		}
 	}
 
-	if (u16[0xffffb014] >= 0x06c0)
+	if (u16[0xffffb000 + 0x14] >= 0x06c0)
 	{
 		objA0.update_address = 0x0420a6
 	}

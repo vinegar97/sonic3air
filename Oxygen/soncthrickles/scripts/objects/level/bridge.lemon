@@ -126,15 +126,15 @@ function void fn0387b6()
 
 	#if STANDALONE
 		// Change characters to the falling animations (used in HCZ 2 Knuckles cutscene)
-		if (u8[0xffffb020] == char.state.RUNNING || u8[0xffffb020] == char.state.STANDING)
+		if (u8[0xffffb000 + 0x20] == char.state.RUNNING || u8[0xffffb000 + 0x20] == char.state.STANDING)
 		{
-			u8[0xffffb020] = char.state.FALLING_PANIC
-			u8[0xffffb02a] |= char.flag.IN_AIR
+			u8[0xffffb000 + 0x20] = char.state.FALLING_PANIC
+			u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
 		}
-		if (u8[0xffffb06a] == char.state.RUNNING || u8[0xffffb06a] == char.state.STANDING)
+		if (u8[0xffffb04a + 0x20] == char.state.RUNNING || u8[0xffffb04a + 0x20] == char.state.STANDING)
 		{
-			u8[0xffffb06a] = char.state.FALLING_PANIC
-			u8[0xffffb074] |= char.flag.IN_AIR
+			u8[0xffffb04a + 0x20] = char.state.FALLING_PANIC
+			u8[0xffffb04a + 0x2a] |= char.flag.IN_AIR
 		}
 	#endif
 	}
@@ -243,14 +243,14 @@ function void fn03890c()
 	if (objA0.flags2a & 0x08)
 	{
 		objA0.flags2a &= ~0x08
-		u8[0xffffb02a] &= ~0x08
-		u8[0xffffb02a] |= 0x02
+		u8[0xffffb000 + 0x2a] &= ~0x08
+		u8[0xffffb000 + 0x2a] |= 0x02
 	}
 	if (objA0.flags2a & 0x10)
 	{
 		objA0.flags2a &= ~0x10
-		u8[0xffffb074] &= ~0x08
-		u8[0xffffb074] |= 0x02
+		u8[0xffffb04a + 0x2a] &= ~0x08
+		u8[0xffffb04a + 0x2a] |= 0x02
 	}
 	UnloadObject()
 }
@@ -514,14 +514,14 @@ function void fn038c12()
 	D4 = 0xfffffffe
 
 	D0.u16 = objA0.flags2a & 0x08
-	if (D0.u16 != 0 && u16[0xffffb018] != 0)
+	if (D0.u16 != 0 && u16[0xffffb000 + 0x18] != 0)
 	{
 		D0.u8 = u8[A0 + 0x3f]
 		fn038c8e()
 	}
 
 	D0.u16 = objA0.flags2a & 0x10
-	if (D0.u16 != 0 && u16[0xffffb062] != 0)
+	if (D0.u16 != 0 && u16[0xffffb04a + 0x18] != 0)
 	{
 		D0.u8 = objA0.value3b
 		fn038c8e()

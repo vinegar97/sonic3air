@@ -203,7 +203,7 @@ function void fn090926()
 		global.in_extra_stage = 1
 		global.sk_bluespheres = 1
 		checkpoint.number = level.backup.checkpoint
-		global.shields_backup_2 = u8[0xffffb02b]
+		global.shields_backup_2 = u8[0xffffb000 + 0x2b]
 	}
 
 	DrawObject()

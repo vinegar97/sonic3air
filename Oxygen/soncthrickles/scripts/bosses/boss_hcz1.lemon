@@ -396,7 +396,7 @@ function void fn06a24c()
 	control.tails = 0
 	player1.control_override = 0xff
 	player2.control_override = 0xff
-	u8[0xffffb02e] = 0x80
+	u8[0xffffb000 + 0x2e] = 0x80
 
 	fn06a270()
 }

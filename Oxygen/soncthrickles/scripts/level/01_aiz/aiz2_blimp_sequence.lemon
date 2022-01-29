@@ -19,8 +19,8 @@ function void fn0502c6()
 	{
 		D1.u16 = 0x0200
 		u16[0xffffeebc] = D1.u16
-		u16[0xffffb010] -= D1.u16
-		u16[0xffffb05a] -= D1.u16
+		u16[0xffffb000 + 0x10] -= D1.u16
+		u16[0xffffb04a + 0x10] -= D1.u16
 
 	#if STANDALONE
 		// Also update position backup data (e.g. for after-images)

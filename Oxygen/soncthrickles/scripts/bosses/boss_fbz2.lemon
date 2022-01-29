@@ -919,8 +919,8 @@ function void fn067bbc()
 //# address-hook(0x067be6) end(0x067c36)
 function void fn067be6()
 {
-	if (u16[0xffffb010] > objA0.position.x.u16)
-		objA0.render_flags |= 0x01
+	if (u16[0xffffb000 + 0x10] > objA0.position.x.u16)
+		objA0.render_flags |= render_flag.FLIP_X
 	else
 		objA0.render_flags &= ~0x01
 

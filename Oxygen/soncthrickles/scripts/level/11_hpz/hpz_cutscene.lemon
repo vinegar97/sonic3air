@@ -632,15 +632,15 @@ function void fn064964()
 
 #if STANDALONE
 	// Change characters to the falling animations
-	if (u8[0xffffb020] == char.state.RUNNING || u8[0xffffb020] == char.state.STANDING)
+	if (u8[0xffffb000 + 0x20] == char.state.RUNNING || u8[0xffffb000 + 0x20] == char.state.STANDING)
 	{
-		u8[0xffffb020] = char.state.FALLING_PANIC
-		u8[0xffffb02a] |= char.flag.IN_AIR
+		u8[0xffffb000 + 0x20] = char.state.FALLING_PANIC
+		u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
 	}
-	if (u8[0xffffb06a] == char.state.RUNNING || u8[0xffffb06a] == char.state.STANDING)
+	if (u8[0xffffb04a + 0x20] == char.state.RUNNING || u8[0xffffb04a + 0x20] == char.state.STANDING)
 	{
-		u8[0xffffb06a] = char.state.FALLING_PANIC
-		u8[0xffffb074] |= char.flag.IN_AIR
+		u8[0xffffb04a + 0x20] = char.state.FALLING_PANIC
+		u8[0xffffb04a + 0x2a] |= char.flag.IN_AIR
 	}
 #endif
 }

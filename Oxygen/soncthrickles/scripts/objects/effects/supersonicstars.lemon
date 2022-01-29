@@ -23,7 +23,7 @@ function void fn019156()
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
 	objA0.sprite_attributes = 0x079c
-	if (u8[0xffffb00a] & 0x80)
+	if (u8[0xffffb000 + 0x0a] & 0x80)
 		u8[A0 + 0x0a] |= 0x80
 
 	objA0.update_address = 0x0191a4
@@ -42,9 +42,9 @@ function void fn0191a4()
 
 #if STANDALONE
 	// Sonic charging a Super Peel-Out right now?
-	if (u8[0xffffb03d] == 0x80)
+	if (u8[0xffffb000 + 0x3d] == 0x80)
 	{
-		objA0.position.x.u16 += (s16[0xffffb01c] >> 10) * ((u8[0xffffb02a] & char.flag.FACING_LEFT) ? 1 : -1)
+		objA0.position.x.u16 += (s16[0xffffb000 + 0x1c] >> 10) * ((u8[0xffffb000 + 0x2a] & char.flag.FACING_LEFT) ? 1 : -1)
 	}
 #endif
 
@@ -71,20 +71,20 @@ function void fn0191a4()
 
 		if (u8[A0 + 0x35] == 0)
 		{
-			objA0.position.x.u16 = u16[0xffffb010]
-			objA0.position.y.u16 = u16[0xffffb014]
+			objA0.position.x.u16 = u16[0xffffb000 + 0x10]
+			objA0.position.y.u16 = u16[0xffffb000 + 0x14]
 		}
 		DrawObject()
 	}
 	else
 	{
-		if (u8[0xffffb02e] == 0 && abs(s16[0xffffb01c]) >= 0x0800)
+		if (u8[0xffffb000 + 0x2e] == 0 && abs(s16[0xffffb000 + 0x1c]) >= 0x0800)
 		{
 			objA0.animation.sprite = 0
 			u8[A0 + 0x34] = 0x01
 
-			objA0.position.x.u16 = u16[0xffffb010]
-			objA0.position.y.u16 = u16[0xffffb014]
+			objA0.position.x.u16 = u16[0xffffb000 + 0x10]
+			objA0.position.y.u16 = u16[0xffffb000 + 0x14]
 			DrawObject()
 		}
 		else

@@ -470,7 +470,7 @@ function void fn013bf8()
 	if (D2.u8 == 0)
 	{
 		D1.u16 |= D0.u16
-		if (u8[0xffffb005] < 0x06)
+		if (u8[0xffffb000 + 0x05] < 0x06)
 		{
 			bool gainControlNow = false
 		#if STANDALONE
@@ -509,7 +509,7 @@ function void fn013bf8()
 //# address-hook(0x013d4a) end(0x013ec8)
 function void fn013d4a()
 {
-	if (u8[0xffffb005] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= 0x06)
 	{
 		tails.ai_routine = 0x04
 		char.spindash = 0

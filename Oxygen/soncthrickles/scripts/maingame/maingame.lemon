@@ -295,7 +295,7 @@ function void UpdateGamePause()
 		}
 		else
 		{
-			bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb005] <= 0x04) && !competition_mode.active
+			bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb000 + 0x05] <= 0x04) && !competition_mode.active
 			Game.onGamePause(canRestart)
 		}
 	}
@@ -1255,8 +1255,8 @@ function void SetupCharacterAtStartPosition()
 	if (checkpoint.number != 0)
 	{
 		SetupCharacterAtLastCheckpoint()
-		D1.u16 = u16[0xffffb010]
-		D0.u16 = u16[0xffffb014]
+		D1.u16 = u16[0xffffb000 + 0x10]
+		D0.u16 = u16[0xffffb000 + 0x14]
 	}
 	else
 	{
@@ -1264,8 +1264,8 @@ function void SetupCharacterAtStartPosition()
 		A1 += global.zone * 8 + global.act * 4
 		D1 = u16[A1]
 		D0 = u16[A1+2]
-		u16[0xffffb010] = D1.u16
-		u16[0xffffb014] = D0.u16
+		u16[0xffffb000 + 0x10] = D1.u16
+		u16[0xffffb000 + 0x14] = D0.u16
 
 		if (global.zone_act == 0x0000)
 		{
@@ -1273,8 +1273,8 @@ function void SetupCharacterAtStartPosition()
 			{
 				D1.u16 = 0
 				D0.u16 = 0x420
-				u16[0xffffb010] = 0x0040
-				u16[0xffffb014] = 0x0420
+				u16[0xffffb000 + 0x10] = 0x0040
+				u16[0xffffb000 + 0x14] = 0x0420
 				move_area.left = 0
 				move_area.left.target = 0
 				move_area.left.player2 = 0
@@ -1286,8 +1286,8 @@ function void SetupCharacterAtStartPosition()
 				//  -> Camera positions here should be the same as in "fn0634ca"
 				if (Game.getSetting(SETTING_LEVELLAYOUTS) == 2)
 				{
-					u16[0xffffb010] = 0x1830
-					u16[0xffffb014] = 0x0119
+					u16[0xffffb000 + 0x10] = 0x1830
+					u16[0xffffb000 + 0x14] = 0x0119
 					D1.u16 = 0x1768
 					D0.u16 = 0x0090
 					move_area.bottom.current = D0.u16
@@ -1310,8 +1310,8 @@ function void SetupCharacterAtStartPosition()
 			#if STANDALONE
 				if (level.start_location == 1)
 				{
-					u16[0xffffb010] = 0x0018
-					u16[0xffffb014] = 0x0600
+					u16[0xffffb000 + 0x10] = 0x0018
+					u16[0xffffb000 + 0x14] = 0x0600
 					D1.u16 = 0x0018
 					D0.u16 = 0x0600
 				}
@@ -1326,8 +1326,8 @@ function void SetupCharacterAtStartPosition()
 		{
 			if (isMainCharacter(CHARACTER_TAILS))
 			{
-				u16[0xffffb010] = 0x3780
-				u16[0xffffb014] = 0x01e0
+				u16[0xffffb000 + 0x10] = 0x3780
+				u16[0xffffb000 + 0x14] = 0x01e0
 				camera.position.x.u16 = 0x36f0
 				camera.position.y.u16 = 0x0200
 				move_area.left  = 0x35a0
@@ -1346,8 +1346,8 @@ function void SetupCharacterAtStartPosition()
 				if (level.start_location == 1)
 				{
 					// Use Tails' start
-					u16[0xffffb010] = 0x3780
-					u16[0xffffb014] = 0x01e0
+					u16[0xffffb000 + 0x10] = 0x3780
+					u16[0xffffb000 + 0x14] = 0x01e0
 					camera.position.x.u16 = 0x36f0
 					camera.position.y.u16 = 0x0200
 					move_area.left  = 0x35a0
@@ -1369,7 +1369,7 @@ function void SetupCharacterAtStartPosition()
 			if (isMainCharacter(CHARACTER_KNUCKLES) && getNumPlayers() == 2)
 			{
 				// Move Knuckles a bit to the right in LBZ 2 to make space for Tails
-				u16[0xffffb010] += 0x10
+				u16[0xffffb000 + 0x10] += 0x10
 				D1.u16 += 0x10
 			}
 		}
@@ -1443,13 +1443,13 @@ function void SetupCharacterAtLastCheckpoint()
 		checkpoint.number		 = checkpoint.number.backup
 		global.zone_act			 = checkpoint.zone_act
 		global.zone_act.apparent = checkpoint.zone_act.apparent
-		u16[0xffffb010]			 = checkpoint.x
-		u16[0xffffb014]			 = checkpoint.y
+		u16[0xffffb000 + 0x10]			 = checkpoint.x
+		u16[0xffffb000 + 0x14]			 = checkpoint.y
 	#if STANDALONE
 		if (checkpoint.y & 0x8000)
 		{
-			u16[0xffffb014] &= 0x7fff
-			u8[0xffffb02a] |= char.flag.FACING_LEFT
+			u16[0xffffb000 + 0x14] &= 0x7fff
+			u8[0xffffb000 + 0x2a] |= char.flag.FACING_LEFT
 		}
 	#endif
 
@@ -1467,8 +1467,8 @@ function void SetupCharacterAtLastCheckpoint()
 		timer.alldata = checkpoint.time
 		timer.frames = 59
 		--timer.seconds
-		u16[0xffffb00a] = checkpoint.sprite_attr
-		u16[0xffffb046] = checkpoint.layer_flags
+		u16[0xffffb000 + 0x0a] = checkpoint.sprite_attr
+		u16[0xffffb000 + 0x46] = checkpoint.layer_flags
 
 		camera.update_routine = checkpoint.camera_routine
 		move_area.bottom.current = checkpoint.move_area.bottom
@@ -1487,15 +1487,15 @@ function void SetupCharacterAtLastCheckpoint()
 		global.stage_type = 0
 		global.zone_act = level.backup.zone_act
 		global.zone_act.apparent = u16[0xffffff9c]
-		u16[0xffffb010] = u16[0xfffffe4c]
-		u16[0xffffb014] = u16[0xfffffe4e]
+		u16[0xffffb000 + 0x10] = u16[0xfffffe4c]
+		u16[0xffffb000 + 0x14] = u16[0xfffffe4e]
 		ring_counter = u16[0xfffffe50]
 		extra_lives_granted = u8[0xfffffe61]
 		timer.alldata = u32[0xfffffe52]
 		timer.frames = 59
 		--timer.seconds
-		u16[0xffffb00a] = u16[0xfffffe56]
-		u16[0xffffb046] = u16[0xfffffe58]
+		u16[0xffffb000 + 0x0a] = u16[0xfffffe56]
+		u16[0xffffb000 + 0x46] = u16[0xfffffe58]
 
 		camera.update_routine = u8[0xfffffe64]
 		move_area.bottom.current = u16[0xfffffe62]
@@ -1705,7 +1705,7 @@ function void ResetOscillatingNumbers()
 //# address-hook(0x00773c) end(0x007790)
 function void UpdateOscillatingNumbers()
 {
-	if (competition_mode.active == 0 && u8[0xffffb005] >= 0x06)
+	if (competition_mode.active == 0 && u8[0xffffb000 + 0x05] >= 0x06)
 		return
 
 	A1 = 0xfffffe6e
@@ -1824,8 +1824,8 @@ function void fn0067ee()
 		if (spawnAITails)
 		{
 			u32[0xffffb04a] = 0x01365c
-			u16[0xffffb05a] = u16[0xffffb010]
-			u16[0xffffb05e] = u16[0xffffb014]
+			u16[0xffffb04a + 0x10] = u16[0xffffb000 + 0x10]
+			u16[0xffffb04a + 0x14] = u16[0xffffb000 + 0x14]
 			tails.ai_routine = 0
 		}
 		else if (isMainCharacter(CHARACTER_TAILS))
@@ -1878,8 +1878,8 @@ function void fn0067ee()
 			if (global.characters == CHARS_SONIC_ALONE)
 			{
 				u32[0xffffb04a] = 0x01365c
-				u16[0xffffb05a] = u16[0xffffb010]
-				u16[0xffffb05e] = u16[0xffffb014]
+				u16[0xffffb04a + 0x10] = u16[0xffffb000 + 0x10]
+				u16[0xffffb04a + 0x14] = u16[0xffffb000 + 0x14]
 				tails.ai_routine = 0
 			}
 			else if (isMainCharacter(CHARACTER_TAILS))
@@ -2037,9 +2037,9 @@ function void InitializeGameCharacters()
 		fn006bd8()
 
 		u32[0xffffb000] = D1
-		u8[0xffffb038] = competition_mode.character.player1
-		u16[0xffffb05a] = u16[0xffffb010]
-		u16[0xffffb05e] = u16[0xffffb014]
+		u8[0xffffb000 + 0x38] = competition_mode.character.player1
+		u16[0xffffb04a + 0x10] = u16[0xffffb000 + 0x10]
+		u16[0xffffb04a + 0x14] = u16[0xffffb000 + 0x14]
 		u32[0xffffcc54] = 0x018f86
 
 		if (competition_mode.multiplay)
@@ -2048,7 +2048,7 @@ function void InitializeGameCharacters()
 			fn006bd8()
 
 			u32[0xffffb04a] = D1
-			u8[0xffffb082] = competition_mode.character.player2
+			u8[0xffffb04a + 0x38] = competition_mode.character.player2
 			u32[0xffffcc9e] = 0x018f86
 		}
 
@@ -2073,7 +2073,7 @@ function void InitializeGameCharacters()
 		// Spawn Tails
 		u32[0xffffb000] = 0x01365c
 		u32[0xffffcc9e] = 0x018b3e
-		u16[0xffffb014] += 4
+		u16[0xffffb000 + 0x14] += 4
 		tails.ai_routine = 0
 	}
 	else if (global.characters == CHARS_KNUCKLES_ALONE)
@@ -2093,8 +2093,8 @@ function void InitializeGameCharacters()
 	if (spawnSecondPlayerTails)
 	{
 		u32[0xffffb04a] = 0x01365c
-		u16[0xffffb05a] = u16[0xffffb010] - 0x20
-		u16[0xffffb05e] = u16[0xffffb014] + 4
+		u16[0xffffb04a + 0x10] = u16[0xffffb000 + 0x10] - 0x20
+		u16[0xffffb04a + 0x14] = u16[0xffffb000 + 0x14] + 4
 		u32[0xffffcc9e] = 0x018b3e
 		tails.ai_routine = 0
 	}
@@ -2131,8 +2131,8 @@ function void fn04b6aa()
 
 	A1 = 0xffff4020
 	A0 = 0x1e4080
-	u16[0xffffb010] = u16[(A0+=2)-2]
-	u16[0xffffb014] = u16[(A0+=2)-2]
+	u16[0xffffb000 + 0x10] = u16[(A0+=2)-2]
+	u16[0xffffb000 + 0x14] = u16[(A0+=2)-2]
 
 	D1 = 0x1f
 	while (D1.s16 >= 0)
@@ -2261,7 +2261,7 @@ function void fn0075d2()
 function void UpdateSpecialScrolling()
 {
 	// Update of auto-scrolling (and similar)
-	if (u8[0xffffb005] < 0x06)
+	if (u8[0xffffb000 + 0x05] < 0x06)
 	{
 		// Call targets:
 		//  - 0x04f366	-> level.special_scrolling == 0x00	-> Default, does nothing at all

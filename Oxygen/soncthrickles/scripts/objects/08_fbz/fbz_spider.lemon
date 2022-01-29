@@ -98,8 +98,8 @@ function void fn03d11e()
 //# address-hook(0x03d1b2) end(0x03d21a)
 function void fn03d1b2()
 {
-	u16[0xffffb010] = objA0.position.x.u16
-	u16[0xffffb014] = objA0.position.y.u16 + 0x10
+	u16[0xffffb000 + 0x10] = objA0.position.x.u16
+	u16[0xffffb000 + 0x14] = objA0.position.y.u16 + 0x10
 
 	if (allocDynamicObjectAfterA0())
 	{
@@ -147,8 +147,8 @@ function void fn03d220()
 	A1 = 0xffff0000 + u16[A0 + 0x3c]
 	objA1.position.x.u16 = objA0.position.x.u16
 	objA1.position.y.u16 = objA0.position.y.u16
-	u16[0xffffb010] = objA0.position.x.u16
-	u16[0xffffb014] = objA0.position.y.u16 + 0x10
+	u16[0xffffb000 + 0x10] = objA0.position.x.u16
+	u16[0xffffb000 + 0x14] = objA0.position.y.u16 + 0x10
 
 	DrawOrUnloadObject()
 }
@@ -201,7 +201,7 @@ function void fn03d278()
 
 	A1 = 0xffff0000 + u16[A0 + 0x3c]
 	objA1.position.x.u16 = objA0.position.x.u16
-	u16[0xffffb010] = objA0.position.x.u16
+	u16[0xffffb000 + 0x10] = objA0.position.x.u16
 
 	DrawOrUnloadObject()
 }

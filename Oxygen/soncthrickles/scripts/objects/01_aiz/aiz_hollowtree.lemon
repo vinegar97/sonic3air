@@ -38,7 +38,7 @@ function void fn01f752()
 		{
 			if (move_area.left != 0x1300)
 			{
-				if (u16[0xffffb010] >= 0x2d00)
+				if (u16[0xffffb000 + 0x10] >= 0x2d00)
 				{
 					move_area.left = 0x1300
 				}
@@ -49,7 +49,7 @@ function void fn01f752()
 			}
 			if (move_area.right != 0x4000)
 			{
-				if (u16[0xffffb010] < 0x2d00)
+				if (u16[0xffffb000 + 0x10] < 0x2d00)
 				{
 					move_area.right = 0x4000
 				}

@@ -104,7 +104,7 @@ function void fn05d8bc()
 		}
 		else
 		{
-			u8[0xffffb020] = 0
+			u8[0xffffb000 + 0x20] = 0
 			if (isMainCharacter(CHARACTER_TAILS))
 			{
 				fn05fcb4()
@@ -234,7 +234,7 @@ function void fn05da74()
 	if (global.characters == CHARS_TAILS_ALONE)
 	{
 		D0.u8 -= 4
-		u8[0xffffcc0e] &= ~0x04
+		u8[0xffffcc0a + 0x04] &= ~0x04
 	}
 	u8[A1 + 0x43] = D0.u8
 	D1.u16 = objA1.position.y.u16
@@ -558,7 +558,7 @@ function void fn05dbf6()
 		objA0.base_state = 0x14
 		objA0.flags2a |= 0x80
 		u8[0xffffeec4] = 0xff
-		u8[0xffffb020] = 0
+		u8[0xffffb000 + 0x20] = 0
 
 		objA0.countdown_value = 0x8f
 	#if STANDALONE
@@ -967,7 +967,7 @@ function void fn05e1c2()
 //# address-hook(0x05e288) end(0x05e2bc)
 function void fn05e288()
 {
-	u8[0xffffcc0e] &= ~0x04
+	u8[0xffffcc0a + 0x04] &= ~0x04
 	fn0847e6()
 
 	UpdateMovementStraightSimple()
@@ -1801,7 +1801,7 @@ function void fn05f6fc()
 //# address-hook(0x05fc8e) end(0x05fc98)
 function void fn05fc8e()
 {
-	u8[0xffffb020] = 0
+	u8[0xffffb000 + 0x20] = 0
 	super.palettefx.frame = 36
 	super.active = 1
 	fn05fc9e()
@@ -1813,7 +1813,7 @@ function void fn05fc9e()
 {
 	super.palettefx.state = 0xff
 	super.palettefx.timer = 0
-	u32[0xffffb00c] = 0x146816
+	u32[0xffffb000 + 0x0c] = 0x146816
 }
 
 
@@ -1941,7 +1941,7 @@ function void fn05fde0()
 //# address-hook(0x05fe10) end(0x05fe18)
 function void fn05fe10()
 {
-	u32[0xffffb00c] = 0x146620
+	u32[0xffffb000 + 0x0c] = 0x146620
 	UnloadObject()
 }
 
@@ -1996,13 +1996,13 @@ function void fn08648c()
 	global.move.speedcap = 0x800
 	global.move.acceleration = 0x18
 	global.move.deceleration = 0xc0
-	u8[0xffffb020] = char.state.TRANSFORMING
+	u8[0xffffb000 + 0x20] = char.state.TRANSFORMING
 
 	if (global.characters == CHARS_TAILS_ALONE)
 	{
 		super.active = 0
 		super.active.tails = 0x01
-		u8[0xffffb020] = char.state.TAILS_TRANSFORM
+		u8[0xffffb000 + 0x20] = char.state.TAILS_TRANSFORM
 		global.move.speedcap.tails = 0x800
 		global.move.acceleration.tails = 0x18
 		global.move.deceleration.tails = 0xc0
@@ -2010,7 +2010,7 @@ function void fn08648c()
 	}
 	else if (global.characters < CHARS_TAILS_ALONE)
 	{
-		u32[0xffffb00c] = 0x146816
+		u32[0xffffb000 + 0x0c] = 0x146816
 		super.active = 0xff
 	#if STANDALONE
 		super.active = (global.super_emeralds == 7) ? 0xff : 0x01
@@ -2025,7 +2025,7 @@ function void fn08648c()
 		u32[0xffffcbc0] = 0x01a494		// After-images effect
 	}
 
-	u8[0xffffb02b] |= 0x02
-	u8[0xffffb02e] = 0x81
-	u8[0xffffb035] = 0
+	u8[0xffffb000 + 0x2b] |= 0x02
+	u8[0xffffb000 + 0x2e] = 0x81
+	u8[0xffffb000 + 0x35] = 0
 }

@@ -165,8 +165,8 @@ function void TitleCard.Appear()
 		unused.player2.total_rings = 0
 		hud.dirty.timer = 0xff
 		hud.dirty.rings = 0xff
-		u8[0xffffb02c] = 30
-		u8[0xffffb076] = 30
+		u8[0xffffb000 + 0x2c] = 30
+		u8[0xffffb04a + 0x2c] = 30
 		PlayMusicAfterLevelResults()
 	}
 

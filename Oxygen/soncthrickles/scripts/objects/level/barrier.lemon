@@ -235,7 +235,7 @@ function void fn02095e()
 			A4 = u32[A0 + 0x30]
 			if ((objA0.subtype2c & 0x80) && (objA0.flags2a & 0x18))
 			{
-				D1.u16 = (objA0.flags2a & 0x08) ? u16[0xffffb010] : u16[0xffffb05a]
+				D1.u16 = (objA0.flags2a & 0x08) ? u16[0xffffb000 + 0x10] : u16[0xffffb04a + 0x10]
 				if (D1.u16 < objA0.position.x.u16)
 				{
 					A4 = objA0.countdown_callback
@@ -280,7 +280,7 @@ function void fn0209d0()
 	if (D0.u8 != 0)
 	{
 		// Query the protection flag set by spinning top
-		D1.u8 = (D0.u8 & 0x08) ? u8[0xffffb037] : u8[0xffffb081]
+		D1.u8 = (D0.u8 & 0x08) ? u8[0xffffb000 + 0x37] : u8[0xffffb04a + 0x37]
 		if (D1.u8 & 0x80)
 		{
 			if (objA0.flags2a & 0x08)
@@ -349,9 +349,9 @@ function void fn020af6()
 				if (D0.u8 != 0)
 				{
 					if (D0.u8 & 0x08)
-						D1.u16 = u16[0xffffb010]
+						D1.u16 = u16[0xffffb000 + 0x10]
 					else
-						D1.u16 = u16[0xffffb05a]
+						D1.u16 = u16[0xffffb04a + 0x10]
 
 					if (D1.u16 < objA0.position.x.u16)
 					{

@@ -270,7 +270,7 @@ function void fn0676ac()
 function void fn0676c6()
 {
 	fn0679b8()
-	if (u16[0xffffb010] < 0x0918)
+	if (u16[0xffffb000 + 0x10] < 0x0918)
 	{
 		Object.CountdownAndTrigger()
 	}
@@ -286,7 +286,7 @@ function void fn0676c6()
 function void fn0676e8()
 {
 	fn0679b8()
-	if (u16[0xffffb010] >= 0x1240)
+	if (u16[0xffffb000 + 0x10] >= 0x1240)
 	{
 		objA0.base_state = 0x1a
 		objA0.position.y.u16 -= 0x20
@@ -298,7 +298,7 @@ function void fn0676e8()
 function void fn067704()
 {
 	fn0679b8()
-	if (u16[0xffffb010] < 0x13d0)
+	if (u16[0xffffb000 + 0x10] < 0x13d0)
 		return
 
 	u8[0xfffff650] = 0xff
@@ -578,7 +578,7 @@ function void fn067a08()
 	else
 	{
 		// Sonic's position gets increased afterwards
-		u16[0xffffb010] += u16[A0 + 0x40]
+		u16[0xffffb000 + 0x10] += u16[A0 + 0x40]
 	}
 }
 

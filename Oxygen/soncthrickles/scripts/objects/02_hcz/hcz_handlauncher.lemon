@@ -48,8 +48,8 @@ function void fn030ad0()
 //# address-hook(0x030b58) end(0x030c00)
 function void fn030b58()
 {
-	u16 dx1 = u16[0xffffb010] - objA0.position.x.u16 + 0x20
-	u16 dx2 = u16[0xffffb05a] - objA0.position.x.u16 + 0x20
+	u16 dx1 = u16[0xffffb000 + 0x10] - objA0.position.x.u16 + 0x20
+	u16 dx2 = u16[0xffffb04a + 0x10] - objA0.position.x.u16 + 0x20
 	if (dx1 >= 0x40 && dx2 >= 0x40)
 	{
 		if (u16[A0 + 0x30] != 0x50)

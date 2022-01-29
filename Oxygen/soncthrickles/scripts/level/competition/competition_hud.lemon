@@ -577,7 +577,7 @@ function void fn037ec2()
 //# address-hook(0x037f1a) end(0x037f3c)
 function void fn037f1a()
 {
-	if (u8[0xffffb02b] & char.bonus.SPEED_UP)
+	if (u8[0xffffb000 + 0x2b] & char.bonus.SPEED_UP)
 	{
 		objA0.animation.sprite = (global.move.speedcap == 0x0c00) ? 1 : 2
 	}
@@ -592,7 +592,7 @@ function void fn037f1a()
 //# address-hook(0x037f42) end(0x037f64)
 function void fn037f42()
 {
-	if (u8[0xffffb075] & char.bonus.SPEED_UP)
+	if (u8[0xffffb04a + 0x2b] & char.bonus.SPEED_UP)
 	{
 		objA0.animation.sprite = (global.move.speedcap.tails == 0x0c00) ? 1 : 2
 	}

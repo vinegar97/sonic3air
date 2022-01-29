@@ -193,8 +193,8 @@ function void Checkpoint.SaveCurrentState()
 	checkpoint.number.backup = checkpoint.number
 	checkpoint.zone_act = global.zone_act
 	checkpoint.zone_act.apparent = global.zone_act.apparent
-	checkpoint.sprite_attr = u16[0xffffb00a]
-	checkpoint.layer_flags = u16[0xffffb046]
+	checkpoint.sprite_attr = u16[0xffffb000 + 0x0a]
+	checkpoint.layer_flags = u16[0xffffb000 + 0x46]
 	checkpoint.rings = ring_counter
 	checkpoint.lives_granted = extra_lives_granted
 	checkpoint.time = timer.alldata
@@ -232,8 +232,8 @@ function void fn02d1cc()
 	u16[0xffffff9c] = global.zone_act.apparent
 	u16[0xfffffe4c] = objA0.position.x.u16
 	u16[0xfffffe4e] = objA0.position.y.u16
-	u16[0xfffffe56] = u16[0xffffb00a]
-	u16[0xfffffe58] = u16[0xffffb046]
+	u16[0xfffffe56] = u16[0xffffb000 + 0x0a]
+	u16[0xfffffe58] = u16[0xffffb000 + 0x46]
 	u16[0xfffffe50] = ring_counter
 	u8[0xfffffe61] = extra_lives_granted
 	u32[0xfffffe52] = timer.alldata
@@ -243,7 +243,7 @@ function void fn02d1cc()
 	u16[0xfffffe5c] = camera.position.y.u16
 	u16[0xfffffe5e] = water.height.next
 	u8[0xfffffe60] = water.fullscreen
-	global.shields_backup_2 = u8[0xffffb02b]
+	global.shields_backup_2 = u8[0xffffb000 + 0x2b]
 }
 
 
@@ -340,7 +340,7 @@ function void fn02d47e()
 			level.restart.u8 = 1
 
 			// Backup of shields active before entering the Special Stage
-			D0.u8 = u8[0xffffb02b] & 0x71
+			D0.u8 = u8[0xffffb000 + 0x2b] & 0x71
 			global.shields_backup_1 = D0.u8
 			global.shields_backup_2 = D0.u8
 			global.in_extra_stage = 1

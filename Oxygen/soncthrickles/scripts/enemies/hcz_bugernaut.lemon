@@ -121,7 +121,7 @@ function void fn087ae6()
 			D0.u16 = objA0.position.x.u16
 			D1.u16 = 0x0200
 			objA0.render_flags |= render_flag.FLIP_X
-			if (D0.u16 < u16[0xffffb010])
+			if (D0.u16 < u16[0xffffb000 + 0x10])
 			{
 				D1.s16 = -D1.s16
 				objA0.render_flags &= ~render_flag.FLIP_X

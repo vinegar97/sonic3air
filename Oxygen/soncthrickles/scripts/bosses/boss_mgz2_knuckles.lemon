@@ -273,7 +273,7 @@ function void fn06c8f4()
 function void fn06c932()
 {
 	D0.u16 = camera.position.x.u16 + getScreenWidth() + 0x10
-	if (D0.u16 <= u16[0xffffb010])
+	if (D0.u16 <= u16[0xffffb000 + 0x10])
 	{
 		fn06d13c()
 	}

@@ -540,7 +540,7 @@ function void fn07e26a()
 	{
 		objA1.update_address = 0x0863c0
 	}
-	if (u16[0xffffb010] >= 0x0140)		// Note that this is *not* referring to the screen width, but an actual fixed position
+	if (u16[0xffffb000 + 0x10] >= 0x0140)		// Note that this is *not* referring to the screen width, but an actual fixed position
 	{
 		objA0.flags38 |= 0x08
 	}
@@ -658,7 +658,7 @@ function void fn07e3ca()
 	{
 		objA0.update_address = 0x07e3ec
 		objA0.countdown_value = 0x24
-		u8[0xffffb00a] &= ~0x80
+		u8[0xffffb000 + 0x0a] &= ~0x80
 	}
 
 	fn07eeee()
@@ -681,7 +681,7 @@ function void fn07e3ec()
 		playSound(0x9f)
 	}
 
-	u16[0xffffb014] -= 0x10
+	u16[0xffffb000 + 0x14] -= 0x10
 	fn07eeee()
 }
 
@@ -743,7 +743,7 @@ function void fn07e4a2()
 	// Slight palette change
 	copyMemory(0xfffffc20, 0x07f01c, 0x20)
 
-	u8[0xffffb02e] = 0
+	u8[0xffffb000 + 0x2e] = 0
 	player1.control_override = 0
 	player2.control_override = 0
 	UnloadObject()
@@ -1527,7 +1527,7 @@ function void fn07eb76()
 //# address-hook(0x07eb8e) end(0x07ebc0)
 function void fn07eb8e()
 {
-	if (u8[0xffffb02a] & 0x08)
+	if (u8[0xffffb000 + 0x2a] & 0x08)
 	{
 		u16[A0 + 0x3c] = u16[A0 + 0x26]
 	}
@@ -1671,8 +1671,8 @@ function void fn07ec64()
 function void fn07ec84()
 {
 	D0.u16 = objA0.position.x.u16
-	D1.s16 = (u16[0xffffb010] > objA0.position.x.u16) ? 0x80 : -0x80
-	D2.u16 = u16[0xffffb010] - objA0.position.x.u16
+	D1.s16 = (u16[0xffffb000 + 0x10] > objA0.position.x.u16) ? 0x80 : -0x80
+	D2.u16 = u16[0xffffb000 + 0x10] - objA0.position.x.u16
 
 	objA0.velocity.x = D1.u16
 	if (objA0.velocity.x != 0)
@@ -1734,7 +1734,7 @@ function void fn07ed6c()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	objA0.position.y.u16 = objA1.position.y.u16
-	D0.u16 = u16[0xffffb010] - objA1.position.x.u16
+	D0.u16 = u16[0xffffb000 + 0x10] - objA1.position.x.u16
 	D1.u16 = objA1.position.x.u16
 	D2.u8 = (D0.s16 < 0) ? 0xff : 0x00
 	D0.u16 = min(abs(D0.s16), 0xa0)

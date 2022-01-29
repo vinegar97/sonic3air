@@ -333,7 +333,7 @@ function void fn06e778()
 	// (which happens in widescreen when having Sonic at the right screen edge during level results)
 	if (camera.position.x.u16 >= 0x4900)
 #else
-	if (u16[0xffffb010] >= 0x4a30)
+	if (u16[0xffffb000 + 0x10] >= 0x4a30)
 #endif
 	{
 		objA0.update_address = 0x06e7b6
@@ -394,10 +394,10 @@ function void fn06e80c()
 {
 #if STANDALONE
 	// Minor tweak: Fade out a little later
-	if (u16[0xffffb014] > camera.position.y.u16)
+	if (u16[0xffffb000 + 0x14] > camera.position.y.u16)
 		return
 #else
-	if (u16[0xffffb014] > camera.position.y.u16 + 0x20)
+	if (u16[0xffffb000 + 0x14] > camera.position.y.u16 + 0x20)
 		return
 #endif
 

@@ -874,8 +874,8 @@ function void fn07caf8()
 		#else
 			objA0.velocity.x = 0x80
 		#endif
-		objA0.render_flags |= 0x01
-		u8[0xffffb004] &= ~0x01
+		objA0.render_flags |= render_flag.FLIP_X
+		u8[0xffffb000 + 0x04] &= ~render_flag.FLIP_X
 	}
 
 	fn0847e6()
