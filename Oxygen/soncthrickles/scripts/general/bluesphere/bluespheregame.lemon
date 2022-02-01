@@ -166,10 +166,10 @@ function void fn04c97e()
 	D2 = 0x07
 	CopyRectToVRAM()
 
-	A1 = 0x04cc62
+	A1 = 0x04cc62	// "GET BLUE SPHERES!"
 	if (bluespheregame.menu_flags == 0)
 	{
-		A1 = 0x04cc36
+		A1 = 0x04cc36	// "NO WAY! NO WAY! NO WAY! NO WAY?"
 		levelselect.characters = CHARS_SONIC_ALONE
 		scrolloffset.y.both = 0xfff0fff8
 	}
@@ -183,8 +183,8 @@ function void fn04c97e()
 	}
 
 	u32[0xffffb000] = 0x04ceaa
-	u32[0xffffb04a] = 0x04da30
-	u32[0xffffb094] = 0x04d986
+	u32[0xffffb04a] = 0x04da30	// Copyright text
+	u32[0xffffb094] = 0x04d986	// Animations for the four characters in background
 	UpdateGameObjects()
 	RenderSprites()
 
@@ -417,7 +417,7 @@ function void fn04ceb6()
 	#if !STANDALONE
 		set_status_register(0x2700)
 	#endif
-		A1 = 0x04cc62
+		A1 = 0x04cc62	// "GET BLUE SPHERES!"
 		D2.u16 = 0x0100
 		D6.u16 = 0x05bf
 		fn05b318()
@@ -433,30 +433,30 @@ function void fn04ceb6()
 //# address-hook(0x04cef8) end(0x04cf80)
 function void fn04cef8()
 {
-	objA0.update_address = 0x04cf82
-	u32[0xffffb1bc] = 0x04d03e
+	objA0.update_address = 0x04cf82	// Controls scrolling the "noway!" text on the top of the screen, as well as player input
+	u32[0xffffb1bc] = 0x04d03e	// Level text and number
 	u16[0xffffb1bc + 0x14] = 0xc0
 	bluespheregame.menu_flags = 0x01
 	bluespheregame.menu_selection = 0
-	u32[0xffffbd4c] = 0x04d64e	// first bumper cursor
-	u32[0xffffbd96] = 0x04d64e	// second bumper cursor
-	u8[0xffffbd96 + 0x04] |= render_flag.FLIP_X	// flip second bumper
+	u32[0xffffbd4c] = 0x04d64e	// First bumper cursor
+	u32[0xffffbd96] = 0x04d64e	// Second bumper cursor
+	u8[0xffffbd96 + 0x04] |= render_flag.FLIP_X	// Flip second bumper
 
 	if (bluespheregame.fully_unlocked != 0)
 	{
 		u16[0xffffb1bc + 0x14] = 0xb0
-		u32[0xffffb534] = 0x04d2f4
+		u32[0xffffb534] = 0x04d2f4	// Active code entry
 		u16[0xffffb534 + 0x14] = 0x0144
-		u32[0xffffb8f6] = 0x04d302
+		u32[0xffffb8f6] = 0x04d302	// Inactive code display
 		u16[0xffffb8f6 + 0x14] = 0x0144
-		u32[0xffffbd02] = 0x04d610
+		u32[0xffffbd02] = 0x04d610	// Text "Start"
 		bluespheregame.menu_selection = 1
 	}
 	else
 	{
 		if (bluespheres.blue_remaining == 0 && bluespheres.rings_remaining == 0)
 		{
-			u32[0xffffb8f6] = 0x04d302
+			u32[0xffffb8f6] = 0x04d302	// Inactive code display
 			u16[0xffffb8f6 + 0x14] = 0x0144
 		}
 	}
@@ -480,7 +480,7 @@ function void fn04cf82()
 			D1 = 0x03
 			while (D1.s16 >= 0)
 			{
-				--u16[A1 + 0x14]
+				--objA1.position.y.u16
 				A1 += 0x4a
 				--D1.s16
 			}
@@ -548,19 +548,20 @@ function void fn04d03e()
 
 	D3.u16 = objA0.position.y.u16 + 0x10
 	A1 = A0
-	u8[A1 + 0x6c] = 0x0a
+	u8[A1 + 0x4a + 0x22] = 0x0a	// Left star sprite
 	D2.u16 = 0xf7
 	D1 = 0x0a
 	while (D1.s16 >= 0)
 	{
+		// Create the stars and digits
 		A1 += 0x4a
-		u32[A1] = 0x04d5b4
-		u16[A1 + 0x10] = D2.u16 + getScreenExtend()
-		u16[A1 + 0x14] = D3.u16
+		objA1.update_address = 0x04d5b4
+		objA1.position.x.u16 = D2.u16 + getScreenExtend()
+		objA1.position.y.u16 = D3.u16
 		D2.u16 += 8
 		--D1.s16
 	}
-	u8[A1 + 0x22] = 0x0b
+	objA1.animation.sprite = 0x0b	// Right star sprite
 
 	objA0.update_address = 0x04d09e
 	fn04d09e()
@@ -578,7 +579,7 @@ function void fn04d09e()
 			D1 = (bluespheregame.current_stage + 1) & 0x07ffffff
 			fn04d13a()
 
-			objA0.animation.sprite = 0
+			objA0.animation.sprite = 0	// "LEVEL"
 			DrawObject()
 			return
 		}
@@ -595,7 +596,7 @@ function void fn04d09e()
 	D1 &= 0x0fffffff
 	fn04d0f6()
 
-	objA0.animation.sprite = 1
+	objA0.animation.sprite = 1	// "STAGE"
 	DrawObject()
 }
 
@@ -822,20 +823,24 @@ function void fn04d268()
 }
 
 
+// Active code entry
+
 //# address-hook(0x04d2f4) end(0x04d300)
 function void fn04d2f4()
 {
 	objA0.update_address = 0x04d3ce
-	D2 = 0x04d5fa
+	D2 = 0x04d5fa	// Active code entry digits
 	fn04d30e()
 }
 
+
+// Inactive code display
 
 //# address-hook(0x04d302) end(0x04d308)
 function void fn04d302()
 {
 	objA0.update_address = 0x04d362
-	D2 = 0x04d5e4
+	D2 = 0x04d5e4	// Inactive code display digits
 	fn04d30e()
 }
 
@@ -849,7 +854,7 @@ function void fn04d30e()
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x14
 	objA0.box_size.y = 0x08
-	objA0.animation.sprite = 2
+	objA0.animation.sprite = 2	// "CODE:"
 
 	A2 = 0x04d2dc
 	A1 = A0
@@ -857,9 +862,9 @@ function void fn04d30e()
 	while (D1.s16 >= 0)
 	{
 		A1 += 0x4a
-		u32[A1] = D2
-		u16[A1 + 0x10] = u16[A2] - 0x0c + getScreenExtend()
-		u16[A1 + 0x14] = objA0.position.y.u16
+		objA1.update_address = D2	// Code digits routine
+		objA1.position.x.u16 = u16[A2] - 0x0c + getScreenExtend()
+		objA1.position.y.u16 = objA0.position.y.u16
 		A2 += 2
 		--D1.s16
 	}
@@ -936,15 +941,15 @@ function void fn04d3ce()
 #endif
 	if (D1 & CONTROL_UP)
 	{
-		--u8[A1 + 0x22]
-		if (u8[A1 + 0x22] == -1)
-			u8[A1 + 0x22] = 9
+		--objA1.animation.sprite
+		if (objA1.animation.sprite == -1)
+			objA1.animation.sprite = 9
 	}
 	if (D1 & CONTROL_DOWN)
 	{
-		++u8[A1 + 0x22]
-		if (u8[A1 + 0x22] >= 10)
-			u8[A1 + 0x22] = 0
+		++objA1.animation.sprite
+		if (objA1.animation.sprite >= 10)
+			objA1.animation.sprite = 0
 	}
 	if (D1 & CONTROL_LEFT)
 	{
@@ -1095,7 +1100,7 @@ function void fn04d5c2()
 
 
 
-// Code display
+// Inactive code display digits
 
 //# address-hook(0x04d5e4) end(0x04d5e6)
 function void fn04d5e4()
@@ -1115,6 +1120,8 @@ function void fn04d5ec()
 	}
 }
 
+
+// Active code entry digits
 
 //# address-hook(0x04d5fa) end(0x04d5fc)
 function void fn04d5fa()
@@ -1148,7 +1155,7 @@ function void fn04d610()
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x14
 	objA0.box_size.y = 0x08
-	objA0.animation.sprite = 0x03
+	objA0.animation.sprite = 0x03	// "START"
 
 	objA0.update_address = 0x04d648
 	fn04d648()
@@ -1228,7 +1235,7 @@ function void fn04d6b8()
 		if (!skipPart)
 		{
 			D1.u16 = 0x40
-			if (D2.s16 < s16[A0 + 0x10])
+			if (D2.s16 < s16(objA0.position.x.u16))
 			{
 				D1.s16 = -D1.s16
 				if (objA0.velocity.x >= 0)
@@ -1262,7 +1269,7 @@ function void fn04d6b8()
 		if (!skipPart)
 		{
 			D1.u16 = 0x80
-			if (D3.s16 < s16[A0 + 0x14])
+			if (D3.s16 < s16(objA0.position.y.u16))
 			{
 				D1.s16 = -D1.s16
 				if (objA0.velocity.y >= 0)
@@ -1356,19 +1363,19 @@ function void fn04d986()
 	D1 = 3
 	while (D1.s16 >= 0)
 	{
-		u32[A1 + 0x0c] = 0x188e7c
-		u16[A1 + 0x0a] = 0x20fe
-		u16[A1 + 0x10] = u16[(A2+=2)-2] + getScreenExtend()
-		u16[A1 + 0x14] = u16[(A2+=2)-2]
+		objA1.mapping_offset = 0x188e7c
+		objA1.sprite_attributes = 0x20fe
+		objA1.position.x.u16 = u16[(A2+=2)-2] + getScreenExtend()
+		objA1.position.y.u16 = u16[(A2+=2)-2]
 		if (bluespheregame.menu_flags != 0 && bluespheregame.fully_unlocked != 0)
 		{
-			u16[A1 + 0x14] -= 0x10
+			objA1.position.y.u16 -= 0x10
 		}
-		u16[A1 + 0x08] = 0x0180
-		u8[A1 + 0x07] = 0x10
-		u8[A1 + 0x06] = 0x10
-		u32[A1] = 0x04d9ec
-		u8[A1 + 0x20] = D1.u8
+		objA1.sprite_priority = 0x0180
+		objA1.box_size.x = 0x10
+		objA1.box_size.y = 0x10
+		objA1.update_address = 0x04d9ec
+		objA1.state = D1.u8
 		D0.u16 = D1.u16 * 2
 
 		// Targets:
@@ -1456,7 +1463,7 @@ function void fn04da7e()
 	Nemesis.loadDataToVRAM(0x0dde34, 0xb7e0)
 	Nemesis.loadDataToVRAM(0x189c7c, 0x32e0)
 
-	A1 = 0x04de88
+	A1 = 0x04de88	// "CONGRATULATIONS!"
 	D2.u16 = 0x030a
 	D6.u16 = 0x85bf
 	fn05b318()
@@ -1467,10 +1474,10 @@ function void fn04da7e()
 
 	bluespheregame.menu_selection = 1
 	u32[0xffffb000] = 0x04def8
-	u32[0xffffb04a] = 0x04df86
-	u32[0xffffb1bc] = 0x04d03e
+	u32[0xffffb04a] = 0x04df86	// Character
+	u32[0xffffb1bc] = 0x04d03e	// Level text and number
 	u16[0xffffb1bc + 0x14] = 0x90
-	u32[0xffffb862] = 0x04e012
+	u32[0xffffb862] = 0x04e012	// Emeralds
 
 	UpdateGameObjects()
 	RenderSprites()
@@ -1530,9 +1537,9 @@ function void fn04da7e()
 
 	fn04dea2()
 
-	u32[0xffffb04a] = 0x04d03e
+	u32[0xffffb04a] = 0x04d03e	// Level text and number
 	u16[0xffffb04a + 0x14] = 0xc0
-	u32[0xffffb3c2] = 0x04e0a4
+	u32[0xffffb3c2] = 0x04e0a4	// "Difficulty" text
 
 	UpdateGameObjects()
 	RenderSprites()
@@ -1638,7 +1645,7 @@ function void fn04df04()
 		#if !STANDALONE
 			set_status_register(0x2700)
 		#endif
-			A1 = 0x04de9a
+			A1 = 0x04de9a	// "PERFECT"
 			D2.u16 = 0x049a
 			D6.u16 = 0x85bf
 			fn05b318()
@@ -1778,15 +1785,15 @@ function void fn04e012()
 	D1 = 6
 	while (D1.s16 >= 0)
 	{
-		u32[A1] = 0x04e074
-		u32[A1 + 0x0c] = 0x04e316
-		u16[A1 + 0x0a] = 0x01dc
-		u16[A1 + 0x08] = 0x80
-		u8[A1 + 0x07] = 0x18
-		u8[A1 + 0x06] = 0x18
+		objA1.update_address = 0x04e074
+		objA1.mapping_offset = 0x04e316
+		objA1.sprite_attributes = 0x01dc
+		objA1.sprite_priority = 0x80
+		objA1.box_size.x = 0x18
+		objA1.box_size.y = 0x18
 		u8[A1 + 0x26] = D0.u8
 		D0.u8 += 0x24
-		u8[A1 + 0x22] = D2.u8
+		objA1.animation.sprite = D2.u8
 		++D2.u8
 		A1 += 0x4a
 		--D1.s16
@@ -1840,10 +1847,10 @@ function void fn04e0a4()
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x28
 	objA0.box_size.y = 0x08
-	objA0.animation.sprite = 0x04
+	objA0.animation.sprite = 0x04	// "DIFFICULTY"
 
 	A1 = A0
-	u8[A1 + 0x6c] = 10
+	u8[A1 + 0x4a + 0x22] = 0x0a	// Left star sprite
 	D2.u16 = 0x0114 + getScreenExtend()
 	D3.u16 = objA0.position.y.u16 + 0x10
 
@@ -1852,13 +1859,13 @@ function void fn04e0a4()
 		// Create the stars and digits
 		//  -> Note that they will get updated in "fn04d1aa"
 		A1 += 0x4a
-		u32[A1] = 0x04e1aa
-		u16[A1 + 0x10] = D2.u16
-		u16[A1 + 0x14] = D3.u16
+		objA1.update_address = 0x04e1aa
+		objA1.position.x.u16 = D2.u16
+		objA1.position.y.u16 = D3.u16
 		D2.u16 += 8
 	}
 
-	u8[A1 + 0x22] = 0x0b
+	objA1.animation.sprite = 0x0b	// Right star sprite
 	u16[A0 + 0x30] = 0x1d
 	objA0.update_address = 0x04e116
 	fn04e116()
@@ -1884,7 +1891,7 @@ function void fn04e116()
 		}
 	}
 
-	objA0.animation.sprite = (bluespheregame.shown_difficulty != 0x0c) ? 4 : 5
+	objA0.animation.sprite = (bluespheregame.shown_difficulty != 12) ? 4 : 5	// "DIFFICULTY" : "DIFFICULTY *MAX*"
 	DrawObject()
 }
 
@@ -1908,10 +1915,12 @@ function void fn04e160()
 		//  - 0x07cff0	-> D1.u16 = 9	-> Master Emerald in perfect screen
 		//  - 0x05face	-> D1.u16 = 10	-> Sonic & Knuckles Logo in perfect screen
 		//  - 0x04e24c	-> D1.u16 = 11	-> Sonic going Super at MAX difficulty
-		u32[A1] = u32[0x04e17a + D1.u16]
+		objA1.update_address = u32[0x04e17a + D1.u16]
 	}
 }
 
+
+// Level number (and stars around) in difficulty screen
 
 //# address-hook(0x04e1aa) end(0x04e1ae)
 function void fn04e1aa()
@@ -1925,7 +1934,7 @@ function void fn04e1aa()
 //# address-hook(0x04e1b4) end(0x04e1be)
 function void fn04e1b4()
 {
-	if (bluespheregame.shown_difficulty != 0x0c)
+	if (bluespheregame.shown_difficulty != 12)
 	{
 		DrawObject()
 	}
@@ -2360,7 +2369,7 @@ function void fn05face()
 	// Attatch trademark
 	if (allocDynamicObjectStd())
 	{
-		u32[A1] = 0x05fb1a
+		objA1.update_address = 0x05fb1a
 		u16[A1 + 0x46] = A0.u16
 	}
 }
