@@ -278,8 +278,7 @@ function void fn0452da()
 //# address-hook(0x045336) end(0x04535e)
 function void fn045336()
 {
-	A1 = 0x046ac4
-	Object.AlternativeAnimationUpdate()
+	Object.AlternativeAnimationUpdate(0x046ac4)
 	if (objA0.base_state != 0)
 	{
 		objA0.update_address = 0x01abb6

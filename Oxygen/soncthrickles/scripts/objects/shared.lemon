@@ -16,7 +16,7 @@
 function void DrawObject()
 {
 	// Add object RAM address to one of the lists of rendered objects
-	//  -> There are multiple lists of 0x80 bytes, to get a priorization
+	//  -> There are multiple lists of 0x80 bytes, to get a prioritization
 	u32 address = 0xffffac00 + objA0.sprite_priority
 	while (address <= 0xffffaf80)
 	{
@@ -1041,6 +1041,12 @@ function void Object.AnimationUpdate()
 	}
 }
 
+
+function void Object.AlternativeAnimationUpdate(u32 address)
+{
+	A1 = address
+	Object.AlternativeAnimationUpdate()
+}
 
 //# address-hook(0x01ac88) end(0x01ad1e)
 function void Object.AlternativeAnimationUpdate()

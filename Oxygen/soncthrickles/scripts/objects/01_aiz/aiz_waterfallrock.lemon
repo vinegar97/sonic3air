@@ -61,8 +61,7 @@ function void AIZWaterfallRock.Update()
 		}
 	}
 
-	A1 = 0x02a3b0
-	Object.AlternativeAnimationUpdate()
+	Object.AlternativeAnimationUpdate(0x02a3b0)
 
 	if (objA0.animation.sprite == 5 && u8[A0 + 0x36] == 0)
 	{

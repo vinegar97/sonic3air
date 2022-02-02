@@ -269,8 +269,7 @@ function void fn03023e()
 {
 	if (objA0.render_flags & render_flag.VISIBLE)
 	{
-		A1 = 0x030260
-		Object.AlternativeAnimationUpdate()
+		Object.AlternativeAnimationUpdate(0x030260)
 		if (objA0.base_state == 0)
 		{
 			DrawObject()

@@ -47,8 +47,7 @@ function void fn03bb08()
 //# address-hook(0x03bb34) end(0x03bb80)
 function void fn03bb34()
 {
-	A1 = 0x03bb9a
-	Object.AlternativeAnimationUpdate()
+	Object.AlternativeAnimationUpdate(0x03bb9a)
 	if (objA0.animation.sprite != 0)
 	{
 		A1 = 0xffffb000

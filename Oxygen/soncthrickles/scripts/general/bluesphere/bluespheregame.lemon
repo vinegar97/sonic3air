@@ -1399,8 +1399,7 @@ function void fn04d9ec()
 {
 	if (bluespheregame.fully_unlocked != 0)
 	{
-		A1 = 0x04da04
-		Object.AlternativeAnimationUpdate()
+		Object.AlternativeAnimationUpdate(0x04da04)
 	}
 	DrawObject()
 }
