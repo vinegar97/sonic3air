@@ -2366,7 +2366,7 @@ function void fn05face()
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0xa0
 
-	// Attatch trademark
+	// Attach trademark
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05fb1a

@@ -549,14 +549,14 @@ function void fn05f20a()
 
 	copyMemory(0xfffffca0, 0x060ada, 0x20)
 
-	// Attatch "& Knuckles"
+	// Attach "& Knuckles"
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05f526
 		u16[A1 + 0x46] = A0.u16
 	}
 
-	// Attatch trademark
+	// Attach trademark
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05f4fa
@@ -588,7 +588,7 @@ function void fn05f26c()
 
 	copyMemory(0xfffffca0, 0x060ada, 0x20)
 
-	// Attatch trademark
+	// Attach trademark
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05f4fa
@@ -596,7 +596,7 @@ function void fn05f26c()
 		u8[A1 + 0x2c] = 0x04
 	}
 
-	// Attatch "& Knuckles"
+	// Attach "& Knuckles"
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05f546
