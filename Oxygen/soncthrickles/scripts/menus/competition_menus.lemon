@@ -57,7 +57,7 @@ function void CompetitionMode.MainMenu()
 
 	A0 = 0x39d4a4
 	A1 = 0xffff0000
-	A2 = 0xffff0020
+	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
 	u32[0xffffef44] = 0xa85c
@@ -66,11 +66,12 @@ function void CompetitionMode.MainMenu()
 
 	A0 = 0x39f87e
 	A1 = 0xffff0000
-	A2 = 0xffff53e0
+	A2 = 0xffff0000 + 0x53e0
 	fn00c006()
 
 	A0 = 0x39f46e
-	A2 = 0xffff6940
+	// A1 = 0xffff5300
+	A2 = 0xffff0000 + 0x6940
 	fn00c006()
 
 	global.frame_state = 0x1e
@@ -375,7 +376,7 @@ function void CompetitionMode.StageSelect()
 
 	A0 = 0x39d4a4
 	A1 = 0xffff0000
-	A2 = 0xffff0020
+	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
 	u32[0xffffef44] = 0xa85c
@@ -384,11 +385,12 @@ function void CompetitionMode.StageSelect()
 
 	A0 = 0x39f87e
 	A1 = 0xffff0000
-	A2 = 0xffff53e0
+	A2 = 0xffff0000 + 0x53e0
 	fn00c006()
 
 	A0 = 0x3a1b30
-	A2 = 0xffffb920
+	// A1 = 0xffff5300
+	A2 = 0xffff0000 + 0xb920
 	fn00c006()
 
 	global.frame_state = 0x1e
@@ -799,7 +801,7 @@ function void fn00b2cc()
 
 	A0 = 0x39d4a4
 	A1 = 0xffff0000
-	A2 = 0xffff0020
+	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
 	u32[0xffffef44] = 0xa85c
@@ -808,11 +810,12 @@ function void fn00b2cc()
 
 	A0 = 0x39f87e
 	A1 = 0xffff0000
-	A2 = 0xffff53e0
+	A2 = 0xffff0000 + 0x53e0
 	fn00c006()
 
 	A0 = 0x3a1b30
-	A2 = 0xffffb920
+	// A1 = 0xffff5300
+	A2 = 0xffff0000 + 0xb920
 	fn00c006()
 
 	global.frame_state = 0x1e
@@ -1298,10 +1301,12 @@ function void fn00b74e()
 	fn00c006()
 
 	A0 = 0x3a16be
+	// A1 = 0xffff5300
 	A2 = 0xffff0000 + 0x6940
 	fn00c006()
 
 	A0 = 0x3a1b30
+	// A1 = 0xffff6800
 	A2 = 0xffff0000 + 0xb920
 	fn00c006()
 
@@ -1659,7 +1664,7 @@ function void fn00bc08()
 
 	A0 = 0x39d4a4
 	A1 = 0xffff0000
-	A2 = 0xffff0020
+	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
 	u32[0xffffef44] = 0x00a85c
@@ -1668,15 +1673,17 @@ function void fn00bc08()
 
 	A0 = 0x39f87e
 	A1 = 0xffff0000
-	A2 = 0xffff53e0
+	A2 = 0xffff0000 + 0x53e0
 	fn00c006()
 
 	A0 = 0x3a16be
-	A2 = 0xffff6940
+	// A1 = 0xffff5300
+	A2 = 0xffff0000 + 0x6940
 	fn00c006()
 
 	A0 = 0x3a1b30
-	A2 = 0xffffb920
+	// A1 = 0xffff6800
+	A2 = 0xffff0000 + 0xb920
 	fn00c006()
 
 	global.frame_state = 0x1e

@@ -109,17 +109,22 @@ function void fn00c890()
 		{
 			if (u8[A3 + 0x3a] == u8[A3 + 0x37] && u8[A3 + 0x3b] != 0)
 			{
+				// Render "CLEAR" label
 				A1 = 0x00db36
 				D0.u16 = D7.u16
 				fn00d9f4()
 			}
 			else
 			{
+				// Render "ZONE" label
 				A1 = 0x00db31
 				D0.u16 = D7.u16 - 2
 				fn00d9f4()
 
+				// Render zone number
 				D0.u16 = u16[A3 + 0x36] * 2
+
+				// Second digit (10, 20, etc)
 				D1 = u8[0x00c95e + D0.s16]
 				if (D1.s8 < 0)
 				{
@@ -131,12 +136,14 @@ function void fn00c890()
 				}
 				VDP.writeData16(D1.u16)
 
+				// First digit (1, 2, etc)
 				D1 = 0xa562 + u8[0x00c95f + D0.s16]
 				VDP.writeData16(D1.u16)
 			}
 		}
 		else
 		{
+			// Render empty tiles
 			A1 = 0x00db2b
 			D0.u16 = D7.u16
 			fn00d9f4()
@@ -200,9 +207,9 @@ function void fn00c97a()
 		}
 		else
 		{
-			// lives digits
+			// Render lives digits
 			D0.u8 = u8[A3 + 0x3e]	// get lives data from save file
-			fn00ca14()	// render lives digits
+			fn00ca14()
 
 			D0.u16 = D7.u16 + 6
 			fn00c87e()
@@ -210,9 +217,9 @@ function void fn00c97a()
 			D2 = 1
 			fn001506()
 
-			// continues digits
+			// Render continues digits
 			D0.u8 = u8[A3 + 0x3f] 	// get continues data from save file
-			fn00ca14()	// render continues digits
+			fn00ca14()
 
 			D0.u16 = D7.u16 + 0x0306
 			fn00c87e()
@@ -242,12 +249,12 @@ function void fn00ca14()
 
 	A1 = 0xffffeeea		// Start address of vertical scroll offsets, looks like we're abusing this for something else here
 
-	// render second digit (10, 20, etc)
+	// Render second digit (10, 20, etc)
 	D1.u16 = (D1.u16 == 0) ? 0x28 : (D1.u16 << 2)	// don't render zero for second digit
 	u16[A1] = u16[0x00ca4c + D1.s16]
 	u16[A1 + 0x04] = u16[0x00ca4e + D1.s16]
 	
-	// render first digit (1, 2, etc)
+	// Render first digit (1, 2, etc)
 	D0.u16 = D0.u8 * 4
 	u16[A1 + 0x02] = u16[0x00ca4c + D0.s16]
 	u16[A1 + 0x06] = u16[0x00ca4e + D0.s16]
@@ -296,21 +303,24 @@ function void DataSelect.setup()
 
 	Nemesis.loadDataToVRAM(0x0ca5e0, 0xac40)
 
+	// Render "NO" label
 	A1 = 0x00db1c
 	D0.u16 = 0xcc06
-	fn00d9f4()	// render "NO" label
+	fn00d9f4()
 
+	// Render "SAVE" label
 	// A1 = 0x00db1f
 	D0.u16 = 0xcc0c
-	fn00d9f4()	// render "SAVE" label
+	fn00d9f4()
 
+	// Render "DELETE" label
 	// A1 = 0x00db24
 	D0.u16 = 0xccec
-	fn00d9f4()	// render "DELETE" label
+	fn00d9f4()
 
 	A0 = 0x39d4a4
 	A1 = 0xffff0000
-	A2 = 0xffff0020
+	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
 	u32[0xffffef44] = 0x00c56e
@@ -319,7 +329,7 @@ function void DataSelect.setup()
 
 	A0 = 0x3a23aa
 	A1 = 0xffff0000
-	A2 = 0xffff53e0
+	A2 = 0xffff0000 + 0x53e0
 	fn00c006()
 
 	global.frame_state = 0x1e
@@ -327,7 +337,7 @@ function void DataSelect.setup()
 
 	A0 = 0x15a774
 	A1 = 0xffff0000
-	A2 = 0xffff8a80
+	A2 = 0xffff0000 + 0x8a80
 	fn00c006()
 
 	global.frame_state = 0x1e
