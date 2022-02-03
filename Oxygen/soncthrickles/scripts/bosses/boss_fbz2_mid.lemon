@@ -431,7 +431,7 @@ function void fn0701b4()
 {
 	MoveWithParent()
 
-	fn084700()
+	Object.AnimationProgressByLocalA1.SpeedUp()
 #if STANDALONE
 	// Make the laser shoot faster
 	objA0.flags2e = min(objA0.flags2e, 0x08)

@@ -44,7 +44,7 @@ function void fn0891ba()
 //# address-hook(0x0891ee) end(0x0891ee)
 function void fn0891ee()
 {
-	fn084700()
+	Object.AnimationProgressByLocalA1.SpeedUp()
 }
 
 

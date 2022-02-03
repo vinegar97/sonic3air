@@ -1779,14 +1779,14 @@ function void fn08592c()
 
 
 //# address-hook(0x084400) end(0x084432)
-function void Object.AnimationProgressByLocalA1()
+function void Object.AnimationProgressByLocalA1()		// "Animate_Raw" in skdisasm
 {
 	Object.animationProgress(u32[A0 + 0x30])
 }
 
 
 //# address-hook(0x084404)
-function void Object.AnimationProgress()
+function void Object.AnimationProgress()		// "Animate_RawNoSST" in skdisasm
 {
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
@@ -1800,6 +1800,7 @@ function void Object.AnimationProgress()
 		}
 		else
 		{
+			// Advance to next frame
 			objA0.animation.timer = u8[A1]
 			objA0.animation.sprite = D1.u8
 		}
@@ -1816,7 +1817,11 @@ function void Object.animationProgress(u32 address)
 //# address-hook(0x084428)
 function void fn084428()
 {
-	call 0x084430 - D1.s8		// Can be 0x084434, 0x084438, 0x08443c
+	// Calls one of the following:
+	//	- 0x084434
+	//	- 0x084438
+	//	- 0x08443c
+	call 0x084430 - D1.s8
 	objA0.animation.frame = 0
 }
 
@@ -1824,18 +1829,21 @@ function void fn084428()
 //# address-hook(0x084434) end(0x084434)
 function void fn084434()
 {
+	// Loop Animation from the start
 	fn08444e()
 }
 
 //# address-hook(0x084438) end(0x084438)
 function void fn084438()
 {
+	// Loop animation from specific frame
 	fn084440()
 }
 
 //# address-hook(0x08443c) end(0x08443c)
 function void fn08443c()
 {
+	// Call another function
 	fn08445a()
 }
 
@@ -1843,6 +1851,7 @@ function void fn08443c()
 //# address-hook(0x084440) end(0x084458)
 function void fn084440()
 {
+	// Set animation loop point
 	A1 += s8[A1 + D0.s16 + 2]
 	u32[A0 + 0x30] = A1
 	objA0.animation.sprite = u8[A1 + 1]
@@ -1853,6 +1862,7 @@ function void fn084440()
 //# address-hook(0x08444e)
 function void fn08444e()
 {
+	// Restart animation
 	objA0.animation.sprite = u8[A1 + 1]
 	objA0.animation.timer = u8[A1]
 }
@@ -1861,16 +1871,24 @@ function void fn08444e()
 //# address-hook(0x08445a) end(0x084462)
 function void fn08445a()
 {
+	// Call address stored in objA0.countdown_callback
 	objA0.animation.timer = 0
 	A1 = objA0.countdown_callback
 	call A1
 }
 
 
-//# address-hook(0x084464) end(0x084496)
-function void fn084464()
+//# address-hook(0x084464) end(0x084464)
+function void Object.AnimationProgressByLocalA1.CheckFlipX()		// "Animate_RawAdjustFlipX" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
+	Object.AnimationProgress.CheckFlipX(u32[A0 + 0x30])
+}
+
+
+
+//# address-hook(0x084468) end(0x084496)
+function void Object.AnimationProgress.CheckFlipX()		// "Animate_RawNoSSTAdjustFlipX" in skdisasm
+{
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
 	{
@@ -1890,10 +1908,17 @@ function void fn084464()
 				objA0.render_flags ^= render_flag.FLIP_X
 			}
 
+			// Advance to next frame
 			objA0.animation.timer = u8[A1]
 			objA0.animation.sprite = D1.u8
 		}
 	}
+}
+
+function void Object.AnimationProgress.CheckFlipX(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.CheckFlipX()
 }
 
 

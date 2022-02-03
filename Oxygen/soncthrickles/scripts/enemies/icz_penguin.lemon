@@ -209,7 +209,7 @@ function void fn08bb24()
 //# address-hook(0x08bb6a) end(0x08bc02)
 function void fn08bb6a()
 {
-	fn084700()
+	Object.AnimationProgressByLocalA1.SpeedUp()
 	if (!_equal())
 	{
 		if (objA0.flags2e <= 0x02)

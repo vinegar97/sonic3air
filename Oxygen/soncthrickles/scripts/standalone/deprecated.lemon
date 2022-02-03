@@ -196,3 +196,23 @@ function void fn01d6c2()
 {
 	MonitorIntact.CheckBlocking.player2()
 }
+
+function void fn084464()
+{
+	Object.AnimationProgressByLocalA1.CheckFlipX()
+}
+
+function void fn084498()
+{
+	Object.AnimationProgressByLocalA1.CheckFlipY()
+}
+
+function void fn084700()
+{
+	Object.AnimationProgressByLocalA1.SpeedUp()
+}
+
+function void fn084780()
+{
+	Object.AnimationProgressByLocalA1.SlowDown()
+}

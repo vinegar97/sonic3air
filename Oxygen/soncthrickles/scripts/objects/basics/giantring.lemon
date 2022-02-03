@@ -218,7 +218,7 @@ function void fn0617e0()
 function void fn061822()
 {
 	D6.u8 = objA0.animation.sprite
-	fn084464()
+	Object.AnimationProgressByLocalA1.CheckFlipX()
 	if (D6.u8 != objA0.animation.sprite && objA0.animation.frame == 3)
 	{
 		A1 = 0xffff0000 + u16[A0 + 0x46]

@@ -354,7 +354,7 @@ function void fn06b1d8()
 function void fn06b204()
 {
 	playSoundRepeatedly(0xc0)
-	fn084700()
+	Object.AnimationProgressByLocalA1.SpeedUp()
 }
 
 
@@ -387,7 +387,7 @@ function void fn06b22a()
 //# address-hook(0x06b25c) end(0x06b25c)
 function void fn06b25c()
 {
-	fn084780()
+	Object.AnimationProgressByLocalA1.SlowDown()
 }
 
 
@@ -858,7 +858,7 @@ function void fn06b71c()
 //# address-hook(0x06b734) end(0x06b734)
 function void fn06b734()
 {
-	fn084700()
+	Object.AnimationProgressByLocalA1.SpeedUp()
 }
 
 
@@ -1390,10 +1390,16 @@ function void fn06bcb2()
 
 
 
-//# address-hook(0x084780) end(0x0847e4)
-function void fn084780()
+//# address-hook(0x084780) end(0x084780)
+function void Object.AnimationProgressByLocalA1.SlowDown()		// "Animate_RawGetSlower" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
+	Object.AnimationProgress.SlowDown(u32[A0 + 0x30])
+}
+
+
+//# address-hook(0x084784) end(0x0847e4)
+function void Object.AnimationProgress.SlowDown()		// "Animate_RawNoSSTGetSlower" in skdisasm
+{
 	if ((objA0.flags38 & 0x20) == 0)
 	{
 		objA0.countdown_value = 0
@@ -1433,6 +1439,12 @@ function void fn084780()
 
 	A2 = objA0.countdown_callback
 	call A2
+}
+
+function void Object.AnimationProgress.SlowDown(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.SlowDown()
 }
 
 

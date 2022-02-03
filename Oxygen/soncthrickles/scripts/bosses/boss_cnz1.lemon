@@ -272,7 +272,7 @@ function void fn06dbfe()
 function void fn06dc28()
 {
 	MoveWithParent()
-	fn084700()
+	Object.AnimationProgressByLocalA1.SpeedUp()
 }
 
 

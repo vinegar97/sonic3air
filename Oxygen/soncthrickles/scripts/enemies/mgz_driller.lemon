@@ -96,7 +96,7 @@ function void fn0884d2()
 {
 	fn0847e6()
 	UpdateMovementStraightSimple()
-	fn084700()
+	Object.AnimationProgressByLocalA1.SpeedUp()
 }
 
 
