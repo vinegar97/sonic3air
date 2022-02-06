@@ -114,7 +114,7 @@ function void fn080584()
 function void fn080590()
 {
 	objA0.update_address = 0x0805ae
-	u8[A0 + 0x28] = 0x08
+	objA0.collision_attributes = collision.size.24x12
 	boss.remaining_hits = 0xff
 	objA0.value42 = 0xa0
 	u16[A0 + 0x44] = 0xffcc

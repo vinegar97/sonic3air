@@ -1762,7 +1762,7 @@ function bool SetupObjectAttributesSlotted()
 	objA0.box_size.x = u8[(A1+=1)-1]
 	objA0.box_size.y = u8[(A1+=1)-1]
 	objA0.animation.sprite = u8[(A1+=1)-1]
-	u8[A0 + 0x28] = u8[(A1+=1)-1]
+	objA0.collision_attributes = u8[(A1+=1)-1]
 	objA0.flags2a |= 0x04
 	objA0.value3a = 0xff
 	objA0.render_flags |= render_flag.WORLD

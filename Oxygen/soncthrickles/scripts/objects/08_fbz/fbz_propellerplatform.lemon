@@ -17,7 +17,7 @@ function void fn03a580()
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x18
 	objA0.sprite_priority = 0x0280
-	u8[A0 + 0x28] = 0x8c
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.20x16)
 	u16[A0 + 0x44] = objA0.position.x.u16
 	u16[A0 + 0x46] = objA0.position.y.u16
 

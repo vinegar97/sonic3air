@@ -660,7 +660,7 @@ function void fn076f88()
 	if (u8[A1 + 0x38] & 0x02)
 	{
 		objA0.base_state = 0x06
-		u8[A0 + 0x28] = 0xd7
+		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 		boss.remaining_hits = 0
 	}
 }

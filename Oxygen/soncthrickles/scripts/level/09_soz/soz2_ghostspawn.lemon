@@ -313,7 +313,7 @@ function void fn08f322()
 		return
 
 	objA0.base_state = 0x10
-	u8[A0 + 0x28] = 0xd7
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 	objA0.render_flags |= 0x04
 
 	objA0.position.x.u16 = camera.position.x.u16 + objA0.position.x.u16 - 0x80

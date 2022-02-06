@@ -210,7 +210,7 @@ function void fn0786a6()
 function void fn0786bc()
 {
 	objA0.base_state = 0x10
-	u8[A0 + 0x28] = 0xb5
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.40x32)
 	objA0.countdown_callback = 0x0786ea
 
 	A1 = 0x078df1
@@ -232,7 +232,7 @@ function void fn0786ea()
 {
 	objA0.base_state = 0x12
 	objA0.animation.sprite = 5
-	u8[A0 + 0x28] = 0x06
+	objA0.collision_attributes = collision.size.16x16
 	objA0.countdown_value = 0x5f
 	objA0.countdown_callback = 0x07873a
 	camera.screenshake.state = 0x14

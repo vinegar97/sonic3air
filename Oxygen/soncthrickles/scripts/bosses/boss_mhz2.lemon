@@ -89,7 +89,7 @@ function void fn075fd4()
 //# address-hook(0x076004) end(0x076036)
 function void fn076004()
 {
-	u8[A0 + 0x28] = 0x0f
+	objA0.collision_attributes = collision.size.24x24
 	boss.remaining_hits = 9
 	u8[A0 + 0x25] = u8[A0 + 0x28]
 	u8[0xfffffa88] = 0
@@ -544,7 +544,7 @@ function void fn076674()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if ((u8[A1 + 0x2a] & 0x80) == 0)
 	{
-		u8[A0 + 0x28] = (u8[A1 + 0x2a] & 0x40) ? 0 : 0x8b
+		objA0.collision_attributes = (u8[A1 + 0x2a] & 0x40) ? 0 : (collision.flag.THREAT | collision.size.8x8)
 
 		D0.u8 = (global.framecounter & 0x01) ? 0xff : 0x00
 		if (objA0.subtype2c != 0)
@@ -796,7 +796,7 @@ function void fn05577c()
 	objA0.box_size.y = 0x10
 	objA0.sprite_attributes = 0x23af
 	objA0.mapping_offset = 0x055908
-	u8[A0 + 0x28] = 0x8b
+	u8[A0 + 0x28] = (collision.flag.THREAT | collision.size.8x8)
 
 	D0.u16 = 0x80
 	D1 = 4

@@ -532,7 +532,7 @@ function void fn07155a()
 function void fn071566()
 {
 	objA0.base_state = 0x08
-	u8[A0 + 0x28] = 0x8b
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x8)
 	playSound(0xbf)
 }
 

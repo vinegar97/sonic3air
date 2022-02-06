@@ -448,7 +448,7 @@ function void fn07f45a()
 {
 	objA0.position.y.u16 -= D1.u16
 	objA0.base_state = 0
-	u8[A0 + 0x28] = 0xc6
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 	objA0.value3a = 0xff
 	fn07f486()
 }
@@ -459,7 +459,7 @@ function void fn07f472()
 {
 	objA0.position.y.u16 += D1.u16
 	objA0.base_state = 0x02
-	u8[A0 + 0x28] = 0xc6
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 	objA0.value3a = 0
 	fn07f486()
 }
@@ -637,14 +637,14 @@ function void fn07f56e()
 	if (b)
 	{
 		objA0.base_state = 0x02
-		u8[A0 + 0x28] = 0xc6
+		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 		objA0.velocity.x = u16[A0 + 0x3c]
 		objA0.velocity.y = 0
 	}
 	else
 	{
 		objA0.base_state = 0
-		u8[A0 + 0x28] = 0xc6
+		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 	}
 }
 
@@ -1067,7 +1067,7 @@ function void fn07f8ca()
 	if (D0.u8 != 0)
 	{
 		objA0.base_state = 0x04
-		u8[A0 + 0x28] = 0xc6
+		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 		objA0.value39 = 0
 		D0.u16 = objA0.velocity.x
 		if (D0.u16 != 0)
@@ -1112,7 +1112,7 @@ function void fn07f900()
 	}
 
 	objA0.base_state = 0x06
-	u8[A0 + 0x28] = 0xc6
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 	objA0.value42 = 0x07
 	objA0.value39 = 0x08
 

@@ -276,7 +276,7 @@ function void fn03b766()
 			objA1.update_address = 0x03b8c2
 			u16[A1 + 0x0a] = 0x2443
 			u8[A1 + 0x22] = 0x01
-			u8[A1 + 0x28] = 0x86
+			objA1.collision_attributes = (collision.flag.THREAT | collision.size.16x16)
 		}
 		D2.u8 >>= 1
 

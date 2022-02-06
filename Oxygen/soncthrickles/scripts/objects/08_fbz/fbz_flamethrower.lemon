@@ -231,7 +231,7 @@ function void fn03cec0()
 		u16[A1 + 0x08] = 0x0200
 		u8[A1 + 0x07] = 0x0c
 		u8[A1 + 0x06] = 0x0c
-		u8[A1 + 0x28] = 0x98
+		objA1.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
 		u8[A1 + 0x2b] |= 0x10
 
 		if (objA0.subtype2c & 0x40)

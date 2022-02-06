@@ -55,7 +55,7 @@ function void fn0471d6()
 				objA1.position.y.u16 = objA0.position.y.u16
 				objA1.velocity.x = (objA0.flags2a & 0x01) ? 0x400 : -0x400
 				u8[A1 + 0x22] = 0x09
-				u8[A1 + 0x28] = 0x9b
+				objA1.collision_attributes = (collision.flag.THREAT | collision.size.8x4)
 
 				playSound(0x7c)
 			}

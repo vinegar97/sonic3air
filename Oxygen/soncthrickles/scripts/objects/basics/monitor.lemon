@@ -286,7 +286,7 @@ function void MonitorIntact.Init()
 		}
 	}
 
-	u8[A0 + 0x28] = 0x46
+	objA0.collision_attributes = (collision.flag.ITEM | collision.size.16x16)
 	objA0.state = objA0.subtype2c
 #if STANDALONE
 	if (objA0.state == 0x0b)	// Classic Shield's state is not completely supported

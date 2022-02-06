@@ -121,7 +121,7 @@ function void fn08dc6e()
 		if (objA0.state != 0)
 			return
 
-		u8[A0 + 0x28] = 0xd7
+		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 	}
 
 	fn085870()

@@ -55,7 +55,7 @@ function void fn043b96()
 	if (D0.s8 < 0)
 	{
 		objA0.sprite_attributes |= 0x8000
-		u8[A0 + 0x28] = 0x9a
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.12x12)
 	}
 	LookupSinCos()
 	D1.s16 >>= 3
@@ -80,7 +80,7 @@ function void fn043bde()
 	if (D0.s8 < 0)
 	{
 		objA0.sprite_attributes |= 0x8000
-		u8[A0 + 0x28] = 0x8f
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.24x24)
 	}
 	LookupSinCos()
 	D0.u16 = D1.u16
@@ -142,7 +142,7 @@ function void fn043c88()
 	if (D0.s8 < 0)
 	{
 		objA0.sprite_attributes |= 0x8000
-		u8[A0 + 0x28] = 0x9a
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.12x12)
 	}
 	LookupSinCos()
 	D0.u16 = D1.u16
@@ -170,7 +170,7 @@ function void fn043cd6()
 	if (D0.s8 < 0)
 	{
 		objA0.sprite_attributes |= 0x8000
-		u8[A0 + 0x28] = 0x8f
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.24x24)
 	}
 	LookupSinCos()
 	D1.s16 >>= 2

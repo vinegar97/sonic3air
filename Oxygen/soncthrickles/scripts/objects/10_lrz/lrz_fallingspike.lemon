@@ -22,7 +22,7 @@ function void fn04285a()
 	objA0.box_size.y = 0x10
 	objA0.hitbox_extends.y = 0x0c
 	objA0.sprite_priority = 0x0280
-	u8[A0 + 0x28] = 0x82
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.12x20)
 	objA0.value2f = objA0.subtype2c
 
 	objA0.update_address = 0x042898

@@ -27,7 +27,7 @@ function void fn04429c()
 		objA0.mapping_offset = 0x0445b0
 		objA0.box_size.x = 0x04
 		objA0.box_size.y = 0x30
-		u8[A0 + 0x28] = 0xa0
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.4x40)
 
 		objA0.update_address = 0x044592
 		fn044592()

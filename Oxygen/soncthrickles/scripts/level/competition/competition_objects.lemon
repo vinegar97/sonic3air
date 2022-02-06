@@ -164,7 +164,7 @@ function void fn035a7a()
 		u32[A1] = 0x035b90
 		u16[A1 + 0x10] = objA0.position.x.u16 - 0x10
 		u16[A1 + 0x14] = objA0.position.y.u16 + 0x0c
-		u8[A1 + 0x28] = 0xa6
+		objA1.collision_attributes = (collision.flag.THREAT | collision.size.16x4)
 		u16[A1 + 0x3e] = A0.u16
 
 		if (allocDynamicObjectAfterA0())
@@ -172,7 +172,7 @@ function void fn035a7a()
 			u32[A1] = 0x035ba6
 			u16[A1 + 0x10] = objA0.position.x.u16 + 0x10
 			u16[A1 + 0x14] = objA0.position.y.u16 + 0x14
-			u8[A1 + 0x28] = 0xa6
+			objA1.collision_attributes = (collision.flag.THREAT | collision.size.16x4)
 			u16[A1 + 0x3e] = A0.u16
 		}
 	}
@@ -721,7 +721,7 @@ function void fn035d80()
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
-	u8[A0 + 0x28] = 0xd7
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 
 	u32[A0] = 0x035db2
 	fn035db2()

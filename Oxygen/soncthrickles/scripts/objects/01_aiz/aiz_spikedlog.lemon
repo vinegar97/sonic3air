@@ -28,7 +28,7 @@ function void AIZSpikedLog.Init()
 	{
 		objA1.update_address = 0x02b8ee
 		objA1.render_flags = render_flag.WORLD
-		u8[A1 + 0x28] = 0x9c
+		objA1.collision_attributes = (collision.flag.THREAT | collision.size.24x4)
 		u16[A1 + 0x3c] = A0.u16
 		u16[A0 + 0x3c] = A1.u16
 	}

@@ -97,7 +97,7 @@ function void fn07432a()
 
 	u8[A0 + 0x0a] |= 0x80
 	objA0.velocity.y = 0
-	u8[A0 + 0x28] = 0x0f
+	objA0.collision_attributes = collision.size.24x24
 	objA0.render_flags ^= 0x01
 
 	// "spawnChildObjects(0x07513c)" replaced by:
@@ -844,7 +844,7 @@ function void fn074a14()
 	{
 		u8[A0 + 0x0a] |= 0x80
 		objA0.base_state = 0x04
-		u8[A0 + 0x28] = 0xad
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.32x16)
 	}
 
 	A2 = 0x360b08
@@ -1072,7 +1072,7 @@ function void fn074bd8()
 function void fn074c00()
 {
 	objA0.update_address = 0x074c0c
-	u8[A0 + 0x28] = 0x9c
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.24x4)
 	fn074c0c()
 }
 
@@ -1358,7 +1358,7 @@ function void fn074ebc(u32 returnAddress)
 	if (u8[A1 + 0x0a] & 0x80)
 	{
 		u8[A0 + 0x0a] |= 0x80
-		u8[A0 + 0x28] = D0.u8
+		objA0.collision_attributes = D0.u8
 
 		// Originally this is "objA0.update_address = u32[A7]"
 		//  -> But this wouldn't work in script, as the system stack is not used the same way
@@ -1447,7 +1447,7 @@ function void fn074fd2()
 		// "spawnChildObjects(0x075186)" replaced by:
 		spawnChildObject(0x074e12, 0x00, 0, 16)
 
-#if STANDALONE
+	#if STANDALONE
 		// Release main character if he was grabbed (can happen if second character makes the final hit)
 		if (u8[0xffffb000 + 0x2e] & 0x81)
 			u8[0xffffb000 + 0x2e] &= ~0x81
@@ -1458,7 +1458,7 @@ function void fn074fd2()
 			// Change in standalone: No music fade-out to (very brief) level music before level results
 			objA0.update_address = 0x08566a
 		}
-#endif
+	#endif
 		return
 	}
 
@@ -1484,7 +1484,7 @@ function void fn074fd2()
 		objA0.flags2a &= ~0x40
 		u8[A0 + 0x28] = u8[A0 + 0x25]
 		A1 = 0xffff0000 + u16[A0 + 0x44]
-		u8[A1 + 0x28] = 0xad
+		objA1.collision_attributes = (collision.flag.THREAT | collision.size.32x16)
 	}
 }
 

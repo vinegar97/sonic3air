@@ -44,7 +44,7 @@ function void fn080184()
 	setupObjectAttributesFull(0x0812ec)
 
 	objA0.render_flags |= 0x01
-	u8[A0 + 0x28] = 0x0f
+	objA0.collision_attributes = collision.size.24x24
 	boss.remaining_hits = 8
 
 	objA0.position.x.u16 = camera.foreground.x.u16 + 0x60 + getScreenExtend()

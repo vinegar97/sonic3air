@@ -93,7 +93,7 @@ function void fn08fdd8()
 {
 	setupObjectAttributesBasic(0x09003a)
 
-	u8[A0 + 0x28] = 0xd8
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.4x4_2)
 	objA0.hitbox_extends.y = 0x18
 	objA0.countdown_value = 0x6f
 	objA0.countdown_callback = 0x08fe10

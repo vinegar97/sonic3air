@@ -17,7 +17,7 @@ function void fn041cc2()
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x08
 	objA0.sprite_priority = 0x0280
-	u8[A0 + 0x28] = 0xc6
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 
 	D0.u16 = objA0.respawn_entry
 	if (D0.u16 != 0)

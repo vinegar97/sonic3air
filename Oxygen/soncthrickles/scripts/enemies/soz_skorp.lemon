@@ -158,7 +158,7 @@ function void fn08e78c()
 	{
 		objA0.animation.sprite = 4
 		objA0.sprite_priority = 0x0100
-		u8[A0 + 0x28] = 0x87
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.6x6)
 	}
 
 	fn08e982()

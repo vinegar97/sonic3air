@@ -1256,7 +1256,7 @@ function void fn064f20()
 		objA0.update_address = 0x064f70
 		objA0.flags38 |= 0x10
 		objA0.velocity.x = 0
-		u8[A0 + 0x28] = 0x0f
+		objA0.collision_attributes = collision.size.24x24
 		u8[A0 + 0x29] = 0xff
 
 		spawnIdenticalChildObjects(0x066624)

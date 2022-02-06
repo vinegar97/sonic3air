@@ -25,7 +25,7 @@ function void fn04379e()
 	if (objA0.subtype2c == 0)
 	{
 		objA0.sprite_attributes |= 0x8000
-		u8[A0 + 0x28] = 0x8f
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.24x24)
 		objA0.update_address = 0x04397e
 		fn04397e()
 	}
@@ -50,7 +50,7 @@ function void fn0437fe()
 	if (s8[A0 + 0x26] < 0)
 	{
 		objA0.sprite_attributes |= 0x8000
-		u8[A0 + 0x28] = 0x8f
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.24x24)
 	}
 
 	A1 = 0xffffb000

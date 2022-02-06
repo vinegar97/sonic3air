@@ -19,7 +19,7 @@ function void fn03b2f6()
 	objA0.sprite_priority = 0x0280
 	objA0.hitbox_extends.y = 0x0f
 	u16[A0 + 0x46] = objA0.position.y.u16
-	u8[A0 + 0x28] = 0x8d
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.20x8)
 
 	D1 = u16(objA0.subtype2c) << 4
 	D1.u16 -= 0x20

@@ -19,7 +19,7 @@ function void fn032df2()
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x80
-	u8[A0 + 0x28] = 0xd7
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 	u16[A0 + 0x30] = objA0.position.x.u16
 	objA0.value32 = objA0.position.y.u16
 

@@ -28,7 +28,7 @@ function void BubblesEnemy.Update()
 	//  - 0x0883e6	-> objA0.base_state = 0x04
 	call tableLookupAddress(0x08836a, objA0.base_state)
 
-	u8[A0 + 0x28] = (objA0.animation.sprite == 4) ? 0x86 : 0x12
+	objA0.collision_attributes = (objA0.animation.sprite == 4) ? (collision.flag.THREAT | collision.size.16x16) : collision.size.8x16
 
 	Object.loadSpritePatterns(0x088436)
 	fn085208()

@@ -71,7 +71,7 @@ function void fn08eacc()
 function void fn08ead2()
 {
 	objA0.base_state = 0x04
-	u8[A0 + 0x28] = 0x8b - (objA0.flags38 & 0x80)	// All parts except head count as threat
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x8) - (objA0.flags38 & 0x80)	// All parts except head count as threat
 	u16[A0 + 0x3a] = objA0.position.y.u16
 
 	D0 = -0x60

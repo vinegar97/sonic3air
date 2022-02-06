@@ -36,7 +36,7 @@ function void fn0263dc()
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 			u8[A1 + 0x2a] = objA0.flags2a
-			u8[A1 + 0x28] = 0x9d
+			objA1.collision_attributes = (collision.flag.THREAT | collision.size.40x4)
 			u8[A1 + 0x2b] |= 0x10
 			objA1.position.x.u16 += 0x40
 			if (objA0.flags2a & 0x01)

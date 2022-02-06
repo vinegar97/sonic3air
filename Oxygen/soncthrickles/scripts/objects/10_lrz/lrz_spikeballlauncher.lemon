@@ -30,7 +30,7 @@ function void fn044826()
 		u16[A1 + 0x08] = 0x0280
 		u8[A1 + 0x07] = 0x10
 		u8[A1 + 0x06] = 0x10
-		u8[A1 + 0x28] = 0x9a
+		objA1.collision_attributes = (collision.flag.THREAT | collision.size.12x12)
 		u16[A0 + 0x3c] = A1.u16
 	}
 

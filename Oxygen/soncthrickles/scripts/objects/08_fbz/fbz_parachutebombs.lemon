@@ -211,7 +211,7 @@ function void fn03c6cc()
 		if (objA0.velocity.y >= 0)
 		{
 			objA0.animation.sprite = 0x03
-			u8[A0 + 0x28] = 0x9e
+			objA0.collision_attributes = (collision.flag.THREAT | collision.size.4x8)
 			objA0.sprite_attributes &= 0x7fff
 		}
 	}

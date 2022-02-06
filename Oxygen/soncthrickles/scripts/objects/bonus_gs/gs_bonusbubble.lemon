@@ -21,7 +21,7 @@ function void fn04a1e6()
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0200
-	u8[A0 + 0x28] = 0xd7
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 
 	objA0.update_address = 0x04a218
 	fn04a218()
@@ -84,7 +84,7 @@ function void fn04a2cc()
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0200
-	u8[A0 + 0x28] = 0xd7
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 	if (u8[A0 + 0x29] != 0)
 	{
 		fn04a362()

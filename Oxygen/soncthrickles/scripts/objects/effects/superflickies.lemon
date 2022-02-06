@@ -181,11 +181,11 @@ function void fn01a292()
 //# address-hook(0x01a31e) end(0x01a378)
 function void fn01a31e()
 {
-	D0.u8 = u8[A1 + 0x28]
+	D0.u8 = objA1.collision_attributes
 	if (D0.u8 == 0)
 		return
 
-	D0.u8 &= 0xc0
+	D0.u8 &= collision_attributes.flags
 	if (D0.u8 == 0)
 	{
 		if (u8[A1 + 0x29] != 0)
@@ -210,7 +210,7 @@ function void fn01a31e()
 	}
 	else
 	{
-		if (D0.u8 != 0xc0)
+		if (D0.u8 != collision.flag.SPECIAL)
 			return
 
 		u8[A1 + 0x29] |= 0x02
@@ -311,7 +311,7 @@ function void fn01a3fe()
 		{
 			A1 = 0xffff0000 + u16[A4]
 			A4 += 2
-			D0.u8 = u8[A1 + 0x28]
+			D0.u8 = objA1.collision_attributes
 			if (D0.u8 != 0)
 			{
 				fn01a434()
@@ -341,8 +341,8 @@ function void fn01a434()
 			return
 	#endif
 
-		D0.u8 &= 0xc0
-		if (D0.u8 == 0 || D0.u8 == 0xc0)
+		D0.u8 &= collision_attributes.flags
+		if (D0.u8 == 0 || D0.u8 == collision.flag.SPECIAL)
 		{
 			u8[A1 + 0x2d] = 0xff		// Could this be a flag like "attacked by a flicky"?
 			objA0.value42 = A1.u16

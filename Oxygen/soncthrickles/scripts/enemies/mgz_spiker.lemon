@@ -121,7 +121,7 @@ function void fn088c38()
 function void fn088c6e()
 {
 	objA0.base_state = objA0.value3a
-	u8[A0 + 0x28] = 0x0a
+	objA0.collision_attributes = collision.size.16x8
 }
 
 
@@ -274,7 +274,7 @@ function void fn088d94()
 function void fn088d98()
 {
 	objA0.base_state = 0x02
-	u8[A0 + 0x28] = 0xca
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x8)
 }
 
 

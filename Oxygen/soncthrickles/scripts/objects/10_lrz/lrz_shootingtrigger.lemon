@@ -17,7 +17,7 @@ function void fn042dbe()
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0280
-	u8[A0 + 0x28] = 0xc6
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 	D0 = (objA0.subtype2c & 0xf0) >> 2
 	u16[A0 + 0x30] = D0.u16
 
@@ -46,7 +46,7 @@ function void fn042e00()
 				u16[A1 + 0x08] = 0x0300
 				u8[A1 + 0x07] = 0x04
 				u8[A1 + 0x06] = 0x04
-				u8[A1 + 0x28] = 0x98
+				objA1.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
 				u8[A1 + 0x2b] |= 0x08
 				u8[A1 + 0x22] = 0x01
 				objA1.velocity.x = 0x0200

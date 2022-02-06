@@ -48,7 +48,7 @@ function void fn029386()
 
 				u16[A1 + 0x08] = 0x80
 				u8[A1 + 0x22] = 0x02
-				u8[A1 + 0x28] = 0x98
+				objA1.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
 				objA1.update_address = 0x029416
 
 				playSound(0xa8)

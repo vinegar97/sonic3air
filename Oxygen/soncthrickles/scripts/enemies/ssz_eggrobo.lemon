@@ -266,7 +266,7 @@ function void fn09176c()
 	{
 		objA0.update_address = 0x0917b4
 		objA0.animation.sprite = 0x07
-		u8[A0 + 0x28] = 0x9c
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.24x4)
 		objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x800 : -0x800
 		playSound(0x5e)
 	}

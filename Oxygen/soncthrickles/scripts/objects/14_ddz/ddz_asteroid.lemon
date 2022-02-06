@@ -179,7 +179,7 @@ function void fn083146()
 	objA0.box_size.x = u8[(A1+=1)-1]
 	objA0.box_size.y = u8[(A1+=1)-1]
 	objA0.animation.sprite = u8[(A1+=1)-1]
-	u8[A0 + 0x28] = u8[(A1+=1)-1]
+	objA0.collision_attributes = u8[(A1+=1)-1]
 	u32[A0 + 0x30] = u32[(A1+=4)-4]
 	objA0.render_flags |= 0x04
 	D1.u16 = (D1.u16 & 0x0f) * 2

@@ -19,7 +19,7 @@ function void DynamicRing.Init()
 	objA0.sprite_attributes = 0xa6bc
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x100
-	u8[A0 + 0x28] = 0x47
+	objA0.collision_attributes = (collision.flag.ITEM | collision.size.6x6)
 	objA0.box_size.x = 8
 	objA0.box_size.y = 8
 	objA0.hitbox_extends.x = 8
@@ -229,7 +229,7 @@ function void SpillRings()
 		objA1.position.y.u16 = objA0.position.y.u16
 		u8[A1 + 0x1e] = 8
 		u8[A1 + 0x1f] = 8
-		u8[A1 + 0x28] = 0x47
+		objA1.collision_attributes = (collision.flag.ITEM | collision.size.6x6)
 
 		spilled_rings.speed = 0xff
 		if (D4.s16 >= 0)
@@ -408,7 +408,7 @@ function void fn01a532()
 	objA0.sprite_attributes = (competition_mode.active) ? 0x63d2 :0xa6bc
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0100
-	u8[A0 + 0x28] = 0x47
+	objA0.collision_attributes = (collision.flag.ITEM | collision.size.6x6)
 	objA0.box_size.x = 0x08
 	fn01a568()
 }

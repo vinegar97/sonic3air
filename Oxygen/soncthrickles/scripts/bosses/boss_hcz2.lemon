@@ -352,7 +352,7 @@ function void fn06b1d8()
 		return
 
 	objA0.base_state = 0x04
-	u8[A0 + 0x28] = 0xa6
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.16x4)
 	u32[A0 + 0x30] = 0x06bdf4
 	objA0.countdown_callback = 0x06b212
 }

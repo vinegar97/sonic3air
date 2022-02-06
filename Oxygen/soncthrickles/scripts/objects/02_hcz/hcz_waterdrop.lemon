@@ -46,7 +46,7 @@ function void fn0382ba()
 				}
 
 				objA1.update_address = 0x0382fc
-				u8[A1 + 0x28] = 0xc7
+				objA1.collision_attributes = (collision.flag.SPECIAL | collision.size.6x6)
 				D0 = 0
 			}
 		}

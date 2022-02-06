@@ -83,7 +83,7 @@ function void fn07a72c()
 	objA0.position.y.u16 = 0x0300
 	objA0.animation.sprite = 0x0a
 	objA0.base_state += 2
-	u8[A0 + 0x28] = 0x11
+	objA0.collision_attributes = collision.size.16x24
 	boss.remaining_hits = 8
 	u8[A0 + 0x3c] = 0x07
 
@@ -686,7 +686,7 @@ function void fn07acf2()
 		--u8[A0 + 0x1c]
 		if (u8[A0 + 0x1c] == 0)
 		{
-			u8[A0 + 0x28] = 0x0f
+			objA0.collision_attributes = collision.size.24x24
 		}
 	}
 }
@@ -726,7 +726,7 @@ function void fn07ada2()
 		u8[A1 + 0x41] = u8[0x07ae14 + D2.s16]
 		u8[A1 + 0x40] = u8[0x07ae1b + D2.s16]
 		u8[A1 + 0x2f] = 0x40
-		u8[A1 + 0x28] = 0x87
+		objA1.collision_attributes = (collision.flag.THREAT | collision.size.6x6)
 		u8[A1 + 0x42] = 0
 
 		++D2.u16
@@ -901,7 +901,7 @@ function void fn07afa4()
 		--u8[A0 + 0x3c]
 		if (s8[A0 + 0x3c] < 0)
 		{
-			u8[A0 + 0x28] = 0xc6
+			objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 		}
 	}
 
@@ -942,7 +942,7 @@ function void fn07b02a()
 		--u8[A0 + 0x3c]
 		if (s8[A0 + 0x3c] < 0)
 		{
-			u8[A0 + 0x28] = 0xda
+			objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.12x12)
 		}
 	}
 	fn07b0c2()

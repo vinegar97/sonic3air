@@ -395,7 +395,7 @@ function void fn080522()
 	else
 	{
 		objA0.update_address = 0x080542
-		u8[A0 + 0x28] = 0x16
+		objA0.collision_attributes = collision.size.32x32
 		fn080542()
 	}
 }

@@ -18,7 +18,7 @@ function void fn034302()
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x38
 	objA0.animation.sprite = 2
-	u8[A0 + 0x28] = 0x17
+	objA0.collision_attributes = collision.size.8x8_2
 	u8[A0 + 0x29] = 3
 	objA0.render_flags |= 0x40
 	u16[A0 + 0x16] = 1
@@ -64,14 +64,14 @@ function void fn03438e()
 			}
 		}
 
-		if (u8[A0 + 0x28] == 0)
+		if (objA0.collision_attributes == 0)
 		{
 			if (objA0.value32 != 0)
 			{
 				--objA0.value32
 				if (objA0.value32 == 0)
 				{
-					u8[A0 + 0x28] = 0x17
+					objA0.collision_attributes = collision.size.8x8_2
 				}
 			}
 			else
@@ -125,7 +125,7 @@ function void fn03438e()
 				u16[A1 + 0x08] = 0x0300
 				u8[A1 + 0x07] = 0x10
 				u8[A1 + 0x06] = 0x04
-				u8[A1 + 0x28] = 0x9b
+				objA1.collision_attributes = (collision.flag.THREAT | collision.size.8x4)
 				objA1.velocity.x = -0x400
 				if (objA0.flags2a & 0x01)
 				{

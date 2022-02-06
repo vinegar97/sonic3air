@@ -316,7 +316,7 @@ function void fn036faa()
 		if (u32[A1] == 0x0363d0)
 		{
 			u8[A1 + 0x20] = u8[(A4+=1)-1]
-			u8[A1 + 0x28] = 0xc7
+			u8[A1 + 0x28] = (collision.flag.SPECIAL | collision.size.6x6)
 		}
 		--D0.s16
 	}

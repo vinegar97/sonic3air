@@ -93,7 +93,7 @@ function void fn08904e()
 function void fn089056()
 {
 	objA0.base_state = 0x02
-	u8[A0 + 0x28] = 0x0a
+	objA0.collision_attributes = collision.size.16x8
 }
 
 
