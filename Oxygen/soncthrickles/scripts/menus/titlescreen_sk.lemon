@@ -98,9 +98,9 @@ function void TitleScreen_SK()
 
 	palette_fade.range = 0x3f
 	global.fade_timer = 0x16
-	u32[0xffffb000] = 0x5628
-	u32[0xffffb04a] = 0x5770
-	u32[0xffffb094] = 0x5856
+	u32[0xffffb000] = 0x005628		// Sonic jumping down
+	u32[0xffffb04a] = 0x005770		// The Death Egg
+	u32[0xffffb094] = 0x005856		// Mountain top
 
 	playMusic(MUSIC_TITLESCREEN)
 
@@ -459,7 +459,7 @@ function void fn00571e()
 	Kosinski.addToDMAQueue(0x0d3bb4, 0x9dc0)
 	Kosinski.addToDMAQueue(0x0d5cc6, 0x8c40)
 
-	u32[0xffffb0de] = 0x58a8
+	u32[0xffffb0de] = 0x0058a8		// Sonic & Knuckles logo
 	u8[0xffffb0de + 0x24] = 0x1e
 	objA0.update_address = 0x00576e
 }

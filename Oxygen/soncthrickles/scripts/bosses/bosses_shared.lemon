@@ -469,6 +469,21 @@ function void fn083d84()
 	objA0.value3b = u8[A1+2]
 	u32 offset = u8[A1+3]
 
+	// Targets:
+	// offset = 0x00 -> 0x08488a	-> Address of "Object.CountdownAndTrigger"
+	// offset = 0x01 -> 0x083e70
+	// offset = 0x02 -> 0x083e4c
+	// offset = 0x03 -> 0x083e70
+	// offset = 0x04 -> 0x08488a	-> Address of "Object.CountdownAndTrigger"
+	// offset = 0x05 -> 0x083ec6
+	// offset = 0x06 -> 0x08488a	-> Address of "Object.CountdownAndTrigger"
+	// offset = 0x07 -> 0x083eec
+	// offset = 0x08 -> 0x083e4c
+	// offset = 0x09 -> 0x083eec
+	// offset = 0x0a -> 0x083e4c
+	// offset = 0x0b -> 0x083ec6
+	// offset = 0x0c -> 0x083e4c
+	// offset = 0x0d -> 0x083f06
 	A1 = 0x083dae + offset
 	A2 = u32[A1]
 	objA0.update_address = A2

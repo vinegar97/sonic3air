@@ -153,6 +153,7 @@ function void fn08724e()
 	}
 	else
 	{
+		// Coconut
 		objA0.update_address = 0x08744c
 		objA0.animation.sprite = 6
 		A1 = 0xffff0000 + u16[A0 + 0x46]

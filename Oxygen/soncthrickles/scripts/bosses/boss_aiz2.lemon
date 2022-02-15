@@ -367,7 +367,11 @@ function void fn069526()
 	if (D0.u16 > objA1.position.x.u16)
 	{
 		// Move right
+
+		// control.player1.state = CONTROL_RIGHT
+		// control.player1.pressed = CONTROL_RIGHT
 		control.player1 = 0x0808
+
 		return
 	}
 
@@ -387,6 +391,9 @@ function void fn069526()
 	else
 	{
 		objA0.update_address = 0x0695ce
+
+		// control.player1.state = CONTROL_C
+		// control.player1.pressed = CONTROL_C
 		control.player1 = 0x2020
 	}
 }
@@ -410,7 +417,10 @@ function void fn069588()
 		}
 	#endif
 
+		// control.player1.state = CONTROL_UP
+		// control.player1.pressed = CONTROL_UP
 		control.player1 = 0x0101
+
 		control.tails = 0
 	}
 	else
@@ -445,7 +455,10 @@ function void fn0695ae()
 //# address-hook(0x0695ce) end(0x069610)
 function void fn0695ce()
 {
+	// control.player1.state = CONTROL_C
+	// control.player1.pressed = 0
 	control.player1 = 0x2000
+
 	A1 = 0xffffb000
 	u8[A1 + 0x0a] |= 0x80
 	if (objA1.velocity.y < 0)
@@ -1154,7 +1167,7 @@ function void fn069720()
 
 
 
-// Used in the boss fight, but more general maybe?
+// Drawbridge, Used in the boss fight, but more general maybe?
 
 //# address-hook(0x02b12a) end(0x02b266)
 function void fn02b12a()
@@ -1187,12 +1200,12 @@ function void fn02b12a()
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x02b380
-		u8[A1 + 0x04] = render_flag.WORLD | render_flag.COMPOUND
-		u8[A1 + 0x06] = 0x40
-		u8[A1 + 0x07] = 0x40
-		u16[A1 + 0x08] = objA0.sprite_priority
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u32[A1 + 0x0c] = objA0.mapping_offset
+		objA1.render_flags = (render_flag.WORLD | render_flag.COMPOUND)
+		objA1.box_size.y = 0x40
+		objA1.box_size.x = 0x40
+		objA1.sprite_priority = objA0.sprite_priority
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.mapping_offset = objA0.mapping_offset
 
 		D2.u16 = u16[A0 + 0x30]
 		D3.u16 = objA0.value32
@@ -1218,12 +1231,12 @@ function void fn02b12a()
 		if (allocDynamicObjectAfterA0())
 		{
 			objA1.update_address = 0x02b380
-			u8[A1 + 0x04] = render_flag.WORLD | render_flag.COMPOUND
-			u8[A1 + 0x06] = 0x40
-			u8[A1 + 0x07] = 0x40
-			u16[A1 + 0x08] = objA0.sprite_priority
-			u16[A1 + 0x0a] = objA0.sprite_attributes
-			u32[A1 + 0x0c] = objA0.mapping_offset
+			objA1.render_flags = (render_flag.WORLD | render_flag.COMPOUND)
+			objA1.box_size.y = 0x40
+			objA1.box_size.x = 0x40
+			objA1.sprite_priority = objA0.sprite_priority
+			objA1.sprite_attributes = objA0.sprite_attributes
+			objA1.mapping_offset = objA0.mapping_offset
 
 			D1 = 4
 			u16[A1 + 0x16] = D1.u16

@@ -55,7 +55,7 @@ function void fn027424()
 
 			A2 = 0xffffb04a
 			u8[A2 + 0x2a] &= ~char.flag.PUSHING
-			if (u8[A2 + 0x20] == 0x02)
+			if (u8[A2 + 0x20] == char.state.ROLLING)
 			{
 				u16[A2 + 0x18] = objA0.value32
 				u16[A2 + 0x1c] = u16[A2 + 0x18]

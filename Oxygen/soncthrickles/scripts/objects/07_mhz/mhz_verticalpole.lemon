@@ -178,7 +178,7 @@ function void fn03f1c8()
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
 	u8[A1 + 0x2f] = 0
 	u8[A1 + 0x27] = 0
-	u8[A1 + 0x22] = (u8[A1 + 0x38] == 0x01) ? 0x0e : 0x24
+	u8[A1 + 0x22] = (u8[A1 + 0x38] == CHARACTER_TAILS) ? 0x0e : 0x24
 
 	fn03f10a()
 }

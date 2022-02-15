@@ -1000,7 +1000,10 @@ function void fn064ca6()
 	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 		return
 
+	// control.player1.state = CONTROL_RIGHT
+	// control.player1.pressed = CONTROL_RIGHT
 	control.player1 = 0x0808
+
 	if (objA1.position.x.u16 < 0x15a8)
 		return
 
@@ -1016,7 +1019,7 @@ function void fn064ca6()
 	A1 = 0xffffb000
 	player1.control_override = 0
 	u8[A1 + 0x2e] = 0x83
-	u8[A1 + 0x22] = (u8[A1 + 0x38] == CHARACTER_TAILS) ? 0xb0 : 0xc4
+	objA1.animation.sprite = (u8[A1 + 0x38] == CHARACTER_TAILS) ? 0xb0 : 0xc4
 	u8[A1 + 0x20] = char.state.LOOKING_UP
 	control.player1 = 0
 	StopObjectA1()
@@ -1045,6 +1048,9 @@ function void fn064d38()
 		A1 = 0xffffb000
 		u8[A1 + 0x2e] = 0
 		player1.control_override = 0xff
+
+		// control.player1.state = CONTROL_RIGHT
+		// control.player1.pressed = CONTROL_RIGHT
 		control.player1 = 0x0808
 	}
 }

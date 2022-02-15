@@ -94,7 +94,7 @@ function void TitleCard.Wait()
 		}
 		else if (u8[A0 + 0x45] != 0)
 		{
-			// Yet unknown...
+			// Competition mode stage (unused)
 			A2 = 0x02daa6
 			D1 = 0
 		}

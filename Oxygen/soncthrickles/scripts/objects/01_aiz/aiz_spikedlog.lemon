@@ -27,7 +27,7 @@ function void AIZSpikedLog.Init()
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x02b8ee
-		u8[A1 + 0x04] = render_flag.WORLD
+		objA1.render_flags = render_flag.WORLD
 		u8[A1 + 0x28] = 0x9c
 		u16[A1 + 0x3c] = A0.u16
 		u16[A0 + 0x3c] = A1.u16

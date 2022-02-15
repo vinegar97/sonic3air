@@ -383,13 +383,13 @@ function void TitleScreen()
 		Nemesis.loadDataToVRAM(0x0d6498, 0x9800)
 	}
 
-	u32[0xffffb000] = 0x00482c
-	u32[0xffffb04a] = 0x004a5c
-	u32[0xffffb0de] = 0x004a1e
-	u32[0xffffb128] = 0x004ae4
-	u32[0xffffb172] = 0x004b54
-	u32[0xffffb1bc] = 0x004bb2
-	u32[0xffffb206] = 0x00496a
+	u32[0xffffb000] = 0x00482c		// Banner ("Sonic 3 - Sonic The Hedgehog")
+	u32[0xffffb04a] = 0x004a5c		// Menu items
+	u32[0xffffb0de] = 0x004a1e		// Copyright info
+	u32[0xffffb128] = 0x004ae4		// Sonic's hand wagging
+	u32[0xffffb172] = 0x004b54		// Sonic's eye blinking
+	u32[0xffffb1bc] = 0x004bb2		// Tails in the Tornado
+	u32[0xffffb206] = 0x00496a		// "& Knuckles" logo append
 	titleintro.frames = 0
 
 	#if STANDALONE
@@ -684,7 +684,7 @@ function void fn00486c()
 	if (D0.u16 == 0 && objA0.velocity.y == 0xffa5)
 	{
 		objA0.update_address = 0x0048dc
-		u32[0xffffb094] = 0x004924
+		u32[0xffffb094] = 0x004924		// Trademark
 	}
 	else
 	{
@@ -795,7 +795,7 @@ function void fn004a88()
 {
 	D2 = titlescreen.selection
 
-	D0.u8 = control.pad1.pressed | control.pad2.pressed
+	D0.u8 = (control.pad1.pressed | control.pad2.pressed)
 	if (D0 & CONTROL_UP)
 	{
 		--D2.u8
@@ -821,7 +821,7 @@ function void fn004a88()
 	objA0.animation.sprite = D2.u8
 	titlescreen.selection = D2.u8
 
-	if ((D0.u8 & 0x03) != 0)
+	if ((D0.u8 & (CONTROL_UP | CONTROL_DOWN)) != 0)
 	{
 		playSound(0x5b)
 	}

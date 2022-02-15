@@ -42,7 +42,7 @@ function void fn02ff2a()
 	objA0.sprite_attributes = 0x4500
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x20
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 0x01
 
 	A2 = A0 + 0x18
@@ -73,18 +73,19 @@ function void fn02ff7c()
 			if (!allocDynamicObjectAfterA0())
 				break
 
+			// Wall bricks broken off by geyser
 			objA1.update_address = 0x03011a
-			u32[A1 + 0x0c] = 0x22ef0e
-			u16[A1 + 0x0a] = 0x4558
-			u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+			objA1.mapping_offset = 0x22ef0e
+			objA1.sprite_attributes = 0x4558
+			objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 			objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
 			objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
-			u16[A1 + 0x08] = 0x0380
-			u8[A1 + 0x07] = 0x18
-			u8[A1 + 0x06] = 0x18
+			objA1.sprite_priority = 0x0380
+			objA1.box_size.x = 0x18
+			objA1.box_size.y = 0x18
 			objA1.velocity.x = u16[(A3+=2)-2]
 			objA1.velocity.y = u16[(A3+=2)-2]
-			u8[A1 + 0x22] = D1.u8
+			objA1.animation.sprite = D1.u8
 
 			--D1.s16
 		}

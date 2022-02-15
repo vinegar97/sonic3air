@@ -81,11 +81,12 @@ function void fn02c8b8()
 		{
 			if (allocDynamicObjectStd())
 			{
+				// Spawn floating points display
 				objA1.update_address = 0x02cce0
 				objA1.position.x.u16 = objA0.position.x.u16
 				objA1.position.y.u16 = objA0.position.y.u16
 				D0.u16 = objA0.value3e >> 1
-				u8[A1 + 0x22] = D0.u8
+				objA1.animation.sprite = D0.u8
 			}
 		}
 		else

@@ -617,7 +617,7 @@ function void SpawnProjectileChildObjects()
 			return
 
 		// Basic initialization as above
-		u32[A1] = u32[A2]
+		objA1.update_address = u32[A2]
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.subtype2c = D2.u8

@@ -1084,7 +1084,7 @@ function void Tails.CheckDropSonic()
 	{
 		A1 = 0xffffb000
 	#if STANDALONE
-		if (objA0.state = char.state.ROLLING)
+		if (objA0.state == char.state.ROLLING)
 			objA1.state = char.state.ROLLING		// Player 1 should also roll in this case
 	#endif
 		u8[A1 + 0x2e] = 0
@@ -5127,7 +5127,7 @@ function void Character.OnCollisionWithDynamicObject()
 function void Character.OnThreatCollision()
 {
 	// Check for shield or invincibility
-	D0.u8 = char.bonus_effect & 0x73
+	D0.u8 = char.bonus_effect & (char.bonus.ALL_SHIELDS | char.bonus.INVINCIBLE)
 	if (D0.u8 != 0)
 	{
 		D0.u8 &= u8[A1 + 0x2b]
@@ -5391,7 +5391,7 @@ function void deflectProjectile()
 	objA1.velocity.x = (-s32(lookupCos(angle)) * 0x0800) >> 8
 	objA1.velocity.y = (-s32(lookupSin(angle)) * 0x0800) >> 8
 
-	// Remove deflectable flag
+	// Remove collision box
 	u8[A1 + 0x28] = 0
 }
 

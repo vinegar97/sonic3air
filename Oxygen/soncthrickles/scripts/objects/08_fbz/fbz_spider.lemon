@@ -13,13 +13,13 @@ function void fn03d090()
 {
 	objA0.mapping_offset = 0x03d2fc
 	objA0.sprite_attributes = 0x2339
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x60
 	objA0.sprite_priority = 0x80
 	u16[A0 + 0x44] = objA0.position.x.u16
 	u16[A0 + 0x46] = objA0.position.y.u16
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 0x01
 
 	A2 = A0 + 0x18

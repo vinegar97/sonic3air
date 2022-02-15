@@ -701,7 +701,10 @@ function void fn013f40()
 		else
 			objA0.flags2a &= ~char.flag.FACING_LEFT
 
+		// control.tails.state = CONTROL_DOWN
+		// control.tails.pressed = CONTROL_DOWN
 		control.tails = 0x0202
+
 		D0.u8 = level.framecounter.low & 0x7f
 		if (D0.u8 == 0)
 		{
@@ -710,12 +713,17 @@ function void fn013f40()
 		}
 		else if (char.state == char.state.COWERING)
 		{
+			// control.tails.state = (CONTROL_ABC | CONTROL_DOWN)
+			// control.tails.pressed = (CONTROL_ABC | CONTROL_DOWN)
 			control.tails = 0x7272
 		}
 	}
 	else
 	{
+		// control.tails.state = CONTROL_DOWN
+		// control.tails.pressed = CONTROL_DOWN
 		control.tails = 0x0202
+
 		D0.u8 = level.framecounter.low & 0x7f
 		if (D0.u8 == 0)
 		{
@@ -724,6 +732,8 @@ function void fn013f40()
 		}
 		else if ((D0.u8 & 0x1f) == 0)
 		{
+			// control.tails.state = (CONTROL_ABC | CONTROL_DOWN)
+			// control.tails.pressed = (CONTROL_ABC | CONTROL_DOWN)
 			control.tails = 0x7272
 		}
 	}

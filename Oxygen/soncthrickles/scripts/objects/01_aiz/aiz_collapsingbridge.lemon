@@ -31,16 +31,16 @@ function void fn02acdc()
 		if (allocDynamicObjectAfterA0())
 		{
 			objA1.update_address = 0x02aeb4
-			u32[A1 + 0x0c] = 0x02b070
-			u16[A1 + 0x0a] = 0x42e9
-			u8[A1 + 0x04] |= 0x04
-			u8[A1 + 0x07] = 0x5a
-			u8[A1 + 0x06] = 0x08
-			u16[A1 + 0x08] = 0x200
+			objA1.mapping_offset = 0x02b070
+			objA1.sprite_attributes = 0x42e9
+			objA1.render_flags |= render_flag.WORLD
+			objA1.box_size.x = 0x5a
+			objA1.box_size.y = 0x08
+			objA1.sprite_priority = 0x200
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
-			u8[A1 + 0x04] |= render_flag.COMPOUND
-			u16[A1 + 0x16] = 6
+			objA1.render_flags |= render_flag.COMPOUND
+			u16[A1 + 0x16] = 6		// number of bridge segments
 			D2.u16 = objA0.position.y.u16
 			D3.u16 = objA0.position.x.u16 - 0x4b
 
@@ -77,16 +77,16 @@ function void fn02acdc()
 		if (allocDynamicObjectAfterA0())
 		{
 			objA1.update_address = 0x02aeb4
-			u32[A1 + 0xc] = 0x02b092
-			u16[A1 + 0xa] = 0xc2e9
-			u8[A1 + 0x04] |= 0x04
-			u8[A1 + 0x07] = 0x60
-			u8[A1 + 0x06] = 0x08
-			u16[A1 + 0x08] = 0x200
+			objA1.mapping_offset = 0x02b092
+			objA1.sprite_attributes = 0xc2e9
+			objA1.render_flags |= render_flag.WORLD
+			objA1.box_size.x = 0x60
+			objA1.box_size.y = 0x08
+			objA1.sprite_priority = 0x200
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
-			u8[A1 + 0x04] |= render_flag.COMPOUND
-			u16[A1 + 0x16] = 6
+			objA1.render_flags |= render_flag.COMPOUND
+			u16[A1 + 0x16] = 6		// number of bridge segments
 			D2.u16 = objA0.position.y.u16
 			D3.u16 = objA0.position.x.u16 - 0x50
 
@@ -172,13 +172,13 @@ function void fn02b016()
 {
 	while (true)
 	{
-		u32[A1] = D4
-		u32[A1 + 0x0c] = u32[A3 + 0x0c]
-		u8[A1 + 0x04] = u8[A3 + 0x04]
-		u16[A1 + 0x0a] = u16[A3 + 0x0a]
-		u16[A1 + 0x08] = u16[A3 + 0x08]
-		u8[A1 + 0x07] = u8[A3 + 0x07]
-		u8[A1 + 0x06] = u8[A3 + 0x06]
+		objA1.update_address = D4
+		objA1.mapping_offset = u32[A3 + 0x0c]
+		objA1.render_flags = u8[A3 + 0x04]
+		objA1.sprite_attributes = u16[A3 + 0x0a]
+		objA1.sprite_priority = u16[A3 + 0x08]
+		objA1.box_size.x = u8[A3 + 0x07]
+		objA1.box_size.y = u8[A3 + 0x06]
 		objA1.position.x.u16 = u16[(A2+=2)-2]
 		objA1.position.y.u16 = u16[(A2+=2)-2]
 		D0.u16 = u16[(A2+=2)-2]

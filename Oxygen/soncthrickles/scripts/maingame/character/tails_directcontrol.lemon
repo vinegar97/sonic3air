@@ -284,6 +284,9 @@ function void fn0142e2()
 					if (tails.up_press_timer >= 0x58)
 					{
 						tails.up_press_timer = 0
+
+						// control.tails.state = CONTROL_ABC
+						// control.tails.pressed = CONTROL_ABC
 						control.tails = 0x7070
 					}
 					else
@@ -293,6 +296,8 @@ function void fn0142e2()
 				}
 				else
 				{
+					// control.tails.state = CONTROL_ABC
+					// control.tails.pressed = CONTROL_ABC				
 					control.tails = 0x7070
 				}
 			}

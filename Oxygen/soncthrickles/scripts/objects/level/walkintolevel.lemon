@@ -32,7 +32,11 @@ function void fn044a0c()
 function void fn044a26()
 {
 	player1.control_override = 1
+
+	// control.player1.state = CONTROL_RIGHT
+	// control.player1.pressed = 0
 	control.player1 = 0x0800
+
 	camera.use_forced_target = true			// Forces camera to a certain position
 	camera.forced_target.x = u16[A0 + 0x30]
 	camera.forced_target.y = objA0.value32

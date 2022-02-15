@@ -101,7 +101,7 @@ function void fn02d028()
 				u16[A1 + 0x08] = 0x200
 				u16[A1 + 0x0a] = u16[A0 + 0x0a]
 				objA1.mapping_offset = objA0.mapping_offset
-				u8[A1 + 0x22] = 2
+				objA1.animation.sprite = 2
 				u16[A1 + 0x30] = objA0.position.x.u16
 				u16[A1 + 0x32] = objA0.position.y.u16 - 0x14
 				u16[A1 + 0x36] = 0x20
@@ -340,7 +340,7 @@ function void fn02d47e()
 			level.restart.u8 = 1
 
 			// Backup of shields active before entering the Special Stage
-			D0.u8 = u8[0xffffb000 + 0x2b] & 0x71
+			D0.u8 = u8[0xffffb000 + 0x2b] & char.bonus.ALL_SHIELDS
 			global.shields_backup_1 = D0.u8
 			global.shields_backup_2 = D0.u8
 			global.in_extra_stage = 1

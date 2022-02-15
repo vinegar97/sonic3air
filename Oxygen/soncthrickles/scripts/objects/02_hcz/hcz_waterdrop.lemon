@@ -113,8 +113,8 @@ function void fn038336()
 //# address-hook(0x038382) end(0x0383a8)
 function void fn038382()
 {
-	if (u8[A2 + 0x20] == 0x05)
-		u8[A2 + 0x21] = 0
+	if (u8[A2 + 0x20] == char.state.STANDING)
+		u8[A2 + 0x21] = char.state.RUNNING
 
 	objA0.state = 0x01
 	objA0.update_address = 0x038336

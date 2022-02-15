@@ -586,6 +586,9 @@ function void fn05c7b2()
 	objA0.sprite_attributes = 0x06a0
 	objA0.sprite_priority = 0x0280
 	char.animation.sprite.backup.tails = 0
+
+	// objA0.state = char.state.STANDING
+    // objA0.state.former = char.state.RUNNING
 	objA0.state.both = 0x0500
 
 	// objA0.animation.sprite = 0xad

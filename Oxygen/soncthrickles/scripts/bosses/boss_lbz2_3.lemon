@@ -592,7 +592,10 @@ function void fn074768()
 //# address-hook(0x0747d6) end(0x074816)
 function void fn0747d6()
 {
+	// control.player1.state = CONTROL_UP
+	// control.player1.pressed = CONTROL_UP
 	control.player1 = 0x0101
+
 	D0.u16 = objA0.position.y.u16 + 1
 	D1.u16 = camera.position.y.u16 + 0x40
 	if (D0.u16 < D1.u16)
@@ -614,7 +617,10 @@ function void fn0747d6()
 //# address-hook(0x07481c) end(0x07488e)
 function void fn07481c()
 {
+	// control.player1.state = CONTROL_UP
+	// control.player1.pressed = CONTROL_UP
 	control.player1 = 0x0101
+
 	fn0847e6()
 	UpdateMovementStraightSimple()
 	D0.u16 = objA0.position.x.u16
@@ -693,6 +699,9 @@ function void fn0748f4()
 	if (objA0.flags38 & 0x08)
 	{
 		objA0.update_address = 0x07490a
+
+		// control.player1.state = CONTROL_RIGHT
+		// control.player1.pressed = CONTROL_RIGHT
 		control.player1 = 0x0808
 	}
 }
@@ -709,9 +718,12 @@ function void fn07490a()
 		objA0.position.x.u16 = objA1.position.x.u16
 		objA0.position.y.u16 = objA1.position.y.u16
 		u8[A1 + 0x2e] = 0x83
-		u8[A1 + 0x22] = 0x8c
+		objA1.animation.sprite = 0x8c
 	#if STANDALONE
 		// This makes AI Tails jump
+
+		// control.player1.state = CONTROL_B
+		// control.player1.pressed = CONTROL_B
 		control.player1 = 0x1010
 	#endif
 		UpdatePlayer1SpritePatterns()
@@ -737,7 +749,7 @@ function void fn074952()
 	{
 		objA0.animation.timer = 0x0a
 		++objA0.animation.frame
-		u8[A1 + 0x22] = (objA0.animation.frame & 0x01) ? 0xffffff8c : 0xffffff8d
+		objA1.animation.sprite = (objA0.animation.frame & 0x01) ? 0xffffff8c : 0xffffff8d
 		UpdatePlayer1SpritePatterns()
 	}
 

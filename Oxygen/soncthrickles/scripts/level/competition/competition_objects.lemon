@@ -261,6 +261,7 @@ function void fn023b38()
 {
 	if (allocDynamicObjectAfterA0())
 	{
+		// Retracting spring
 		u32[A1] = 0x023ed0
 		u32[A1 + 0x0c] = 0x023f4a
 		u16[A1 + 0x0a] = 0x0391

@@ -2250,8 +2250,14 @@ function void fn0075d2()
 	++A0
 	u32[0xffffef52] = A0
 	rolling_demo.last_input = 0
+
+	// control.pad1.state = CONTROL_START
+	// control.pad1.pressed = 0
+	// control.pad2.state = CONTROL_START
+	// control.pad2.pressed = 0
 	control.pad1 = 0x8000
 	control.pad2 = 0x8000
+
 	u8[0xffffef50] = 0xff
 }
 

@@ -993,6 +993,8 @@ function void fn07b0c2()
 
 		boss.remaining_hits = 0
 		D0.u8 &= 0x03
+		// A1 is assigned 0xffffb000 for D0.u8 == 0 or D0.u8 == 1,
+		//            and 0xffffb04a for D0.u8 == 2 or D0.u8 == 3
 		A1 = 0xffff0000 + u16[0x07b10e + D0.u8 * 2]
 		if (u8[A1 + 0x34] != 0)
 			return

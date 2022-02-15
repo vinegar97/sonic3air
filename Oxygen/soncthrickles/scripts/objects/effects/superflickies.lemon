@@ -218,7 +218,7 @@ function void fn01a31e()
 
 	u16[0xffffb04a + 0x10] = objA0.position.x.u16
 	u16[0xffffb04a + 0x14] = objA0.position.y.u16
-	u8[0xffffb04a + 0x20] = 2
+	u8[0xffffb04a + 0x20] = char.state.ROLLING
 }
 
 
@@ -329,15 +329,15 @@ function void fn01a434()
 	{
 	#if STANDALONE
 		// Exclude SOZ 1 boss
-		if (u32[A1] == 0x076f46)
+		if (objA1.update_address == 0x076f46)
 			return
 
 		// Exclude DEZ 2 boss and its robots
-		if (u32[A1] == 0x07f344 || u32[A1] == 0x07f4fa)
+		if (objA1.update_address == 0x07f344 || objA1.update_address == 0x07f4fa)
 			return
 
-		// Excluse SOZ 2 sand cork
-		if (u32[A1] == 0x041d32)
+		// Exclude SOZ 2 sand cork
+		if (objA1.update_address == 0x041d32)
 			return
 	#endif
 

@@ -24,7 +24,7 @@ function void CatakillerJr.BaseUpdate()
 {
 	// Targets:
 	//  - 0x0876ec	-> objA0.base_state = 0x00
-	//  - 0x087728	-> objA0.base_state = 0x04
+	//  - 0x087728	-> objA0.base_state = 0x02, 0x04
 	//  - 0x087758	-> objA0.base_state = 0x06
 	//  - 0x08777a	-> objA0.base_state = 0x08
 	call tableLookupAddress(0x0876e2, objA0.base_state)

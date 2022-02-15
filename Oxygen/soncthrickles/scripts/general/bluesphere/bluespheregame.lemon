@@ -548,7 +548,11 @@ function void fn04d03e()
 
 	D3.u16 = objA0.position.y.u16 + 0x10
 	A1 = A0
+
+	// A1 += 0x4a
+	// objA1.animation.sprite = 0x0a
 	u8[A1 + 0x4a + 0x22] = 0x0a	// Left star sprite
+
 	D2.u16 = 0xf7
 	D1 = 0x0a
 	while (D1.s16 >= 0)
@@ -1849,7 +1853,11 @@ function void fn04e0a4()
 	objA0.animation.sprite = 0x04	// "DIFFICULTY"
 
 	A1 = A0
+
+	// A1 += 0x4a
+	// objA1.animation.sprite = 0x0a
 	u8[A1 + 0x4a + 0x22] = 0x0a	// Left star sprite
+
 	D2.u16 = 0x0114 + getScreenExtend()
 	D3.u16 = objA0.position.y.u16 + 0x10
 

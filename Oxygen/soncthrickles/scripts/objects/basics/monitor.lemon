@@ -587,7 +587,6 @@ function void ItemEffect.Init()
 	//  - 0x01dc32	-> D0 = 0x09
 	//  - 0x01dc40	-> D0 = 0x0a
 	//  - 0x01dc4e	-> D0 = 0x0b
-	//  - 0x01dba3	-> D0 = 0x0c
 	A1 = tableLookupAddress(0x01dba2, D0 * 2)
 	A1 += 2
 	objA0.mapping_offset = A1

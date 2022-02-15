@@ -321,12 +321,21 @@ function void fn0763b2()
 //# address-hook(0x0763d8) end(0x076402)
 function void fn0763d8()
 {
+	// control.player1.state = CONTROL_UP
+	// control.player1.pressed = CONTROL_UP
 	control.player1 = 0x0101
+
+	// control.pad2.state = CONTROL_UP
+	// control.pad2.pressed = CONTROL_UP
 	control.pad2 = 0x0101
+
 	if (u8[0xfffffaa9] == 0)
 		return
 
 	objA0.update_address = 0x076404
+
+	// control.player1.state = CONTROL_C
+	// control.player1.pressed = CONTROL_C
 	control.player1 = 0x2020
 
 	A1 = 0xffffb000
@@ -337,7 +346,10 @@ function void fn0763d8()
 //# address-hook(0x076404) end(0x076450)
 function void fn076404()
 {
+	// control.player1.state = CONTROL_C
+	// control.player1.pressed = 0
 	control.player1 = 0x2000
+
 	A1 = 0xffffb000
 	if (objA1.velocity.y < 0)
 		return

@@ -19,12 +19,12 @@ function void AIZZipLine.Init()
 	objA1.update_address = 0x021d28
 	fn021d00()
 
-	u8[A1 + 0x22] = 0x21
+	objA1.animation.sprite = 0x21
 	D2.u16 = objA0.position.x.u16
 	D3.u16 = objA0.position.y.u16
 	u16[A0 + 0x46] = objA0.position.x.u16 + ((objA0.subtype2c & 0x7f) << 4)
 
-	D1 = 4
+	D1 = 4		// Length of vine
 	if (allocDynamicObjectAfterA0())
 	{
 		objA0.value3e = A1.u16
@@ -57,7 +57,7 @@ function void fn021cb8()
 		if (D1.s16 < 0)
 		{
 			objA1.update_address = 0x022074
-			u8[A1 + 0x22] = 0x20
+			objA1.animation.sprite = 0x20
 			u16[A0 + 0x40] = A1.u16
 			break
 		}
@@ -76,12 +76,12 @@ function void fn021cb8()
 //# address-hook(0x021d00) end(0x021d26)
 function void fn021d00()
 {
-	u8[A1 + 0x04] = render_flag.WORLD
-	u8[A1 + 0x06] = 8
-	u8[A1 + 0x07] = 8
-	u16[A1 + 0x08] = 0x0200
-	u16[A1 + 0x0a] = 0x041b
-	u32[A1 + 0x0c] = 0x022b9e
+	objA1.render_flags = render_flag.WORLD
+	objA1.box_size.y = 8
+	objA1.box_size.x = 8
+	objA1.sprite_priority = 0x0200
+	objA1.sprite_attributes = 0x041b
+	objA1.mapping_offset = 0x022b9e
 }
 
 
@@ -109,7 +109,7 @@ function void fn021d4c()
 	D0.u16 = objA0.position.x.u16
 	if (D0.u16 >= u16[A0 + 0x46])
 	{
-		if (s8[A0 + 0x2c] < 0)
+		if (s8(objA0.subtype2c) < 0)
 		{
 			objA0.update_address = 0x021df2
 			objA0.velocity.x = 0x800

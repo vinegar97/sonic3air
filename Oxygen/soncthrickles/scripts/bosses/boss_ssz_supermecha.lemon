@@ -233,7 +233,11 @@ function void fn07bbe0()
 	u8[0xfffffab8] ^= 0x40
 
 	// Make Knuckles walk right until he's close enough
+
+	// control.player1.state = CONTROL_RIGHT
+	// control.player1.pressed = CONTROL_RIGHT
 	control.player1 = 0x0808
+
 	A1 = 0xffffb000
 	D0.u16 = objA1.position.x.u16
 	D1.u16 = u16[0xfffffa8a] + 0x10

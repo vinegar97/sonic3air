@@ -115,6 +115,9 @@ function void fn072c0a()
 
 			u8[A1 + 0x04] &= ~render_flag.FLIP_X
 			u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
+
+			// control.player1.state = CONTROL_UP
+			// control.player1.pressed = CONTROL_UP
 			control.player1 = 0x0101
 
 			spawnSimpleChildObjects(0x073806)
