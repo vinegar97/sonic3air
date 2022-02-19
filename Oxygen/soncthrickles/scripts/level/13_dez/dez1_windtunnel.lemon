@@ -249,6 +249,8 @@ function void fn049848()
 //# address-hook(0x049850) end(0x0498c0)
 function void fn049850()
 {
+	u8 bit = (1 << D5.u8)
+
 	objA1.flags2a &= ~char.flag.FACING_LEFT
 	objA1.velocity.x = 0x0c00
 
@@ -258,7 +260,7 @@ function void fn049850()
 		objA1.flags2a |= char.flag.FACING_LEFT
 		objA1.velocity.x = -objA1.velocity.x
 	}
-	objA0.flags2a &= ~(1 << D5.u8)
+	objA0.flags2a &= ~bit
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
 	u8[A1 + 0x2f] = 0

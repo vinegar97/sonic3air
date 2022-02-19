@@ -159,6 +159,8 @@ function void fn03fe44()
 //# address-hook(0x03fe70) end(0x03ff7e)
 function void fn03fe70()
 {
+	u8 bit = (1 << D6.u8)
+
 	if (u8[A2] != 0)
 	{
 		--u8[A2]
@@ -168,14 +170,14 @@ function void fn03fe70()
 	u16 dx = objA1.position.x.u16 - objA0.position.x.u16 + D2.u16
 	u16 dy = objA1.position.y.u16 - objA0.position.y.u16 + 0x10
 
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	if ((objA0.flags2a & bit) == 0)
 	{
 		if (dx < D3.u16 && dy < 0x20)
 		{
 			if (u8[A1 + 0x2a] & 0x02 && (u8[A1 + 0x2a] & 0x08) == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0 && objA1.velocity.y >= 0)
 			{
 				u8[A1 + 0x2a] |= 0x08
-				objA0.flags2a |= (1 << D6.u8)
+				objA0.flags2a |= bit
 				u8[A1 + 0x1e] = 0x0e
 				u8[A1 + 0x1f] = 0x07
 				u8[A1 + 0x20] = 0x02
@@ -199,7 +201,7 @@ function void fn03fe70()
 				{
 					objA1.velocity.y = 0x0400
 					u8[A1 + 0x2a] &= ~0x08
-					objA0.flags2a &= ~(1 << D6.u8)
+					objA0.flags2a &= ~bit
 
 					u8[A2] = 0x1e
 					playSound(0x62)
@@ -221,7 +223,7 @@ function void fn03fe70()
 
 		objA1.velocity.y = 0
 		u8[A1 + 0x2a] &= ~0x08
-		objA0.flags2a &= ~(1 << D6.u8)
+		objA0.flags2a &= ~bit
 	}
 }
 
@@ -250,7 +252,7 @@ function void fn03ff9e()
 	u16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 0x20
 	u16 dy = objA1.position.y.u16 - objA0.position.y.u16 + D2.u16
 
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
 		if (dx < 0x40 && dy < D3.u16)

@@ -43,7 +43,7 @@ function void fn033c86()
 //# address-hook(0x033cac) end(0x033f64)
 function void fn033cac()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
 		if (u8[A2 + 0x04] != 0)

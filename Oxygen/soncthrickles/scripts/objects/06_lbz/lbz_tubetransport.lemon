@@ -537,7 +537,9 @@ function void fn01de20()
 
 function void fn01de36()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+
+	if (objA0.flags2a & bit)
 	{
 		if ((objA1.flags2a & char.flag.IN_AIR) == 0)
 		{
@@ -557,7 +559,7 @@ function void fn01de36()
 		objA1.flags2a &= ~char.flag.ON_OBJECT
 		objA1.flags2a |= char.flag.IN_AIR
 
-		objA0.flags2a &= ~(1 << D6.u8)
+		objA0.flags2a &= ~bit
 		D4 = 0
 	}
 	else

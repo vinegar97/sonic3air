@@ -133,7 +133,9 @@ function void fn03e9c6()
 		return
 #endif
 
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+
+	if (objA0.flags2a & bit)
 	{
 		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
@@ -153,7 +155,7 @@ function void fn03e9c6()
 		}
 
 		objA1.flags2a &= ~char.flag.ON_OBJECT
-		objA0.flags2a &= ~(1 << D6.u8)
+		objA0.flags2a &= ~bit
 		u8[A0 + D5.s16] = 0
 		D4 = 0
 	}

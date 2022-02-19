@@ -334,7 +334,8 @@ function void fn065efe()
 //# address-hook(0x065f2e) end(0x065f84)
 function void fn065f2e()
 {
-	if ((objA0.flags38 & (1 << D2.u8)) == 0)
+	u8 bit = (1 << D2.u8)
+	if ((objA0.flags38 & bit) == 0)
 		return
 
 	--u8[A1 + 0x24]
@@ -364,14 +365,15 @@ function void fn065f2e()
 //# address-hook(0x065f84) end(0x065fd4)
 function void fn065f84()
 {
-	if (objA0.flags38 & (1 << D2.u8))
+	u8 bit = (1 << D2.u8)
+	if (objA0.flags38 & bit)
 		return
 
 	A2 = 0x065fd6
 	fn0858c8()
 	if (!_equal())
 	{
-		objA0.flags38 |= (1 << D2.u8)
+		objA0.flags38 |= bit
 		u16 backupD3 = D3.u16
 		player1.camera_lock = 0
 		hud.dirty.timer = 0

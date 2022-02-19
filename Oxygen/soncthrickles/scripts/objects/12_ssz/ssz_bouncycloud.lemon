@@ -93,6 +93,8 @@ function void fn045170()
 		return
 #endif
 
+	u8 bit = (1 << D6.u8)
+
 	D1 = 0x20
 	D2 = 0x10
 	D3 = 0
@@ -101,7 +103,7 @@ function void fn045170()
 
 	if (u8[A2] == 0)
 	{
-		if (objA0.flags2a & (1 << D6.u8))
+		if (objA0.flags2a & bit)
 		{
 			u16[A2 + 0x02] = objA1.velocity.x
 			u16[A2 + 0x04] = u16[A1 + 0x1c]

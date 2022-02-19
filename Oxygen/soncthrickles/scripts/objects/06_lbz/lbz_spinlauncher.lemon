@@ -140,6 +140,8 @@ function void fn028e76()
 //# address-hook(0x028f40) end(0x028ff2)
 function void fn028f40()
 {
+	u8 bit = (1 << D6.u8)
+
 	if ((objA0.flags2a & 0x01) == 0)
 	{
 		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
@@ -166,6 +168,6 @@ function void fn028f40()
 	u8[A1 + 0x2a] &= ~0x08
 	u8[A1 + 0x2a] &= ~0x04
 	u8[A1 + 0x20] = 0
-	objA0.flags2a &= ~(1 << D6.u8)
+	objA0.flags2a &= ~bit
 	u8[A4] = 0x20
 }

@@ -286,7 +286,8 @@ function void fn034f04()
 	D4.u16 = objA0.position.x.u16
 	fn01dc74()
 
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+	if ((objA0.flags2a & bit) == 0)
 		return
 
 	if (s8[A1 + 0x37] >= 0)
@@ -319,7 +320,7 @@ function void fn034f4c()
 //# address-hook(0x034f6a) end(0x034fba)
 function void fn034f6a()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
 		u8[A4] = 0

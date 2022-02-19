@@ -149,7 +149,7 @@ function void fn038534()
 //# address-hook(0x03857e) end(0x038686)
 function void fn03857e()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
 		if (objA1.velocity.y == 0)

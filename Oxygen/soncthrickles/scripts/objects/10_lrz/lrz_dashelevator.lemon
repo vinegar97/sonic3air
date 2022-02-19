@@ -117,9 +117,11 @@ function void fn042f78()
 //# address-hook(0x04301c) end(0x043094)
 function void fn04301c()
 {
+	u8 bit = (1 << D6.u8)
+
 	if (u8[A2] == 0)
 	{
-		if (objA0.flags2a & (1 << D6.u8))
+		if (objA0.flags2a & bit)
 		{
 		#if STANDALONE
 			// Allow Super Peel-Out as well

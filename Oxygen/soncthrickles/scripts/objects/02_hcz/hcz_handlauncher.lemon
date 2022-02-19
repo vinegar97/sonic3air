@@ -162,7 +162,7 @@ function void fn030c7c()
 
 function void fn030c8c()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if (u8[A0 + 0x35] & bit)
 	{
 		u8[A0 + 0x35] &= ~bit

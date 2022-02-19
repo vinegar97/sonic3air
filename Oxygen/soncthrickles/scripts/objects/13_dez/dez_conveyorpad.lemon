@@ -128,7 +128,8 @@ function void fn047a88()
 function void fn047a96()
 {
 	// Move characters standing on the conveyor belt
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		D0 = 2
 		if ((objA0.state != 0) != global.inv_gravity)

@@ -458,7 +458,8 @@ function void fn01ddc6()
 
 function void fn01dddc()
 {
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+	if ((objA0.flags2a & bit) == 0)
 	{
 		fn01dece()
 	}
@@ -480,7 +481,7 @@ function void fn01dddc()
 			}
 		}
 		u8[A1 + 0x2a] &= ~0x08
-		objA0.flags2a &= ~(1 << D6.u8)
+		objA0.flags2a &= ~bit
 		D4 = 0
 	}
 }

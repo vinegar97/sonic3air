@@ -89,9 +89,11 @@ function void fn039ce8()
 //# address-hook(0x039d1a) end(0x039d3c)
 function void fn039d1a()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+
+	if (objA0.flags2a & bit)
 	{
-		objA0.flags2a &= ~(1 << D6.u8)
+		objA0.flags2a &= ~bit
 		u8[A1 + 0x2a] &= ~0x08
 		u8[A1 + 0x2a] &= ~0x20
 		u8[A1 + 0x2a] |= 0x02

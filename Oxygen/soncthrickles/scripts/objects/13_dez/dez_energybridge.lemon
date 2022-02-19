@@ -122,7 +122,7 @@ function void fn047e8c()
 //# address-hook(0x047ee8) end(0x047efa)
 function void fn047ee8()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if (objA0.flags2a & bit)
 	{
 		objA0.flags2a &= ~bit
@@ -211,6 +211,7 @@ function void fn047f56()
 //# address-hook(0x047f9c) end(0x047ff6)
 function void fn047f9c()
 {
+	u8 bit = (1 << D6.u8)
 	if (u16[A0 + 0x34] != 0)
 	{
 		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x50
@@ -219,7 +220,7 @@ function void fn047f9c()
 			D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x30
 			if (D0.u16 < 0x60)
 			{
-				objA0.flags2a |= (1 << D6.u8)
+				objA0.flags2a |= bit
 				u8[A1 + 0x46] = 0x0e
 				u8[A1 + 0x47] = 0x0f
 				return
@@ -227,7 +228,7 @@ function void fn047f9c()
 		}
 	}
 
-	u8 bit = 1 << D6.u8
+	//u8 bit = (1 << D6.u8)
 	if (objA0.flags2a & bit)
 	{
 		objA0.flags2a &= ~bit

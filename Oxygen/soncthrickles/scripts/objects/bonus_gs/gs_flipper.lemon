@@ -72,12 +72,13 @@ function void fn049c8a()
 //# address-hook(0x049cfe) end(0x049d6e)
 function void fn049cfe()
 {
+	u8 bit = (1 << D6.u8)
 	if (debug_mode.state == 0)
 	{
 		D0.u8 = u8[A3]
 		if (D0.u8 == 0)
 		{
-			if (objA0.flags2a & (1 << D6.u8))
+			if (objA0.flags2a & bit)
 			{
 				++u8[A3]
 				u16[A1 + 0x20] = 0x0200
@@ -102,7 +103,7 @@ function void fn049cfe()
 			return
 		}
 
-		if (objA0.flags2a & (1 << D6.u8))
+		if (objA0.flags2a & bit)
 		{
 			D1 = 0x18
 			if (objA0.flags2a & 0x01)

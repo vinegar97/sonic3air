@@ -81,7 +81,8 @@ function void fn03b97a()
 //# address-hook(0x03b9d8) end(0x03ba48)
 function void fn03b9d8()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		D0 = 4
 		D1.u16 = 0x0100

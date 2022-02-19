@@ -347,7 +347,8 @@ function void fn038a88()
 //# address-hook(0x038aa2)
 function void fn038aa2()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
@@ -372,7 +373,7 @@ function void fn038aa2()
 		}
 
 		objA1.flags2a &= ~char.flag.ON_OBJECT
-		objA0.flags2a &= ~(1 << D6.u8)
+		objA0.flags2a &= ~bit
 		D4 = 0
 	}
 	else
@@ -381,7 +382,7 @@ function void fn038aa2()
 		fn01e410()
 		D1.u16 = backupD1
 
-		if (objA0.flags2a & (1 << D6.u8))
+		if (objA0.flags2a & bit)
 		{
 			D0 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
 			D0.u16 >>= 4
@@ -651,7 +652,8 @@ function void fn038b2a()
 //# address-hook(0x038b44)
 function void fn038b44()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		if ((u8[A1 + 0x2a] & 0x02) == 0)
 		{
@@ -677,7 +679,7 @@ function void fn038b44()
 		}
 
 		u8[A1 + 0x2a] &= ~0x08
-		objA0.flags2a &= ~(1 << D6.u8)
+		objA0.flags2a &= ~bit
 		D4 = 0
 	}
 	else
@@ -722,7 +724,8 @@ function void fn038bd8()
 //# address-hook(0x038bea)
 function void fn038bea()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		if ((u8[A1 + 0x2a] & 0x02) == 0)
 		{

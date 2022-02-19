@@ -169,7 +169,9 @@ function void fn03f996()
 
 function void fn03fa26()
 {
-	if (u8[A1 + 0x2a] & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+
+	if (u8[A1 + 0x2a] & bit)
 	{
 		u8[A2 + 0x05] = 0x02
 		u16[A2 + 0x1a] = (u16[A0 + 0x3a] < 0x0900) ? 0xf300 : 0xf180
@@ -186,7 +188,9 @@ function void fn03fa26()
 
 function void fn03fa5a()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+
+	if (objA0.flags2a & bit)
 	{
 		u8[A2 + 0x05] = 0x02
 		u16[A2 + 0x1a] = 0xf300

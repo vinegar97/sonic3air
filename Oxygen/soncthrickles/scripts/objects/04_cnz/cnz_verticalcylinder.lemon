@@ -65,7 +65,9 @@ function void fn03385e()
 //# address-hook(0x0338c4) end(0x033abe)
 function void fn0338c4()
 {
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+
+	if ((objA0.flags2a & bit) == 0)
 	{
 		if (u8[A2 + 0x01] != 0)
 		{
@@ -216,7 +218,7 @@ function void fn0338c4()
 	u8[A1 + 0x1f] = 0x09
 	u16[A1 + 0x20] = 0x01
 	u8[A1 + 0x2a] &= ~0x08
-	objA0.flags2a &= ~(1 << D6.u8)
+	objA0.flags2a &= ~bit
 	u8[A1 + 0x2e] &= ~0x40
 	u8[A1 + 0x2e] &= ~0x02
 	u16[A1 + 0x0a] &= 0x7fff
@@ -227,6 +229,8 @@ function void fn0338c4()
 //# address-hook(0x033ade) end(0x033c14)
 function void fn033ade()
 {
+	u8 bit = (1 << D6.u8)
+
 	if (debug_mode.state == 0)
 	{
 		D5.u16 &= 0x70
@@ -285,7 +289,7 @@ function void fn033ade()
 	u8[A1 + 0x1f] = 0x09
 	u16[A1 + 0x20] = 0x01
 	u8[A1 + 0x2a] &= ~0x08
-	objA0.flags2a &= ~(1 << D6.u8)
+	objA0.flags2a &= ~bit
 	u8[A1 + 0x2e] &= ~0x40
 	u8[A1 + 0x2e] &= ~0x02
 	u8[A1 + 0x2e] &= ~0x01
@@ -328,10 +332,12 @@ function void fn033bba()
 //# address-hook(0x033c34) end(0x033c72)
 function void fn033c34()
 {
+	u8 bit = (1 << D6.u8)
+
 	if (u8[A1 + 0x2a] & 0x08)
 	{
 		A3 = 0xffff0000 + u16[A1 + 0x42]
-		u8[A3 + 0x2a] &= ~(1 << D6.u8)
+		u8[A3 + 0x2a] &= ~bit
 	}
 
 	u16[A1 + 0x42] = A0.u16
@@ -346,5 +352,5 @@ function void fn033c34()
 
 	u8[A1 + 0x2a] |= 0x08
 	u8[A1 + 0x2a] &= ~0x02
-	objA0.flags2a |= (1 << D6.u8)
+	objA0.flags2a |= bit
 }

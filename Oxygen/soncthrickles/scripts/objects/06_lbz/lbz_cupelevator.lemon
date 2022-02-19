@@ -530,7 +530,7 @@ function void fn026e78()
 //# address-hook(0x026eb4) end(0x026ed8)
 function void fn026eb4()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if (objA0.flags2a & bit)
 	{
 		objA0.flags2a &= ~bit
@@ -551,6 +551,8 @@ function void fn026eda()
 		return
 #endif
 
+	u8 bit = (1 << D6.u8)
+
 	if (u8[A2] == 0)
 	{
 		if (u8[A2 + 0x02] != 0)
@@ -568,7 +570,7 @@ function void fn026eda()
 			fn01df90()
 		}
 
-		if ((objA0.flags2a & (1 << D6.u8)) == 0)
+		if ((objA0.flags2a & bit) == 0)
 			return
 
 		if (u16[A0 + 0x34] == 0)
@@ -590,7 +592,7 @@ function void fn026eda()
 	{
 		if (s8[A1 + 0x04] >= 0 || u8[A1 + 0x05] >= 0x04)
 		{
-			objA0.flags2a &= ~(1 << D6.u8)
+			objA0.flags2a &= ~bit
 			u8[A1 + 0x2a] &= ~0x08
 			u16[A1 + 0x08] = 0x0100
 			u8[A1 + 0x2e] = 0
@@ -605,7 +607,7 @@ function void fn026eda()
 			// Jumping out of the cup
 			u16[A1 + 0x08] = 0x0100
 			u8[A1 + 0x2e] = 0
-			objA0.flags2a &= ~(1 << D6.u8)
+			objA0.flags2a &= ~bit
 			u8[A1 + 0x2a] &= ~0x08
 			u8[A1 + 0x2a] &= ~0x20
 			u8[A1 + 0x2a] |= 0x02

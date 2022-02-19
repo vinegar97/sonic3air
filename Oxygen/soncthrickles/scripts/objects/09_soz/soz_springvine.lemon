@@ -125,7 +125,9 @@ function void fn040878()
 //# address-hook(0x04093e) end(0x0409b8)
 function void fn04093e()
 {
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+
+	if ((objA0.flags2a & bit) == 0)
 	{
 		u8[A2] = 0
 		return

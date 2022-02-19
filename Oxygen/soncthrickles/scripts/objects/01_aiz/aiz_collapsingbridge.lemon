@@ -257,7 +257,8 @@ function void fn02af70()
 //# address-hook(0x02af9c) end(0x02affc)
 function void fn02af9c()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		D2.u16 = D1.u16 * 2
 		if ((u8[A1 + 0x2a] & 0x02) == 0)
@@ -277,7 +278,7 @@ function void fn02af9c()
 					return
 			}
 		}
-		objA0.flags2a &= ~(1 << D6.u8)
+		objA0.flags2a &= ~bit
 		u8[A1 + 0x2a] &= ~0x08
 		u8[A1 + 0x2a] &= ~0x20
 		u8[A1 + 0x2a] |= 0x02

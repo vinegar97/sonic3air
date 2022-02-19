@@ -40,7 +40,9 @@ function void fn04045e()
 //# address-hook(0x040474) end(0x040544)
 function void fn040474()
 {
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+
+	if ((objA0.flags2a & bit) == 0)
 	{
 		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
 		if (D0.u16 < 0x20)
@@ -50,7 +52,7 @@ function void fn040474()
 			{
 				if ((u8[A1 + 0x2a] & 0x08) == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0 && objA1.velocity.y >= 0x0800)
 				{
-					objA0.flags2a |= (1 << D6.u8)
+					objA0.flags2a |= bit
 					u8[A1 + 0x1e] = 0x0e
 					u8[A1 + 0x1f] = 0x07
 					u8[A1 + 0x20] = 0x02
@@ -78,7 +80,7 @@ function void fn040474()
 		if (D0.s16 >= s16(objA0.position.y.u16))
 		{
 			u8[A1 + 0x2a] &= ~0x08
-			objA0.flags2a &= ~(1 << D6.u8)
+			objA0.flags2a &= ~bit
 			u8[A1 + 0x2e] = 0
 		}
 	}

@@ -49,8 +49,10 @@ function void CNZBarberPole.UpdateVariantLeftToRight()
 //# address-hook(0x033392) end(0x0335a6)
 function void fn033392()
 {
+	u8 bit = (1 << D6.u8)
+
 	D0 = 0
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	if ((objA0.flags2a & bit) == 0)
 	{
 		if ((u8[A1 + 0x2a] & 0x08) == 0)
 		{
@@ -174,7 +176,7 @@ function void fn033392()
 	}
 
 	u8[A1 + 0x2a] &= ~0x08
-	objA0.flags2a &= ~(1 << D6.u8)
+	objA0.flags2a &= ~bit
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x31] = 0x04
 	u16[A1 + 0x0a] &= 0x7fff
@@ -201,8 +203,10 @@ function void CNZBarberPole.UpdateVariantRightToLeft()
 //# address-hook(0x0335c4) end(0x0337d6)
 function void fn0335c4()
 {
+	u8 bit = (1 << D6.u8)
+
 	D0 = 0
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	if ((objA0.flags2a & bit) == 0)
 	{
 		if ((u8[A1 + 0x2a] & 0x08) == 0)
 		{
@@ -327,7 +331,7 @@ function void fn0335c4()
 	}
 
 	u8[A1 + 0x2a] &= ~0x08
-	objA0.flags2a &= ~(1 << D6.u8)
+	objA0.flags2a &= ~bit
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x31] = 0x04
 	u16[A1 + 0x0a] &= 0x7fff
@@ -337,10 +341,12 @@ function void fn0335c4()
 //# address-hook(0x0337d8) end(0x033834)
 function void fn0337d8()
 {
+	u8 bit = (1 << D6.u8)
+
 	if (u8[A1 + 0x2a] & 0x08)
 	{
 		A3 = 0xffff0000 + u16[A1 + 0x42]
-		u8[A3 + 0x2a] &= ~(1 << D6.u8)
+		u8[A3 + 0x2a] &= ~bit
 	}
 
 	u16[A1 + 0x42] = A0.u16
@@ -358,5 +364,5 @@ function void fn0337d8()
 
 	u8[A1 + 0x2a] |= 0x08
 	u8[A1 + 0x2a] &= ~0x02
-	objA0.flags2a |= (1 << D6.u8)
+	objA0.flags2a |= bit
 }

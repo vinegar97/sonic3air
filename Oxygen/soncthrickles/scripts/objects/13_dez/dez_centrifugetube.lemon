@@ -54,7 +54,9 @@ function void fn048eec()
 //# address-hook(0x048f12) end(0x048f8e)
 function void fn048f12()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+
+	if (objA0.flags2a & bit)
 	{
 		fn048fa4()
 		return
@@ -93,6 +95,8 @@ function void fn048f12()
 //# address-hook(0x048fa4) end(0x049068)
 function void fn048fa4()
 {
+	u8 bit = (1 << D6.u8)
+
 	if (u8[A1 + 0x2a] & 0x02)
 	{
 		objA1.velocity.y = 0
@@ -154,7 +158,7 @@ function void fn048fa4()
 	}
 
 	u8[A1 + 0x2a] &= ~0x08
-	objA0.flags2a &= ~(1 << D6.u8)
+	objA0.flags2a &= ~bit
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x31] = 0x04
 	u8[A1 + 0x2a] |= 0x02
@@ -193,7 +197,9 @@ function void fn04906a()
 //# address-hook(0x049090) end(0x0491d4)
 function void fn049090()
 {
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+
+	if ((objA0.flags2a & bit) == 0)
 	{
 		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x20
 		D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + D4.u16
@@ -236,7 +242,7 @@ function void fn049090()
 	{
 		u8[A1 + 0x2e] = 0
 		u8[A1 + 0x2a] &= ~0x08
-		objA0.flags2a &= ~(1 << D6.u8)
+		objA0.flags2a &= ~bit
 		u8[A1 + 0x27] = 1
 		u8[A1 + 0x30] = 0
 		u8[A1 + 0x31] = 4

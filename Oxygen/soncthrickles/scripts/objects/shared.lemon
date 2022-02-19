@@ -309,7 +309,7 @@ function void fn01dc56()
 //# address-hook(0x01dc74)
 function void fn01dc74()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
 		fn01df88()
@@ -381,7 +381,7 @@ function bool fn01dcb6_internal(u32 characterAddress, u8 bitnum)
 {
 	A1 = characterAddress
 	D6.u8 = bitnum
-	u8 bit = 1 << bitnum
+	u8 bit = (1 << bitnum)
 
 	if ((objA0.flags2a & bit) == 0)
 	{
@@ -437,7 +437,8 @@ function void fn01dd0e()
 //# address-hook(0x01dd24) end(0x01dd6c)
 function void fn01dd24()
 {
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+	if ((objA0.flags2a & bit) == 0)
 	{
 		fn01dece()
 		return
@@ -460,7 +461,7 @@ function void fn01dd24()
 
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.ON_OBJECT
-	objA0.flags2a &= ~(1 << D6.u8)
+	objA0.flags2a &= ~bit
 	D4 = 0
 }
 
@@ -1520,7 +1521,7 @@ function void fn01e2fe()
 
 function void fn01e314()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
 		fn01e50e()
@@ -1666,7 +1667,7 @@ function void fn01e45a()
 //# address-hook(0x01e490)
 function void LetSonicClimbOnObject()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 
 	// Already on another object?
 	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)

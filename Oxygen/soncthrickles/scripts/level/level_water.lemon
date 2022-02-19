@@ -418,6 +418,8 @@ function void fn006f4a()
 
 function void fn006f90()
 {
+	u8 bit = (1 << D5.u8)
+
 	A2 = (global.act == 0) ? 0x00705c : 0x007130
 	D2.u16 = u16[(A2+=2)-2]
 
@@ -433,7 +435,7 @@ function void fn006f90()
 				return
 			}
 
-			if ((u8[0xfffff7c7] & (1 << D5.u8)) == 0)
+			if ((u8[0xfffff7c7] & bit) == 0)
 			{
 				if (u8[A1 + 0x2e] != 0)
 				{
