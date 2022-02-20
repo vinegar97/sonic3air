@@ -210,7 +210,7 @@ define u8 OBJECTTABLE1_31		= 0x31		// Object address 0x02c3ae = LBZ Large Horizo
 define u8 OBJECTTABLE1_32		= 0x32		// Object address 0x02b12a = Drawbridge from AIZ2 end cutscene
 define u8 OBJECTTABLE1_33		= 0x33		// Object address 0x02c518 = Button
 define u8 OBJECTTABLE1_34		= 0x34		// Object address 0x02cfa8 = Checkpoint / Starpost
-define u8 OBJECTTABLE1_35		= 0x35		// Object address 0x02c1f0 = AIZ Foreground Farns
+define u8 OBJECTTABLE1_35		= 0x35		// Object address 0x02c1f0 = AIZ Foreground Ferns
 define u8 OBJECTTABLE1_36		= 0x36		// Object address 0x01ed26 = HCZ Breakable Bar
 define u8 OBJECTTABLE1_37		= 0x37		// Object address 0x02fda4 = -- hcz1_firstpool.lemon
 define u8 OBJECTTABLE1_38		= 0x38		// Object address 0x030580 = -- hcz_fan.lemon
