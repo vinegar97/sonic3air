@@ -62,7 +62,7 @@ function void fn01ecaa()
 //# address-hook(0x01f3ea) end(0x01f3f0)
 function void fn01f3ea()
 {
-	objA0.flags2b |= 0x20
+	objA0.flags2b |= char.bonus.SHIELD_LIGHTNING		// Shocking surfaces
 	fn01f3f8()
 }
 
@@ -70,7 +70,7 @@ function void fn01f3ea()
 //# address-hook(0x01f3f2) end(0x01f4f2)
 function void fn01f3f2()
 {
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE		// Burning surfaces, like lava
 	fn01f3f8()
 }
 
@@ -158,7 +158,7 @@ function void fn01f528()
 function void BlockerElement.DoDamage()
 {
 	// Check if character is protected by shield against this damage type
-	D0.u8 = objA0.flags2b & 0x73
+	D0.u8 = objA0.flags2b & (char.bonus.ALL_SHIELDS | char.bonus.INVINCIBLE)
 	if ((D0.u8 & u8[A1 + 0x2b]) == 0)
 	{
 		DamageCharacter()
