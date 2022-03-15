@@ -4797,7 +4797,7 @@ function void Character.CheckCollisionsWithDynamicObjects()
 	if (Game.getSetting(SETTING_INSTA_SHIELD))
 #endif
 	{
-		if (char.character == CHARACTER_SONIC && (char.bonus_effect & 0x73) == 0)
+		if (char.character == CHARACTER_SONIC && (char.bonus_effect & (char.bonus.ALL_SHIELDS | char.bonus.INVINCIBLE)) == 0)
 		{
 			hasInstaShield = (char.double_jump_state == 1)
 		}
