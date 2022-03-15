@@ -37,8 +37,7 @@ function void fn08e184()
 //# address-hook(0x08e1aa) end(0x08e1b8)
 function void fn08e1aa()
 {
-	A1 = 0x08e3d8
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x08e3d8))
 		return
 
 	spawnChildObjectsInDir(0x08e402)

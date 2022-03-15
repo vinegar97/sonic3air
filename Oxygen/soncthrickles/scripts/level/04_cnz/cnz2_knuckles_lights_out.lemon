@@ -53,8 +53,7 @@ function void fn0622b2()
 //# address-hook(0x0622e4) end(0x06232c)
 function void fn0622e4()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	u32[A0 + 0x30] = 0x0666bf

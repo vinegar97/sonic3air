@@ -63,8 +63,7 @@ function void fn061f98()
 //# address-hook(0x061fc2) end(0x062012)
 function void fn061fc2()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	objA0.position.x.u16 = 0x4b8e

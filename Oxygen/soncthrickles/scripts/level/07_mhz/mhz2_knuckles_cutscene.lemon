@@ -52,8 +52,7 @@ function void fn0630fc()
 //# address-hook(0x063134) end(0x06316a)
 function void fn063134()
 {
-	A1 = 0x0663cc
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663cc))
 		return
 
 	objA0.countdown_callback = 0x063182

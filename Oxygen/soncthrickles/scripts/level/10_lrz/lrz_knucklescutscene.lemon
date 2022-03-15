@@ -37,8 +37,7 @@ function void fn063a6a()
 //# address-hook(0x063a96) end(0x063ac4)
 function void fn063a96()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	objA0.render_flags |= 0x01

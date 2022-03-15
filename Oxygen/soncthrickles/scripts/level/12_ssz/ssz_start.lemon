@@ -257,8 +257,7 @@ function void fn0656da()
 //# address-hook(0x065730) end(0x065758)
 function void fn065730()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 #if STANDALONE
@@ -607,8 +606,7 @@ function void fn065a8c()
 //# address-hook(0x065ab6) end(0x065ace)
 function void fn065ab6()
 {
-	A1 = 0x0664b6
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0664b6))
 		return
 
 	u32[A0 + 0x30] = 0x066739

@@ -672,8 +672,7 @@ function void fn05f71e()
 function void fn05f74e()
 {
 	u16[0xfffffa9a] = 0
-	A1 = 0x07d3ea
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x07d3ea))
 		return
 
 	objA0.render_flags &= ~0x04

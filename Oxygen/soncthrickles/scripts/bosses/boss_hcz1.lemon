@@ -654,8 +654,7 @@ function void fn06a4c0()
 //# address-hook(0x06a4c8) end(0x06a4f2)
 function void fn06a4c8()
 {
-	A1 = 0x06ad30
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x06ad30))
 		return
 
 	objA0.position.y.u16 = water.height.current

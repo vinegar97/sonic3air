@@ -38,8 +38,7 @@ function void BubblesEnemy.Update()
 //# address-hook(0x088370) end(0x0883aa)
 function void fn088370()
 {
-	A1 = 0x088424
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x088424))
 		return
 
 	objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x80 : -0x80

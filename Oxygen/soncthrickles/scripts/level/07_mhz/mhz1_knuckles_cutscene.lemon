@@ -30,8 +30,7 @@ function void fn062b3a()
 //# address-hook(0x062b68) end(0x062bac)
 function void fn062b68()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	u8[A0 + 0x0a] &= ~0x80

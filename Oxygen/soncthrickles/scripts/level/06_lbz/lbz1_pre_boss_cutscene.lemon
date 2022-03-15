@@ -448,8 +448,7 @@ function void fn062678()
 		return
 	}
 
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	objA0.animation.sprite = 0x16

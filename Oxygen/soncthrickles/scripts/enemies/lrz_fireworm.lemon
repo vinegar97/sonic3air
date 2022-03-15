@@ -94,8 +94,7 @@ function void fn08f7a4()
 //# address-hook(0x08f7ea) end(0x08f80c)
 function void fn08f7ea()
 {
-	A1 = 0x08f9ea
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x08f9ea))
 		return
 
 	objA0.base_state = 0x04

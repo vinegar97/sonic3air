@@ -71,8 +71,7 @@ function bool GiantRing.isSuperEmeraldStage()
 //# address-hook(0x06169a) end(0x0616e4)
 function void fn06169a()
 {
-	A1 = 0x06198e
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x06198e))
 		return
 
 	u32[A0 + 0x30] = 0x0619c2
@@ -195,8 +194,7 @@ function void fn0617be()
 //# address-hook(0x0617e0) end(0x061820)
 function void fn0617e0()
 {
-	A1 = 0x0619a0
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0619a0))
 		return
 
 	u32[A0 + 0x30] = 0x0619d4

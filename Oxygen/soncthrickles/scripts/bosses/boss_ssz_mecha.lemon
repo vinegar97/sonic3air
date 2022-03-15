@@ -57,8 +57,7 @@ function void fn07b2dc()
 	}
 #endif
 
-	A1 = 0x07d3ea
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x07d3ea))
 		return
 
 	boss.remaining_hits = 8

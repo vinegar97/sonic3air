@@ -175,8 +175,7 @@ function void fn08bd3c()
 //# address-hook(0x08bb0e) end(0x08bb1e)
 function void fn08bb0e()
 {
-	A1 = 0x08bddc
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x08bddc))
 		return
 
 	if (objA0.render_flags & render_flag.FLIP_Y)

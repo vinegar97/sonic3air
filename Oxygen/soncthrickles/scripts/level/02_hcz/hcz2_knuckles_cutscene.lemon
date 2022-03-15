@@ -67,8 +67,7 @@ function void fn062124()
 //# address-hook(0x06215e) end(0x062192)
 function void fn06215e()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	screenmover_target.top = level.vertical_wrap

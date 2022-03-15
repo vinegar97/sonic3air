@@ -2127,8 +2127,7 @@ function void fn07cfa4()
 //# address-hook(0x07cfc6) end(0x07cfee)
 function void fn07cfc6()
 {
-	A1 = 0x07d3ea
-	fn084fa4()	// TODO: This is only "translated" for a reason!
+	SetupObjectAttributesSlotted(0x07d3ea)	// TODO: This is only "translated" for a reason!
 
 	objA0.sprite_attributes = 0x43f4
 	objA0.render_flags &= ~0x04

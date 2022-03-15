@@ -216,3 +216,8 @@ function void fn084780()
 {
 	Object.AnimationProgressByLocalA1.SlowDown()
 }
+
+function bool fn084fa4()
+{
+	return SetupObjectAttributesSlotted()
+}

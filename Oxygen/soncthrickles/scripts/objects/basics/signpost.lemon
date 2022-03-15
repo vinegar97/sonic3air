@@ -152,8 +152,7 @@ function void SignPost.BaseUpdate()
 //# address-hook(0x0837d8) end(0x08382e)
 function void fn0837d8()
 {
-	A1 = 0x083b04
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x083b04))
 		return
 
 	if (u8[0xffffb000 + 0x0a] & 0x80)

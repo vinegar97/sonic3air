@@ -152,8 +152,7 @@ function void fn08f16a()
 //# address-hook(0x08f1ac) end(0x08f1f2)
 function void fn08f1ac()
 {
-	A1 = 0x08f61c
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x08f61c))
 	{
 		signalMultiReturn()
 		return
@@ -437,8 +436,7 @@ function void fn08f48e()
 	fn084b6e()
 	if (objA0.subtype2c == 0)
 	{
-		A1 = 0x08f61c
-		fn084fa4()
+		SetupObjectAttributesSlotted(0x08f61c)
 	}
 	else
 	{

@@ -41,8 +41,7 @@ function void fn08c96c()
 //# address-hook(0x08c994) end(0x08c9b0)
 function void fn08c994()
 {
-	A1 = 0x08cb10
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x08cb10))
 	{
 		signalMultiReturn()
 		return

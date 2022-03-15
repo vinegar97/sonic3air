@@ -1699,8 +1699,14 @@ function void fn084f6e()
 }
 
 
+function bool SetupObjectAttributesSlotted(u32 sourceAddress)
+{
+	A1 = sourceAddress
+	return SetupObjectAttributesSlotted()
+}
+
 //# translated(0x084fa4) end(0x085020)
-function bool fn084fa4()
+function bool SetupObjectAttributesSlotted()
 {
 	D0 = 0
 	D1.u16 = u16[A1]
