@@ -110,12 +110,12 @@ function void fn019236()
 			return
 
 		objA1.update_address = 0x0192c0
-		u8[A1 + 0x04] = (render_flag.VISIBLE | render_flag.WORLD)
-		u8[A1 + 0x06] = 0x08
-		u8[A1 + 0x07] = 0x08
-		u16[A1 + 0x08] = 0x0380
-		u16[A1 + 0x0a] = 0x879c
-		u32[A1 + 0x0c] = 0x0192ea
+		objA1.render_flags = (render_flag.VISIBLE | render_flag.WORLD)
+		objA1.box_size.y = 0x08
+		objA1.box_size.x = 0x08
+		objA1.sprite_priority = 0x0380
+		objA1.sprite_attributes = 0x879c
+		objA1.mapping_offset = 0x0192ea
 		objA1.position.x.u16 = u16[A2 + 0x10]
 		objA1.position.y.u16 = u16[A2 + 0x14]
 

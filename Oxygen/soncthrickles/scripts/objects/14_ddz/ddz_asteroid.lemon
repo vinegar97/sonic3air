@@ -123,9 +123,9 @@ function void fn0821fc()
 		if (!allocDynamicObjectStd())
 			break
 
-		u32[A1] = D1
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
+		objA1.update_address = D1
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.position.x.u16 = D2.u16 + s8[(A2+=1)-1]
 		objA1.position.y.u16 = D3.u16 + s8[(A2+=1)-1]
 		u16[A1 + 0x2c] = u16[(A2+=2)-2]

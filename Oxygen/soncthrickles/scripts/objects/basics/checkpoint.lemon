@@ -26,7 +26,7 @@ function void Checkpoint.BaseUpdate()
 
 
 //# address-hook(0x02cfc0) end(0x02d00c)
-function void fn02cfc0()
+function void Checkpoint.Init()
 {
 #if STANDALONE
 	// No checkpoints in Time Attack, as they serve no purpose there

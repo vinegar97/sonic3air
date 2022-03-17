@@ -511,9 +511,9 @@ function void MonitorIntact.Opening()
 		objA1.position.y.u16 = objA0.position.y.u16
 		u8[A1 + 0x04] = objA0.render_flags
 	#if STANDALONE
-		u8[A1 + 0x20] = objA0.subtype2c
+		objA1.state = objA0.subtype2c
 	#else
-		u8[A1 + 0x20] = objA0.state
+		objA1.state = objA0.state
 	#endif
 		u8[A1 + 0x2a] = objA0.flags2a
 		objA1.monitor.character_address = objA0.monitor.character_address
@@ -523,7 +523,7 @@ function void MonitorIntact.Opening()
 	{
 		// Explosion
 		objA1.update_address = 0x01e5e0
-		u8[A1 + 0x05] += 2
+		objA1.base_state += 2
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 	}

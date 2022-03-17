@@ -40,12 +40,12 @@ function void fn030580()
 		u8[A1 + 0x2c] = (objA0.subtype2c & ~0x20) | 0x10
 	}
 
-	u32[A1 + 0x0c] = 0x22f3aa
-	u16[A1 + 0x0a] = 0x240b
-	u8[A1 + 0x04] |= 0x04
-	u16[A1 + 0x08] = 0x0200
-	u8[A1 + 0x07] = 0x10
-	u8[A1 + 0x06] = 0x0c
+	objA1.mapping_offset = 0x22f3aa
+	objA1.sprite_attributes = 0x240b
+	objA1.render_flags |= 0x04
+	objA1.sprite_priority = 0x0200
+	objA1.box_size.x = 0x10
+	objA1.box_size.y = 0x0c
 	u16[A1 + 0x40] = objA1.position.x.u16
 	D0.u16 = ((u8[A1 + 0x2c] & 0x0f) + 8) << 4
 	u16[A1 + 0x36] = D0.u16

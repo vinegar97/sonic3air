@@ -789,6 +789,7 @@ function void fn00d39e()
 {
 	if (allocDynamicObjectAfterA0())
 	{
+		// Spawn Emeralds
 		objA1.update_address = 0x00d70c
 		u16[A1 + 0x48] = A0.u16
 	}

@@ -334,7 +334,7 @@ function void Wall.Destroy()
 function void fn0216b8()
 {
 	D0 = objA0.animation.sprite * 2
-	A3 = u32[A0 + 0x0c]
+	A3 = objA0.mapping_offset
 	A3 += u16[A3 + D0.s16]
 	D1.u16 = u16[A3] - 1
 	A3 += 2
@@ -345,15 +345,15 @@ function void fn0216b8()
 
 	while (true)
 	{
-		u32[A1] = D4
-		u32[A1 + 0x0c] = A3
-		u8[A1 + 0x04] = D5.u8
+		objA1.update_address = D4
+		objA0.mapping_offset = A3
+		objA1.render_flags = D5.u8
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u16[A1 + 0x0a] = u16[A0 + 0x0a] | 0x8000
-		u8[A1 + 0x08] = u8[A0 + 0x08]
-		u8[A1 + 0x07] = objA0.box_size.x
-		u8[A1 + 0x06] = objA0.box_size.y
+		objA1.sprite_attributes = objA0.sprite_attributes | 0x8000
+		objA1.sprite_priority = objA0.sprite_priority
+		objA1.box_size.x = objA0.box_size.x
+		objA1.box_size.y = objA0.box_size.y
 		objA1.velocity.x = u16[A4]
 		objA1.velocity.y = u16[A4+2]
 

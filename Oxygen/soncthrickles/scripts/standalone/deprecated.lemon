@@ -217,6 +217,11 @@ function void fn084780()
 	Object.AnimationProgressByLocalA1.SlowDown()
 }
 
+function void fn02cfc0()
+{
+	Checkpoint.Init()
+}
+
 function bool fn084fa4()
 {
 	return SetupObjectAttributesSlotted()

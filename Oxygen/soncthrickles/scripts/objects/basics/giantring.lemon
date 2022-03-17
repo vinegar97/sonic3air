@@ -136,14 +136,14 @@ function void fn0616e6()
 
 			A1 = 0xffffb000
 			objA1.state = char.state.DISAPPEARED
-			u8[A1 + 0x22] = 0
+			objA1.animation.sprite = 0
 			u8[A1 + 0x2e] = 0x53
 
 			if (tails.carrying)
 			{
 				A1 = 0xffffb04a
 				objA1.state = char.state.DISAPPEARED
-				u8[A1 + 0x22] = 0
+				objA1.animation.sprite = 0
 				u8[A1 + 0x2e] = 0x53
 			}
 

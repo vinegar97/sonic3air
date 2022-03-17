@@ -45,7 +45,7 @@ function void fn049f20()
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.x.u16 += 0x0190
 		objA1.position.y.u16 = objA0.position.y.u16
-		u8[A1 + 0x04] |= render_flag.FLIP_X
+		objA1.render_flags |= render_flag.FLIP_X
 		u16[A1 + 0x3e] = A0.u16
 	}
 
