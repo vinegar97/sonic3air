@@ -221,3 +221,8 @@ function bool fn084fa4()
 {
 	return SetupObjectAttributesSlotted()
 }
+
+function void fn0193ca()
+{
+	HyperSonicStars.CreateSparks()
+}
