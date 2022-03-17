@@ -231,3 +231,8 @@ function void fn0193ca()
 {
 	HyperSonicStars.CreateSparks()
 }
+
+function void fn085b8a()
+{
+	stopCharacterWinPose.player1()
+}

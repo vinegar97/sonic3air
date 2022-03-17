@@ -928,7 +928,7 @@ function void PlayMusicAfterLevelResults()
 
 
 //# address-hook(0x085b8a) end(0x085b8a)
-function void fn085b8a()
+function void stopCharacterWinPose.player1()
 {
 	stopCharacterWinPose(0xffffb000)
 }
