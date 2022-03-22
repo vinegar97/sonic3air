@@ -245,6 +245,8 @@ function void fn085436()
 }
 
 
+// Movement towards target X position
+
 //# address-hook(0x08548e) end(0x0854b8)
 function void fn08548e()
 {
@@ -260,6 +262,8 @@ function void fn08548e()
 	}
 }
 
+
+// Movement towards target Y position
 
 //# address-hook(0x0854ba) end(0x0854e4)
 function void fn0854ba()
@@ -416,16 +420,16 @@ function void Enemy.DamageCharacter()
 //# address-hook(0x0857c2) end(0x0857e6)
 function void fn0857c2()
 {
-	if (u8[A1 + 0x2b] & 0x02 || u8[A1 + 0x20] == 2 || u8[A1 + 0x20] == 9)
+	if (u8[A1 + 0x2b] & char.bonus.INVINCIBLE || u8[A1 + 0x20] == char.state.ROLLING || u8[A1 + 0x20] == char.state.SPINDASH)
 	{
 		fn085822()
 		return
 	}
 
 	// Targets:
-	//  - 0x0857f0	-> u8[A1 + 0x38] = 0x00
-	//  - 0x0857f4	-> u8[A1 + 0x38] = 0x01
-	//  - 0x085826	-> u8[A1 + 0x38] = 0x02
+	//  - 0x0857f0	-> u8[A1 + 0x38] = CHARACTER_SONIC
+	//  - 0x0857f4	-> u8[A1 + 0x38] = CHARACTER_TAILS
+	//  - 0x085826	-> u8[A1 + 0x38] = CHARACTER_KNUCKLES
 	D0 = u8[A1 + 0x38] * 2
 	call tableLookupAddress(0x0857ea, D0.u16)
 }
