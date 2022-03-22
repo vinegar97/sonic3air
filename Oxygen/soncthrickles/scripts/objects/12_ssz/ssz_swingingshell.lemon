@@ -285,7 +285,7 @@ function void fn046324()
 			if (D1.s16 <= -0x10)
 			{
 				u8[A3] = 0
-				objA0.flags2a &= ~(u8(1) << D5.u8)
+				objA0.flags2a &= ~bit
 				u8[A1 + 0x2e] = 0
 				u8[A1 + 0x2a] &= ~0x08
 				D0.s16 = (objA0.flags2a & 0x01) ? -0x800 : 0x800
