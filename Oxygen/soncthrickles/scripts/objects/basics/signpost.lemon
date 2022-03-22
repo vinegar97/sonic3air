@@ -501,8 +501,7 @@ function void fn086932()
 
 	if (global.zone == 0x03)
 	{
-		A1 = 0xffffb000
-		StartCharacterWinPose()
+		StartCharacterWinPose(0xffffb000)
 	}
 
 	if (objA0.flags38 & 0x80)
@@ -534,6 +533,12 @@ function void fn086a3e()
 }
 
 
+
+function void StartCharacterWinPose(u32 address)
+{
+	A1 = address
+	StartCharacterWinPose()
+}
 
 //# address-hook(0x0869c6) end(0x0869f4)
 function void StartCharacterWinPose()
