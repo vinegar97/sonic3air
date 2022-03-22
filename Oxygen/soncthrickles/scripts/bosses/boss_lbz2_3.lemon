@@ -756,8 +756,7 @@ function void fn074952()
 	if (u16[0xffffb000 + 0x14] < level.bossarea.top + 0x0200)
 		return
 
-	D0.u16 = 0x0700
-	TriggerNextZone()
+	TriggerNextZone(0x0700)
 	UnloadObject()
 }
 

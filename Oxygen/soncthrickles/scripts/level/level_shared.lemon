@@ -336,6 +336,13 @@ function void InitBossArea()
 }
 
 
+function void TriggerNextZone(u16 zoneAndAct)
+{
+	D0.u16 = zoneAndAct
+	TriggerNextZone()
+}
+
+
 //# address-hook(0x085e3a) end(0x085e50)
 function void TriggerNextZone()
 {

@@ -307,8 +307,7 @@ function void fn07092a()
 		return
 	}
 
-	D0.u16 = 0x0800
-	TriggerNextZone()
+	TriggerNextZone(0x0800)
 	UnloadObject()
 
 #if STANDALONE

@@ -352,8 +352,7 @@ function void fn077a02()
 	--objA0.countdown_value
 	if (objA0.countdown_value < 0)
 	{
-		D0.u16 = 0x0900
-		TriggerNextZone()
+		TriggerNextZone(0x0900)
 		UnloadObject()
 	}
 }
@@ -370,8 +369,7 @@ function void fn077a3e()
 
 	if (objA1.position.x.u16 >= 0x5560)
 	{
-		D0.u16 = 0x0900
-		TriggerNextZone()
+		TriggerNextZone(0x0900)
 		UnloadObject()
 	}
 }

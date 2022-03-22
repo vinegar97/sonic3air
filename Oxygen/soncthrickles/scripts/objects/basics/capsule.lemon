@@ -668,8 +668,7 @@ function void fn08b616()
 			spawnChildObjects(0x08b880)
 			if (objA0.subtype2c & 0x80)
 			{
-				D0.u16 = 0x0600
-				TriggerNextZone()
+				TriggerNextZone(0x0600)
 			}
 		}
 		Object.TriggerUnloading()

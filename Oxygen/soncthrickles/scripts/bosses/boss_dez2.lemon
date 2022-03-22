@@ -279,8 +279,7 @@ function void fn07f2fe()
 	level.backup.timer.alldata = timer.alldata
 	global.shields_backup_2 = u8[0xffffb000 + 0x2b]
 
-	D0.u16 = 0x1700
-	TriggerNextZone()
+	TriggerNextZone(0x1700)
 	UnloadObject()
 }
 

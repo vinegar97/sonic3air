@@ -287,16 +287,14 @@ function void fn0803d6()
 		if (DEZFinalBoss3.canPlayerEnterDoomsday())
 		{
 			// Yay, Doomsday Zone!
-			D0.u16 = 0x0c00
-			TriggerNextZone()
+			TriggerNextZone(0x0c00)
 		}
 		else
 		{
 			if (global.characters != CHARS_KNUCKLES_ALONE)
 			{
 				// Outro for Sonic / Tails
-				D0.u16 = 0x0d01
-				TriggerNextZone()
+				TriggerNextZone(0x0d01)
 			}
 			else
 			{

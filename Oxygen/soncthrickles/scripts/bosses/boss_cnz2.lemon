@@ -405,8 +405,7 @@ function void fn06e80c()
 		return
 #endif
 
-	D0.u16 = 0x0500
-	TriggerNextZone()
+	TriggerNextZone(0x0500)
 	fn0852ae()
 }
 

@@ -1019,8 +1019,7 @@ function void fn06b8c8()
 		return
 	}
 
-	D0.u16 = 0x0200
-	TriggerNextZone()
+	TriggerNextZone(0x0200)
 	UnloadObject()
 }
 

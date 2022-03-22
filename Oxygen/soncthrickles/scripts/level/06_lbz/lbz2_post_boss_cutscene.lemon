@@ -191,8 +191,7 @@ function void fn072cda()
 	if (u16[0xffffb000 + 0x14] >= camera.position.y.u16 + 0x0120)
 	{
 		// Go on with Mushroom Hill Zone
-		D0.u16 = 0x0700
-		TriggerNextZone()
+		TriggerNextZone(0x0700)
 		UnloadObject()
 	}
 }

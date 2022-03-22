@@ -380,8 +380,7 @@ function void fn076456()
 	if (objA0.countdown_value >= 0)
 		return
 
-	D0.u16 = 0x0400
-	TriggerNextZone()
+	TriggerNextZone(0x0400)
 	UnloadObject()
 
 #if STANDALONE

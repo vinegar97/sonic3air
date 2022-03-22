@@ -368,9 +368,7 @@ function void fn045b94()
 
 		u8[0xffffef56] = 0xff
 		SaveGameOnLevelFinished()
-
-		D0.u16 = 0x0a01
-		TriggerNextZone()
+		TriggerNextZone(0x0a01)
 	}
 	else
 	{
@@ -561,9 +559,7 @@ function void fn045c8e()
 
 			u8[0xffffef56] = 0xff
 			SaveGameOnLevelFinished()
-
-			D0.u16 = 0x0a00
-			TriggerNextZone()
+			TriggerNextZone(0x0a00)
 		}
 	}
 }
@@ -686,9 +682,7 @@ function void fn0523ca()
 	if (camera.position.y.u16 < 0x0780)
 	{
 		playMusic(MUSIC_CTRL_FADEOUT)
-
-		D0.u16 = 0x0500
-		TriggerNextZone()
+		TriggerNextZone(0x0500)
 	}
 }
 
