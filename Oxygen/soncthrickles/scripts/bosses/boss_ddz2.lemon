@@ -209,8 +209,7 @@ function void fn081ca4()
 	SaveGameOnLevelFinished()
 
 	// Start outro
-	D0.u16 = 0x0d01
-	TriggerNextZone()
+	TriggerNextZone(0x0d01)
 
 	UnloadObject()
 }
