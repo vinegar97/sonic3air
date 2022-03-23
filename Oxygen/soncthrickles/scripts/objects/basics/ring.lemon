@@ -304,15 +304,9 @@ function void fn01a75c()
 				}
 			}
 
-			if (spilled_rings.speed == 0)
+			if ((spilled_rings.speed == 0) || (objA0.position.y.u16 > move_area.bottom.current + getScreenHeight()))
 			{
 				// Time over for this ring
-				UnloadObject()
-				return
-			}
-
-			if (objA0.position.y.u16 > move_area.bottom.current + getScreenHeight())
-			{
 				UnloadObject()
 				return
 			}
@@ -357,6 +351,7 @@ function void fn01a7e8()
 
 			if ((spilled_rings.speed == 0) || (objA0.position.y.u16 > move_area.bottom.current + getScreenHeight()))
 			{
+				// Time over for this ring
 				UnloadObject()
 				return
 			}
@@ -364,8 +359,7 @@ function void fn01a7e8()
 	}
 
 	AddAsDynamicObject()
-	D0.u16 = u16[0xffffeebc]
-	objA0.position.x.u16 -= D0.u16
+	objA0.position.x.u16 -= u16[0xffffeebc]
 	DrawObject()
 }
 

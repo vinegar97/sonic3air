@@ -4370,12 +4370,12 @@ function void Character.updateUprightOnGroundInner()
 			// Movement left or right
 			if (input_state & CONTROL_LEFT)
 			{
-				// Though the original code uses different functions for the three characters here, they actaully are identical
+				// Though the original code uses different functions for the three characters here, they actually are identical
 				PressedLeftWhileUprightOnGround()
 			}
 			if (input_state & CONTROL_RIGHT)
 			{
-				// Though the original code uses different functions for the three characters here, they actaully are identical
+				// Though the original code uses different functions for the three characters here, they actually are identical
 				PressedRightWhileUprightOnGround()
 			}
 
@@ -5165,7 +5165,7 @@ function void Character.OnThreatCollision()
 		}
 	}
 
-	if ((u8[A1 + 0x2b] & 0x08) == 0)
+	if ((u8[A1 + 0x2b] & char.bonus.DEFLECTABLE) == 0)
 	{
 		if ((char.bonus_effect & char.bonus.INVINCIBLE) == 0)
 		{
@@ -5365,7 +5365,7 @@ function void UpdateShieldDeflecting()
 
 				if (checkBoxOverlap(D2.u16, D3.u16, D4.u16, D5.u16, px, py, sx, sy))
 				{
-					if (u8[A1 + 0x2b] & 0x08)
+					if (u8[A1 + 0x2b] & char.bonus.DEFLECTABLE)
 					{
 						deflectProjectile()
 						return
@@ -5543,7 +5543,7 @@ function void fn01050c()
 	{
 		fn01059c()
 	}
-	else if (D0.u8 & 0x80 && u8[A1 + 0x2b] & 0x08)
+	else if ((D0.u8 & 0x80) && (u8[A1 + 0x2b] & char.bonus.DEFLECTABLE))
 	{
 		deflectProjectile()
 	}
@@ -5582,7 +5582,7 @@ function void fn01059c()
 	//  -> CNZ balloon
 	//  -> CNZ bumpers (2 variants with different addresses)
 	//  -> SOZ sandcork
-	if (u32[A1] == 0x025cf0 || u32[A1] == 0x02cfa8 || u32[A1] == 0x031754 || (u32[A1] == 0x032e7e || u32[A1] == 0x032eaa) || u32[A1] == 0x041d32)
+	if (objA1.update_address == 0x025cf0 || objA1.update_address == 0x02cfa8 || objA1.update_address == 0x031754 || (objA1.update_address == 0x032e7e || objA1.update_address == 0x032eaa) || objA1.update_address == 0x041d32)
 		return
 #endif
 

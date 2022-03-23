@@ -92,6 +92,21 @@ function void fn01094c()
 	CompetitionMode.Character.UpdateSpindash.Sonic_Knuckles()
 }
 
+function void fn012d36()
+{
+	CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
+}
+
+function void fn01309a()
+{
+	CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
+}
+
+function void fn010a80()
+{
+	CompetitionMode.centerCameraYOffset.Sonic_Knuckles()
+}
+
 function void fn013102()
 {
 	CompetitionMode.Character.BaseUpdate.Tails()
@@ -137,16 +152,6 @@ function void fn013520()
 	CompetitionMode.Character.UpdateSpindash.Tails()
 }
 
-function void fn012d36()
-{
-	CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
-}
-
-function void fn01309a()
-{
-	CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
-}
-
 function void fn015cd0()
 {
 	CompetitionMode.Character.UpdateAnimation.Tails()
@@ -162,6 +167,11 @@ function void fn016050()
 	CompetitionMode.Character.UpdateSpritePatterns.Tails()
 }
 
+function void fn013648()
+{
+	CompetitionMode.centerCameraYOffset.Tails()
+}
+
 function void fn0161fa()
 {
 	CompetitionMode.TailsTails.Init()
@@ -175,16 +185,6 @@ function void fn016232()
 function void fn016022()
 {
 	CompetitionMode.TailsTails.UpdateSpritePatterns()
-}
-
-function void fn010a80()
-{
-	CompetitionMode.centerCameraYOffset.Sonic_Knuckles()
-}
-
-function void fn013648()
-{
-	CompetitionMode.centerCameraYOffset.Tails()
 }
 
 function void fn01d890()

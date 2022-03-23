@@ -163,6 +163,7 @@ define char.bonus_effect				=  u8[A0 + 0x2b]
 define u8 char.bonus.ANY_SHIELD			=  0x01	// also sometimes used for classic shield in standalone
 define u8 char.bonus.INVINCIBLE			=  0x02
 define u8 char.bonus.SPEED_UP			=  0x04	// also used for slow shoes in competition mode
+define u8 char.bonus.DEFLECTABLE		=  0x08	// seems unused? sometimes used to denote projectiles that should be deflected by shields
 define u8 char.bonus.SHIELD_FIRE		=  0x10
 define u8 char.bonus.SHIELD_LIGHTNING	=  0x20
 define u8 char.bonus.SHIELD_BUBBLE		=  0x40

@@ -438,6 +438,7 @@ function void fn0857c2()
 //# address-hook(0x0857f0) end(0x0857f2)
 function void fn0857f0()
 {
+	// No special conditions for Sonic, attacked
 	D0 = 0
 	_setZeroFlagByValue(0)
 }
@@ -446,19 +447,22 @@ function void fn0857f0()
 //# address-hook(0x0857f4) end(0x085824)
 function void fn0857f4()
 {
-	if (u8[A1 + 0x2f] != 0 && (u8[A1 + 0x2a] & 0x40) == 0)
+	// Check for if the enemy is above Tails while flying and not underwater
+	if (u8[A1 + 0x2f] != 0 && (u8[A1 + 0x2a] & char.flag.UNDERWATER) == 0)
 	{
 		s16 dx = objA1.position.x.u16 - objA0.position.x.u16
 		s16 dy = objA1.position.y.u16 - objA0.position.y.u16
 		u8 angle = lookupAngleByVector(dx, dy)
 		if (u8(angle - 0x20) < 0x40)
 		{
+			// Attack the enemy
 			D0 = 1
 			_setZeroFlagByValue(1)
 			return
 		}
 	}
 
+	// Attack Tails
 	D0 = 0
 	_setZeroFlagByValue(0)
 }
@@ -467,6 +471,7 @@ function void fn0857f4()
 //# address-hook(0x085822)
 function void fn085822()
 {
+	// Attack the enemy
 	D0 = 1
 	_setZeroFlagByValue(1)
 }
@@ -475,7 +480,7 @@ function void fn085822()
 //# address-hook(0x085826) end(0x085836)
 function void fn085826()
 {
-	D0 = (u8[A1 + 0x2f] == 1 || u8[A1 + 0x2f] == 3) ? 1 : 0
+	D0 = (u8[A1 + 0x2f] == 1 || u8[A1 + 0x2f] == 3) ? 1 : 0		// Check for Knuckles' gliding and ground slide states
 	_setZeroFlagByValue(D0)
 }
 

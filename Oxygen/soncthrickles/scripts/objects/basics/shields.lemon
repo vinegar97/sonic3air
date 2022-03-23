@@ -294,7 +294,7 @@ function void Effects.CreateSparks()
 		objA1.position.y.u16 = objA0.position.y.u16
 		objA1.velocity.x = u16[A2]
 		objA1.velocity.y = u16[A2+2]
-		u8[A1 + 0x20] = D2.u8
+		objA1.state = D2.u8
 
 		A2 += 4
 		--counter
@@ -404,7 +404,7 @@ function void fn0187f0()
 		objA1.sprite_attributes = 0x079c
 		objA1.mapping_offset = 0x018aea
 		u16[A1 + 0x16] = 2
-		objA1.shield.character_address = objA0.value42
+		objA1.shield.character_address = objA0.shield.character_address
 		u8[A1 + 0x36] = D2.u8
 		u32[A1 + 0x30] = u32[(A2+=4)-4]
 		u16[A1 + 0x34] = u16[(A2+=2)-2]

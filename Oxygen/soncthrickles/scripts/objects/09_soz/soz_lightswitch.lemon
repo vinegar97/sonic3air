@@ -131,16 +131,16 @@ function void fn040f52()
 				u8[A2] = 0
 				u8[A2+2] = 0x12
 
-				if (D0.u16 & 0x0f00)
+				if (D0.u16 & 0x0f00)		// CONTROL_DPAD
 				{
 					u8[A2+2] = 0x3c
 				}
 
-				if (D0.u16 & 0x0800)
+				if (D0.u16 & 0x0800)		// CONTROL_RIGHT
 				{
 					objA1.velocity.x = 0x200
 				}
-				else if (D0.u16 & 0x0400)
+				else if (D0.u16 & 0x0400)		// CONTROL_LEFT
 				{
 					objA1.velocity.x = -0x200
 				}

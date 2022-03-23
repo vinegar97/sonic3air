@@ -54,7 +54,7 @@
 // 0xffffe380 .. 0xffffe3ff
 // Table of dynamic objects in range
 //  - First word is twice the number of objects in the table
-//  - One word for object, telling us its RAM address (lower u16 part only)
+//  - One word per object, telling us its RAM address (lower u16 part only)
 
 
 // 0xffffe41c .. 0xffffe450
