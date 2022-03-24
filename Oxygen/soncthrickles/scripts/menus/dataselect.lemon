@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -13,11 +13,11 @@
 //-------------------------------------------------------//
 
 #if STANDALONE
-	define u8 DataSelect.CONTROLS_ACCEPT = 0xc0		// = CONTROL_START | CONTROL_A		-> Excluding CONTROL_C, which is is [X] on an Xbox Controller, or Square on a PlayStation controller
-	define u8 DataSelect.CONTROLS_CANCEL = 0x10		// = CONTROL_B
+	constant u8 DataSelect.CONTROLS_ACCEPT = 0xc0		// = CONTROL_START | CONTROL_A		-> Excluding CONTROL_C, which is is [X] on an Xbox Controller, or Square on a PlayStation controller
+	constant u8 DataSelect.CONTROLS_CANCEL = 0x10		// = CONTROL_B
 #else
-	define u8 DataSelect.CONTROLS_ACCEPT = 0xe0		// = CONTROL_START | CONTROL_A | CONTROL_C
-	define u8 DataSelect.CONTROLS_CANCEL = 0x10		// = CONTROL_B
+	constant u8 DataSelect.CONTROLS_ACCEPT = 0xe0		// = CONTROL_START | CONTROL_A | CONTROL_C
+	constant u8 DataSelect.CONTROLS_CANCEL = 0x10		// = CONTROL_B
 #endif
 
 
@@ -623,7 +623,9 @@ function void fn00d1fa()
 					}
 				}
 			}
-
+		#if STANDALONE
+			else	// Don't allow both left & right being pressed at the same time, as this leads to buggy behavior
+		#endif
 			if (control.pad1.pressed & CONTROL_RIGHT)
 			{
 				if (dataselect.slot_selected != 9)

@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -17,21 +17,21 @@ class API_EXPORT FontSource
 public:
 	struct GlyphInfo
 	{
-		uint32 unicode;
+		uint32 unicode = 0;
 		Bitmap bitmap;
-		int leftIndent;
-		int topIndent;
-		int advance;
+		int leftIndent = 0;
+		int topIndent = 0;
+		int advance = 0;
 	};
 
 public:
 	virtual ~FontSource() {}
 	virtual const GlyphInfo* getGlyph(uint32 unicode);
 
-	int getAscender()	{ return mAscender; }
-	int getDescender()	{ return mDescender; }
-	int getHeight()		{ return mAscender + mDescender; }
-	int getLineHeight()	{ return mLineHeight; }
+	inline int getAscender() const	 { return mAscender; }
+	inline int getDescender() const	 { return mDescender; }
+	inline int getHeight() const	 { return mAscender + mDescender; }
+	inline int getLineHeight() const { return mLineHeight; }
 
 protected:
 	virtual bool fillGlyphInfo(GlyphInfo& info)  { return false; }

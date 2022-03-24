@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -113,7 +113,9 @@ function void fn08bdc2()
 		return
 
 	playSound(0xc8)
-	spawnChildObjects(0x08bdfa)
+
+	// "spawnChildObjects(0x08bdfa)" replaced by:
+	spawnChildObject(0x08bd40, 0x00, 0, 12)
 }
 
 

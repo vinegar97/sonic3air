@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -30,8 +30,8 @@ private:
 	std::vector<uint8> mVisibilityLookup;
 	std::vector<uint8> mStraightIntensityLookup[0x20];
 	std::vector<uint8> mRotationIntensityLookup[0x0f];
-	int mNumPureSkyRows;
-	int mNumPureGroundRows;
+	int mNumPureSkyRows = 0;
+	int mNumPureGroundRows = 0;
 	int mPureRowsForWidth = 0;
 
 	bool mLastFiltering = false;

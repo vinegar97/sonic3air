@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -122,7 +122,7 @@ bool TimeAttackMenu::canBeRemoved()
 void TimeAttackMenu::initialize()
 {
 	// Update Max Control unlocking
-	GameMenuEntries::Option* option = mCharacterEntry->getOptionByValue((uint32)CharacterOption::SONIC_MAXCONTROL);
+	GameMenuEntry::Option* option = mCharacterEntry->getOptionByValue((uint32)CharacterOption::SONIC_MAXCONTROL);
 	RMX_CHECK(nullptr != option, "Option for Max Control not found", );
 	if (nullptr != option)
 	{

@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -14,18 +14,20 @@
 
 struct StringReader
 {
-	const char* mString;
-	const wchar_t* mWString;
-	size_t mLength;
+	const char* mString = nullptr;
+	const wchar_t* mWString = nullptr;
+	size_t mLength = 0;
 
-	StringReader(const char* str)		  : mString(str),  mWString(nullptr), mLength(strlen(str))  {}
-	StringReader(const wchar_t* str)	  : mString(nullptr), mWString(str),  mLength(wcslen(str))  {}
-	StringReader(const String& str)		  : mString(*str), mWString(nullptr), mLength(str.length()) {}
-	StringReader(const WString& str)	  : mString(nullptr), mWString(*str), mLength(str.length()) {}
-	StringReader(const std::string& str)  : mString(str.c_str()), mWString(nullptr), mLength(str.length()) {}
-	StringReader(const std::wstring& str) : mString(nullptr), mWString(str.c_str()), mLength(str.length()) {}
+	StringReader(const char* str)		  : mString(str), mLength(strlen(str)) {}
+	StringReader(const wchar_t* str)	  : mWString(str), mLength(wcslen(str)) {}
+	StringReader(const String& str)		  : mString(*str), mLength(str.length()) {}
+	StringReader(const WString& str)	  : mWString(*str), mLength(str.length()) {}
+	StringReader(const std::string& str)  : mString(str.c_str()), mLength(str.length()) {}
+	StringReader(const std::wstring& str) : mWString(str.c_str()), mLength(str.length()) {}
+	StringReader(std::string_view str)	  : mString(str.data()), mLength(str.length()) {}
+	StringReader(std::wstring_view str)	  : mWString(str.data()), mLength(str.length()) {}
 
-	uint32 operator[](size_t index) const  { return mString ? (uint32)(uint8)mString[index] : (uint32)mWString[index]; }
+	uint32 operator[](size_t index) const  { return (nullptr != mString) ? (uint32)(uint8)mString[index] : (uint32)mWString[index]; }
 };
 
 
@@ -102,12 +104,12 @@ public:
 	};
 
 public:
-	Font();
+	inline Font() {}
 	Font(const String& filename, float size);
-	Font(float size);
+	explicit Font(float size);
 	~Font();
 
-	void load(const String& filename, float size);
+	bool loadFromFile(const String& filename, float size = 0.0f);
 	void setSize(float size);
 	void setShadow(bool enable, const Vec2f offset = Vec2f(1,1), float blur = 1.0f, float alpha = 1.0f);
 	void addFontProcessor(FontProcessor& processor);
@@ -129,15 +131,18 @@ public:
 	void print(int x, int y, int w, int h, const StringReader& text, int alignment = 1);
 	void print(const Rectf& rect, const StringReader& text, int alignment = 1);
 
-	void printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& rect, const StringReader& text, int alignment = 1, int spacing = 0);
+	void printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& drawRect, const StringReader& text, int alignment = 1, int spacing = 0);
+	void printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReader& text, int spacing = 0);
+
+	static Vec2i applyAlignment(const Recti& drawRect, const Recti& innerRect, int alignment);
 
 private:
-	void rebuildFontSource();
+	bool rebuildFontSource();
 
 private:
 	FontSource* mFontSource = nullptr;
 	FontKey mKey;
-	float mAdvance;
+	float mAdvance = 0.0f;
 
 public:
 	struct API_EXPORT CodecList

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -16,6 +16,48 @@ namespace lemon
 	namespace
 	{
 		static const std::vector<Function*> EMPTY_FUNCTIONS;
+		static const SourceFileInfo EMPTY_SOURCE_FILE_INFO;
+
+		static BaseType DEFAULT_OPCODE_BASETYPES[(size_t)Opcode::Type::_NUM_TYPES] =
+		{
+			BaseType::VOID,			// NOP
+			BaseType::VOID,			// MOVE_STACK
+			BaseType::VOID,			// MOVE_VAR_STACK
+			BaseType::INT_CONST,	// PUSH_CONSTANT
+			BaseType::VOID,			// DUPLICATE
+			BaseType::VOID,			// EXCHANGE
+			BaseType::UINT_32,		// GET_VARIABLE_VALUE
+			BaseType::UINT_32,		// SET_VARIABLE_VALUE
+			BaseType::UINT_8,		// READ_MEMORY
+			BaseType::UINT_8,		// WRITE_MEMORY
+			BaseType::VOID,			// CAST_VALUE
+			BaseType::VOID,			// MAKE_BOOL
+			BaseType::UINT_32,		// ARITHM_ADD
+			BaseType::UINT_32,		// ARITHM_SUB
+			BaseType::UINT_32,		// ARITHM_MUL
+			BaseType::UINT_32,		// ARITHM_DIV
+			BaseType::UINT_32,		// ARITHM_MOD
+			BaseType::UINT_8,		// ARITHM_AND
+			BaseType::UINT_8,		// ARITHM_OR
+			BaseType::UINT_8,		// ARITHM_XOR
+			BaseType::UINT_32,		// ARITHM_SHL
+			BaseType::UINT_32,		// ARITHM_SHR
+			BaseType::INT_CONST,	// ARITHM_NEG
+			BaseType::UINT_8,		// ARITHM_NOT
+			BaseType::UINT_8,		// ARITHM_BITNOT
+			BaseType::UINT_8,		// COMPARE_EQ
+			BaseType::UINT_8,		// COMPARE_NEQ
+			BaseType::UINT_8,		// COMPARE_LT
+			BaseType::UINT_8,		// COMPARE_LE
+			BaseType::UINT_8,		// COMPARE_GT
+			BaseType::UINT_8,		// COMPARE_GE
+			BaseType::UINT_32,		// JUMP
+			BaseType::UINT_32,		// JUMP_CONDITIONAL
+			BaseType::VOID,			// CALL
+			BaseType::VOID,			// RETURN
+			BaseType::VOID,			// EXTERNAL_CALL
+			BaseType::VOID,			// EXTERNAL_JUMP
+		};
 	}
 
 
@@ -32,6 +74,9 @@ namespace lemon
 
 	void Module::clear()
 	{
+		// Preprocessor definitions
+		mPreprocessorDefinitions.clear();
+
 		// Functions
 		for (Function* func : mFunctions)
 		{
@@ -48,6 +93,12 @@ namespace lemon
 		// Variables
 		mGlobalVariables.clear();
 
+		// Constants
+		mConstants.clear();
+
+		// Constant arrays
+		mConstantArrays.clear();
+
 		// Defines
 		for (Define* define : mDefines)
 		{
@@ -58,6 +109,10 @@ namespace lemon
 
 		// String literals
 		mStringLiterals.clear();
+
+		// Clear source file infos
+		mSourceFileInfoPool.clear();
+		mAllSourceFiles.clear();
 	}
 
 	void Module::startCompiling(const GlobalsLookup& globalsLookup)
@@ -65,7 +120,7 @@ namespace lemon
 		if (mFunctions.empty())
 		{
 			// It's the same here as for variables, see below
-			mFirstFunctionId = globalsLookup.mNextFunctionId;
+			mFirstFunctionID = globalsLookup.mNextFunctionID;
 		}
 
 		if (mGlobalVariables.empty())
@@ -73,8 +128,73 @@ namespace lemon
 			// This here only makes sense if no global variables got set previously
 			//  -> That's because the existing global variables are likely part of the globals lookup already
 			//  -> Unfortunately, this is only safe to assume for the first module -- TODO: How to handle other cases?
-			mFirstVariableId = globalsLookup.mNextVariableId;
+			mFirstVariableID = globalsLookup.mNextVariableID;
 		}
+
+		if (mConstantArrays.empty())
+		{
+			mFirstConstantArrayID = globalsLookup.mNextConstantArrayID;
+		}
+	}
+
+	void Module::dumpDefinitionsToScriptFile(const std::wstring& filename)
+	{
+		String content;
+		content << "// This file was auto-generated from the definitions in lemon script module '" << getModuleName() << "'.\r\n";
+		content << "\r\n";
+		
+		for (const Function* function : mFunctions)
+		{
+			if (function->getName().getString()[0] == '#')	// Exclude hidden built-ins (which can't be accessed by scripts directly anyways)
+				continue;
+
+			content << "\r\n";
+			content << "declare function " << function->getReturnType()->toString() << " " << function->getName().getString() << "(";
+			for (size_t i = 0; i < function->getParameters().size(); ++i)
+			{
+				if (i != 0)
+					content << ", ";
+				const Function::Parameter& parameter = function->getParameters()[i];
+				content << parameter.mType->toString();
+				if (parameter.mName.isValid())
+					content << " " << parameter.mName.getString();
+			}
+			content << ")\r\n";
+		}
+
+		content.saveFile(filename);
+	}
+
+	const SourceFileInfo& Module::addSourceFileInfo(const std::wstring& basepath, const std::wstring& filename)
+	{
+		SourceFileInfo& sourceFileInfo = mSourceFileInfoPool.createObject();
+		sourceFileInfo.mFilename = filename;
+		sourceFileInfo.mFullPath = basepath + filename;
+		sourceFileInfo.mIndex = mAllSourceFiles.size();
+		mAllSourceFiles.push_back(&sourceFileInfo);
+		return sourceFileInfo;
+	}
+
+	void Module::registerNewPreprocessorDefinitions(PreprocessorDefinitionMap& preprocessorDefinitions)
+	{
+		for (uint64 hash : preprocessorDefinitions.getNewDefinitions())
+		{
+			const PreprocessorDefinition* definition = preprocessorDefinitions.getDefinition(hash);
+			RMX_ASSERT(nullptr != definition, "Invalid entry in PreprocessorDefinitionMap's new definitions set");
+			Constant& constant = addPreprocessorDefinition(definition->mIdentifier, definition->mValue);
+			mPreprocessorDefinitions.emplace_back(&constant);
+		}
+		preprocessorDefinitions.clearNewDefinitions();
+	}
+
+	Constant& Module::addPreprocessorDefinition(FlyweightString name, int64 value)
+	{
+		Constant& constant = mConstantPool.createObject();
+		constant.mName = name;
+		constant.mDataType = &PredefinedDataTypes::INT_64;
+		constant.mValue = value;
+		mPreprocessorDefinitions.emplace_back(&constant);
+		return constant;
 	}
 
 	const Function* Module::getFunctionByUniqueId(uint64 uniqueId) const
@@ -83,7 +203,7 @@ namespace lemon
 		return mFunctions[uniqueId & 0xffff];
 	}
 
-	ScriptFunction& Module::addScriptFunction(const std::string& name, const DataTypeDefinition* returnType, const Function::ParameterList* parameters)
+	ScriptFunction& Module::addScriptFunction(FlyweightString name, const DataTypeDefinition* returnType, const Function::ParameterList* parameters)
 	{
 		ScriptFunction& func = mScriptFunctionPool.createObject();
 		func.setModule(*this);
@@ -97,7 +217,7 @@ namespace lemon
 		return func;
 	}
 
-	UserDefinedFunction& Module::addUserDefinedFunction(const std::string& name, const UserDefinedFunction::FunctionWrapper& functionWrapper, uint8 flags)
+	UserDefinedFunction& Module::addUserDefinedFunction(FlyweightString name, const UserDefinedFunction::FunctionWrapper& functionWrapper, uint8 flags)
 	{
 		UserDefinedFunction& func = mUserDefinedFunctionPool.createObject();
 		func.mName = name;
@@ -111,42 +231,40 @@ namespace lemon
 	void Module::addFunctionInternal(Function& func)
 	{
 		RMX_ASSERT(mFunctions.size() < 0x10000, "Too many functions in module");
-		func.mId = mFirstFunctionId + (uint32)mFunctions.size();
-		func.mNameHash = rmx::getMurmur2_64(func.mName);
-		func.mNameAndSignatureHash = func.mNameHash + func.getSignatureHash();
+		func.mID = mFirstFunctionID + (uint32)mFunctions.size();
+		func.mNameAndSignatureHash = func.mName.getHash() + func.getSignatureHash();
 		mFunctions.push_back(&func);
 	}
 
-	GlobalVariable& Module::addGlobalVariable(const std::string& identifier, const DataTypeDefinition* dataType)
+	GlobalVariable& Module::addGlobalVariable(FlyweightString name, const DataTypeDefinition* dataType)
 	{
-		// TODO: Add an alloc buffer for this
+		// TODO: Add an object pool for this
 		GlobalVariable& variable = *new GlobalVariable();
-		addGlobalVariable(variable, identifier, dataType);
+		addGlobalVariable(variable, name, dataType);
 		return variable;
 	}
 
-	UserDefinedVariable& Module::addUserDefinedVariable(const std::string& identifier, const DataTypeDefinition* dataType)
+	UserDefinedVariable& Module::addUserDefinedVariable(FlyweightString name, const DataTypeDefinition* dataType)
 	{
-		// TODO: Add an alloc buffer for this
+		// TODO: Add an object pool for this
 		UserDefinedVariable& variable = *new UserDefinedVariable();
-		addGlobalVariable(variable, identifier, dataType);
+		addGlobalVariable(variable, name, dataType);
 		return variable;
 	}
 
-	ExternalVariable& Module::addExternalVariable(const std::string& identifier, const DataTypeDefinition* dataType)
+	ExternalVariable& Module::addExternalVariable(FlyweightString name, const DataTypeDefinition* dataType)
 	{
-		// TODO: Add an alloc buffer for this
+		// TODO: Add an object pool for this
 		ExternalVariable& variable = *new ExternalVariable();
-		addGlobalVariable(variable, identifier, dataType);
+		addGlobalVariable(variable, name, dataType);
 		return variable;
 	}
 
-	void Module::addGlobalVariable(Variable& variable, const std::string& name, const DataTypeDefinition* dataType)
+	void Module::addGlobalVariable(Variable& variable, FlyweightString name, const DataTypeDefinition* dataType)
 	{
 		variable.mName = name;
-		variable.mNameHash = rmx::getMurmur2_64(name);
 		variable.mDataType = dataType;
-		variable.mId = mFirstVariableId + (uint32)mGlobalVariables.size() + ((uint32)variable.mType << 28);
+		variable.mID = mFirstVariableID + (uint32)mGlobalVariables.size() + ((uint32)variable.mType << 28);
 		mGlobalVariables.emplace_back(&variable);
 	}
 
@@ -160,7 +278,37 @@ namespace lemon
 		mLocalVariablesPool.destroyObject(variable);
 	}
 
-	Define& Module::addDefine(const std::string& name, const DataTypeDefinition* dataType)
+	Constant& Module::addConstant(FlyweightString name, const DataTypeDefinition* dataType, uint64 value)
+	{
+		Constant& constant = mConstantPool.createObject();
+		constant.mName = name;
+		constant.mDataType = dataType;
+		constant.mValue = value;
+		mConstants.emplace_back(&constant);
+		return constant;
+	}
+
+	ConstantArray& Module::addConstantArray(FlyweightString name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size, bool isGlobalDefinition)
+	{
+		ConstantArray& constantArray = mConstantArrayPool.createObject();
+		constantArray.mName = name;
+		constantArray.mElementDataType = elementDataType;
+		constantArray.mID = mFirstConstantArrayID + (uint32)mConstantArrays.size();
+		if (nullptr != values)
+			constantArray.setContent(values, size);
+		else if (size > 0)
+			constantArray.setSize(size);
+		mConstantArrays.emplace_back(&constantArray);
+
+		if (isGlobalDefinition)
+		{
+			RMX_ASSERT(mNumGlobalConstantArrays + 1 == mConstantArrays.size(), "Gap in global constant arrays list");
+			mNumGlobalConstantArrays = mConstantArrays.size();
+		}
+		return constantArray;
+	}
+
+	Define& Module::addDefine(FlyweightString name, const DataTypeDefinition* dataType)
 	{
 		Define& define = mDefinePool.createObject();
 		define.mName = name;
@@ -169,14 +317,11 @@ namespace lemon
 		return define;
 	}
 
-	const StoredString* Module::addStringLiteral(const std::string& str)
+	void Module::addStringLiteral(FlyweightString str)
 	{
-		return &mStringLiterals.getOrAddString(str);
-	}
-	
-	const StoredString* Module::addStringLiteral(const std::string& str, uint64 hash)
-	{
-		return &mStringLiterals.getOrAddString(str, hash);
+		if (mStringLiterals.empty())
+			mStringLiterals.reserve(0x100);
+		mStringLiterals.push_back(str);
 	}
 
 	bool Module::serialize(VectorBinarySerializer& outerSerializer)
@@ -187,10 +332,15 @@ namespace lemon
 		//  - 0x02 = Variable size of opcode parameter serialization + dumping backwards compatibility with older versions, as it's not really needed
 		//  - 0x03 = Added opcode flags and deflate compression
 		//  - 0x04 = Added source information to function serialization
+		//  - 0x05 = Added serialization of constants
+		//  - 0x06 = Support for string data type in serialization - this breaks compatibility with older versions
+		//  - 0x07 = Several compatibility breaking changes and extensions (e.g. constant arrays)
+		//  - 0x08 = Added preprocessor definitions
+		//  - 0x09 = Added source file infos + more compact way of line number serialization
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";
-		uint16 version = 0x04;
+		uint16 version = 0x09;
 		if (outerSerializer.isReading())
 		{
 			const uint32 signature = *(const uint32*)outerSerializer.peek();
@@ -199,7 +349,7 @@ namespace lemon
 
 			outerSerializer.skip(4);
 			version = outerSerializer.read<uint16>();
-			if (version < 0x03)
+			if (version < 0x09)
 				return false;	// Loading older versions is not supported
 		}
 		else
@@ -219,20 +369,70 @@ namespace lemon
 		VectorBinarySerializer serializer(outerSerializer.isReading(), uncompressed);
 
 		// Serialize module
-		serializer & mFirstFunctionId;
-		serializer & mFirstVariableId;
+		serializer & mFirstFunctionID;
+		serializer & mFirstVariableID;
+
+		// Serialize source file info
+		{
+			size_t numberOfSourceFiles = mAllSourceFiles.size();
+			serializer.serializeAs<uint16>(numberOfSourceFiles);
+
+			if (serializer.isReading())
+			{
+				std::wstring filename;
+				for (size_t i = 0; i < numberOfSourceFiles; ++i)
+				{
+					serializer.serialize(filename);
+					addSourceFileInfo(L"", filename);
+				}
+			}
+			else
+			{
+				for (const SourceFileInfo* sourceFileInfo : mAllSourceFiles)
+				{
+					serializer.write(sourceFileInfo->mFilename);
+				}
+			}
+		}
+
+		// Serialize preprocessor definitions
+		{
+			size_t numberOfConstants = mPreprocessorDefinitions.size();
+			serializer.serializeAs<uint16>(numberOfConstants);
+
+			if (serializer.isReading())
+			{
+				for (size_t i = 0; i < numberOfConstants; ++i)
+				{
+					FlyweightString name;
+					name.serialize(serializer);
+					const uint64 value = serializer.read<uint64>();
+					addPreprocessorDefinition(name, value);
+				}
+			}
+			else
+			{
+				for (Constant* constant : mPreprocessorDefinitions)
+				{
+					constant->getName().write(serializer);
+					serializer.write(constant->mValue);
+				}
+			}
+		}
 
 		// Serialize functions
 		{
 			uint32 numberOfFunctions = (uint32)mFunctions.size();
 			serializer & numberOfFunctions;
 
+			uint32 lastLineNumber = 0;
 			for (uint32 i = 0; i < numberOfFunctions; ++i)
 			{
 				if (serializer.isReading())
 				{
 					const Function::Type type = (Function::Type)serializer.read<uint8>();
-					const std::string name = serializer.read<std::string>();
+					FlyweightString name;
+					name.serialize(serializer);
 
 					const DataTypeDefinition* returnType = DataTypeHelper::readDataType(serializer);
 					Function::ParameterList parameters;
@@ -240,7 +440,7 @@ namespace lemon
 					parameters.resize((size_t)parameterCount);
 					for (uint8 k = 0; k < parameterCount; ++k)
 					{
-						serializer.serialize(parameters[k].mIdentifier);
+						parameters[k].mName.serialize(serializer);
 						parameters[k].mType = DataTypeHelper::readDataType(serializer);
 					}
 
@@ -252,14 +452,11 @@ namespace lemon
 					{
 						// Create new script function
 						ScriptFunction& scriptFunc = addScriptFunction(name, returnType, &parameters);
-						uint32 lastLineNumber = 0;
 
 						// Source information
-						if (version >= 0x04)
-						{
-							serializer.serialize(scriptFunc.mSourceFilename);
-							serializer.serialize(scriptFunc.mSourceBaseLineOffset);
-						}
+						const size_t index = (size_t)serializer.read<uint16>();
+						scriptFunc.mSourceFileInfo = (index < mAllSourceFiles.size()) ? mAllSourceFiles[index] : &EMPTY_SOURCE_FILE_INFO;
+						serializer.serialize(scriptFunc.mSourceBaseLineOffset);
 
 						// Opcodes
 						size_t count = (size_t)serializer.read<uint32>();
@@ -273,8 +470,8 @@ namespace lemon
 
 							const uint8 parameterBits  = (uint8)(typeAndFlags >> 6) & 0x07;
 							const bool hasDataType     = (typeAndFlags & 0x200) != 0;
-							const bool hasOpcodeFlags  = (typeAndFlags & 0x400) != 0;
-							const uint8 lineNumberBits = (uint8)(typeAndFlags >> 11) & 0x03;
+							const bool isSequenceBreak = (typeAndFlags & 0x400) != 0;
+							const uint8 lineNumberBits = (uint8)(typeAndFlags >> 11) & 0x1f;
 
 							switch (parameterBits)
 							{
@@ -288,9 +485,23 @@ namespace lemon
 								case 6:  opcode.mParameter = serializer.read<int64>();	break;
 							}
 
-							opcode.mDataType = hasDataType ? (BaseType)serializer.read<uint8>() : BaseType::VOID;
-							opcode.mFlags = hasOpcodeFlags ? serializer.read<uint8>() : 0;
-							opcode.mLineNumber = (lineNumberBits == 3) ? serializer.read<uint32>() : (lastLineNumber + lineNumberBits);
+							opcode.mDataType = hasDataType ? (BaseType)serializer.read<uint8>() : DEFAULT_OPCODE_BASETYPES[(size_t)opcode.mType];
+
+							// Load / rebuild the two opcode flags that are actually needed during run-time (see "OpcodeProcessor::buildOpcodeData")
+							opcode.mFlags = isSequenceBreak ? Opcode::Flag::SEQ_BREAK : 0;
+							switch (opcode.mType)
+							{
+								case Opcode::Type::JUMP:
+								case Opcode::Type::JUMP_CONDITIONAL:
+								case Opcode::Type::CALL:
+								case Opcode::Type::RETURN:
+								case Opcode::Type::EXTERNAL_CALL:
+								case Opcode::Type::EXTERNAL_JUMP:
+									opcode.mFlags |= Opcode::Flag::CTRLFLOW;
+									break;
+							}
+
+							opcode.mLineNumber = (lineNumberBits == 31) ? serializer.read<uint32>() : (lastLineNumber + lineNumberBits);
 							lastLineNumber = opcode.mLineNumber;
 						}
 
@@ -298,16 +509,18 @@ namespace lemon
 						count = (size_t)serializer.read<uint32>();
 						for (size_t k = 0; k < count; ++k)
 						{
-							const std::string identifier = serializer.read<std::string>();
+							FlyweightString name;
+							name.serialize(serializer);
 							const DataTypeDefinition* dataType = DataTypeHelper::readDataType(serializer);
-							scriptFunc.addLocalVariable(identifier, dataType, 0);
+							scriptFunc.addLocalVariable(name, dataType, 0);
 						}
 
 						// Labels
 						count = (size_t)serializer.read<uint32>();
 						for (size_t k = 0; k < count; ++k)
 						{
-							const std::string name = serializer.read<std::string>();
+							FlyweightString name;
+							name.serialize(serializer);
 							const uint32 offset = serializer.read<uint32>();
 							scriptFunc.addLabel(name, (size_t)offset);
 						}
@@ -325,14 +538,14 @@ namespace lemon
 					const Function& function = *mFunctions[i];
 
 					serializer.write((uint8)function.getType());
-					serializer.write(function.mName);
+					function.mName.write(serializer);
 
 					DataTypeHelper::writeDataType(serializer, function.mReturnType);
 					const uint8 parameterCount = (uint8)function.mParameters.size();
 					serializer.write(parameterCount);
 					for (uint8 k = 0; k < parameterCount; ++k)
 					{
-						serializer.write(function.mParameters[k].mIdentifier);
+						function.mParameters[k].mName.write(serializer);
 						DataTypeHelper::writeDataType(serializer, function.mParameters[k].mType);
 					}
 
@@ -340,10 +553,9 @@ namespace lemon
 					{
 						// Load script function
 						const ScriptFunction& scriptFunc = static_cast<const ScriptFunction&>(function);
-						uint32 lastLineNumber = 0;
 
 						// Source information
-						serializer.write(scriptFunc.mSourceFilename);
+						serializer.writeAs<uint16>(scriptFunc.mSourceFileInfo->mIndex);
 						serializer.write(scriptFunc.mSourceBaseLineOffset);
 
 						// Opcodes
@@ -358,11 +570,11 @@ namespace lemon
 														(opcode.mParameter == (int64)(int8)opcode.mParameter)  ? 3 :
 														(opcode.mParameter == (int64)(int16)opcode.mParameter) ? 4 :
 														(opcode.mParameter == (int64)(int32)opcode.mParameter) ? 5 : 6;
-							const bool hasDataType    = (opcode.mDataType != BaseType::VOID);
-							const bool hasOpcodeFlags = (opcode.mFlags != 0);
-							const uint8 lineNumberBits = (opcode.mLineNumber >= lastLineNumber && opcode.mLineNumber <= lastLineNumber + 2) ? (opcode.mLineNumber - lastLineNumber) : 3;
+							const bool hasDataType     = (opcode.mDataType != DEFAULT_OPCODE_BASETYPES[(size_t)opcode.mType]);
+							const bool isSequenceBreak = (opcode.mFlags & Opcode::Flag::SEQ_BREAK) != 0;
+							const uint8 lineNumberBits = (opcode.mLineNumber >= lastLineNumber && opcode.mLineNumber < lastLineNumber + 31) ? (opcode.mLineNumber - lastLineNumber) : 31;
 
-							const uint16 typeAndFlags = (uint16)opcode.mType | ((uint16)parameterBits << 6) | (hasDataType ? 0x200 : 0) | (hasOpcodeFlags ? 0x400 : 0) | ((uint16)lineNumberBits << 11);
+							const uint16 typeAndFlags = (uint16)opcode.mType | ((uint16)parameterBits << 6) | ((uint16)hasDataType * 0x200) | ((uint16)isSequenceBreak * 0x400) | ((uint16)lineNumberBits << 11);
 							serializer.write(typeAndFlags);
 
 							switch (parameterBits)
@@ -376,27 +588,25 @@ namespace lemon
 
 							if (hasDataType)
 								serializer.writeAs<uint8>(opcode.mDataType);
-							if (hasOpcodeFlags)
-								serializer.write(opcode.mFlags);
-							if (lineNumberBits == 3)
+							if (lineNumberBits == 31)
 								serializer.write(opcode.mLineNumber);
 							lastLineNumber = opcode.mLineNumber;
 						}
 
 						// Local variables
-						serializer.writeAs<uint32>(scriptFunc.mLocalVariablesById.size());
-						for (const LocalVariable* var : scriptFunc.mLocalVariablesById)
+						serializer.writeAs<uint32>(scriptFunc.mLocalVariablesByID.size());
+						for (const LocalVariable* var : scriptFunc.mLocalVariablesByID)
 						{
-							serializer.write(var->getName());
+							var->getName().serialize(serializer);
 							DataTypeHelper::writeDataType(serializer, var->getDataType());
 						}
 
 						// Labels
 						serializer.writeAs<uint32>(scriptFunc.mLabels.size());
-						for (const auto& pair : scriptFunc.mLabels)
+						for (const ScriptFunction::Label& label : scriptFunc.mLabels)
 						{
-							serializer.write(pair.first);
-							serializer.write(pair.second);
+							label.mName.write(serializer);
+							serializer.write(label.mOffset);
 						}
 
 						// Pragmas
@@ -419,7 +629,8 @@ namespace lemon
 			const uint32 numberOfGlobals = serializer.read<uint32>();
 			for (uint32 i = 0; i < numberOfGlobals; ++i)
 			{
-				const std::string name = serializer.read<std::string>();
+				FlyweightString name;
+				name.serialize(serializer);
 				const DataTypeDefinition* dataType = DataTypeHelper::readDataType(serializer);
 				const int64 initialValue = serializer.read<int64>();
 				GlobalVariable& globalVariable = addGlobalVariable(name, dataType);
@@ -446,22 +657,79 @@ namespace lemon
 				RMX_CHECK(variable.getType() == Variable::Type::GLOBAL, "Mix of global variables and others", return false);
 				const GlobalVariable& globalVariable = static_cast<const GlobalVariable&>(variable);
 
-				serializer.write(variable.getName());
+				variable.getName().serialize(serializer);
 				DataTypeHelper::writeDataType(serializer, variable.getDataType());
 				serializer.writeAs<int64>(globalVariable.mInitialValue);
 			}
 		}
 
-		// Serialize defines
+		// Serialize constants
 		{
-			uint32 numberOfDefines = (uint32)mDefines.size();
-			serializer & numberOfDefines;
+			size_t numberOfConstants = mConstants.size();
+			serializer.serializeAs<uint16>(numberOfConstants);
 
 			if (serializer.isReading())
 			{
-				for (uint32 i = 0; i < numberOfDefines; ++i)
+				for (size_t i = 0; i < numberOfConstants; ++i)
 				{
-					const std::string name = serializer.read<std::string>();
+					FlyweightString name;
+					name.serialize(serializer);
+					const DataTypeDefinition* dataType = DataTypeHelper::readDataType(serializer);
+					const uint64 value = serializer.read<uint64>();
+					addConstant(name, dataType, value);
+				}
+			}
+			else
+			{
+				for (Constant* constant : mConstants)
+				{
+					constant->getName().write(serializer);
+					DataTypeHelper::writeDataType(serializer, constant->getDataType());
+					serializer.write(constant->mValue);
+				}
+			}
+		}
+
+		// Serialize constant arrays
+		{
+			size_t numberOfConstantArrays = mConstantArrays.size();
+			serializer.serializeAs<uint16>(numberOfConstantArrays);
+
+			if (serializer.isReading())
+			{
+				const size_t numGlobalConstantArrays = (size_t)serializer.read<uint16>();
+				for (size_t i = 0; i < numberOfConstantArrays; ++i)
+				{
+					FlyweightString name;
+					name.serialize(serializer);
+					const DataTypeDefinition* dataType = DataTypeHelper::readDataType(serializer);
+					ConstantArray& constantArray = addConstantArray(name, dataType, nullptr, 0, i < numGlobalConstantArrays);
+					constantArray.serializeData(serializer);
+				}
+			}
+			else
+			{
+				serializer.serializeAs<uint16>(mNumGlobalConstantArrays);
+				for (ConstantArray* constantArray : mConstantArrays)
+				{
+					constantArray->getName().write(serializer);
+					DataTypeHelper::writeDataType(serializer, constantArray->getElementDataType());
+					constantArray->serializeData(serializer);
+				}
+			}
+		}
+
+		// Serialize defines
+		{
+			size_t numberOfDefines = mDefines.size();
+			serializer.serializeAs<uint16>(numberOfDefines);
+
+			if (serializer.isReading())
+			{
+				for (size_t i = 0; i < numberOfDefines; ++i)
+				{
+					FlyweightString name;
+					name.serialize(serializer);
 					const DataTypeDefinition* dataType = DataTypeHelper::readDataType(serializer);
 
 					Define& define = addDefine(name, dataType);
@@ -472,7 +740,7 @@ namespace lemon
 			{
 				for (Define* define : mDefines)
 				{
-					serializer.write(define->getName());
+					define->getName().serialize(serializer);
 					DataTypeHelper::writeDataType(serializer, define->getDataType());
 
 					TokenSerializer::serializeTokenList(serializer, define->mContent);
@@ -481,12 +749,18 @@ namespace lemon
 		}
 
 		// Serialize string literals
-		mStringLiterals.serialize(serializer);
+		{
+			serializer.serializeArraySize(mStringLiterals);
+			for (FlyweightString& str : mStringLiterals)
+			{
+				str.serialize(serializer);
+			}
+		}
 
 		if (!outerSerializer.isReading())
 		{
 			std::vector<uint8> compressed;
-			if (!ZlibDeflate::encode(compressed, &uncompressed[0], uncompressed.size()))
+			if (!ZlibDeflate::encode(compressed, &uncompressed[0], uncompressed.size(), 5))
 				return false;
 			outerSerializer.write(&compressed[0], compressed.size());
 		}

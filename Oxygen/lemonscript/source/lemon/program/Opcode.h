@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -75,10 +75,10 @@ namespace lemon
 		};
 
 		Type mType = Type::NOP;
-		BaseType mDataType;
+		BaseType mDataType = BaseType::VOID;
 		uint8 mFlags = 0;
-		int64 mParameter = 0;	// For constants, or ID in case of variables and calls
 		uint32 mLineNumber = 0;
+		int64 mParameter = 0;	// For constants, or ID in case of variables and calls
 	};
 
 }

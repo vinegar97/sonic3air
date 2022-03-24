@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -30,14 +30,18 @@ namespace lemon
 
 		inline const std::vector<RuntimeOpcode*>& getOpcodePointers() const  { return mOpcodePointers; }
 
+		void clear();
 		void reserveForOpcodes(size_t numOpcodes);
 		RuntimeOpcode& addOpcode(size_t parameterSize);
+
+		void copyFrom(const RuntimeOpcodeBuffer& other, rmx::OneTimeAllocPool& memoryPool);
 
 	public:
 		std::vector<RuntimeOpcode*> mOpcodePointers;	// Direct pointers to runtime opcodes
 
 	private:
 		uint8* mBuffer = nullptr;
+		bool mSelfManagedBuffer = false;
 		size_t mSize = 0;		// In bytes
 		size_t mReserved = 0;	// In bytes
 	};
@@ -46,7 +50,7 @@ namespace lemon
 	class API_EXPORT RuntimeFunction
 	{
 	public:
-		void build(const Runtime& runtime);
+		void build(Runtime& runtime);
 
 		const uint8* getFirstRuntimeOpcode() const	{ return mRuntimeOpcodeBuffer.getStart(); }
 

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -85,7 +85,7 @@ namespace lemon
 				{
 					const LabelNode& labelNode = node.as<LabelNode>();
 					writer.decreaseIndentation();
-					writer.writeLine(labelNode.mLabel + ":");
+					writer.writeLine(std::string(labelNode.mLabel.getString()) + ":");
 					writer.increaseIndentation();
 					break;
 				}
@@ -93,7 +93,7 @@ namespace lemon
 				case Node::Type::JUMP:
 				{
 					const JumpNode& jumpNode = node.as<JumpNode>();
-					writer.writeLine("goto " + jumpNode.mLabelToken->mName + ";");
+					writer.writeLine("goto " + std::string(jumpNode.mLabelToken->mName.getString()) + ";");
 					break;
 				}
 
@@ -339,23 +339,21 @@ namespace lemon
 				case Token::Type::VARIABLE:
 				{
 					const VariableToken& vt = token.as<VariableToken>();
-					CppWriter::addIdentifier(line, vt.mVariable->getName());
+					CppWriter::addIdentifier(line, vt.mVariable->getName().getString());
 					break;
 				}
 
 				case Token::Type::FUNCTION:
 				{
 					const FunctionToken& ft = token.as<FunctionToken>();
-					CppWriter::addIdentifier(line, ft.mFunctionName);
+					CppWriter::addIdentifier(line, ft.mFunction->getName().getString());
 					line << "(";
 
-					// TODO: Is this parameter list actually used as a list, or only a single comma-separated value in each case anyways?
-					const TokenList& parameters = ft.mParenthesis->mContent;
-					for (size_t k = 0; k < parameters.size(); ++k)
+					for (size_t k = 0; k < ft.mParameters.size(); ++k)
 					{
 						if (k > 0)
 							line << ", ";
-						translateTokenInternal(line, static_cast<const StatementToken&>(parameters[k]));
+						translateTokenInternal(line, ft.mParameters[k]);
 					}
 
 					line << ")";

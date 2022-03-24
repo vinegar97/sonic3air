@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -12,11 +12,11 @@
 // Standalone-specific functions and callbacks           //
 //-------------------------------------------------------//
 
-define u8 SPRITE_FLAG_FLIP_X		 = 0x01
-define u8 SPRITE_FLAG_FLIP_Y		 = 0x02
-define u8 SPRITE_FLAG_WORLDSPACE	 = 0x20
-define u8 SPRITE_FLAG_PRIO			 = 0x40
-define u8 SPRITE_FLAG_NO_GLOBAL_TINT = 0x80
+constant u8 SPRITE_FLAG_FLIP_X		 = 0x01
+constant u8 SPRITE_FLAG_FLIP_Y		 = 0x02
+constant u8 SPRITE_FLAG_WORLDSPACE	 = 0x20
+constant u8 SPRITE_FLAG_PRIO			 = 0x40
+constant u8 SPRITE_FLAG_NO_GLOBAL_TINT = 0x80
 
 
 function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
@@ -226,7 +226,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// FBZ 2 boss fight Egg Robo head
 		if (objA0.update_address == 0x067b96 && isMainCharacter(CHARACTER_KNUCKLES))
 		{
-			u64 key
+			string key
 			if (objA0.animation.sprite < 2)
 				key = (level.framecounter & 0x10) ? "eggrobo_fbz_00" : "eggrobo_fbz_01"
 			else if (objA0.animation.sprite == 2)
@@ -420,7 +420,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			if (Renderer.hasCustomSprite(key))
 			{
 				// Check if there's also a custom palette
-				u64 paletteKey = (character == CHARACTER_SONIC) ? "bluesphere_palette_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_palette_tails" : "bluesphere_palette_knuckles"
+				string paletteKey = (character == CHARACTER_SONIC) ? "bluesphere_palette_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_palette_tails" : "bluesphere_palette_knuckles"
 				if (System.hasExternalPaletteData(paletteKey, 0))
 				{
 					atex = 0x40 + character * 0x20
@@ -447,7 +447,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			if (Renderer.hasCustomSprite(key))
 			{
 				// Check if there's also a custom palette
-				u64 paletteKey = "bluesphere_palette_tails"
+				string paletteKey = "bluesphere_palette_tails"
 				if (System.hasExternalPaletteData(paletteKey, 0))
 				{
 					atex = 0x40 + CHARACTER_TAILS * 0x20
@@ -513,7 +513,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Continue icon
 		if (objA0.update_address == 0x02ebe8 && objA0.animation.sprite >= 0x29 && objA0.animation.sprite <= 0x2b)
 		{
-			u64 key = (objA0.animation.sprite == 0x29) ? "continue_icon_sonic" : (objA0.animation.sprite == 0x2a) ? "continue_icon_tails" : "continue_icon_knuckles"
+			string key = (objA0.animation.sprite == 0x29) ? "continue_icon_sonic" : (objA0.animation.sprite == 0x2a) ? "continue_icon_tails" : "continue_icon_knuckles"
 			Renderer.drawCustomSprite(key, px, py, 0x00, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
 			return true
 		}

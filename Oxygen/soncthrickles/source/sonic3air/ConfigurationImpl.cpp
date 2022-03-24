@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -26,6 +26,8 @@ void ConfigurationImpl::preLoadInitialization()
 
 bool ConfigurationImpl::loadConfigurationInternal(JsonHelper& jsonHelper)
 {
+	loadSharedSettingsConfig(jsonHelper);
+
 	// Add special preprocessor define
 	//  -> Used to query whether it's the game build (i.e. not the Oxygen App), and to get its build number
 	mPreprocessorDefinitions.setDefinition("GAMEAPP", BUILD_NUMBER);
@@ -56,6 +58,58 @@ bool ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 	return true;
 }
 
+void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
+{
+	// Game server
+	{
+		const Json::Value& gameServerJson = rootHelper.mJson["GameServer"];
+		if (!gameServerJson.isNull())
+		{
+			// General game server settings
+			JsonHelper gameServerHelper(gameServerJson);
+			std::string serverAddress;
+			if (gameServerHelper.tryReadString("ServerAddress", serverAddress))
+			{
+				// Setup default ports, they might be overwritten
+				mGameServer.mServerPortUDP = 21094;
+				mGameServer.mServerPortTCP = 21095;
+
+				const String str = serverAddress;
+				const int colonPosition = str.findChar(':', 0, +1);
+				if (colonPosition >= 0 && colonPosition < str.length())
+				{
+					mGameServer.mServerHostName = *str.getSubString(0, colonPosition);
+
+					const int hyphenPosition = str.findChar('-', colonPosition+1, +1);
+					if (hyphenPosition >= 0 && hyphenPosition < str.length())
+					{
+						mGameServer.mServerPortUDP = str.getSubString(colonPosition+1, hyphenPosition-colonPosition-1).parseInt();
+						mGameServer.mServerPortTCP = str.getSubString(hyphenPosition+1).parseInt();
+					}
+					else
+					{
+						mGameServer.mServerPortUDP = str.getSubString(colonPosition+1).parseInt();
+					}
+				}
+				else
+				{
+					mGameServer.mServerHostName = *str;
+				}
+			}
+
+			// Ghost sync settings
+			const Json::Value& ghostSyncJson = gameServerHelper.mJson["GhostSync"];
+			if (!ghostSyncJson.isNull())
+			{
+				JsonHelper jsonHelper(ghostSyncJson);
+				jsonHelper.tryReadBool("Enabled", mGameServer.mGhostSync.mEnabled);
+				jsonHelper.tryReadString("ChannelName", mGameServer.mGhostSync.mChannelName);
+				jsonHelper.tryReadBool("ShowOffscreenGhosts", mGameServer.mGhostSync.mShowOffscreenGhosts);
+			}
+		}
+	}
+}
+
 void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsType settingsType, bool isDeprecatedJson)
 {
 	if (!isDeprecatedJson && settingsType == SettingsType::STANDARD)
@@ -73,6 +127,8 @@ void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 				loadSettingsInternal(deprecatedJsonHelper, settingsType, true);
 			}
 		}
+
+		loadSharedSettingsConfig(rootHelper);
 	}
 
 	// Audio

@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -72,7 +72,7 @@ function void SpecialStage()
 	for (u8 player = 0; player < getNumPlayers(); ++player)
 	{
 		u8 character = getPlayerCharacter(player)
-		u64 paletteKey = (character == CHARACTER_SONIC) ? "bluesphere_palette_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_palette_tails" : "bluesphere_palette_knuckles"
+		string paletteKey = (character == CHARACTER_SONIC) ? "bluesphere_palette_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_palette_tails" : "bluesphere_palette_knuckles"
 		u16 numColors = System.loadExternalPaletteData(paletteKey, 0, 0x800000, 0x20)
 		if (numColors > 0)
 		{

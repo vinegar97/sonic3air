@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -50,7 +50,9 @@ function void fn08d5b0()
 
 	objA0.base_state = 0x04
 	objA0.flags38 |= 0x02
-	spawnChildObjects(0x08d9c0)
+
+	// "spawnChildObjects(0x08d9c0)" replaced by:
+	spawnChildObject(0x08d602, 0x00, 0, 16)
 }
 
 

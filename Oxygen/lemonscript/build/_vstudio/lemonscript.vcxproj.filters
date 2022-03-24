@@ -19,6 +19,9 @@
     <Filter Include="lemon\runtime\provider">
       <UniqueIdentifier>{a4f5d1ec-558c-40ad-aabc-d73ac59dd3f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lemon\utility">
+      <UniqueIdentifier>{24cc8bbf-111e-496d-a56b-0339bee81deb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\lemon\compiler\Compiler.cpp">
@@ -99,11 +102,29 @@
     <ClCompile Include="..\..\source\lemon\program\DataType.cpp">
       <Filter>lemon\program</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\lemon\program\StoredString.cpp">
+    <ClCompile Include="..\..\source\lemon\program\StringRef.cpp">
       <Filter>lemon\program</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\lemon\runtime\ControlFlow.cpp">
       <Filter>lemon\runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\TypeCasting.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\Operators.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\ConstantArray.cpp">
+      <Filter>lemon\program</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\LineNumberTranslation.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\utility\FlyweightString.cpp">
+      <Filter>lemon\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\Define.cpp">
+      <Filter>lemon\program</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -197,7 +218,7 @@
     <ClInclude Include="..\..\source\lemon\translator\SourceCodeWriter.h">
       <Filter>lemon\translator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\lemon\program\StoredString.h">
+    <ClInclude Include="..\..\source\lemon\program\StringRef.h">
       <Filter>lemon\program</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\runtime\OpcodeProcessor.h">
@@ -226,6 +247,30 @@
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\runtime\ControlFlow.h">
       <Filter>lemon\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\TypeCasting.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\Operators.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\Errors.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\ConstantArray.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\Constant.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\LineNumberTranslation.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\utility\FlyweightString.h">
+      <Filter>lemon\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\SourceFileInfo.h">
+      <Filter>lemon\program</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

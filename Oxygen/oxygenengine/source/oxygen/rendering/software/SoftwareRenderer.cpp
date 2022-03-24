@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -298,13 +298,27 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 		case Geometry::Type::RECT:
 		{
 			const RectGeometry& rg = static_cast<const RectGeometry&>(geometry);
-			Bitmap& gameScreenBitmap = mGameScreenTexture.accessBitmap();
-			BitmapWrapper gameScreenWrapper(gameScreenBitmap);
+			BitmapWrapper gameScreenWrapper(mGameScreenTexture.accessBitmap());
 
 			Blitter::Options options;
 			options.mUseAlphaBlending = true;
 
 			Blitter::blitColor(gameScreenWrapper, rg.mRect, rg.mColor, options);
+			break;
+		}
+
+		case Geometry::Type::TEXTURED_RECT:
+		{
+			const TexturedRectGeometry& tg = static_cast<const TexturedRectGeometry&>(geometry);
+			Bitmap& gameScreenBitmap = mGameScreenTexture.accessBitmap();
+			BitmapWrapper gameScreenWrapper(gameScreenBitmap);
+			BitmapWrapper inputWrapper(tg.mDrawerTexture.accessBitmap());
+
+			Blitter::Options options;
+			options.mUseAlphaBlending = true;
+			options.mTintColor = tg.mColor;
+
+			Blitter::blitBitmap(gameScreenWrapper, tg.mRect.getPos(), inputWrapper, Recti(0, 0, tg.mRect.width, tg.mRect.height), options);
 			break;
 		}
 

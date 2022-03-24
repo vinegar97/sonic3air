@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -113,8 +113,14 @@ void ScriptImplementations::registerScriptBindings(lemon::Module& module)
 	module.addUserDefinedFunction("Kosinski.Decompress", lemon::wrap(&s3air::kosinskiDecompress), defaultFlags);
 	module.addUserDefinedFunction("WriteScrollOffsets", lemon::wrap(&s3air::writeScrollOffsets), defaultFlags);
 	module.addUserDefinedFunction("WriteScrollOffsetsFlipped", lemon::wrap(&s3air::writeScrollOffsetsFlipped), defaultFlags);
-	module.addUserDefinedFunction("putNybbles", lemon::wrap(&s3air::putNybbles), defaultFlags);
+
+	module.addUserDefinedFunction("putNybbles", lemon::wrap(&s3air::putNybbles), defaultFlags)
+		.setParameterInfo(0, "input")
+		.setParameterInfo(1, "count")
+		.setParameterInfo(2, "value");
 
 	// TEST!
-	module.addUserDefinedFunction("uncompressKosinskiData", lemon::wrap(&s3air::decompressKosinskiData), defaultFlags);
+	module.addUserDefinedFunction("uncompressKosinskiData", lemon::wrap(&s3air::decompressKosinskiData), defaultFlags)
+		.setParameterInfo(0, "sourceAddress")
+		.setParameterInfo(1, "targetInVRAM");
 }

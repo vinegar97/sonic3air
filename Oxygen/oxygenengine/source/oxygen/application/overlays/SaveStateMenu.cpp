@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -333,7 +333,7 @@ void SaveStateMenu::onAccept(bool loadingAllowed, bool savingAllowed)
 			const Entry& entry = mEntries[mHighlightedIndex];
 			if (entry.mType <= Entry::Type::SAVESTATE_LOCAL)
 			{
-				const WString filename = WString(mSaveStateDirectory[(size_t)entry.mType]) + L"/" + entry.mName + L".state";
+				const WString filename = WString(mSaveStateDirectory[(size_t)entry.mType]) + entry.mName + L".state";
 				simulation.loadState(*filename);
 			}
 			else if (entry.mType == Entry::Type::RESET)
@@ -349,7 +349,7 @@ void SaveStateMenu::onAccept(bool loadingAllowed, bool savingAllowed)
 			const Entry& entry = mEntries[mHighlightedIndex];
 			if (entry.mType != Entry::Type::RESET && !entry.mName.empty())
 			{
-				const WString filename = WString(mSaveStateDirectory[1]) + L"/" + entry.mName + L".state";
+				const WString filename = WString(mSaveStateDirectory[1]) + entry.mName + L".state";
 				simulation.saveState(*filename);
 			}
 		}

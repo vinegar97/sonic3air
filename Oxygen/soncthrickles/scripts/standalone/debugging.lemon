@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -138,7 +138,6 @@ function void OxygenCallback.setupCustomSidePanelEntries()
 
 			if (System.SidePanel.isEntryHovered(address))
 			{
-				// TODO: Unfortunately, this does not work when simulation is paused
 				debugDrawRect(px - 15, py - 15, 31, 31, 0xc00080ff)
 			}
 		}

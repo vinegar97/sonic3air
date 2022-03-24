@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -35,7 +35,7 @@ public:
 		inline Assignment()  {}
 		inline Assignment(Type type, uint32 index) : mType(type), mIndex(index)  {}
 		inline bool operator==(const Assignment& other) const  { return (mType == other.mType && mIndex == other.mIndex); }
-		
+
 		void getMappingString(String& outString, DeviceType deviceType) const;
 		static bool setFromMappingString(Assignment& output, const String& mappingString, DeviceType deviceType);
 	};
@@ -63,7 +63,7 @@ public:
 			_NUM
 		};
 
-		DeviceType mDeviceType;
+		DeviceType mDeviceType = DeviceType::KEYBOARD;
 		std::string mIdentifier;
 		std::map<uint64, std::string> mDeviceNames;		// Uses string hash as key
 		ControlMapping mMappings[(size_t)Button::_NUM];

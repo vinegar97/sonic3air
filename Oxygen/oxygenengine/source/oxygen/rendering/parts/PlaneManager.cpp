@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -218,6 +218,11 @@ uint16 PlaneManager::getPlaneBaseVRAMAddress(int planeIndex) const
 const uint16* PlaneManager::getPlaneDataInVRAM(int planeIndex) const
 {
 	return (const uint16*)(EmulatorInterface::instance().getVRam() + getPlaneBaseVRAMAddress(planeIndex));
+}
+
+size_t PlaneManager::getPlaneSizeInVRAM(int planeIndex) const
+{
+	return (size_t)(mPlayfieldSize.x * mPlayfieldSize.y * 2);
 }
 
 uint16 PlaneManager::getPatternVRAMAddress(int planeIndex, uint16 patternIndex) const

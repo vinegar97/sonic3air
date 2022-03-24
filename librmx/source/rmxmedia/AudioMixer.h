@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -24,7 +24,7 @@ namespace rmx
 	public:
 		struct MixerParameters
 		{
-			int32* mOutputBuffers[2];		// One for each channel
+			int32* mOutputBuffers[2] = { nullptr, nullptr };	// One for each channel
 			size_t mOutputSamples = 0;
 			const SDL_AudioSpec* mOutputFormat = nullptr;
 			float mAccumulatedVolume = 1.0f;

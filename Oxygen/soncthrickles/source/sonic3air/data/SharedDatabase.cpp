@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -92,6 +92,7 @@ void SharedDatabase::initialize()
 		ADD_SETTING_SERIALIZED(Setting::SETTING_BUBBLE_SHIELD_BOUNCE);
 		ADD_SETTING_SERIALIZED(Setting::SETTING_CAMERA_OUTRUN);
 		ADD_SETTING_SERIALIZED(Setting::SETTING_EXTENDED_CAMERA);
+		ADD_SETTING_SERIALIZED(Setting::SETTING_MAINTAIN_SHIELDS);
 		ADD_SETTING_SERIALIZED(Setting::SETTING_BS_REPEAT_ON_FAIL);
 		ADD_SETTING_SERIALIZED(Setting::SETTING_DISABLE_GHOST_SPAWN);
 
@@ -236,6 +237,7 @@ uint64 SharedDatabase::setupCharacterSprite(uint8 character, uint16 animationSpr
 		uint32 mappingOffset;
 		switch (character)
 		{
+			default:
 			case 0:		// Sonic
 				sourceBase    = (animationSprite >= 0xda) ? 0x140060 : 0x100000;
 				tableAddress  = (superActive) ? 0x148378 : 0x148182;

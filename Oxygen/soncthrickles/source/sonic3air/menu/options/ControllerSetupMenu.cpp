@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -67,7 +67,7 @@ void ControllerSetupMenu::initialize()
 {
 	mMenuEntries.reserve(16);
 	{
-		GameMenuEntries::Entry& entry = mMenuEntries.addEntry("", ::CONTROLLER_SELECT);
+		GameMenuEntry& entry = mMenuEntries.addEntry("", ::CONTROLLER_SELECT);
 		mControllerSelectEntry = &entry;
 		refreshGamepadList(true);
 	}
@@ -206,7 +206,7 @@ void ControllerSetupMenu::update(float timeElapsed)
 			{
 				if (buttonEffect == ButtonEffect::ACCEPT)
 				{
-					const GameMenuEntries::Entry& selectedEntry = mMenuEntries.selected();
+					const GameMenuEntry& selectedEntry = mMenuEntries.selected();
 					switch (selectedEntry.mData)
 					{
 						case ::ASSIGN_ALL:
@@ -342,7 +342,7 @@ void ControllerSetupMenu::render()
 
 		const std::string& text = entry.mOptions.empty() ? entry.mText : entry.mOptions[entry.mSelectedIndex].mText;
 		const bool isSelected = ((int)line == mMenuEntries.mSelectedEntryIndex);
-		
+
 		Color color = isSelected ? Color::YELLOW : Color::WHITE;
 		color.a *= alpha;
 
@@ -357,56 +357,61 @@ void ControllerSetupMenu::render()
 			if (nullptr != device)
 			{
 				InputManager& inputManager = InputManager::instance();
-				const InputConfig::ControlMapping& mapping = device->mControlMappings[entry.mData - 0x10];
-				const bool assigningThis = (mCurrentlyAssigningButtonIndex == (entry.mData & 0x0f));
-
-				size_t numAssignmentsToShow = mapping.mAssignments.size();
-				if (assigningThis && !mAppendAssignment)
+				const size_t buttonIndex = entry.mData - 0x10;
+				RMX_ASSERT(buttonIndex < device->mControlMappings.size(), "Ohhhh!");
+				if (buttonIndex < device->mControlMappings.size())	// It's unclear how, but an invalid index is possible and led to crashes for some players
 				{
-					numAssignmentsToShow = mapping.mNumFixedAssignments;
-				}
+					const InputConfig::ControlMapping& mapping = device->mControlMappings[buttonIndex];
+					const bool assigningThis = (mCurrentlyAssigningButtonIndex == (entry.mData & 0x0f));
 
-				std::string assignmentsString1;
-				std::string assignmentsString2;
-				for (size_t k = 0; k < numAssignmentsToShow; ++k)
-				{
-					const InputConfig::Assignment& assignment = mapping.mAssignments[k];
-					String str;
-					assignment.getMappingString(str, device->mType);
-					if (k < mapping.mNumFixedAssignments)
+					size_t numAssignmentsToShow = mapping.mAssignments.size();
+					if (assigningThis && !mAppendAssignment)
 					{
-						if (!assignmentsString1.empty())
-							assignmentsString1 += ", ";
-						assignmentsString1 += *str;
+						numAssignmentsToShow = mapping.mNumFixedAssignments;
 					}
-					else
+
+					std::string assignmentsString1;
+					std::string assignmentsString2;
+					for (size_t k = 0; k < numAssignmentsToShow; ++k)
+					{
+						const InputConfig::Assignment& assignment = mapping.mAssignments[k];
+						String str;
+						assignment.getMappingString(str, device->mType);
+						if (k < mapping.mNumFixedAssignments)
+						{
+							if (!assignmentsString1.empty())
+								assignmentsString1 += ", ";
+							assignmentsString1 += *str;
+						}
+						else
+						{
+							if (!assignmentsString2.empty())
+								assignmentsString2 += ", ";
+							else if (!assignmentsString1.empty())
+								assignmentsString1 += ", ";
+							assignmentsString2 += *str;
+						}
+					}
+					if (assigningThis)
 					{
 						if (!assignmentsString2.empty())
 							assignmentsString2 += ", ";
 						else if (!assignmentsString1.empty())
 							assignmentsString1 += ", ";
-						assignmentsString2 += *str;
+						assignmentsString2 += "?";
 					}
-				}
-				if (assigningThis)
-				{
-					if (!assignmentsString2.empty())
-						assignmentsString2 += ", ";
-					else if (!assignmentsString1.empty())
-						assignmentsString1 += ", ";
-					assignmentsString2 += "?";
-				}
 
-				if (assignmentsString1.empty() && assignmentsString2.empty())
-				{
-					const Color grayColor = isSelected ? color : Color(color.r * 0.7f, color.g * 0.7f, color.b * 0.7f, color.a);
-					drawer.printText(font, Recti(baseX + 16, py, 0, 10), "none", 4, grayColor);
-				}
-				else
-				{
-					const Color cyanColor = isSelected ? color : Color(color.r * 0.7f, color.g * 0.9f, color.b * 0.9f, color.a);
-					drawer.printText(font, Recti(baseX + 16, py, 0, 10), assignmentsString1, 4, cyanColor);
-					drawer.printText(font, Recti(baseX + 16 + font.getWidth(assignmentsString1), py, 0, 10), assignmentsString2, 4, color);
+					if (assignmentsString1.empty() && assignmentsString2.empty())
+					{
+						const Color grayColor = isSelected ? color : Color(color.r * 0.7f, color.g * 0.7f, color.b * 0.7f, color.a);
+						drawer.printText(font, Recti(baseX + 16, py, 0, 10), "none", 4, grayColor);
+					}
+					else
+					{
+						const Color cyanColor = isSelected ? color : Color(color.r * 0.7f, color.g * 0.9f, color.b * 0.9f, color.a);
+						drawer.printText(font, Recti(baseX + 16, py, 0, 10), assignmentsString1, 4, cyanColor);
+						drawer.printText(font, Recti(baseX + 16 + font.getWidth(assignmentsString1), py, 0, 10), assignmentsString2, 4, color);
+					}
 				}
 			}
 
@@ -572,7 +577,7 @@ void ControllerSetupMenu::refreshGamepadList(bool forceUpdate)
 	{
 		mLastGamepadsChangeCounter = changeCounter;
 
-		GameMenuEntries::Entry& entry = *mControllerSelectEntry;
+		GameMenuEntry& entry = *mControllerSelectEntry;
 		const int oldValue = entry.hasSelected() ? entry.selected().mValue : 0;		// Default value 0 = select first controller if something goes wrong
 		if (Application::instance().hasKeyboard())
 		{

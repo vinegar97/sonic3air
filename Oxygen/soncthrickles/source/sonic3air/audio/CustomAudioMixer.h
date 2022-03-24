@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -31,9 +31,9 @@ private:
 
 	struct ChannelData
 	{
-		int32 mOutputBuffer[OUTPUT_BUFFER_SIZE];
-		int32 mHistoryBuffer[ACCUMULATION_BUFFER_SIZE];		// Cyclic buffer
-		size_t mIndexInHistory = 0;							// Index of next value in history buffer
+		int32 mOutputBuffer[OUTPUT_BUFFER_SIZE] = { 0 };
+		int32 mHistoryBuffer[ACCUMULATION_BUFFER_SIZE] = { 0 };	// Cyclic buffer
+		size_t mIndexInHistory = 0;								// Index of next value in history buffer
 		int64 mAccumulator = 0;
 	};
 	ChannelData mChannelData[MAX_NUM_CHANNELS];

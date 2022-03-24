@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,8 +9,10 @@
 #include "lemon/pch.h"
 #include "lemon/compiler/TokenProcessing.h"
 #include "lemon/compiler/TokenTypes.h"
+#include "lemon/compiler/TypeCasting.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/GlobalsLookup.h"
+#include "lemon/runtime/StandardLibrary.h"
 
 
 namespace lemon
@@ -18,391 +20,15 @@ namespace lemon
 
 	namespace
 	{
-		static const uint8 operatorPriorityLookup[] =
-		{
-			15,	 // ASSIGN
-			15,	 // ASSIGN_PLUS
-			15,	 // ASSIGN_MINUS
-			15,	 // ASSIGN_MULTIPLY
-			15,	 // ASSIGN_DIVIDE
-			15,	 // ASSIGN_MODULO
-			15,	 // ASSIGN_SHIFT_LEFT
-			15,	 // ASSIGN_SHIFT_RIGHT
-			15,	 // ASSIGN_AND
-			15,	 // ASSIGN_OR
-			15,	 // ASSIGN_XOR
-			6,	 // BINARY_PLUS
-			6,	 // BINARY_MINUS
-			5,	 // BINARY_MULTIPLY
-			5,	 // BINARY_DIVIDE
-			5,	 // BINARY_MODULO
-			7,	 // BINARY_SHIFT_LEFT
-			7,	 // BINARY_SHIFT_RIGHT
-			10,	 // BINARY_AND
-			12,	 // BINARY_OR
-			11,	 // BINARY_XOR
-			13,	 // LOGICAL_AND
-			14,	 // LOGICAL_OR
-			3,   // UNARY_NOT
-			3,   // UNARY_BITNOT
-			3,	 // UNARY_DECREMENT (actually 2 for post-, 3 for pre-decrement)
-			3,	 // UNARY_INCREMENT (same here)
-			9,	 // COMPARE_EQUAL
-			9,	 // COMPARE_NOT_EQUAL
-			8,	 // COMPARE_LESS
-			8,	 // COMPARE_LESS_OR_EQUAL
-			8,	 // COMPARE_GREATER
-			8,	 // COMPARE_GREATER_OR_EQUAL
-			15,	 // QUESTIONMARK
-			15,	 // COLON
-			18,	 // SEMICOLON_SEPARATOR (only in 'for' statements, otherwise ignored)
-			17,	 // COMMA_SEPARATOR (should be evaluated separatedly, after all others)
-			2,	 // PARENTHESIS_LEFT
-			2,	 // PARENTHESIS_RIGHT
-			2,	 // BRACKET_LEFT
-			2	 // BRACKET_RIGHT
-		};
-		static_assert(sizeof(operatorPriorityLookup) == (size_t)Operator::_NUM_OPERATORS, "Update operator priority lookup");
-
-		static const bool operatorAssociativityLookup[] =
-		{
-			// "false" = left to right
-			// "true" = right to left
-			false,		// Priority 0 (unused)
-			false,		// Priority 1 (reserved for :: operator)
-			false,		// Priority 2 (parentheses)
-			true,		// Priority 3 (unary operators)
-			false,		// Priority 4 (reserved for element access)
-			false,		// Priority 5 (multiplication, division)
-			false,		// Priority 6 (addition, subtraction)
-			false,		// Priority 7 (shifts)
-			false,		// Priority 8 (comparisons)
-			false,		// Priority 9 (comparisons)
-			false,		// Priority 10 (bitwise AND)
-			false,		// Priority 11 (bitwise XOR)
-			false,		// Priority 12 (bitwise OR)
-			false,		// Priority 13 (logical AND)
-			false,		// Priority 14 (logical OR)
-			true,		// Priority 15 (assignments and trinary operator)
-			true,		// Priority 16 (reserved for throw)
-			false		// Priority 17 (comma separator)
-		};
-
-		uint8 getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target)
-		{
-			const uint8 CANNOT_CAST = 0xff;
-			if (original == target)
-			{
-				// No cast required at all
-				return 0;
-			}
-
-			if (original->mClass == DataTypeDefinition::Class::INTEGER && target->mClass == DataTypeDefinition::Class::INTEGER)
-			{
-				const IntegerDataType& originalInt = original->as<IntegerDataType>();
-				const IntegerDataType& targetInt = target->as<IntegerDataType>();
-
-				// Is one type undefined?
-				if (originalInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
-				{
-					// Const may get cast to everything
-					return 1;
-				}
-				if (targetInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
-				{
-					// Can this happen at all?
-					return 1;
-				}
-
-				if (originalInt.mBytes == targetInt.mBytes)
-				{
-					return (originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x02 : 0x01;
-				}
-				
-				const uint8 a = (uint8)DataTypeHelper::getBaseType(original);
-				const uint8 b = (uint8)DataTypeHelper::getBaseType(target);
-				const uint8 sizeA = a & 0x07;
-				const uint8 sizeB = b & 0x07;
-				if (originalInt.mBytes < targetInt.mBytes)
-				{
-					// Up cast
-					return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x20 : 0x10) + (sizeB - sizeA);
-				}
-				else
-				{
-					// Down cast
-					return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x40 : 0x30) + (sizeB - sizeA);
-				}
-			}
-			else
-			{
-				// No cast between non-integers
-				return CANNOT_CAST;
-			}
-		}
-
-		struct BinaryOperatorSignature
-		{
-			const DataTypeDefinition* mLeft;
-			const DataTypeDefinition* mRight;
-			const DataTypeDefinition* mResult;
-			inline BinaryOperatorSignature(const DataTypeDefinition* left, const DataTypeDefinition* right, const DataTypeDefinition* result) : mLeft(left), mRight(right), mResult(result) {}
-		};
-
-		uint16 getPriorityOfSignature(const BinaryOperatorSignature& signature, const DataTypeDefinition* left, const DataTypeDefinition* right)
-		{
-			const uint8 prioLeft = getImplicitCastPriority(left, signature.mLeft);
-			const uint8 prioRight = getImplicitCastPriority(right, signature.mRight);
-			if (prioLeft < prioRight)
-			{
-				return ((uint16)prioRight << 8) + (uint16)prioLeft;
-			}
-			else
-			{
-				return ((uint16)prioLeft << 8) + (uint16)prioRight;
-			}
-		}
-
-		uint32 getPriorityOfSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target)
-		{
-			if (original.size() != target.size())
-				return 0xffffffff;
-
-			const size_t size = original.size();
-			static std::vector<uint8> priorities;	// Not multi-threading safe
-			priorities.resize(size);
-
-			for (size_t i = 0; i < size; ++i)
-			{
-				priorities[i] = getImplicitCastPriority(original[i], target[i].mType);
-			}
-
-			// Highest priority should be first
-			std::sort(priorities.begin(), priorities.end(), std::greater<uint8>());
-
-			uint32 result = 0;
-			for (size_t i = 0; i < std::min<size_t>(size, 4); ++i)
-			{
-				result |= (priorities[i] << (24 - i * 8));
-			}
-			return result;
-		}
-
-		enum class OperatorType
-		{
-			ASSIGNMENT,
-			SYMMETRIC,
-			COMPARISON,
-			TRINARY,
-			UNKNOWN
-		};
-
-		OperatorType getOperatorType(Operator op)
-		{
-			switch (op)
-			{
-				case Operator::ASSIGN:
-				case Operator::ASSIGN_PLUS:
-				case Operator::ASSIGN_MINUS:
-				case Operator::ASSIGN_MULTIPLY:
-				case Operator::ASSIGN_DIVIDE:
-				case Operator::ASSIGN_MODULO:
-				case Operator::ASSIGN_SHIFT_LEFT:	// TODO: Special handling required
-				case Operator::ASSIGN_SHIFT_RIGHT:	// TODO: Special handling required
-				case Operator::ASSIGN_AND:
-				case Operator::ASSIGN_OR:
-				case Operator::ASSIGN_XOR:
-				{
-					return OperatorType::ASSIGNMENT;
-				}
-
-				case Operator::BINARY_PLUS:
-				case Operator::BINARY_MINUS:
-				case Operator::BINARY_MULTIPLY:
-				case Operator::BINARY_DIVIDE:
-				case Operator::BINARY_MODULO:
-				case Operator::BINARY_SHIFT_LEFT:	// TODO: Special handling required
-				case Operator::BINARY_SHIFT_RIGHT:	// TODO: Special handling required
-				case Operator::BINARY_AND:
-				case Operator::BINARY_OR:
-				case Operator::BINARY_XOR:
-				case Operator::LOGICAL_AND:
-				case Operator::LOGICAL_OR:
-				case Operator::COLON:
-				{
-					return OperatorType::SYMMETRIC;
-				}
-
-				case Operator::COMPARE_EQUAL:
-				case Operator::COMPARE_NOT_EQUAL:
-				case Operator::COMPARE_LESS:
-				case Operator::COMPARE_LESS_OR_EQUAL:
-				case Operator::COMPARE_GREATER:
-				case Operator::COMPARE_GREATER_OR_EQUAL:
-				{
-					return OperatorType::COMPARISON;
-				}
-
-				case Operator::QUESTIONMARK:
-				{
-					return OperatorType::TRINARY;
-				}
-
-				default:
-				{
-					return OperatorType::UNKNOWN;
-				}
-			}
-		}
-
-		bool getBestSignature(Operator op, const DataTypeDefinition* left, const DataTypeDefinition* right, const BinaryOperatorSignature** outSignature)
-		{
-			static const std::vector<BinaryOperatorSignature> signaturesSymmetric =
-			{
-				// TODO: This is oversimplified, there are cases like multiply and left-shift (and probably also add / subtract) that require different handling
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64),
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32),
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8)
-			};
-			static const std::vector<BinaryOperatorSignature> signaturesComparison =
-			{
-				// Result types are always bool
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::BOOL)
-			};
-			static const std::vector<BinaryOperatorSignature> signaturesTrinary =
-			{
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8)
-			};
-
-			const std::vector<BinaryOperatorSignature>* signatures = nullptr;
-			bool exactMatchLeftRequired = false;
-
-			switch (getOperatorType(op))
-			{
-				case OperatorType::ASSIGNMENT:
-				{
-					signatures = &signaturesSymmetric;
-					exactMatchLeftRequired = true;
-					break;
-				}
-
-				case OperatorType::SYMMETRIC:
-				{
-					signatures = &signaturesSymmetric;
-					break;
-				}
-
-				case OperatorType::COMPARISON:
-				{
-					signatures = &signaturesComparison;
-					break;
-				}
-
-				case OperatorType::TRINARY:
-				{
-					signatures = &signaturesTrinary;
-					break;
-				}
-
-				default:
-				{
-					// This should never happen
-					CHECK_ERROR_NOLINE(false, "Unknown operator type");
-				}
-			}
-
-			uint16 bestPriority = 0xff00;
-			for (const BinaryOperatorSignature& signature : *signatures)
-			{
-				if (exactMatchLeftRequired)
-				{
-					if (signature.mLeft != left)
-						continue;
-				}
-
-				const uint16 priority = getPriorityOfSignature(signature, left, right);
-				if (priority < bestPriority)
-				{
-					bestPriority = priority;
-					*outSignature = &signature;
-				}
-			}
-			return (bestPriority != 0xff00);
-		}
-
-		const char* operatorCharacters[] =
-		{
-			"=",	// ASSIGN
-			"+=",	// ASSIGN_PLUS
-			"-=",	// ASSIGN_MINUS
-			"*=",	// ASSIGN_MULTIPLY
-			"/=",	// ASSIGN_DIVIDE
-			"%=",	// ASSIGN_MODULO
-			"<<=",	// ASSIGN_SHIFT_LEFT
-			">>=",	// ASSIGN_SHIFT_RIGHT
-			"&=",	// ASSIGN_AND
-			"|=",	// ASSIGN_OR
-			"^=",	// ASSIGN_XOR
-			"+",	// BINARY_PLUS
-			"-",	// BINARY_MINUS
-			"*",	// BINARY_MULTIPLY
-			"/",	// BINARY_DIVIDE
-			"%",	// BINARY_MODULO
-			"<<",	// BINARY_SHIFT_LEFT
-			">>",	// BINARY_SHIFT_RIGHT
-			"&",	// BINARY_AND
-			"|",	// BINARY_OR
-			"^",	// BINARY_XOR
-			"&&",	// LOGICAL_AND
-			"||",	// LOGICAL_OR
-			"",		// UNARY_NOT
-			"",		// UNARY_BITNOT
-			"-",	// UNARY_DECREMENT
-			"+",	// UNARY_INCREMENT
-			"==",	// COMPARE_EQUAL
-			"!=",	// COMPARE_NOT_EQUAL
-			"<",	// COMPARE_LESS
-			"<=",	// COMPARE_LESS_OR_EQUAL
-			">",	// COMPARE_GREATER
-			">=",	// COMPARE_GREATER_OR_EQUAL
-			"?",	// QUESTIONMARK
-			":",	// COLON
-			";",	// SEMICOLON_SEPARATOR
-			",",	// COMMA_SEPARATOR
-			"(",	// PARENTHESIS_LEFT
-			")",	// PARENTHESIS_RIGHT
-			"[",	// BRACKET_LEFT
-			"]",	// BRACKET_RIGHT
-		};
-
 		std::string getOperatorNotAllowedErrorMessage(Operator op)
 		{
 			if (op >= Operator::UNARY_NOT && op <= Operator::UNARY_INCREMENT)
 			{
-				return std::string("Unary operator ") + operatorCharacters[(int)op] + " is not allowed here";
+				return std::string("Unary operator ") + OperatorHelper::getOperatorCharacters(op) + " is not allowed here";
 			}
 			else if (op <= Operator::COLON)
 			{
-				return std::string("Binary operator ") + operatorCharacters[(int)op] + " is not allowed here";
+				return std::string("Binary operator ") + OperatorHelper::getOperatorCharacters(op) + " is not allowed here";
 			}
 			else
 			{
@@ -422,6 +48,9 @@ namespace lemon
 
 		bool tryReplaceConstants(const ConstantToken& constLeft, const ConstantToken& constRight, Operator op, int64& outValue)
 		{
+			if (constLeft.mDataType == &PredefinedDataTypes::STRING || constRight.mDataType == &PredefinedDataTypes::STRING)
+				return false;
+
 			switch (op)
 			{
 				case Operator::BINARY_PLUS:			outValue = constLeft.mValue + constRight.mValue;	return true;
@@ -436,35 +65,67 @@ namespace lemon
 			}
 			return false;
 		}
+
+		void fillCachedBuiltinFunction(TokenProcessing::CachedBuiltinFunction& outCached, const GlobalsLookup& globalsLookup, const StandardLibrary::FunctionName& functionName, bool allowOnlyOne)
+		{
+			const std::vector<Function*>& functions = globalsLookup.getFunctionsByName(functionName.mHash);
+			RMX_ASSERT(!functions.empty(), "Unable to find built-in function '" << functionName.mName << "'");
+			if (allowOnlyOne)
+				RMX_ASSERT(functions.size() == 1, "Multiple definitions for built-in function '" << functionName.mName << "'");
+			outCached.mFunctions = functions;
+		}
+
+		template<typename T>
+		T* findInList(const std::vector<T*>& list, uint64 nameHash)
+		{
+			for (T* item : list)
+			{
+				if (item->getName().getHash() == nameHash)
+					return item;
+			}
+			return nullptr;
+		}
 	}
 
 
-	uint8 TokenProcessing::getOperatorPriority(Operator op)
+	TokenProcessing::TokenProcessing(GlobalsLookup& globalsLookup, const GlobalCompilerConfig& config) :
+		mGlobalsLookup(globalsLookup),
+		mConfig(config)
 	{
-		return operatorPriorityLookup[(size_t)op];
-	}
-
-	bool TokenProcessing::isOperatorAssociative(Operator op)
-	{
-		const uint8 priority = operatorPriorityLookup[(size_t)op];
-		return operatorAssociativityLookup[priority];
+		fillCachedBuiltinFunction(mBuiltinConstantArrayAccess,			globalsLookup, StandardLibrary::BUILTIN_NAME_CONSTANT_ARRAY_ACCESS, false);
+		fillCachedBuiltinFunction(mBuiltinStringOperatorPlus,			globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS, true);
+		fillCachedBuiltinFunction(mBuiltinStringOperatorLess,			globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS, true);
+		fillCachedBuiltinFunction(mBuiltinStringOperatorLessOrEqual,	globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL, true);
+		fillCachedBuiltinFunction(mBuiltinStringOperatorGreater,		globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER, true);
+		fillCachedBuiltinFunction(mBuiltinStringOperatorGreaterOrEqual,	globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL, true);
+		fillCachedBuiltinFunction(mBuiltinStringLength,					globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_LENGTH, true);
 	}
 
 	void TokenProcessing::processTokens(TokenList& tokensRoot, uint32 lineNumber, const DataTypeDefinition* resultType)
 	{
 		mLineNumber = lineNumber;
 
-		// Process defines
+		// Try to resolve identifiers
+		resolveIdentifiers(tokensRoot);
+
+		// Process defines early, as they can introduce new tokens that need to be considered in the following steps
 		processDefines(tokensRoot);
 
-		// Split by parentheses
-		//  -> Each linear token list represents contents of one pair of parenthesis, plus one for the whole root
+		// Process constants
+		processConstants(tokensRoot);
+
+		// Build linear token lists that can mostly be processed individually
+		//  -> Each linear token list represents contents of one pair of parenthesis, or a comma-separated part in there -- plus there's always one linear token list for the whole root
+		//  -> They are sorted so that inner token lists have a lower index in "linearTokenLists" than their outer token list, so they're evaluated first
 		static std::vector<TokenList*> linearTokenLists;	// Not multi-threading safe
 		linearTokenLists.clear();
-		processParentheses(tokensRoot, linearTokenLists);
+		{
+			// Split by parentheses
+			processParentheses(tokensRoot, linearTokenLists);
 
-		// Split by commas
-		processCommaSeparators(linearTokenLists);
+			// Split by commas
+			processCommaSeparators(linearTokenLists);
+		}
 
 		// We do the other processing steps on each linear token list individually
 		for (TokenList* tokenList : linearTokenLists)
@@ -472,8 +133,9 @@ namespace lemon
 			processVariableDefinitions(*tokenList);
 			processFunctionCalls(*tokenList);
 			processMemoryAccesses(*tokenList);
+			processArrayAccesses(*tokenList);
 			processExplicitCasts(*tokenList);
-			processIdentifiers(*tokenList);
+			processVariables(*tokenList);
 
 			processUnaryOperations(*tokenList);
 			processBinaryOperations(*tokenList);
@@ -487,8 +149,7 @@ namespace lemon
 	{
 		mLineNumber = lineNumber;
 
-		// Split by parentheses
-		//  -> Each linear token list represents contents of one pair of parenthesis, plus one for the whole root
+		// Build linear token lists that can mostly be processed individually
 		static std::vector<TokenList*> linearTokenLists;	// Not multi-threading safe
 		linearTokenLists.clear();
 		processParentheses(tokensRoot, linearTokenLists);
@@ -501,24 +162,81 @@ namespace lemon
 		}
 	}
 
-	void TokenProcessing::processDefines(TokenList& tokens)
+	void TokenProcessing::resolveIdentifiers(TokenList& tokens)
 	{
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
 			if (tokens[i].getType() == Token::Type::IDENTIFIER)
 			{
-				const uint64 identifierHash = rmx::getMurmur2_64(tokens[i].as<IdentifierToken>().mIdentifier);
-				const Define* define = mContext.mGlobalsLookup.getDefineByName(identifierHash);
-				if (nullptr != define)
+				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+				if (nullptr == identifierToken.mResolved)
 				{
+					const uint64 nameHash = identifierToken.mName.getHash();
+					identifierToken.mResolved = mGlobalsLookup.resolveIdentifierByHash(nameHash);
+				}
+			}
+		}
+	}
+
+	void TokenProcessing::processDefines(TokenList& tokens)
+	{
+		bool anyDefineResolved = false;
+		for (size_t i = 0; i < tokens.size(); ++i)
+		{
+			if (tokens[i].getType() == Token::Type::IDENTIFIER)
+			{
+				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+				if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::DEFINE)
+				{
+					const Define& define = identifierToken.mResolved->as<Define>();
 					tokens.erase(i);
-					for (size_t k = 0; k < define->mContent.size(); ++k)
+					for (size_t k = 0; k < define.mContent.size(); ++k)
 					{
-						tokens.insert(define->mContent[k], i + k);
+						tokens.insert(define.mContent[k], i + k);
 					}
 
 					// TODO: Add implicit cast if necessary
+
+					anyDefineResolved = true;
 				}
+			}
+		}
+
+		if (anyDefineResolved)
+		{
+			resolveIdentifiers(tokens);
+		}
+	}
+
+	void TokenProcessing::processConstants(TokenList& tokens)
+	{
+		for (size_t i = 0; i < tokens.size(); ++i)
+		{
+			if (tokens[i].getType() == Token::Type::IDENTIFIER)
+			{
+				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+				const Constant* constant = nullptr;
+				if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT)
+				{
+					constant = &identifierToken.mResolved->as<Constant>();
+				}
+				else
+				{
+					for (const Constant& localConstant : *mContext.mLocalConstants)
+					{
+						if (localConstant.getName() == identifierToken.mName)
+						{
+							constant = &localConstant;
+							break;
+						}
+					}
+					if (nullptr == constant)
+						continue;
+				}
+
+				ConstantToken& newToken = tokens.createReplaceAt<ConstantToken>(i);
+				newToken.mDataType = constant->getDataType();
+				newToken.mValue = constant->getValue();
 			}
 		}
 	}
@@ -668,23 +386,25 @@ namespace lemon
 						CHECK_ERROR(varType->mClass != DataTypeDefinition::Class::VOID, "void variables not allowed", mLineNumber);
 
 						// Create new variable
-						const std::string& identifier = tokens[i+1].as<IdentifierToken>().mIdentifier;
-						CHECK_ERROR(nullptr == findLocalVariable(identifier), "Variable name already used", mLineNumber);
+						const IdentifierToken& identifierToken = tokens[i+1].as<IdentifierToken>();
+						CHECK_ERROR(nullptr == findLocalVariable(identifierToken.mName.getHash()), "Variable name already used", mLineNumber);
 
 						// Variable may already exist in function (but not in scope, we just checked that)
 						RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
-						LocalVariable* variable = mContext.mFunction->getLocalVariableByIdentifier(identifier);
+						LocalVariable* variable = mContext.mFunction->getLocalVariableByIdentifier(identifierToken.mName.getHash());
 						if (nullptr == variable)
 						{
-							variable = &mContext.mFunction->addLocalVariable(identifier, varType, mLineNumber);
+							variable = &mContext.mFunction->addLocalVariable(identifierToken.mName, varType, mLineNumber);
 						}
-						mContext.mLocalVariables.push_back(variable);
+						mContext.mLocalVariables->push_back(variable);
 
 						VariableToken& token = tokens.createReplaceAt<VariableToken>(i);
 						token.mVariable = variable;
+						token.mDataType = variable->getDataType();
 
 						tokens.erase(i+1);
 					}
+					break;
 				}
 
 				default:
@@ -695,20 +415,148 @@ namespace lemon
 
 	void TokenProcessing::processFunctionCalls(TokenList& tokens)
 	{
-		for (size_t i = 0; i < tokens.size()-1; ++i)
+		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
 			if (tokens[i].getType() == Token::Type::IDENTIFIER && tokens[i+1].getType() == Token::Type::PARENTHESIS)
 			{
 				// Must be a round parenthesis, not a bracket
 				if (tokens[i+1].as<ParenthesisToken>().mParenthesisType == ParenthesisType::PARENTHESIS)
 				{
-					const std::string functionName = tokens[i].as<IdentifierToken>().mIdentifier;
-					CHECK_ERROR(!mContext.mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(functionName)).empty() || String(functionName).startsWith("base."), "Unknown function name '" + functionName + "'", mLineNumber);
+					TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
+					IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+					const std::string_view functionName = identifierToken.mName.getString();
+					bool isBaseCall = false;
+					const Function* function = nullptr;
+					const Variable* thisPointerVariable = nullptr;
 
+					bool isValidFunctionCall = false;
+					const std::vector<Function*>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
+					if (!candidateFunctions.empty())
+					{
+						// Is it a global function
+						isValidFunctionCall = true;
+					}
+					else if (rmx::startsWith(functionName, "base."))
+					{
+						// It's a base call
+						CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName().getString(), "Base call goes to a different function", mLineNumber);
+						isValidFunctionCall = true;
+						isBaseCall = true;
+					}
+					else
+					{
+						// Special handling for "string.length()" and "array.length()"
+						//  -> TODO: Generalize this to pave the way for other kinds of "method calls"
+						if (rmx::endsWith(functionName, ".length") && content.empty())
+						{
+							const std::string_view variableName = functionName.substr(0, functionName.length() - 7);
+							const Variable* variable = findVariable(rmx::getMurmur2_64(variableName));
+							if (nullptr != variable && variable->getDataType() == &PredefinedDataTypes::STRING)
+							{
+								function = mBuiltinStringLength.mFunctions[0];
+								thisPointerVariable = variable;
+								isValidFunctionCall = true;
+							}
+							else
+							{
+								const ConstantArray* constantArray = findConstantArray(rmx::getMurmur2_64(variableName));
+								if (nullptr != constantArray)
+								{
+									// This can simply be replaced with a compile-time constant
+									ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
+									constantToken.mValue = (uint64)constantArray->getSize();
+									constantToken.mDataType = &PredefinedDataTypes::CONST_INT;
+									tokens.erase(i+1);
+									continue;
+								}
+							}
+						}
+					}
+					CHECK_ERROR(isValidFunctionCall, "Unknown function name '" << functionName << "'", mLineNumber);
+
+					// Create function token
 					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
-					token.mFunctionName = functionName;
-					token.mParenthesis = tokens[i+1].as<ParenthesisToken>();
+
+					// Build list of parameters
+					if (!content.empty())
+					{
+						if (content[0].getType() == Token::Type::COMMA_SEPARATED)
+						{
+							const std::vector<TokenList>& tokenLists = content[0].as<CommaSeparatedListToken>().mContent;
+							token.mParameters.reserve(tokenLists.size());
+							for (const TokenList& tokenList : tokenLists)
+							{
+								CHECK_ERROR(tokenList.size() == 1, "Function parameter content must be one token", mLineNumber);
+								CHECK_ERROR(tokenList[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
+								vectorAdd(token.mParameters) = tokenList[0].as<StatementToken>();
+							}
+						}
+						else
+						{
+							CHECK_ERROR(content.size() == 1, "Function parameter content must be one token", mLineNumber);
+							CHECK_ERROR(content[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
+							vectorAdd(token.mParameters) = content[0].as<StatementToken>();
+						}
+					}
+					if (nullptr != thisPointerVariable)
+					{
+						VariableToken& variableToken = vectorAdd(token.mParameters).create<VariableToken>();
+						variableToken.mVariable = thisPointerVariable;
+						variableToken.mDataType = thisPointerVariable->getDataType();
+					}
 					tokens.erase(i+1);
+
+					// Assign types
+					static std::vector<const DataTypeDefinition*> parameterTypes;	// Not multi-threading safe
+					parameterTypes.resize(token.mParameters.size());
+					for (size_t i = 0; i < token.mParameters.size(); ++i)
+					{
+						parameterTypes[i] = assignStatementDataType(*token.mParameters[i], nullptr);
+					}
+
+					// If the function was not determined already, do that now
+					if (nullptr == function)
+					{
+						// Find out which function signature actually fits
+						RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
+						if (isBaseCall)
+						{
+							// Base call must use the same function signature as the current one
+							CHECK_ERROR(parameterTypes.size() == mContext.mFunction->getParameters().size(), "Base function call has different parameter count", mLineNumber);
+							for (size_t i = 0; i < parameterTypes.size(); ++i)
+							{
+								CHECK_ERROR(parameterTypes[i] == mContext.mFunction->getParameters()[i].mType, "Base function call has different parameter at index " + std::to_string(i), mLineNumber);
+							}
+
+							// Use the very same function again, as a base call
+							function = mContext.mFunction;
+							token.mIsBaseCall = true;
+						}
+						else
+						{
+							// Find best-fitting correct function overload
+							function = nullptr;
+							uint32 bestPriority = 0xff000000;
+							for (const Function* candidateFunction : candidateFunctions)
+							{
+								const uint32 priority = TypeCasting(mConfig).getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
+								if (priority < bestPriority)
+								{
+									bestPriority = priority;
+									function = candidateFunction;
+								}
+							}
+							CHECK_ERROR(bestPriority < 0xff000000, "No appropriate function overload found calling '" << functionName << "', the number or types of parameters passed are wrong", mLineNumber);
+						}
+
+						// TODO: Perform implicit casts for parameters here?
+					}
+
+					if (nullptr != function)
+					{
+						token.mFunction = function;
+						token.mDataType = function->getReturnType();
+					}
 				}
 			}
 		}
@@ -716,7 +564,7 @@ namespace lemon
 
 	void TokenProcessing::processMemoryAccesses(TokenList& tokens)
 	{
-		for (size_t i = 0; i < tokens.size()-1; ++i)
+		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
 			if (tokens[i].getType() == Token::Type::VARTYPE && tokens[i+1].getType() == Token::Type::PARENTHESIS)
 			{
@@ -728,10 +576,74 @@ namespace lemon
 					CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
 
 					const DataTypeDefinition* dataType = tokens[i].as<VarTypeToken>().mDataType;
+					CHECK_ERROR(dataType->mClass == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::DEFAULT, "Memory access is only possible using basic integer types, but not '" << dataType->toString() << "'", mLineNumber);
 
 					MemoryAccessToken& token = tokens.createReplaceAt<MemoryAccessToken>(i);
 					token.mDataType = dataType;
 					token.mAddress = content[0].as<StatementToken>();
+					tokens.erase(i+1);
+
+					assignStatementDataType(*token.mAddress, &PredefinedDataTypes::UINT_32);
+				}
+			}
+		}
+	}
+
+	void TokenProcessing::processArrayAccesses(TokenList& tokens)
+	{
+		for (size_t i = 0; i + 1 < tokens.size(); ++i)
+		{
+			if (tokens[i].getType() == Token::Type::IDENTIFIER && tokens[i+1].getType() == Token::Type::PARENTHESIS)
+			{
+				// Must be a bracket
+				if (tokens[i+1].as<ParenthesisToken>().mParenthesisType == ParenthesisType::BRACKET)
+				{
+					// Check the identifier
+					IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+					const ConstantArray* constantArray = nullptr;
+					if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT_ARRAY)
+					{
+						constantArray = &identifierToken.mResolved->as<ConstantArray>();
+					}
+					else
+					{
+						// Check for local constant array
+						constantArray = findInList(*mContext.mLocalConstantArrays, identifierToken.mName.getHash());
+						CHECK_ERROR(nullptr != constantArray, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
+					}
+
+					TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
+					CHECK_ERROR(content.size() == 1, "Expected exactly one token inside brackets", mLineNumber);
+					CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
+
+					const Function* matchingFunction = nullptr;
+					for (const Function* function : mBuiltinConstantArrayAccess.mFunctions)
+					{
+						if (function->getReturnType() == constantArray->getElementDataType())
+						{
+							matchingFunction = function;
+							break;
+						}
+					}
+					if (nullptr == matchingFunction)
+						continue;
+
+				#ifdef DEBUG
+					const Function::ParameterList& parameterList = matchingFunction->getParameters();
+					RMX_ASSERT(parameterList.size() == 2 && parameterList[0].mType == &PredefinedDataTypes::UINT_32 && parameterList[1].mType == &PredefinedDataTypes::UINT_32, "Function signature for constant array access does not fit");
+				#endif
+
+					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
+					token.mFunction = matchingFunction;
+					token.mParameters.resize(2);
+					ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
+					idToken.mValue = constantArray->getID();
+					idToken.mDataType = &PredefinedDataTypes::UINT_32;
+					token.mParameters[1] = content[0].as<StatementToken>();		// Array index
+					token.mDataType = matchingFunction->getReturnType();
+
+					assignStatementDataType(*token.mParameters[0], &PredefinedDataTypes::UINT_32);
+
 					tokens.erase(i+1);
 				}
 			}
@@ -740,7 +652,7 @@ namespace lemon
 
 	void TokenProcessing::processExplicitCasts(TokenList& tokens)
 	{
-		for (size_t i = 0; i < tokens.size()-1; ++i)
+		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
 			if (tokens[i].getType() == Token::Type::VARTYPE && tokens[i+1].getType() == Token::Type::PARENTHESIS)
 			{
@@ -750,7 +662,7 @@ namespace lemon
 					const DataTypeDefinition* targetType = tokens[i].as<VarTypeToken>().mDataType;
 
 					ValueCastToken& token = tokens.createReplaceAt<ValueCastToken>(i);
-					token.mArgument = tokens[i + 1].as<ParenthesisToken>();
+					token.mArgument = tokens[i+1].as<ParenthesisToken>();
 					token.mDataType = targetType;
 					tokens.erase(i+1);
 				}
@@ -758,28 +670,30 @@ namespace lemon
 		}
 	}
 
-	void TokenProcessing::processIdentifiers(TokenList& tokens)
+	void TokenProcessing::processVariables(TokenList& tokens)
 	{
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
 			Token& token = tokens[i];
 			if (token.getType() == Token::Type::IDENTIFIER)
 			{
-				const std::string& name = token.as<IdentifierToken>().mIdentifier;
-
-				// Search for local variables first
-				const Variable* variable = findLocalVariable(name);
-				if (nullptr == variable)
+				// Check the identifier
+				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+				const Variable* variable = nullptr;
+				if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::GLOBAL_VARIABLE)
 				{
-					// Maybe it's a global variable
-					const uint64 nameHash = rmx::getMurmur2_64(name);
-					variable = mContext.mGlobalsLookup.getGlobalVariableByName(nameHash);
+					variable = &identifierToken.mResolved->as<Variable>();
 				}
-
-				CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " + name, mLineNumber);
+				else
+				{
+					// Check for local variable
+					variable = findLocalVariable(identifierToken.mName.getHash());
+					CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
+				}
 
 				VariableToken& token = tokens.createReplaceAt<VariableToken>(i);
 				token.mVariable = variable;
+				token.mDataType = variable->getDataType();
 			}
 		}
 	}
@@ -801,7 +715,7 @@ namespace lemon
 						if (i == 0)
 							continue;
 
-						Token& leftToken = tokens[i - 1];
+						Token& leftToken = tokens[i-1];
 						if (!leftToken.isStatement())
 							continue;
 
@@ -809,7 +723,7 @@ namespace lemon
 						token.mOperator = op;
 						token.mArgument = &leftToken.as<StatementToken>();
 
-						tokens.erase(i - 1);
+						tokens.erase(i-1);
 						break;
 					}
 
@@ -836,19 +750,19 @@ namespace lemon
 						// Minus could be binary or unary... let's find out
 						if (op == Operator::BINARY_MINUS && i > 0)
 						{
-							Token& leftToken = tokens[i - 1];
+							Token& leftToken = tokens[i-1];
 							if (leftToken.getType() != Token::Type::OPERATOR)
 								continue;
 						}
 
-						Token& rightToken = tokens[i + 1];
+						Token& rightToken = tokens[i+1];
 						CHECK_ERROR(rightToken.isStatement(), "Right of operator is no statement", mLineNumber);
 
 						UnaryOperationToken& token = tokens.createReplaceAt<UnaryOperationToken>(i);
 						token.mOperator = op;
 						token.mArgument = &rightToken.as<StatementToken>();
 
-						tokens.erase(i + 1);
+						tokens.erase(i+1);
 						break;
 					}
 
@@ -859,7 +773,7 @@ namespace lemon
 						if ((size_t)(i+1) == tokens.size())
 							continue;
 
-						Token& rightToken = tokens[i + 1];
+						Token& rightToken = tokens[i+1];
 						if (!rightToken.isStatement())
 							continue;
 
@@ -867,7 +781,7 @@ namespace lemon
 						token.mOperator = op;
 						token.mArgument = &rightToken.as<StatementToken>();
 
-						tokens.erase(i + 1);
+						tokens.erase(i+1);
 						break;
 					}
 
@@ -892,8 +806,8 @@ namespace lemon
 					const Operator op = tokens[i].as<OperatorToken>().mOperator;
 					CHECK_ERROR((i > 0 && i < tokens.size()-1) && (op != Operator::SEMICOLON_SEPARATOR), getOperatorNotAllowedErrorMessage(op), mLineNumber);
 
-					const uint8 priority = operatorPriorityLookup[(size_t)op];
-					const bool isLower = (priority == bestPriority) ? operatorAssociativityLookup[priority] : (priority < bestPriority);
+					const uint8 priority = OperatorHelper::getOperatorPriority(op);
+					const bool isLower = (priority == bestPriority) ? OperatorHelper::isOperatorAssociative(op) : (priority < bestPriority);
 					if (isLower)
 					{
 						bestPriority = priority;
@@ -956,102 +870,28 @@ namespace lemon
 		{
 			case Token::Type::CONSTANT:
 			{
-				token.mDataType = (nullptr != resultType) ? resultType : &PredefinedDataTypes::CONST_INT;
+				if (token.mDataType != &PredefinedDataTypes::STRING)
+				{
+					token.mDataType = (nullptr != resultType) ? resultType : &PredefinedDataTypes::CONST_INT;
+				}
 				break;
 			}
 
 			case Token::Type::VARIABLE:
 			{
-				// Use variable data type
-				token.mDataType = token.as<VariableToken>().mVariable->getDataType();
+				// Nothing to do, data type was already set when creating the token
 				break;
 			}
 
 			case Token::Type::FUNCTION:
 			{
-				FunctionToken& ft = token.as<FunctionToken>();
-				std::vector<StatementToken*> parameterTokens;	// TODO: For this and "parameterTypes" below, use some kind of buffer for std::vectors?
-
-				TokenList& content = ft.mParenthesis->mContent;
-				if (!content.empty())
-				{
-					if (content[0].getType() == Token::Type::COMMA_SEPARATED)
-					{
-						const std::vector<TokenList>& tokenLists = content[0].as<CommaSeparatedListToken>().mContent;
-						parameterTokens.reserve(tokenLists.size());
-						for (const TokenList& tokens : tokenLists)
-						{
-							CHECK_ERROR(tokens.size() == 1, "Function parameter content must be one token", mLineNumber);
-							CHECK_ERROR(tokens[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
-							parameterTokens.push_back(&tokens[0].as<StatementToken>());
-						}
-					}
-					else
-					{
-						CHECK_ERROR(content.size() == 1, "Function parameter content must be one token", mLineNumber);
-						CHECK_ERROR(content[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
-						parameterTokens.push_back(&content[0].as<StatementToken>());
-					}
-				}
-
-				// Assign types
-				std::vector<const DataTypeDefinition*> parameterTypes;
-				parameterTypes.reserve(parameterTokens.size());
-				for (size_t i = 0; i < parameterTokens.size(); ++i)
-				{
-					const DataTypeDefinition* type = assignStatementDataType(*parameterTokens[i], nullptr);
-					parameterTypes.push_back(type);
-				}
-
-				// Find out which function signature actually fits
-				RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
-				const Function* function = mContext.mFunction;
-				String functionName(ft.mFunctionName);
-				if (functionName.startsWith("base.") && functionName.getSubString(5, -1) == function->getName())
-				{
-					// Base call must use the same function signature as the current one
-					CHECK_ERROR(parameterTypes.size() == function->getParameters().size(), "Base function call has different parameter count", mLineNumber);
-					for (size_t i = 0; i < parameterTypes.size(); ++i)
-					{
-						CHECK_ERROR(parameterTypes[i] == function->getParameters()[i].mType, "Base function call has different parameter at index " + std::to_string(i), mLineNumber);
-					}
-
-					// Make this a call to itself, the runtime system will resolve that to a base call to whatever is the actual base function
-					ft.mIsBaseCall = true;
-				}
-				else
-				{
-					const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(functionName));
-					CHECK_ERROR(!functions.empty(), "Unknown function name '" + ft.mFunctionName + "'", mLineNumber);
-
-					// Find best-fitting correct function overload
-					function = nullptr;
-					uint32 bestPriority = 0xff000000;
-					for (const Function* candidateFunction : functions)
-					{
-						const uint32 priority = getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
-						if (priority < bestPriority)
-						{
-							bestPriority = priority;
-							function = candidateFunction;
-						}
-					}
-					CHECK_ERROR(bestPriority < 0xff000000, "No appropriate function overload found calling '" + ft.mFunctionName + "', the number or types of parameters passed are wrong", mLineNumber);
-				}
-
-				// TODO: Perform implicit casts for parameters here?
-
-				ft.mFunction = function;
-				ft.mDataType = function->getReturnType();
+				// Nothing to do, "processFunctionCalls" cared about everything already
 				break;
 			}
 
 			case Token::Type::MEMORY_ACCESS:
 			{
-				MemoryAccessToken& mat = token.as<MemoryAccessToken>();
-				assignStatementDataType(*mat.mAddress, &PredefinedDataTypes::UINT_32);
-
-				// Data type of the memory access token itself was already set on creation
+				// Nothing to do, "processMemoryAccesses" cared about everything already
 				break;
 			}
 
@@ -1077,20 +917,45 @@ namespace lemon
 			case Token::Type::BINARY_OPERATION:
 			{
 				BinaryOperationToken& bot = token.as<BinaryOperationToken>();
-				const OperatorType opType = getOperatorType(bot.mOperator);
-				const DataTypeDefinition* expectedType = (opType == OperatorType::SYMMETRIC) ? resultType : nullptr;
+				const OperatorHelper::OperatorType opType = OperatorHelper::getOperatorType(bot.mOperator);
+				const DataTypeDefinition* expectedType = (opType == OperatorHelper::OperatorType::SYMMETRIC) ? resultType : nullptr;
 
 				const DataTypeDefinition* leftDataType = assignStatementDataType(*bot.mLeft, expectedType);
-				const DataTypeDefinition* rightDataType = assignStatementDataType(*bot.mRight, (opType == OperatorType::ASSIGNMENT) ? leftDataType : expectedType);
+				const DataTypeDefinition* rightDataType = assignStatementDataType(*bot.mRight, (opType == OperatorHelper::OperatorType::ASSIGNMENT) ? leftDataType : expectedType);
+
+				if (mConfig.mScriptFeatureLevel >= 2)
+				{
+					// Special handling for certain operations with two strings
+					if (leftDataType == &PredefinedDataTypes::STRING && rightDataType == &PredefinedDataTypes::STRING)
+					{
+						CachedBuiltinFunction* cachedBuiltinFunction = nullptr;
+						switch (bot.mOperator)
+						{
+							case Operator::BINARY_PLUS:				 cachedBuiltinFunction = &mBuiltinStringOperatorPlus;  break;
+							case Operator::COMPARE_LESS:			 cachedBuiltinFunction = &mBuiltinStringOperatorLess;  break;
+							case Operator::COMPARE_LESS_OR_EQUAL:	 cachedBuiltinFunction = &mBuiltinStringOperatorLessOrEqual;  break;
+							case Operator::COMPARE_GREATER:			 cachedBuiltinFunction = &mBuiltinStringOperatorGreater;  break;
+							case Operator::COMPARE_GREATER_OR_EQUAL: cachedBuiltinFunction = &mBuiltinStringOperatorGreaterOrEqual;  break;
+							default: break;
+						}
+
+						if (nullptr != cachedBuiltinFunction)
+						{
+							bot.mFunction = cachedBuiltinFunction->mFunctions[0];
+							token.mDataType = &PredefinedDataTypes::STRING;
+							break;
+						}
+					}
+				}
 
 				// Choose best fitting signature
-				const BinaryOperatorSignature* signature = nullptr;
-				const bool result = getBestSignature(bot.mOperator, leftDataType, rightDataType, &signature);
-				CHECK_ERROR(result, "Can not implicitly cast between types '" << leftDataType->toString() << "' and '" << rightDataType->toString() << "'", mLineNumber);
+				const TypeCasting::BinaryOperatorSignature* signature = nullptr;
+				const bool result = TypeCasting(mConfig).getBestSignature(bot.mOperator, leftDataType, rightDataType, &signature);
+				CHECK_ERROR(result, "Cannot implicitly cast between types '" << leftDataType->toString() << "' and '" << rightDataType->toString() << "'", mLineNumber);
 
 				token.mDataType = signature->mResult;
 
-				if (opType != OperatorType::TRINARY)
+				if (opType != OperatorHelper::OperatorType::TRINARY)
 				{
 					if (leftDataType->mClass == DataTypeDefinition::Class::INTEGER && rightDataType->mClass == DataTypeDefinition::Class::INTEGER)
 					{
@@ -1111,7 +976,6 @@ namespace lemon
 						}
 					}
 				}
-
 				break;
 			}
 
@@ -1124,7 +988,7 @@ namespace lemon
 				assignStatementDataType(*vct.mArgument, token.mDataType);
 
 				// Check if types fit together at all
-				CHECK_ERROR(getImplicitCastPriority(vct.mArgument->mDataType, vct.mDataType) != 0xff, "Explicit cast not possible", mLineNumber);
+				CHECK_ERROR(TypeCasting(mConfig).getImplicitCastPriority(vct.mArgument->mDataType, vct.mDataType) != 0xff, "Explicit cast not possible", mLineNumber);
 				break;
 			}
 
@@ -1134,14 +998,41 @@ namespace lemon
 		return token.mDataType;
 	}
 
-	LocalVariable* TokenProcessing::findLocalVariable(const std::string& name)
+	const Variable* TokenProcessing::findVariable(uint64 nameHash)
 	{
-		for (LocalVariable* var : mContext.mLocalVariables)
+		// Search for local variables first
+		const Variable* variable = findLocalVariable(nameHash);
+		if (nullptr == variable)
 		{
-			if (var->getName() == name)
-				return var;
+			// Maybe it's a global variable
+			const GlobalsLookup::Identifier* resolvedIdentifier = mGlobalsLookup.resolveIdentifierByHash(nameHash);
+			if (nullptr != resolvedIdentifier && resolvedIdentifier->getType() == GlobalsLookup::Identifier::Type::GLOBAL_VARIABLE)
+			{
+				variable = &resolvedIdentifier->as<Variable>();
+			}
 		}
-		return nullptr;
+		return variable;
+	}
+
+	LocalVariable* TokenProcessing::findLocalVariable(uint64 nameHash)
+	{
+		return findInList(*mContext.mLocalVariables, nameHash);
+	}
+
+	const ConstantArray* TokenProcessing::findConstantArray(uint64 nameHash)
+	{
+		// Search for local constant arrays first
+		const ConstantArray* constantArray = findInList(*mContext.mLocalConstantArrays, nameHash);
+		if (nullptr == constantArray)
+		{
+			// Maybe it's a global constant array
+			const GlobalsLookup::Identifier* resolvedIdentifier = mGlobalsLookup.resolveIdentifierByHash(nameHash);
+			if (nullptr != resolvedIdentifier && resolvedIdentifier->getType() == GlobalsLookup::Identifier::Type::CONSTANT_ARRAY)
+			{
+				constantArray = &resolvedIdentifier->as<ConstantArray>();
+			}
+		}
+		return constantArray;
 	}
 
 }

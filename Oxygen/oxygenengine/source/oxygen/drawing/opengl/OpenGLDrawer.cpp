@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -14,7 +14,7 @@
 #include "oxygen/drawing/DrawCollection.h"
 #include "oxygen/drawing/DrawCommand.h"
 #include "oxygen/application/EngineMain.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
@@ -96,13 +96,13 @@ namespace opengldrawer
 
 		#if defined(RMX_USE_GLEW)
 			// GLEW initialization
-			LOG_INFO("GLEW initialization...");
+			RMX_LOG_INFO("GLEW initialization...");
 			glewInit();
 		#endif
 
 		#if defined(RMX_USE_GLAD)
 			// GLAD initialization
-			LOG_INFO("GLAD initialization...");
+			RMX_LOG_INFO("GLAD initialization...");
 			gladLoadGL();
 		#endif
 
@@ -113,15 +113,15 @@ namespace opengldrawer
 		#endif
 
 			// Setup OpenGL defaults
-			LOG_INFO("Setting OpenGL defaults...");
+			RMX_LOG_INFO("Setting OpenGL defaults...");
 			setBlendMode(DrawerBlendMode::NONE);
 
 			// Startup OpenGL drawer resources, including quad VAO and some basic shaders
-			LOG_INFO("OpenGL drawer resources startup");
+			RMX_LOG_INFO("OpenGL drawer resources startup");
 			OpenGLDrawerResources::startup();
 
 			// Startup upscaler
-			LOG_INFO("Upscaler startup");
+			RMX_LOG_INFO("Upscaler startup");
 			mUpscaler.startup();
 		}
 

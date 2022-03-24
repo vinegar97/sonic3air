@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -115,10 +115,24 @@ LemonScriptProgram::~LemonScriptProgram()
 
 void LemonScriptProgram::startup()
 {
+	Configuration& config = Configuration::instance();
+
 	// Register script bindings (user-defined variables and functions)
 	//  -> TODO: This has some dependency of the runtime, as the register variables directly access the emulator interface instance;
 	//           and this in turn is the reason why there's a need for this separate startup function at all...
 	mInternal.mLemonScriptBindings.registerBindings(mInternal.mCoreModule);
+
+	// Set preprocessor definitions in core module
+	for (const auto& pair : config.mPreprocessorDefinitions.getDefinitions())
+	{
+		mInternal.mCoreModule.addPreprocessorDefinition(pair.second.mIdentifier, pair.second.mValue);
+	}
+
+	// Optionally dump the core module script bindings into a generated script file for reference
+	if (!config.mDumpCppDefinitionsOutput.empty())
+	{
+		mInternal.mCoreModule.dumpDefinitionsToScriptFile(config.mDumpCppDefinitionsOutput);
+	}
 }
 
 LemonScriptBindings& LemonScriptProgram::getLemonScriptBindings()
@@ -136,13 +150,12 @@ bool LemonScriptProgram::hasValidProgram() const
 	return !mInternal.mProgram.getModules().empty();
 }
 
-bool LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename, const lemon::PreprocessorDefinitionMap& preprocessorDefinitions)
+bool LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename)
 {
 	try
 	{
 		// Compile script source
 		lemon::Compiler::CompileOptions options;
-		options.mPreprocessorDefinitions = preprocessorDefinitions;
 		//options.mOutputCombinedSource = L"combined_source.lemon";	// Just for debugging preprocessor issues
 		//options.mOutputTranslatedSource = L"output.cpp";			// For testing translation
 		lemon::Compiler compiler(module, globalsLookup, options);
@@ -150,17 +163,28 @@ bool LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsL
 		const bool compileSuccess = compiler.loadScript(filename);
 		if (!compileSuccess && !compiler.getErrors().empty())
 		{
-			for (const auto& error : compiler.getErrors())
+			for (const lemon::Compiler::ErrorMessage& error : compiler.getErrors())
 			{
-				LogDisplay::instance().addLogError(String(0, "Compile error: %s (in '%s', line %d)", error.mMessage.c_str(), *WString(error.mFilename).toString(), error.mLineNumber));
+				LogDisplay::instance().addLogError(String(0, "Compile error: %s (in '%s', line %d)", error.mMessage.c_str(), *WString(error.mFilename).toString(), error.mError.mLineNumber));
 			}
 
-			const auto& error = compiler.getErrors().front();
-			std::string text = "Script compile error:\n" + error.mMessage + "\n";
+			const lemon::Compiler::ErrorMessage& error = compiler.getErrors().front();
+			std::string text = error.mMessage + ".";	// Because error messages usually don't end with a dot
+			switch (error.mError.mCode)
+			{
+				case lemon::CompilerError::Code::SCRIPT_FEATURE_LEVEL_TOO_HIGH:
+				{
+					text += " It's possible the module requires a newer game version.";
+					break;
+				}
+				default:
+					break;
+			}
+			text = "Script compile error:\n" + text + "\n\n";
 			if (error.mFilename.empty())
-				text += "in module " + module.getModuleName();
+				text += "Caused in module " + module.getModuleName() + ".";
 			else
-				text += "in file '" + WString(error.mFilename).toStdString() + "', line " + std::to_string(error.mLineNumber) + ", of module '" + module.getModuleName() + "'";
+				text += "Caused in file '" + WString(error.mFilename).toStdString() + "', line " + std::to_string(error.mError.mLineNumber) + ", of module '" + module.getModuleName() + "'.";
 			RMX_ERROR(text, );
 			return false;
 		}
@@ -191,8 +215,8 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 	}
 
 	// Check if there's anything to do at all
-	const bool completeReloadNeeded = (mInternal.mProgram.getModules().empty() || loadOptions.mEnforceFullReload);
-	if (!completeReloadNeeded)
+	const bool mainScriptReloadNeeded = (mInternal.mProgram.getModules().empty() || loadOptions.mEnforceFullReload);
+	if (!mainScriptReloadNeeded)
 	{
 		if (modsToLoad == mInternal.mLastModSelection)
 		{
@@ -201,7 +225,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 		}
 	}
 
-	const Configuration& config = Configuration::instance();
+	Configuration& config = Configuration::instance();
 	lemon::GlobalsLookup globalsLookup;
 	globalsLookup.addDefinitionsFromModule(mInternal.mCoreModule);
 
@@ -209,7 +233,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 	mInternal.mProgram.clear();
 
 	// Load project's main script module, but only if a full reload is needed
-	if (completeReloadNeeded)
+	if (mainScriptReloadNeeded)
 	{
 		mInternal.mScriptModule.clear();
 
@@ -227,7 +251,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 				{
 					VectorBinarySerializer serializer(true, buffer);
 					scriptsLoaded = mInternal.mScriptModule.serialize(serializer);
-					RMX_CHECK(scriptsLoaded, "Failed to deserialize scripts", );
+					RMX_CHECK(scriptsLoaded, "Failed to deserialize scripts, possibly because the compiled script file '" << WString(config.mCompiledScriptSavePath).toStdString() << "' is using an older format", );
 				}
 			}
 		#endif
@@ -238,7 +262,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 				if (FTX::FileSystem->exists(filename))
 				{
 					// Compile module
-					scriptsLoaded = loadScriptModule(mInternal.mScriptModule, globalsLookup, *String(filename).toWString(), loadOptions.mPreprocessorDefinitions);
+					scriptsLoaded = loadScriptModule(mInternal.mScriptModule, globalsLookup, *String(filename).toWString());
 
 					// If there are no script functions at all, we consider that a failure
 					scriptsLoaded = scriptsLoaded && !mInternal.mScriptModule.getScriptFunctions().empty();
@@ -295,7 +319,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 				// Create and compile module
 				lemon::Module* module = new lemon::Module(mod->mName);
 				const std::wstring mainScriptFilename = mod->mFullPath + L"scripts/main.lemon";
-				const bool success = loadScriptModule(*module, globalsLookup, mainScriptFilename, loadOptions.mPreprocessorDefinitions);
+				const bool success = loadScriptModule(*module, globalsLookup, mainScriptFilename);
 				if (success)
 				{
 					mInternal.mModModules.push_back(module);
@@ -320,10 +344,12 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 
 	mInternal.mProgram.setOptimizationLevel(config.mScriptOptimizationLevel);
 
-#if defined(DEBUG)
 	// Optional code nativization
-//	mInternal.mProgram.runNativization(mInternal.mScriptModule, L"source/sonic3air/_nativized/NativizedCode.inc", EmulatorInterface::instance());
-#endif
+	if (config.mRunScriptNativization == 1 && !config.mScriptNativizationOutput.empty())
+	{
+		mInternal.mProgram.runNativization(mInternal.mScriptModule, config.mScriptNativizationOutput, EmulatorInterface::instance());
+		config.mRunScriptNativization = 2;		// Mark as done
+	}
 
 	// Scan for function pragmas defining hooks
 	evaluateFunctionPragmas();
@@ -378,7 +404,7 @@ void LemonScriptProgram::evaluateFunctionPragmas()
 					RMX_CHECK(entry.mValue.empty(), "Update hook must not have any value", continue);
 
 					// Create update hook
-					Hook& hook = addHook(Hook::Type::PRE_UPDATE, 0, function->getName());
+					Hook& hook = addHook(Hook::Type::PRE_UPDATE, 0);
 					hook.mFunction = function;
 				}
 				else if (entry.mArgument == "post-update-hook")
@@ -386,7 +412,7 @@ void LemonScriptProgram::evaluateFunctionPragmas()
 					RMX_CHECK(entry.mValue.empty(), "Update hook must not have any value", continue);
 
 					// Create update hook
-					Hook& hook = addHook(Hook::Type::POST_UPDATE, 0, function->getName());
+					Hook& hook = addHook(Hook::Type::POST_UPDATE, 0);
 					hook.mFunction = function;
 				}
 				else if (entry.mArgument == "address-hook" || entry.mArgument == "translated")
@@ -398,7 +424,7 @@ void LemonScriptProgram::evaluateFunctionPragmas()
 					if (entry.mArgument == "address-hook")
 					{
 						// Create address hook
-						Hook& hook = addHook(Hook::Type::ADDRESS, address, function->getName());
+						Hook& hook = addHook(Hook::Type::ADDRESS, address);
 						hook.mFunction = function;
 					}
 				}
@@ -436,18 +462,18 @@ void LemonScriptProgram::evaluateDefines()
 					var.mBytes = (uint8)dataType.mBytes;
 					var.mSigned = dataType.as<lemon::IntegerDataType>().mIsSigned;
 
-					const int pos = String(var.mName).findChar('.', 0, 1);	// Position of the dot
-					var.mCategoryHash = (pos == -1) ? 0 : rmx::getMurmur2_64(var.mName.substr(0, pos));
+					const int pos = String(var.mName.getString()).findChar('.', 0, 1);	// Position of the dot
+					var.mCategoryHash = (pos == -1) ? 0 : rmx::getMurmur2_64(var.mName.getString().substr(0, pos));
 				}
 			}
 		}
 	}
 
 	// Sort alphabetically
-	std::sort(mGlobalDefines.begin(), mGlobalDefines.end(), [](const GlobalDefine& a, const GlobalDefine& b) { return a.mName < b.mName; } );
+	std::sort(mGlobalDefines.begin(), mGlobalDefines.end(), [](const GlobalDefine& a, const GlobalDefine& b) { return a.mName.getString() < b.mName.getString(); } );
 }
 
-LemonScriptProgram::Hook& LemonScriptProgram::addHook(Hook::Type type, uint32 address, const std::string& functionName)
+LemonScriptProgram::Hook& LemonScriptProgram::addHook(Hook::Type type, uint32 address)
 {
 	Hook* hook = nullptr;
 	if (type == Hook::Type::ADDRESS)
@@ -471,11 +497,10 @@ LemonScriptProgram::Hook& LemonScriptProgram::addHook(Hook::Type type, uint32 ad
 	return *hook;
 }
 
-const std::string& LemonScriptProgram::getFunctionNameByHash(uint64 hash) const
+std::string_view LemonScriptProgram::getFunctionNameByHash(uint64 hash) const
 {
-	static const std::string EMPTY_STRING;
 	const auto& list = mInternal.mProgram.getFunctionsByName(hash);
-	return list.empty() ? EMPTY_STRING : list[0]->getName();
+	return list.empty() ? std::string_view() : list[0]->getName().getString();
 }
 
 lemon::Variable* LemonScriptProgram::getGlobalVariableByHash(uint64 hash) const
@@ -485,7 +510,7 @@ lemon::Variable* LemonScriptProgram::getGlobalVariableByHash(uint64 hash) const
 
 void LemonScriptProgram::resolveLocation(uint32 functionId, uint32 programCounter, std::string& scriptFilename, uint32& lineNumber) const
 {
-	const lemon::Function* function = mInternal.mProgram.getFunctionById(functionId);
+	const lemon::Function* function = mInternal.mProgram.getFunctionByID(functionId);
 	if (nullptr == function)
 	{
 		scriptFilename = *String(0, "<unknown function id %d>", functionId);
@@ -503,16 +528,16 @@ void LemonScriptProgram::resolveLocation(const lemon::Function& function, uint32
 		const lemon::ScriptFunction& scriptFunc = static_cast<const lemon::ScriptFunction&>(function);
 		if (programCounter < scriptFunc.mOpcodes.size())
 		{
-			scriptFilename = *WString(scriptFunc.mSourceFilename).toString();
+			scriptFilename = *WString(scriptFunc.mSourceFileInfo->mFilename).toString();
 			lineNumber = scriptFunc.mOpcodes[programCounter].mLineNumber - scriptFunc.mSourceBaseLineOffset + 1;
 		}
 		else
 		{
-			scriptFilename = *String(0, "<invalid program counter %d in function '%s'>", programCounter, function.getName().c_str());
+			scriptFilename = *String(0, "<invalid program counter %d in function '%.*s'>", programCounter, function.getName().getString().length(), function.getName().getString().data());
 		}
 	}
 	else
 	{
-		scriptFilename = *String(0, "<user-defined function '%s'>", function.getName().c_str());
+		scriptFilename = *String(0, "<user-defined function '%.*s'>", function.getName().getString().length(), function.getName().getString().data());
 	}
 }

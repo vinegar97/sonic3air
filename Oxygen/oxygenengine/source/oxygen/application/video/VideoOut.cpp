@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -11,12 +11,13 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/drawing/DrawerTexture.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/Geometry.h"
 #include "oxygen/rendering/RenderResources.h"
 #include "oxygen/rendering/hardware/HardwareRenderer.h"
 #include "oxygen/rendering/software/SoftwareRenderer.h"
 #include "oxygen/rendering/parts/RenderParts.h"
+#include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/Simulation.h"
@@ -40,13 +41,13 @@ void VideoOut::startup()
 {
 	mGameResolution = Configuration::instance().mGameScreen;
 
-	LOG_INFO("VideoOut: Setup of game screen");
+	RMX_LOG_INFO("VideoOut: Setup of game screen");
 	EngineMain::instance().getDrawer().createTexture(mGameScreenTexture);
 	mGameScreenTexture.setupAsRenderTarget(mGameResolution.x, mGameResolution.y);
 
 	if (nullptr == mRenderParts)
 	{
-		LOG_INFO("VideoOut: Creating render parts");
+		RMX_LOG_INFO("VideoOut: Creating render parts");
 		mRenderParts = new RenderParts();
 		mRenderParts->setFullEmulation(Configuration::instance().mFullEmulationRendering);
 	}
@@ -63,6 +64,15 @@ void VideoOut::reset()
 {
 	mRenderParts->reset();
 	mActiveRenderer->reset();
+
+	mDebugDrawRenderingRequested = false;
+	mPreviouslyHadOutsideFrameDebugDraws = false;
+}
+
+void VideoOut::handleActiveModsChanged()
+{
+	// Better reset everything, as sprite references might have become invalid and should be removed
+	reset();
 }
 
 void VideoOut::createRenderer(bool reset)
@@ -82,10 +92,10 @@ void VideoOut::setActiveRenderer(bool useSoftwareRenderer, bool reset)
 	{
 		if (nullptr == mSoftwareRenderer)
 		{
-			LOG_INFO("VideoOut: Creating software renderer");
+			RMX_LOG_INFO("VideoOut: Creating software renderer");
 			mSoftwareRenderer = new SoftwareRenderer(*mRenderParts, mGameScreenTexture);
 
-			LOG_INFO("VideoOut: Renderer initialization");
+			RMX_LOG_INFO("VideoOut: Renderer initialization");
 			mSoftwareRenderer->initialize();
 		}
 		mActiveRenderer = mSoftwareRenderer;
@@ -94,10 +104,10 @@ void VideoOut::setActiveRenderer(bool useSoftwareRenderer, bool reset)
 	{
 		if (nullptr == mHardwareRenderer)
 		{
-			LOG_INFO("VideoOut: Creating hardware renderer");
+			RMX_LOG_INFO("VideoOut: Creating hardware renderer");
 			mHardwareRenderer = new HardwareRenderer(*mRenderParts, mGameScreenTexture);
 
-			LOG_INFO("VideoOut: Renderer initialization");
+			RMX_LOG_INFO("VideoOut: Renderer initialization");
 			mHardwareRenderer->initialize();
 		}
 		mActiveRenderer = mHardwareRenderer;
@@ -122,7 +132,7 @@ void VideoOut::setScreenSize(uint32 width, uint32 height)
 
 Vec2i VideoOut::getInterpolatedWorldSpaceOffset() const
 {
-	Vec2i offset = mRenderParts->getSpriteManager().getWorldSpaceOffset();
+	Vec2i offset = mRenderParts->getSpacesManager().getWorldSpaceOffset();
 	if (mUsingFrameInterpolation)
 	{
 		const Vec2f interpolatedDifference = Vec2f(mLastWorldSpaceOffset - offset) * (1.0f - mInterFramePosition);
@@ -134,7 +144,7 @@ Vec2i VideoOut::getInterpolatedWorldSpaceOffset() const
 void VideoOut::preFrameUpdate()
 {
 	mRenderParts->preFrameUpdate();
-	mLastWorldSpaceOffset = mRenderParts->getSpriteManager().getWorldSpaceOffset();
+	mLastWorldSpaceOffset = mRenderParts->getSpacesManager().getWorldSpaceOffset();
 
 	// Skipped frames without rendering?
 	if (mFrameState == FrameState::FRAME_READY)
@@ -144,7 +154,9 @@ void VideoOut::preFrameUpdate()
 		refreshParameters.mSkipThisFrame = true;
 		mRenderParts->refresh(refreshParameters);
 	}
+
 	mFrameState = FrameState::INSIDE_FRAME;
+	mDebugDrawRenderingRequested = false;
 }
 
 void VideoOut::postFrameUpdate()
@@ -154,6 +166,7 @@ void VideoOut::postFrameUpdate()
 	// Signal for rendering
 	mFrameState = FrameState::FRAME_READY;
 	mLastFrameTicks = SDL_GetTicks();
+	mDebugDrawRenderingRequested = false;
 }
 
 void VideoOut::setInterFramePosition(float position)
@@ -163,14 +176,11 @@ void VideoOut::setInterFramePosition(float position)
 
 bool VideoOut::updateGameScreen()
 {
-	#if 0
-		// This is highly experimental stuff
-		mUsingFrameInterpolation = FTX::keyState(SDLK_LCTRL);
-	#endif
+	mUsingFrameInterpolation = (Configuration::instance().mFrameSync == Configuration::FrameSyncType::FRAME_INTERPOLATION);
 
 	// Only render something if a frame simulation was completed in the meantime
 	const bool hasNewSimulationFrame = (mFrameState == FrameState::FRAME_READY);
-	if (!hasNewSimulationFrame && !mUsingFrameInterpolation)
+	if (!hasNewSimulationFrame && !mUsingFrameInterpolation && !mDebugDrawRenderingRequested)
 	{
 		// No update
 		return false;
@@ -187,8 +197,6 @@ bool VideoOut::updateGameScreen()
 
 	// Render a new image
 	renderGameScreen();
-
-	mRenderParts->setEnforceClearScreen(false);
 
 	// Game screen got updated
 	return true;
@@ -230,6 +238,9 @@ void VideoOut::clearGeometries()
 		mGeometryFactory.destroy(*geometry);
 	}
 	mGeometries.clear();
+
+	// Regularly cleanup old cache items -- it's safe now that no geometry references a texture in there any more
+	RenderResources::instance().mPrintedTextCache.regularCleanup();
 }
 
 void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
@@ -303,6 +314,7 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 	// Add sprite geometries
 	SpriteManager& spriteManager = mRenderParts->getSpriteManager();
 	{
+		const Vec2i worldSpaceOffset = mRenderParts->getSpacesManager().getWorldSpaceOffset();
 		const auto& sprites = spriteManager.getSprites();
 		for (auto spriteIterator = sprites.begin(); spriteIterator != sprites.end(); ++spriteIterator)
 		{
@@ -341,7 +353,7 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 					else if (sprite.mLogicalSpace == SpriteManager::Space::WORLD)
 					{
 						// Assume sprite is standing still in world space, i.e. moving entirely with camera
-						difference = mLastWorldSpaceOffset - spriteManager.getWorldSpaceOffset();
+						difference = mLastWorldSpaceOffset - worldSpaceOffset;
 					}
 					else
 					{
@@ -397,22 +409,52 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 
 	// Insert debug draw rects
 	{
-		const std::vector<OverlayManager::DebugDrawRect>& debugDrawRects = RenderParts::instance().getOverlayManager().getDebugDrawRects();
-		if (!debugDrawRects.empty())
+		const OverlayManager& overlayManager = RenderParts::instance().getOverlayManager();
+		const Vec2i worldSpaceOffset = getInterpolatedWorldSpaceOffset();
+		for (int i = 0; i < OverlayManager::NUM_CONTEXTS; ++i)
 		{
-			const Vec2i offset = getInterpolatedWorldSpaceOffset();
+			const std::vector<OverlayManager::DebugDrawRect>& debugDrawRects = overlayManager.getDebugDrawRects((OverlayManager::Context)i);
 			for (const OverlayManager::DebugDrawRect& debugDrawRect : debugDrawRects)
 			{
 				// Translate rect
-				Recti screenRect;
-				screenRect.x = debugDrawRect.mRect.x - offset.x;
-				screenRect.y = debugDrawRect.mRect.y - offset.y;
-				screenRect.width = debugDrawRect.mRect.width;
-				screenRect.height = debugDrawRect.mRect.height;
+				Recti screenRect = debugDrawRect.mRect;
+				if (debugDrawRect.mSpace == SpacesManager::Space::WORLD)
+				{
+					screenRect -= worldSpaceOffset;
+				}
 
 				Geometry& geometry = mGeometryFactory.createRectGeometry(screenRect, debugDrawRect.mColor);
 				geometry.mRenderQueue = 0xffff;		// Always on top
 				geometries.push_back(&geometry);
+			}
+
+			const std::vector<OverlayManager::Text>& texts = overlayManager.getTexts((OverlayManager::Context)i);
+			for (const OverlayManager::Text& text : texts)
+			{
+				// Translate position
+				Vec2i screenPosition = text.mPosition;
+				if (text.mSpace == SpacesManager::Space::WORLD)
+				{
+					screenPosition -= worldSpaceOffset;
+				}
+
+				Font* font = ResourcesCache::instance().getFontByKey(text.mFontKeyString, text.mFontKeyHash);
+				if (nullptr != font)
+				{
+					const PrintedTextCache::Key key(text.mFontKeyHash, text.mTextHash, text.mSpacing);
+					PrintedTextCache& cache = RenderResources::instance().mPrintedTextCache;
+					PrintedTextCache::CacheItem* cacheItem = cache.getCacheItem(key);
+					if (nullptr == cacheItem)
+					{
+						cacheItem = &cache.addCacheItem(key, *font, text.mTextString);
+					}
+					const Vec2i drawPosition = Font::applyAlignment(Recti(screenPosition, Vec2i(0, 0)), cacheItem->mInnerRect, text.mAlignment);
+					const Recti rect(drawPosition, cacheItem->mTexture.getSize());
+
+					Geometry& geometry = mGeometryFactory.createTexturedRectGeometry(rect, cacheItem->mTexture, text.mColor);
+					geometry.mRenderQueue = text.mRenderQueue;
+					geometries.push_back(&geometry);
+				}
 			}
 		}
 	}
@@ -433,6 +475,18 @@ void VideoOut::renderGameScreen()
 
 	// Render them
 	mActiveRenderer->renderGameScreen(mGeometries);
+}
+
+void VideoOut::preRefreshDebugging()
+{
+	mRenderParts->getOverlayManager().clearContext(OverlayManager::Context::OUTSIDE_FRAME);
+}
+
+void VideoOut::postRefreshDebugging()
+{
+	const bool hasOutsideFrameDebugDraws = !mRenderParts->getOverlayManager().getDebugDrawRects(OverlayManager::Context::OUTSIDE_FRAME).empty();
+	mDebugDrawRenderingRequested = hasOutsideFrameDebugDraws || !mPreviouslyHadOutsideFrameDebugDraws;
+	mPreviouslyHadOutsideFrameDebugDraws = hasOutsideFrameDebugDraws;
 }
 
 void VideoOut::renderDebugDraw(int debugDrawMode, const Recti& rect)

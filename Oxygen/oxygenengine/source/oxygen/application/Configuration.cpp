@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -318,12 +318,9 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 		// Graphics
 		tryReadRenderMethod(rootHelper, mFailSafeMode, mRenderMethod, mAutoDetectRenderMethod);
 
-		int windowMode = 0;
-		rootHelper.tryReadInt("Fullscreen", windowMode);
-		mWindowMode = (WindowMode)windowMode;
-
+		rootHelper.tryReadAsInt("Fullscreen", mWindowMode);
 		rootHelper.tryReadInt("DisplayIndex", mDisplayIndex);
-		rootHelper.tryReadInt("FrameSync", mFrameSync);
+		rootHelper.tryReadAsInt("FrameSync", mFrameSync);
 		rootHelper.tryReadInt("Upscaling", mUpscaling);
 		rootHelper.tryReadInt("Backdrop", mBackdrop);
 		rootHelper.tryReadInt("Filtering", mFiltering);
@@ -430,7 +427,7 @@ void Configuration::saveSettings()
 		// Graphics
 		root["Fullscreen"] = (int)mWindowMode;
 		root["DisplayIndex"] = mDisplayIndex;
-		root["FrameSync"] = mFrameSync;
+		root["FrameSync"] = (int)mFrameSync;
 		root["Upscaling"] = mUpscaling;
 		root["Backdrop"] = mBackdrop;
 		root["Filtering"] = mFiltering;
@@ -503,10 +500,21 @@ void Configuration::saveSettings()
 void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 {
 	// Read dev mode setting first, as other settings rely on it
-	if (!mDevMode)	// If either config or settings set this to true, then it stays true
+	if (!mDevMode.mEnabled)	// If either config or settings set this to true, then it stays true
 	{
-		rootHelper.tryReadBool("DevMode", mDevMode);
-		rootHelper.tryReadBool("DebugMode", mDevMode);		// Not a mistake -- this is intentional
+		rootHelper.tryReadBool("DebugMode", mDevMode.mEnabled);		// Not a mistake -- this is intentional
+
+		Json::Value devModeJson = rootHelper.mJson["DevMode"];
+		if (devModeJson.isObject())
+		{
+			JsonHelper devModeHelper(devModeJson);
+			devModeHelper.tryReadBool("Enabled", mDevMode.mEnabled);
+
+			devModeHelper.tryReadString("LoadSaveState", mLoadSaveState);
+			devModeHelper.tryReadInt("LoadLevel", mLoadLevel);
+			devModeHelper.tryReadInt("UseCharacters", mUseCharacters);
+			mUseCharacters = clamp(mUseCharacters, 0, 4);
+		}
 	}
 
 	// Paths
@@ -523,7 +531,7 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 	}
 	rootHelper.tryReadString("MainScriptName", mMainScriptName);
 
-	if (mDevMode)
+	if (mDevMode.mEnabled)
 	{
 		if (rootHelper.tryReadString("SaveStatesDir", mSaveStatesDir))
 		{
@@ -535,14 +543,6 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 	rootHelper.tryReadInt("PlatformFlags", mPlatformFlags);
 
 	// Game
-	if (mDevMode)
-	{
-		rootHelper.tryReadString("LoadSaveState", mLoadSaveState);
-	}
-	rootHelper.tryReadInt("LoadLevel", mLoadLevel);
-	rootHelper.tryReadInt("UseCharacters", mUseCharacters);
-	mUseCharacters = clamp(mUseCharacters, 0, 4);
-
 	rootHelper.tryReadInt("StartPhase", mStartPhase);
 	rootHelper.tryReadInt("GameRecording", mGameRecording);
 	rootHelper.tryReadInt("GameRecPlayFrom", mGameRecPlayFrom);
@@ -556,7 +556,7 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 
 	// Video
 	tryParseWindowSize(rootHelper.mJson["WindowSize"].asString(), mWindowSize);
-	if (mDevMode)
+	if (mDevMode.mEnabled)
 	{
 		tryParseWindowSize(rootHelper.mJson["GameScreen"].asString(), mGameScreen);
 	}
@@ -571,7 +571,7 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 	rootHelper.tryReadInt("AudioSampleRate", mAudioSampleRate);
 
 	// Input recorder
-	if (mDevMode)
+	if (mDevMode.mEnabled)
 	{
 		JsonHelper jsonHelper(rootHelper.mJson["InputRecorder"]);
 		jsonHelper.tryReadString("Playback", mInputRecorderInput);
@@ -580,7 +580,7 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 
 	// Script
 	rootHelper.tryReadInt("ScriptOptimizationLevel", mScriptOptimizationLevel);
-	if (mDevMode)
+	if (mDevMode.mEnabled)
 	{
 		rootHelper.tryReadBool("EnableROMDataAnalyzer", mEnableROMDataAnalyzer);
 	}

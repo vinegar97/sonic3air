@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -75,7 +75,7 @@ public:
 	void copy(const CHAR* str);
 	void copy(const std::basic_string<CHAR, std::char_traits<CHAR>, std::allocator<CHAR>>& str);
 	void copy(const std::basic_string_view<CHAR>& str);
-	
+
 	void swap(StringTemplate& other);
 
 	void add(const StringTemplate& str);
@@ -122,6 +122,7 @@ public:
 	void makeSubString(const StringTemplate& str, int pos, int len);
 	void makeSubString(const StringTemplate& str, int pos);
 	CLASS getSubString(int pos, int len) const;
+	CLASS getSubString(int pos) const;
 
 	int split(CLASS** str_ptr, CHAR separator) const;
 	void split(std::vector<CLASS>& output, CHAR separator) const;

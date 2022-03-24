@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -27,7 +27,9 @@ function void fn0630e0()
 	}
 	else
 	{
-		spawnChildObjects(0x0665bc)
+		// "spawnChildObjects(0x0665bc)" replaced by:
+		spawnChildObject(0x0632ca, 0x00, -8, 0)
+
 		Object.TriggerUnloading()
 	}
 }
@@ -63,7 +65,8 @@ function void fn063134()
 	u8[0xffffeee8] = 0xff
 	CutsceneKnuckles.loadPalette()
 
-	spawnChildObjects(0x0665bc)
+	// "spawnChildObjects(0x0665bc)" replaced by:
+	spawnChildObject(0x0632ca, 0x00, -8, 0)
 }
 
 

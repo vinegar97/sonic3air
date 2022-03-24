@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -30,6 +30,18 @@ namespace rmx
 		bool tryReadBool(const std::string& key, bool& output);
 		bool tryReadFloat(const std::string& key, float& output);
 		bool tryReadStringArray(const std::string& key, std::vector<std::string>& output);
+
+		template<typename T>
+		bool tryReadAsInt(const std::string& key, T& output)
+		{
+			int value = 0;
+			if (tryReadInt(key, value))
+			{
+				output = static_cast<T>(value);
+				return true;
+			}
+			return false;
+		}
 
 	public:
 		const Json::Value& mJson;

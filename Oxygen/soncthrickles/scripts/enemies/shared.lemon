@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -420,7 +420,13 @@ function void Enemy.DamageCharacter()
 //# address-hook(0x0857c2) end(0x0857e6)
 function void fn0857c2()
 {
+#if STANDALONE
+	// Bug fix for the drop dash not counting as a rolling state in collision checks for certain enemies,
+	// i.e. Sonic gets hurt when dropdashing on them -- thanks to GFX32 for the fix!
+	if (u8[A1 + 0x2b] & char.bonus.INVINCIBLE || u8[A1 + 0x20] == char.state.ROLLING || u8[A1 + 0x20] == char.state.SPINDASH || u8[A1 + 0x20] == char.state.SONIC_DROPDASH)
+#else
 	if (u8[A1 + 0x2b] & char.bonus.INVINCIBLE || u8[A1 + 0x20] == char.state.ROLLING || u8[A1 + 0x20] == char.state.SPINDASH)
+#endif
 	{
 		fn085822()
 		return
@@ -649,7 +655,10 @@ function void fn085da8()
 //# address-hook(0x085de0)
 function void fn085de0()
 {
-	spawnChildObjects(0x085de8)
+	// "spawnChildObjects(0x085de8)" replaced by:
+	spawnChildObject(0x084a48, 0x00, 0, 0)		// Screen mover
+	spawnChildObject(0x084aa4, 0x02, 0, 0)		// Screen mover for the upper border
+	spawnChildObject(0x084ad2, 0x04, 0, 0)
 }
 
 

@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -77,7 +77,8 @@ function void fn0891f2()
 	objA0.countdown_value = 0x04
 	objA0.countdown_callback = 0x089212
 
-	spawnChildObjects(0x089352)
+	// "spawnChildObjects(0x089352)" replaced by:
+	spawnChildObject(0x089256, 0x00, 0, 0)
 }
 
 

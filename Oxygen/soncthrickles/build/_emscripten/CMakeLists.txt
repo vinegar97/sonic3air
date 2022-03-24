@@ -33,7 +33,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 set (CMAKE_CXX_FLAGS "-s USE_VORBIS=1 -s USE_SDL=2 -s FULL_ES2=1 -s FORCE_FILESYSTEM=1 -s ALLOW_MEMORY_GROWTH=1 -s EXIT_RUNTIME=1 -s USE_ZLIB=1")
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lidbfs.js")
+set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lidbfs.js -lwebsocket.js")
 
 include_directories(${WORKSPACE_DIR}/framework/external/sdl/SDL2/include)
 include_directories(${WORKSPACE_DIR}/librmx/source)
@@ -88,22 +88,21 @@ target_link_libraries(lemonscript rmxbase)
 
 
 
-# TODO: There might be better ways to differentiate between development and enduser versions of oxygen;
-#       e.g. use a "Release-Enduser" build configuration like in the Visual Studio project
+# oxygen_netcore
 
-# oxygen_development
+file(GLOB_RECURSE OXYGEN_NETCORE_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygen_netcore/*.cpp)
 
-#file(GLOB_RECURSE OXYGEN_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygen/*.cpp)
+add_library(oxygen_netcore ${OXYGEN_NETCORE_SOURCES})
 
-#add_library(oxygen_development ${OXYGEN_SOURCES})
+if (NOT CMAKE_VERSION VERSION_LESS "3.16.0")
+	target_precompile_headers(oxygen_netcore PRIVATE ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygen_netcore/pch.h)
+endif()
 
-#target_link_libraries(oxygen_development rmxmedia)
-#target_link_libraries(oxygen_development rmxext_oggvorbis)
-#target_link_libraries(oxygen_development lemonscript)
-
+target_link_libraries(oxygen_netcore rmxbase)
 
 
-# oxygen_enduser
+
+# oxygenengine
 
 file(GLOB_RECURSE OXYGEN_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygen/*.cpp
 	${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizip/ioapi.c
@@ -116,6 +115,7 @@ target_compile_definitions(oxygen_enduser PUBLIC ENDUSER)
 target_link_libraries(oxygen_enduser rmxmedia)
 target_link_libraries(oxygen_enduser rmxext_oggvorbis)
 target_link_libraries(oxygen_enduser lemonscript)
+target_link_libraries(oxygen_enduser oxygen_netcore)
 
 
 

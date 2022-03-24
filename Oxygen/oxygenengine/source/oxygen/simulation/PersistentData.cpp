@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -56,7 +56,7 @@ const std::vector<uint8>& PersistentData::getData(uint64 keyHash) const
 	return (it == mEntries.end()) ? EMPTY : it->second.mData;
 }
 
-void PersistentData::setData(const std::string& key, const std::vector<uint8>& data)
+void PersistentData::setData(std::string_view key, const std::vector<uint8>& data)
 {
 	const uint64 keyHash = rmx::getMurmur2_64(key);
 	const auto it = mEntries.find(keyHash);

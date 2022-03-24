@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -49,6 +49,7 @@ private:
 		uint16 mSprite = 0;
 		uint8  mRotation = 0;
 		uint8  mFlags = 0;
+		// TODO: Adding velocity direction (as angle) would make sense here for Tails, to get smoother tails movement while rolling & jumping
 	};
 	struct Recording
 	{
@@ -61,6 +62,7 @@ private:
 		int    mRank = 0;
 		uint32 mTime = 0;
 		bool   mVisible = true;
+		size_t mIndex = 0;			// Only valid during playback
 		std::vector<Frame> mFrames;
 	};
 

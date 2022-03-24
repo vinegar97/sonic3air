@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -50,7 +50,7 @@ public:
 	inline const ScriptLogEntryMap& getScriptLogEntries() const  { return mScriptLogEntries; }
 	void clearScriptLogValues();
 	void clearScriptLogValue(const std::string& key);
-	ScriptLogSingleEntry& updateScriptLogValue(const std::string& key, const std::string& value);
+	ScriptLogSingleEntry& updateScriptLogValue(std::string_view key, std::string_view value);
 
 	// Debug color log
 	inline const ColorLogEntryArray& getColorLogEntries() const { return mColorLogEntries; }

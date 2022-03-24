@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -14,7 +14,7 @@
 #include "oxygen/drawing/DrawerTexture.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/HighResolutionTimer.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/rendering/RenderResources.h"
@@ -185,7 +185,7 @@ void GameView::initialize()
 
 	const Vec2i& resolution = Configuration::instance().mGameScreen;
 
-	LOG_INFO("Creating game screen texture");
+	RMX_LOG_INFO("Creating game screen texture");
 	EngineMain::instance().getDrawer().createTexture(mFinalGameTexture);
 	mFinalGameTexture.setupAsRenderTarget(resolution.x, resolution.y);
 }
@@ -240,12 +240,12 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 
 					case 'h':
 					{
-						int& frameSync = Configuration::instance().mFrameSync;
-						frameSync = (frameSync + 1) % 3;
+						Configuration::FrameSyncType& frameSync = Configuration::instance().mFrameSync;
+						frameSync = Configuration::FrameSyncType(((int)frameSync + 1) % (int)Configuration::FrameSyncType::_NUM);
 						EngineMain::instance().setVSyncMode(frameSync);
 
-						static const std::string FRAME_SYNC_NAME[] = { "V-Sync Off", "VSync On", "V-Sync + FPS Cap" };
-						setLogDisplay("Frame Sync: " + FRAME_SYNC_NAME[frameSync]);
+						static const std::string FRAME_SYNC_NAME[(int)Configuration::FrameSyncType::_NUM] = { "V-Sync Off", "VSync On", "V-Sync + FPS Cap", "Frame Interpolation" };
+						setLogDisplay("Frame Sync: " + FRAME_SYNC_NAME[(int)frameSync]);
 						break;
 					}
 				}
@@ -390,7 +390,7 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 						{
 							HighResolutionTimer timer;
 							timer.start();
-							if (mSimulation.reloadScripts(true))
+							if (mSimulation.triggerFullScriptsReload())
 							{
 								setLogDisplay(String(0, "Reloaded scripts in %0.2f sec", timer.getSecondsSinceStart()));
 							}
@@ -507,10 +507,11 @@ void GameView::update(float timeElapsed)
 			if (mDebugOutput >= 0)
 			{
 				// Get the mouse position inside the debug output
+				PlaneManager& planeManager = VideoOut::instance().getRenderParts().getPlaneManager();
 				Rectf rect;
 				if (mDebugOutput <= PlaneManager::PLANE_A)
 				{
-					const Vec2i playfieldSize = VideoOut::instance().getRenderParts().getPlaneManager().getPlayfieldSizeInPixels();
+					const Vec2i playfieldSize = planeManager.getPlayfieldSizeInPixels();
 					rect = RenderUtils::getLetterBoxRect(mRect, (float)playfieldSize.x / (float)playfieldSize.y);
 				}
 				else
@@ -525,8 +526,8 @@ void GameView::update(float timeElapsed)
 					LogDisplay::instance().updateScriptLogValue("~index", rmx::hexString(index, 4));
 					if (mDebugOutput < 2)
 					{
-						const uint16 address = VideoOut::instance().getRenderParts().getPlaneManager().getPatternVRAMAddress(mDebugOutput, index);
-						const uint16 pattern = VideoOut::instance().getRenderParts().getPlaneManager().getPatternAtIndex(mDebugOutput, index);
+						const uint16 address = planeManager.getPatternVRAMAddress(mDebugOutput, index);
+						const uint16 pattern = planeManager.getPatternAtIndex(mDebugOutput, index);
 						LogDisplay::instance().updateScriptLogValue("~addr", rmx::hexString(address, 4));
 						LogDisplay::instance().updateScriptLogValue("~ptrn", rmx::hexString(pattern, 4));
 					}
@@ -596,16 +597,14 @@ void GameView::render()
 	// Here goes the real rendering
 	drawer.setRenderTarget(mFinalGameTexture, gameScreenRect);
 	drawer.setBlendMode(DrawerBlendMode::NONE);
-#if 0
-	// Test: Lazy version of a simple mirror mode
-	//  -> TODO: ControlsIn needs to support mirror mode as well
-	if (drawer.getType() != Drawer::Type::SOFTWARE)
+
+	// Simple mirror mode implementation: Just mirror the whole screen
+	if (Configuration::instance().mMirrorMode)
 	{
 		const Recti drawRect(gameScreenRect.x + gameScreenRect.width, gameScreenRect.y, -gameScreenRect.width, gameScreenRect.height);
 		drawer.drawRect(drawRect, videoOut.getGameScreenTexture());
 	}
 	else
-#endif
 	{
 		drawer.drawRect(gameScreenRect, videoOut.getGameScreenTexture());
 	}

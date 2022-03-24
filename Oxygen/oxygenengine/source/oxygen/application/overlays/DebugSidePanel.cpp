@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -14,6 +14,7 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/video/VideoOut.h"
+#include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LemonScriptProgram.h"
@@ -40,7 +41,7 @@ namespace
 }
 
 
-void DebugSidePanel::Builder::addLine(const String& text, const Color& color, int intend, uint64 key, int lineSpacing)
+DebugSidePanel::Builder::TextLine& DebugSidePanel::Builder::addLine(const String& text, const Color& color, int intend, uint64 key, int lineSpacing)
 {
 	TextLine& textLine = vectorAdd(mTextLines);
 	textLine.mText = text;
@@ -48,6 +49,19 @@ void DebugSidePanel::Builder::addLine(const String& text, const Color& color, in
 	textLine.mIntend = intend;
 	textLine.mKey = key;
 	textLine.mLineSpacing = lineSpacing;
+	return textLine;
+}
+
+DebugSidePanel::Builder::TextLine& DebugSidePanel::Builder::addOption(const String& text, bool value, const Color& color, int intend, uint64 key, int lineSpacing)
+{
+	TextLine& textLine = vectorAdd(mTextLines);
+	textLine.mText = text;
+	textLine.mColor = color;
+	textLine.mIntend = intend;
+	textLine.mKey = key;
+	textLine.mLineSpacing = lineSpacing;
+	textLine.mOptionValue = value ? 1 : 0;
+	return textLine;
 }
 
 void DebugSidePanel::Builder::addSpacing(int lineSpacing)
@@ -79,7 +93,7 @@ DebugSidePanel::~DebugSidePanel()
 
 void DebugSidePanel::initialize()
 {
-	mSmallFont.load("data/font/freefont_sampled.json", 0.0f);
+	mSmallFont.loadFromFile("data/font/freefont_sampled.json");
 	mSmallFont.setShadow(true, Vec2f(1.0f, 1.0f), 0.0f);
 }
 
@@ -312,6 +326,15 @@ void DebugSidePanel::render()
 				drawer.drawRect(selectionRect, Color(1.0f, 1.0f, 0.0f, 0.5f));
 			}
 
+			if (line.mOptionValue >= 0)
+			{
+				drawer.printText(mSmallFont, textRect, (line.mOptionValue != 0) ? "[x" : "[ ", 1, line.mColor);
+				textRect.x += 10;
+				drawer.printText(mSmallFont, textRect, "]", 1, line.mColor);
+				textRect.x += 10;
+				textRect.width -= 20;
+			}
+
 			drawer.printText(mSmallFont, textRect, line.mText, 1, line.mColor);
 		}
 	}
@@ -329,7 +352,7 @@ DebugSidePanelCategory& DebugSidePanel::createGameCategory(size_t identifier, co
 	return category;
 }
 
-bool DebugSidePanel::setupCustomCategory(const std::string& header, char shortCharacter)
+bool DebugSidePanel::setupCustomCategory(std::string_view header, char shortCharacter)
 {
 	// Search for the category
 	mSetupCustomCategory = nullptr;
@@ -363,7 +386,7 @@ bool DebugSidePanel::setupCustomCategory(const std::string& header, char shortCh
 	return ((size_t)index == mActiveCategoryIndex);
 }
 
-bool DebugSidePanel::addOption(const std::string& text, bool defaultValue)
+bool DebugSidePanel::addOption(std::string_view text, bool defaultValue)
 {
 	if (nullptr == mSetupCustomCategory)
 		return false;
@@ -379,7 +402,7 @@ void DebugSidePanel::addEntry(uint64 key)
 	return mSetupCustomCategory->addEntry(key);
 }
 
-void DebugSidePanel::addLine(const std::string& text, int indent, const Color& color)
+void DebugSidePanel::addLine(std::string_view text, int indent, const Color& color)
 {
 	if (nullptr == mSetupCustomCategory)
 		return;
@@ -395,12 +418,12 @@ bool DebugSidePanel::isEntryHovered(uint64 key)
 	return mSetupCustomCategory->isEntryHovered(key);
 }
 
-DebugSidePanelCategory& DebugSidePanel::addCategory(size_t identifier, const std::string& header, char shortCharacter)
+DebugSidePanelCategory& DebugSidePanel::addCategory(size_t identifier, std::string_view header, char shortCharacter)
 {
 	DebugSidePanelCategory* category = new DebugSidePanelCategory();
 	category->mIdentifier = identifier;
 	category->mHeader = header;
-	category->mShortCharacter = shortCharacter ? shortCharacter : header[0];
+	category->mShortCharacter = shortCharacter ? shortCharacter : header.empty() ? 0 : header[0];
 
 	mCategories.push_back(category);
 	return *category;
@@ -422,12 +445,12 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 			const bool visualizationSorting = (category.mOpenKeys.count(0x1000000000000002) > 0);
 			const bool showOpcodesExecuted  = (category.mOpenKeys.count(0x1000000000000003) > 0);
 
-			builder.addLine(String(0, "[%c] Show all hit functions", showAllHitFunctions ? 'x' : ' '), Color::CYAN, 0, 0x1000000000000001);
+			builder.addOption("Show all hit functions", showAllHitFunctions, Color::CYAN, 0, 0x1000000000000001);
 			builder.addSpacing(12);
 
 			if (showAllHitFunctions)
 			{
-				builder.addLine(String(0, "[%c] Sort by filename", visualizationSorting ? 'x' : ' '), Color::CYAN, 0, 0x1000000000000002);
+				builder.addOption("Sort by filename", visualizationSorting, Color::CYAN, 0, 0x1000000000000002);
 				builder.addSpacing(12);
 
 				std::map<uint32, const lemon::Function*> functions;
@@ -435,7 +458,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 				{
 					if (nullptr != callFrame.mFunction)
 					{
-						const uint32 key = (callFrame.mAddress != 0xffffffff) ? callFrame.mAddress : (0x80000000 + callFrame.mFunction->getId());
+						const uint32 key = (callFrame.mAddress != 0xffffffff) ? callFrame.mAddress : (0x80000000 + callFrame.mFunction->getID());
 						functions.emplace(key, callFrame.mFunction);
 					}
 				}
@@ -450,8 +473,8 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					{
 						if (visualizationSorting)
 						{
-							const std::wstring& filenameA = (a.second->getType() == lemon::Function::Type::SCRIPT) ? static_cast<const lemon::ScriptFunction*>(a.second)->mSourceFilename : L"";
-							const std::wstring& filenameB = (b.second->getType() == lemon::Function::Type::SCRIPT) ? static_cast<const lemon::ScriptFunction*>(b.second)->mSourceFilename : L"";
+							const std::wstring& filenameA = (a.second->getType() == lemon::Function::Type::SCRIPT) ? static_cast<const lemon::ScriptFunction*>(a.second)->mSourceFileInfo->mFilename : L"";
+							const std::wstring& filenameB = (b.second->getType() == lemon::Function::Type::SCRIPT) ? static_cast<const lemon::ScriptFunction*>(b.second)->mSourceFileInfo->mFilename : L"";
 							if (filenameA != filenameB)
 							{
 								return (filenameA < filenameB);
@@ -459,7 +482,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						}
 						if ((a.first & 0x80000000) && (b.first & 0x80000000))
 						{
-							return a.second->getName() < b.second->getName();
+							return a.second->getName().getString() < b.second->getName().getString();
 						}
 						else
 						{
@@ -470,12 +493,12 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 				for (const auto& pair : sortedFunctions)
 				{
-					const String filename = (pair.second->getType() == lemon::Function::Type::SCRIPT) ? WString(static_cast<const lemon::ScriptFunction*>(pair.second)->mSourceFilename).toString() : "";
+					const String filename = (pair.second->getType() == lemon::Function::Type::SCRIPT) ? WString(static_cast<const lemon::ScriptFunction*>(pair.second)->mSourceFileInfo->mFilename).toString() : "";
 					String line;
 					if (visualizationSorting && !filename.empty())
 						line << filename << " | ";
 					line << ((pair.first < 0x80000000) ? String(0, "0x%06x: ", pair.first) : "");
-					line << pair.second->getName();
+					line << pair.second->getName().getString();
 					if (!visualizationSorting && !filename.empty())
 						line << " | " << filename;
 					builder.addLine(line, Color::WHITE, 10);
@@ -483,14 +506,14 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 			}
 			else
 			{
-				builder.addLine(String(0, "[%c] Show profiling samples", showOpcodesExecuted ? 'x' : ' '), Color::CYAN, 0, 0x1000000000000003);
+				builder.addOption("Show profiling samples", showOpcodesExecuted, Color::CYAN, 0, 0x1000000000000003);
 				builder.addSpacing(12);
 
 				int ignoreDepth = 0;
 				for (const CodeExec::CallFrame& callFrame : callFrames)
 				{
 					// Ignore debugging stuff
-					if (nullptr != callFrame.mFunction && String(callFrame.mFunction->getName()).startsWith("debug"))
+					if (nullptr != callFrame.mFunction && rmx::startsWith(callFrame.mFunction->getName().getString(), "debug"))
 						continue;
 
 					if (ignoreDepth != 0)
@@ -501,7 +524,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 							ignoreDepth = 0;
 					}
 
-					const uint64 key = (nullptr == callFrame.mFunction) ? INVALID_KEY : callFrame.mFunction->getId();
+					const uint64 key = (nullptr == callFrame.mFunction) ? INVALID_KEY : callFrame.mFunction->getID();
 					const bool isOpen = (callFrame.mAnyChildFailed || callFrame.mDepth < 2 || category.mOpenKeys.count(key) != 0);
 
 					std::string postfix;
@@ -531,7 +554,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 									(callFrame.mType == CodeExec::CallFrame::Type::SCRIPT_DIRECT) ? Color::WHITE : Color::YELLOW;
 						}
 						RMX_ASSERT(nullptr != callFrame.mFunction, "Invalid function pointer");
-						builder.addLine(callFrame.mFunction->getName() + postfix, color, indent, key);
+						builder.addLine(std::string(callFrame.mFunction->getName().getString()) + postfix, color, indent, key);
 					}
 				}
 				if (callFrames.size() == CodeExec::CALL_FRAMES_LIMIT)
@@ -578,17 +601,36 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					{
 						const auto& hit = watch.mHits[hitIndex];
 						const uint64 key = ((uint64)watch.mAddress << 32) + hitIndex;
+						Builder::TextLine* textLine;
 						if (watch.mBytes <= 4)
-							builder.addLine(String(0, "= %s at %s", rmx::hexString(hit.mWrittenValue, watch.mBytes * 2).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
+							textLine = &builder.addLine(String(0, "= %s at %s", rmx::hexString(hit.mWrittenValue, watch.mBytes * 2).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
 						else
-							builder.addLine(String(0, "u%d[0xffff%04x] = %s at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
+							textLine = &builder.addLine(String(0, "u%d[0xffff%04x] = %s at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
+
+						// Just a test
+					#if 0
+						if (key == category.mChangedKey)
+						{
+							std::string scriptFilename;
+							uint32 lineNumber;
+							codeExec.getLemonScriptProgram().resolveLocation(*hit.mLocation.mFunction, (uint32)hit.mLocation.mProgramCounter, scriptFilename, lineNumber);
+							textLine->mCodeLocation = "\"" + scriptFilename + "\":" + std::to_string(lineNumber);
+
+							// TODO: The script file name needs to contains the full file path for this to work, not just the file name itself
+							//  -> Maybe store a list of source files in the module?
+							//  -> Also, this only makes sense if the sources are available, i.e. not for modules loaded from a serialized binary file
+						#if defined(PLATFORM_WINDOWS)
+							::system(("code -r -g " + textLine->mCodeLocation).c_str());
+						#endif
+						}
+					#endif
 
 						if (category.mOpenKeys.count(key) != 0)
 						{
 							for (uint64 functionNameHash : hit.mCallStack)
 							{
-								const std::string& name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
-								builder.addLine(String(0, "%s", name.c_str()), Color::fromABGR32(0xffc0c0c0), 32);
+								const std::string_view name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
+								builder.addLine(String(name), Color::fromABGR32(0xffc0c0c0), 32);
 							}
 						}
 					}
@@ -619,26 +661,27 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					builder.addSpacing(4);
 				}
 
+				const std::string_view& name = globalDefine.mName.getString();
 				switch (globalDefine.mBytes)
 				{
 					case 1:
 					{
 						const uint8 value = emulatorInterface.readMemory8(globalDefine.mAddress);
-						builder.addLine(String(0, "%s   = 0x%02x", globalDefine.mName.c_str(), value), color, indent, key);
+						builder.addLine(String(0, "%.*s   = 0x%02x", name.length(), name.data(), value), color, indent, key);
 						break;
 					}
 
 					case 2:
 					{
 						const uint16 value = emulatorInterface.readMemory16(globalDefine.mAddress);
-						builder.addLine(String(0, "%s   = 0x%04x", globalDefine.mName.c_str(), value), color, indent, key);
+						builder.addLine(String(0, "%.*s   = 0x%04x", name.length(), name.data(), value), color, indent, key);
 						break;
 					}
 
 					case 4:
 					{
 						const uint32 value = emulatorInterface.readMemory32(globalDefine.mAddress);
-						builder.addLine(String(0, "%s   = 0x%08x", globalDefine.mName.c_str(), value), color, indent, key);
+						builder.addLine(String(0, "%.*s   = 0x%08x", name.length(), name.data(), value), color, indent, key);
 						break;
 					}
 				}
@@ -661,7 +704,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 								codeExec.removeWatch(globalDefine.mAddress, globalDefine.mBytes);
 							}
 						}
-						builder.addLine(String(0, "[%c] Watched", watched ? 'x' : ' '), color, indent + 20, key2);
+						builder.addOption("Watched", watched, color, indent + 20, key2);
 					}
 					builder.addSpacing(5);
 				}
@@ -783,21 +826,69 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 		case CATEGORY_VRAM_WRITES:
 		{
+			const PlaneManager& planeManager = VideoOut::instance().getRenderParts().getPlaneManager();
+			const uint16 startAddressPlaneA = planeManager.getPlaneBaseVRAMAddress(PlaneManager::PLANE_A);
+			const uint16 startAddressPlaneB = planeManager.getPlaneBaseVRAMAddress(PlaneManager::PLANE_B);
+			const uint16 endAddressPlaneA = startAddressPlaneA + (uint16)planeManager.getPlaneSizeInVRAM(PlaneManager::PLANE_A);
+			const uint16 endAddressPlaneB = startAddressPlaneB + (uint16)planeManager.getPlaneSizeInVRAM(PlaneManager::PLANE_B);
+			const ScrollOffsetsManager& scrollOffsetsManager = VideoOut::instance().getRenderParts().getScrollOffsetsManager();
+			const uint16 startAddressScrollOffsets = scrollOffsetsManager.getHorizontalScrollTableBase();
+			const uint16 endAddressScrollOffsets = startAddressScrollOffsets + 0x200;
+
 			// Create a sorted list
 			std::vector<CodeExec::VRAMWrite*> writes = codeExec.getVRAMWrites();
 			std::sort(writes.begin(), writes.end(), [](const CodeExec::VRAMWrite* a, const CodeExec::VRAMWrite* b) { return a->mAddress < b->mAddress; } );
 
+			const bool showPlaneA = (category.mOpenKeys.count(0x1000000000000001) == 0);
+			const bool showPlaneB = (category.mOpenKeys.count(0x1000000000000002) == 0);
+			const bool showScroll = (category.mOpenKeys.count(0x1000000000000003) == 0);
+			const bool showOthers = (category.mOpenKeys.count(0x1000000000000004) == 0);
+
+			builder.addOption("Plane A", showPlaneA, Color::CYAN, 0, 0x1000000000000001);
+			builder.addOption("Plane B", showPlaneB, Color::CYAN, 0, 0x1000000000000002);
+			builder.addOption("Scroll Offsets", showScroll, Color::CYAN, 0, 0x1000000000000003);
+			builder.addOption("Patterns and others", showOthers, Color::CYAN, 0, 0x1000000000000004);
+			builder.addSpacing(12);
+
 			for (const CodeExec::VRAMWrite* write : writes)
 			{
 				const uint64 key = ((uint64)write->mAddress << 32) + write->mSize;
-				builder.addLine(String(0, "0x%04x (0x%02x bytes) at %s", write->mAddress, write->mSize, write->mLocation.toString().c_str()), Color::WHITE, 0, key);
+				String line(0, "0x%04x (0x%02x bytes) at %s", write->mAddress, write->mSize, write->mLocation.toString().c_str());
+				Color color = Color::WHITE;
+				if (write->mAddress >= startAddressPlaneA && write->mAddress < endAddressPlaneA)
+				{
+					if (!showPlaneA)
+						continue;
+					line = String("[Plane A] ") + line;
+					color = Color::fromABGR32(0xffc0ffff);
+				}
+				else if (write->mAddress >= startAddressPlaneB && write->mAddress < endAddressPlaneB)
+				{
+					if (!showPlaneB)
+						continue;
+					line = String("[Plane B] ") + line;
+					color = Color::fromABGR32(0xffffc0ff);
+				}
+				else if (write->mAddress >= startAddressScrollOffsets && write->mAddress < endAddressScrollOffsets)
+				{
+					if (!showScroll)
+						continue;
+					line = String("[Scroll Offsets] ") + line;
+					color = Color::fromABGR32(0xffffffc0);
+				}
+				else
+				{
+					if (!showOthers)
+						continue;
+				}
+				builder.addLine(line, color, 0, key);
 
 				if (category.mOpenKeys.count(key) != 0)
 				{
 					for (uint64 functionNameHash : write->mCallStack)
 					{
-						const std::string& name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
-						builder.addLine(String(0, "%s", name.c_str()), Color::fromABGR32(0xffc0c0c0), 32);
+						const std::string_view name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
+						builder.addLine(String(name), Color::fromABGR32(0xffc0c0c0), 32);
 					}
 				}
 			}
@@ -834,8 +925,8 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						{
 							for (uint64 functionNameHash : singleEntry.mCallStack)
 							{
-								const std::string& name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
-								builder.addLine(String(0, "%s", name.c_str()), Color::fromABGR32(0xffc0c0c0), 32);
+								const std::string_view name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
+								builder.addLine(String(name), Color::fromABGR32(0xffc0c0c0), 32);
 							}
 						}
 					}

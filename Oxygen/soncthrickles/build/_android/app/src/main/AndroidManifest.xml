@@ -44,6 +44,8 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <!-- Allow access to the vibrator -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Needed for TCP/UDP sockets -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- if you want to capture audio, uncomment this. -->
     <!-- <uses-permission android:name="android.permission.RECORD_AUDIO" /> -->
@@ -74,6 +76,7 @@
             android:launchMode="singleInstance"
             android:configChanges="layoutDirection|locale|orientation|uiMode|screenLayout|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
             android:preferMinimalPostProcessing="true"
+            android:exported="true"
             android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -11,6 +11,7 @@
 #include <codecvt>
 
 #ifdef PLATFORM_WINDOWS
+	#define WIN32_LEAN_AND_MEAN
 	#include "../CleanWindowsInclude.h"
 
 	//#define USE_VISTA_STYLE	// Not defined to reduce external dependencies -- espcially considering that the Vista-style message box code does not even seem to work!

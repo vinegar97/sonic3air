@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -167,7 +167,8 @@ function void fn0837d8()
 
 	playSound(0xb8)
 
-	spawnChildObjects(0x083b2e)
+	// "spawnChildObjects(0x083b2e)" replaced by:
+	spawnChildObject(0x083a24, 0x00, 0, 24)
 }
 
 
@@ -176,7 +177,8 @@ function void fn083832()
 {
 	if ((global.framecounter & 0x03) == 0)
 	{
-		spawnSimpleChildObjects(0x083b36)
+		// "spawnSimpleChildObjects(0x083b36)" replaced by:
+		spawnSimpleChildObjects(0x0839a2, 1)
 	}
 
 	fn083a50()
@@ -411,7 +413,8 @@ function void fn083a70()
 
 	playSound(0xb8)
 
-	spawnSimpleChildObjects(0x083b3c)
+	// "spawnSimpleChildObjects(0x083b3c)" replaced by:
+	spawnSimpleChildObjects(0x02cce0, 1)
 
 	A3 = A1
 	addScore(10)

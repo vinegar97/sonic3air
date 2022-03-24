@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,6 +10,7 @@
 #include "lemon/compiler/FunctionCompiler.h"
 #include "lemon/compiler/Node.h"
 #include "lemon/compiler/TokenTypes.h"
+#include "lemon/compiler/TypeCasting.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/Program.h"
 
@@ -90,7 +91,7 @@ namespace lemon
 	};
 
 
-	FunctionCompiler::FunctionCompiler(ScriptFunction& function, const Configuration& config) :
+	FunctionCompiler::FunctionCompiler(ScriptFunction& function, const GlobalCompilerConfig& config) :
 		mFunction(function),
 		mConfig(config),
 		mOpcodes(function.mOpcodes)
@@ -100,22 +101,24 @@ namespace lemon
 	void FunctionCompiler::processParameters()
 	{
 		// Check if anything to do at all (note that parameters are also local variables)
-		if (mFunction.mLocalVariablesById.empty())
+		if (mFunction.mLocalVariablesByID.empty())
 			return;
 
+		mLineNumber = mFunction.mStartLineNumber;
+
 		// Create scope
-		addOpcode(Opcode::Type::MOVE_VAR_STACK, BaseType::VOID, mFunction.mLocalVariablesById.size());
+		addOpcode(Opcode::Type::MOVE_VAR_STACK, BaseType::VOID, mFunction.mLocalVariablesByID.size());
 
 		// Go through parameters in reverse order
 		for (int index = (int)mFunction.getParameters().size() - 1; index >= 0; --index)
 		{
 			const Function::Parameter& parameter = mFunction.getParameters()[index];
-			const Variable* variable = mFunction.getLocalVariableByIdentifier(parameter.mIdentifier);
+			const Variable* variable = mFunction.getLocalVariableByIdentifier(parameter.mName.getHash());
 			RMX_ASSERT(nullptr != variable, "Variable not found");
 			RMX_ASSERT(variable->getDataType() == parameter.mType, "Variable has wrong type");
 
 			// Assume the variable value is on the stack
-			addOpcode(Opcode::Type::SET_VARIABLE_VALUE, variable->getDataType(), variable->getId());
+			addOpcode(Opcode::Type::SET_VARIABLE_VALUE, variable->getDataType(), variable->getID());
 
 			// Pop value from stack (as SET_VARIABLE_VALUE opcode does not consume it)
 			addOpcode(Opcode::Type::MOVE_STACK, BaseType::VOID, -1);
@@ -169,45 +172,27 @@ namespace lemon
 
 	Opcode& FunctionCompiler::addOpcode(Opcode::Type type, const DataTypeDefinition* dataType, int64 parameter)
 	{
-		Opcode& opcode = vectorAdd(mOpcodes);
-		opcode.mType = type;
-		opcode.mDataType = DataTypeHelper::getBaseType(dataType);
-		opcode.mParameter = parameter;
-		opcode.mLineNumber = mLineNumber;
-		return opcode;
+		BaseType baseType = dataType->mBaseType;
+		if (dataType->mClass == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::BOOLEAN)
+		{
+			baseType = BaseType::BOOL;
+		}
+		return addOpcode(type, baseType, parameter);
 	}
 
 	void FunctionCompiler::addCastOpcodeIfNecessary(const DataTypeDefinition* sourceType, const DataTypeDefinition* targetType)
 	{
-		// Both integers?
-		if (sourceType->mClass == DataTypeDefinition::Class::INTEGER && targetType->mClass == DataTypeDefinition::Class::INTEGER)
+		const BaseCastType castType = TypeCasting(mConfig).getBaseCastType(sourceType, targetType);
+		if (castType != BaseCastType::NONE)
 		{
-			const uint8 sourceBits = (uint8)DataTypeHelper::getBaseType(sourceType);
-			const uint8 targetBits = (uint8)DataTypeHelper::getBaseType(targetType);
-
-			// Size is between 0 and 3 (for 8-bit, 16-bit, 32-bit, 64-bit)
-			//  -> We are silently treating INT_CONST as INT_64 by ignoring flag 0x04
-			const uint8 sourceSize = (sourceBits & 0x03);
-			const uint8 targetSize = (targetBits & 0x03);
-
-			// No need for an opcode if size does not change at all
-			if (sourceSize != targetSize)
+			if (castType != BaseCastType::INVALID)
 			{
-				uint8 castType = (sourceSize << 4) + targetSize;
-
-				// Recognize signed up-cast
-				const bool isSourceSigned = (sourceBits & 0x08) != 0;
-				if (isSourceSigned && targetSize > sourceSize)
-				{
-					castType += 0x80;
-				}
-
-				addOpcode(Opcode::Type::CAST_VALUE, BaseType::VOID, castType);
+				addOpcode(Opcode::Type::CAST_VALUE, BaseType::VOID, (int64)castType);
 			}
-		}
-		else
-		{
-			CHECK_ERROR(false, "Cannot cast from " << sourceType->toString() << " to " << targetType->toString(), mLineNumber);
+			else
+			{
+				CHECK_ERROR(false, "Cannot cast from " << sourceType->toString() << " to " << targetType->toString(), mLineNumber);
+			}
 		}
 	}
 
@@ -257,7 +242,7 @@ namespace lemon
 
 				size_t offset = 0xffffffff;
 				if (!mFunction.getLabel(jumpNode.mLabelToken->mName, offset))
-					CHECK_ERROR(false, "Jump target label not found: " + jumpNode.mLabelToken->mName, node.getLineNumber());
+					CHECK_ERROR(false, "Jump target label not found: " << jumpNode.mLabelToken->mName.getString(), node.getLineNumber());
 
 				addOpcode(Opcode::Type::JUMP, BaseType::UINT_32, offset);
 				break;
@@ -286,13 +271,13 @@ namespace lemon
 				const ReturnNode& returnNode = node.as<ReturnNode>();
 				if (returnNode.mStatementToken.valid())
 				{
-					CHECK_ERROR(mFunction.getReturnType()->mClass != DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' with 'void' return type cannot return a value", node.getLineNumber());
+					CHECK_ERROR(mFunction.getReturnType()->mClass != DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName().getString() << "' with 'void' return type cannot return a value", node.getLineNumber());
 					compileTokenTreeToOpcodes(*returnNode.mStatementToken);
 					addCastOpcodeIfNecessary(returnNode.mStatementToken->mDataType, mFunction.getReturnType());
 				}
 				else
 				{
-					CHECK_ERROR(mFunction.getReturnType()->mClass == DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->toString() << " value", node.getLineNumber());
+					CHECK_ERROR(mFunction.getReturnType()->mClass == DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName().getString() << "' must return a " << mFunction.getReturnType()->toString() << " value", node.getLineNumber());
 				}
 				addOpcode(Opcode::Type::RETURN);
 				break;
@@ -434,10 +419,6 @@ namespace lemon
 				break;
 			}
 
-			case Node::Type::ELSE_STATEMENT:
-				CHECK_ERROR(false, "Else statement not allowed here", node.getLineNumber());
-				break;
-
 			default:
 				break;
 		}
@@ -495,6 +476,15 @@ namespace lemon
 			case Token::Type::BINARY_OPERATION:
 			{
 				const BinaryOperationToken& bot = token.as<BinaryOperationToken>();
+				if (nullptr != bot.mFunction)
+				{
+					// Treat this just like a function call
+					compileTokenTreeToOpcodes(*bot.mLeft);
+					compileTokenTreeToOpcodes(*bot.mRight);
+					addOpcode(Opcode::Type::CALL, (BaseType)0, bot.mFunction->getNameAndSignatureHash());
+					break;
+				}
+
 				switch (bot.mOperator)
 				{
 					case Operator::ASSIGN:
@@ -505,16 +495,16 @@ namespace lemon
 						break;
 					}
 
-					case Operator::ASSIGN_PLUS:				 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_ADD);	break;
-					case Operator::ASSIGN_MINUS:			 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_SUB);	break;
-					case Operator::ASSIGN_MULTIPLY:			 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_MUL);	break;
-					case Operator::ASSIGN_DIVIDE:			 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_DIV);	break;
-					case Operator::ASSIGN_MODULO:			 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_MOD);	break;
-					case Operator::ASSIGN_AND:				 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_AND);	break;
-					case Operator::ASSIGN_OR:				 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_OR);		break;
-					case Operator::ASSIGN_XOR:				 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_XOR);	break;
-					case Operator::ASSIGN_SHIFT_LEFT:		 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_SHL);	break;
-					case Operator::ASSIGN_SHIFT_RIGHT:		 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_SHR);	break;
+					case Operator::ASSIGN_PLUS:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_ADD);	break;
+					case Operator::ASSIGN_MINUS:			 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_SUB);	break;
+					case Operator::ASSIGN_MULTIPLY:			 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_MUL);	break;
+					case Operator::ASSIGN_DIVIDE:			 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_DIV);	break;
+					case Operator::ASSIGN_MODULO:			 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_MOD);	break;
+					case Operator::ASSIGN_AND:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_AND);	break;
+					case Operator::ASSIGN_OR:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_OR);		break;
+					case Operator::ASSIGN_XOR:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_XOR);	break;
+					case Operator::ASSIGN_SHIFT_LEFT:		 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_SHL);	break;
+					case Operator::ASSIGN_SHIFT_RIGHT:		 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_SHR);	break;
 
 					case Operator::BINARY_PLUS:				 compileBinaryOperationToOpcodes(bot, Opcode::Type::ARITHM_ADD);	break;
 					case Operator::BINARY_MINUS:			 compileBinaryOperationToOpcodes(bot, Opcode::Type::ARITHM_SUB);	break;
@@ -526,7 +516,13 @@ namespace lemon
 					case Operator::BINARY_AND:				 compileBinaryOperationToOpcodes(bot, Opcode::Type::ARITHM_AND);	break;
 					case Operator::BINARY_OR:				 compileBinaryOperationToOpcodes(bot, Opcode::Type::ARITHM_OR);		break;
 					case Operator::BINARY_XOR:				 compileBinaryOperationToOpcodes(bot, Opcode::Type::ARITHM_XOR);	break;
-					case Operator::COMPARE_EQUAL:			 compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_EQ);	break;
+
+					case Operator::COMPARE_EQUAL:
+						compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_EQ);
+						if (consumeResult && mConfig.mScriptFeatureLevel >= 2)
+							CHECK_ERROR(false, "Result of comparison is not used, this is certainly a mistake in the script", mLineNumber);
+						break;
+
 					case Operator::COMPARE_NOT_EQUAL:		 compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_NEQ);	break;
 					case Operator::COMPARE_LESS:			 compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_LT);	break;
 					case Operator::COMPARE_LESS_OR_EQUAL:	 compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_LE);	break;
@@ -638,33 +634,18 @@ namespace lemon
 			{
 				const VariableToken& vt = token.as<VariableToken>();
 				const Opcode::Type opcodeType = isLValue ? Opcode::Type::SET_VARIABLE_VALUE : Opcode::Type::GET_VARIABLE_VALUE;
-				addOpcode(opcodeType, vt.mDataType, vt.mVariable->getId());
+				addOpcode(opcodeType, vt.mDataType, vt.mVariable->getID());
 				break;
 			}
 
 			case Token::Type::FUNCTION:
 			{
 				const FunctionToken& ft = token.as<FunctionToken>();
-				const TokenList& content = ft.mParenthesis->mContent;
 
-				if (!content.empty())
+				// TODO: Check parameters vs. function signature?
+				for (const TokenPtr<StatementToken>& token : ft.mParameters)
 				{
-					// TODO: Check parameters vs. function signature
-					CHECK_ERROR(content.size() == 1, "More than one token left in function parameters", mLineNumber);
-					if (content[0].getType() == Token::Type::COMMA_SEPARATED)
-					{
-						for (const TokenList& tokens : content[0].as<CommaSeparatedListToken>().mContent)
-						{
-							CHECK_ERROR(tokens.size() == 1, "More than one token left between commas", mLineNumber);
-							CHECK_ERROR(tokens[0].isStatement(), "Expected a statement as function parameter", mLineNumber);
-							compileTokenTreeToOpcodes(tokens[0].as<StatementToken>());
-						}
-					}
-					else
-					{
-						CHECK_ERROR(content[0].isStatement(), "Expected a statement as function parameter", mLineNumber);
-						compileTokenTreeToOpcodes(content[0].as<StatementToken>());
-					}
+					compileTokenTreeToOpcodes(*token);
 				}
 
 				// Using the data type parameter here to encode whether or not this is a base function call
@@ -701,7 +682,7 @@ namespace lemon
 		}
 	}
 
-	void FunctionCompiler::compileBinaryAssigmentToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType)
+	void FunctionCompiler::compileBinaryAssignmentToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType)
 	{
 		// Special handling for memory access on left side
 		//  -> Memory address calculation must only be done once, especially if it has side effects (e.g. "u8[A0++] += 8")
@@ -818,11 +799,11 @@ namespace lemon
 				}
 
 				// Collect labels
-				for (auto& pair : mFunction.mLabels)
+				for (ScriptFunction::Label& label : mFunction.mLabels)
 				{
-					if ((size_t)pair.second < isOpcodeJumpTarget.size())
+					if ((size_t)label.mOffset < isOpcodeJumpTarget.size())
 					{
-						isOpcodeJumpTarget[(size_t)pair.second] = true;
+						isOpcodeJumpTarget[(size_t)label.mOffset] = true;
 					}
 				}
 			}
@@ -941,7 +922,7 @@ namespace lemon
 				{
 					const bool conditionMet = (firstOpcode.mParameter != 0);
 					const Opcode& condJumpOpcode = mOpcodes[condJumpPosition];
-					uint64 jumpTarget = conditionMet ? (uint64)(condJumpPosition + 1) : condJumpOpcode.mParameter;
+					uint64 jumpTarget = conditionMet ? ((uint64)condJumpPosition + 1) : condJumpOpcode.mParameter;
 
 					// Check for a shortcut (as this is not ruled out at that point)
 					if (mOpcodes[(size_t)jumpTarget].mType == Opcode::Type::JUMP)
@@ -988,9 +969,9 @@ namespace lemon
 			static std::vector<size_t> openSeeds;
 			openSeeds.clear();
 			openSeeds.push_back(0);
-			for (const auto& pair : mFunction.mLabels)
+			for (const ScriptFunction::Label& label : mFunction.mLabels)
 			{
-				openSeeds.push_back(pair.second);
+				openSeeds.push_back((size_t)label.mOffset);
 			}
 
 			// Trace all reachable opcodes from our seeds
@@ -1115,9 +1096,9 @@ namespace lemon
 			}
 
 			// Update labels
-			for (auto& pair : mFunction.mLabels)
+			for (ScriptFunction::Label& label : mFunction.mLabels)
 			{
-				pair.second = ((size_t)pair.second < indexRemap.size()) ? indexRemap[(size_t)pair.second] : lastOpcode;
+				label.mOffset = ((size_t)label.mOffset < indexRemap.size()) ? (uint32)indexRemap[(size_t)label.mOffset] : (uint32)lastOpcode;
 			}
 
 			mOpcodes.resize(newSize);
@@ -1159,9 +1140,9 @@ namespace lemon
 		}
 
 		// Add label targets
-		for (const auto& pair : mFunction.mLabels)
+		for (const ScriptFunction::Label& label : mFunction.mLabels)
 		{
-			mOpcodes[pair.second].mFlags |= Opcode::Flag::LABEL;
+			mOpcodes[label.mOffset].mFlags |= Opcode::Flag::LABEL;
 		}
 
 		// Add jump targets

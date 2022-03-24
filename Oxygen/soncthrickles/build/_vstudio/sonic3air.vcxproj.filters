@@ -10,9 +10,6 @@
     <Filter Include="data">
       <UniqueIdentifier>{42163305-1062-4b89-bda4-c1d0beec816a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="debug">
-      <UniqueIdentifier>{0227d73b-36b6-4c9e-adb4-87ce02b2cfd6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="generator">
       <UniqueIdentifier>{2ffc19d3-51ef-4726-91ed-a0f64d0d407e}</UniqueIdentifier>
     </Filter>
@@ -37,6 +34,9 @@
     <Filter Include="_nativized">
       <UniqueIdentifier>{08f6d9c0-554c-44b7-80ce-85ac88afe488}</UniqueIdentifier>
     </Filter>
+    <Filter Include="client">
+      <UniqueIdentifier>{5e5e5db6-45b6-422c-ba5a-723d5e2c95a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\sonic3air\menu\GameApp.cpp">
@@ -59,9 +59,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\scriptimpl\ScriptImplementations.cpp">
       <Filter>scriptimpl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\sonic3air\debug\DebugSidePanelAdditions.cpp">
-      <Filter>debug</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.cpp">
       <Filter>generator</Filter>
@@ -136,6 +133,19 @@
     <ClCompile Include="..\..\source\sonic3air\menu\options\ControllerSetupMenu.cpp">
       <Filter>menu\options</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\client\GameClient.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\client\UpdateCheck.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\client\GhostSync.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\pch.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\options\OptionsMenuEntries.cpp">
+      <Filter>menu\options</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -161,9 +171,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\scriptimpl\ScriptImplementations.h">
       <Filter>scriptimpl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\sonic3air\debug\DebugSidePanelAdditions.h">
-      <Filter>debug</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.h">
       <Filter>generator</Filter>
@@ -233,6 +240,18 @@
       <Filter>audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\menu\options\ControllerSetupMenu.h">
+      <Filter>menu\options</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\client\GameClient.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\client\UpdateCheck.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\client\GhostSync.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\options\OptionsMenuEntries.h">
       <Filter>menu\options</Filter>
     </ClInclude>
   </ItemGroup>

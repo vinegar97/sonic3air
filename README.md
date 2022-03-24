@@ -44,12 +44,12 @@ External libraries and code used in this project:
 ## How to build
 
 For information on how to build for different platforms, find the readme files in the respective subdirectories of "Oxygen/soncthrickles":
-* Windows: ["build/_vstudio"](Oxygen/soncthrickles/build/_vstudio)
-* Mac:     ["build/_xcode"](Oxygen/soncthrickles/build/_xcode)
-* Linux:   ["build/_cmake"](Oxygen/soncthrickles/build/_cmake)
-* Android: ["build/_android"](Oxygen/soncthrickles/build/_android)
-* Web:     ["build/_emscripten"](Oxygen/soncthrickles/build/_emscripten)
-* Switch:  ["build/_make"](Oxygen/soncthrickles/build/_make)
+* Windows: ["_vstudio"](Oxygen/soncthrickles/build/_vstudio)
+* Mac:     ["_xcode"](Oxygen/soncthrickles/build/_xcode)
+* Linux:   ["_cmake"](Oxygen/soncthrickles/build/_cmake)
+* Android: ["_android"](Oxygen/soncthrickles/build/_android)
+* Web:     ["_emscripten"](Oxygen/soncthrickles/build/_emscripten)
+* Switch:  ["_make"](Oxygen/soncthrickles/build/_make)
 
 
 ## Want to contribute?

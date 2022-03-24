@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -56,6 +56,8 @@ void ControlsIn::update(bool readControllers)
 	if (!readControllers)
 		return;
 
+	const bool switchLeftRight = Configuration::instance().mMirrorMode;
+
 	// Update controllers
 	for (int controllerIndex = 0; controllerIndex < 2; ++controllerIndex)
 	{
@@ -70,6 +72,10 @@ void ControlsIn::update(bool readControllers)
 			{
 				inputFlags |= pair.second;
 			}
+		}
+		if (switchLeftRight)
+		{
+			inputFlags = (inputFlags & 0xfff3) | ((inputFlags & (uint16)Button::LEFT) << 1) | ((inputFlags & (uint16)Button::RIGHT) >> 1);
 		}
 
 		// Remove all inputs from our list of ignored input that are currently not pressed

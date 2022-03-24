@@ -1,12 +1,11 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
-#define RMX_LIB
 #include "sonic3air/pch.h"
 #include "sonic3air/EngineDelegate.h"
 #include "sonic3air/version.inc"
@@ -34,6 +33,77 @@ extern "C"
 #endif
 
 
+struct Arguments
+{
+	bool mPack = false;
+	bool mNativize = false;
+	bool mDumpCppDefinitions = false;
+};
+
+void readArguments(Arguments& outArguments, int argc, char** argv)
+{
+#if !defined(ENDUSER) && !defined(PLATFORM_ANDROID)
+	for (int i = 0; i < argc; ++i)
+	{
+		const std::string parameter(argv[i]);
+		if (parameter == "-pack")
+		{
+			outArguments.mPack = true;
+		}
+		else if (parameter == "-nativize")
+		{
+			outArguments.mNativize = true;
+		}
+		else if (parameter == "-dumpcppdefinitions")
+		{
+			outArguments.mDumpCppDefinitions = true;
+		}
+	}
+#endif
+}
+
+void performPacking()
+{
+	// Update metadata.json
+	String metadata;
+	metadata << "{\r\n"
+			 << "\t\"Game\" : \"Sonic 3 - Angel Island Revisited\",\r\n"
+			 << "\t\"Author\" : \"Eukaryot (original game by SEGA)\",\r\n"
+			 << "\t\"Version\" : \"" << BUILD_STRING << "\",\r\n"
+			 << "\t\"GameAppBuild\" : \"" << rmx::hexString(BUILD_NUMBER, 8) << "\"\r\n"
+			 << "}\r\n";
+	metadata.saveFile("data/metadata.json");
+
+	// "gamedata.bin" = data directory except audio and shaders
+	{
+		std::vector<std::wstring> includedPaths = { L"data/" };
+		std::vector<std::wstring> excludedPaths = { L"data/audio/", L"data/shader/", L"data/metadata.json" };
+		FilePackage::createFilePackage(L"gamedata.bin", includedPaths, excludedPaths, L"_master_image_template/data/", BUILD_NUMBER);
+	}
+
+	// "audiodata.bin" = emulated / original audio directory
+	{
+		std::vector<std::wstring> includedPaths = { L"data/audio/original/" };
+		std::vector<std::wstring> excludedPaths = { };
+		FilePackage::createFilePackage(L"audiodata.bin", includedPaths, excludedPaths, L"_master_image_template/data/", BUILD_NUMBER);
+	}
+
+	// "audioremaster.bin" = remastered audio directory
+	{
+		std::vector<std::wstring> includedPaths = { L"data/audio/remastered/" };
+		std::vector<std::wstring> excludedPaths = { };
+		FilePackage::createFilePackage(L"audioremaster.bin", includedPaths, excludedPaths, L"_master_image_template/data/", BUILD_NUMBER);
+	}
+
+	// "enginedata.bin" = shaders directory
+	{
+		std::vector<std::wstring> includedPaths = { L"data/shader/" };
+		std::vector<std::wstring> excludedPaths = { };
+		FilePackage::createFilePackage(L"enginedata.bin", includedPaths, excludedPaths, L"_master_image_template/data/", BUILD_NUMBER);
+	}
+}
+
+
 int main(int argc, char** argv)
 {
 	EngineMain::earlySetup();
@@ -41,55 +111,34 @@ int main(int argc, char** argv)
 	// Make sure we're in the correct working directory
 	PlatformFunctions::changeWorkingDirectory(argc == 0 ? "" : argv[0]);
 
-#if !defined(ENDUSER) && !defined(PLATFORM_ANDROID)
-	if (argc == 2 && std::string(argv[1]) == "-pack")
+	// Read command line arguments
+	Arguments arguments;
+	readArguments(arguments, argc, argv);
+
+	if (arguments.mPack)
 	{
-		// Update metadata.json
-		String metadata;
-		metadata << "{\r\n"
-				 << "\t\"Game\" : \"Sonic 3 - Angel Island Revisited\",\r\n"
-				 << "\t\"Author\" : \"Eukaryot (original game by SEGA)\",\r\n"
-				 << "\t\"Version\" : \"" << BUILD_STRING << "\",\r\n"
-				 << "\t\"GameAppBuild\" : \"" << rmx::hexString(BUILD_NUMBER, 8) << "\"\r\n"
-				 << "}\r\n";
-		metadata.saveFile("data/metadata.json");
-
-		// "gamedata.bin" = data directory except audio and shaders
-		{
-			std::vector<std::wstring> includedPaths = { L"data/" };
-			std::vector<std::wstring> excludedPaths = { L"data/audio/", L"data/shader/", L"data/metadata.json" };
-			FilePackage::createFilePackage(L"gamedata.bin", includedPaths, excludedPaths, L"_master_image_template/data/", BUILD_NUMBER);
-		}
-
-		// "audiodata.bin" = emulated / original audio directory
-		{
-			std::vector<std::wstring> includedPaths = { L"data/audio/original/" };
-			std::vector<std::wstring> excludedPaths = { };
-			FilePackage::createFilePackage(L"audiodata.bin", includedPaths, excludedPaths, L"_master_image_template/data/", BUILD_NUMBER);
-		}
-
-		// "audioremaster.bin" = remastered audio directory
-		{
-			std::vector<std::wstring> includedPaths = { L"data/audio/remastered/" };
-			std::vector<std::wstring> excludedPaths = { };
-			FilePackage::createFilePackage(L"audioremaster.bin", includedPaths, excludedPaths, L"_master_image_template/data/", BUILD_NUMBER);
-		}
-
-		// "enginedata.bin" = shaders directory
-		{
-			std::vector<std::wstring> includedPaths = { L"data/shader/" };
-			std::vector<std::wstring> excludedPaths = { };
-			FilePackage::createFilePackage(L"enginedata.bin", includedPaths, excludedPaths, L"_master_image_template/data/", BUILD_NUMBER);
-		}
-		return 0;
+		performPacking();
+		if (!arguments.mNativize && !arguments.mDumpCppDefinitions)		// In case multiple arguments got combined, the others would got ignored without this check
+			return 0;
 	}
-#endif
 
 	try
 	{
 		// Create engine delegate and engine main instance
 		EngineDelegate myDelegate;
 		EngineMain myMain(myDelegate);
+
+		if (arguments.mNativize)
+		{
+			Configuration::instance().mRunScriptNativization = 1;
+			Configuration::instance().mScriptNativizationOutput = L"source/sonic3air/_nativized/NativizedCode.inc";
+			Configuration::instance().mExitAfterScriptLoading = true;
+		}
+		if (arguments.mDumpCppDefinitions)
+		{
+			Configuration::instance().mDumpCppDefinitionsOutput = L"scripts/_reference/cpp_core_functions.lemon";
+			Configuration::instance().mExitAfterScriptLoading = true;
+		}
 
 		myMain.execute(argc, argv);
 	}

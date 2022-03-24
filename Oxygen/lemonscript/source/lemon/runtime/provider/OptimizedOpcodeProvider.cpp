@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -62,7 +62,7 @@ namespace lemon
 			--context.mControlFlow->mValueStackPtr;
 			const int64 value = *context.mControlFlow->mValueStackPtr;
 			const uint32 variableId = context.getParameter<uint32>();
-			GlobalVariable& variable = static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableById(variableId));
+			GlobalVariable& variable = static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(variableId));
 			variable.setValue(value);
 		}
 
@@ -262,7 +262,7 @@ namespace lemon
 						SELECT_EXEC_FUNC_BY_DATATYPE(OptimizedOpcodeExec::exec_OPT_EXTERNAL_ADD_CONSTANT, opcodes[0].mDataType);
 
 						const uint32 variableId = (uint32)opcodes[0].mParameter;
-						const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableById(variableId));
+						const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
 						runtimeOpcode.setParameter(variable.mPointer);
 						runtimeOpcode.setParameter(opcodes[1].mParameter, 8);
 						outNumOpcodesConsumed = 3;
@@ -324,10 +324,10 @@ namespace lemon
 
 						case Variable::Type::GLOBAL:
 						{
-							int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableById(variableId));
+							int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
 							runtimeOpcode.setParameter(value);
 
-							switch (DataTypeHelper::getDefinitionFromBaseType(opcodes[0].mDataType)->mBytes)
+							switch (DataTypeHelper::getSizeOfBaseType(opcodes[0].mDataType))
 							{
 								case 1:  runtimeOpcode.mExecFunc = &OptimizedOpcodeExec::exec_OPT_SET_VARIABLE_VALUE_EXTERNAL_DISCARD<uint8>;   break;
 								case 2:  runtimeOpcode.mExecFunc = &OptimizedOpcodeExec::exec_OPT_SET_VARIABLE_VALUE_EXTERNAL_DISCARD<uint16>;  break;
@@ -339,7 +339,7 @@ namespace lemon
 
 						case Variable::Type::EXTERNAL:
 						{
-							const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableById(variableId));
+							const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
 							runtimeOpcode.setParameter(variable.mPointer);
 
 							switch (variable.getDataType()->mBytes)
@@ -383,7 +383,7 @@ namespace lemon
 				{
 					uint64 address = opcodes[0].mParameter;
 					MemoryAccessHandler::SpecializationResult result;
-					runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getDefinitionFromBaseType(opcodes[1].mDataType)->mBytes, false);
+					runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getSizeOfBaseType(opcodes[1].mDataType), false);
 					if (result.mResult == MemoryAccessHandler::SpecializationResult::HAS_SPECIALIZATION)
 					{
 						RuntimeOpcode& runtimeOpcode = buffer.addOpcode(8);
@@ -415,7 +415,7 @@ namespace lemon
 				{
 					uint64 address = opcodes[0].mParameter;
 					MemoryAccessHandler::SpecializationResult result;
-					runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getDefinitionFromBaseType(opcodes[1].mDataType)->mBytes, true);
+					runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getSizeOfBaseType(opcodes[1].mDataType), true);
 					if (result.mResult == MemoryAccessHandler::SpecializationResult::HAS_SPECIALIZATION)
 					{
 						RuntimeOpcode& runtimeOpcode = buffer.addOpcode(8);

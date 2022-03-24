@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -18,7 +18,6 @@
 #include "sonic3air/menu/overlays/SkippableCutsceneWindow.h"
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/data/SharedDatabase.h"
-#include "sonic3air/debug/DebugSidePanelAdditions.h"
 #include "sonic3air/Game.h"
 
 #include "oxygen/application/Application.h"
@@ -68,8 +67,6 @@ void GameApp::initialize()
 	// Init shared resources
 	global::loadSharedResources();
 
-	FileHelper::loadTexture(mDisclaimerTexture, L"data/images/menu/disclaimer.png");
-
 	mGameView = &Application::instance().getGameView();
 	Simulation& simulation = Application::instance().getSimulation();
 	simulation.setRunning(false);
@@ -84,16 +81,6 @@ void GameApp::initialize()
 	{
 		mApplicationContextMenu = createChild<ApplicationContextMenu>();
 	}
-
-#ifndef ENDUSER
-	{
-		DebugSidePanel* debugSidePanel = Application::instance().getDebugSidePanel();
-		if (nullptr != debugSidePanel)
-			s3air::registerDebugSidePanelAdditions(*debugSidePanel);
-		else
-			RMX_ERROR("No debug side panel instance found", );
-	}
-#endif
 }
 
 void GameApp::deinitialize()
@@ -132,6 +119,7 @@ void GameApp::update(float timeElapsed)
 		mStateTimeout -= timeElapsed;
 		if (mStateTimeout <= 0.0f)
 		{
+			mDisclaimerTexture.clearBitmap();	// Unload to save on RAM
 			gotoPhase(1);
 		}
 	}
@@ -178,6 +166,12 @@ void GameApp::render()
 
 	if (mCurrentState == State::DISCLAIMER)
 	{
+		// Load disclaimer is not done already
+		if (!mDisclaimerTexture.isValid())
+		{
+			FileHelper::loadTexture(mDisclaimerTexture, L"data/images/menu/disclaimer.png");
+		}
+
 		const Rectf rect = RenderUtils::getLetterBoxRect(FTX::screenRect(), (float)mDisclaimerTexture.getWidth() / (float)mDisclaimerTexture.getHeight());
 		drawer.setBlendMode(DrawerBlendMode::NONE);
 		drawer.setSamplingMode(DrawerSamplingMode::BILINEAR);
@@ -205,12 +199,9 @@ void GameApp::openTitleScreen()
 
 void GameApp::openMainMenu()
 {
-	if (mCurrentState == State::INGAME || mCurrentState == State::TIME_ATTACK_RESULTS)
-	{
-		Application::instance().getSimulation().setRunning(false);
-		AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
-		AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
-	}
+	Application::instance().getSimulation().setRunning(false);
+	AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
+	AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
 
 	if (mPauseMenu->getParent() == mGameView)
 		mGameView->removeChild(mPauseMenu);

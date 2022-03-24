@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,16 +8,14 @@
 
 #pragma once
 
-#include "lemon/program/StoredString.h"
+#include "lemon/program/StringRef.h"
 #include "lemon/runtime/ControlFlow.h"
-#include <unordered_map>
 
 
 namespace lemon
 {
 	class Function;
 	class Program;
-	class StoredString;
 	class UserDefinedFunction;
 	class Variable;
 	struct RuntimeOpcode;
@@ -56,6 +54,17 @@ namespace lemon
 	};
 
 
+	class API_EXPORT Environment	// This is meant to be derived from, if needed, to provide custom information
+	{
+	public:
+		inline explicit Environment(uint64 type) : mType(type) {}
+		inline uint64 getType() const  { return mType; }
+
+	private:
+		uint64 mType = 0;	// Can be used to differentiate between various implementations
+	};
+
+
 	class API_EXPORT RuntimeDetailHandler
 	{
 	public:
@@ -70,6 +79,7 @@ namespace lemon
 	friend class OpcodeExec;
 	friend class OptimizedOpcodeExec;
 	friend class NativizedCode;
+	friend class RuntimeFunction;
 	friend struct RuntimeOpcodeContext;
 
 	public:
@@ -93,8 +103,11 @@ namespace lemon
 		};
 
 	public:
-		inline static ControlFlow* getActiveControlFlow() { return mActiveControlFlow; }
-		inline static Runtime* getActiveRuntime() { return (nullptr == mActiveControlFlow) ? nullptr : &mActiveControlFlow->getRuntime(); }
+		inline static ControlFlow* getActiveControlFlow()	{ return mActiveControlFlow; }
+		inline static Runtime* getActiveRuntime()			{ return (nullptr == mActiveControlFlow) ? nullptr : &mActiveControlFlow->getRuntime(); }
+
+		inline static const Environment* getActiveEnvironment()					{ return mActiveEnvironment; }
+		inline static void setActiveEnvironment(const Environment* environment)	{ mActiveEnvironment = environment; }
 
 	public:
 		Runtime();
@@ -117,16 +130,15 @@ namespace lemon
 		RuntimeFunction* getRuntimeFunctionBySignature(uint64 signatureHash, size_t index = 0);
 
 		bool hasStringWithKey(uint64 key) const;
-		const StoredString* resolveStringByKey(uint64 key) const;
-		uint64 addString(const std::string& str);
-		uint64 addString(const std::string_view& str);
-		uint64 addString(const char* str, size_t length);
+		const FlyweightString* resolveStringByKey(uint64 key) const;
+		uint64 addString(std::string_view str);
 
 		int64 getGlobalVariableValue(const Variable& variable);
 		void setGlobalVariableValue(const Variable& variable, int64 value);
 		int64* accessGlobalVariableValue(const Variable& variable);
 
-		inline const ControlFlow& getMainControlFlow() const  { return *mMainControlFlow; }
+		inline const ControlFlow& getMainControlFlow() const  { return *mControlFlows[0]; }
+		inline const ControlFlow& getSelectedControlFlow() const  { return *mSelectedControlFlow; }
 
 		void callFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex = 0);
 		void callFunction(const Function& function, size_t baseCallIndex = 0);
@@ -143,6 +155,7 @@ namespace lemon
 
 	private:
 		inline static ControlFlow* mActiveControlFlow = nullptr;
+		inline static const Environment* mActiveEnvironment = nullptr;
 
 	private:
 		const Program* mProgram = nullptr;
@@ -152,12 +165,15 @@ namespace lemon
 		std::vector<RuntimeFunction> mRuntimeFunctions;
 		std::unordered_map<const ScriptFunction*, RuntimeFunction*> mRuntimeFunctionsMapped;
 		std::unordered_map<uint64, std::vector<RuntimeFunction*>> mRuntimeFunctionsBySignature;   // Key is the hashed function name + signature hash
+		rmx::OneTimeAllocPool mRuntimeOpcodesPool;
 
 		std::vector<int64> mGlobalVariables;
 
 		StringLookup mStrings;
 
-		ControlFlow* mMainControlFlow = nullptr;
+		// TODO: Add functions to create / destroy control flows, otherwise we're stuck with just the main control flow
+		std::vector<ControlFlow*> mControlFlows;		// Contains at least one control flow at all times = the main control flow at index 0
+		ControlFlow* mSelectedControlFlow = nullptr;	// The currently selected control flow used by methods like "executeSteps" and "callFunction"; this must always be a valid pointer
 	};
 
 }

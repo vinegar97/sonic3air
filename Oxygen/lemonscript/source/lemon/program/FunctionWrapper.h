@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -17,7 +17,7 @@ namespace lemon
 
 	namespace traits
 	{
-		template<typename T> const DataTypeDefinition* getDataType()	{ return T::UNKNOWN_TYPE; }
+		template<typename T> const DataTypeDefinition* getDataType()  { return T::UNKNOWN_TYPE; }
 		template<> const DataTypeDefinition* getDataType<void>();
 		template<> const DataTypeDefinition* getDataType<bool>();
 		template<> const DataTypeDefinition* getDataType<int8>();
@@ -28,6 +28,7 @@ namespace lemon
 		template<> const DataTypeDefinition* getDataType<uint32>();
 		template<> const DataTypeDefinition* getDataType<int64>();
 		template<> const DataTypeDefinition* getDataType<uint64>();
+		template<> const DataTypeDefinition* getDataType<StringRef>();
 	}
 
 
@@ -41,6 +42,10 @@ namespace lemon
 		{
 			context.mControlFlow.pushValueStack(traits::getDataType<R>(), result);
 		};
+
+		template<>
+		void handleResult<StringRef>(StringRef result, const UserDefinedFunction::Context context);
+
 
 		template<typename R>
 		struct ReturnTypeHandler0
@@ -482,6 +487,15 @@ namespace lemon
 
 		// Function wrappers
 
+		template<typename T>
+		T popStackGeneric(const UserDefinedFunction::Context context)
+		{
+			return static_cast<T>(context.mControlFlow.popValueStack(traits::getDataType<T>()));
+		}
+
+		template<>
+		StringRef popStackGeneric(const UserDefinedFunction::Context context);
+
 		template<typename R>
 		class FunctionWrapperBase : public UserDefinedFunction::FunctionWrapper
 		{
@@ -494,7 +508,7 @@ namespace lemon
 			template<typename T>
 			static inline T popStack(const UserDefinedFunction::Context context)
 			{
-				return static_cast<T>(context.mControlFlow.popValueStack(traits::getDataType<T>()));
+				return popStackGeneric<T>(context);
 			}
 		};
 

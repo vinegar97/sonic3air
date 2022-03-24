@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -30,6 +30,20 @@ public:
 		WINDOWED,
 		BORDERLESS_FULLSCREEN,
 		EXCLUSIVE_FULLSCREEN
+	};
+
+	enum class FrameSyncType
+	{
+		VSYNC_OFF,
+		VSYNC_ON,
+		VSYNC_FRAMECAP,
+		FRAME_INTERPOLATION,
+		_NUM
+	};
+
+	struct DevModeSettings
+	{
+		bool mEnabled = false;
 	};
 
 	struct VirtualGamepad
@@ -110,14 +124,16 @@ public:
 
 	// Game
 	std::wstring mLoadSaveState;
-	int	   mLoadLevel = -1;
-	int	   mUseCharacters = 1;
-	int    mStartPhase = 0;
-	bool   mDevMode = false;
-	int    mSimulationFrequency = 60;
-	int    mGameRecording = -1;
-	int    mGameRecPlayFrom = 0;
-	bool   mGameRecIgnoreKeys = false;
+	int	 mLoadLevel = -1;
+	int	 mUseCharacters = 1;
+	int  mStartPhase = 0;
+	int  mSimulationFrequency = 60;
+	int  mGameRecording = -1;
+	int  mGameRecPlayFrom = 0;
+	bool mGameRecIgnoreKeys = false;
+
+	// Dev mode
+	DevModeSettings mDevMode;
 
 	// Video
 	WindowMode mWindowMode = WindowMode::WINDOWED;
@@ -126,7 +142,7 @@ public:
 	int   mDisplayIndex = 0;
 	RenderMethod mRenderMethod = RenderMethod::UNDEFINED;
 	bool  mAutoDetectRenderMethod = true;
-	int   mFrameSync = 1;				// 0: V-Sync off, 1: V-Sync On, 2: V-Sync + Framecap
+	FrameSyncType mFrameSync = FrameSyncType::VSYNC_ON;
 	int   mUpscaling = 0;
 	int   mBackdrop = 0;
 	int   mFiltering = 0;
@@ -150,11 +166,18 @@ public:
 	std::wstring mInputRecorderInput;
 	std::wstring mInputRecorderOutput;
 
+	// Misc
+	bool mMirrorMode = false;
+
 	// Internal
 	bool mForceCompileScripts = false;
 	int mScriptOptimizationLevel = 3;
 	std::wstring mCompiledScriptSavePath;
 	bool mEnableROMDataAnalyzer = false;
+	bool mExitAfterScriptLoading = false;
+	int mRunScriptNativization = 0;			// 0: Disabled, 1: Run nativization, 2: Nativization done
+	std::wstring mScriptNativizationOutput;
+	std::wstring mDumpCppDefinitionsOutput;
 
 	// Mod settings
 	std::map<uint64, Mod> mModSettings;

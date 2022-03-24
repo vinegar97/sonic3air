@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -74,7 +74,7 @@ namespace rmx
 		const Sint64 totalSize = SDL_RWsize(context);
 		if (totalSize == 0)
 			return true;
-	
+
 		if (totalSize > 0)	// Otherwise size could not be determined
 		{
 			outData.reserve((size_t)totalSize);

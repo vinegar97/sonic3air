@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,16 +9,20 @@
 #pragma once
 
 #include "lemon/program/Opcode.h"
-#include "lemon/compiler/PreprocessorDefinition.h"
+#include "lemon/compiler/Definitions.h"
+#include "lemon/compiler/Errors.h"
+#include "lemon/compiler/LineNumberTranslation.h"
+#include "lemon/compiler/Preprocessor.h"
+#include "lemon/compiler/TokenProcessing.h"
 
 
 namespace lemon
 {
 	class Module;
 	class GlobalsLookup;
-	class Preprocessor;
 	class ScriptFunction;
 	class LocalVariable;
+	class ConstantArray;
 	class Node;
 	class BlockNode;
 	class UndefinedNode;
@@ -28,23 +32,8 @@ namespace lemon
 	class API_EXPORT Compiler
 	{
 	public:
-		struct LineNumberTranslation
-		{
-			struct Interval
-			{
-				uint32 mStartLineNumber = 0;	// End line number is the start of the next item minus one
-				std::wstring mFilename;
-				uint32 mLineOffsetInFile = 0;
-			};
-			std::vector<Interval> mIntervals;
-
-			std::pair<uint32, std::wstring> translateLineNumber(uint32 lineNumber) const;
-			void push(uint32 currentLineNumber, const std::wstring& filename, uint32 lineOffsetInFile);
-		};
-
 		struct CompileOptions
 		{
-			PreprocessorDefinitionMap mPreprocessorDefinitions;
 			const DataTypeDefinition* mExternalAddressType = &PredefinedDataTypes::UINT_64;
 			std::wstring mOutputCombinedSource;
 			std::wstring mOutputNativizedSource;
@@ -55,11 +44,10 @@ namespace lemon
 		{
 			std::string mMessage;
 			std::wstring mFilename;
-			uint32 mLineNumber = 0;
+			CompilerError mError;
 		};
 
 	public:
-		Compiler(Module& module, GlobalsLookup& globalsLookup);
 		Compiler(Module& module, GlobalsLookup& globalsLookup, const CompileOptions& compileOptions);
 		~Compiler();
 
@@ -67,44 +55,48 @@ namespace lemon
 
 		bool loadCodeLines(std::vector<std::string_view>& outLines, const std::wstring& path);
 		bool compileLines(const std::vector<std::string_view>& lines);
-		void compileLinesToNode(BlockNode& outNode, const std::vector<std::string_view>& lines);
 
 		inline const std::vector<ErrorMessage>& getErrors() const  { return mErrors; }
 
 	private:
 		struct ScopeContext
 		{
+			struct StackItem
+			{
+				size_t mNumLocalVariables = 0;
+				size_t mNumLocalConstants = 0;
+				size_t mNumLocalConstantArrays = 0;
+			};
+
 			std::vector<LocalVariable*> mLocalVariables;
-			std::vector<std::pair<size_t, uint32>> mScopeStack;		// Number of local variables for each scope on the stack + number of nodes until scope ends
+			std::vector<Constant> mLocalConstants;
+			std::vector<ConstantArray*> mLocalConstantArrays;
+			std::vector<StackItem> mScopeStack;			// Number of local variables for each scope on the stack
 
 			ScopeContext()
 			{
 				mScopeStack.reserve(4);
 			}
 
-			inline void beginScope(uint32 autoEndAfterNodes = 0)
+			inline void beginScope()
 			{
-				mScopeStack.emplace_back(mLocalVariables.size(), autoEndAfterNodes);
+				StackItem& item = vectorAdd(mScopeStack);
+				item.mNumLocalVariables = mLocalVariables.size();
+				item.mNumLocalConstants = mLocalConstants.size();
+				item.mNumLocalConstantArrays = mLocalConstantArrays.size();
 			}
 
 			inline void endScope()
 			{
-				mLocalVariables.resize(mScopeStack.back().first);
+				const StackItem& item = mScopeStack.back();
+				mLocalVariables.resize(item.mNumLocalVariables);
+				mLocalConstants.resize(item.mNumLocalConstants);
+				mLocalConstantArrays.resize(item.mNumLocalConstantArrays);
 				mScopeStack.pop_back();
 			}
-
-			inline void onNodeProcessed()
-			{
-				while (!mScopeStack.empty() && mScopeStack.back().second > 0)
-				{
-					--mScopeStack.back().second;
-					if (mScopeStack.back().second > 0)
-						break;
-
-					endScope();
-				}
-			}
 		};
+
+		struct NodesIterator;
 
 	private:
 		bool loadScriptInternal(const std::wstring& basepath, const std::wstring& filename, std::vector<std::string_view>& outLines, int inclusionDepth);
@@ -116,16 +108,23 @@ namespace lemon
 		void processGlobalDefinitions(BlockNode& rootNode);
 		ScriptFunction& processFunctionHeader(Node& node, const TokenList& tokens);
 		void processSingleFunction(FunctionNode& functionNode);
-		void formSingleStatement(BlockNode& blockNode, size_t index);
 		void processUndefinedNodesInBlock(BlockNode& blockNode, ScriptFunction& function, ScopeContext& scopeContext);
-		Node* processUndefinedNode(UndefinedNode& undefinedNode, ScriptFunction& function, ScopeContext& scopeContext);
+		Node* processUndefinedNode(UndefinedNode& undefinedNode, ScriptFunction& function, ScopeContext& scopeContext, NodesIterator& nodesIterator);
+		Node* gatherNextStatement(NodesIterator& nodesIterator, ScriptFunction& function, ScopeContext& scopeContext);
 		void processTokens(TokenList& tokens, ScriptFunction& function, ScopeContext& scopeContext, uint32 lineNumber, const DataTypeDefinition* resultType = nullptr);
+		void processConstantDefinition(TokenList& tokens, NodesIterator& nodesIterator, ScopeContext* scopeContext);
+
+		// Misc
+		bool processGlobalPragma(const std::string& content);
 
 	private:
 		Module& mModule;
 		GlobalsLookup& mGlobalsLookup;
 		CompileOptions mCompileOptions;
-		Preprocessor& mPreprocessor;		// Must stay alive as it holds the modified code lines
+		GlobalCompilerConfig mGlobalCompilerConfig;
+
+		TokenProcessing mTokenProcessing;
+		Preprocessor mPreprocessor;
 
 		struct ScriptFile
 		{
@@ -137,7 +136,6 @@ namespace lemon
 		std::vector<ScriptFile*> mScriptFiles;
 		ObjectPool<ScriptFile,64> mScriptFilesPool;
 
-		std::string mScriptContent;
 		std::vector<FunctionNode*> mFunctionNodes;
 		LineNumberTranslation mLineNumberTranslation;
 		std::wstring mCurrentScriptFilename;

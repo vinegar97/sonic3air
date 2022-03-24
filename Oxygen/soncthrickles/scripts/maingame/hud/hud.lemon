@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -23,7 +23,7 @@ function void HUD.drawDigit(u8 digit, u16 px, u16 py, u16 renderQueue)
 	Renderer.drawCustomSprite(stringformat("hud_digit_%d", digit), px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
 }
 
-function void HUD.drawNumber(u64 stringMask, u32 number, u16 px, u16 py, u16 renderQueue)
+function void HUD.drawNumber(string stringMask, u32 number, u16 px, u16 py, u16 renderQueue)
 {
 	while (true)
 	{
@@ -182,7 +182,7 @@ function void RenderHUD()
 			u16 px = useMobilePosition ? (getScreenWidth() - baseX - 0x30) : baseX
 			u16 py = useMobilePosition ? baseY : 200
 
-			u64 characterName
+			string characterName
 			if (getMainCharacter() == CHARACTER_SONIC)
 				characterName = "sonic"
 			else if (getMainCharacter() == CHARACTER_TAILS)

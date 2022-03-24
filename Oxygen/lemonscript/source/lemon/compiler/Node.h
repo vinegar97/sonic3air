@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -35,7 +35,6 @@ namespace lemon
 			EXTERNAL,
 			STATEMENT,
 			IF_STATEMENT,
-			ELSE_STATEMENT,
 			WHILE_STATEMENT,
 			FOR_STATEMENT
 		};
@@ -151,7 +150,7 @@ namespace lemon
 		inline LabelNode() : Node(TYPE) {}
 
 	public:
-		std::string mLabel;
+		FlyweightString mLabel;
 	};
 
 
@@ -247,16 +246,6 @@ namespace lemon
 		TokenPtr<StatementToken> mConditionToken;
 		NodePtr<Node> mContentIf;
 		NodePtr<Node> mContentElse;
-	};
-
-
-	class ElseStatementNode : public Node
-	{
-	public:
-		static const Type TYPE = Type::ELSE_STATEMENT;
-
-	public:
-		inline ElseStatementNode() : Node(TYPE) {}
 	};
 
 

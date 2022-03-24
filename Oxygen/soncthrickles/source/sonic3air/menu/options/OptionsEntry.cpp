@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -31,7 +31,7 @@ void OptionEntry::loadValue()
 			const uint32 value = Game::instance().getSetting(mSetting, true);
 			for (size_t index = 0; index < mGameMenuEntry->mOptions.size(); ++index)
 			{
-				GameMenuEntries::Option& option = mGameMenuEntry->mOptions[index];
+				GameMenuEntry::Option& option = mGameMenuEntry->mOptions[index];
 				const bool setBits = (option.mValue & 0x80000000) != 0;
 				const uint32 bitmask = (option.mValue & 0x7fffffff);
 				if (setBits)
@@ -63,6 +63,14 @@ void OptionEntry::loadValue()
 		case OptionEntry::Type::CONFIG_INT:
 		{
 			int* ptr = reinterpret_cast<int*>(mValuePointer);
+			const uint32 value = (uint32)*ptr;
+			mGameMenuEntry->setSelectedIndexByValue(value);
+			break;
+		}
+
+		case OptionEntry::Type::CONFIG_ENUM_8:
+		{
+			uint8* ptr = reinterpret_cast<uint8*>(mValuePointer);
 			const uint32 value = (uint32)*ptr;
 			mGameMenuEntry->setSelectedIndexByValue(value);
 			break;
@@ -126,6 +134,13 @@ void OptionEntry::applyValue()
 		{
 			int* ptr = reinterpret_cast<int*>(mValuePointer);
 			*ptr = (int)value;
+			break;
+		}
+
+		case OptionEntry::Type::CONFIG_ENUM_8:
+		{
+			uint8* ptr = reinterpret_cast<uint8*>(mValuePointer);
+			*ptr = (uint8)value;
 			break;
 		}
 

@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -66,7 +66,9 @@ function void fn08b4ec()
 		A0 = A2
 	}
 
-	spawnSimpleChildObjects(0x08b54a)
+	// "spawnSimpleChildObjects(0x08b54a)" replaced by:
+	spawnSimpleChildObjects(0x08b230, 12)
+
 	Object.TriggerUnloading()
 	playSound(0x80)
 	DrawObject()

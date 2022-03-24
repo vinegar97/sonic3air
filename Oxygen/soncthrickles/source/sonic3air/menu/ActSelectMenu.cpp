@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -35,7 +35,7 @@ ActSelectMenu::ActSelectMenu(MenuBackground& menuBackground) :
 		for (size_t zoneIndex = 0; zoneIndex < zones.size(); ++zoneIndex)
 		{
 			const SharedDatabase::Zone& zone = zones[zoneIndex];
-			const int acts = zone.mActsFreeRoam;
+			const int acts = zone.mActsNormal;
 			if (acts > 0)
 			{
 				uint16 zoneId = zone.mInternalIndex << 8;

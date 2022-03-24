@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -92,7 +92,7 @@ namespace lemon
 						case Nativizer::LookupEntry::ParameterInfo::Semantics::GLOBAL_VARIABLE:
 						{
 							const uint32 variableId = (uint32)opcode.mParameter;
-							int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableById(variableId));
+							int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
 							runtimeOpcode.setParameter(value, parameter.mOffset);
 							break;
 						}
@@ -100,7 +100,7 @@ namespace lemon
 						case Nativizer::LookupEntry::ParameterInfo::Semantics::EXTERNAL_VARIABLE:
 						{
 							const uint32 variableId = (uint32)opcode.mParameter;
-							const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableById(variableId));
+							const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
 							runtimeOpcode.setParameter(variable.mPointer, parameter.mOffset);
 							break;
 						}
@@ -110,7 +110,7 @@ namespace lemon
 							// TODO: "opcode.mDataType" refers to the PUSH_CONSTANT opcode, so it actually does not tell us the correct data type; however, this shouldn't be much of a problem for now
 							const uint64 address = opcode.mParameter;
 							MemoryAccessHandler::SpecializationResult result;
-							runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getDefinitionFromBaseType(opcode.mDataType)->mBytes, false);	// No support for write access here
+							runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getSizeOfBaseType(opcode.mDataType), false);	// No support for write access here
 							RMX_ASSERT(result.mResult == MemoryAccessHandler::SpecializationResult::HAS_SPECIALIZATION, "No memory access specialization found even though this was previously checked");
 							runtimeOpcode.setParameter(result.mDirectAccessPointer, parameter.mOffset);
 							break;

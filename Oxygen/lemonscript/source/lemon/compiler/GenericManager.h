@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -53,11 +53,11 @@ namespace genericmanager
 		}
 
 	protected:
-		inline Element(Type type) : mType(type) {}
+		inline explicit Element(Type type) : mType(type) {}
 		inline virtual ~Element() {}
 
 	private:
-		Type mType;
+		const Type mType;
 		uint32 mReferenceCounter = 0;
 	};
 
@@ -72,6 +72,7 @@ namespace genericmanager
 		public:
 			virtual ELEMENT& create() = 0;
 			virtual void destroy(ELEMENT& element) = 0;
+			virtual void shrinkPool() {}
 		};
 
 
@@ -79,8 +80,9 @@ namespace genericmanager
 		class ElementFactory : public ElementFactoryBase<ELEMENT>
 		{
 		public:
-			virtual ELEMENT& create() { return mElementPool.createObject(); }
-			virtual void destroy(ELEMENT& element) { mElementPool.destroyObject(static_cast<T&>(element)); }
+			inline ELEMENT& create() override  { return mElementPool.createObject(); }
+			inline void destroy(ELEMENT& element) override  { mElementPool.destroyObject(static_cast<T&>(element)); }
+			inline void shrinkPool() override  { mElementPool.shrink(); }
 
 		private:
 			ObjectPool<T, 256> mElementPool;
@@ -153,6 +155,19 @@ namespace genericmanager
 				return *dummy;
 			}
 
+			void shrinkAllPools()
+			{
+				for (size_t index = 0; index < 0x80; ++index)
+				{
+					if (nullptr != mClassFactoriesList[index])
+						mClassFactoriesList[index]->shrinkPool();
+				}
+				for (const auto& pair : mClassFactoriesMap)
+				{
+					pair.second->shrinkPool();
+				}
+			}
+
 		private:
 			FactoryBase* mClassFactoriesList[0x80] = { nullptr };	// Used for types that are less than 0x80 as unsigned integer
 			std::map<uint32, FactoryBase*> mClassFactoriesMap;		// Used for types that are 0x80 or higher as unsigned integer
@@ -176,6 +191,11 @@ namespace genericmanager
 		{
 			detail::ElementFactoryBase<ELEMENT>& factory = mFactoryMap.template getOrCreateElementFactory<TYPE>();
 			return static_cast<TYPE&>(factory.create());
+		}
+
+		static void shrinkAllPools()
+		{
+			mFactoryMap.shrinkAllPools();
 		}
 
 	private:

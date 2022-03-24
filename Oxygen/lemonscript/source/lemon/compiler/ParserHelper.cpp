@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -81,7 +81,7 @@ namespace lemon
 		if (mInitialized)
 			return;
 
-		const std::map<std::string, Operator> operatorStrings =
+		const std::vector<std::pair<std::string_view, Operator>> operatorStrings =
 		{
 			{ "=",   Operator::ASSIGN },
 			{ "+=",  Operator::ASSIGN_PLUS },
@@ -134,7 +134,7 @@ namespace lemon
 
 		for (const auto& pair : operatorStrings)
 		{
-			const std::string& string = pair.first;
+			const std::string_view& string = pair.first;
 			Entry* parentEntry = nullptr;
 			for (size_t i = 0; i < string.length(); ++i)
 			{

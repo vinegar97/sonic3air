@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -59,33 +59,21 @@ namespace
 			memcpy(dst, &data[offset], bytes);
 			return bytes;
 		}
-
-		const std::string* tryResolveString(uint64 stringKey)
-		{
-			lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
-			RMX_ASSERT(nullptr != runtime, "No active lemon script runtime");
-
-			const lemon::StoredString* str = runtime->resolveStringByKey(stringKey);
-			RMX_CHECK(nullptr != str, "Could not resolve string from key", return nullptr);
-
-			return &str->getString();
-		}
 	}
 
 
 	DebugNotificationInterface* gDebugNotificationInterface = nullptr;
 
-	void scriptAssert1(uint8 condition, uint64 text)
+	void scriptAssert1(uint8 condition, lemon::StringRef text)
 	{
 		if (!condition)
 		{
 			std::string locationText = LemonScriptRuntime::getCurrentScriptLocationString();
 			RMX_ASSERT(!locationText.empty(), "No active lemon script runtime");
 
-			const std::string* textString = (text == 0) ? nullptr : detail::tryResolveString(text);
-			if (nullptr != textString)
+			if (text.isValid())
 			{
-				RMX_ERROR("Script assertion failed:\n'" << *textString << "'.\nIn " << locationText << ".", );
+				RMX_ERROR("Script assertion failed:\n'" << text.getString() << "'.\nIn " << locationText << ".", );
 			}
 			else
 			{
@@ -96,7 +84,7 @@ namespace
 
 	void scriptAssert2(uint8 condition)
 	{
-		scriptAssert1(condition, 0);
+		scriptAssert1(condition, lemon::StringRef());
 	}
 
 
@@ -121,32 +109,6 @@ namespace
 	{
 		const int bits = sizeof(T) * 8;
 		EmulatorInterface::instance().setFlagN((value >> (bits - 1)) != 0);
-	}
-
-	void push(uint32 value)
-	{
-		uint32& A7 = EmulatorInterface::instance().getRegister(15);
-		A7 -= 4;
-		EmulatorInterface::instance().writeMemory32(A7, value);
-	}
-
-	uint32 pop()
-	{
-		uint32& A7 = EmulatorInterface::instance().getRegister(15);
-		const uint32 result = EmulatorInterface::instance().readMemory32(A7);
-		A7 += 4;
-		return result;
-	}
-
-	uint16 get_status_register()
-	{
-		// Dummy implementation, only exists for compatibility
-		return 0;
-	}
-
-	void set_status_register(uint16 parameter)
-	{
-		// Dummy implementation, only exists for compatibility
 	}
 
 
@@ -205,13 +167,29 @@ namespace
 	}
 
 
-	uint32 System_loadPersistentData(uint32 targetAddress, uint64 key, uint32 maxBytes)
+	void push(uint32 value)
 	{
-		const std::vector<uint8>& data = PersistentData::instance().getData(key);
+		uint32& A7 = EmulatorInterface::instance().getRegister(15);
+		A7 -= 4;
+		EmulatorInterface::instance().writeMemory32(A7, value);
+	}
+
+	uint32 pop()
+	{
+		uint32& A7 = EmulatorInterface::instance().getRegister(15);
+		const uint32 result = EmulatorInterface::instance().readMemory32(A7);
+		A7 += 4;
+		return result;
+	}
+
+
+	uint32 System_loadPersistentData(uint32 targetAddress, lemon::StringRef key, uint32 maxBytes)
+	{
+		const std::vector<uint8>& data = PersistentData::instance().getData(key.getHash());
 		return detail::loadData(targetAddress, data, 0, maxBytes);
 	}
 
-	void System_savePersistentData(uint32 sourceAddress, uint64 key, uint32 bytes)
+	void System_savePersistentData(uint32 sourceAddress, lemon::StringRef key, uint32 bytes)
 	{
 		const size_t size = (size_t)bytes;
 		std::vector<uint8> data;
@@ -219,11 +197,10 @@ namespace
 		const uint8* src = EmulatorInterface::instance().getMemoryPointer(sourceAddress, false, bytes);
 		memcpy(&data[0], src, size);
 
-		const std::string* keyString = detail::tryResolveString(key);
-		if (nullptr == keyString)
-			return;
-
-		PersistentData::instance().setData(*keyString, data);
+		if (key.isValid())
+		{
+			PersistentData::instance().setData(key.getString(), data);
+		}
 	}
 
 	uint32 SRAM_load(uint32 address, uint16 offset, uint16 bytes)
@@ -237,26 +214,19 @@ namespace
 	}
 
 
-	void System_setupCallFrame2(uint64 functionName, uint64 labelName)
+	void System_setupCallFrame2(lemon::StringRef functionName, lemon::StringRef labelName)
 	{
-		const std::string* functionNameString = detail::tryResolveString(functionName);
-		if (nullptr == functionNameString)
+		if (!functionName.isValid())
 			return;
-
-		const std::string* labelNameString = nullptr;
-		if (labelName != 0)
-		{
-			labelNameString = detail::tryResolveString(labelName);
-		}
 
 		CodeExec* codeExec = CodeExec::getActiveInstance();
 		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return);
-		codeExec->setupCallFrame(*functionNameString, (nullptr == labelNameString) ? "" : *labelNameString);
+		codeExec->setupCallFrame(functionName.getString(), labelName.getString());
 	}
 
-	void System_setupCallFrame1(uint64 functionName)
+	void System_setupCallFrame1(lemon::StringRef functionName)
 	{
-		System_setupCallFrame2(functionName, 0);
+		System_setupCallFrame2(functionName, lemon::StringRef());
 	}
 
 	uint32 System_rand()
@@ -275,15 +245,15 @@ namespace
 		return (System_getPlatformFlags() & flag) != 0;
 	}
 
-	bool System_hasExternalRawData(uint64 key)
+	bool System_hasExternalRawData(lemon::StringRef key)
 	{
-		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key);
+		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key.getHash());
 		return !rawDataVector.empty();
 	}
 
-	uint32 System_loadExternalRawData1(uint64 key, uint32 targetAddress, uint32 offset, uint32 maxBytes, bool loadOriginalData, bool loadModdedData)
+	uint32 System_loadExternalRawData1(lemon::StringRef key, uint32 targetAddress, uint32 offset, uint32 maxBytes, bool loadOriginalData, bool loadModdedData)
 	{
-		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key);
+		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key.getHash());
 		const ResourcesCache::RawData* rawData = nullptr;
 		for (int i = (int)rawDataVector.size() - 1; i >= 0; --i)
 		{
@@ -302,20 +272,20 @@ namespace
 		return detail::loadData(targetAddress, rawData->mContent, offset, maxBytes);
 	}
 
-	uint32 System_loadExternalRawData2(uint64 key, uint32 targetAddress)
+	uint32 System_loadExternalRawData2(lemon::StringRef key, uint32 targetAddress)
 	{
 		return System_loadExternalRawData1(key, targetAddress, 0, 0, true, true);
 	}
 
-	bool System_hasExternalPaletteData(uint64 key, uint8 line)
+	bool System_hasExternalPaletteData(lemon::StringRef key, uint8 line)
 	{
-		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key, line);
+		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key.getHash(), line);
 		return (nullptr != palette);
 	}
 
-	uint16 System_loadExternalPaletteData(uint64 key, uint8 line, uint32 targetAddress, uint8 maxColors)
+	uint16 System_loadExternalPaletteData(lemon::StringRef key, uint8 line, uint32 targetAddress, uint8 maxColors)
 	{
-		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key, line);
+		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key.getHash(), line);
 		if (nullptr == palette)
 			return 0;
 
@@ -330,7 +300,7 @@ namespace
 	}
 
 
-	void debugLogInternal(const std::string& valueString)
+	void debugLogInternal(std::string_view valueString)
 	{
 		uint32 lineNumber = 0;
 		const bool success = LemonScriptRuntime::getCurrentScriptFunction(nullptr, nullptr, &lineNumber, nullptr);
@@ -349,21 +319,19 @@ namespace
 		debugLogInternal(valueString);
 	}
 
-	void debugLog(uint64 stringHash)
+	void debugLog(lemon::StringRef text)
 	{
-		const std::string* str = detail::tryResolveString(stringHash);
-		if (nullptr != str)
+		if (text.isValid())
 		{
-			debugLogInternal(*str);
+			debugLogInternal(text.getString());
 		}
 	}
 
-	void debugLogColors(uint64 name, uint32 startAddress, uint8 numColors)
+	void debugLogColors(lemon::StringRef name, uint32 startAddress, uint8 numColors)
 	{
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
-			const std::string* str = detail::tryResolveString(name);
-			if (nullptr == str)
+			if (!name.isValid())
 				return;
 
 			CodeExec* codeExec = CodeExec::getActiveInstance();
@@ -371,7 +339,7 @@ namespace
 			EmulatorInterface& emulatorInterface = codeExec->getEmulatorInterface();
 
 			LogDisplay::ColorLogEntry entry;
-			entry.mName = *str;
+			entry.mName = name.getString();
 			entry.mColors.reserve(numColors);
 			for (uint8 i = 0; i < numColors; ++i)
 			{
@@ -558,13 +526,15 @@ namespace
 		RMX_CHECK((bytes & 1) == 0, "Number of bytes in VDP_copyToVRAM must be divisible by two, but is " << bytes, bytes &= 0xfffe);
 		RMX_CHECK(uint32(mWriteAddress) + bytes <= 0x10000, "Invalid VRAM access from " << rmx::hexString(mWriteAddress, 8) << " to " << rmx::hexString(mWriteAddress+bytes-1, 8) << " in VDP_copyToVRAM", return);
 
-		if (nullptr != gDebugNotificationInterface)
-			gDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes);
-
 		EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
 		if (mWriteIncrement == 2)
 		{
 			// Optimized version of the code below
+			if (nullptr != gDebugNotificationInterface)
+			{
+				gDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes);
+			}
+
 			uint16* dst = (uint16*)(emulatorInterface.getVRam() + mWriteAddress);
 			const uint16* src = (uint16*)(emulatorInterface.getMemoryPointer(address, false, bytes));
 			const uint16* end = src + (bytes / 2);
@@ -576,6 +546,12 @@ namespace
 		}
 		else
 		{
+			if (nullptr != gDebugNotificationInterface)
+			{
+				for (uint16 i = 0; i < bytes; i += 2)
+					gDebugNotificationInterface->onVRAMWrite(mWriteAddress + mWriteIncrement * i/2, 2);
+			}
+
 			for (uint16 i = 0; i < bytes; i += 2)
 			{
 				uint16* dst = (uint16*)(emulatorInterface.getVRam() + mWriteAddress);
@@ -792,9 +768,9 @@ namespace
 		RenderParts::instance().getSpriteManager().drawVdpSprite(Vec2i(px, py), encodedSize, patternIndex, renderQueue, Color(1.0f, 1.0f, 1.0f, (float)alpha / 255.0f));
 	}
 
-	void Renderer_drawVdpSpriteWithTint(int16 px, int16 py, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, uint32 tintColor, uint32 addedColor)
+	void Renderer_drawVdpSpriteTinted(int16 px, int16 py, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, uint32 tintColor, uint32 addedColor)
 	{
-		RenderParts::instance().getSpriteManager().drawVdpSprite(Vec2i(px, py), encodedSize, patternIndex, renderQueue, Color::fromABGR32(tintColor), Color::fromABGR32(addedColor));
+		RenderParts::instance().getSpriteManager().drawVdpSprite(Vec2i(px, py), encodedSize, patternIndex, renderQueue, Color::fromRGBA32(tintColor), Color::fromRGBA32(addedColor));
 	}
 
 	bool Renderer_hasCustomSprite(uint64 key)
@@ -837,27 +813,26 @@ namespace
 		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color(1.0f, 1.0f, 1.0f, (float)alpha / 255.0f), (float)angle / 128.0f * PI_FLOAT);
 	}
 
-	void Renderer_drawCustomSprite3(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint32 tint, int32 scale)
+	void Renderer_drawCustomSpriteTinted(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint32 tintColor, int32 scale)
 	{
-		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromABGR32(tint), (float)angle / 128.0f * PI_FLOAT, (float)scale / 65536.0f);
+		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), (float)angle / 128.0f * PI_FLOAT, (float)scale / 65536.0f);
 	}
 
-	void Renderer_drawCustomSpriteWithTransform(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint32 tint, int32 transform11, int32 transform12, int32 transform21, int32 transform22)
+	void Renderer_drawCustomSpriteTransformed(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint32 tintColor, int32 transform11, int32 transform12, int32 transform21, int32 transform22)
 	{
 		Transform2D transformation;
 		transformation.setByMatrix((float)transform11 / 65536.0f, (float)transform12 / 65536.0f, (float)transform21 / 65536.0f, (float)transform22 / 65536.0f);
-		RenderParts::instance().getSpriteManager().drawCustomSpriteWithTransform(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromABGR32(tint), transformation);
+		RenderParts::instance().getSpriteManager().drawCustomSpriteWithTransform(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), transformation);
 	}
 
-	void Renderer_extractCustomSprite(uint64 key, uint64 categoryName, uint8 spriteNumber, uint8 atex)
+	void Renderer_extractCustomSprite(uint64 key, lemon::StringRef categoryName, uint8 spriteNumber, uint8 atex)
 	{
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
-			const std::string* categoryNameString = detail::tryResolveString(categoryName);
-			if (nullptr == categoryNameString)
-				return;
-
-			SpriteCache::instance().dumpSprite(key, *categoryNameString, spriteNumber, atex);
+			if (categoryName.isValid())
+			{
+				SpriteCache::instance().dumpSprite(key, categoryName.getString(), spriteNumber, atex);
+			}
 		}
 	}
 
@@ -912,7 +887,31 @@ namespace
 
 	void Audio_playAudio1(uint64 sfxId, uint8 contextId)
 	{
-		EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
+		const bool success = EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
+		if (!success)
+		{
+			// Audio collections expect lowercase IDs, so we might need to do the conversion here first
+			lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
+			if (nullptr != runtime)
+			{
+				const lemon::FlyweightString* str = runtime->resolveStringByKey(sfxId);
+				if (nullptr != str)
+				{
+					const std::string_view textString = str->getString();
+
+					// Does the string contain any uppercase letters?
+					const auto it = std::find_if(textString.begin(), textString.end(), [](char ch) { return (ch >= 'A' && ch <= 'Z'); } );
+					if (it != textString.end())
+					{
+						// Convert to lowercase and try again
+						String str = textString;
+						str.lowerCase();
+						sfxId = rmx::getMurmur2_64(str);
+						EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
+					}
+				}
+			}
+		}
 	}
 
 	void Audio_playAudio2(uint64 sfxId)
@@ -920,19 +919,9 @@ namespace
 		Audio_playAudio1(sfxId, 0x01);	// In-game sound effect context
 	}
 
-	void Audio_playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, uint8 overriddenChannelId)
-	{
-		EngineMain::instance().getAudioOut().playOverride(sfxId, contextId, channelId, overriddenChannelId);
-	}
-
 	void Audio_stopChannel(uint8 channel)
 	{
 		EngineMain::instance().getAudioOut().stopChannel(channel);
-	}
-
-	void Audio_fadeOutChannel(uint8 channel, uint16 length)
-	{
-		EngineMain::instance().getAudioOut().fadeOutChannel(channel, (float)length / 256.0f);
 	}
 
 	void Audio_fadeInChannel(uint8 channel, uint16 length)
@@ -940,13 +929,22 @@ namespace
 		EngineMain::instance().getAudioOut().fadeInChannel(channel, (float)length / 256.0f);
 	}
 
-	void Audio_enableAudioModifier(uint8 channel, uint8 context, uint64 postfix, uint32 relativeSpeed)
+	void Audio_fadeOutChannel(uint8 channel, uint16 length)
 	{
-		const std::string* postfixString = detail::tryResolveString(postfix);
-		if (nullptr == postfixString)
-			return;
+		EngineMain::instance().getAudioOut().fadeOutChannel(channel, (float)length / 256.0f);
+	}
 
-		EngineMain::instance().getAudioOut().enableAudioModifier(channel, context, *postfixString, (float)relativeSpeed / 65536.0f);
+	void Audio_playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, uint8 overriddenChannelId)
+	{
+		EngineMain::instance().getAudioOut().playOverride(sfxId, contextId, channelId, overriddenChannelId);
+	}
+
+	void Audio_enableAudioModifier(uint8 channel, uint8 context, lemon::StringRef postfix, uint32 relativeSpeed)
+	{
+		if (postfix.isValid())
+		{
+			EngineMain::instance().getAudioOut().enableAudioModifier(channel, context, postfix.getString(), (float)relativeSpeed / 65536.0f);
+		}
 	}
 
 	void Audio_disableAudioModifier(uint8 channel, uint8 context)
@@ -955,29 +953,24 @@ namespace
 	}
 
 
-	const Mod* getActiveModByNameHash(uint64 modName)
+	const Mod* getActiveModByNameHash(lemon::StringRef modName)
 	{
-		const std::string* modNameString = detail::tryResolveString(modName);
-		if (nullptr == modNameString)
-			return nullptr;
-
-		// TODO: This can be optimized with a lookup map by mod name hash (which we already have from the parameter)
-		const auto& activeMods = ModManager::instance().getActiveMods();
-		for (const Mod* mod : activeMods)
+		if (modName.isValid())
 		{
-			if (mod->mDisplayName == *modNameString)
-				return mod;
+			Mod*const* modPtr = mapFind(ModManager::instance().getActiveModsByNameHash(), modName.getHash());
+			if (nullptr != modPtr)
+				return *modPtr;
 		}
 		return nullptr;
 	}
 
-	uint8 Mods_isModActive(uint64 modName)
+	uint8 Mods_isModActive(lemon::StringRef modName)
 	{
 		const Mod* mod = getActiveModByNameHash(modName);
 		return (nullptr != mod);
 	}
 
-	int32 Mods_getModPriority(uint64 modName)
+	int32 Mods_getModPriority(lemon::StringRef modName)
 	{
 		const Mod* mod = getActiveModByNameHash(modName);
 		return (nullptr != mod) ? (int32)mod->mActivePriority : -1;
@@ -987,18 +980,26 @@ namespace
 	void setWorldSpaceOffset(int32 px, int32 py)
 	{
 		// Note that this is needed for world space sprite masking, not only debug drawing
-		RenderParts::instance().getSpriteManager().setWorldSpaceOffset(Vec2i(px, py));
+		RenderParts::instance().getSpacesManager().setWorldSpaceOffset(Vec2i(px, py));
 	}
 
-	void debugDrawRect(int32 px, int32 py, int32 sx, int32 sy)
+	void debugDrawRect(int32 px, int32 py, int32 width, int32 height)
 	{
-		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, sx, sy));
+		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, width, height));
 	}
 
-	void debugDrawRect2(int32 px, int32 py, int32 sx, int32 sy, uint32 color)
+	void debugDrawRect2(int32 px, int32 py, int32 width, int32 height, uint32 color)
 	{
-		const Color rgba(((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f, (color & 0xff) / 255.0f, ((color >> 24) & 0xff) / 255.0f);
-		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, sx, sy), rgba);
+		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, width, height), Color::fromRGBA32(color));
+	}
+
+	void Renderer_drawText(lemon::StringRef fontKey, int32 px, int32 py, lemon::StringRef text, uint32 tintColor, uint8 alignment, int8 spacing, uint16 renderQueue, bool useWorldSpace)
+	{
+		RMX_CHECK(alignment >= 1 && alignment <= 9, "Invalid alignment " << alignment << " used for drawing text, fallback to alignment = 1", alignment = 1);
+		if (fontKey.isValid() && text.isValid())
+		{
+			RenderParts::instance().getOverlayManager().addText(fontKey.getString(), fontKey.getHash(), Vec2i(px, py), text.getString(), text.getHash(), Color::fromRGBA32(tintColor), (int)alignment, (int)spacing, renderQueue, useWorldSpace ? OverlayManager::Space::WORLD : OverlayManager::Space::SCREEN);
+		}
 	}
 
 
@@ -1027,7 +1028,7 @@ namespace
 	}
 
 
-	void debugDumpToFile(uint64 filename, uint32 startAddress, uint32 bytes)
+	void debugDumpToFile(lemon::StringRef filename, uint32 startAddress, uint32 bytes)
 	{
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
@@ -1037,12 +1038,11 @@ namespace
 			const bool isValid = emulatorInterface.isValidMemoryRegion(startAddress, bytes);
 			RMX_CHECK(isValid, "No valid memory region for debugDumpToFile: startAddress = " << rmx::hexString(startAddress, 6) << ", bytes = " << rmx::hexString(bytes, 2), return);
 
-			const std::string* str = detail::tryResolveString(filename);
-			if (nullptr == str)
-				return;
-
-			const uint8* src = emulatorInterface.getMemoryPointer(startAddress, false, bytes);
-			FTX::FileSystem->saveFile(*str, src, (size_t)bytes);
+			if (filename.isValid())
+			{
+				const uint8* src = emulatorInterface.getMemoryPointer(startAddress, false, bytes);
+				FTX::FileSystem->saveFile(filename.getString(), src, (size_t)bytes);
+			}
 		}
 	}
 
@@ -1052,34 +1052,32 @@ namespace
 		return Configuration::instance().mEnableROMDataAnalyzer;
 	}
 
-	bool ROMDataAnalyser_hasEntry(uint64 categoryHash, uint32 address)
+	bool ROMDataAnalyser_hasEntry(lemon::StringRef category, uint32 address)
 	{
 		if (Configuration::instance().mEnableROMDataAnalyzer)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
 			{
-				const std::string* categoryName = detail::tryResolveString(categoryHash);
-				if (nullptr != categoryName)
+				if (category.isValid())
 				{
-					return analyser->hasEntry(*categoryName, address);
+					return analyser->hasEntry(category.getString(), address);
 				}
 			}
 		}
 		return false;
 	}
 
-	void ROMDataAnalyser_beginEntry(uint64 categoryHash, uint32 address)
+	void ROMDataAnalyser_beginEntry(lemon::StringRef category, uint32 address)
 	{
 		if (Configuration::instance().mEnableROMDataAnalyzer)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
 			{
-				const std::string* categoryName = detail::tryResolveString(categoryHash);
-				if (nullptr != categoryName)
+				if (category.isValid())
 				{
-					analyser->beginEntry(*categoryName, address);
+					analyser->beginEntry(category.getString(), address);
 				}
 			}
 		}
@@ -1097,34 +1095,31 @@ namespace
 		}
 	}
 
-	void ROMDataAnalyser_addKeyValue(uint64 keyHash, uint64 valueHash)
+	void ROMDataAnalyser_addKeyValue(lemon::StringRef key, lemon::StringRef value)
 	{
 		if (Configuration::instance().mEnableROMDataAnalyzer)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
 			{
-				const std::string* keyString = detail::tryResolveString(keyHash);
-				const std::string* valueString = detail::tryResolveString(valueHash);
-				if (nullptr != keyString && nullptr != valueString)
+				if (key.isValid() && value.isValid())
 				{
-					analyser->addKeyValue(*keyString, *valueString);
+					analyser->addKeyValue(key.getString(), value.getString());
 				}
 			}
 		}
 	}
 
-	void ROMDataAnalyser_beginObject(uint64 keyHash)
+	void ROMDataAnalyser_beginObject(lemon::StringRef key)
 	{
 		if (Configuration::instance().mEnableROMDataAnalyzer)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
 			{
-				const std::string* keyString = detail::tryResolveString(keyHash);
-				if (nullptr != keyString)
+				if (key.isValid())
 				{
-					analyser->beginObject(*keyString);
+					analyser->beginObject(key.getString());
 				}
 			}
 		}
@@ -1142,23 +1137,18 @@ namespace
 		}
 	}
 
-	bool System_SidePanel_setupCustomCategory(uint64 shortNameHash, uint64 fullNameHash)
+	bool System_SidePanel_setupCustomCategory(lemon::StringRef shortName, lemon::StringRef fullName)
 	{
-		const std::string* shortName = detail::tryResolveString(shortNameHash);
-		const std::string* fullName = detail::tryResolveString(fullNameHash);
-		if (nullptr == shortName || nullptr == fullName)
+		if (!shortName.isValid())
 			return false;
-
-		return Application::instance().getDebugSidePanel()->setupCustomCategory(*fullName, (*shortName)[0]);
+		return Application::instance().getDebugSidePanel()->setupCustomCategory(fullName.getString(), shortName.getString()[0]);
 	}
 
-	bool System_SidePanel_addOption(uint64 stringHash, bool defaultValue)
+	bool System_SidePanel_addOption(lemon::StringRef text, bool defaultValue)
 	{
-		const std::string* string = detail::tryResolveString(stringHash);
-		if (nullptr == string)
+		if (!text.isValid())
 			return false;
-
-		return Application::instance().getDebugSidePanel()->addOption(*string, defaultValue);
+		return Application::instance().getDebugSidePanel()->addOption(text.getString(), defaultValue);
 	}
 
 	void System_SidePanel_addEntry(uint64 key)
@@ -1166,18 +1156,17 @@ namespace
 		return Application::instance().getDebugSidePanel()->addEntry(key);
 	}
 
-	void System_SidePanel_addLine1(uint64 stringHash, int8 indent, uint32 color)
+	void System_SidePanel_addLine1(lemon::StringRef text, int8 indent, uint32 color)
 	{
-		const std::string* string = detail::tryResolveString(stringHash);
-		if (nullptr != string)
+		if (text.isValid())
 		{
-			Application::instance().getDebugSidePanel()->addLine(*string, (int)indent, Color::fromABGR32(color));
+			Application::instance().getDebugSidePanel()->addLine(text.getString(), (int)indent, Color::fromRGBA32(color));
 		}
 	}
 
-	void System_SidePanel_addLine2(uint64 stringHash, int8 indent)
+	void System_SidePanel_addLine2(lemon::StringRef str, int8 indent)
 	{
-		System_SidePanel_addLine1(stringHash, indent, 0xffffffff);
+		System_SidePanel_addLine1(str, indent, 0xffffffff);
 	}
 
 	bool System_SidePanel_isEntryHovered(uint64 key)
@@ -1185,12 +1174,11 @@ namespace
 		return Application::instance().getDebugSidePanel()->isEntryHovered(key);
 	}
 
-	void System_writeDisplayLine(uint64 stringHash)
+	void System_writeDisplayLine(lemon::StringRef text)
 	{
-		const std::string* str = detail::tryResolveString(stringHash);
-		if (nullptr != str)
+		if (text.isValid())
 		{
-			LogDisplay::instance().setLogDisplay(*str, 2.0f);
+			LogDisplay::instance().setLogDisplay(text.getString(), 2.0f);
 		}
 	}
 
@@ -1241,60 +1229,144 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		module.addUserDefinedFunction("_negative", lemon::wrap(&checkFlags_negative), defaultFlags);
 
 		// Explictly set flags
-		module.addUserDefinedFunction("_setZeroFlagByValue", lemon::wrap(&setZeroFlagByValue), defaultFlags);
-		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int8>), defaultFlags);
-		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int16>), defaultFlags);
-		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int32>), defaultFlags);
+		module.addUserDefinedFunction("_setZeroFlagByValue", lemon::wrap(&setZeroFlagByValue), defaultFlags)
+			.setParameterInfo(0, "value");
+
+		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int8>), defaultFlags)
+			.setParameterInfo(0, "value");
+
+		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int16>), defaultFlags)
+			.setParameterInfo(0, "value");
+
+		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int32>), defaultFlags)
+			.setParameterInfo(0, "value");
+
 
 		// Memory access
-		module.addUserDefinedFunction("copyMemory", lemon::wrap(&copyMemory), defaultFlags);
-		module.addUserDefinedFunction("zeroMemory", lemon::wrap(&zeroMemory), defaultFlags);
-		module.addUserDefinedFunction("fillMemory_u8", lemon::wrap(&fillMemory_u8), defaultFlags);
-		module.addUserDefinedFunction("fillMemory_u16", lemon::wrap(&fillMemory_u16), defaultFlags);
-		module.addUserDefinedFunction("fillMemory_u32", lemon::wrap(&fillMemory_u32), defaultFlags);
+		module.addUserDefinedFunction("copyMemory", lemon::wrap(&copyMemory), defaultFlags)
+			.setParameterInfo(0, "destAddress")
+			.setParameterInfo(1, "sourceAddress")
+			.setParameterInfo(2, "bytes");
+
+		module.addUserDefinedFunction("zeroMemory", lemon::wrap(&zeroMemory), defaultFlags)
+			.setParameterInfo(0, "startAddress")
+			.setParameterInfo(1, "bytes");
+
+		module.addUserDefinedFunction("fillMemory_u8", lemon::wrap(&fillMemory_u8), defaultFlags)
+			.setParameterInfo(0, "startAddress")
+			.setParameterInfo(1, "bytes")
+			.setParameterInfo(2, "value");
+
+		module.addUserDefinedFunction("fillMemory_u16", lemon::wrap(&fillMemory_u16), defaultFlags)
+			.setParameterInfo(0, "startAddress")
+			.setParameterInfo(1, "bytes")
+			.setParameterInfo(2, "value");
+
+		module.addUserDefinedFunction("fillMemory_u32", lemon::wrap(&fillMemory_u32), defaultFlags)
+			.setParameterInfo(0, "startAddress")
+			.setParameterInfo(1, "bytes")
+			.setParameterInfo(2, "value");
+
 
 		// Push and pop
 		module.addUserDefinedFunction("push", lemon::wrap(&push), defaultFlags);
 		module.addUserDefinedFunction("pop", lemon::wrap(&pop), defaultFlags);
 
-		// Status registers (for compatibility only)
-		module.addUserDefinedFunction("get_status_register", lemon::wrap(&get_status_register), defaultFlags);
-		module.addUserDefinedFunction("set_status_register", lemon::wrap(&set_status_register), defaultFlags);
 
 		// Persistent data
-		module.addUserDefinedFunction("System.loadPersistentData", lemon::wrap(&System_loadPersistentData), defaultFlags);
-		module.addUserDefinedFunction("System.savePersistentData", lemon::wrap(&System_savePersistentData), defaultFlags);
+		module.addUserDefinedFunction("System.loadPersistentData", lemon::wrap(&System_loadPersistentData), defaultFlags)
+			.setParameterInfo(0, "targetAddress")
+			.setParameterInfo(1, "key")
+			.setParameterInfo(2, "bytes");
+
+		module.addUserDefinedFunction("System.savePersistentData", lemon::wrap(&System_savePersistentData), defaultFlags)
+			.setParameterInfo(0, "sourceAddress")
+			.setParameterInfo(1, "key")
+			.setParameterInfo(2, "bytes");
+
 
 		// SRAM
-		module.addUserDefinedFunction("SRAM.load", lemon::wrap(&SRAM_load), defaultFlags);
-		module.addUserDefinedFunction("SRAM.save", lemon::wrap(&SRAM_save), defaultFlags);
+		module.addUserDefinedFunction("SRAM.load", lemon::wrap(&SRAM_load), defaultFlags)
+			.setParameterInfo(0, "address")
+			.setParameterInfo(1, "offset")
+			.setParameterInfo(2, "bytes");
+
+		module.addUserDefinedFunction("SRAM.save", lemon::wrap(&SRAM_save), defaultFlags)
+			.setParameterInfo(0, "address")
+			.setParameterInfo(1, "offset")
+			.setParameterInfo(2, "bytes");
+
 
 		// System
-		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame1));	// Should not get inline executed
-		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame2));	// Should not get inline executed
+		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame1))	// Should not get inline executed
+			.setParameterInfo(0, "functionName");
+
+		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame2))	// Should not get inline executed
+			.setParameterInfo(0, "functionName")
+			.setParameterInfo(1, "labelName");
+
 		module.addUserDefinedFunction("System.rand", lemon::wrap(&System_rand), defaultFlags);
+
 		module.addUserDefinedFunction("System.getPlatformFlags", lemon::wrap(&System_getPlatformFlags), defaultFlags);
-		module.addUserDefinedFunction("System.hasPlatformFlag", lemon::wrap(&System_hasPlatformFlag), defaultFlags);
+
+		module.addUserDefinedFunction("System.hasPlatformFlag", lemon::wrap(&System_hasPlatformFlag), defaultFlags)
+			.setParameterInfo(0, "flag");
+
 
 		// Access external data
-		module.addUserDefinedFunction("System.hasExternalRawData", lemon::wrap(&System_hasExternalRawData), defaultFlags);
-		module.addUserDefinedFunction("System.loadExternalRawData", lemon::wrap(&System_loadExternalRawData1), defaultFlags);
-		module.addUserDefinedFunction("System.loadExternalRawData", lemon::wrap(&System_loadExternalRawData2), defaultFlags);
-		module.addUserDefinedFunction("System.hasExternalPaletteData", lemon::wrap(&System_hasExternalPaletteData), defaultFlags);
-		module.addUserDefinedFunction("System.loadExternalPaletteData", lemon::wrap(&System_loadExternalPaletteData), defaultFlags);
+		module.addUserDefinedFunction("System.hasExternalRawData", lemon::wrap(&System_hasExternalRawData), defaultFlags)
+			.setParameterInfo(0, "key");
+
+		module.addUserDefinedFunction("System.loadExternalRawData", lemon::wrap(&System_loadExternalRawData1), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "targetAddress")
+			.setParameterInfo(2, "offset")
+			.setParameterInfo(3, "maxBytes")
+			.setParameterInfo(4, "loadOriginalData")
+			.setParameterInfo(5, "loadModdedData");
+
+		module.addUserDefinedFunction("System.loadExternalRawData", lemon::wrap(&System_loadExternalRawData2), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "targetAddress");
+
+		module.addUserDefinedFunction("System.hasExternalPaletteData", lemon::wrap(&System_hasExternalPaletteData), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "line");
+
+		module.addUserDefinedFunction("System.loadExternalPaletteData", lemon::wrap(&System_loadExternalPaletteData), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "line")
+			.setParameterInfo(2, "targetAddress")
+			.setParameterInfo(3, "maxColors");
 	}
 
 	// High-level functionality
 	{
 		// Input
-		module.addUserDefinedFunction("Input.getController", lemon::wrap(&Input_getController), defaultFlags);
-		module.addUserDefinedFunction("Input.getControllerPrevious", lemon::wrap(&Input_getControllerPrevious), defaultFlags);
-		module.addUserDefinedFunction("buttonDown", lemon::wrap(&Input_buttonDown), defaultFlags);			// Deprecated
-		module.addUserDefinedFunction("buttonPressed", lemon::wrap(&Input_buttonPressed), defaultFlags);	// Deprecated
-		module.addUserDefinedFunction("Input.buttonDown", lemon::wrap(&Input_buttonDown), defaultFlags);
-		module.addUserDefinedFunction("Input.buttonPressed", lemon::wrap(&Input_buttonPressed), defaultFlags);
-		module.addUserDefinedFunction("Input.setTouchInputMode", lemon::wrap(&Input_setTouchInputMode), defaultFlags);
-		module.addUserDefinedFunction("Input.setControllerLEDs", lemon::wrap(&Input_setControllerLEDs), defaultFlags);
+		module.addUserDefinedFunction("Input.getController", lemon::wrap(&Input_getController), defaultFlags)
+			.setParameterInfo(0, "controllerIndex");
+
+		module.addUserDefinedFunction("Input.getControllerPrevious", lemon::wrap(&Input_getControllerPrevious), defaultFlags)
+			.setParameterInfo(0, "controllerIndex");
+
+		module.addUserDefinedFunction("buttonDown", lemon::wrap(&Input_buttonDown), defaultFlags)			// Deprecated
+			.setParameterInfo(0, "index");
+
+		module.addUserDefinedFunction("buttonPressed", lemon::wrap(&Input_buttonPressed), defaultFlags)		// Deprecated
+			.setParameterInfo(0, "index");
+
+		module.addUserDefinedFunction("Input.buttonDown", lemon::wrap(&Input_buttonDown), defaultFlags)
+			.setParameterInfo(0, "index");
+
+		module.addUserDefinedFunction("Input.buttonPressed", lemon::wrap(&Input_buttonPressed), defaultFlags)
+			.setParameterInfo(0, "index");
+
+		module.addUserDefinedFunction("Input.setTouchInputMode", lemon::wrap(&Input_setTouchInputMode), defaultFlags)
+			.setParameterInfo(0, "index");
+
+		module.addUserDefinedFunction("Input.setControllerLEDs", lemon::wrap(&Input_setControllerLEDs), defaultFlags)
+			.setParameterInfo(0, "playerIndex")
+			.setParameterInfo(1, "color");
 
 		// Yield
 		module.addUserDefinedFunction("yieldExecution", lemon::wrap(&yieldExecution));	// Should not get inline executed
@@ -1304,91 +1376,389 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		module.addUserDefinedFunction("getScreenHeight", lemon::wrap(&getScreenHeight), defaultFlags);
 		module.addUserDefinedFunction("getScreenExtend", lemon::wrap(&getScreenExtend), defaultFlags);
 
+
 		// VDP emulation
-		module.addUserDefinedFunction("VDP.setupVRAMWrite", lemon::wrap(&VDP_setupVRAMWrite), defaultFlags);
-		module.addUserDefinedFunction("VDP.setupVSRAMWrite", lemon::wrap(&VDP_setupVSRAMWrite), defaultFlags);
-		module.addUserDefinedFunction("VDP.setupCRAMWrite", lemon::wrap(&VDP_setupCRAMWrite), defaultFlags);
-		module.addUserDefinedFunction("VDP.setWriteIncrement", lemon::wrap(&VDP_setWriteIncrement), defaultFlags);
+		module.addUserDefinedFunction("VDP.setupVRAMWrite", lemon::wrap(&VDP_setupVRAMWrite), defaultFlags)
+			.setParameterInfo(0, "vramAddress");
+
+		module.addUserDefinedFunction("VDP.setupVSRAMWrite", lemon::wrap(&VDP_setupVSRAMWrite), defaultFlags)
+			.setParameterInfo(0, "vsramAddress");
+
+		module.addUserDefinedFunction("VDP.setupCRAMWrite", lemon::wrap(&VDP_setupCRAMWrite), defaultFlags)
+			.setParameterInfo(0, "cramAddress");
+
+		module.addUserDefinedFunction("VDP.setWriteIncrement", lemon::wrap(&VDP_setWriteIncrement), defaultFlags)
+			.setParameterInfo(0, "increment");
+
 		module.addUserDefinedFunction("VDP.readData16", lemon::wrap(&VDP_readData16), defaultFlags);
+
 		module.addUserDefinedFunction("VDP.readData32", lemon::wrap(&VDP_readData32), defaultFlags);
-		module.addUserDefinedFunction("VDP.writeData16", lemon::wrap(&VDP_writeData16), defaultFlags);
-		module.addUserDefinedFunction("VDP.writeData32", lemon::wrap(&VDP_writeData32), defaultFlags);
-		module.addUserDefinedFunction("VDP.copyToVRAM", lemon::wrap(&VDP_copyToVRAM), defaultFlags);
-		module.addUserDefinedFunction("VDP.zeroVRAM", lemon::wrap(&VDP_zeroVRAM), defaultFlags);
-		module.addUserDefinedFunction("VDP.copyToVRAMbyDMA", lemon::wrap(&VDP_copyToVRAMbyDMA), defaultFlags);
-		module.addUserDefinedFunction("VDP.copyToCRAMbyDMA", lemon::wrap(&VDP_copyToCRAMbyDMA), defaultFlags);
-		module.addUserDefinedFunction("VDP.fillVRAMbyDMA", lemon::wrap(&VDP_fillVRAMbyDMA), defaultFlags);
+
+		module.addUserDefinedFunction("VDP.writeData16", lemon::wrap(&VDP_writeData16), defaultFlags)
+			.setParameterInfo(0, "value");
+
+		module.addUserDefinedFunction("VDP.writeData32", lemon::wrap(&VDP_writeData32), defaultFlags)
+			.setParameterInfo(0, "value");
+
+		module.addUserDefinedFunction("VDP.copyToVRAM", lemon::wrap(&VDP_copyToVRAM), defaultFlags)
+			.setParameterInfo(0, "address")
+			.setParameterInfo(1, "bytes");
+
+		module.addUserDefinedFunction("VDP.fillVRAMbyDMA", lemon::wrap(&VDP_fillVRAMbyDMA), defaultFlags)
+			.setParameterInfo(0, "fillValue")
+			.setParameterInfo(1, "vramAddress")
+			.setParameterInfo(2, "bytes");
+
+		module.addUserDefinedFunction("VDP.zeroVRAM", lemon::wrap(&VDP_zeroVRAM), defaultFlags)
+			.setParameterInfo(0, "bytes");
+
+		module.addUserDefinedFunction("VDP.copyToVRAMbyDMA", lemon::wrap(&VDP_copyToVRAMbyDMA), defaultFlags)
+			.setParameterInfo(0, "sourceAddress")
+			.setParameterInfo(1, "vramAddress")
+			.setParameterInfo(2, "bytes");
+
+		module.addUserDefinedFunction("VDP.copyToCRAMbyDMA", lemon::wrap(&VDP_copyToCRAMbyDMA), defaultFlags)
+			.setParameterInfo(0, "sourceAddress")
+			.setParameterInfo(1, "vramAddress")
+			.setParameterInfo(2, "bytes");
+
 
 		// VDP config
-		module.addUserDefinedFunction("VDP.Config.setActiveDisplay", lemon::wrap(&VDP_Config_setActiveDisplay), defaultFlags);
-		module.addUserDefinedFunction("VDP.Config.setNameTableBasePlaneB", lemon::wrap(&VDP_Config_setNameTableBasePlaneB), defaultFlags);
-		module.addUserDefinedFunction("VDP.Config.setNameTableBasePlaneA", lemon::wrap(&VDP_Config_setNameTableBasePlaneA), defaultFlags);
-		module.addUserDefinedFunction("VDP.Config.setNameTableBasePlaneW", lemon::wrap(&VDP_Config_setNameTableBasePlaneW), defaultFlags);
-		module.addUserDefinedFunction("VDP.Config.setBackdropColor", lemon::wrap(&VDP_Config_setBackdropColor), defaultFlags);
-		module.addUserDefinedFunction("VDP.Config.setVerticalScrolling", lemon::wrap(&VDP_Config_setVerticalScrolling), defaultFlags);
-		module.addUserDefinedFunction("VDP.Config.setRenderingModeConfiguration", lemon::wrap(&VDP_Config_setRenderingModeConfiguration), defaultFlags);
-		module.addUserDefinedFunction("VDP.Config.setHorizontalScrollTableBase", lemon::wrap(&VDP_Config_setHorizontalScrollTableBase), defaultFlags);
-		module.addUserDefinedFunction("VDP.Config.setPlayfieldSizeInPatterns", lemon::wrap(&VDP_Config_setPlayfieldSizeInPatterns), defaultFlags);
-		module.addUserDefinedFunction("VDP.Config.setPlayfieldSizeInPixels", lemon::wrap(&VDP_Config_setPlayfieldSizeInPixels), defaultFlags);
-		module.addUserDefinedFunction("VDP.Config.setupWindowPlane", lemon::wrap(&VDP_Config_setupWindowPlane), defaultFlags);
-		module.addUserDefinedFunction("VDP.Config.setPlaneWScrollOffset", lemon::wrap(&VDP_Config_setPlaneWScrollOffset), defaultFlags);
-		module.addUserDefinedFunction("VDP.Config.setSpriteAttributeTableBase", lemon::wrap(&VDP_Config_setSpriteAttributeTableBase), defaultFlags);
+		module.addUserDefinedFunction("VDP.Config.setActiveDisplay", lemon::wrap(&VDP_Config_setActiveDisplay), defaultFlags)
+			.setParameterInfo(0, "enable");
+
+		module.addUserDefinedFunction("VDP.Config.setNameTableBasePlaneB", lemon::wrap(&VDP_Config_setNameTableBasePlaneB), defaultFlags)
+			.setParameterInfo(0, "vramAddress");
+
+		module.addUserDefinedFunction("VDP.Config.setNameTableBasePlaneA", lemon::wrap(&VDP_Config_setNameTableBasePlaneA), defaultFlags)
+			.setParameterInfo(0, "vramAddress");
+
+		module.addUserDefinedFunction("VDP.Config.setNameTableBasePlaneW", lemon::wrap(&VDP_Config_setNameTableBasePlaneW), defaultFlags)
+			.setParameterInfo(0, "vramAddress");
+
+		module.addUserDefinedFunction("VDP.Config.setBackdropColor", lemon::wrap(&VDP_Config_setBackdropColor), defaultFlags)
+			.setParameterInfo(0, "paletteIndex");
+
+		module.addUserDefinedFunction("VDP.Config.setVerticalScrolling", lemon::wrap(&VDP_Config_setVerticalScrolling), defaultFlags)
+			.setParameterInfo(0, "verticalScrolling")
+			.setParameterInfo(1, "horizontalScrollMask");
+
+		module.addUserDefinedFunction("VDP.Config.setRenderingModeConfiguration", lemon::wrap(&VDP_Config_setRenderingModeConfiguration), defaultFlags)
+			.setParameterInfo(0, "shadowHighlightPalette");
+
+		module.addUserDefinedFunction("VDP.Config.setHorizontalScrollTableBase", lemon::wrap(&VDP_Config_setHorizontalScrollTableBase), defaultFlags)
+			.setParameterInfo(0, "vramAddress");
+
+		module.addUserDefinedFunction("VDP.Config.setPlayfieldSizeInPatterns", lemon::wrap(&VDP_Config_setPlayfieldSizeInPatterns), defaultFlags)
+			.setParameterInfo(0, "width")
+			.setParameterInfo(1, "height");
+
+		module.addUserDefinedFunction("VDP.Config.setPlayfieldSizeInPixels", lemon::wrap(&VDP_Config_setPlayfieldSizeInPixels), defaultFlags)
+			.setParameterInfo(0, "width")
+			.setParameterInfo(1, "height");
+
+		module.addUserDefinedFunction("VDP.Config.setupWindowPlane", lemon::wrap(&VDP_Config_setupWindowPlane), defaultFlags)
+			.setParameterInfo(0, "useWindowPlane")
+			.setParameterInfo(1, "splitY");
+
+		module.addUserDefinedFunction("VDP.Config.setPlaneWScrollOffset", lemon::wrap(&VDP_Config_setPlaneWScrollOffset), defaultFlags)
+			.setParameterInfo(0, "x")
+			.setParameterInfo(1, "y");
+
+		module.addUserDefinedFunction("VDP.Config.setSpriteAttributeTableBase", lemon::wrap(&VDP_Config_setSpriteAttributeTableBase), defaultFlags)
+			.setParameterInfo(0, "vramAddress");
+
 
 		// Direct VRAM access
-		module.addUserDefinedFunction("getVRAM", lemon::wrap(&getVRAM), defaultFlags);
-		module.addUserDefinedFunction("setVRAM", lemon::wrap(&setVRAM), defaultFlags);
+		module.addUserDefinedFunction("getVRAM", lemon::wrap(&getVRAM), defaultFlags)
+			.setParameterInfo(0, "vramAddress");
+
+		module.addUserDefinedFunction("setVRAM", lemon::wrap(&setVRAM), defaultFlags)
+			.setParameterInfo(0, "vramAddress")
+			.setParameterInfo(1, "value");
+
 
 		// Special renderer functionality
-		module.addUserDefinedFunction("Renderer.setPaletteEntry", lemon::wrap(&Renderer_setPaletteEntry), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setPaletteEntryPacked", lemon::wrap(&Renderer_setPaletteEntryPacked), defaultFlags);
-		module.addUserDefinedFunction("Renderer.enableSecondaryPalette", lemon::wrap(&Renderer_enableSecondaryPalette), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setSecondaryPaletteEntryPacked", lemon::wrap(&Renderer_setSecondaryPaletteEntryPacked), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setScrollOffsetH", lemon::wrap(&Renderer_setScrollOffsetH), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setScrollOffsetV", lemon::wrap(&Renderer_setScrollOffsetV), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setHorizontalScrollNoRepeat", lemon::wrap(&Renderer_setHorizontalScrollNoRepeat), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setVerticalScrollOffsetBias", lemon::wrap(&Renderer_setVerticalScrollOffsetBias), defaultFlags);
-		module.addUserDefinedFunction("Renderer.enforceClearScreen", lemon::wrap(&Renderer_enforceClearScreen), defaultFlags);
-		module.addUserDefinedFunction("Renderer.enableDefaultPlane", lemon::wrap(&Renderer_enableDefaultPlane), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setupPlane", lemon::wrap(&Renderer_setupPlane), defaultFlags);
+		module.addUserDefinedFunction("Renderer.setPaletteEntry", lemon::wrap(&Renderer_setPaletteEntry), defaultFlags)
+			.setParameterInfo(0, "index")
+			.setParameterInfo(1, "color");
+
+		module.addUserDefinedFunction("Renderer.setPaletteEntryPacked", lemon::wrap(&Renderer_setPaletteEntryPacked), defaultFlags)
+			.setParameterInfo(0, "index")
+			.setParameterInfo(1, "color");
+
+		module.addUserDefinedFunction("Renderer.enableSecondaryPalette", lemon::wrap(&Renderer_enableSecondaryPalette), defaultFlags)
+			.setParameterInfo(0, "line");
+
+		module.addUserDefinedFunction("Renderer.setSecondaryPaletteEntryPacked", lemon::wrap(&Renderer_setSecondaryPaletteEntryPacked), defaultFlags)
+			.setParameterInfo(0, "index")
+			.setParameterInfo(1, "color");
+
+		module.addUserDefinedFunction("Renderer.setScrollOffsetH", lemon::wrap(&Renderer_setScrollOffsetH), defaultFlags)
+			.setParameterInfo(0, "setIndex")
+			.setParameterInfo(1, "lineNumber")
+			.setParameterInfo(2, "value");
+
+		module.addUserDefinedFunction("Renderer.setScrollOffsetV", lemon::wrap(&Renderer_setScrollOffsetV), defaultFlags)
+			.setParameterInfo(0, "setIndex")
+			.setParameterInfo(1, "rowNumber")
+			.setParameterInfo(2, "value");
+
+		module.addUserDefinedFunction("Renderer.setHorizontalScrollNoRepeat", lemon::wrap(&Renderer_setHorizontalScrollNoRepeat), defaultFlags)
+			.setParameterInfo(0, "setIndex")
+			.setParameterInfo(1, "enable");
+
+		module.addUserDefinedFunction("Renderer.setVerticalScrollOffsetBias", lemon::wrap(&Renderer_setVerticalScrollOffsetBias), defaultFlags)
+			.setParameterInfo(0, "bias");
+
+		module.addUserDefinedFunction("Renderer.enforceClearScreen", lemon::wrap(&Renderer_enforceClearScreen), defaultFlags)
+			.setParameterInfo(0, "enabled");
+
+		module.addUserDefinedFunction("Renderer.enableDefaultPlane", lemon::wrap(&Renderer_enableDefaultPlane), defaultFlags)
+			.setParameterInfo(0, "planeIndex")
+			.setParameterInfo(1, "enabled");
+
+		module.addUserDefinedFunction("Renderer.setupPlane", lemon::wrap(&Renderer_setupPlane), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py")
+			.setParameterInfo(2, "width")
+			.setParameterInfo(3, "height")
+			.setParameterInfo(4, "planeIndex")
+			.setParameterInfo(5, "scrollOffsets")
+			.setParameterInfo(6, "renderQueue");
+
 		module.addUserDefinedFunction("Renderer.resetCustomPlaneConfigurations", lemon::wrap(&Renderer_resetCustomPlaneConfigurations), defaultFlags);
+
 		module.addUserDefinedFunction("Renderer.resetSprites", lemon::wrap(&Renderer_resetSprites), defaultFlags);
-		module.addUserDefinedFunction("Renderer.drawVdpSprite", lemon::wrap(&Renderer_drawVdpSprite), defaultFlags);
-		module.addUserDefinedFunction("Renderer.drawVdpSpriteWithAlpha", lemon::wrap(&Renderer_drawVdpSpriteWithAlpha), defaultFlags);
-		module.addUserDefinedFunction("Renderer.drawVdpSpriteWithTint", lemon::wrap(&Renderer_drawVdpSpriteWithTint), defaultFlags);
-		module.addUserDefinedFunction("Renderer.hasCustomSprite", lemon::wrap(&Renderer_hasCustomSprite), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setupCustomUncompressedSprite", lemon::wrap(&Renderer_setupCustomUncompressedSprite), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setupCustomCharacterSprite", lemon::wrap(&Renderer_setupCustomCharacterSprite), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setupCustomObjectSprite", lemon::wrap(&Renderer_setupCustomObjectSprite), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setupKosinskiCompressedSprite", lemon::wrap(&Renderer_setupKosinskiCompressedSprite1), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setupKosinskiCompressedSprite", lemon::wrap(&Renderer_setupKosinskiCompressedSprite2), defaultFlags);
-		module.addUserDefinedFunction("Renderer.drawCustomSprite", lemon::wrap(&Renderer_drawCustomSprite1), defaultFlags);
-		module.addUserDefinedFunction("Renderer.drawCustomSprite", lemon::wrap(&Renderer_drawCustomSprite2), defaultFlags);
-		module.addUserDefinedFunction("Renderer.drawCustomSprite", lemon::wrap(&Renderer_drawCustomSprite3), defaultFlags);
-		module.addUserDefinedFunction("Renderer.drawCustomSpriteWithTransform", lemon::wrap(&Renderer_drawCustomSpriteWithTransform), defaultFlags);
-		module.addUserDefinedFunction("Renderer.extractCustomSprite", lemon::wrap(&Renderer_extractCustomSprite), defaultFlags);
-		module.addUserDefinedFunction("Renderer.addSpriteMask", lemon::wrap(&Renderer_addSpriteMask), defaultFlags);
-		module.addUserDefinedFunction("Renderer.addSpriteMaskWorld", lemon::wrap(&Renderer_addSpriteMaskWorld), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setLogicalSpriteSpace", lemon::wrap(&Renderer_setLogicalSpriteSpace), defaultFlags);
+
+		module.addUserDefinedFunction("Renderer.drawVdpSprite", lemon::wrap(&Renderer_drawVdpSprite), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py")
+			.setParameterInfo(2, "encodedSize")
+			.setParameterInfo(3, "patternIndex")
+			.setParameterInfo(4, "renderQueue");
+
+		module.addUserDefinedFunction("Renderer.drawVdpSpriteWithAlpha", lemon::wrap(&Renderer_drawVdpSpriteWithAlpha), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py")
+			.setParameterInfo(2, "encodedSize")
+			.setParameterInfo(3, "patternIndex")
+			.setParameterInfo(4, "renderQueue")
+			.setParameterInfo(5, "alpha");
+
+		module.addUserDefinedFunction("Renderer.drawVdpSpriteTinted", lemon::wrap(&Renderer_drawVdpSpriteTinted), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py")
+			.setParameterInfo(2, "encodedSize")
+			.setParameterInfo(3, "patternIndex")
+			.setParameterInfo(4, "renderQueue")
+			.setParameterInfo(5, "tintColor")
+			.setParameterInfo(6, "addedColor");
+
+		module.addUserDefinedFunction("Renderer.hasCustomSprite", lemon::wrap(&Renderer_hasCustomSprite), defaultFlags)
+			.setParameterInfo(0, "key");
+
+		module.addUserDefinedFunction("Renderer.setupCustomUncompressedSprite", lemon::wrap(&Renderer_setupCustomUncompressedSprite), defaultFlags)
+			.setParameterInfo(0, "sourceBase")
+			.setParameterInfo(1, "word")
+			.setParameterInfo(2, "mappingOffset")
+			.setParameterInfo(3, "animationSprite")
+			.setParameterInfo(4, "atex");
+
+		module.addUserDefinedFunction("Renderer.setupCustomCharacterSprite", lemon::wrap(&Renderer_setupCustomCharacterSprite), defaultFlags)
+			.setParameterInfo(0, "sourceBase")
+			.setParameterInfo(1, "tableAddress")
+			.setParameterInfo(2, "mappingOffset")
+			.setParameterInfo(3, "animationSprite")
+			.setParameterInfo(4, "atex");
+
+		module.addUserDefinedFunction("Renderer.setupCustomObjectSprite", lemon::wrap(&Renderer_setupCustomObjectSprite), defaultFlags)
+			.setParameterInfo(0, "sourceBase")
+			.setParameterInfo(1, "tableAddress")
+			.setParameterInfo(2, "mappingOffset")
+			.setParameterInfo(3, "animationSprite")
+			.setParameterInfo(4, "atex");
+
+		module.addUserDefinedFunction("Renderer.setupKosinskiCompressedSprite", lemon::wrap(&Renderer_setupKosinskiCompressedSprite1), defaultFlags)
+			.setParameterInfo(0, "sourceBase")
+			.setParameterInfo(1, "mappingOffset")
+			.setParameterInfo(2, "animationSprite")
+			.setParameterInfo(3, "atex");
+
+		module.addUserDefinedFunction("Renderer.setupKosinskiCompressedSprite", lemon::wrap(&Renderer_setupKosinskiCompressedSprite2), defaultFlags)
+			.setParameterInfo(0, "sourceBase")
+			.setParameterInfo(1, "mappingOffset")
+			.setParameterInfo(2, "animationSprite")
+			.setParameterInfo(3, "atex")
+			.setParameterInfo(4, "indexOffset");
+
+		module.addUserDefinedFunction("Renderer.drawCustomSprite", lemon::wrap(&Renderer_drawCustomSprite1), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "px")
+			.setParameterInfo(2, "py")
+			.setParameterInfo(3, "atex")
+			.setParameterInfo(4, "flags")
+			.setParameterInfo(5, "renderQueue");
+
+		module.addUserDefinedFunction("Renderer.drawCustomSprite", lemon::wrap(&Renderer_drawCustomSprite2), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "px")
+			.setParameterInfo(2, "py")
+			.setParameterInfo(3, "atex")
+			.setParameterInfo(4, "flags")
+			.setParameterInfo(5, "renderQueue")
+			.setParameterInfo(6, "angle")
+			.setParameterInfo(7, "alpha");
+
+		module.addUserDefinedFunction("Renderer.drawCustomSpriteTinted", lemon::wrap(&Renderer_drawCustomSpriteTinted), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "px")
+			.setParameterInfo(2, "py")
+			.setParameterInfo(3, "atex")
+			.setParameterInfo(4, "flags")
+			.setParameterInfo(5, "renderQueue")
+			.setParameterInfo(6, "angle")
+			.setParameterInfo(7, "tintColor")
+			.setParameterInfo(8, "scale");
+
+		module.addUserDefinedFunction("Renderer.drawCustomSpriteTransformed", lemon::wrap(&Renderer_drawCustomSpriteTransformed), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "px")
+			.setParameterInfo(2, "py")
+			.setParameterInfo(3, "atex")
+			.setParameterInfo(4, "flags")
+			.setParameterInfo(5, "renderQueue")
+			.setParameterInfo(6, "tintColor")
+			.setParameterInfo(7, "transform11")
+			.setParameterInfo(8, "transform12")
+			.setParameterInfo(9, "transform21")
+			.setParameterInfo(10, "transform22");
+
+		module.addUserDefinedFunction("Renderer.extractCustomSprite", lemon::wrap(&Renderer_extractCustomSprite), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "categoryName")
+			.setParameterInfo(2, "spriteNumber")
+			.setParameterInfo(3, "atex");
+
+		module.addUserDefinedFunction("Renderer.addSpriteMask", lemon::wrap(&Renderer_addSpriteMask), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py")
+			.setParameterInfo(2, "width")
+			.setParameterInfo(3, "height")
+			.setParameterInfo(4, "renderQueue")
+			.setParameterInfo(5, "priorityFlag");
+
+		module.addUserDefinedFunction("Renderer.addSpriteMaskWorld", lemon::wrap(&Renderer_addSpriteMaskWorld), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py")
+			.setParameterInfo(2, "width")
+			.setParameterInfo(3, "height")
+			.setParameterInfo(4, "renderQueue")
+			.setParameterInfo(5, "priorityFlag");
+
+		module.addUserDefinedFunction("Renderer.setLogicalSpriteSpace", lemon::wrap(&Renderer_setLogicalSpriteSpace), defaultFlags)
+			.setParameterInfo(0, "space");
+
 		module.addUserDefinedFunction("Renderer.clearSpriteTag", lemon::wrap(&Renderer_clearSpriteTag), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setSpriteTagWithPosition", lemon::wrap(&Renderer_setSpriteTagWithPosition), defaultFlags);
-		module.addUserDefinedFunction("Renderer.resetViewport", lemon::wrap(&Renderer_resetViewport), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setViewport", lemon::wrap(&Renderer_setViewport), defaultFlags);
-		module.addUserDefinedFunction("Renderer.setGlobalComponentTint", lemon::wrap(&Renderer_setGlobalComponentTint), defaultFlags);
+
+		module.addUserDefinedFunction("Renderer.setSpriteTagWithPosition", lemon::wrap(&Renderer_setSpriteTagWithPosition), defaultFlags)
+			.setParameterInfo(0, "spriteTag")
+			.setParameterInfo(1, "px")
+			.setParameterInfo(2, "py");
+
+		module.addUserDefinedFunction("Renderer.resetViewport", lemon::wrap(&Renderer_resetViewport), defaultFlags)
+			.setParameterInfo(0, "renderQueue");
+
+		module.addUserDefinedFunction("Renderer.setViewport", lemon::wrap(&Renderer_setViewport), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py")
+			.setParameterInfo(2, "width")
+			.setParameterInfo(3, "height")
+			.setParameterInfo(4, "renderQueue");
+
+		module.addUserDefinedFunction("Renderer.setGlobalComponentTint", lemon::wrap(&Renderer_setGlobalComponentTint), defaultFlags)
+			.setParameterInfo(0, "tintR")
+			.setParameterInfo(1, "tintG")
+			.setParameterInfo(2, "tintB")
+			.setParameterInfo(3, "addedR")
+			.setParameterInfo(4, "addedG")
+			.setParameterInfo(5, "addedB");
+
+		// Debug draw rects & texts
+		module.addUserDefinedFunction("setWorldSpaceOffset", lemon::wrap(&setWorldSpaceOffset), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py");
+
+		module.addUserDefinedFunction("Debug.drawRect", lemon::wrap(&debugDrawRect), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py")
+			.setParameterInfo(2, "width")
+			.setParameterInfo(3, "height");
+
+		module.addUserDefinedFunction("Debug.drawRect", lemon::wrap(&debugDrawRect2), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py")
+			.setParameterInfo(2, "width")
+			.setParameterInfo(3, "height")
+			.setParameterInfo(4, "color");
+
+		module.addUserDefinedFunction("Renderer.drawText", lemon::wrap(&Renderer_drawText), defaultFlags)
+			.setParameterInfo(0, "fontKey")
+			.setParameterInfo(1, "px")
+			.setParameterInfo(2, "py")
+			.setParameterInfo(3, "text")
+			.setParameterInfo(4, "tintColor")
+			.setParameterInfo(5, "alignment")
+			.setParameterInfo(6, "spacing")
+			.setParameterInfo(7, "renderQueue")
+			.setParameterInfo(8, "useWorldSpace");
+
 
 		// Audio
-		module.addUserDefinedFunction("Audio.isPlayingAudio", lemon::wrap(&Audio_isPlayingAudio), defaultFlags);
-		module.addUserDefinedFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio1), defaultFlags);
-		module.addUserDefinedFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio2), defaultFlags);
-		module.addUserDefinedFunction("Audio.stopChannel", lemon::wrap(&Audio_stopChannel), defaultFlags);
-		module.addUserDefinedFunction("Audio.fadeInChannel", lemon::wrap(&Audio_fadeInChannel), defaultFlags);
-		module.addUserDefinedFunction("Audio.fadeOutChannel", lemon::wrap(&Audio_fadeOutChannel), defaultFlags);
-		module.addUserDefinedFunction("Audio.playOverride", lemon::wrap(&Audio_playOverride), defaultFlags);
-		module.addUserDefinedFunction("Audio.enableAudioModifier", lemon::wrap(&Audio_enableAudioModifier), defaultFlags);
-		module.addUserDefinedFunction("Audio.disableAudioModifier", lemon::wrap(&Audio_disableAudioModifier), defaultFlags);
+		module.addUserDefinedFunction("Audio.isPlayingAudio", lemon::wrap(&Audio_isPlayingAudio), defaultFlags)
+			.setParameterInfo(0, "id");
+
+		module.addUserDefinedFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio1), defaultFlags)
+			.setParameterInfo(0, "sfxId")
+			.setParameterInfo(1, "contextId");
+
+		module.addUserDefinedFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio2), defaultFlags)
+			.setParameterInfo(0, "sfxId");
+
+		module.addUserDefinedFunction("Audio.stopChannel", lemon::wrap(&Audio_stopChannel), defaultFlags)
+			.setParameterInfo(0, "channel");
+
+		module.addUserDefinedFunction("Audio.fadeInChannel", lemon::wrap(&Audio_fadeInChannel), defaultFlags)
+			.setParameterInfo(0, "channel")
+			.setParameterInfo(1, "length");
+
+		module.addUserDefinedFunction("Audio.fadeOutChannel", lemon::wrap(&Audio_fadeOutChannel), defaultFlags)
+			.setParameterInfo(0, "channel")
+			.setParameterInfo(1, "length");
+
+		module.addUserDefinedFunction("Audio.playOverride", lemon::wrap(&Audio_playOverride), defaultFlags)
+			.setParameterInfo(0, "sfxId")
+			.setParameterInfo(1, "contextId")
+			.setParameterInfo(2, "channelId")
+			.setParameterInfo(3, "overriddenChannelId");
+
+		module.addUserDefinedFunction("Audio.enableAudioModifier", lemon::wrap(&Audio_enableAudioModifier), defaultFlags)
+			.setParameterInfo(0, "channel")
+			.setParameterInfo(1, "context")
+			.setParameterInfo(2, "postfix")
+			.setParameterInfo(3, "relativeSpeed");
+
+		module.addUserDefinedFunction("Audio.disableAudioModifier", lemon::wrap(&Audio_disableAudioModifier), defaultFlags)
+			.setParameterInfo(0, "channel")
+			.setParameterInfo(1, "context");
+
 
 		// Misc
-		module.addUserDefinedFunction("Mods.isModActive", lemon::wrap(&Mods_isModActive), defaultFlags);
-		module.addUserDefinedFunction("Mods.getModPriority", lemon::wrap(&Mods_getModPriority), defaultFlags);
+		module.addUserDefinedFunction("Mods.isModActive", lemon::wrap(&Mods_isModActive), defaultFlags)
+			.setParameterInfo(0, "modName");
+
+		module.addUserDefinedFunction("Mods.getModPriority", lemon::wrap(&Mods_getModPriority), defaultFlags)
+			.setParameterInfo(0, "modName");
 	}
 
 	// Debug features
@@ -1403,15 +1773,14 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			var.mSetter = std::bind(logSetter, std::placeholders::_1, true);
 		}
 
-		module.addUserDefinedFunction("debugLog", lemon::wrap(&debugLog), defaultFlags);
-		module.addUserDefinedFunction("debugLogColors", lemon::wrap(&debugLogColors), defaultFlags);
+		module.addUserDefinedFunction("debugLog", lemon::wrap(&debugLog), defaultFlags)
+			.setParameterInfo(0, "text");
 
-		// Debug draw
-		{
-			module.addUserDefinedFunction("setWorldSpaceOffset", lemon::wrap(&setWorldSpaceOffset), defaultFlags);
-			module.addUserDefinedFunction("debugDrawRect", lemon::wrap(&debugDrawRect), defaultFlags);
-			module.addUserDefinedFunction("debugDrawRect", lemon::wrap(&debugDrawRect2), defaultFlags);
-		}
+		module.addUserDefinedFunction("debugLogColors", lemon::wrap(&debugLogColors), defaultFlags)
+			.setParameterInfo(0, "name")
+			.setParameterInfo(1, "startAddress")
+			.setParameterInfo(2, "numColors");
+
 
 		// Debug keys
 		for (int i = 0; i < 10; ++i)
@@ -1420,31 +1789,71 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			var.mGetter = std::bind(debugKeyGetter, i);
 		}
 
+
 		// Watches
-		module.addUserDefinedFunction("debugWatch", lemon::wrap(&debugWatch), defaultFlags);
+		module.addUserDefinedFunction("debugWatch", lemon::wrap(&debugWatch), defaultFlags)
+			.setParameterInfo(0, "address")
+			.setParameterInfo(1, "bytes");
+
 
 		// Dump to file
-		module.addUserDefinedFunction("debugDumpToFile", lemon::wrap(&debugDumpToFile), defaultFlags);
+		module.addUserDefinedFunction("debugDumpToFile", lemon::wrap(&debugDumpToFile), defaultFlags)
+			.setParameterInfo(0, "filename")
+			.setParameterInfo(1, "startAddress")
+			.setParameterInfo(2, "bytes");
+
 
 		// ROM data analyser
-		module.addUserDefinedFunction("ROMDataAnalyser.isEnabled",   lemon::wrap(&ROMDataAnalyser_isEnabled), defaultFlags);
-		module.addUserDefinedFunction("ROMDataAnalyser.hasEntry",    lemon::wrap(&ROMDataAnalyser_hasEntry), defaultFlags);
-		module.addUserDefinedFunction("ROMDataAnalyser.beginEntry",  lemon::wrap(&ROMDataAnalyser_beginEntry), defaultFlags);
-		module.addUserDefinedFunction("ROMDataAnalyser.endEntry",    lemon::wrap(&ROMDataAnalyser_endEntry), defaultFlags);
-		module.addUserDefinedFunction("ROMDataAnalyser.addKeyValue", lemon::wrap(&ROMDataAnalyser_addKeyValue), defaultFlags);
-		module.addUserDefinedFunction("ROMDataAnalyser.beginObject", lemon::wrap(&ROMDataAnalyser_beginObject), defaultFlags);
-		module.addUserDefinedFunction("ROMDataAnalyser.endObject",   lemon::wrap(&ROMDataAnalyser_endObject), defaultFlags);
+		module.addUserDefinedFunction("ROMDataAnalyser.isEnabled", lemon::wrap(&ROMDataAnalyser_isEnabled), defaultFlags);
+
+		module.addUserDefinedFunction("ROMDataAnalyser.hasEntry", lemon::wrap(&ROMDataAnalyser_hasEntry), defaultFlags)
+			.setParameterInfo(0, "category")
+			.setParameterInfo(1, "address");
+
+		module.addUserDefinedFunction("ROMDataAnalyser.beginEntry", lemon::wrap(&ROMDataAnalyser_beginEntry), defaultFlags)
+			.setParameterInfo(0, "category")
+			.setParameterInfo(1, "address");
+
+		module.addUserDefinedFunction("ROMDataAnalyser.endEntry", lemon::wrap(&ROMDataAnalyser_endEntry), defaultFlags);
+
+		module.addUserDefinedFunction("ROMDataAnalyser.addKeyValue", lemon::wrap(&ROMDataAnalyser_addKeyValue), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "value");
+
+		module.addUserDefinedFunction("ROMDataAnalyser.beginObject", lemon::wrap(&ROMDataAnalyser_beginObject), defaultFlags)
+			.setParameterInfo(0, "key");
+
+		module.addUserDefinedFunction("ROMDataAnalyser.endObject", lemon::wrap(&ROMDataAnalyser_endObject), defaultFlags);
+
 
 		// Debug side panel
-		module.addUserDefinedFunction("System.SidePanel.setupCustomCategory", lemon::wrap(&System_SidePanel_setupCustomCategory), defaultFlags);
-		module.addUserDefinedFunction("System.SidePanel.addOption", lemon::wrap(&System_SidePanel_addOption), defaultFlags);
-		module.addUserDefinedFunction("System.SidePanel.addEntry", lemon::wrap(&System_SidePanel_addEntry), defaultFlags);
-		module.addUserDefinedFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine1), defaultFlags);
-		module.addUserDefinedFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine2), defaultFlags);
-		module.addUserDefinedFunction("System.SidePanel.isEntryHovered", lemon::wrap(&System_SidePanel_isEntryHovered), defaultFlags);
+		module.addUserDefinedFunction("System.SidePanel.setupCustomCategory", lemon::wrap(&System_SidePanel_setupCustomCategory), defaultFlags)
+			.setParameterInfo(0, "shortName")
+			.setParameterInfo(1, "fullName");
+
+		module.addUserDefinedFunction("System.SidePanel.addOption", lemon::wrap(&System_SidePanel_addOption), defaultFlags)
+			.setParameterInfo(0, "text")
+			.setParameterInfo(1, "defaultValue");
+
+		module.addUserDefinedFunction("System.SidePanel.addEntry", lemon::wrap(&System_SidePanel_addEntry), defaultFlags)
+			.setParameterInfo(0, "key");
+
+		module.addUserDefinedFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine1), defaultFlags)
+			.setParameterInfo(0, "text")
+			.setParameterInfo(1, "indent")
+			.setParameterInfo(2, "color");
+
+		module.addUserDefinedFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine2), defaultFlags)
+			.setParameterInfo(0, "text")
+			.setParameterInfo(1, "indent");
+
+		module.addUserDefinedFunction("System.SidePanel.isEntryHovered", lemon::wrap(&System_SidePanel_isEntryHovered), defaultFlags)
+			.setParameterInfo(0, "key");
+
 
 		// This is not really debugging-related, as it's meant to be written in non-developer environment as well
-		module.addUserDefinedFunction("System.writeDisplayLine", lemon::wrap(&System_writeDisplayLine), defaultFlags);
+		module.addUserDefinedFunction("System.writeDisplayLine", lemon::wrap(&System_writeDisplayLine), defaultFlags)
+			.setParameterInfo(0, "text");
 	}
 
 	// Register game-specific script bindings

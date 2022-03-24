@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -16,6 +16,7 @@
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/PackageFileCrawler.h"
 #include "oxygen/rendering/utils/PaletteBitmap.h"
+#include "oxygen/resources/ResourcesCache.h"
 
 
 namespace
@@ -60,12 +61,21 @@ namespace
 				}
 			}
 			bitmap.insertBlend(insetX, insetY, data.mBitmap);
-			const int pixels = bitmap.getPixelCount();
-			for (int i = 0; i < pixels; ++i)
+			for (int y = 0; y < bitmap.mHeight; ++y)
 			{
-				float colorIntensity = (float)(bitmap.mData[i] & 0xff) / 255.0f;
-				colorIntensity *= interpolate(0.65f, 1.0f, saturate((float)(i / bitmap.mWidth) / (float)bitmap.mHeight * 2.0f));
-				bitmap.mData[i] = (bitmap.mData[i] & 0xff000000) | ((int)(colorIntensity * 255.5f) * 0x10101);
+				uint32* pixelPtr = bitmap.getPixelPointer(0, y);
+				const float shadingFactor = interpolate(0.65f, 1.0f, saturate((float)y / (float)bitmap.mHeight * 2.0f));
+				for (int x = 0; x < bitmap.mWidth; ++x)
+				{
+					float colorR = (float)((*pixelPtr) & 0xff);
+					float colorG = (float)((*pixelPtr >> 8) & 0xff);
+					float colorB = (float)((*pixelPtr >> 16) & 0xff);
+					colorR *= shadingFactor;
+					colorG *= shadingFactor;
+					colorB *= shadingFactor;
+					*pixelPtr = (uint32)(colorR + 0.5f) | ((uint32)(colorG + 0.5f) << 8) | ((uint32)(colorB + 0.5f) << 16) | (*pixelPtr & 0xff000000);
+					++pixelPtr;
+				}
 			}
 			data.mBitmap = bitmap;
 		}
@@ -113,28 +123,39 @@ namespace global
 
 	void loadSharedResources()
 	{
-		mFont3Pure.load("data/font/smallfont.json", 0.0f);
+		ResourcesCache& resourcesCache = ResourcesCache::instance();
+		resourcesCache.registerFontSource("monofont");
+		resourcesCache.registerFontSource("oxyfont_light");
+		resourcesCache.registerFontSource("oxyfont_regular");
+		resourcesCache.registerFontSource("oxyfont_small");
+		resourcesCache.registerFontSource("oxyfont_tiny");
+		resourcesCache.registerFontSource("oxyfont_tiny_narrow");
+		resourcesCache.registerFontSource("smallfont");
+		resourcesCache.registerFontSource("sonic3_fontB");
+		resourcesCache.registerFontSource("sonic3_fontC");
 
-		mFont3.load("data/font/smallfont.json", 0.0f);
+		mFont3Pure.loadFromFile("data/font/smallfont.json");
+
+		mFont3.loadFromFile("data/font/smallfont.json");
 		mFont3.addFontProcessor(gOutlineFontProcessorTransparent);
 
-		mFont4.load("data/font/freefont_pixeled_tiny.json", 0.0f);
+		mFont4.loadFromFile("data/font/oxyfont_tiny.json");
 		mFont4.addFontProcessor(gOutlineFontProcessor);
 		mFont4.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
 
-		mFont5.load("data/font/freefont_pixeled_small.json", 0.0f);
+		mFont5.loadFromFile("data/font/oxyfont_small.json");
 		mFont5.addFontProcessor(gOutlineFontProcessor);
 		mFont5.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
 
-		mFont7.load("data/font/sonic3_fontB.json", 0.0f);
+		mFont7.loadFromFile("data/font/sonic3_fontB.json");
 		mFont7.addFontProcessor(gOutlineFontProcessor);
 		mFont7.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
 
-		mFont10.load("data/font/freefont_pixeled.json", 0.0f);
+		mFont10.loadFromFile("data/font/oxyfont_regular.json");
 		mFont10.addFontProcessor(gOutlineFontProcessor);
 		mFont10.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
 
-		mFont18.load("data/font/sonic3_fontC.json", 0.0f);
+		mFont18.loadFromFile("data/font/sonic3_fontC.json");
 		mFont18.addFontProcessor(gOutlineFontProcessor);
 		mFont18.setShadow(true, Vec2f(1.0f, 0.5f), 0.5f);
 
@@ -160,7 +181,7 @@ namespace global
 		const std::vector<SharedDatabase::Zone>& zones = SharedDatabase::getAllZones();
 		for (const SharedDatabase::Zone& zone : zones)
 		{
-			const uint8 acts = std::max(zone.mActsFreeRoam, zone.mActsTimeAttack);
+			const uint8 acts = std::max(zone.mActsNormal, zone.mActsTimeAttack);
 			if (acts == 0)
 				continue;
 

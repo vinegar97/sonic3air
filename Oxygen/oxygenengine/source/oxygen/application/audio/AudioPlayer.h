@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -51,7 +51,7 @@ public:
 	void resetChannelOverrides();
 
 	void resetAudioModifiers();
-	void enableAudioModifier(int channelId, int contextId, const std::string& postfix, float relativeSpeed);
+	void enableAudioModifier(int channelId, int contextId, std::string_view postfix, float relativeSpeed);
 	void disableAudioModifier(int channelId, int contextId);
 
 	inline size_t getNumPlayingSounds() const  { return mPlayingSounds.size(); }
@@ -138,8 +138,8 @@ private:
 	bool isChannelOverridden(int channelId) const;
 
 	AudioModifier* findAudioModifier(int channelId, int contextId, int* outIndex = nullptr);
-	SourceRegistration* getModifiedSourceRegistration(SourceRegistration& baseSourceReg, const std::string& postfix) const;
-	void applyAudioModifier(int channelId, int contextId, const std::string& postfix, float relativeSpeed, float speedChange);
+	SourceRegistration* getModifiedSourceRegistration(SourceRegistration& baseSourceReg, std::string_view postfix) const;
+	void applyAudioModifier(int channelId, int contextId, std::string_view postfix, float relativeSpeed, float speedChange);
 
 	void startAutoStreamer(AudioSourceBase& audioSource, float currentTime, float speed = 1.0f);
 	void stopAutoStreamer(AudioSourceBase& audioSource);

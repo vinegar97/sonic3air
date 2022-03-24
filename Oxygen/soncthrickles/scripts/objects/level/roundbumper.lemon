@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -35,7 +35,11 @@ function void fn032df2()
 	if (competition_mode.active)
 	{
 		objA0.mapping_offset = 0x2322ee
+	#if STANDALONE
+		objA0.sprite_attributes = 0x0300	// Fix for wrong palette line usage, thanks to Legobouwer
+	#else
 		objA0.sprite_attributes = 0x2300
+	#endif
 		objA0.update_address = 0x032ff0
 		fn032ff0()
 		return

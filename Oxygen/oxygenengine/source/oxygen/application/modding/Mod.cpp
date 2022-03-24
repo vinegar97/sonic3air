@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -47,7 +47,7 @@ void Mod::loadFromJson(const Json::Value& json)
 				std::string displayName;
 				std::string variableName;
 				std::string defaultValue;
-			
+
 				JsonHelper jsonHelper(content);
 				jsonHelper.tryReadString("Category", categoryName);
 				jsonHelper.tryReadString("InternalName", internalName);
@@ -96,7 +96,7 @@ void Mod::loadFromJson(const Json::Value& json)
 						continue;
 
 					const std::string valueString = it2.key().asString();
-				
+
 					Setting::Option& option = vectorAdd(setting.mOptions);
 					option.mDisplayName = it2->asString();
 					option.mValue = (uint32)rmx::parseInteger(valueString);

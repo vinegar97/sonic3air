@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -18,15 +18,24 @@ namespace
 		return (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F');
 	}
 
-	int compareSourceRegistrationPackages(AudioCollection::Package a, AudioCollection::Package b, bool preferOriginal)
+	int compareSourceRegistrationPackages(AudioCollection::Package a, AudioCollection::Package b, bool preferOriginalSoundtrack)
 	{
 		const int prioritiesA[3] = { 0, 1, 2 };		// Preferring remastered over original, but modded will always be first
 		const int prioritiesB[3] = { 1, 0, 2 };		// Preferring original over remastered, but modded will always be first
-		const int* priorities = preferOriginal ? prioritiesB : prioritiesA;
+		const int* priorities = preferOriginalSoundtrack ? prioritiesB : prioritiesA;
 
 		const int prioA = priorities[(int)a];
 		const int prioB = priorities[(int)b];
 		return (prioA == prioB) ? 0 : (prioA < prioB) ? 1 : -1;
+	}
+
+	bool shouldPreferSoundRegistration(AudioCollection::SourceRegistration& soundRegToCheck, AudioCollection::SourceRegistration* bestFoundSoFar, bool preferOriginalSoundtrack)
+	{
+		if (nullptr == bestFoundSoFar)
+			return true;
+
+		// Using <= instead of < here, so that with multiple modded sources, the last one will get used - that's the one with highest priority
+		return (compareSourceRegistrationPackages(soundRegToCheck.mPackage, bestFoundSoFar->mPackage, preferOriginalSoundtrack) <= 0);
 	}
 
 	bool getHexCodeRetranslation(uint64& outKey, uint64 hexCodeString)
@@ -116,6 +125,7 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 
 		// Read definition from JSON
 		AudioDefinition::Type type = AudioDefinition::Type::SOUND;
+		std::string displayName;
 		WString audioFilename;
 		uint32 sourceAddress = 0;
 		uint32 contentOffset = 0;
@@ -130,7 +140,11 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 			const std::string key = it.key().asString();
 			const std::string value = it->asString();
 
-			if (key == "Type")
+			if (key == "Name")
+			{
+				displayName = value;
+			}
+			else if (key == "Type")
 			{
 				if (value == "Music")
 				{
@@ -160,7 +174,7 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 			}
 			else if (key == "Source" && !value.empty())
 			{
-				sourceType = (value == "EmulationContinuous") ? SourceRegistration::Type::EMULATION_CONTINUOUS : 
+				sourceType = (value == "EmulationContinuous") ? SourceRegistration::Type::EMULATION_CONTINUOUS :
 							 (value == "EmulationDirect") ? SourceRegistration::Type::EMULATION_DIRECT : SourceRegistration::Type::EMULATION_BUFFERED;
 			}
 			else if (key == "Address" && !value.empty())
@@ -215,6 +229,10 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 			// Definition already exists, ignore the properties that are not specifying the source
 		}
 
+		// Set or overwrite values in audio definition
+		if (!displayName.empty())
+			audioDefinition->mDisplayName = displayName;
+
 		// Add audio source
 		SourceRegistration& sourceRegistration = vectorAdd(audioDefinition->mSources);
 		sourceRegistration.mAudioDefinition = audioDefinition;
@@ -243,23 +261,17 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 	return true;
 }
 
-void AudioCollection::determineActiveSourceRegistrations(bool preferOriginal)
+void AudioCollection::determineActiveSourceRegistrations(bool preferOriginalSoundtrack)
 {
 	for (auto& pair : mAudioDefinitions)
 	{
 		// Search for the right one considering settings
 		SourceRegistration* bestSourceReg = nullptr;
+		for (SourceRegistration& soundReg : pair.second.mSources)
 		{
-			for (SourceRegistration& soundReg : pair.second.mSources)
+			if (shouldPreferSoundRegistration(soundReg, bestSourceReg, preferOriginalSoundtrack))
 			{
-				if (bestSourceReg == nullptr)
-				{
-					bestSourceReg = &soundReg;
-				}
-				else if (compareSourceRegistrationPackages(soundReg.mPackage, bestSourceReg->mPackage, preferOriginal) < 0)
-				{
-					bestSourceReg = &soundReg;
-				}
+				bestSourceReg = &soundReg;
 			}
 		}
 		pair.second.mActiveSource = bestSourceReg;

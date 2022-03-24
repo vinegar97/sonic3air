@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -72,7 +72,8 @@ function void fn061362()
 	objA0.animation.sprite = D0.u8
 	if (D0.u8 == 0x16)
 	{
-		spawnSimpleChildObjects(0x06144a)
+		// "spawnSimpleChildObjects(0x06144a)" replaced by:
+		spawnSimpleChildObjects(0x0610b6, 1)
 	}
 }
 

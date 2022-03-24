@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -142,7 +142,7 @@ function void UpdateCameraPositionX()
 	}
 
 #if STANDALONE
-	if (Game.getSetting(SETTING_EXTENDED_CAMERA))
+	if (Game.getSetting(SETTING_EXTENDED_CAMERA) != 0 && global.game_mode != 0x08)	// Disable in rolling demo, as it breaks MGZ
 	{
 		if (global.level_started <= 0 || global.stage_type != 0)	// First is relevant e.g. for AIZ 1 Sonic intro
 		{

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,7 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/file/ZipFileProvider.h"
 #include "oxygen/file/FileStructureTree.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 
 
 // Other platforms than Windows with Visual C++ need to the zlib library dependency into their build separately
@@ -129,11 +129,11 @@ ZipFileProvider::ZipFileProvider(const std::wstring& zipFilename) :
 
 	if (mLoaded)
 	{
-		LOG_INFO("Loaded ZIP file '" << WString(zipFilename).toStdString() << "' with " << (uint32)mContainedFiles.size() << " entries");
+		RMX_LOG_INFO("Loaded ZIP file '" << WString(zipFilename).toStdString() << "' with " << (uint32)mContainedFiles.size() << " entries");
 	}
 	else
 	{
-		LOG_INFO("Failed to load zip file '" << WString(zipFilename).toStdString() << "'");
+		RMX_LOG_INFO("Failed to load zip file '" << WString(zipFilename).toStdString() << "'");
 	}
 }
 

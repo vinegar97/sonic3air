@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -74,9 +74,9 @@ public:
 	CustomDebugSidePanelCategory();
 
 	void onSetup();
-	bool addOption(const std::string& text, bool defaultValue);
+	bool addOption(std::string_view text, bool defaultValue);
 	void addEntry(uint64 key);
-	void addLine(const std::string& text, int indent, const Color& color);
+	void addLine(std::string_view text, int indent, const Color& color);
 	bool isEntryHovered(uint64 key);
 
 	void buildCategoryContent(DebugSidePanel::Builder& builder, Drawer& drawer, uint64 mouseOverKey);

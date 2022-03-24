@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -171,22 +171,22 @@ function bool Game.isModdedSound(u64 key)
 	return false
 }
 
-function void Game.setDiscordDetails(u64 text)
+function void Game.setDiscordDetails(string text)
 {
 	// Feature not supported in Oxygen project
 }
 
-function void Game.setDiscordState(u64 text)
+function void Game.setDiscordState(string text)
 {
 	// Feature not supported in Oxygen project
 }
 
-function void Game.setDiscordLargeImage(u64 imageName)
+function void Game.setDiscordLargeImage(string imageName)
 {
 	// Feature not supported in Oxygen project
 }
 
-function void Game.setDiscordSmallImage(u64 imageName)
+function void Game.setDiscordSmallImage(string imageName)
 {
 	// Feature not supported in Oxygen project
 }

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,6 +10,7 @@
 #include "lemon/runtime/StandardLibrary.h"
 #include "lemon/program/FunctionWrapper.h"
 #include "lemon/program/Module.h"
+#include "lemon/program/Program.h"
 
 
 namespace
@@ -24,22 +25,19 @@ namespace
 
 		void addChar(char ch)
 		{
+			RMX_CHECK(mLength < 0x100, "Too long string", return);
 			mBuffer[mLength] = ch;
 			++mLength;
 		}
 
 		void addString(const char* str, int length)
 		{
+			RMX_CHECK(mLength + length <= 0x100, "Too long string", return);
 			memcpy(&mBuffer[mLength], str, length);
 			mLength += length;
 		}
 
-		void addString(const std::string& str)
-		{
-			addString(str.c_str(), (int)str.length());
-		}
-
-		void addString(const std::string_view& str)
+		void addString(std::string_view str)
 		{
 			addString(str.data(), (int)str.length());
 		}
@@ -48,12 +46,14 @@ namespace
 		{
 			if (value < 0)
 			{
+				RMX_CHECK(mLength < 0x100, "Too long string", return);
 				mBuffer[mLength] = '-';
 				++mLength;
 				value = -value;
 			}
 			else if (value == 0)
 			{
+				RMX_CHECK(mLength < 0x100, "Too long string", return);
 				mBuffer[mLength] = '0';
 				++mLength;
 				return;
@@ -68,6 +68,7 @@ namespace
 			}
 			for (int64 digitBase = digitMax / 10; digitBase > 0; digitBase /= 10)
 			{
+				RMX_CHECK(mLength < 0x100, "Too long string", return);
 				mBuffer[mLength] = '0' + (char)((value / digitBase) % 10);
 				++mLength;
 			}
@@ -80,6 +81,7 @@ namespace
 			{
 				++shift;
 			}
+			RMX_CHECK(mLength + shift <= 0x100, "Too long string", return);
 			for (--shift; shift >= 0; --shift)
 			{
 				const int binValue = (value >> shift) & 0x01;
@@ -95,22 +97,13 @@ namespace
 			{
 				shift += 4;
 			}
+			RMX_CHECK(mLength + shift / 4 <= 0x100, "Too long string", return);
 			for (shift -= 4; shift >= 0; shift -= 4)
 			{
 				const int hexValue = (value >> shift) & 0x0f;
 				mBuffer[mLength] = (hexValue <= 9) ? ('0' + (char)hexValue) : ('a' + (char)(hexValue - 10));
 				++mLength;
 			}
-		}
-
-		std::string getStdString() const
-		{
-			return std::string(mBuffer, mLength);
-		}
-
-		uint64 getHash() const
-		{
-			return rmx::getMurmur2_64((uint8*)mBuffer, (size_t)mLength);
 		}
 
 	public:
@@ -122,18 +115,75 @@ namespace
 
 namespace lemon
 {
-	const StoredString* resolveStringByKey(uint64 key)
+	namespace builtins
 	{
-		Runtime* runtime = Runtime::getActiveRuntime();
-		RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
-		return runtime->resolveStringByKey(key);
-	}
+		template<typename T>
+		T constant_array_access(uint32 id, uint32 index)
+		{
+			Runtime* runtime = Runtime::getActiveRuntime();
+			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			const std::vector<ConstantArray*>& constantArrays = runtime->getProgram().getConstantArrays();
+			RMX_CHECK(id < constantArrays.size(), "Invalid constant array ID " << id << " (must be below " << constantArrays.size() << ")", return 0);
+			return (T)constantArrays[id]->getElement(index);
+		}
 
-	const StoredString* resolveStringByKeySafe(uint64 key)
-	{
-		const StoredString* stringPtr = resolveStringByKey(key);
-		RMX_CHECK(nullptr != stringPtr, "Unable to resolve format string", return nullptr);
-		return stringPtr;
+		template<>
+		StringRef constant_array_access(uint32 id, uint32 index)
+		{
+			Runtime* runtime = Runtime::getActiveRuntime();
+			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			const std::vector<ConstantArray*>& constantArrays = runtime->getProgram().getConstantArrays();
+			RMX_CHECK(id < constantArrays.size(), "Invalid constant array ID " << id << " (must be below " << constantArrays.size() << ")", return StringRef());
+			return StringRef(constantArrays[id]->getElement(index));
+		}
+
+		StringRef string_operator_plus(StringRef str1, StringRef str2)
+		{
+			Runtime* runtime = Runtime::getActiveRuntime();
+			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			RMX_CHECK(str1.isValid(), "Unable to resolve string", return StringRef());
+			RMX_CHECK(str2.isValid(), "Unable to resolve string", return StringRef());
+			
+			static FastStringStream result;
+			result.clear();
+			result.addString(str1.getStringRef());
+			result.addString(str2.getStringRef());
+			return StringRef(runtime->addString(std::string_view(result.mBuffer, result.mLength)));
+		}
+
+		bool string_operator_less(StringRef str1, StringRef str2)
+		{
+			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
+			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
+			return (str1.getString() < str2.getString());
+		}
+
+		bool string_operator_less_or_equal(StringRef str1, StringRef str2)
+		{
+			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
+			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
+			return (str1.getString() <= str2.getString());
+		}
+
+		bool string_operator_greater(StringRef str1, StringRef str2)
+		{
+			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
+			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
+			return (str1.getString() > str2.getString());
+		}
+
+		bool string_operator_greater_or_equal(StringRef str1, StringRef str2)
+		{
+			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
+			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
+			return (str1.getString() >= str2.getString());
+		}
+
+		uint32 string_length(StringRef str)
+		{
+			RMX_CHECK(str.isValid(), "Unable to resolve string", return 0);
+			return (uint32)str.getString().length();
+		}
 	}
 
 	namespace functions
@@ -187,17 +237,15 @@ namespace lemon
 			return (int32)roundToInt(std::cos((float)x / (float)0x10000) * (float)0x10000);
 		}
 
-		uint64 stringformat(uint64 fmtKey, int argv, uint64* args)
+		StringRef stringformat(StringRef format, int argv, uint64* args)
 		{
 			Runtime* runtime = Runtime::getActiveRuntime();
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			RMX_CHECK(format.isValid(), "Unable to resolve format string", return StringRef());
 
-			const StoredString* fmtStoredString = runtime->resolveStringByKey(fmtKey);
-			RMX_CHECK(nullptr != fmtStoredString, "Unable to resolve format string", return 0);
-
-			const std::string& fmtString = fmtStoredString->getString();
-			const int length = (int)fmtString.length();
-			const char* fmtPtr = fmtString.c_str();
+			std::string_view formatString = format.getString();
+			const int length = (int)formatString.length();
+			const char* fmtPtr = formatString.data();
 			const char* fmtEnd = fmtPtr + length;
 
 			static FastStringStream result;
@@ -241,7 +289,7 @@ namespace lemon
 					else if (fmtPtr[1] == 's')
 					{
 						// String argument
-						const StoredString* argStoredString = resolveStringByKey(args[0]);
+						const FlyweightString* argStoredString = runtime->resolveStringByKey(args[0]);
 						if (nullptr == argStoredString)
 							result.addString("<?>", 3);
 						else
@@ -301,87 +349,124 @@ namespace lemon
 				}
 			}
 
-			return runtime->addString(result.mBuffer, result.mLength);
+			return StringRef(runtime->addString(std::string_view(result.mBuffer, result.mLength)));
 		}
 
-		uint64 stringformat1(uint64 fmt, uint64 arg1)
+		StringRef stringformat1(StringRef format, uint64 arg1)
 		{
-			return stringformat(fmt, 1, &arg1);
+			return stringformat(format, 1, &arg1);
 		}
 
-		uint64 stringformat2(uint64 fmt, uint64 arg1, uint64 arg2)
+		StringRef stringformat2(StringRef format, uint64 arg1, uint64 arg2)
 		{
 			uint64 args[] = { arg1, arg2 };
-			return stringformat(fmt, 2, args);
+			return stringformat(format, 2, args);
 		}
 
-		uint64 stringformat3(uint64 fmt, uint64 arg1, uint64 arg2, uint64 arg3)
+		StringRef stringformat3(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3)
 		{
 			uint64 args[] = { arg1, arg2, arg3 };
-			return stringformat(fmt, 3, args);
+			return stringformat(format, 3, args);
 		}
 
-		uint64 stringformat4(uint64 fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4)
+		StringRef stringformat4(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4 };
-			return stringformat(fmt, 4, args);
+			return stringformat(format, 4, args);
 		}
 
-		uint64 stringformat5(uint64 fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5)
+		StringRef stringformat5(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4, arg5 };
-			return stringformat(fmt, 5, args);
+			return stringformat(format, 5, args);
 		}
 
-		uint64 stringformat6(uint64 fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6)
+		StringRef stringformat6(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4, arg5, arg6 };
-			return stringformat(fmt, 6, args);
+			return stringformat(format, 6, args);
 		}
 
-		uint64 stringformat7(uint64 fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7)
+		StringRef stringformat7(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7 };
-			return stringformat(fmt, 7, args);
+			return stringformat(format, 7, args);
 		}
 
-		uint64 stringformat8(uint64 fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7, uint64 arg8)
+		StringRef stringformat8(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7, uint64 arg8)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 };
-			return stringformat(fmt, 8, args);
+			return stringformat(format, 8, args);
 		}
 
-		uint32 strlen(uint64 key)
+		uint32 strlen(StringRef string)
 		{
-			const StoredString* storedString = resolveStringByKeySafe(key);
-			return (nullptr == storedString) ? 0 : (uint32)storedString->getString().length();
+			return (string.isValid()) ? (uint32)string.getString().length() : 0;
 		}
 
-		uint8 getchar(uint64 key, uint32 index)
+		uint8 getchar(StringRef string, uint32 index)
 		{
-			const StoredString* storedString = resolveStringByKeySafe(key);
-			if (nullptr == storedString || index >= storedString->getString().length())
+			if (!string.isValid())
 				return 0;
-			return (storedString->getString())[index];
+			if (index >= string.getString().length())
+				return 0;
+			return string.getString()[index];
 		}
 
-		uint64 substring(uint64 key, uint32 index, uint32 length)
+		uint64 substring(StringRef string, uint32 index, uint32 length)
 		{
 			Runtime* runtime = Runtime::getActiveRuntime();
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			if (!string.isValid())
+				return 0;
 
-			const StoredString* storedString = runtime->resolveStringByKey(key);
-			RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return 0);
-
-			const std::string part = storedString->getString().substr(index, length);
+			const std::string_view part = string.getString().substr(index, length);
 			return runtime->addString(part);
 		}
+
+		StringRef getStringFromHash(uint64 hash)
+		{
+			Runtime* runtime = Runtime::getActiveRuntime();
+			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			const FlyweightString* str = runtime->resolveStringByKey(hash);
+			return (nullptr == str) ? StringRef() : StringRef(*str);
+		}
 	}
+
+
+
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_CONSTANT_ARRAY_ACCESS("#builtin_constant_array_access");
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS("#builtin_string_operator_plus");
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS("#builtin_string_operator_less");
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL("#builtin_string_operator_less_equal");
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER("#builtin_string_operator_greater");
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL("#builtin_string_operator_greater_equal");
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_LENGTH("#builtin_string_length");
 
 
 	void StandardLibrary::registerBindings(lemon::Module& module)
 	{
 		const uint8 flags = UserDefinedFunction::FLAG_ALLOW_INLINE_EXECUTION;
+
+		// Register built-in functions, which are directly referenced by the compiler
+		{
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int8>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint8>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int16>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint16>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int32>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint32>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int64>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint64>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<StringRef>), flags);
+
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_PLUS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_LESS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_less), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_less_or_equal), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater_or_equal), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_LENGTH.makeFlyweightString(), lemon::wrap(&builtins::string_length), flags);
+		}
 
 		module.addUserDefinedFunction("min", lemon::wrap(&functions::minimum<int8>), flags);
 		module.addUserDefinedFunction("min", lemon::wrap(&functions::minimum<uint8>), flags);
@@ -415,17 +500,79 @@ namespace lemon
 		module.addUserDefinedFunction("cos_s16", lemon::wrap(&functions::cos_s16), flags);
 		module.addUserDefinedFunction("cos_s32", lemon::wrap(&functions::cos_s32), flags);
 
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat1), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat2), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat3), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat4), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat5), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat6), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat7), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat8), flags);
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat1), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1");
 
-		module.addUserDefinedFunction("strlen", lemon::wrap(&functions::strlen), flags);
-		module.addUserDefinedFunction("getchar", lemon::wrap(&functions::getchar), flags);
-		module.addUserDefinedFunction("substring", lemon::wrap(&functions::substring), flags);
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat2), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2");
+
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat3), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2")
+			.setParameterInfo(3, "arg3");
+
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat4), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2")
+			.setParameterInfo(3, "arg3")
+			.setParameterInfo(4, "arg4");
+
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat5), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2")
+			.setParameterInfo(3, "arg3")
+			.setParameterInfo(4, "arg4")
+			.setParameterInfo(5, "arg5");
+
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat6), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2")
+			.setParameterInfo(3, "arg3")
+			.setParameterInfo(4, "arg4")
+			.setParameterInfo(5, "arg5")
+			.setParameterInfo(6, "arg6");
+
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat7), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2")
+			.setParameterInfo(3, "arg3")
+			.setParameterInfo(4, "arg4")
+			.setParameterInfo(5, "arg5")
+			.setParameterInfo(6, "arg6")
+			.setParameterInfo(7, "arg7");
+
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat8), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2")
+			.setParameterInfo(3, "arg3")
+			.setParameterInfo(4, "arg4")
+			.setParameterInfo(5, "arg5")
+			.setParameterInfo(6, "arg6")
+			.setParameterInfo(7, "arg7")
+			.setParameterInfo(8, "arg8");
+
+		module.addUserDefinedFunction("strlen", lemon::wrap(&functions::strlen), flags)
+			.setParameterInfo(0, "str");
+
+		module.addUserDefinedFunction("getchar", lemon::wrap(&functions::getchar), flags)
+			.setParameterInfo(0, "str")
+			.setParameterInfo(1, "index");
+
+		module.addUserDefinedFunction("substring", lemon::wrap(&functions::substring), flags)
+			.setParameterInfo(0, "str")
+			.setParameterInfo(1, "index")
+			.setParameterInfo(2, "length");
+
+		module.addUserDefinedFunction("getStringFromHash", lemon::wrap(&functions::getStringFromHash), flags)
+			.setParameterInfo(0, "hash");
 	}
 }

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,12 +9,14 @@
 #include "sonic3air/pch.h"
 #include "sonic3air/menu/options/OptionsMenu.h"
 #include "sonic3air/menu/options/ControllerSetupMenu.h"
+#include "sonic3air/menu/options/OptionsMenuEntries.h"
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/MenuBackground.h"
 #include "sonic3air/menu/SharedResources.h"
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/ConfigurationImpl.h"
 #include "sonic3air/Game.h"
+#include "sonic3air/version.inc"
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
@@ -26,19 +28,6 @@
 #include "oxygen/helper/Utils.h"
 
 
-namespace option
-{
-	static const std::string TEXT_NOT_AVAILABLE = "not available";
-
-	static const std::vector<std::string> HINT_TEXTS =
-	{
-		"Have a look at the ", "#Manual", " for an overview",
-		"$of ", "#controller setup", ", ", "#new character moves",
-		"$and ", "#graphics troubleshooting"
-	};
-}
-
-
 OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	mMenuBackground(&menuBackground)
 {
@@ -48,7 +37,8 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	{
 		ConfigurationImpl& config = ConfigurationImpl::instance();
 
-		setupOptionEntryInt(option::FRAME_SYNC,					&config.mFrameSync);
+		setupOptionEntryEnum8(option::FRAME_SYNC,				&config.mFrameSync);
+
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
 		setupOptionEntryInt(option::BACKDROP,					&config.mBackdrop);
 		setupOptionEntryInt(option::FILTERING,					&config.mFiltering);
@@ -78,6 +68,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::TAILS_FLIGHT_CANCEL,		SharedDatabase::Setting::SETTING_CANCEL_FLIGHT);
 		setupOptionEntry(option::NO_CONTROL_LOCK,			SharedDatabase::Setting::SETTING_NO_CONTROL_LOCK);
 		setupOptionEntry(option::HYPER_TAILS,				SharedDatabase::Setting::SETTING_HYPER_TAILS);
+		setupOptionEntry(option::MAINTAIN_SHIELDS,			SharedDatabase::Setting::SETTING_MAINTAIN_SHIELDS);
 		setupOptionEntry(option::SHIELD_TYPES,				SharedDatabase::Setting::SETTING_SHIELD_TYPES);
 		setupOptionEntry(option::BUBBLE_SHIELD_BOUNCE,		SharedDatabase::Setting::SETTING_BUBBLE_SHIELD_BOUNCE);
 		setupOptionEntry(option::SUPER_CANCEL,				SharedDatabase::Setting::SETTING_SUPER_CANCEL);
@@ -117,9 +108,6 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::DEBUG_MODE,				SharedDatabase::Setting::SETTING_DEBUG_MODE);
 		setupOptionEntry(option::TITLE_SCREEN,				SharedDatabase::Setting::SETTING_TITLE_SCREEN);
 
-		//setupOptionEntry(option::LEVELMUSIC_CNZ,			SharedDatabase::Setting::SETTING_CNZ_PROTOTYPE_MUSIC);
-		//setupOptionEntry(option::LEVELMUSIC_ICZ,			SharedDatabase::Setting::SETTING_ICZ_PROTOTYPE_MUSIC);
-		//setupOptionEntry(option::LEVELMUSIC_LBZ,			SharedDatabase::Setting::SETTING_LBZ_PROTOTYPE_MUSIC);
 		setupOptionEntryBitmask(option::LEVELMUSIC_CNZ1,	SharedDatabase::Setting::SETTING_CNZ_PROTOTYPE_MUSIC);
 		setupOptionEntryBitmask(option::LEVELMUSIC_CNZ2,	SharedDatabase::Setting::SETTING_CNZ_PROTOTYPE_MUSIC);
 		setupOptionEntryBitmask(option::LEVELMUSIC_ICZ1,	SharedDatabase::Setting::SETTING_ICZ_PROTOTYPE_MUSIC);
@@ -129,15 +117,15 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	}
 
 	// Build up tab menu entries
-	mTabMenuEntries.addEntry("", option::_TAB_SELECTION)
+	mTabMenuEntries.addEntry<OptionsMenuEntry>().initEntry("", option::_TAB_SELECTION)
 		.addOption("MODS",     Tab::Id::MODS)
+		.addOption("SYSTEM",   Tab::Id::SYSTEM)
 		.addOption("DISPLAY",  Tab::Id::DISPLAY)
 		.addOption("AUDIO",    Tab::Id::AUDIO)
 		.addOption("VISUALS",  Tab::Id::VISUALS)
 		.addOption("GAMEPLAY", Tab::Id::GAMEPLAY)
 		.addOption("CONTROLS", Tab::Id::CONTROLS)
-		.addOption("TWEAKS",   Tab::Id::TWEAKS)
-		.addOption("INFO",     Tab::Id::INFO);
+		.addOption("TWEAKS",   Tab::Id::TWEAKS);
 
 	for (int i = 0; i < Tab::Id::_NUM; ++i)
 	{
@@ -148,38 +136,51 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 	// Mods tab needs to be rebuilt each time again
 
+	// System tab
+	{
+		Tab& tab = mTabs[Tab::Id::SYSTEM];
+		GameMenuEntries& entries = tab.mMenuEntries;
+
+		entries.addEntry<TitleMenuEntry>().initEntry("Update");
+		entries.addEntry<UpdateCheckMenuEntry>().initEntry("Check for updates", option::_CHECK_FOR_UPDATE);
+
+		entries.addEntry<TitleMenuEntry>().initEntry("More Info");
+		entries.addEntry<OptionsMenuEntry>().initEntry("Open Game Homepage", option::_OPEN_HOMEPAGE);
+		entries.addEntry<OptionsMenuEntry>().initEntry("Open Manual", option::_OPEN_MANUAL);
+	}
+
 	// Display tab
 	{
 		Tab& tab = mTabs[Tab::Id::DISPLAY];
 		GameMenuEntries& entries = tab.mMenuEntries;
-		std::map<size_t, std::string>& titles = tab.mTitles;
 
-		titles[entries.size()] = "General";
 
-		entries.addEntry("Renderer:", option::RENDERER)
+		entries.addEntry<TitleMenuEntry>().initEntry("General");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Renderer:", option::RENDERER)
 			.addOption("Fail-Safe / Software", (uint32)Configuration::RenderMethod::SOFTWARE)
 			.addOption("OpenGL Software", (uint32)Configuration::RenderMethod::OPENGL_SOFT)
 			.addOption("OpenGL Hardware", (uint32)Configuration::RenderMethod::OPENGL_FULL);
 
-		entries.addEntry("Frame Sync:", option::FRAME_SYNC)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Frame Sync:", option::FRAME_SYNC)
 			.addOption("V-Sync Off", 0)
 			.addOption("V-Sync On", 1)
 			.addOption("V-Sync + FPS Cap", 2);
 
-		entries.addEntry("Upscaling:", option::UPSCALING)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Upscaling:", option::UPSCALING)
 			.addOption("Integer Scale", 1)
 			.addOption("Aspect Fit", 0)
 			.addOption("Stretch 50%", 2)
 			.addOption("Stretch 100%", 3);
 			//.addOption("Scale To Fill", 4);	// Works, but shouldn't be an option, as it looks a bit broken
 
-		entries.addEntry("Backdrop:", option::BACKDROP)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Backdrop:", option::BACKDROP)
 			.addOption("Black", 0)
 			.addOption("Classic Box 1", 1)
 			.addOption("Classic Box 2", 2)
 			.addOption("Classic Box 3", 3);
 
-		entries.addEntry("Screen Filter:", option::FILTERING)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Screen Filter:", option::FILTERING)
 			.addOption("Sharp", 0)
 			.addOption("Soft 1", 1)
 			.addOption("Soft 2", 2)
@@ -188,35 +189,37 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.addOption("HQ3x", 5)
 			.addOption("HQ4x", 6);
 
-		entries.addEntry("Scanlines:", option::SCANLINES)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Scanlines:", option::SCANLINES)
 			.addOption("Off", 0)
 			.addOption("25%", 1)
 			.addOption("50%", 2)
 			.addOption("75%", 3)
 			.addOption("100%", 4);
 
-		entries.addEntry("Background Blur:", option::BG_BLUR)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Background Blur:", option::BG_BLUR)
 			.addOption("Off", 0)
 			.addOption("25%", 1)
 			.addOption("50%", 2)
 			.addOption("75%", 3)
 			.addOption("100%", 4);
 
-		titles[entries.size()] = "Window Mode";
 
-		entries.addEntry("Current Screen:", option::WINDOW_MODE)
+		entries.addEntry<TitleMenuEntry>().initEntry("Window Mode");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Current Screen:", option::WINDOW_MODE)
 			.addOption("Windowed", 0)
 			.addOption("Fullscreen", 1)
 			.addOption("Exclusive Fullscreen", 2);
 
-		entries.addEntry("Startup Screen:", option::WINDOW_MODE_STARTUP)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Startup Screen:", option::WINDOW_MODE_STARTUP)
 			.addOption("Windowed", 0)
 			.addOption("Fullscreen", 1)
 			.addOption("Exclusive Fullscreen", 2);
 
-		titles[entries.size()] = "Performance Output";
 
-		entries.addEntry("Show Performance:", option::PERFORMANCE_DISPLAY)
+		entries.addEntry<TitleMenuEntry>().initEntry("Performance Output");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Show Performance:", option::PERFORMANCE_DISPLAY)
 			.addOption("Off", 0)
 			.addOption("Show Framerate", 1)
 			.addOption("Full Profiling", 2);
@@ -226,44 +229,46 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	{
 		Tab& tab = mTabs[Tab::Id::AUDIO];
 		GameMenuEntries& entries = tab.mMenuEntries;
-		std::map<size_t, std::string>& titles = tab.mTitles;
 
-		titles[entries.size()] = "Volume";
+
+		entries.addEntry<TitleMenuEntry>().initEntry("Volume");
 
 		const char* volumeName[] = { "Overall Volume:", "Music Volume:", "Sound Volume:" };
 		for (int k = 0; k < 3; ++k)
 		{
-			GameMenuEntries::Entry& entry = entries.addEntry(volumeName[k], option::AUDIO_VOLUME + k);
+			GameMenuEntry& entry = entries.addEntry<OptionsMenuEntry>().initEntry(volumeName[k], option::AUDIO_VOLUME + k);
 			entry.addOption("Off", 0);
 			for (int i = 5; i <= 100; i += 5)
 				entry.addOption(*String(0, "%d %%", i), i);
 		}
 
-		titles[entries.size()] = "Soundtrack";
 
-		entries.addEntry("Soundtrack Type:", option::SOUNDTRACK)
+		entries.addEntry<TitleMenuEntry>().initEntry("Soundtrack");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Soundtrack Type:", option::SOUNDTRACK)
 			.addOption("Emulated", 0)
 			.addOption("Remastered", 1);
 
-		entries.addEntry("Sound Test:", option::SOUND_TEST);	// Will be filled with content in "initialize()"
+		entries.addEntry<OptionsMenuEntry>().initEntry("Sound Test:", option::SOUND_TEST);	// Will be filled with content in "initialize()"
 
-		titles[entries.size()] = "Theme Selection";
 
-		entries.addEntry("Title Theme:", option::TITLE_THEME)
+		entries.addEntry<TitleMenuEntry>().initEntry("Theme Selection");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Title Theme:", option::TITLE_THEME)
 			.addOption("Sonic 3", 0)
 			.addOption("Sonic & Knuckles", 1);
 
-		entries.addEntry("1-up Jingle:", option::EXTRA_LIFE_JINGLE)
+		entries.addEntry<OptionsMenuEntry>().initEntry("1-up Jingle:", option::EXTRA_LIFE_JINGLE)
 			.addOption("Sonic 3", 0)
 			.addOption("Sonic & Knuckles", 1)
 			.addOption("Pick by Zone", 0x10);
 
-		entries.addEntry("Invincibility Theme:", option::INVINCIBILITY_THEME)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Invincibility Theme:", option::INVINCIBILITY_THEME)
 			.addOption("Sonic 3", 0)
 			.addOption("Sonic & Knuckles", 1)
 			.addOption("Pick by Zone", 0x10);
 
-		entries.addEntry("Super/Hyper Theme:", option::SUPER_THEME)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Super/Hyper Theme:", option::SUPER_THEME)
 			.addOption("Normal level music", 0)
 			.addOption("Fast level music", 1)
 			.addOption("Sonic 2", 2)
@@ -271,76 +276,81 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.addOption("Sonic & Knuckles", 4)
 			.addOption("S3 Prototype", 5);
 
-		entries.addEntry("Mini-Boss Theme:", option::MINIBOSS_THEME)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Mini-Boss Theme:", option::MINIBOSS_THEME)
 			.addOption("Sonic 3", 0)
 			.addOption("Sonic & Knuckles", 1)
 			.addOption("Pick by Zone", 0x10);
 
-		entries.addEntry("Knuckles' Theme:", option::KNUCKLES_THEME)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Knuckles' Theme:", option::KNUCKLES_THEME)
 			.addOption("Sonic 3", 0)
 			.addOption("Sonic & Knuckles", 1)
 			.addOption("S3 Prototype", 2)
 			.addOption("Pick by Zone", 0x10);
 
-		titles[entries.size()] = "Level Music";
 
-		entries.addEntry("Carnival Night Act 1:", option::LEVELMUSIC_CNZ1)
+		entries.addEntry<TitleMenuEntry>().initEntry("Level Music");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Carnival Night Act 1:", option::LEVELMUSIC_CNZ1)
 			.addOption("As Released", 0x00000001)
 			.addOption("S3 Prototype", 0x80000001);
 
-		entries.addEntry("Carnival Night Act 2:", option::LEVELMUSIC_CNZ2)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Carnival Night Act 2:", option::LEVELMUSIC_CNZ2)
 			.addOption("As Released", 0x00000002)
 			.addOption("S3 Prototype", 0x80000002);
 
-		entries.addEntry("IceCap Act 1:", option::LEVELMUSIC_ICZ1)
+		entries.addEntry<OptionsMenuEntry>().initEntry("IceCap Act 1:", option::LEVELMUSIC_ICZ1)
 			.addOption("As Released", 0x00000001)
 			.addOption("S3 Prototype", 0x80000001);
 
-		entries.addEntry("IceCap Act 2:", option::LEVELMUSIC_ICZ2)
+		entries.addEntry<OptionsMenuEntry>().initEntry("IceCap Act 2:", option::LEVELMUSIC_ICZ2)
 			.addOption("As Released", 0x00000002)
 			.addOption("S3 Prototype", 0x80000002);
 
-		entries.addEntry("Launch Base Act 1:", option::LEVELMUSIC_LBZ1)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Launch Base Act 1:", option::LEVELMUSIC_LBZ1)
 			.addOption("As Released", 0x00000001)
 			.addOption("S3 Prototype", 0x80000001);
 
-		entries.addEntry("Launch Base Act 2:", option::LEVELMUSIC_LBZ2)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Launch Base Act 2:", option::LEVELMUSIC_LBZ2)
 			.addOption("As Released", 0x00000002)
 			.addOption("S3 Prototype", 0x80000002);
 
-		titles[entries.size()] = "Music Selection";
 
-		entries.addEntry("In Hidden Palace:", option::HPZ_MUSIC)
+		entries.addEntry<TitleMenuEntry>().initEntry("Music Selection");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("In Hidden Palace:", option::HPZ_MUSIC)
 			.addOption("Sonic 3", 0)
 			.addOption("Sonic & Knuckles", 1)
-			.addOption("S3 + S&K Mini-Boss", 2);
+			.addOption("S3 + S&K Mini-Boss", 2)
+			.addOption("S3 Prototype", 3);
 
-		entries.addEntry("Sky Sanctuary Bosses:", option::SSZ_BOSSTRACKS)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Sky Sanctuary Bosses:", option::SSZ_BOSSTRACKS)
 			.addOption("Normal Boss Music", 0)
 			.addOption("Sonic 1 & 2 Tracks", 1);
 
-		entries.addEntry("Outro Music:", option::OUTRO_MUSIC)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Outro Music:", option::OUTRO_MUSIC)
 			.addOption("Sky Sanctuary", 0)
 			.addOption("Sonic 3 Credits", 1)
 			.addOption("S3 Prototype", 2);
 
-		entries.addEntry("Competition Menu:", option::COMPETITION_MENU_MUSIC)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Competition Menu:", option::COMPETITION_MENU_MUSIC)
 			.addOption("Sonic 3", 0)
 			.addOption("S3 Prototype", 1);
 
-		entries.addEntry("Continue Screen:", option::CONTINUE_SCREEN_MUSIC)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Continue Screen:", option::CONTINUE_SCREEN_MUSIC)
 			.addOption("Sonic 3", 0)
 			.addOption("Sonic & Knuckles", 1);
 
-		titles[entries.size()] = "Music Behavior";
 
-		entries.addEntry("On Level (Re)Start:", option::CONTINUE_MUSIC)
+		entries.addEntry<TitleMenuEntry>().initEntry("Music Behavior");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("On Level (Re)Start:", option::CONTINUE_MUSIC)
 			.addOption("Restart Music", 0)
 			.addOption("Continue Music", 1);
 
-		titles[entries.size()] = "Effects";
 
-		entries.addEntry("Underwater Sound:", option::UNDERWATER_AUDIO)
+		entries.addEntry<TitleMenuEntry>().initEntry("Effects");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Underwater Sound:", option::UNDERWATER_AUDIO)
 			.addOption("Normal", 0)
 			.addOption("Muffled", 1);
 	}
@@ -349,65 +359,69 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	{
 		Tab& tab = mTabs[Tab::Id::VISUALS];
 		GameMenuEntries& entries = tab.mMenuEntries;
-		std::map<size_t, std::string>& titles = tab.mTitles;
 
-		titles[entries.size()] = "Visual Enhancements";
 
-		entries.addEntry("Character Rotation:", option::ROTATION)
+		entries.addEntry<TitleMenuEntry>().initEntry("Visual Enhancements");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Character Rotation:", option::ROTATION)
 			.addOption("Original", 0)
 			.addOption("Smooth", 1);
 
-		entries.addEntry("Time Display:", option::TIME_DISPLAY)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Time Display:", option::TIME_DISPLAY)
 			.addOption("Original", 0)
 			.addOption("Extended", 1);
 
-		entries.addEntry("Lives Display:", option::LIVES_DISPLAY)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Lives Display:", option::LIVES_DISPLAY)
 			.addOption("Auto", 0)
 			.addOption("Classic", 1)
 			.addOption("Mobile", 2);
 
-		entries.addEntry("Speed Shoes Effect:", option::SPEEDUP_AFTER_IMAGES)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Speed Shoes Effect:", option::SPEEDUP_AFTER_IMAGES)
 			.addOption("None (Original)", 0)
 			.addOption("After-Images", 1);
 
-		entries.addEntry("Fast Run Animation:", option::FAST_RUN_ANIM)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Fast Run Animation:", option::FAST_RUN_ANIM)
 			.addOption("None (Original)", 0)
 			.addOption("Peel-Out", 1);
 
-		entries.addEntry("Flicker Effects:", option::ANTI_FLICKER)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Flicker Effects:", option::ANTI_FLICKER)
 			.addOption("As Original", 0)
 			.addOption("Slightly Smoothed", 1)
 			.addOption("Heavily Smoothed", 2);
 
-		titles[entries.size()] = "Camera";
 
-		entries.addEntry("Outrun Camera:", option::CAMERA_OUTRUN)
+		entries.addEntry<TitleMenuEntry>().initEntry("Camera");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Outrun Camera:", option::CAMERA_OUTRUN)
 			.addOption("Off", 0)
 			.addOption("On", 1);
 
-		entries.addEntry("Extended Camera:", option::EXTENDED_CAMERA)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Extended Camera:", option::EXTENDED_CAMERA)
 			.addOption("Off", 0)
 			.addOption("On", 1);
 
-		titles[entries.size()] = "Objects";
 
-		entries.addEntry("Monitor Style:", option::MONITOR_STYLE)
+		entries.addEntry<TitleMenuEntry>().initEntry("Objects");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Monitor Style:", option::MONITOR_STYLE)
 			.addOption("Sonic 1 / 2", 1)
 			.addOption("Sonic 3 & Knuckles", 0);
 
-		titles[entries.size()] = "Color Changes";
 
-		entries.addEntry("IceCap Startup Time:", option::ICZ_NIGHTTIME)
+		entries.addEntry<TitleMenuEntry>().initEntry("Color Changes");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("IceCap Startup Time:", option::ICZ_NIGHTTIME)
 			.addOption("Daytime", 0)
 			.addOption("Morning Dawn", 1);
 
-		titles[entries.size()] = "Special Stages";
 
-		entries.addEntry("Blue Spheres Style:", option::SPECIAL_STAGE_VISUALS)
+		entries.addEntry<TitleMenuEntry>().initEntry("Special Stages");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Blue Spheres Style:", option::SPECIAL_STAGE_VISUALS)
 			.addOption("Classic", 0)
 			.addOption("Modernized", 3);
 
-		entries.addEntry("Ring Counter:", option::SPECIAL_STAGE_RING_COUNT)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Ring Counter:", option::SPECIAL_STAGE_RING_COUNT)
 			.addOption("Counting Up", 0)
 			.addOption("Counting Down", 1);
 	}
@@ -416,42 +430,48 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	{
 		Tab& tab = mTabs[Tab::Id::GAMEPLAY];
 		GameMenuEntries& entries = tab.mMenuEntries;
-		std::map<size_t, std::string>& titles = tab.mTitles;
 
-		titles[entries.size()] = "Levels";
 
-		entries.addEntry("Level Layouts:", option::LEVEL_LAYOUTS)
+		entries.addEntry<TitleMenuEntry>().initEntry("Levels");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Level Layouts:", option::LEVEL_LAYOUTS)
 			.addOption("Sonic 3", 0)
 			.addOption("Sonic 3 & Knuckles", 1)
 			.addOption("Sonic 3 A.I.R.", 2);
 
-		titles[entries.size()] = "Difficulty Changes";
 
-		entries.addEntry("Angel Island Bombing:", option::AIZ_BLIMPSEQUENCE)
+		entries.addEntry<TitleMenuEntry>().initEntry("Difficulty Changes");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Angel Island Bombing:", option::AIZ_BLIMPSEQUENCE)
 			.addOption("Original", 0)
 			.addOption("Alternative", 1);
 
-		entries.addEntry("Big Arms Boss Fight:", option::LBZ_BIGARMS)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Big Arms Boss Fight:", option::LBZ_BIGARMS)
 			.addOption("Only Knuckles", 0)
 			.addOption("All characters", 1);
 
-		entries.addEntry("Sandopolis Ghosts:", option::SOZ_GHOSTSPAWN)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Sandopolis Ghosts:", option::SOZ_GHOSTSPAWN)
 			.addOption("Disabled", 1)
 			.addOption("Enabled", 0);
 
-		entries.addEntry("Lava Reef Act 2 Boss:", option::LRZ2_BOSS)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Lava Reef Act 2 Boss:", option::LRZ2_BOSS)
 			.addOption("8 hits", 1)
 			.addOption("14 hits (original)", 0);
 
-		titles[entries.size()] = "Time Attack";
+		entries.addEntry<OptionsMenuEntry>().initEntry("Keep Shield after Zone:", option::MAINTAIN_SHIELDS)
+			.addOption("Disabled", 0)
+			.addOption("Enabled", 1);
 
-		entries.addEntry("Max. Recorded Ghosts:", option::TIMEATTACK_GHOSTS)
+
+		entries.addEntry<TitleMenuEntry>().initEntry("Time Attack");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Max. Recorded Ghosts:", option::TIMEATTACK_GHOSTS)
 			.addOption("Off", 0)
 			.addOption("1", 1)
 			.addOption("3", 3)
 			.addOption("5", 5);
 
-		entries.addEntry("Quick Restart:", option::TIMEATTACK_INSTANTRESTART)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Quick Restart:", option::TIMEATTACK_INSTANTRESTART)
 			.addOption("Hold Y Button", 0)
 			.addOption("Press Y Button", 1);
 	}
@@ -460,15 +480,15 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	{
 		Tab& tab = mTabs[Tab::Id::CONTROLS];
 		GameMenuEntries& entries = tab.mMenuEntries;
-		std::map<size_t, std::string>& titles = tab.mTitles;
 
-		titles[entries.size()] = "Unlocked by Secrets";
 
-		entries.addEntry("Sonic Drop Dash:", option::DROP_DASH)
+		entries.addEntry<TitleMenuEntry>().initEntry("Unlocked by Secrets");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Sonic Drop Dash:", option::DROP_DASH)
 			.addOption("Off", 0)
 			.addOption("On", 1);
 
-		entries.addEntry("Sonic Super Peel-Out:", option::SUPER_PEELOUT)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Sonic Super Peel-Out:", option::SUPER_PEELOUT)
 			.addOption("Off", 0)
 			.addOption("On", 1);
 
@@ -477,13 +497,14 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			mUnlockedSecretsEntries[0].push_back(&entries[i]);
 		}
 
-		titles[entries.size()] = "Controllers";
 
-		entries.addEntry("Setup Keyboard & Game Controllers...", option::CONTROLLER_SETUP);		// This text here won't be used, see rendering
+		entries.addEntry<TitleMenuEntry>().initEntry("Controllers");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Setup Keyboard & Game Controllers...", option::CONTROLLER_SETUP);		// This text here won't be used, see rendering
 
 		for (int k = 0; k < 2; ++k)
 		{
-			GameMenuEntries::Entry& entry = entries.addEntry(*String(0, "Controller Player %d", k+1), option::CONTROLLER_PLAYER_1 + k);
+			GameMenuEntry& entry = entries.addEntry<OptionsMenuEntry>().initEntry(*String(0, "Controller Player %d", k+1), option::CONTROLLER_PLAYER_1 + k);
 			if (Application::instance().hasVirtualGamepad())
 				entry.addOption("None (Touch only)", -1);
 			else
@@ -492,52 +513,54 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			mGamepadAssignmentEntries[k] = &entry;
 		}
 
-		entries.addEntry("Other controllers", option::CONTROLLER_AUTOASSIGN)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Other controllers", option::CONTROLLER_AUTOASSIGN)
 			.addOption("Not used", -1)
 			.addOption("Assign to Player 1", 0)
 			.addOption("Assign to Player 2", 1);
 
 		if (Application::instance().hasVirtualGamepad())
 		{
-			titles[entries.size()] = "Virtual Gamepad";
+			entries.addEntry<TitleMenuEntry>().initEntry("Virtual Gamepad");
 
-			entries.addEntry("Visibility:",   option::VGAMEPAD_OPACITY).addPercentageOptions(0, 100, 10);
-			entries.addEntry("D-Pad Size:",	  option::VGAMEPAD_DPAD_SIZE).addNumberOptions(50, 150, 10);
-			entries.addEntry("Buttons Size:", option::VGAMEPAD_BUTTONS_SIZE).addNumberOptions(50, 150, 10);
-			entries.addEntry("Set Touch Gamepad Layout...",	option::VGAMEPAD_SETUP);
+			entries.addEntry<OptionsMenuEntry>().initEntry("Visibility:",   option::VGAMEPAD_OPACITY).addPercentageOptions(0, 100, 10);
+			entries.addEntry<OptionsMenuEntry>().initEntry("D-Pad Size:",	  option::VGAMEPAD_DPAD_SIZE).addNumberOptions(50, 150, 10);
+			entries.addEntry<OptionsMenuEntry>().initEntry("Buttons Size:", option::VGAMEPAD_BUTTONS_SIZE).addNumberOptions(50, 150, 10);
+			entries.addEntry<OptionsMenuEntry>().initEntry("Set Touch Gamepad Layout...",	option::VGAMEPAD_SETUP);
 		}
 
-		titles[entries.size()] = "Abilities";
 
-		entries.addEntry("Sonic Insta-Shield:", option::INSTA_SHIELD)
+		entries.addEntry<TitleMenuEntry>().initEntry("Abilities");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Sonic Insta-Shield:", option::INSTA_SHIELD)
 			.addOption("Off", 0)
 			.addOption("On", 1);
 
-		entries.addEntry("Tails Assist:", option::TAILS_ASSIST)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Tails Assist:", option::TAILS_ASSIST)
 			.addOption("Off", 0)
 			.addOption("Sonic 3 A.I.R. Style", 1)
 			.addOption("Hybrid Style", 2)
 			.addOption("Sonic Mania Style", 3);
 
-		entries.addEntry("Tails Flight Cancel:", option::TAILS_FLIGHT_CANCEL)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Tails Flight Cancel:", option::TAILS_FLIGHT_CANCEL)
 			.addOption("Off", 0)
 			.addOption("Down + Jump", 1);
 
-		entries.addEntry("Roll Jump Control Lock:", option::NO_CONTROL_LOCK)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Roll Jump Control Lock:", option::NO_CONTROL_LOCK)
 			.addOption("Locked (Classic)", 0)
 			.addOption("Free Movement", 1);
 
-		entries.addEntry("Bubble Shield Bounce:", option::BUBBLE_SHIELD_BOUNCE)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Bubble Shield Bounce:", option::BUBBLE_SHIELD_BOUNCE)
 			.addOption("Sonic 3 Style", 0)
 			.addOption("Sonic Mania Style", 1);
 
-		titles[entries.size()] = "Super & Hyper Forms";
 
-		entries.addEntry("Tails Super Forms:", option::HYPER_TAILS)
+		entries.addEntry<TitleMenuEntry>().initEntry("Super & Hyper Forms");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Tails Super Forms:", option::HYPER_TAILS)
 			.addOption("Only Super Tails", 0)
 			.addOption("Super & Hyper Tails", 1);
 
-		entries.addEntry("Super Cancel:", option::SUPER_CANCEL)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Super Cancel:", option::SUPER_CANCEL)
 			.addOption("Off", 0)
 			.addOption("On", 1);
 	}
@@ -546,19 +569,19 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	{
 		Tab& tab = mTabs[Tab::Id::TWEAKS];
 		GameMenuEntries& entries = tab.mMenuEntries;
-		std::map<size_t, std::string>& titles = tab.mTitles;
 
-		titles[entries.size()] = "Unlocked by Secrets";
 
-		entries.addEntry("Debug Mode:", option::DEBUG_MODE)
+		entries.addEntry<TitleMenuEntry>().initEntry("Unlocked by Secrets");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Debug Mode:", option::DEBUG_MODE)
 			.addOption("Off", 0)
 			.addOption("On", 1);
 
-		entries.addEntry("Title Screen:", option::TITLE_SCREEN)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Title Screen:", option::TITLE_SCREEN)
 			.addOption("Sonic 3", 0)
 			.addOption("Sonic & Knuckles", 1);
 
-		entries.addEntry("Game Speed:", option::GAME_SPEED)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Game Speed:", option::GAME_SPEED)
 			.addOption("50 Hz (slower)", 50)
 			.addOption("60 Hz (normal)", 60)
 			.addOption("75 Hz (faster)", 75)
@@ -571,65 +594,58 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			mUnlockedSecretsEntries[1].push_back(&entries[i]);
 		}
 
-		titles[entries.size()] = "Accessibility";
 
-		entries.addEntry("Infinite Lives:", option::INFINITE_LIVES)
+		entries.addEntry<TitleMenuEntry>().initEntry("Accessibility");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Infinite Lives:", option::INFINITE_LIVES)
 			.addOption("Disabled", 0)
 			.addOption("Enabled", 1);
 
-		entries.addEntry("Infinite Time:", option::INFINITE_TIME)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Infinite Time:", option::INFINITE_TIME)
 			.addOption("Disabled", 0)
 			.addOption("Enabled", 1);
 
-		titles[entries.size()] = "Game Variety";
 
-		entries.addEntry("Shields:", option::SHIELD_TYPES)
+		entries.addEntry<TitleMenuEntry>().initEntry("Game Variety");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Shields:", option::SHIELD_TYPES)
 			.addOption("Classic Shield", 0)
 			.addOption("Elemental Shields", 1)
 			.addOption("Classic + Elemental", 2)
 			.addOption("Upgradable Shields", 3);
 
-		entries.addEntry("Randomized Monitors:", option::RANDOM_MONITORS)
+		entries.addEntry<OptionsMenuEntry>().initEntry("Randomized Monitors:", option::RANDOM_MONITORS)
 			.addOption("Normal Monitors", 0)
 			.addOption("Random Shields", 1)
 			.addOption("Random Monitors", 2);
 
-		titles[entries.size()] = "Special Stages";
 
-		entries.addEntry("Special Stage Layouts:", option::RANDOM_SPECIALSTAGES)
+		entries.addEntry<TitleMenuEntry>().initEntry("Special Stages");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Special Stage Layouts:", option::RANDOM_SPECIALSTAGES)
 			.addOption("Original", 0)
 			.addOption("Randomly Generated", 1);
 
-		entries.addEntry("On Fail:", option::SPECIAL_STAGE_REPEAT)
+		entries.addEntry<OptionsMenuEntry>().initEntry("On Fail:", option::SPECIAL_STAGE_REPEAT)
 			.addOption("Advance to next", 0)
 			.addOption("Do not advance", 1);
 
-		titles[entries.size()] = "Region";
 
-		entries.addEntry("Region Code:", option::REGION)
+		entries.addEntry<TitleMenuEntry>().initEntry("Region");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Region Code:", option::REGION)
 			.addOption("Western (\"Tails\")", 0x80)
 			.addOption("Japan (\"Miles\")", 0x00);
-	}
-
-	// Info tab
-	{
-		Tab& tab = mTabs[Tab::Id::INFO];
-		GameMenuEntries& entries = tab.mMenuEntries;
-		std::map<size_t, std::string>& titles = tab.mTitles;
-
-		titles[entries.size()] = "$Hints";
-		
-		entries.addEntry("Open Manual in web browser", option::_OPEN_MANUAL);
 	}
 
 	for (int i = 1; i < Tab::Id::_NUM; ++i)		// Exclude "Mods" tab
 	{
 		GameMenuEntries& entries = mTabs[i].mMenuEntries;
-		entries.addEntry("Back", option::_BACK);
+		entries.addEntry<OptionsMenuEntry>().initEntry("Back", option::_BACK);
 
 		for (size_t k = 0; k < entries.size(); ++k)
 		{
-			GameMenuEntries::Entry& entry = entries[k];
+			GameMenuEntry& entry = entries[k];
 			OptionEntry& optionEntry = mOptionEntries[entry.mData];
 			optionEntry.mOptionId = (option::Option)entry.mData;
 			optionEntry.mGameMenuEntry = &entry;
@@ -704,11 +720,7 @@ void OptionsMenu::initialize()
 
 		Tab& tab = mTabs[Tab::Id::MODS];
 		GameMenuEntries& entries = tab.mMenuEntries;
-		std::map<size_t, std::string>& sections = tab.mSections;
-		std::map<size_t, std::string>& titles = tab.mTitles;
 		entries.resize(1);
-		sections.clear();
-		titles.clear();
 
 		const std::vector<Mod*>& activeMods = ModManager::instance().getActiveMods();
 		for (int modIndex = (int)activeMods.size() - 1; modIndex >= 0; --modIndex)
@@ -717,25 +729,40 @@ void OptionsMenu::initialize()
 			if (mod->mSettingCategories.empty())
 				continue;
 
-			sections[entries.size()] = mod->mDisplayName;
+			entries.addEntry<SectionMenuEntry>().initEntry(mod->mDisplayName);
+			bool isFirstTitle = true;
 
 			for (Mod::SettingCategory& modSettingCategory : mod->mSettingCategories)
 			{
+				// Check for category change, and add a title if needed
+				const std::string* titleText = nullptr;
 				if (modSettingCategory.mDisplayName.empty())
 				{
 					if (mod->mSettingCategories.size() >= 2)
 					{
-						titles[entries.size()] = "Other Settings";
+						static const std::string OTHER_SETTINGS = "Other Settings";
+						titleText = &OTHER_SETTINGS;
 					}
 				}
 				else
 				{
-					titles[entries.size()] = modSettingCategory.mDisplayName;
+					titleText = &modSettingCategory.mDisplayName;
+				}
+				if (nullptr != titleText)
+				{
+					// Add title
+					TitleMenuEntry& entry = entries.addEntry<TitleMenuEntry>().initEntry(*titleText);
+					entry.mMarginBelow += 3;
+					if (isFirstTitle)
+					{
+						entry.mMarginAbove -= 11;
+						isFirstTitle = false;
+					}
 				}
 
 				for (Mod::Setting& modSetting : modSettingCategory.mSettings)
 				{
-					GameMenuEntries::Entry& entry = entries.addEntry(modSetting.mDisplayName, nextOptionId);
+					GameMenuEntry& entry = entries.addEntry<OptionsMenuEntry>().initEntry(modSetting.mDisplayName, nextOptionId);
 					for (const Mod::Setting::Option& option : modSetting.mOptions)
 					{
 						entry.addOption(option.mDisplayName, option.mValue);
@@ -752,7 +779,7 @@ void OptionsMenu::initialize()
 
 		for (size_t k = 0; k < entries.size(); ++k)
 		{
-			GameMenuEntries::Entry& entry = entries[k];
+			GameMenuEntry& entry = entries[k];
 			OptionEntry& optionEntry = mOptionEntries[entry.mData];
 			optionEntry.mGameMenuEntry = &entry;
 		}
@@ -763,7 +790,7 @@ void OptionsMenu::initialize()
 			++mActiveTab;
 			mActiveTabAnimated = (float)mActiveTab;
 		}
-	
+
 		mTabMenuEntries[0].mOptions[Tab::Id::MODS].mVisible = anyModOptions;
 		mTabMenuEntries[0].mSelectedIndex = mActiveTab;
 	}
@@ -783,7 +810,7 @@ void OptionsMenu::initialize()
 		std::sort(mSoundTestAudioDefinitions.begin(), mSoundTestAudioDefinitions.end(),
 			[](const AudioCollection::AudioDefinition* a, const AudioCollection::AudioDefinition* b) { return a->mKeyString < b->mKeyString; });
 
-		GameMenuEntries::Entry& entry = *mOptionEntries[option::SOUND_TEST].mGameMenuEntry;
+		GameMenuEntry& entry = *mOptionEntries[option::SOUND_TEST].mGameMenuEntry;
 		entry.mOptions.clear();
 		for (size_t index = 0; index < mSoundTestAudioDefinitions.size(); ++index)
 		{
@@ -849,7 +876,7 @@ void OptionsMenu::update(float timeElapsed)
 				}
 				else if (result == GameMenuEntries::UpdateResult::OPTION_CHANGED && mActiveMenu != &mTabMenuEntries)
 				{
-					const GameMenuEntries::Entry& selectedEntry = mActiveMenu->selected();
+					const GameMenuEntry& selectedEntry = mActiveMenu->selected();
 					const uint32 selectedData = selectedEntry.mData;
 					switch (selectedData)
 					{
@@ -912,7 +939,7 @@ void OptionsMenu::update(float timeElapsed)
 								}
 								if (selectedData == option::FRAME_SYNC)
 								{
-									EngineMain::instance().setVSyncMode(selectedEntry.selected().mValue);
+									EngineMain::instance().setVSyncMode((Configuration::FrameSyncType)selectedEntry.selected().mValue);
 								}
 							}
 							break;
@@ -940,7 +967,7 @@ void OptionsMenu::update(float timeElapsed)
 			else if (buttonEffect == ButtonEffect::ACCEPT && mActiveMenu != &mTabMenuEntries)
 			{
 				Tab& tab = mTabs[mActiveTab];
-				const GameMenuEntries::Entry& selectedEntry = tab.mMenuEntries.selected();
+				const GameMenuEntry& selectedEntry = tab.mMenuEntries.selected();
 				switch (selectedEntry.mData)
 				{
 					case option::SOUND_TEST:
@@ -961,6 +988,26 @@ void OptionsMenu::update(float timeElapsed)
 					{
 						InputManager::instance().setLastInputType(InputManager::InputType::TOUCH);
 						TouchControlsOverlay::instance().enableConfigMode(true);
+						break;
+					}
+
+					case option::_CHECK_FOR_UPDATE:
+					{
+						UpdateCheck& updateCheck = GameClient::instance().getUpdateCheck();
+						if (updateCheck.hasUpdate())
+						{
+							PlatformFunctions::openURLExternal(updateCheck.getResponse()->mUpdateInfoURL.empty() ? "https://sonic3air.org" : updateCheck.getResponse()->mUpdateInfoURL);
+						}
+						else
+						{
+							updateCheck.startUpdateCheck();
+						}
+						break;
+					}
+
+					case option::_OPEN_HOMEPAGE:
+					{
+						PlatformFunctions::openURLExternal("https://sonic3air.org/");
 						break;
 					}
 
@@ -986,8 +1033,8 @@ void OptionsMenu::update(float timeElapsed)
 	// Enable / disable options
 	//  -> Done here as the conditions can change at any time (incl. hotkeys)
 	const bool isSoftware = (Configuration::instance().mRenderMethod == Configuration::RenderMethod::SOFTWARE);
-	mOptionEntries[option::SCANLINES].mGameMenuEntry->setEnabled(!isSoftware && Configuration::instance().mFiltering < 3);
-	mOptionEntries[option::FILTERING].mGameMenuEntry->setEnabled(!isSoftware);
+	mOptionEntries[option::SCANLINES].mGameMenuEntry->setInteractable(!isSoftware && Configuration::instance().mFiltering < 3);
+	mOptionEntries[option::FILTERING].mGameMenuEntry->setInteractable(!isSoftware);
 
 	// Scrolling
 	mScrolling.update(timeElapsed);
@@ -1021,6 +1068,10 @@ void OptionsMenu::render()
 {
 	Drawer& drawer = EngineMain::instance().getDrawer();
 
+	OptionsMenuRenderContext renderContext;
+	renderContext.mOptionsMenu = this;
+	renderContext.mDrawer = &drawer;
+
 	int anchorX = 200;
 	int anchorY = 0;
 	float alpha = 1.0f;
@@ -1039,197 +1090,63 @@ void OptionsMenu::render()
 	{
 		const int startY = anchorY + 30 - mScrolling.getScrollOffsetYInt();
 
-		drawer.pushScissor(Recti(0, anchorY + 30, (int)mRect.width, (int)mRect.height - anchorY - 30));
-
-		const int minTabIndex = (int)std::floor(mActiveTabAnimated);
-		const int maxTabIndex = (int)std::ceil(mActiveTabAnimated);
-
-		for (int tabIndex = minTabIndex; tabIndex <= maxTabIndex; ++tabIndex)
+		// Tab contents
 		{
-			const Tab& tab = mTabs[tabIndex];
-			const bool isModsTab = (tabIndex == Tab::Id::MODS);
+			drawer.pushScissor(Recti(0, anchorY + 30, (int)mRect.width, (int)mRect.height - anchorY - 30));
 
-			const float tabAlpha = alpha * (1.0f - std::fabs(tabIndex - mActiveTabAnimated));
-			const int baseX = anchorX + roundToInt((tabIndex - mActiveTabAnimated) * 250);
-			int py = startY + 12;
-			const std::string* pendingTitle = nullptr;
+			const int minTabIndex = (int)std::floor(mActiveTabAnimated);
+			const int maxTabIndex = (int)std::ceil(mActiveTabAnimated);
 
-			for (size_t line = 1; line < tab.mMenuEntries.size(); ++line)
+			for (int tabIndex = minTabIndex; tabIndex <= maxTabIndex; ++tabIndex)
 			{
-				int currentAbsoluteY1 = py - startY;
+				Tab& tab = mTabs[tabIndex];
+				const bool isModsTab = (tabIndex == Tab::Id::MODS);
+				const float tabAlpha = alpha * (1.0f - std::fabs(tabIndex - mActiveTabAnimated));
+				const int baseX = anchorX + roundToInt((tabIndex - mActiveTabAnimated) * 250);
 
-				const auto sectionIterator = tab.mSections.find(line);
-				if (sectionIterator != tab.mSections.end())
+				renderContext.mCurrentPosition.set(baseX, startY + 12);
+				renderContext.mTabAlpha = tabAlpha;
+				renderContext.mIsModsTab = isModsTab;
+
+				for (size_t line = 1; line < tab.mMenuEntries.size(); ++line)
 				{
-					py += 14;
-					const int textWidth = global::mFont10.getWidth(sectionIterator->second);
-					drawer.printText(global::mFont10, Recti(baseX - 140, py, 0, 10), sectionIterator->second, 4, Color(0.7f, 1.0f, 0.9f, tabAlpha));
-					drawer.drawRect(Recti(baseX - 185, py + 4, 40, 1), Color(0.7f, 1.0f, 0.9f, tabAlpha));
-					drawer.drawRect(Recti(baseX - 184, py + 5, 40, 1), Color(0.0f, 0.0f, 0.0f, tabAlpha * 0.75f));
-					drawer.drawRect(Recti(baseX - 135 + textWidth, py + 4, 320 - textWidth, 1), Color(0.7f, 1.0f, 0.9f, tabAlpha));
-					drawer.drawRect(Recti(baseX - 134 + textWidth, py + 5, 320 - textWidth, 1), Color(0.0f, 0.0f, 0.0f, tabAlpha * 0.75f));
-					py += 20;
-
-					if (line > 1)
+					GameMenuEntry& entry = tab.mMenuEntries[line];
+					if (!entry.isVisible())
 					{
-						// Refresh position for scrolling once after text, except if it was the first
-						currentAbsoluteY1 = py - startY;
+						// Skip hidden entries
+						continue;
 					}
-				}
 
-				{
-					const auto titleIterator = tab.mTitles.find(line);
-					if (titleIterator != tab.mTitles.end())
+					if (entry.getMenuEntryType() == TitleMenuEntry::MENU_ENTRY_TYPE)
 					{
-						if (isTitleShown(tabIndex, (int)line))
+						if (!isTitleShown(tabIndex, (int)line))
 						{
-							pendingTitle = &titleIterator->second;
+							// Skip this title
+							continue;
 						}
 					}
+
+					const int currentAbsoluteY1 = renderContext.mCurrentPosition.y - startY;
+					renderContext.mIsSelected = (mActiveMenu == &tab.mMenuEntries && (int)line == tab.mMenuEntries.mSelectedEntryIndex);
+
+					// Render this game menu entry
+					entry.performRenderEntry(renderContext);
+
+					if (renderContext.mIsSelected)
+					{
+						// TODO: Add back in that selecting the first interactable entry scrolls up to the top
+						const int currentAbsoluteY2 = renderContext.mCurrentPosition.y - startY;
+						mScrolling.setCurrentSelection(currentAbsoluteY1 - 30, currentAbsoluteY2 + 45);
+					}
+
+					renderContext.mCurrentPosition.y += isModsTab ? 13 : 16;
 				}
-
-				const auto& entry = tab.mMenuEntries[line];
-				if (!entry.isVisible())
-				{
-					// Skip hidden entries
-					continue;
-				}
-
-				const bool isBack = (entry.mData == option::_BACK);
-				if (isBack)
-				{
-					pendingTitle = nullptr;
-				}	 
-				if (nullptr != pendingTitle)
-				{
-					if (*pendingTitle == "$Hints")
-					{
-						// Show hint text
-						py += 16;
-						int px = baseX - 152;
-						for (size_t k = 0; k < option::HINT_TEXTS.size(); ++k)
-						{
-							const char* text = option::HINT_TEXTS[k].c_str();
-							if (text[0] == '$')
-							{
-								px = baseX - 152;
-								py += 12;
-								++text;
-							}
-							const bool highlighted = (text[0] == '#');
-							if (highlighted)
-							{
-								++text;
-							}
-							const int width = global::mFont7.getWidth(text);
-							drawer.printText(global::mFont7, Recti(px, py, width, 10), text, 1, (highlighted) ? Color(0.5f, 1.0f, 0.75f, tabAlpha) : Color(0.8f, 0.8f, 0.8f, tabAlpha));
-							px += width;
-						}
-						py += 16;
-						py += 8;
-					}
-					else
-					{
-						// Show title
-						py += (sectionIterator != tab.mSections.end()) ? 4 : 15;
-						drawer.printText(global::mFont7, Recti(baseX, py, 0, 10), ("* " + *pendingTitle + " *"), 5, Color(0.6f, 0.8f, 1.0f, tabAlpha));
-						py += 18;
-
-						if (line > 1)
-						{
-							// Refresh position for scrolling once after text, except if it was the first
-							currentAbsoluteY1 = py - startY;
-						}
-					}
-					pendingTitle = nullptr;
-				}
-
-				const bool isSelected = (mActiveMenu == &tab.mMenuEntries && (int)line == tab.mMenuEntries.mSelectedEntryIndex);
-				const bool isDisabled = !entry.isEnabled();
-
-				Color color = isSelected ? Color::YELLOW : isDisabled ? Color(0.4f, 0.4f, 0.4f) : Color(1.0f, 1.0f, 1.0f);
-				color.a *= tabAlpha;
-
-				if (entry.mOptions.empty())
-				{
-					// Used for selectable entries, like "Back"
-					if (entry.mData == option::_BACK)
-					{
-						py += 16;
-					}
-
-					if (entry.mData == option::CONTROLLER_SETUP)
-					{
-						drawer.printText(global::mFont10, Recti(baseX, py, 0, 10), Application::instance().hasKeyboard() ? "Setup Keyboard & Game Controllers..." : "Setup Game Controllers...", 5, color);
-					}
-					else
-					{
-						drawer.printText(global::mFont10, Recti(baseX, py, 0, 10), entry.mText, 5, color);
-					}
-
-					if (isSelected)
-					{
-						// Draw arrows
-						const int halfTextWidth = global::mFont10.getWidth(entry.mText) / 2;
-						const int offset = (int)std::fmod(FTX::getTime() * 6.0f, 6.0f);
-						const int arrowDistance = 16 + ((offset > 3) ? (6 - offset) : offset);
-						drawer.printText(global::mFont10, Recti(baseX - halfTextWidth - arrowDistance, py, 0, 10), ">>", 5, color);
-						drawer.printText(global::mFont10, Recti(baseX + halfTextWidth + arrowDistance, py, 0, 10), "<<", 5, color);
-					}
-
-					if (entry.mData == option::CONTROLLER_SETUP)
-						py += 4;
-				}
-				else
-				{
-					// It's an actual options entry, with multiple options to choose from
-					Font& font = isModsTab ? global::mFont5 : global::mFont10;
-
-					const bool canGoLeft  = !isDisabled && (entry.mSelectedIndex > 0);
-					const bool canGoRight = !isDisabled && (entry.mSelectedIndex < entry.mOptions.size() - 1);
-
-					const int center = baseX + 88;
-					int arrowDistance = 75;
-					if (isSelected)
-					{
-						const int offset = (int)std::fmod(FTX::getTime() * 6.0f, 6.0f);
-						arrowDistance += ((offset > 3) ? (6 - offset) : offset);
-					}
-
-					// Description
-					drawer.printText(font, Recti(baseX - 40, py, 0, 10), entry.mText, 6, color);
-
-					// Value text
-					if (entry.mData == option::SOUND_TEST && AudioOut::instance().isSoundIdModded(mSoundTestAudioDefinitions[entry.selected().mValue]->mKeyId))
-					{
-						drawer.printText(font, Recti(center - 80, py, 160, 10), entry.mOptions[entry.mSelectedIndex].mText + " (modded)", 5, color);
-					}
-					else
-					{
-						const std::string& text = (isDisabled && entry.mData != option::RENDERER) ? option::TEXT_NOT_AVAILABLE : entry.mOptions[entry.mSelectedIndex].mText;
-						Font* valueFont = &font;
-						drawer.printText(*valueFont, Recti(center - 80, py, 160, 10), text, 5, color);
-					}
-
-					if (canGoLeft)
-						drawer.printText(font, Recti(center - arrowDistance, py, 0, 10), "<", 5, color);
-					if (canGoRight)
-						drawer.printText(font, Recti(center + arrowDistance, py, 0, 10), ">", 5, color);
-				}
-
-				if (isSelected)
-				{
-					const int currentAbsoluteY2 = py - startY;
-					mScrolling.setCurrentSelection(currentAbsoluteY1 - 30, currentAbsoluteY2 + 45);
-				}
-
-				py += isModsTab ? 13 : 16;
 			}
+
+			drawer.popScissor();
 		}
 
-		drawer.popScissor();
-
-		// Tab titles
+		// Tab titles (must be rendered afterwards because it's meant to be on top)
 		{
 			// Background
 			drawer.drawRect(Recti(anchorX - 200, anchorY - 6, 400, 48), global::mOptionsTopBar, Color(1.0f, 1.0f, 1.0f, alpha));
@@ -1289,6 +1206,11 @@ void OptionsMenu::removeControllerSetupMenu()
 {
 }
 
+const AudioCollection::AudioDefinition* OptionsMenu::getSoundTestAudioDefinition(uint32 index) const
+{
+	return ((size_t)index < mSoundTestAudioDefinitions.size()) ? mSoundTestAudioDefinitions[index] : nullptr;
+}
+
 void OptionsMenu::setupOptionEntry(option::Option optionId, SharedDatabase::Setting::Type setting)
 {
 	OptionEntry& optionEntry = mOptionEntries[optionId];
@@ -1310,6 +1232,14 @@ void OptionsMenu::setupOptionEntryInt(option::Option optionId, int* valuePointer
 	OptionEntry& optionEntry = mOptionEntries[optionId];
 	optionEntry.mOptionId = optionId;
 	optionEntry.mType = OptionEntry::Type::CONFIG_INT;
+	optionEntry.mValuePointer = valuePointer;
+}
+
+void OptionsMenu::setupOptionEntryEnum8(option::Option optionId, void* valuePointer)
+{
+	OptionEntry& optionEntry = mOptionEntries[optionId];
+	optionEntry.mOptionId = optionId;
+	optionEntry.mType = OptionEntry::Type::CONFIG_ENUM_8;
 	optionEntry.mValuePointer = valuePointer;
 }
 
@@ -1346,7 +1276,7 @@ void OptionsMenu::refreshGamepadLists(bool forceUpdate)
 		mLastGamepadsChangeCounter = changeCounter;
 		for (int playerIndex = 0; playerIndex < 2; ++playerIndex)
 		{
-			GameMenuEntries::Entry& entry = *mGamepadAssignmentEntries[playerIndex];
+			GameMenuEntry& entry = *mGamepadAssignmentEntries[playerIndex];
 			const int32 preferredValue = InputManager::instance().getPreferredGamepadByJoystickInstanceId(playerIndex);
 			const uint32 oldSelectedValue = (preferredValue >= 0) ? (uint32)preferredValue : entry.hasSelected() ? entry.selected().mValue : (uint32)-1;
 			entry.mOptions.resize(1);	// First entry is the "None" entry
@@ -1367,7 +1297,7 @@ void OptionsMenu::refreshGamepadLists(bool forceUpdate)
 
 bool OptionsMenu::isTitleShown(int tabIndex, int line) const
 {
-	// Special handling for first titles in Gameplay and Tweaks tabs, if no no unlocks are available there yet
+	// Special handling for first titles in Gameplay and Tweaks tabs, if no unlocks are available there yet
 	if (line != 1)
 		return true;
 
@@ -1377,7 +1307,7 @@ bool OptionsMenu::isTitleShown(int tabIndex, int line) const
 
 	for (auto* entry : mUnlockedSecretsEntries[index])
 	{
-		if (entry->isVisible())
+		if (entry->isFullyInteractable())
 			return true;
 	}
 	return false;

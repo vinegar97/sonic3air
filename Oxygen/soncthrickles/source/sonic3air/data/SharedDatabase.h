@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -20,11 +20,11 @@ public:
 		std::string mShortName;
 		std::string mDisplayName;
 		uint8 mInternalIndex;
-		int mActsFreeRoam;
+		int mActsNormal;
 		int mActsTimeAttack;
 
-		inline Zone(const std::string& initials, const std::string& shortName, const std::string& displayName, uint8 index, int actsFreeRoam, int actsTimeAttack) :
-			mInitials(initials), mShortName(shortName), mDisplayName(displayName), mInternalIndex(index), mActsFreeRoam(actsFreeRoam), mActsTimeAttack(actsTimeAttack) {}
+		inline Zone(const std::string& initials, const std::string& shortName, const std::string& displayName, uint8 index, int actsNormal, int actsTimeAttack) :
+			mInitials(initials), mShortName(shortName), mDisplayName(displayName), mInternalIndex(index), mActsNormal(actsNormal), mActsTimeAttack(actsTimeAttack) {}
 	};
 
 	struct Setting

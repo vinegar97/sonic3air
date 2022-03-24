@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -60,6 +60,7 @@ public:
 
 		uint64 mKeyId = 0;
 		std::string mKeyString;
+		std::string mDisplayName;
 		Type mType = Type::SOUND;
 		uint8 mChannel = 0xff;
 
@@ -77,7 +78,7 @@ public:
 	void clearPackage(Package package);
 	bool loadFromJson(const std::wstring& basepath, const std::wstring& filename, Package package);
 
-	void determineActiveSourceRegistrations(bool preferOriginal);
+	void determineActiveSourceRegistrations(bool preferOriginalSoundtrack);
 
 	const AudioDefinition* getAudioDefinition(uint64 keyId) const;
 	SourceRegistration* getSourceRegistration(uint64 keyId) const;

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -89,7 +89,7 @@ namespace lemon
 		static void exec_GET_VARIABLE_VALUE_USER(const RuntimeOpcodeContext context)
 		{
 			const uint32 variableId = context.getParameter<uint32>();
-			const GlobalVariable& variable = static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableById(variableId));
+			const GlobalVariable& variable = static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(variableId));
 			*context.mControlFlow->mValueStackPtr = variable.getValue();
 			++context.mControlFlow->mValueStackPtr;
 		}
@@ -112,7 +112,7 @@ namespace lemon
 		{
 			const int64 value = *(context.mControlFlow->mValueStackPtr-1);
 			const uint32 variableId = context.getParameter<uint32>();
-			GlobalVariable& variable = static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableById(variableId));
+			GlobalVariable& variable = static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(variableId));
 			variable.setValue(value);
 		}
 
@@ -379,10 +379,10 @@ namespace lemon
 
 					case Variable::Type::GLOBAL:
 					{
-						int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableById(variableId));
+						int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
 						runtimeOpcode.setParameter(value);
 
-						switch (DataTypeHelper::getDefinitionFromBaseType(opcode.mDataType)->mBytes)
+						switch (DataTypeHelper::getSizeOfBaseType(opcode.mDataType))
 						{
 							case 1:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_GET_VARIABLE_VALUE_EXTERNAL<uint8>;   break;
 							case 2:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_GET_VARIABLE_VALUE_EXTERNAL<uint16>;  break;
@@ -394,7 +394,7 @@ namespace lemon
 
 					case Variable::Type::EXTERNAL:
 					{
-						const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableById(variableId));
+						const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
 						runtimeOpcode.setParameter(variable.mPointer);
 
 						switch (variable.getDataType()->mBytes)
@@ -421,10 +421,10 @@ namespace lemon
 
 					case Variable::Type::GLOBAL:
 					{
-						int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableById(variableId));
+						int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
 						runtimeOpcode.setParameter(value);
 
-						switch (DataTypeHelper::getDefinitionFromBaseType(opcode.mDataType)->mBytes)
+						switch (DataTypeHelper::getSizeOfBaseType(opcode.mDataType))
 						{
 							case 1:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_SET_VARIABLE_VALUE_EXTERNAL<uint8>;   break;
 							case 2:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_SET_VARIABLE_VALUE_EXTERNAL<uint16>;  break;
@@ -436,7 +436,7 @@ namespace lemon
 
 					case Variable::Type::EXTERNAL:
 					{
-						const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableById(variableId));
+						const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
 						runtimeOpcode.setParameter(variable.mPointer);
 
 						switch (variable.getDataType()->mBytes)

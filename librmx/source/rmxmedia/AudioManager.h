@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -82,11 +82,11 @@ namespace rmx
 			return *audioMixer;
 		}
 
-		AudioMixer* getAudioMixerById(int mixerId) const;
-		void deleteAudioMixerById(int mixerId);
+		AudioMixer* getAudioMixerByID(int mixerId) const;
+		void deleteAudioMixerByID(int mixerId);
 
-		float getAudioMixerVolumeById(int mixerId) const;
-		void setAudioMixerVolumeById(int mixerId, float relativeVolume);
+		float getAudioMixerVolumeByID(int mixerId) const;
+		void setAudioMixerVolumeByID(int mixerId, float relativeVolume);
 
 		bool addSound(const PlaybackOptions& playbackOptions, AudioReference& ref);
 		int addSound(AudioBuffer* audiobuffer, bool streaming = false);							// Deprecated
@@ -137,5 +137,5 @@ namespace rmx
 	public:
 		static bool load(AudioBuffer* buffer, const String& source, const String& params);
 	};
-	
+
 }

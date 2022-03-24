@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,7 +9,9 @@
 #pragma once
 
 #include "lemon/program/Opcode.h"
+#include "lemon/program/SourceFileInfo.h"
 #include "lemon/program/Variable.h"
+#include "lemon/utility/FlyweightString.h"
 
 
 namespace lemon
@@ -30,7 +32,7 @@ namespace lemon
 		struct Parameter
 		{
 			const DataTypeDefinition* mType = nullptr;
-			std::string mIdentifier;
+			FlyweightString mName;
 		};
 		typedef std::vector<Parameter> ParameterList;
 
@@ -39,10 +41,9 @@ namespace lemon
 
 	public:
 		inline Type getType() const  { return mType; }
-		inline uint32 getId() const  { return mId; }
+		inline uint32 getID() const  { return mID; }
 
-		inline const std::string& getName() const { return mName; }
-		inline uint64 getNameHash() const { return mNameHash; }
+		inline FlyweightString getName() const { return mName; }
 		inline uint64 getNameAndSignatureHash() const { return mNameAndSignatureHash; }
 
 		const DataTypeDefinition* getReturnType() const  { return mReturnType; }
@@ -58,11 +59,10 @@ namespace lemon
 
 	protected:
 		Type mType;
-		uint32 mId = 0;
+		uint32 mID = 0;
 
 		// Metadata
-		std::string mName;
-		uint64 mNameHash = 0;
+		FlyweightString mName;
 		uint64 mNameAndSignatureHash = 0;
 
 		// Signature
@@ -75,38 +75,48 @@ namespace lemon
 	class ScriptFunction : public Function
 	{
 	public:
+		struct Label
+		{
+			FlyweightString mName;
+			uint32 mOffset = 0;
+		};
+
+	public:
 		inline ScriptFunction() : Function(Type::SCRIPT) {}
 		~ScriptFunction();
 
 		inline const Module& getModule() const	{ return *mModule; }
 		inline void setModule(Module& module)	{ mModule = &module; }
 
-		LocalVariable* getLocalVariableByIdentifier(const std::string& identifier) const;
-		LocalVariable& getLocalVariableById(uint32 id) const;
-		LocalVariable& addLocalVariable(const std::string& identifier, const DataTypeDefinition* dataType, uint32 lineNumber);
+		LocalVariable* getLocalVariableByIdentifier(uint64 nameHash) const;
+		LocalVariable& getLocalVariableByID(uint32 id) const;
+		LocalVariable& addLocalVariable(FlyweightString name, const DataTypeDefinition* dataType, uint32 lineNumber);
 
-		bool getLabel(const std::string& labelName, size_t& outOffset) const;
-		void addLabel(const std::string& labelName, size_t offset);
-		const std::string* findLabelByOffset(size_t offset) const;
+		bool getLabel(FlyweightString labelName, size_t& outOffset) const;
+		void addLabel(FlyweightString labelName, size_t offset);
+		const Label* findLabelByOffset(size_t offset) const;
 
 		inline const std::vector<std::string>& getPragmas() const  { return mPragmas; }
 
+		uint64 addToCompiledHash(uint64 hash) const;
+
 	public:
 		// Variables
-		std::map<std::string, LocalVariable*> mLocalVariablesByIdentifier;
-		std::vector<LocalVariable*> mLocalVariablesById;
+		std::map<uint64, LocalVariable*> mLocalVariablesByIdentifier;
+		std::vector<LocalVariable*> mLocalVariablesByID;
 
 		// Code
 		std::vector<Opcode> mOpcodes;
 
 		// Labels
-		std::map<std::string, uint32> mLabels;
+		std::vector<Label> mLabels;
 
 		// Pragmas
 		std::vector<std::string> mPragmas;
 
 		// Source
-		std::wstring mSourceFilename;
+		const SourceFileInfo* mSourceFileInfo = nullptr;
+		uint32 mStartLineNumber = 0;
 		uint32 mSourceBaseLineOffset = 0;	// Offset translating from the full line number (when all includes are fully resolved) to line number inside the original script file
 
 	private:
@@ -142,6 +152,8 @@ namespace lemon
 		inline virtual ~UserDefinedFunction()  { delete mFunctionWrapper; }
 
 		void setFunction(const FunctionWrapper& functionWrapper);
+		UserDefinedFunction& setParameterInfo(size_t index, const std::string& identifier);
+
 		void execute(const Context context) const;
 
 	public:

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -14,7 +14,7 @@
 #include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/helper/PackageFileCrawler.h"
 
 
@@ -66,7 +66,7 @@ bool ResourcesCache::loadRom()
 	// If still not loaded, search for Steam installation of the game
 	if (!loaded && !gameProfile.mRomAutoDiscover.mSteamRomName.empty())
 	{
-		LOG_INFO("Trying to find Steam ROM");
+		RMX_LOG_INFO("Trying to find Steam ROM");
 		romPath = PlatformFunctions::tryGetSteamRomPath(gameProfile.mRomAutoDiscover.mSteamRomName);
 		if (!romPath.empty())
 		{
@@ -151,6 +151,35 @@ const ResourcesCache::Palette* ResourcesCache::getPalette(uint64 key, uint8 line
 {
 	const auto it = mPalettes.find(key + line);
 	return (it == mPalettes.end()) ? nullptr : &it->second;
+}
+
+Font* ResourcesCache::getFontByKey(const std::string& keyString, uint64 keyHash)
+{
+	// Try to find in map
+	const auto it = mCachedFonts.find(keyHash);
+	if (it != mCachedFonts.end())
+	{
+		return &it->second.mFont;
+	}
+	return nullptr;
+}
+
+Font* ResourcesCache::registerFontSource(const std::string& filename)
+{
+	const uint64 keyHash = rmx::getMurmur2_64(filename);
+	CachedFont& cachedFont = mCachedFonts[keyHash];
+	cachedFont.mKeyString = filename;
+	cachedFont.mKeyHash = keyHash;
+	
+	if (cachedFont.mFont.loadFromFile("data/font/" + filename + ".json"))
+	{
+		return &cachedFont.mFont;
+	}
+	else
+	{
+		mCachedFonts.erase(keyHash);
+		return nullptr;
+	}
 }
 
 void ResourcesCache::applyRomInjections(uint8* rom, uint32 romSize) const

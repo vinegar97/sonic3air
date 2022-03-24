@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -23,6 +23,7 @@ protected:
 	void saveSettingsInternal(Json::Value& root, SettingsType settingsType) override;
 
 private:
+	void loadSharedSettingsConfig(JsonHelper& rootHelper);
 	void loadSettingsInternal(JsonHelper& rootHelper, SettingsType settingsType, bool isDeprecatedJson);
 
 public:
@@ -36,4 +37,20 @@ public:
 
 	// Settings game version
 	std::string mGameVersionInSettings;
+
+	// Game server
+	struct GhostSync
+	{
+		bool mEnabled = false;
+		std::string mChannelName;
+		bool mShowOffscreenGhosts = false;
+	};
+	struct GameServer
+	{
+		std::string mServerHostName;
+		int mServerPortUDP = 0;
+		int mServerPortTCP = 0;
+		GhostSync mGhostSync;
+	};
+	GameServer mGameServer;
 };

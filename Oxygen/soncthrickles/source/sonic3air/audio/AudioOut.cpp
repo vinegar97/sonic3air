@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -75,14 +75,14 @@ void AudioOut::realtimeUpdate(float secondsPassed)
 	if (mMusicVolume != config.mMusicVolume)
 	{
 		mMusicVolume = config.mMusicVolume;
-		FTX::Audio->setAudioMixerVolumeById((int)AudioMixerId::INGAME_MUSIC, mMusicVolume);
-		FTX::Audio->setAudioMixerVolumeById((int)AudioMixerId::MENU_MUSIC, mMusicVolume);
+		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::INGAME_MUSIC, mMusicVolume);
+		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::MENU_MUSIC, mMusicVolume);
 	}
 	if (mSoundVolume != config.mSoundVolume)
 	{
 		mSoundVolume = config.mSoundVolume;
-		FTX::Audio->setAudioMixerVolumeById((int)AudioMixerId::INGAME_SOUND, mSoundVolume);
-		FTX::Audio->setAudioMixerVolumeById((int)AudioMixerId::MENU_SOUND, mSoundVolume);
+		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::INGAME_SOUND, mSoundVolume);
+		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::MENU_SOUND, mSoundVolume);
 	}
 
 	// Call base implementation

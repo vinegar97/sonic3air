@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -31,8 +31,9 @@ void SpriteManager::SpriteSets::swap(SpriteSets& other)
 }
 
 
-SpriteManager::SpriteManager(PatternManager& patternManager) :
-	mPatternManager(patternManager)
+SpriteManager::SpriteManager(PatternManager& patternManager, SpacesManager& spacesManager) :
+	mPatternManager(patternManager),
+	mSpacesManager(spacesManager)
 {
 	reset();
 }
@@ -151,11 +152,12 @@ void SpriteManager::refresh()
 	std::reverse(mSprites.begin(), mSprites.end());
 
 	// Process coordinates of all sprites
+	const Vec2i worldSpaceOffset = mSpacesManager.getWorldSpaceOffset();
 	for (SpriteInfo* sprite : mSprites)
 	{
 		if (sprite->mCoordinatesSpace == SpriteManager::Space::WORLD)
 		{
-			sprite->mPosition -= mWorldSpaceOffset;
+			sprite->mPosition -= worldSpaceOffset;
 		}
 	}
 }
@@ -339,11 +341,6 @@ void SpriteManager::setSpriteTagWithPosition(uint64 spriteTag, const Vec2i& posi
 {
 	mSpriteTag = spriteTag;
 	mTaggedSpritePosition = position;
-}
-
-void SpriteManager::setWorldSpaceOffset(const Vec2i& offset)
-{
-	mWorldSpaceOffset = offset;
 }
 
 void SpriteManager::checkSpriteTag(SpriteInfo& sprite)

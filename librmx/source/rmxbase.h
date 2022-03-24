@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -43,6 +43,7 @@
 #include "rmxbase/Sort.h"
 #include "rmxbase/CArray.h"
 #include "rmxbase/ObjectPool.h"
+#include "rmxbase/OneTimeAllocPool.h"
 #include "rmxbase/SingleInstance.h"
 #include "rmxbase/Singleton.h"
 #include "rmxbase/SinglePtr.h"
@@ -65,6 +66,7 @@
 #include "rmxbase/ZlibDeflate.h"
 #include "rmxbase/Color.h"
 #include "rmxbase/Bitmap.h"
+#include "rmxbase/Logging.h"
 
 
 // Library linking via pragma

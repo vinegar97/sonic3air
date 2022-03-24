@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -376,6 +376,35 @@ void HardwareRenderer::renderGeometry(const Geometry& geometry)
 			shader.bind();
 			shader.setParam("Color", Vec4f(rg.mColor.data));
 			shader.setParam("Transform", transform);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+			break;
+		}
+
+		case Geometry::Type::TEXTURED_RECT:
+		{
+			const TexturedRectGeometry& tg = static_cast<const TexturedRectGeometry&>(geometry);
+
+			OpenGLDrawerTexture* texture = tg.mDrawerTexture.getImplementation<OpenGLDrawerTexture>();
+			if (nullptr == texture)
+				break;
+
+			const bool needsRefresh = (mLastRenderedGeometryType != Geometry::Type::TEXTURED_RECT);
+			if (needsRefresh)
+			{
+				glDisable(GL_DEPTH_TEST);
+			}
+
+			Vec4f transform;
+			transform.x = (float)tg.mRect.x / (float)mGameResolution.x * 2.0f - 1.0f;
+			transform.y = (float)tg.mRect.y / (float)mGameResolution.y * 2.0f - 1.0f;
+			transform.z = tg.mRect.width / (float)mGameResolution.x * 2.0f;
+			transform.w = tg.mRect.height / (float)mGameResolution.y * 2.0f;
+
+			Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(true, true);
+			shader.bind();
+			shader.setParam("Transform", transform);
+			shader.setParam("TintColor", tg.mColor);
+			shader.setTexture("Texture", texture->getTextureHandle(), GL_TEXTURE_2D);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			break;
 		}

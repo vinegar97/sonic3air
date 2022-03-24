@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -28,7 +28,7 @@ void CustomDebugSidePanelCategory::onSetup()
 	}
 }
 
-bool CustomDebugSidePanelCategory::addOption(const std::string& text, bool defaultValue)
+bool CustomDebugSidePanelCategory::addOption(std::string_view text, bool defaultValue)
 {
 	// Exists already?
 	for (Option& option : mOptions)
@@ -74,7 +74,7 @@ void CustomDebugSidePanelCategory::addEntry(uint64 key)
 	mEntriesNeedSorting = true;
 }
 
-void CustomDebugSidePanelCategory::addLine(const std::string& text, int indent, const Color& color)
+void CustomDebugSidePanelCategory::addLine(std::string_view text, int indent, const Color& color)
 {
 	if (nullptr == mCurrentEntry)
 		return;
@@ -109,7 +109,7 @@ void CustomDebugSidePanelCategory::buildCategoryContent(DebugSidePanel::Builder&
 				continue;
 
 			option.mChecked = mOpenKeys.count(option.mKey);
-			builder.addLine(String(0, "[%c] %s", option.mChecked ? 'x' : ' ', option.mText.c_str()), Color::CYAN, 0, option.mKey);
+			builder.addOption(option.mText, option.mChecked, Color::CYAN, 0, option.mKey);
 		}
 		builder.addSpacing(12);
 	}

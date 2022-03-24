@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -37,7 +37,9 @@ function void fn089394()
 {
 	setupObjectAttributesFull(0x089454)
 
-	spawnChildObjects(0x08946c)
+	// "spawnChildObjects(0x08946c)" replaced by:
+	spawnChildObject(0x0893e8, 0x00, 0, 16)
+	spawnChildObject(0x08942e, 0x02, 0, 3)
 }
 
 

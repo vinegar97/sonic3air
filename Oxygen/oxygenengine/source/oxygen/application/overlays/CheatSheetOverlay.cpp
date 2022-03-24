@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -87,7 +87,7 @@ void CheatSheetOverlay::render()
 	mRect.setSize(330, (float)(58 + NUM_TEXTS * 18));
 	mRect.setPos(((float)FTX::screenWidth() - mRect.width) * 0.95f, ((float)FTX::screenHeight() - mRect.height) * (1.0f - alpha * 0.1f));
 	drawer.drawRect(mRect, Color(0.1f, 0.1f, 0.1f, alpha * 0.6f));
-	
+
 	Recti rct(roundToInt(mRect.x) + 20, roundToInt(mRect.y) + 16, 40, 20);
 	drawer.printText(font, rct, "Hotkeys overview - show/hide with F1", 1, Color(0.5f, 1.0f, 1.0f, alpha));
 	rct.y += 26;

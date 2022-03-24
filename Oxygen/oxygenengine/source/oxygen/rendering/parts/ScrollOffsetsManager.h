@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -73,6 +73,7 @@ private:
 	struct InterpolatedScrollOffsetSet
 	{
 		bool mValid = false;
+		bool mHasLastScrollOffsets = false;
 		uint16 mInterpolatedScrollOffsetsH[0x100] = { 0 };
 		uint16 mInterpolatedScrollOffsetsV[0x20] = { 0 };
 		uint16 mLastScrollOffsetsH[0x100] = { 0 };
@@ -80,5 +81,5 @@ private:
 		int16 mDifferenceScrollOffsetsH[0x100] = { 0 };
 		int16 mDifferenceScrollOffsetsV[0x20] = { 0 };
 	};
-	InterpolatedScrollOffsetSet mInterpolatedSets[2];
+	InterpolatedScrollOffsetSet mInterpolatedSets[4];
 };

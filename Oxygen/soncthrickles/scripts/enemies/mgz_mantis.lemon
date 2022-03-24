@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -40,7 +40,8 @@ function void fn088e82()
 	setupObjectAttributesFull(0x088f8a)
 	objA0.hitbox_extends.y = 0x29
 
-	spawnChildObjects(0x088f9c)
+	// "spawnChildObjects(0x088f9c)" replaced by:
+	spawnChildObject(0x088f50, 0x00, -9, -11)
 }
 
 

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -93,7 +93,7 @@ void CustomAudioMixer::performAudioMix(const MixerParameters& parameters)
 			// Update accumulator
 			//  -> It is the sum of the last n input values (where n = effect)
 			data.mAccumulator += (int64)(inputValue - historyValue);
-			
+
 			// Get the average and use it as output
 			output[i] = (int32)(data.mAccumulator / divisor);
 

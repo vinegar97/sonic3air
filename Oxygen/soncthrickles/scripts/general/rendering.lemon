@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -34,7 +34,7 @@ function u16 getScreenExtend()
 	// This is actually "(getScreenWidth() - 320) / 2"
 #if STANDALONE
 	return 40
-else
+#else
 	return 0
 #endif
 }
@@ -395,7 +395,9 @@ function void renderNextObject()
 			{
 				u16 backup = D6.u16
 				++spriteTag
+			#if STANDALONE
 				Renderer.setSpriteTagWithPosition(spriteTag, D0.u16, D1.u16)
+			#endif
 				writeToSpriteTableCompound(renderQueue)
 				D6.u16 = backup
 			}
@@ -428,7 +430,10 @@ function void renderNextObject()
 		objA0.render_flags |= render_flag.VISIBLE
 
 	#if STANDALONE
-		Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+		if (objA0.update_address != 0x04a0c6)	// Explicitly disable sprite interpolation for the Glowing Spheres energy beam, as it ruins the effect
+			Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+		else
+			Renderer.clearSpriteTag()
 		if (Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))
 			return
 	#else

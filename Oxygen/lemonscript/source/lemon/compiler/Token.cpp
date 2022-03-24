@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -101,7 +101,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		case Token::Type::LABEL:
 		{
 			LabelToken& token = token_.as<LabelToken>();
-			serializer.serialize(token.mName);
+			token.mName.serialize(serializer);
 			break;
 		}
 
@@ -117,7 +117,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		{
 			IdentifierToken& token = token_.as<IdentifierToken>();
 			DataTypeHelper::serializeDataType(serializer, token.mDataType);
-			serializer.serialize(token.mIdentifier);
+			token.mName.serialize(serializer);
 			break;
 		}
 

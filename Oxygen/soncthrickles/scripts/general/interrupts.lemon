@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -251,7 +251,7 @@ function void VInt.Update.MainGame()
 	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, getScreenHeight() * 4)
 	u16[0xfffff640] = 0x83
 
-	// Update sprite attrribute data in VRAM
+	// Update sprite attribute data in VRAM
 	u32 spriteDataSourceAddress = 0xfffff800
 	if (competition_mode.active)
 	{

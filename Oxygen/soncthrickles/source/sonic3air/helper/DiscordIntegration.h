@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -76,8 +76,8 @@ public:
 
 	static void updateInfo(Game::Mode gameMode, uint32 subMode, EmulatorInterface& emulatorInterface);
 
-	static void setModdedDetails(const std::string& text);
-	static void setModdedState(const std::string& text);
-	static void setModdedLargeImage(const std::string& imageName);
-	static void setModdedSmallImage(const std::string& imageName);
+	static void setModdedDetails(std::string_view text);
+	static void setModdedState(std::string_view text);
+	static void setModdedLargeImage(std::string_view imageName);
+	static void setModdedSmallImage(std::string_view imageName);
 };

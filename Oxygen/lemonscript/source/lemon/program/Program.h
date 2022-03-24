@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
 #include "lemon/program/Function.h"
 #include <unordered_map>
@@ -37,14 +38,17 @@ namespace lemon
 		// Functions
 		inline const std::vector<Function*>& getFunctions() const  { return mFunctions; }
 		inline const std::vector<ScriptFunction*>& getScriptFunctions() const  { return mScriptFunctions; }
-		const Function* getFunctionById(uint32 id) const;
+		const Function* getFunctionByID(uint32 id) const;
 		const Function* getFunctionBySignature(uint64 nameAndSignatureHash, size_t index = 0) const;
 		const std::vector<Function*>& getFunctionsByName(uint64 nameHash) const;
 
 		// Variables
 		inline const std::vector<Variable*>& getGlobalVariables() const  { return mGlobalVariables; }
-		Variable& getGlobalVariableById(uint32 id) const;
+		Variable& getGlobalVariableByID(uint32 id) const;
 		Variable* getGlobalVariableByName(uint64 nameHash) const;
+
+		// Constant arrays
+		inline const std::vector<ConstantArray*>& getConstantArrays() const  { return mConstantArrays; }
 
 		// Defines
 		inline const std::vector<Define*>& getDefines() const  { return mDefines; }
@@ -68,6 +72,9 @@ namespace lemon
 		// Variables
 		std::vector<Variable*> mGlobalVariables;
 		std::unordered_map<uint64, Variable*> mGlobalVariablesByName;
+
+		// Constant arrays
+		std::vector<ConstantArray*> mConstantArrays;
 
 		// Defines
 		std::vector<Define*> mDefines;

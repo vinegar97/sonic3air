@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -21,6 +21,7 @@ public:
 
 	inline const std::vector<Mod*>& getAllMods() const	   { return mAllMods; }
 	inline const std::vector<Mod*>& getActiveMods() const  { return mActiveMods; }
+	inline const std::unordered_map<uint64, Mod*>& getActiveModsByNameHash() const  { return mActiveModsByNameHash; }
 
 	void startup();
 	void clear();
@@ -51,6 +52,7 @@ private:
 	std::wstring mBasePath;
 	std::vector<Mod*> mAllMods;
 	std::vector<Mod*> mActiveMods;
-	std::map<uint64, Mod*> mModsByLocalDirectoryHash;
+	std::unordered_map<uint64, Mod*> mActiveModsByNameHash;		// Each mod is registered by both its internal name and display name
+	std::unordered_map<uint64, Mod*> mModsByLocalDirectoryHash;
 	std::map<std::wstring, ZipFileProvider*> mZipFileProviders;
 };

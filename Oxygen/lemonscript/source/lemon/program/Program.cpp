@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -39,6 +39,9 @@ namespace lemon
 		mGlobalVariables.clear();
 		mGlobalVariablesByName.clear();
 
+		// Constant arrays
+		mConstantArrays.clear();
+
 		// Defines
 		mDefines.clear();
 	}
@@ -57,27 +60,38 @@ namespace lemon
 		mModules.push_back(&module);
 
 		// Functions
+		mFunctions.reserve(mFunctions.size() + module.mFunctions.size());
+		mScriptFunctions.reserve(mScriptFunctions.size() + module.mFunctions.size());	// This is possibly an overestimation, but that's okay
 		for (Function* function : module.mFunctions)
 		{
-			RMX_ASSERT(mFunctions.size() == function->getId(), "Mismatch between expected (" << mFunctions.size() << ") and actual function ID (" << function->getId() << ")");
+			RMX_ASSERT(mFunctions.size() == function->getID(), "Mismatch between expected (" << mFunctions.size() << ") and actual function ID (" << function->getID() << ")");
 			mFunctions.push_back(function);
 			if (function->getType() == Function::Type::SCRIPT)
 				mScriptFunctions.push_back(static_cast<ScriptFunction*>(function));
 
-			mFunctionsByName[function->getNameHash()].push_back(function);
+			mFunctionsByName[function->getName().getHash()].push_back(function);
 			std::vector<Function*>& funcs = mFunctionsBySignature[function->getNameAndSignatureHash()];
 			funcs.insert(funcs.begin(), function);		// Insert as first
 		}
 
 		// Global variables
+		mGlobalVariables.reserve(mGlobalVariables.size() + module.mGlobalVariables.size());
 		for (Variable* variable : module.mGlobalVariables)
 		{
-			RMX_ASSERT(mGlobalVariables.size() == (variable->getId() & 0x0fffffff), "Mismatch between expected and actual variable ID");
+			RMX_ASSERT(mGlobalVariables.size() == (variable->getID() & 0x0fffffff), "Mismatch between expected and actual variable ID");
 			mGlobalVariables.push_back(variable);
-			mGlobalVariablesByName[variable->getNameHash()] = variable;
+			mGlobalVariablesByName[variable->getName().getHash()] = variable;
+		}
+
+		// Constant arrays
+		mConstantArrays.reserve(mConstantArrays.size() + module.mConstantArrays.size());
+		for (ConstantArray* constantArray : module.mConstantArrays)
+		{
+			mConstantArrays.push_back(constantArray);
 		}
 
 		// Defines
+		mDefines.reserve(mDefines.size() + module.mDefines.size());
 		for (Define* define : module.mDefines)
 		{
 			mDefines.push_back(define);
@@ -91,7 +105,7 @@ namespace lemon
 		output.saveFile(outputFilename);
 	}
 
-	const Function* Program::getFunctionById(uint32 id) const
+	const Function* Program::getFunctionByID(uint32 id) const
 	{
 		return mFunctions[id];
 	}
@@ -112,7 +126,7 @@ namespace lemon
 		return (it == mFunctionsByName.end()) ? EMPTY_FUNCTIONS : it->second;
 	}
 
-	Variable& Program::getGlobalVariableById(uint32 id) const
+	Variable& Program::getGlobalVariableByID(uint32 id) const
 	{
 		return *mGlobalVariables[id & 0x0fffffff];
 	}
@@ -127,7 +141,7 @@ namespace lemon
 	{
 		for (const Module* module : mModules)
 		{
-			outStrings.addFromLookup(module->getStringLiterals());
+			outStrings.addFromList(module->getStringLiterals());
 		}
 	}
 

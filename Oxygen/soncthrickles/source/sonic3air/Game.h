@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,10 +8,12 @@
 
 #pragma once
 
-#include "oxygen/resources/ResourcesCache.h"
-#include "sonic3air/helper/BlueSpheresRendering.h"
+#include "sonic3air/client/GameClient.h"
 #include "sonic3air/data/PlayerProgress.h"
 #include "sonic3air/data/PlayerRecorder.h"
+#include "sonic3air/helper/BlueSpheresRendering.h"
+
+#include "oxygen/resources/ResourcesCache.h"
 
 namespace lemon
 {
@@ -122,9 +124,10 @@ private:
 	BlueSpheresRendering mBlueSpheresRendering;
 	PlayerProgress mPlayerProgress;
 	PlayerRecorder mPlayerRecorder;
+	GameClient mGameClient;
 
-	uint16 mLastZoneAndAct;
-	uint8  mLastCharacters;
+	uint16 mLastZoneAndAct = 0;
+	uint8  mLastCharacters = 0;
 
 	bool mReceivedTimeAttackFinished = false;
 	bool mReturnToMenuTriggered = false;

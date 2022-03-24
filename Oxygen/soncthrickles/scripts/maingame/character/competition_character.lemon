@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2021 by Eukaryot
+	Copyright (C) 2017-2022 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -139,9 +139,6 @@ function void CompetitionMode.Character.Initialization.Sonic_Knuckles()
 //# address-hook(0x010740) end(0x0107ec)
 function void CompetitionMode.Character.UpdateNormalState.Sonic_Knuckles()
 {
-	if (A0 == 0xffffb04a)
-		debugWatch(A0 + 0x04, 1)
-
 	if (debug_mode.enabled && A0 == 0xffffb000 && (control.pad1.pressed & CONTROL_B))
 	{
 		debug_mode.state = 0x01

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -18,7 +18,6 @@
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/helper/Utils.h"
 
-#include <lemon/compiler/Compiler.h>
 #include <lemon/compiler/TokenManager.h>
 #include <lemon/program/GlobalsLookup.h>
 #include <lemon/program/Module.h>
@@ -110,7 +109,7 @@ struct LemonScriptRuntime::Internal
 
 
 
-bool LemonScriptRuntime::getCurrentScriptFunction(std::string* outFunctionName, std::wstring* outFileName, uint32* outLineNumber, std::string* outModuleName)
+bool LemonScriptRuntime::getCurrentScriptFunction(std::string_view* outFunctionName, std::wstring* outFileName, uint32* outLineNumber, std::string* outModuleName)
 {
 	lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
 	if (nullptr == runtime)
@@ -121,13 +120,12 @@ bool LemonScriptRuntime::getCurrentScriptFunction(std::string* outFunctionName, 
 	if (nullptr == location.mFunction)
 		return false;
 
-	const auto& opcodes = location.mFunction->mOpcodes;
 	if (nullptr != outFunctionName)
-		*outFunctionName = location.mFunction->getName();
+		*outFunctionName = location.mFunction->getName().getString();
 	if (nullptr != outFileName)
-		*outFileName = location.mFunction->mSourceFilename;
+		*outFileName = location.mFunction->mSourceFileInfo->mFilename;
 	if (nullptr != outLineNumber)
-		*outLineNumber = ((location.mProgramCounter < opcodes.size()) ? opcodes[location.mProgramCounter].mLineNumber : opcodes.back().mLineNumber) - location.mFunction->mSourceBaseLineOffset;
+		*outLineNumber = getLineNumberInFile(*location.mFunction, location.mProgramCounter);
 	if (nullptr != outModuleName)
 		*outModuleName = location.mFunction->getModule().getModuleName();
 	return true;
@@ -142,17 +140,17 @@ std::string LemonScriptRuntime::getCurrentScriptLocationString()
 	return buildScriptLocationString(*runtime);
 }
 
-const std::string* LemonScriptRuntime::tryResolveStringHash(uint64 hash)
+const std::string_view* LemonScriptRuntime::tryResolveStringHash(uint64 hash)
 {
 	lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
 	if (nullptr == runtime)
 		return nullptr;
 
-	const lemon::StoredString* str = runtime->resolveStringByKey(hash);
+	const lemon::FlyweightString* str = runtime->resolveStringByKey(hash);
 	if (nullptr == str)
 		return nullptr;
 
-	return &str->getString();
+	return &str->getStringRef();
 }
 
 
@@ -295,10 +293,10 @@ void LemonScriptRuntime::getCallStackWithLabels(CallStackWithLabels& outCallStac
 	mInternal.mRuntime.getMainControlFlow().getCallStack(locations);
 	for (const lemon::ControlFlow::Location& location : locations)
 	{
-		const std::string* labelName = location.mFunction->findLabelByOffset(location.mProgramCounter);
-		if (nullptr != labelName)
+		const lemon::ScriptFunction::Label* label = location.mFunction->findLabelByOffset(location.mProgramCounter);
+		if (nullptr != label)
 		{
-			outCallStack.emplace_back(location.mFunction->getName(), *labelName);
+			outCallStack.emplace_back(location.mFunction->getName().getString(), label->mName.getString());
 		}
 	}
 }
@@ -338,47 +336,16 @@ std::string LemonScriptRuntime::buildScriptLocationString(lemon::Runtime& runtim
 	if (nullptr == location.mFunction)
 		return "";
 
-	const auto& opcodes = location.mFunction->mOpcodes;
-	const std::string& functionName = location.mFunction->getName();
-	const std::wstring& fileName = location.mFunction->mSourceFilename;
-	uint32 lineNumber = ((location.mProgramCounter < opcodes.size()) ? opcodes[location.mProgramCounter].mLineNumber : opcodes.back().mLineNumber) - location.mFunction->mSourceBaseLineOffset;
+	const std::string functionName(location.mFunction->getName().getString());
+	const std::wstring& fileName = location.mFunction->mSourceFileInfo->mFilename;
+	const uint32 lineNumber = getLineNumberInFile(*location.mFunction, location.mProgramCounter);
 	const std::string& moduleName = location.mFunction->getModule().getModuleName();
 	return "function '" + functionName + "' at line " + std::to_string(lineNumber) + " of file '" + WString(fileName).toStdString() + "' in module '" + moduleName + "'";	return std::string();
 }
 
-bool LemonScriptRuntime::loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename, const lemon::PreprocessorDefinitionMap& preprocessorDefinitions)
+uint32 LemonScriptRuntime::getLineNumberInFile(const lemon::ScriptFunction& function, size_t programCounter)
 {
-	try
-	{
-		// Compile script source
-		lemon::Compiler::CompileOptions options;
-		options.mPreprocessorDefinitions = preprocessorDefinitions;
-		//options.mOutputCombinedSource = L"combined_source.lemon";	// Just for debugging preprocessor issues
-		//options.mOutputTranslatedSource = L"output.cpp";			// For testing translation
-		lemon::Compiler compiler(module, globalsLookup, options);
-
-		const bool compileSuccess = compiler.loadScript(filename);
-		if (!compileSuccess && !compiler.getErrors().empty())
-		{
-			for (const auto& error : compiler.getErrors())
-			{
-				LogDisplay::instance().addLogError(String(0, "Compile error: %s (in '%s', line %d)", error.mMessage.c_str(), *WString(error.mFilename).toString(), error.mLineNumber));
-			}
-
-			const auto& error = compiler.getErrors().front();
-			std::string text = "Script compile error:\n" + error.mMessage + "\n";
-			if (error.mFilename.empty())
-				text += "in module " + module.getModuleName();
-			else
-				text += "in file '" + WString(error.mFilename).toStdString() + "', line " + std::to_string(error.mLineNumber) + ", of module '" + module.getModuleName() + "'";
-			RMX_ERROR(text, );
-			return false;
-		}
-	}
-	catch (...)
-	{
-		return false;
-	}
-
-	return true;
+	const auto& opcodes = function.mOpcodes;
+	const uint32 lineNumber = (programCounter < opcodes.size()) ? opcodes[programCounter].mLineNumber : opcodes.back().mLineNumber;
+	return (lineNumber < function.mSourceBaseLineOffset) ? 0 : (lineNumber - function.mSourceBaseLineOffset);
 }

@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -51,7 +51,7 @@ private:
 	static bool compareSpriteInfoBySize(const SpriteInfo& first, const SpriteInfo& second);
 
 protected:
-	Vec2i mPageSize = Vec2i(512, 512);
+	Vec2i mPageSize = Vec2i(512, 128);		// That size is a bit small for usual text rendering, but okay for pixelized rendering as used by Oxygen
 	int mPadding = 1;
 
 	struct Node

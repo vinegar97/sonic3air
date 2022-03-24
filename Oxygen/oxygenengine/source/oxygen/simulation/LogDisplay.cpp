@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -43,10 +43,10 @@ void LogDisplay::clearScriptLogValue(const std::string& key)
 	mScriptLogEntries.erase(key);
 }
 
-LogDisplay::ScriptLogSingleEntry& LogDisplay::updateScriptLogValue(const std::string& key, const std::string& value)
+LogDisplay::ScriptLogSingleEntry& LogDisplay::updateScriptLogValue(std::string_view key, std::string_view value)
 {
 	const uint32 frameNumber = Application::instance().getSimulation().getFrameNumber();
-	ScriptLogEntry& entry = mScriptLogEntries[key];
+	ScriptLogEntry& entry = mScriptLogEntries[std::string(key)];
 	if (frameNumber != entry.mLastUpdate)
 	{
 		entry.mEntries.clear();

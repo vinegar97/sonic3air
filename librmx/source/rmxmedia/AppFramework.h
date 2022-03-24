@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -16,11 +16,11 @@ namespace rmx
 {
 	struct KeyboardEvent
 	{
-		int key;
-		uint32 scancode;
-		uint16 modifiers;
-		bool state;
-		bool repeat;
+		int key = 0;
+		uint32 scancode = 0;
+		uint16 modifiers = 0;
+		bool state = false;
+		bool repeat = false;
 	};
 
 	struct TextInputEvent
@@ -39,8 +39,8 @@ namespace rmx
 
 	struct MouseEvent
 	{
-		MouseButton button;
-		bool state;
+		MouseButton button = MouseButton::Left;
+		bool state = false;
 		Vec2i position;
 	};
 

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -44,17 +44,14 @@ namespace lemon
 	public:
 		virtual ~Token() {}
 
-		inline Type getType() const  { return mType; }
-		inline bool isStatement() const  { return ((int)mType & (int)Type::STATEMENT) != 0; }
+		inline Type getType() const  { return (Type)genericmanager::Element<Token>::getType(); }
+		inline bool isStatement() const  { return (genericmanager::Element<Token>::getType() & (uint32)Type::STATEMENT) != 0; }
 
 		template<typename T> const T& as() const  { return *static_cast<const T*>(this); }
 		template<typename T> T& as()  { return *static_cast<T*>(this); }
 
 	protected:
-		inline Token(Type type) : genericmanager::Element<Token>((uint32)type), mType(type) {}
-
-	private:
-		const Type mType;
+		inline Token(Type type) : genericmanager::Element<Token>((uint32)type) {}
 	};
 
 
@@ -77,7 +74,7 @@ namespace lemon
 	};
 
 
-	class TokenList : public genericmanager::ElementList<Token, 32>
+	class TokenList : public genericmanager::ElementList<Token, 16>
 	{
 	};
 

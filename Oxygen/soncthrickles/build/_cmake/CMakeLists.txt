@@ -155,21 +155,21 @@ target_link_libraries(lemonscript rmxbase)
 
 
 
-# Oxygen Core Library
+# oxygen_netcore
 
-file(GLOB_RECURSE OXYGENCORE_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygencore/*.cpp)
+file(GLOB_RECURSE OXYGEN_NETCORE_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygen_netcore/*.cpp)
 
-add_library(oxygencore ${OXYGENCORE_SOURCES})
+add_library(oxygen_netcore ${OXYGEN_NETCORE_SOURCES})
 
 if (NOT CMAKE_VERSION VERSION_LESS "3.16.0")
-	target_precompile_headers(oxygencore PRIVATE ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygencore/pch.h)
+	target_precompile_headers(oxygen_netcore PRIVATE ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygen_netcore/pch.h)
 endif()
 
-target_link_libraries(oxygencore rmxbase)
+target_link_libraries(oxygen_netcore rmxbase)
 
 
 
-# Oxygen Engine Library
+# oxygenengine
 
 file(GLOB_RECURSE OXYGEN_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygen/*.cpp)
 
@@ -183,7 +183,7 @@ target_link_libraries(oxygen minizip)
 target_link_libraries(oxygen rmxmedia)
 target_link_libraries(oxygen rmxext_oggvorbis)
 target_link_libraries(oxygen lemonscript)
-target_link_libraries(oxygen oxygencore)
+target_link_libraries(oxygen oxygen_netcore)
 
 
 

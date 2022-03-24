@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2022 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -13,29 +13,50 @@
 namespace rmx
 {
 
-	static const constexpr uint64 FNV1a_START_VALUE = 0xcbf29ce484222325;
-	static const constexpr uint64 FNV1a_MAGIC_PRIME = 0x00000100000001b3;
+	uint32 getFNV1a_32(const uint8* data, size_t bytes)
+	{
+		uint32 hash = FNV1a_32_START_VALUE;
+		for (size_t i = 0; i < bytes; ++i)
+		{
+			hash = (hash ^ data[i]) * FNV1a_32_MAGIC_PRIME;
+		}
+		return hash;
+	}
+
+	uint32 startFNV1a_32()
+	{
+		return FNV1a_32_START_VALUE;
+	}
+
+	uint32 addToFNV1a_32(uint32 hash, const uint8* data, size_t bytes)
+	{
+		for (size_t i = 0; i < bytes; ++i)
+		{
+			hash = (hash ^ data[i]) * FNV1a_32_MAGIC_PRIME;
+		}
+		return hash;
+	}
 
 	uint64 getFNV1a_64(const uint8* data, size_t bytes)
 	{
-		uint64 hash = FNV1a_START_VALUE;
+		uint64 hash = FNV1a_64_START_VALUE;
 		for (size_t i = 0; i < bytes; ++i)
 		{
-			hash = (hash ^ data[i]) * FNV1a_MAGIC_PRIME;
+			hash = (hash ^ data[i]) * FNV1a_64_MAGIC_PRIME;
 		}
 		return hash;
 	}
 
 	uint64 startFNV1a_64()
 	{
-		return FNV1a_START_VALUE;
+		return FNV1a_64_START_VALUE;
 	}
 
 	uint64 addToFNV1a_64(uint64 hash, const uint8* data, size_t bytes)
 	{
 		for (size_t i = 0; i < bytes; ++i)
 		{
-			hash = (hash ^ data[i]) * FNV1a_MAGIC_PRIME;
+			hash = (hash ^ data[i]) * FNV1a_64_MAGIC_PRIME;
 		}
 		return hash;
 	}
@@ -64,11 +85,11 @@ namespace rmx
 				//  -> This somewhat defeats the purpose of the whole optimization by using Murmur2...
 				memcpy(&k, data64, sizeof(uint64_t));
 				++data64;
-				k *= m; 
-				k ^= k >> r; 
-				k *= m; 
+				k *= m;
+				k ^= k >> r;
+				k *= m;
 				h ^= k;
-				h *= m; 
+				h *= m;
 			}
 		}
 		else
@@ -77,23 +98,23 @@ namespace rmx
 			while (data64 != end)
 			{
 				uint64 k = *data64++;
-				k *= m; 
-				k ^= k >> r; 
-				k *= m; 
+				k *= m;
+				k ^= k >> r;
+				k *= m;
 				h ^= k;
-				h *= m; 
+				h *= m;
 			}
 		}
 
 		const uint8* data8 = (const uint8*)data64;
 		switch (bytes & 0x07)
 		{
-			case 7:  h ^= ((uint64)data8[6]) << 48;
-			case 6:  h ^= ((uint64)data8[5]) << 40;
-			case 5:  h ^= ((uint64)data8[4]) << 32;
-			case 4:  h ^= ((uint64)data8[3]) << 24;
-			case 3:  h ^= ((uint64)data8[2]) << 16;
-			case 2:  h ^= ((uint64)data8[1]) << 8;
+			case 7:  h ^= ((uint64)data8[6]) << 48;  [[fallthrough]];
+			case 6:  h ^= ((uint64)data8[5]) << 40;  [[fallthrough]];
+			case 5:  h ^= ((uint64)data8[4]) << 32;  [[fallthrough]];
+			case 4:  h ^= ((uint64)data8[3]) << 24;  [[fallthrough]];
+			case 3:  h ^= ((uint64)data8[2]) << 16;  [[fallthrough]];
+			case 2:  h ^= ((uint64)data8[1]) << 8;   [[fallthrough]];
 			case 1:  h ^= ((uint64)data8[0]);
 				h *= m;
 		};
@@ -123,7 +144,18 @@ namespace rmx
 	uint64 getMurmur2_64(const std::wstring& str)
 	{
 		// Note that this is *not* platform-independent
-		return getMurmur2_64((uint8*)&str[0], str.length() * sizeof(wchar_t));
+		return getMurmur2_64((const uint8*)&str[0], str.length() * sizeof(wchar_t));
+	}
+
+	uint64 getMurmur2_64(std::string_view str)
+	{
+		return getMurmur2_64((const uint8*)str.data(), str.length() * sizeof(char));
+	}
+
+	uint64 getMurmur2_64(std::wstring_view str)
+	{
+		// Note that this is *not* platform-independent
+		return getMurmur2_64((const uint8*)str.data(), str.length() * sizeof(wchar_t));
 	}
 
 	uint32 getCRC32(const uint8* data, size_t bytes)
@@ -181,11 +213,11 @@ namespace rmx
 			uint64 nextDigit;
 			const char ch = input[pos];
 			if (ch >= '0' && ch <= '9')
-				nextDigit = (ch - '0');
+				nextDigit = (uint64)(ch - '0');
 			else if (base == 16 && ch >= 'A' && ch <= 'F')
-				nextDigit = (ch - 'A') + 10;
+				nextDigit = (uint64)(ch - 'A') + 10;
 			else if (base == 16 && ch >= 'a' && ch <= 'f')
-				nextDigit = (ch - 'a') + 10;
+				nextDigit = (uint64)(ch - 'a') + 10;
 			else
 				break;
 
@@ -214,42 +246,66 @@ namespace rmx
 		return str.str();
 	}
 
-	bool startsWith(const std::string& fullString, const std::string& prefix)
+
+	template<typename STRING>
+	bool stringStartsWith(const STRING& fullString, const STRING& prefix)
 	{
 		if (fullString.length() < prefix.length())
 			return false;
-		if (memcmp((void*)&fullString[0], (void*)&prefix[0], prefix.length() * sizeof(char)) != 0)
+		if (memcmp((void*)&fullString[0], (void*)&prefix[0], prefix.length() * sizeof(fullString[0])) != 0)
 			return false;
 		return true;
+	}
+
+	template<typename STRING>
+	bool stringEndsWith(const STRING& fullString, const STRING& suffix)
+	{
+		if (fullString.length() < suffix.length())
+			return false;
+		const size_t offset = fullString.length() - suffix.length();
+		if (memcmp((void*)&fullString[offset], (void*)&suffix[0], suffix.length() * sizeof(fullString[0])) != 0)
+			return false;
+		return true;
+	}
+
+	bool startsWith(const std::string& fullString, const std::string& prefix)
+	{
+		return stringStartsWith<std::string>(fullString, prefix);
 	}
 
 	bool startsWith(const std::wstring& fullString, const std::wstring& prefix)
 	{
-		if (fullString.length() < prefix.length())
-			return false;
-		if (memcmp((void*)&fullString[0], (void*)&prefix[0], prefix.length() * sizeof(wchar_t)) != 0)
-			return false;
-		return true;
+		return stringStartsWith<std::wstring>(fullString, prefix);
 	}
 
-	bool endsWith(const std::string& fullString, const std::string& suffix)
+	bool startsWith(std::string_view fullString, std::string_view prefix)
 	{
-		if (fullString.length() < suffix.length())
-			return false;
-		const size_t offset = fullString.length() - suffix.length();
-		if (memcmp((void*)&fullString[offset], (void*)&suffix[0], suffix.length() * sizeof(char)) != 0)
-			return false;
-		return true;
+		return stringStartsWith<std::string_view>(fullString, prefix);
 	}
 
-	bool endsWith(const std::wstring& fullString, const std::wstring& suffix)
+	bool startsWith(std::wstring_view fullString, std::wstring_view prefix)
 	{
-		if (fullString.length() < suffix.length())
-			return false;
-		const size_t offset = fullString.length() - suffix.length();
-		if (memcmp((void*)&fullString[offset], (void*)&suffix[0], suffix.length() * sizeof(wchar_t)) != 0)
-			return false;
-		return true;
+		return stringStartsWith<std::wstring_view>(fullString, prefix);
+	}
+
+	bool endsWith(const std::string& fullString, const std::string& prefix)
+	{
+		return stringEndsWith<std::string>(fullString, prefix);
+	}
+
+	bool endsWith(const std::wstring& fullString, const std::wstring& prefix)
+	{
+		return stringEndsWith<std::wstring>(fullString, prefix);
+	}
+
+	bool endsWith(std::string_view fullString, std::string_view prefix)
+	{
+		return stringEndsWith<std::string_view>(fullString, prefix);
+	}
+
+	bool endsWith(std::wstring_view fullString, std::wstring_view prefix)
+	{
+		return stringEndsWith<std::wstring_view>(fullString, prefix);
 	}
 
 }
