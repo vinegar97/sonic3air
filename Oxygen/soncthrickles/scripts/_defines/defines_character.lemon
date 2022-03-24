@@ -35,9 +35,9 @@ define char.render_flags		=  u8[A0 + 0x04]
 constant u8 render_flag.FLIP_X	=  0x01		// Flipped horizontally
 constant u8 render_flag.FLIP_Y	=  0x02		// Flipped vertically
 constant u8 render_flag.WORLD	=  0x04		// Usually set, so the object is positioned in world, not on screen
-constant u8 render_flag.COMPETITION_P1_SCREEN	=  0x08		// indicates sprites that belong on the top half / player 1's side of the screen in competition mode
-constant u8 render_flag.COMPETITION_P2_SCREEN	=  0x10		// indicates sprites that belong on the bottom half / player 2's side of the screen in competition mode
-constant u8 render_flag.STATIC_MAPPIMG	=  0x20		// implies that the object's sprite consists of only one 8x8 tile
+constant u8 render_flag.COMPETITION_P1_SCREEN	=  0x08		// Indicates sprites that belong on the top half / player 1's side of the screen in competition mode
+constant u8 render_flag.COMPETITION_P2_SCREEN	=  0x10		// Indicates sprites that belong on the bottom half / player 2's side of the screen in competition mode
+constant u8 render_flag.STATIC_MAPPIMG	=  0x20		// Implies that the object's sprite consists of only one 8x8 tile
 constant u8 render_flag.COMPOUND	=  0x40		// Used for multiple child object rendering
 constant u8 render_flag.VISIBLE	=  0x80		// Object visible on screen if set
 
@@ -162,15 +162,15 @@ constant u8 char.flag.UNDERWATER	=  0x40			// Under water
 
 // Bonus effects
 define char.bonus_effect				=  u8[A0 + 0x2b]
-constant u8 char.bonus.ANY_SHIELD		=  0x01	// also sometimes used for classic shield in standalone
+constant u8 char.bonus.ANY_SHIELD		=  0x01		// Also sometimes used for classic shield in standalone
 constant u8 char.bonus.INVINCIBLE		=  0x02
-constant u8 char.bonus.SPEED_UP			=  0x04	// also used for slow shoes in competition mode
-constant u8 char.bonus.DEFLECTABLE		=  0x08	// seems unused? sometimes used to denote projectiles that should be deflected by shields
+constant u8 char.bonus.SPEED_UP			=  0x04		// Also used for slow shoes in competition mode
+constant u8 char.bonus.DEFLECTABLE		=  0x08		// Seems unused for player characters? harmful objects use it to denote projectiles that can be deflected by shields
 constant u8 char.bonus.SHIELD_FIRE		=  0x10
 constant u8 char.bonus.SHIELD_LIGHTNING	=  0x20
 constant u8 char.bonus.SHIELD_BUBBLE	=  0x40
-constant u8 char.bonus.ELEMENTAL_SHIELDS	=  0x70
-constant u8 char.bonus.ALL_SHIELDS		=  0x71
+constant u8 char.bonus.ELEMENTAL_SHIELDS	=  0x70		// = char.bonus.SHIELD_FIRE | char.bonus.SHIELD_LIGHTNING | char.bonus.SHIELD_BUBBLE
+constant u8 char.bonus.ALL_SHIELDS		=  0x71		// =  char.bonus.ANY_SHIELD | char.bonus.ELEMENTAL_SHIELDS
 constant u8 char.bonus.INFINITE_INERTIA	=  0x80
 
 // Drowning countdown
