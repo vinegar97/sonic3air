@@ -364,7 +364,7 @@ function void fn076404()
 	u8[A1 + 0x2e] = 0x81
 	objA0.countdown_value = 0x5f
 
-	playSound(0x4a)
+	playSound(SFX_GRAB)
 
 	if (allocDynamicObjectStd())
 	{

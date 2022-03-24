@@ -823,7 +823,7 @@ function void fn004a88()
 
 	if ((D0.u8 & (CONTROL_UP | CONTROL_DOWN)) != 0)
 	{
-		playSound(0x5b)
+		playSound(SFX_CLICK)
 	}
 	DrawObject()
 }

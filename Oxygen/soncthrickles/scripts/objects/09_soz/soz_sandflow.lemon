@@ -100,7 +100,7 @@ function void fn03fd4e()
 				if (D5.u16 & CONTROL_ABC)
 				{
 					objA1.velocity.y = -0x800
-					playSound(0x62)
+					playSound(SFX_JUMP)
 				}
 
 			#if STANDALONE
@@ -204,7 +204,7 @@ function void fn03fe70()
 					objA0.flags2a &= ~bit
 
 					u8[A2] = 0x1e
-					playSound(0x62)
+					playSound(SFX_JUMP)
 				}
 				else
 				{

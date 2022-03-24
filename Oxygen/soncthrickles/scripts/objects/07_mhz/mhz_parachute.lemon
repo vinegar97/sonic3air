@@ -255,7 +255,7 @@ function void fn03f6fe()
 			objA1.velocity.x = objA0.velocity.x
 			objA1.velocity.y = objA0.velocity.y
 
-			playSound(0x4a)
+			playSound(SFX_GRAB)
 			fn03f6a6()
 		}
 	}

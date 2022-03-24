@@ -466,7 +466,7 @@ function void fn074640()
 		u8[A1 + 0x3d] = 0
 		u8[A1 + 0x40] = 0
 
-		playSound(0xb1)
+		playSound(SFX_SPRING)
 	}
 	else
 	{

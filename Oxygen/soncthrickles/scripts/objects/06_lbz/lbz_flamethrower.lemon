@@ -46,7 +46,7 @@ function void fn0263dc()
 
 			if (objA0.render_flags & render_flag.VISIBLE)
 			{
-				playSound(0x43)
+				playSound(SFX_FIRESHIELDDASH)
 			}
 		}
 	}

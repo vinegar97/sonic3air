@@ -192,7 +192,7 @@ function void fn040f52()
 
 				u8[A2] = 1
 
-				playSound(0x5b)
+				playSound(SFX_CLICK)
 			}
 		}
 	}

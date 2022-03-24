@@ -315,7 +315,7 @@ function void fn087e48()
 	setupObjectAttributesMost(0x087ed2)
 	objA0.update_address = 0x087e66
 	objA0.value2f = objA0.subtype2c
-	playSound(0x39)
+	playSound(SFX_WATERSPLASH)
 }
 
 

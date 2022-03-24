@@ -409,5 +409,5 @@ function void fn01f188()
 			break
 	}
 
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 }

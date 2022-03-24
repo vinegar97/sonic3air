@@ -914,7 +914,7 @@ function void fn06889a()
 function void fn0688b0()
 {
 	objA0.base_state = 0x06
-	playSound(0x51)
+	playSound(SFX_BOMBFALL)
 	objA0.sprite_priority = 0x80
 	objA0.render_flags |= render_flag.FLIP_Y
 	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"

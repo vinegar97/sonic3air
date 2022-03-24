@@ -216,7 +216,7 @@ function void fn03ed6e()
 						u32 backupA2 = A2
 						SetCharacterSpritePatterns()
 						A2 = backupA2
-						playSound(0x4a)
+						playSound(SFX_GRAB)
 					}
 				}
 			}

@@ -205,7 +205,7 @@ function void fn0275f2()
 	{
 		if (!allocDynamicObjectAfterA0())
 		{
-			playSound(0x59)
+			playSound(SFX_COLLAPSE)
 			return
 		}
 
@@ -260,7 +260,7 @@ function void fn0275f2()
 		A3 += 6
 	}
 
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 }
 
 

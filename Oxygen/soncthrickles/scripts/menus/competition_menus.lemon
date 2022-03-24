@@ -150,7 +150,7 @@ function void CompetitionMode.MainMenu()
 		D1.u8 = competition_mode.menu.game_mode
 		if (D0.u16 & CONTROL_UP)
 		{
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 			if (D1.s8 <= 0)
 				D1 = 3
 			else
@@ -158,7 +158,7 @@ function void CompetitionMode.MainMenu()
 		}
 		else if (D0.u16 & CONTROL_DOWN)
 		{
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 			++D1.u8
 			if (D1.u8 > 3)
 				D1 = 0
@@ -260,7 +260,7 @@ function void fn00aaa6()
 	D1.u8 = competition_mode.menu.game_mode
 	if (D0.u16 & 0x01)
 	{
-		playSound(0x5b)
+		playSound(SFX_CLICK)
 		if (D1.s8 <= 0)
 			D1 = 3
 		else
@@ -268,7 +268,7 @@ function void fn00aaa6()
 	}
 	else if (D0.u16 & 0x02)
 	{
-		playSound(0x5b)
+		playSound(SFX_CLICK)
 		++D1.u8
 		if (D1.u8 > 3)
 			D1 = 0
@@ -307,7 +307,7 @@ function void fn00ab00()
 		if (D0.u16 != 0)
 		{
 			competition_mode.menu.items_toggle = (competition_mode.menu.items_toggle == 0) ? 0xff : 0x00
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 
 		objA0.position.x.u16 = ((competition_mode.menu.items_toggle == 0) ? 0x015c : 0x017c) + getScreenExtend()
@@ -540,7 +540,7 @@ function void CompetitionMode.StageSelect()
 			{
 				if (competition_mode.menu.stage != 0x04)
 				{
-					playSound(0x5b)
+					playSound(SFX_CLICK)
 					++competition_mode.menu.stage
 					if (competition_mode.menu.stage != 0x01 && competition_mode.menu.stage != 0x04)
 					{
@@ -553,7 +553,7 @@ function void CompetitionMode.StageSelect()
 			{
 				if (competition_mode.menu.stage != 0)
 				{
-					playSound(0x5b)
+					playSound(SFX_CLICK)
 					--competition_mode.menu.stage
 					if (competition_mode.menu.stage != 0x00 && competition_mode.menu.stage != 0x03)
 					{

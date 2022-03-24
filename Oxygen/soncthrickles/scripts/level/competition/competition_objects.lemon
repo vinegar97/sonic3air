@@ -403,7 +403,7 @@ function void fn023cdc()
 			--u16[A0 + 0x3a]
 			if (u16[A0 + 0x3a] == 0 && s8[A0 + 0x04] < 0)
 			{
-				playSound(0x52)
+				playSound(SFX_SPIKESMOVE)
 			}
 		}
 		else
@@ -1066,7 +1066,7 @@ function void fn0362ce()
 	{
 		if (u8[A3] == 0)
 		{
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 			objA0.animation.timer = 0
 		}
 

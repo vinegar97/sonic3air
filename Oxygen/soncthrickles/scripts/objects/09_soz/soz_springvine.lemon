@@ -199,7 +199,7 @@ function void fn0409ba()
 	u8[A1 + 0x2f] = 0
 	u8[A1 + 0x40] = 0
 
-	playSound(0xb1)
+	playSound(SFX_SPRING)
 }
 
 

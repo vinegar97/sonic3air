@@ -353,7 +353,7 @@ function void fn053a4c()
 			objA1.state = char.state.ROLLING
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 
-			playSound(0x62)
+			playSound(SFX_JUMP)
 		}
 	}
 }

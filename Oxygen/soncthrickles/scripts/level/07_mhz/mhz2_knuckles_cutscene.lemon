@@ -182,7 +182,7 @@ function void fn063220()
 		{
 			++objA0.value39
 			objA0.value3e -= 4
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 	}
 }

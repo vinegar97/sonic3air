@@ -62,7 +62,7 @@ function void fn042d16()
 	{
 		if (u8[A3] == 0)
 		{
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 		u8[A3] |= (1 << D3.u8)
 		objA0.animation.sprite = 1

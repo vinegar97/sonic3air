@@ -391,7 +391,7 @@ function void fn06401c()
 	if (getRandomNumber() % 3 == 0)
 		objA0.velocity.y = -0x540
 #endif
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()
@@ -532,7 +532,7 @@ function void fn064184()
 {
 	if ((global.framecounter.low & 0x0f) == 0)
 	{
-		playSound(0x3c)
+		playSound(SFX_ROLL)
 	}
 
 	fn08450e()
@@ -745,7 +745,7 @@ function void fn06438a()
 {
 	if ((global.framecounter.low & 0x1f) == 0)
 	{
-		playSound(0x59)
+		playSound(SFX_COLLAPSE)
 	}
 
 	--objA0.countdown_value

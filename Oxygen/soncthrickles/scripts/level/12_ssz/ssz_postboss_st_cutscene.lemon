@@ -77,7 +77,7 @@ function void fn057edc()
 		return
 
 	copyMemory(0xffffa8e0, 0x0577c6, 0x14)
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 	objA0.base_state += 4
 }
 
@@ -258,7 +258,7 @@ function void fn05806e()
 			u16[A1 + 0x12] = 0
 			u16[A1 + 0x16] = 0
 
-			playSound(0x62)
+			playSound(SFX_JUMP)
 			return
 		}
 

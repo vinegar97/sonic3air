@@ -158,7 +158,7 @@ function void fn07609a()
 	objA0.countdown_value = 0x3f
 	objA0.countdown_callback = 0x0760c4
 
-	playSound(0xb6)
+	playSound(SFX_SPINDASH_RELEASE)
 }
 
 

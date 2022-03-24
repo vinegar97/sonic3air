@@ -187,7 +187,7 @@ function void fn06453c()
 	objA0.animation.sprite = 0x9a
 	objA0.velocity.x = 0xc0
 	objA0.velocity.y = -0x600
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()
@@ -233,7 +233,7 @@ function void fn0645b0()
 	objA0.base_state = 0x2a
 	objA0.velocity.x = -0xc0
 	objA0.velocity.y = -0x500
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()
@@ -346,7 +346,7 @@ function void fn0646b8()
 	objA0.animation.sprite = 0x9a
 	objA0.velocity.x = 0x0300
 	objA0.velocity.y = -0x500
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()
@@ -375,7 +375,7 @@ function void fn06471a()
 	objA0.animation.sprite = 0x9a
 	objA0.velocity.x = -0x200
 	objA0.velocity.y = -0x200
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()
@@ -436,7 +436,7 @@ function void fn0647ec()
 {
 	objA0.base_state = 0x38
 	objA0.velocity.y = -0x600
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()
@@ -775,7 +775,7 @@ function void fn064a6e()
 		if (objA0.animation.frame == 6)
 		{
 			u8[0xfffffaa2] = 0xff
-			playSound(0x59)
+			playSound(SFX_COLLAPSE)
 		}
 	}
 }
@@ -888,7 +888,7 @@ function void fn064b80()
 	objA0.render_flags |= render_flag.FLIP_X
 #endif
 
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()

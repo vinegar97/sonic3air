@@ -827,7 +827,7 @@ function void fn005b42()
 
 		if (D0.u8 & 0x03)
 		{
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 	}
 

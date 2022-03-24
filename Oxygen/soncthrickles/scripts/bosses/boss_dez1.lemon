@@ -691,7 +691,7 @@ function void fn07e3ec()
 		objA0.position.x.u16 = objA1.position.x.u16
 		objA0.position.y.u16 = objA1.position.y.u16
 
-		playSound(0x9f)
+		playSound(SFX_SUPERTRANSFORM)
 	}
 
 	u16[0xffffb000 + 0x14] -= 0x10

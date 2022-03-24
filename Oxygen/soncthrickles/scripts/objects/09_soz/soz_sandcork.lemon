@@ -93,7 +93,7 @@ function void fn041d5c()
 
 	++objA0.animation.sprite
 	objA0.sprite_priority = 0
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 
 	fn0216b8()
 	UpdateMovementStraightSimple()

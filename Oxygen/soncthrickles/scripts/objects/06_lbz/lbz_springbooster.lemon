@@ -132,7 +132,7 @@ function void fn0261f2()
 			u8[A1 + 0x2a] &= ~0x20
 		}
 
-		playSound(0xb1)
+		playSound(SFX_SPRING)
 	}
 }
 

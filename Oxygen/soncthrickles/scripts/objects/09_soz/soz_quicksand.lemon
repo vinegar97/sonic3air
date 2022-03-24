@@ -105,7 +105,7 @@ function void fn0400f0()
 					u8[A1 + 0x2f] = 0
 					u8[A1 + 0x40] = 0x01
 
-					playSound(0x62)
+					playSound(SFX_JUMP)
 				}
 				else
 				{

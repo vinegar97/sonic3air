@@ -476,7 +476,7 @@ function void fn034fbc()
 		u8[A1 + 0x20] = 0x02
 		u8[A1 + 0x2a] |= 0x04
 
-		playSound(0x62)
+		playSound(SFX_JUMP)
 	}
 
 	u8[A1 + 0x2e] &= ~0x01
@@ -827,7 +827,7 @@ function void fn03555c()
 		{
 			objA0.state = 0x0d
 			objA0.flags2a &= ~0x01
-			playSound(0x36)
+			playSound(SFX_BRAKE)
 
 			A2 = A0 - 0xb000 + 0xcc54
 			u8[A2 + 0x05] = 0x06
@@ -896,7 +896,7 @@ function void fn0355e4()
 		{
 			objA0.state = 0x0d
 			objA0.flags2a |= 0x01
-			playSound(0x36)
+			playSound(SFX_BRAKE)
 
 			A2 = A0 - 0xb000 + 0xcc54
 			u8[A2 + 0x05] = 0x06

@@ -139,7 +139,7 @@ function void fn045e6e()
 			u8[A1 + 0x2e] = 0
 			u8[A1 + 0x40] = 0x01
 
-			playSound(0x62)
+			playSound(SFX_JUMP)
 			return
 		}
 
@@ -286,7 +286,7 @@ function void fn045f74()
 		u8[A1 + 0x2e] = 0
 		u8[A1 + 0x40] = 0x01
 
-		playSound(0x62)
+		playSound(SFX_JUMP)
 		return
 	}
 

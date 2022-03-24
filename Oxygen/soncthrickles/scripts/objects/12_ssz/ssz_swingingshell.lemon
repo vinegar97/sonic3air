@@ -233,7 +233,7 @@ function void fn046324()
 
 		if (objA0.flags2a & bit)
 		{
-			playSound(0x3c)
+			playSound(SFX_ROLL)
 			u8[A3] = 0xff
 
 			objA1.velocity.y = 0
@@ -292,7 +292,7 @@ function void fn046324()
 				objA1.velocity.x = D0.u16
 				u16[A1 + 0x1c] = D0.u16
 
-				playSound(0xb6)
+				playSound(SFX_SPINDASH_RELEASE)
 				return
 			}
 		}
@@ -307,6 +307,6 @@ function void fn046324()
 		u8[A1 + 0x2a] |= 0x02
 		u8[A1 + 0x40] = 0x01
 
-		playSound(0x62)
+		playSound(SFX_JUMP)
 	}
 }

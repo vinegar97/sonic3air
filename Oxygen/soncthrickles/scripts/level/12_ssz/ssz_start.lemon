@@ -453,7 +453,7 @@ function void fn0658f2()
 
 	// Trigger the bridge already
 	u8[0xffffeeda] = 0xff
-	playSound(0x5b)
+	playSound(SFX_CLICK)
 
 	A1 = 0x06671f
 	fn084580()

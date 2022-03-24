@@ -1635,7 +1635,7 @@ function void fn0567b0()
 	}
 
 	level.display_routine = 0
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 	u16[0xffffeeda] += 4
 	fn05680a()
 }

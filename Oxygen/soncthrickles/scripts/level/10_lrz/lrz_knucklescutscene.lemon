@@ -274,7 +274,7 @@ function void fn063cac()
 		{
 			objA0.velocity.y = -0x100
 			camera.screenshake.state = 0x14
-			playSound(0x59)
+			playSound(SFX_COLLAPSE)
 		}
 	}
 	DrawObject()

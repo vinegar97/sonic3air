@@ -161,7 +161,7 @@ function void fn08d680()
 	// Throwing
 	u32[A0 + 0x30] = 0x08d9dd
 	objA0.countdown_callback = 0x08d6ae
-	playSound(0x52)
+	playSound(SFX_SPIKESMOVE)
 
 	A2 = (objA0.render_flags & render_flag.FLIP_X) ? 0x08d9d0 : 0x08d9c8
 	SpawnChildObjects()

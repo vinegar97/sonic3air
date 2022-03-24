@@ -259,7 +259,7 @@ function void fn04bbb2()
 		D0.s32 >>= 8
 		objA0.velocity.y = D0.u16
 		objA0.flags2a |= 0x02
-		playSound(0x62)
+		playSound(SFX_JUMP)
 	}
 }
 

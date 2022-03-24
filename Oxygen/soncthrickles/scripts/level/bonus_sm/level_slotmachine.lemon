@@ -918,7 +918,7 @@ function void fn04c374()
 		if (u16[0xffffe404] >= 0x05)
 		{
 			u16[0xffffe404] = 0
-			playSound(0x37)
+			playSound(SFX_HITSPIKES)
 		}
 
 		if (ring_counter != 0)

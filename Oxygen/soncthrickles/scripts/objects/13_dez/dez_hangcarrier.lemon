@@ -161,7 +161,7 @@ function void fn04703e()
 			u8[A1 + 0x2e] = 1
 
 			u8[A2] = 1
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 	}
 }

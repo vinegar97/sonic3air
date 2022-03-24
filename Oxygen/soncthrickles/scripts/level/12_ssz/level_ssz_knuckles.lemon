@@ -1166,7 +1166,7 @@ function void fn07cd82()
 		u8[A1 + 0x40] = 0
 
 		UpdatePlayer1SpritePatterns()
-		playSound(0x4a)
+		playSound(SFX_GRAB)
 	}
 
 	MoveAndFlipWithParent()

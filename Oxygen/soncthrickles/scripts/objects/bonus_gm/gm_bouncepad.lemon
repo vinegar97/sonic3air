@@ -76,5 +76,5 @@ function void fn060f94()
 	A1 = 0xffff0000 + u16[0xfffffaa4]
 	u8[A1 + 0x38] |= 0x01
 
-	playSound(0xb1)
+	playSound(SFX_SPRING)
 }

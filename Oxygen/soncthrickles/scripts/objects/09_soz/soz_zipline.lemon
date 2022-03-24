@@ -162,7 +162,7 @@ function void fn04aac8()
 #endif
 	if (jumpPressed)
 	{
-		playSound(0x62)
+		playSound(SFX_JUMP)
 
 	#if STANDALONE
 	/*
@@ -750,7 +750,7 @@ function void fn04af80()
 				objA1.state = char.state.ROLLING
 				u8[A1 + 0x2a] |= 0x04
 
-				playSound(0x62)
+				playSound(SFX_JUMP)
 			}
 			return
 		}
@@ -846,7 +846,7 @@ function void fn04b130()
 			u8[A1 + 0x2a] |= D0.u8
 			u8[A2] = 0x01
 
-			playSound(0x4a)
+			playSound(SFX_GRAB)
 		}
 	}
 }

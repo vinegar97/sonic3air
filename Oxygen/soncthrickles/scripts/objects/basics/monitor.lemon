@@ -902,7 +902,7 @@ function void ItemEffect.ApplySuperTransformation()
 	u8[0xffffb000 + 0x35] = 0
 	u8[A1 + 0x2b] |= char.bonus.INVINCIBLE
 
-	playSound(0x9f)
+	playSound(SFX_SUPERTRANSFORM)
 #if STANDALONE
 	chooseFittingMusic()	// Usually switches to super theme
 #else

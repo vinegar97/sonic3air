@@ -191,7 +191,7 @@ function void fn06a042()
 function void fn06a046()
 {
 	objA0.base_state = 0x0a
-	playSound(0x3c)
+	playSound(SFX_ROLL)
 
 	objA0.flags38 |= 0x40
 	objA0.flags38 &= ~0x80
@@ -1273,7 +1273,7 @@ function void fn06aaa0()
 function void fn06aab6()
 {
 	objA0.flags38 |= 0x80
-	playSound(0x39)
+	playSound(SFX_WATERSPLASH)
 	u16[0xfffffa9a] = 0
 
 	// "spawnChildObjects(0x06ad7e)" replaced by:

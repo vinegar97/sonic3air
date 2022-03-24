@@ -442,7 +442,7 @@ function void fn0629a8()
 {
 	if (objA0.position.y.u16 >= water.height.current)
 	{
-		playSound(0x39)
+		playSound(SFX_WATERSPLASH)
 		objA0.base_state = 0x0c
 	}
 

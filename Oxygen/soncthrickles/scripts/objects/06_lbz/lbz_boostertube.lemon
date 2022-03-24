@@ -97,7 +97,7 @@ function void fn029620()
 
 		fn0297a2()
 
-		playSound(0x3c)
+		playSound(SFX_ROLL)
 
 		if (objA0.subtype2c & 0x20 && global.act != 0)
 		{

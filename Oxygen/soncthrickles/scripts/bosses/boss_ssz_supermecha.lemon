@@ -540,7 +540,7 @@ function void fn07be4e()
 	{
 		objA1.update_address = 0x07d09c
 	}
-	playSound(0x9f)
+	playSound(SFX_SUPERTRANSFORM)
 }
 
 
@@ -726,7 +726,7 @@ function void fn07c06e()
 		objA0.countdown_value = 0x1f
 		objA0.countdown_callback = 0x07c12e
 
-		playSound(0x3c)
+		playSound(SFX_ROLL)
 
 		A1 = 0xffffb000
 		D0 = objA1.position.x.u16

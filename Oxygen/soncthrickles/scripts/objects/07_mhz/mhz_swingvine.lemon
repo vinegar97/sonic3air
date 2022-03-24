@@ -478,7 +478,7 @@ function void fn022af8()
 			if (objA1.velocity.x >= 0x0400)
 			{
 				u8[A2] = 0x81
-				playSound(0x4a)
+				playSound(SFX_GRAB)
 			}
 
 			objA1.velocity.x = 0

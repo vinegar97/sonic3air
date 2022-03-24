@@ -175,5 +175,5 @@ function void fn039d84()
 		objA0.respawn_entry = 0
 	}
 
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 }

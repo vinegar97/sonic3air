@@ -158,7 +158,7 @@ function void fn0290f2()
 				u8[A1 + 0x2e] = 0x01
 				u8[A2] = 0x01
 
-				playSound(0x5b)
+				playSound(SFX_CLICK)
 			}
 		}
 	}

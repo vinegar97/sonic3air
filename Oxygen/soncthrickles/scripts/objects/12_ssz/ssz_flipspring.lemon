@@ -159,7 +159,7 @@ function void fn046536()
 		u8[A1 + 0x04] |= D2.u8
 		objA0.animation.sprite = 3
 		++u8[A2]
-		playSound(0xb1)
+		playSound(SFX_SPRING)
 	}
 	else if (D0.u8 == 2)
 	{

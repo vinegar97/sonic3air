@@ -246,7 +246,7 @@ function void fn089dc4()
 function void fn089dcc()
 {
 	// Rings
-	playSound(0xb9)
+	playSound(SFX_SPILLRINGS)
 
 	// "spawnChildObjects(0x089ef0)" replaced by:
 	spawnChildObject(0x089d44, 0x00, -8, -4)

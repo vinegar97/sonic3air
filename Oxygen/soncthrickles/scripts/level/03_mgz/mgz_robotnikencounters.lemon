@@ -88,7 +88,7 @@ function void fn06bfca()
 function void fn06c014()
 {
 	objA0.base_state = 0x04
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 }
 
 
@@ -387,7 +387,7 @@ function void fn06ca62()
 				// "spawnChildObjects(0x06d812)" replaced by:
 				spawnChildObject(0x06cce6, 0x00, 0, 0)		// Spawn the chain
 
-				playSound(0x59)
+				playSound(SFX_COLLAPSE)
 
 				// "spawnSimpleChildObjects(0x06d83e)" replaced by:
 				spawnSimpleChildObjects(0x06d16a, 1)		// Debris spawner
@@ -481,7 +481,7 @@ function void fn06cbce()
 	{
 		u8[A1 + 0x2c] = 0x02
 	}
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 
 	// "spawnSimpleChildObjects(0x06d83e)" replaced by:
 	spawnSimpleChildObjects(0x06d16a, 1)		// Debris spawner

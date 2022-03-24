@@ -275,7 +275,7 @@ function void fn03d4c2()
 						D0.u16 -= D2.u16
 						u16[A2 + 0x1a] = D0.u16
 
-						playSound(0x62)
+						playSound(SFX_JUMP)
 					}
 				}
 			}

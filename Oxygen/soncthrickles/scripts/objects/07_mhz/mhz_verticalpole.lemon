@@ -263,7 +263,7 @@ function void fn03f246()
 				SetCharacterSpritePatterns()
 				A2 = backupA2
 
-				playSound(0x4a)
+				playSound(SFX_GRAB)
 			}
 		}
 	}

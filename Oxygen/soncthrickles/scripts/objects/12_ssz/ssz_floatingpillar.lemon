@@ -61,7 +61,7 @@ function void fn044b30()
 			}
 		}
 
-		playSound(0x59)
+		playSound(SFX_COLLAPSE)
 		objA0.animation.sprite = 0
 		objA0.update_address = 0x044b90
 	}

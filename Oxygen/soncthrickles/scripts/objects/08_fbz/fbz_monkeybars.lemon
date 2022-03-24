@@ -204,7 +204,7 @@ function void fn03a8b8()
 			u16[A1 + 0x42] = A0.u16
 
 			u8[A2] = 0x01
-			playSound(0x4a)
+			playSound(SFX_GRAB)
 
 		#if STANDALONE
 			u8[A1 + 0x3d] = 0	// Clear char.spindash
@@ -295,7 +295,7 @@ function void fn03aa7e()
 				D1 = u8[A2 + 0x04]
 				if (D1.u8 == 2)
 				{
-					playSound(0x4a)
+					playSound(SFX_GRAB)
 				}
 				--D1.u16
 				u8[A1 + 0x20] = (D1.u16 == 0) ? char.state.HANGING : char.state.RUNNING
@@ -477,7 +477,7 @@ function void fn03ac86()
 			SetCharacterSpritePatterns()
 			A2 = backupA2
 
-			playSound(0x4a)
+			playSound(SFX_GRAB)
 
 		#if STANDALONE
 			u8[A1 + 0x3d] = 0	// Clear char.spindash

@@ -402,7 +402,7 @@ function void fn08160a()
 	u8[0xffffb000 + 0x2b] |= char.bonus.INVINCIBLE
 
 #if STANDALONE
-	playSound(0x9f)
+	playSound(SFX_SUPERTRANSFORM)
 #else
 	playSound(0x46)
 #endif

@@ -288,7 +288,7 @@ function void fn088da6()
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
 	u8[A1 + 0x40] = 0
 
-	playSound(0xb1)
+	playSound(SFX_SPRING)
 }
 
 

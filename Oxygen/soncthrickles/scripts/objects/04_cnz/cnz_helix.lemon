@@ -68,7 +68,7 @@ function void fn033102()
 			objA1.position.x.u16 = D1.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 
-			playSound(0x3c)
+			playSound(SFX_ROLL)
 		}
 	}
 }

@@ -982,7 +982,7 @@ function bool fn00d458()
 			D1.u16 = u16[A0 + 0x36]
 			if (control.pad1.pressed & CONTROL_DOWN)
 			{
-				playSound(0x5b)
+				playSound(SFX_CLICK)
 				--D1.u16
 				if (D1.s16 < 0)
 				{
@@ -991,7 +991,7 @@ function bool fn00d458()
 			}
 			else if (control.pad1.pressed & CONTROL_UP)
 			{
-				playSound(0x5b)
+				playSound(SFX_CLICK)
 				++D1.u16
 				if (D1.u16 > D6.u16)
 				{
@@ -1133,12 +1133,12 @@ function void fn00d6d0()
 		if (control.pad1.pressed & CONTROL_UP)
 		{
 			character = (character < maxCharacterSelection) ? (character + 1) : 0
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 		else if (control.pad1.pressed & CONTROL_DOWN)
 		{
 			character = (character > 0) ? (character - 1) : maxCharacterSelection
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 	}
 	D0 = character

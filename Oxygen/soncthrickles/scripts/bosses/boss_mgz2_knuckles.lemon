@@ -145,7 +145,7 @@ function void fn06c7d8()
 {
 	if (objA0.countdown_value == 0x28)
 	{
-		playSound(0x59)
+		playSound(SFX_COLLAPSE)
 
 		// "spawnSimpleChildObjects(0x06d83e)" replaced by:
 		spawnSimpleChildObjects(0x06d16a, 1)
@@ -190,7 +190,7 @@ function void fn06c83c()
 {
 	if (objA0.countdown_value == 0x48)
 	{
-		playSound(0x59)
+		playSound(SFX_COLLAPSE)
 
 		// "spawnSimpleChildObjects(0x06d83e)" replaced by:
 		spawnSimpleChildObjects(0x06d16a, 1)
@@ -506,7 +506,7 @@ function void fn06d51a()
 	{
 		objA0.velocity.x = -objA0.velocity.x
 	}
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 
 	// "spawnSimpleChildObjects(0x06d83e)" replaced by:
 	spawnSimpleChildObjects(0x06d16a, 1)

@@ -440,7 +440,7 @@ function void fn03e682()
 				u8[A2] = 1
 				D1.u8 = 0x90
 
-				playSound(0x4a)
+				playSound(SFX_GRAB)
 				fn03e658()
 			}
 		}

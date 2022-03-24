@@ -415,7 +415,7 @@ function void fn062e92()
 			objA0.flags38 |= 0x02
 			u8[0xfffffaa9] = 0xff
 
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 	}
 
@@ -456,13 +456,13 @@ function void fn062f0a()
 	{
 		objA0.update_address = 0x062f4c
 		objA0.animation.sprite = 1
-		playSound(0x5b)
+		playSound(SFX_CLICK)
 
 		if ((objA0.flags38 & 0x04) == 0)
 		{
 			objA0.flags38 |= 0x02
 			u8[0xfffffaa9] ^= 0xff
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 	}
 

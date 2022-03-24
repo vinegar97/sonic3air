@@ -380,7 +380,7 @@ function void fn07b63a()
 	s16[A0 + 0x40] = D1.s16
 	objA0.velocity.y = 0
 
-	playSound(0xb6)
+	playSound(SFX_SPINDASH_RELEASE)
 }
 
 
@@ -509,7 +509,7 @@ function void fn07b790()
 	}
 	objA0.velocity.x = D0.u16
 	u16[A0 + 0x40] = D1.u16
-	playSound(0xb6)
+	playSound(SFX_SPINDASH_RELEASE)
 }
 
 
@@ -716,7 +716,7 @@ function void fn07c902()
 	objA0.update_address = 0x07c91c
 	fn07d236()
 
-	playSound(0x3c)
+	playSound(SFX_ROLL)
 	fn07c91c()
 }
 

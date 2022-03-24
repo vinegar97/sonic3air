@@ -183,7 +183,7 @@ function void fn029e42()
 	else
 	{
 		u8[A4] += 2
-		playSound(0x3c)
+		playSound(SFX_ROLL)
 		fn029eb2()
 	}
 }

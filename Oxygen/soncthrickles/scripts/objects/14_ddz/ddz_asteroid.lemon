@@ -52,7 +52,7 @@ function void fn0821fc()
 	}
 
 	// Sonic crashed into the asteroid
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 	D0.u16 = u16[0xfffffa8e]
 	if (D0.u16 != 0)
 	{

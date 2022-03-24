@@ -113,7 +113,7 @@ function void fn048d2c()
 		u16[A4 + 0x08] = D0.u16 >> 1
 		objA1.velocity.y = (objA0.flags2a & 0x02) ? 0x1000 : -0x1000
 		u8[A4] += 2
-		playSound(0x9f)
+		playSound(SFX_SUPERTRANSFORM)
 	}
 
 	fn048d66()

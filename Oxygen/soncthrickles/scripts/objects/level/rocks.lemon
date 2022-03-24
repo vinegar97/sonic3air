@@ -853,5 +853,5 @@ function void fn0201de()
 			break
 	}
 
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 }

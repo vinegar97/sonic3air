@@ -1071,7 +1071,7 @@ function void Tails.CheckCatchSonic()
 		if (u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0 && u8[A1 + 0x3d] == 0 && debug_mode.state == 0)
 		{
 			fn01459e()
-			playSound(0x4a)
+			playSound(SFX_GRAB)
 			u8[A2] = 1
 		}
 	}

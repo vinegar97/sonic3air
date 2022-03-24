@@ -120,7 +120,7 @@ function void fn030c06()
 		{
 			u8[A0 + 0x34] = 0
 			objA0.update_address = 0x030b58
-			playSound(0xb6)
+			playSound(SFX_SPINDASH_RELEASE)
 		}
 		else
 		{
@@ -247,7 +247,7 @@ function void fn030cf8()
 		{
 			u8[A0 + 0x35] |= bit
 
-			playSound(0x3c)
+			playSound(SFX_ROLL)
 
 			u8[A1 + 0x20] = 0
 			u8[A1 + 0x1e] = (objA1.update_address == 0x01365c) ? 0x0f : 0x13

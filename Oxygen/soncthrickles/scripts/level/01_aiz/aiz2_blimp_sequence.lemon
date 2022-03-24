@@ -276,7 +276,7 @@ function void fn0504dc()
 	if (objA0.value32 == 0)
 	{
 		objA0.base_state += 4
-		playSound(0x51)
+		playSound(SFX_BOMBFALL)
 	}
 	fn0504ee()
 }
