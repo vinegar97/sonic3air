@@ -65,24 +65,12 @@ bin/
 /framework/include/
 
 # librmx
-/librmx/build/_vstudio/rmxbase_x64/rmxbase.lib.recipe
-/librmx/build/_vstudio/rmxbase_x86/rmxbase.lib.recipe
-/librmx/build/_vstudio/rmxbase_x86d/rmxbase.lib.recipe
-/librmx/build/_vstudio/rmxext_oggvorbis_x64/rmxext_oggvorbis.lib.recipe
-/librmx/build/_vstudio/rmxext_oggvorbis_x86/rmxext_oggvorbis.lib.recipe
-/librmx/build/_vstudio/rmxext_oggvorbis_x86d/rmxext_oggvorbis.lib.recipe
-/librmx/build/_vstudio/rmxmedia_x64/rmxmedia.lib.recipe
-/librmx/build/_vstudio/rmxmedia_x86/rmxmedia.lib.recipe
-/librmx/build/_vstudio/rmxmedia_x86d/rmxmedia.lib.recipe
-/librmx/build/_vstudio/rmxTest_x64/rmxTest.exp
 /librmx/build/_vstudio/rmxTest_x86/rmx_test.vcxproj.FileListAbsolute.txt
-/librmx/build/_vstudio/rmxTest_x86/rmxTest.exe.recipe
-/librmx/build/_vstudio/rmxTest_x86/rmxTest.exp
 /librmx/build/_vstudio/rmxTest_x86/rmxTest.iobj
 /librmx/build/_vstudio/rmxTest_x86/rmxTest.ipdb
 /librmx/build/_vstudio/rmxTest_x86d/rmx_test.vcxproj.FileListAbsolute.txt
-/librmx/build/_vstudio/rmxTest_x86d/rmxTest.exe.recipe
-/librmx/build/_vstudio/rmxTest_x86d/rmxTest.exp
+*.recipe
+*.exp
 
 
 # Oxygen
