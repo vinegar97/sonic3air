@@ -405,6 +405,7 @@ function void fn090512()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn collapsing rock formation
 			objA1.update_address = 0x039c50
 			u8[A1 + 0x32] = 0x01
 			objA1.position.x.u16 = 0x0f00
@@ -413,6 +414,7 @@ function void fn090512()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn collapsing rock formation
 			objA1.update_address = 0x039c50
 			u8[A1 + 0x32] = 0x01
 			objA1.position.x.u16 = 0x0f80
@@ -425,6 +427,7 @@ function void fn090512()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn collapsing rock formation
 			objA1.update_address = 0x039c50
 			u8[A1 + 0x32] = 0x01
 			objA1.position.x.u16 = 0x0540

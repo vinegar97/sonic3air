@@ -37,6 +37,7 @@ function void fn081a74()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the upper border
 			objA1.update_address = 0x084aa4
 		}
 
@@ -46,6 +47,7 @@ function void fn081a74()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the lower border
 			objA1.update_address = 0x084ad2
 		}
 

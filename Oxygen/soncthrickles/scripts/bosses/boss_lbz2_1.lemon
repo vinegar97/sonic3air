@@ -851,7 +851,7 @@ function void fn073fe2()
 			screenmover_target.right = 0x3ab8
 
 			// "spawnSimpleChildObjects(0x084b00)" replaced by:
-			spawnSimpleChildObjects(0x084a48, 1)
+			spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 		}
 		else
 		{

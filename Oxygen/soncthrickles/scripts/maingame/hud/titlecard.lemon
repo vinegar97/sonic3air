@@ -196,6 +196,7 @@ function void TitleCard.Show()
 		{
 			if (allocDynamicObjectStd())
 			{
+				// Ghost spawner
 				objA1.update_address = 0x08f0b8
 			}
 		}

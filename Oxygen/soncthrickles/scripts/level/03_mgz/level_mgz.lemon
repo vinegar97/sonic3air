@@ -262,6 +262,7 @@ function void fn01c96e()
 
 		if (allocDynamicObjectStd())
 		{
+			// Trigger boss
 			objA1.update_address = 0x06c31a
 			objA1.position.x.u16 = 0x3d20
 			objA1.position.y.u16 = 0x0668
@@ -676,6 +677,7 @@ function void fn051560()
 
 		if (allocDynamicObjectStd())
 		{
+			// Mid-level Robotnik encounter
 			objA1.update_address = 0x06bf2a
 			objA1.position.x.u16 = 0x08e0
 			objA1.position.y.u16 = 0x0690
@@ -712,6 +714,7 @@ function void fn0515a4()
 
 		if (allocDynamicObjectStd())
 		{
+			// Mid-level Robotnik encounter
 			objA1.update_address = 0x06bf2a
 			u8[A1 + 0x04] |= render_flag.FLIP_X
 			objA1.position.x.u16 = 0x2fa0
@@ -737,6 +740,7 @@ function void fn05160e()
 
 			if (allocDynamicObjectStd())
 			{
+				// Mid-level Robotnik encounter
 				objA1.update_address = 0x06bf2a
 				u8[A1 + 0x04] |= render_flag.FLIP_X
 				objA1.position.x.u16 = 0x3300

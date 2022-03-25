@@ -20,8 +20,9 @@ function void fn0705ea()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x19
+		u8[A1 + 0x2c] = MUSIC_MAINBOSS
 	}
 
 	requestLoadingPatterns(0x6f)
@@ -253,6 +254,7 @@ function void fn070870()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn capsule
 		objA1.update_address = 0x086540
 		objA1.position.x.u16 = 0x307c
 		objA1.position.y.u16 = 0x0660
@@ -261,7 +263,7 @@ function void fn070870()
 	screenmover_target.right = 0x2fdc + getScreenExtend()
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 #if STANDALONE
 	// Add chunks with an actual collision near the capsule
@@ -299,7 +301,7 @@ function void fn0708aa()
 	screenmover_target.right = 0x3738
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 	Kosinski.addMultipleToDMAQueue(0x07091c)
 

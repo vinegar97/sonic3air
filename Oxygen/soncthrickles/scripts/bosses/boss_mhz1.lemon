@@ -80,8 +80,9 @@ function void fn075220()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x2e
+		u8[A1 + 0x2c] = MUSIC_MINIBOSS_2
 	}
 
 	Kosinski.addToDMAQueue(0x1680ca, 0x75a0)

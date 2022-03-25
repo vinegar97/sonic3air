@@ -280,6 +280,7 @@ function void fn037406()
 {
 	if (allocDynamicObjectAfterA0())
 	{
+		// Spawn "finish" neon text
 		u32[A1] = 0x03713a
 		u16[A1 + 0x10] = 0x0120 + getScreenExtend()
 		u16[A1 + 0x14] = 0xb8

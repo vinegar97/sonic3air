@@ -244,6 +244,7 @@ function void fn06c8b4()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn capsule
 		objA1.update_address = 0x086540
 		objA1.position.x.u16 = 0x3f40
 		objA1.position.y.u16 = 0xb0
@@ -253,7 +254,7 @@ function void fn06c8b4()
 	screenmover_target.right = D0.u16
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 }
 
 

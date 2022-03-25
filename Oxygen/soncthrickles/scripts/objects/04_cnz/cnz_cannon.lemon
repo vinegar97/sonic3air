@@ -99,6 +99,7 @@ function void fn03192c()
 		{
 			if (allocDynamicObjectAfterA0())
 			{
+				// Spawn small explosion
 				objA1.update_address = 0x01e68e
 				objA1.position.x.u16 = objA0.position.x.u16
 				objA1.position.y.u16 = objA0.position.y.u16 - 0x18

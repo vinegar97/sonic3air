@@ -47,11 +47,13 @@ function void fn07fd9e()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn running Robotnik
 		objA1.update_address = 0x080de0
 	}
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn door to the large Egg Robo
 		objA1.update_address = 0x080d72
 		u16[A1 + 0x46] = A0.u16
 	}
@@ -100,8 +102,9 @@ function void fn07fe2c()
 
 		if (allocDynamicObjectStd())
 		{
+			// Create the object that fades out level music and starts the boss theme afterwards
 			objA1.update_address = 0x085b30
-			u8[A1 + 0x2c] = 0x30
+			u8[A1 + 0x2c] = MUSIC_BIGARMS
 		}
 	}
 }

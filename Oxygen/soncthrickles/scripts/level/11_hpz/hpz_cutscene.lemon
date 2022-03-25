@@ -142,10 +142,12 @@ function void fn064472()
 	}
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the right border
 		objA1.update_address = 0x084a48
 	}
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the upper border
 		objA1.update_address = 0x084aa4
 	}
 
@@ -153,6 +155,7 @@ function void fn064472()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the lower border
 		objA1.update_address = 0x084ad2
 	}
 
@@ -593,6 +596,7 @@ function void fn0648fa()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the lower border
 		objA1.update_address = 0x084ad2
 	}
 
@@ -850,6 +854,7 @@ function void fn064b22()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the left border
 		objA1.update_address = 0x084a76
 	}
 
@@ -1017,8 +1022,9 @@ function void fn064ca6()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x2e
+		u8[A1 + 0x2c] = MUSIC_MINIBOSS_2
 	}
 
 	A1 = 0xffffb000

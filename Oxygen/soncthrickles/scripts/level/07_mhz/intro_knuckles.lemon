@@ -126,6 +126,7 @@ function void fn0634ca()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn check for cutscene skip
 		u32[A1] = 0x063682
 	}
 
@@ -149,6 +150,7 @@ function void fn063526()
 		{
 			if (allocDynamicObjectStd())
 			{
+				// Spawn bomb
 				u32[A1] = 0x063790
 			}
 		}

@@ -137,6 +137,7 @@ function void fn063b40()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn Cutscene Knuckles
 		objA1.update_address = 0x061d4c
 		objA1.subtype2c = 0x24
 	}

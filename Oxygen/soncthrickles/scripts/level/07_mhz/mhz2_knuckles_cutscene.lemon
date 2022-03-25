@@ -426,6 +426,7 @@ function void fn062422()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out the Knuckles theme and starts the level music afterwards
 		objA1.update_address = 0x085b0a
 	}
 

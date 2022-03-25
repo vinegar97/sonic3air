@@ -57,9 +57,9 @@ function void fn06fd38()
 
 	if (allocDynamicObjectStd())
 	{
-		// Spawn music controller
+		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x2e
+		u8[A1 + 0x2c] = MUSIC_MINIBOSS_2
 	}
 
 	// "spawnChildObjects(0x0703d0)" replaced by:
@@ -215,6 +215,7 @@ function void fn06ff10()
 	objA0.countdown_callback = 0x06ff34
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out the boss theme and starts the level music afterwards
 		objA1.update_address = 0x085b0a
 	}
 }

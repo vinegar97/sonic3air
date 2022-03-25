@@ -151,6 +151,7 @@ function void fn02e4d6()
 		u16[0xffffeee0] = 0
 		if (allocDynamicObjectAfterA0())
 		{
+			// Spawn character continue icons
 			u16[0xffffeee0] = A1.u16
 			objA1.update_address = 0x02ebe8
 			objA0.countdown_value = 0x010e

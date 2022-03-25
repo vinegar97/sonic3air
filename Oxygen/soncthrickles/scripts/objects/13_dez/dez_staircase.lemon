@@ -31,6 +31,7 @@ function void fn04763e()
 	D1 = 3
 	while (true)
 	{
+		// Spawn staircase segments
 		u32[A1 + 0x0c] = 0x046f7a
 		u16[A1 + 0x0a] = 0x2480
 		u8[A1 + 0x04] = objA0.render_flags

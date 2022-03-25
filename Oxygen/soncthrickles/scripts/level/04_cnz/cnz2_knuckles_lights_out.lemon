@@ -258,6 +258,7 @@ function void fn065d1c()
 	objA0.update_address = 0x065d46
 	if (allocDynamicObjectAfterA0())
 	{
+		// Spawn corkfloor
 		objA1.update_address = 0x02a3d0
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16

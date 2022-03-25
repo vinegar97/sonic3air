@@ -208,6 +208,7 @@ function void fn0484b0()
 
 	if (allocDynamicObjectAfterA0())
 	{
+		// Tunnel ring spawner
 		objA1.update_address = 0x0487e4
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16

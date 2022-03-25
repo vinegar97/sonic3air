@@ -126,7 +126,7 @@ function void FireShield.Update()
 	if ((u8[A2 + 0x2b] & char.bonus.ANY_SHIELD) == 0)
 	{
 		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
-		objA0.update_address = 0x0194ce
+		objA0.update_address = 0x0194ce		// Insta-Shield
 		return
 	}
 
@@ -135,11 +135,12 @@ function void FireShield.Update()
 		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		if (allocDynamicObjectStd())
 		{
+			// Spawn small explosion
 			objA1.update_address = 0x01e68e
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 		}
-		objA0.update_address = 0x0194ce
+		objA0.update_address = 0x0194ce		// Insta-Shield
 
 	#if STANDALONE
 		if (Game.getSetting(SETTING_SHIELD_TYPES) == 3)
@@ -207,7 +208,7 @@ function void LightningShield.Update()
 	if ((u8[A2 + 0x2b] & char.bonus.ANY_SHIELD) == 0)
 	{
 		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
-		objA0.update_address = 0x0194ce
+		objA0.update_address = 0x0194ce		// Insta-Shield
 		return
 	}
 
@@ -216,7 +217,7 @@ function void LightningShield.Update()
 		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		if (global.fade_timer != 0)
 		{
-			objA0.update_address = 0x0194ce
+			objA0.update_address = 0x0194ce		// Insta-Shield
 		}
 		else
 		{
@@ -280,6 +281,7 @@ function void Effects.CreateSparks()
 	u8 counter = 4
 	while (counter > 0)
 	{
+		// Spawn sparks
 		if (!allocDynamicObjectStd())
 			break
 
@@ -327,7 +329,7 @@ function void LightningShield.ResetWaterPalette()
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
 	{
-		objA0.update_address = 0x0194ce
+		objA0.update_address = 0x0194ce		// Insta-Shield
 		copyMemory(0xfffff080, 0xfffff000, 0x80)
 	}
 }
@@ -363,7 +365,7 @@ function void BubbleShield.Update()
 	if ((u8[A2 + 0x2b] & char.bonus.ANY_SHIELD) == 0)
 	{
 		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
-		objA0.update_address = 0x0194ce
+		objA0.update_address = 0x0194ce		// Insta-Shield
 		return
 	}
 

@@ -264,6 +264,7 @@ function void fn083912()
 
 		if (allocDynamicObjectStd())
 		{
+			// Level results
 			objA1.update_address = 0x02dad0
 		}
 

@@ -866,7 +866,7 @@ function void fn085b44()
 
 	#if STANDALONE
 		// Credits in Knuckles' outro?
-		if (objA0.subtype2c == 0xdc)
+		if (objA0.subtype2c == MUSIC_CREDITSMEDLEY)
 		{
 			// Reset frame counter so we can use it to get the current credits music playback position
 			level.framecounter = 0

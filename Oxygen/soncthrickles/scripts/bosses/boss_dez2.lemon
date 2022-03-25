@@ -260,6 +260,7 @@ function void fn07f29a()
 	screenmover_target.right = 0x3620
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the right border
 		objA1.update_address = 0x084a48
 	}
 }
@@ -1357,6 +1358,7 @@ function void fn07fb92()
 
 			if (allocDynamicObjectStd())
 			{
+				// Restore gravity
 				objA1.update_address = 0x07fc3e
 			}
 			AddScoreForBossEnemy()

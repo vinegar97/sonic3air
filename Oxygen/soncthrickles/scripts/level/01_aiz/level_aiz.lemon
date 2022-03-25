@@ -709,6 +709,7 @@ function void fn04ff74()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn Blimp
 			objA1.update_address = 0x05034a
 		}
 

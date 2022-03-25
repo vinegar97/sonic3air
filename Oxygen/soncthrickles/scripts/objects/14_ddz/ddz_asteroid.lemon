@@ -83,6 +83,7 @@ function void fn0821fc()
 		D4 = 2
 		while (D4.s16 >= 0)
 		{
+			// Spawn smaller asteroids
 			if (!allocDynamicObjectStd())
 			{
 				if (objA0.respawn_entry)
@@ -123,6 +124,7 @@ function void fn0821fc()
 		if (!allocDynamicObjectStd())
 			break
 
+		// Spawn asteroid debris
 		objA1.update_address = D1
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes

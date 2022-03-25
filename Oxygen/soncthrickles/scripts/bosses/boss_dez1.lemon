@@ -632,12 +632,14 @@ function void fn07e342()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the upper border
 			objA1.update_address = 0x084aa4
 		}
 		screenmover_target.bottom = 0x2000
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the lower border
 			objA1.update_address = 0x084ad2
 		}
 		playSound(0xcc)

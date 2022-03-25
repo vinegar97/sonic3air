@@ -68,6 +68,7 @@ function void AIZWaterfallRock.Update()
 		u8[A0 + 0x36] = 1
 		if (allocDynamicObjectAfterA0())
 		{
+			// Spawn water splashes effect
 			objA1.update_address = 0x02a36c
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16

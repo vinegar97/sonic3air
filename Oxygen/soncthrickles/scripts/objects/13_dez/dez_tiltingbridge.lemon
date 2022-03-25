@@ -19,6 +19,7 @@ function void fn046d9e()
 
 	while (true)
 	{
+		// Spawn bridge segments
 		objA1.update_address = 0x046e4c
 		objA1.position.x.u16 = D2.u16
 		objA1.position.y.u16 = objA0.position.y.u16

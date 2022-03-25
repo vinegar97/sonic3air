@@ -830,12 +830,12 @@ function void fn0380f8()
 		objA0.sprite_attributes = 0xc300
 		objA0.animation.sprite = 0x03
 
-		u32[A0] = 0x01abc6
+		objA0.update_address = 0x01abc6
 		DrawObject()
 	}
 	else
 	{
-		u32[A0] = 0x038150
+		objA0.update_address = 0x038150
 		fn038150()
 	}
 }

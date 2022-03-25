@@ -829,6 +829,7 @@ function void fn05f8c6()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn object that fades in the logo palette
 		u16[A0 + 0x44] = A1.u16
 		objA1.update_address = 0x0855b2
 		D0 = 0x05
@@ -1136,6 +1137,7 @@ function void fn05fda4()
 {
 	if (allocDynamicObjectStd())
 	{
+		// Spawn object that fades in the logo palette
 		u16[A0 + 0x44] = A1.u16
 		objA1.update_address = 0x0855b2
 		D0 = 5

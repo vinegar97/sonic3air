@@ -161,7 +161,7 @@ function void fn08cc84()
 	screenmover_target.right = 0x3ea0
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 }
 
 
@@ -298,11 +298,11 @@ function void fn08d0ea()
 //# address-hook(0x08d116) end(0x08d12a)
 function void fn08d116()
 {
-	// Spawn Robotnik
+	// Create the object that fades out level music and starts the boss theme afterwards
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x2e
+		u8[A1 + 0x2c] = MUSIC_MINIBOSS_2
 	}
 }
 
@@ -520,7 +520,7 @@ function void fn062778()
 	screenmover_target.right = 0x3b60 + getScreenExtend() * 2
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 	move_area.bottom.target = 0x0148
 	fn0851e4()

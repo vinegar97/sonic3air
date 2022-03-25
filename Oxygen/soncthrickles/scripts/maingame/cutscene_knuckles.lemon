@@ -157,7 +157,7 @@ function void fn065c56()
 	move_area.bottom.target = D0.u16
 
 	// "spawnSimpleChildObjects(0x084b12)" replaced by:
-	spawnSimpleChildObjects(0x084ad2, 1)
+	spawnSimpleChildObjects(0x084ad2, 1)		// Screen mover for the lower border
 }
 
 

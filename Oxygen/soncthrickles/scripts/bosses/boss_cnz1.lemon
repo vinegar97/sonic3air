@@ -47,6 +47,7 @@ function void fn06da00()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn object to control background scrolling during the CNZ1 boss
 		objA1.update_address = 0x051fce
 	}
 }

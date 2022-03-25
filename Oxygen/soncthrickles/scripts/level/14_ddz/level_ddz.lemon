@@ -298,11 +298,13 @@ function void fn081492()
 
 			if (allocDynamicObjectStd())
 			{
+				// Spawn screen mover for the left border
 				objA1.update_address = 0x084a76
 			}
 
 			if (allocDynamicObjectStd())
 			{
+				// Spawn screen mover for the right border
 				objA1.update_address = 0x084a48
 			}
 		}

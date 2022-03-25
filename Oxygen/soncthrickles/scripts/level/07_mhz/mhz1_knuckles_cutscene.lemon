@@ -392,7 +392,7 @@ function void fn062e5c()
 	spawnSimpleChildObjects(0x061d4c, 1)
 	if (_equal())
 	{
-		u8[A1 + 0x2c] = 0x1c
+		objA1.subtype2c = 0x1c
 	}
 
 	fn062e92()

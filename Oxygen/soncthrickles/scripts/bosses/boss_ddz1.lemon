@@ -155,6 +155,7 @@ function void fn081856()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the left border
 			objA1.update_address = 0x084a76
 		}
 

@@ -56,8 +56,9 @@ function void fn07a20e()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x19
+		u8[A1 + 0x2c] = MUSIC_MAINBOSS
 	}
 
 	objA0.position.x.u16 = camera.position.x.u16 + 0x0110 + getScreenExtend()

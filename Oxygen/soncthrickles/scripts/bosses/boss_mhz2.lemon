@@ -180,7 +180,7 @@ function void fn0760c4()
 	screenmover_target.right = 0x45a0
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 }
 
 
@@ -346,7 +346,7 @@ function void fn076270()
 	addPatternLoadingCue(0x083d7c)
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 }
 
 
@@ -476,8 +476,9 @@ function void fn07654a()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x19
+		u8[A1 + 0x2c] = MUSIC_MAINBOSS
 	}
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:

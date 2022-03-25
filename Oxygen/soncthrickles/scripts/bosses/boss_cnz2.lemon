@@ -294,13 +294,14 @@ function void fn06e6e4()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn capsule
 		objA1.update_address = 0x086540
 		objA1.position.x.u16 = 0x4990
 		objA1.position.y.u16 = 0x02e0
 	}
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 }
 
 
@@ -325,10 +326,10 @@ function void fn06e724()
 #endif
 
 	// "spawnSimpleChildObjects(0x084b0c)" replaced by:
-	spawnSimpleChildObjects(0x084aa4, 1)
+	spawnSimpleChildObjects(0x084aa4, 1)		// Screen mover for the upper border
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 #if STANDALONE
 	// Exchange rightmost chunks

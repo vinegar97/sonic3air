@@ -186,6 +186,7 @@ function void fn06c200()
 		screenmover_target.right = 0x6000
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the right border
 			objA1.update_address = 0x084a48
 		}
 	}
@@ -194,6 +195,7 @@ function void fn06c200()
 		screenmover_target.left = 0
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the left border
 			objA1.update_address = 0x084a76
 		}
 	}

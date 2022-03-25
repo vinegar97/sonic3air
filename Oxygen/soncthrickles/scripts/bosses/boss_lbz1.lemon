@@ -566,6 +566,7 @@ function void fn072562()
 	{
 		if (allocDynamicObjectStd())
 		{
+			// Create the object that fades out the boss theme and starts the level music afterwards
 			objA1.update_address = 0x085b0a
 		}
 		objA0.position.x.u16 = u16[A0 + 0x3c]
@@ -635,13 +636,14 @@ function void fn08cfc8()
 	// Do not create this object, it leads to the level music starting twice
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out the boss theme and starts the level music afterwards
 		objA1.update_address = 0x085b0a
 	}
 #endif
 	hud.dirty.timer = 0
 
 	// "spawnSimpleChildObjects(0x084b12)" replaced by:
-	spawnSimpleChildObjects(0x084ad2, 1)
+	spawnSimpleChildObjects(0x084ad2, 1)		// Screen mover for the lower border
 
 	// "spawnSimpleChildObjects(0x08d27a)" replaced by:
 	spawnSimpleChildObjects(0x08d0ae, 5)

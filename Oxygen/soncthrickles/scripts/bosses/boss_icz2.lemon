@@ -231,6 +231,7 @@ function void fn071d9e()
 	level.boss_encounter = 0
 	if (allocDynamicObjectStd())
 	{
+		// Spawn capsule
 		objA1.update_address = 0x086540
 		objA1.position.x.u16 = 0x4560 - getScreenExtend()
 		objA1.position.y.u16 = 0x06a3
@@ -241,6 +242,7 @@ function void fn071d9e()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the right border
 		objA1.update_address = 0x084a48
 	}
 }
@@ -267,7 +269,7 @@ function void fn071de2()
 #endif
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 	fn0852ae()
 }

@@ -214,6 +214,7 @@ function void fn077848()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn capsule
 			objA1.update_address = 0x086540
 			objA1.position.x.u16 = 0x5360
 			objA1.position.y.u16 = 0x0720
@@ -286,6 +287,7 @@ function void fn0778f2()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the right border
 		objA1.update_address = 0x084a48
 	}
 }

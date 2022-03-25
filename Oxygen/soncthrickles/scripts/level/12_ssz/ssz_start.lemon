@@ -196,6 +196,7 @@ function void fn057e34()
 		if (!allocDynamicObjectAfterA0())
 			return
 
+		// Spawn Cutscene Knuckles
 		objA1.update_address = 0x061d4c
 		objA1.subtype2c = 0x2c
 		objA1.position.x.u16 = 0x0100

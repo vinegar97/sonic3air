@@ -91,7 +91,7 @@ function void fn05b1a2()
 		if (allocDynamicObjectStd())
 		{
 			objA1.update_address = 0x085b30
-			u8[A1 + 0x2c] = 0xdc
+			u8[A1 + 0x2c] = MUSIC_CREDITSMEDLEY
 		}
 	}
 

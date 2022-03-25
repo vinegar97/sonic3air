@@ -383,6 +383,7 @@ function void fn01f188()
 
 	while (true)
 	{
+		// Spawn broken pole pieces
 		objA1.update_address = objA0.update_address
 		u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
 		objA1.mapping_offset = objA0.mapping_offset

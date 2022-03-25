@@ -663,8 +663,9 @@ function void fn065dd6()
 {
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the Knuckles theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x1f
+		u8[A1 + 0x2c] = MUSIC_KNUCKLES
 	}
 }
 

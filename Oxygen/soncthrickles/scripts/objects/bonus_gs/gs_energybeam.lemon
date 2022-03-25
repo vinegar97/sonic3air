@@ -38,6 +38,7 @@ function void fn049f20()
 		if (D1.s16 < 0)
 			break
 
+		// Spawn exit beam wall mounts
 		if (!allocDynamicObjectAfterA0())
 			break
 
@@ -64,6 +65,7 @@ function void fn049f5c()
 	{
 		if (allocDynamicObjectAfterA0())
 		{
+			// Spawn exit beam lasers
 			objA1.update_address = 0x04a09a
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.x.u16 += 0x80

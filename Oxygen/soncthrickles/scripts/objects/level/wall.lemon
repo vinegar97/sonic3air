@@ -345,6 +345,7 @@ function void fn0216b8()
 
 	while (true)
 	{
+		// Spawn wall debris
 		objA1.update_address = D4
 		objA0.mapping_offset = A3
 		objA1.render_flags = D5.u8

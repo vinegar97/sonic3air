@@ -103,6 +103,7 @@ function void fn020c38()
 
 	while (true)
 	{
+		// Spawn cliff debris
 		u8[A1 + 0x04] = D5.u8
 		u8[A1 + 0x06] = objA0.box_size.y
 		u8[A1 + 0x07] = objA0.box_size.x

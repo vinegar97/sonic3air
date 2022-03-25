@@ -99,6 +99,7 @@ function void fn0191a4()
 //# address-hook(0x019236) end(0x0192be)
 function void fn019236()
 {
+	// This is all technically unused
 	objA0.state = 0
 	A2 = 0xffffb000
 	D5 = 0x0f
@@ -106,6 +107,7 @@ function void fn019236()
 
 	while (D5.s16 >= 0)
 	{
+		// Spawn super sparks
 		if (!allocDynamicObjectStd())
 			return
 

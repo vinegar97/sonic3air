@@ -267,10 +267,11 @@ function void fn06b0e8()
 #endif
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn capsule
 		objA1.update_address = 0x086540
 		if (!isMainCharacter(CHARACTER_KNUCKLES))
 		{
