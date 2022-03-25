@@ -1855,8 +1855,7 @@ function void fn084440()
 	// Set animation loop point
 	A1 += s8[A1 + D0.s16 + 2]
 	u32[A0 + 0x30] = A1
-	objA0.animation.sprite = u8[A1 + 1]
-	objA0.animation.timer = u8[A1]
+	fn08444e()
 }
 
 
