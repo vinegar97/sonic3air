@@ -42,7 +42,7 @@ function void RunOnWaterHandler.Init()
 	else
 	{
 		objA0.mapping_offset = 0x237c60
-		objA0.sprite_attributes = 0x43b2
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03b2)
 		objA0.render_flags |= render_flag.WORLD
 		objA0.sprite_priority = 0x0300
 		objA0.box_size.x = 0x28

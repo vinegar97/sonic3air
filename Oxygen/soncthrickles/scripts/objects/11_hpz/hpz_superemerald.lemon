@@ -36,7 +36,7 @@ function void fn0907a2()
 function void fn0907a8()
 {
 	objA0.update_address = 0x0908de
-	objA0.sprite_attributes = 0x8477
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0477)
 	objA0.flags38 |= 0x01
 
 	fn09084e()
@@ -106,7 +106,7 @@ function void fn090880()
 	{
 		objA0.update_address = 0x0908de
 		objA0.animation.sprite = 0x1e
-		objA0.sprite_attributes = 0x8477
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0477)
 
 		fn0908de()
 	}
@@ -123,7 +123,7 @@ function void fn09089e()
 	if (u8[0xfffffac0] == (objA0.subtype2c | 0x80))
 	{
 		objA0.animation.sprite = 0x1e
-		objA0.sprite_attributes = 0x8477
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0477)
 	}
 	else
 	{
@@ -140,7 +140,7 @@ function void fn09089e()
 		{
 			// Draw only a gray something
 			objA0.animation.sprite = 0x07
-			objA0.sprite_attributes = 0x83b5
+			objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x03b5)
 		}
 		else
 		{

@@ -26,12 +26,12 @@ function void Button.Init()
 	if (global.zone == 0x01)
 	{
 		objA0.mapping_offset = 0x22bd1a
-		objA0.sprite_attributes = 0x2426
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0426)
 	}
 	else if (global.zone == 0x03)
 	{
 		objA0.mapping_offset = 0x22bd4a
-		objA0.sprite_attributes = 0x441a
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x041a)
 	}
 	else if (global.zone == 0x04)
 	{

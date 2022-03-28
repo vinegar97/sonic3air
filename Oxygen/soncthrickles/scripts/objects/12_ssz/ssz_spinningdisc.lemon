@@ -21,7 +21,7 @@ function void fn045dae()
 	objA0.box_size.y = 0x20
 	objA0.box_size.x = 0x0c
 	objA0.sprite_priority = 0x0100
-	objA0.sprite_attributes = 0x437e
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x037e)
 	objA0.mapping_offset = 0x046ce8
 
 	if (allocDynamicObjectAfterA0())

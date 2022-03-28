@@ -26,7 +26,7 @@ function void fn03a7cc()
 	objA0.sprite_priority = 0x80
 	u16[A0 + 0x46] = objA0.position.y.u16
 	objA0.mapping_offset = 0x03ad8a
-	objA0.sprite_attributes = 0x4379
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0379)
 
 	objA0.countdown_value = (objA0.subtype2c & 0x7f) << 3
 	u16[A0 + 0x3c] = 0x02

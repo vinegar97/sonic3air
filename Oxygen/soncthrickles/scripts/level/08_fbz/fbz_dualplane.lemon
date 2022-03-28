@@ -176,7 +176,7 @@ function void fn0533ce()
 	objA0.box_size.y = 0xff
 	objA0.box_size.x = 0x20
 	objA0.sprite_priority = 0x0300
-	objA0.sprite_attributes = 0xc3d5
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x03d5)
 	objA0.mapping_offset = 0x053518
 	u16[A0 + 0x16] = 0x02
 	fn053400()
@@ -275,7 +275,7 @@ function void fn0534c6()
 	objA0.box_size.y = 0x0c
 	objA0.box_size.x = 0x2c
 	objA0.sprite_priority = 0x0380
-	objA0.sprite_attributes = 0x63a3
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x03a3)
 	objA0.mapping_offset = 0x053518
 
 	D0.u16 = objA0.countdown_value * 6

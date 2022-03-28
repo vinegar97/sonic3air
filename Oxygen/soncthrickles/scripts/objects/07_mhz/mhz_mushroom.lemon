@@ -19,17 +19,17 @@ function void MushroomHead.Init()
 
 	if (objA0.subtype2c & 0x01)
 	{
-		objA0.sprite_attributes = 0xc399
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0399)
 		u8[A0 + 0x36] = 0x14
 	}
 	else
 	{
-		objA0.sprite_attributes = 0xc369
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0369)
 	}
 
 	if (objA0.subtype2c & 0x40)
 	{
-		objA0.sprite_attributes &= 0x7fff
+		objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 	}
 
 	objA0.mapping_offset = 0x03e1fe

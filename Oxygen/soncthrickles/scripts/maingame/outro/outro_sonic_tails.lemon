@@ -383,7 +383,7 @@ function void fn05de80()
 	objA0.animation.sprite = 0x02
 	if (objA0.subtype2c == 0)
 	{
-		objA0.sprite_attributes = 0xc52e
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x052e)
 		objA0.sprite_priority = 0x0280
 		if (outro.ending_type < 0)
 		{
@@ -393,7 +393,7 @@ function void fn05de80()
 	}
 	else
 	{
-		objA0.sprite_attributes = 0x252e
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x052e)
 		objA0.sprite_priority = 0x0300
 	}
 }
@@ -633,7 +633,7 @@ function void fn05dca6()
 		return
 
 	objA0.base_state = 0x1a
-	objA0.sprite_attributes = 0x226e
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x026e)
 	objA0.render_flags |= 0x01
 	u8[A0 + 0x0a] &= ~0x80
 	objA0.flags38 |= 0x10
@@ -851,7 +851,7 @@ function void fn05e0f8()
 {
 	objA0.base_state = 0x02
 	objA0.mapping_offset = 0x14a8d6
-	objA0.sprite_attributes = 0x84da
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x04da)
 	objA0.sprite_priority = 0x0180
 	objA0.animation.sprite = 0x07
 	objA0.position.x.u16 = 0x01e0 + getScreenExtend() * 2
@@ -1034,7 +1034,7 @@ function void fn05e334()
 		return
 
 	objA0.mapping_offset = 0x0607e6
-	objA0.sprite_attributes = 0x4347
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0347)
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x80
@@ -1305,7 +1305,7 @@ function void fn05e612()
 {
 	objA0.update_address = 0x05e64a
 	objA0.mapping_offset = 0x060796
-	objA0.sprite_attributes = 0x62ff
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x02ff)
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x08
@@ -1365,7 +1365,7 @@ function void fn05eb72()
 {
 	// Sonic
 	objA0.mapping_offset = 0x06036e
-	objA0.sprite_attributes = 0x81e3
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x01e3)
 	objA0.animation.sprite = 0x0c
 }
 
@@ -1375,7 +1375,7 @@ function void fn05eb88()
 {
 	// Tails
 	objA0.mapping_offset = 0x060486
-	objA0.sprite_attributes = 0x826e
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x026e)
 	objA0.animation.sprite = 0x0b
 }
 
@@ -1435,7 +1435,7 @@ function void fn05ed4a()
 function void fn05edac()
 {
 	objA0.mapping_offset = 0x06068e
-	objA0.sprite_attributes = 0xe2ff
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x02ff)
 	objA0.sprite_priority = 0x0300
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10

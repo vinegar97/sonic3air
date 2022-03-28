@@ -42,7 +42,7 @@ function void FBZWindingElevator.spawnPlatform(s16 offset)
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x03ca92
-		u16[A1 + 0x0a] = 0x42d2
+		u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x02d2)
 		u8[A1 + 0x04] |= 0x04
 		u8[A1 + 0x06] = 0x20
 		u8[A1 + 0x07] = 0x30

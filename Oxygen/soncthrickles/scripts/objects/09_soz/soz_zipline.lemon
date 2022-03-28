@@ -98,7 +98,7 @@ function void fn04aa46()
 	u8[A1 + 0x06] = 0x10
 	u16[A1 + 0x08] = 0x0280
 	u32[A1 + 0x0c] = 0x04b1d0
-	u16[A1 + 0x0a] = 0x4411
+	u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x0411)
 	u8[A1 + 0x2a] = objA0.flags2a
 	u16[A1 + 0x3e] = objA0.position.x.u16
 	u16[A1 + 0x40] = objA0.position.y.u16

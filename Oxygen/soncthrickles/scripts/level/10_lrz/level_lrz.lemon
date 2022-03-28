@@ -666,7 +666,7 @@ function void fn05711e()
 	objA0.box_size.y = 0x40
 	objA0.box_size.x = 0x50
 	objA0.sprite_priority = 0x0380
-	objA0.sprite_attributes = 0x639f
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x039f)
 	objA0.mapping_offset = 0x05719e
 
 	fn057156()

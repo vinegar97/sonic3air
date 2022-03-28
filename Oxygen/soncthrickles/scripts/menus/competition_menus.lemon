@@ -290,8 +290,8 @@ function void fn00aadc()
 	D0.u8 = objA0.flags2e
 	if (D0.s8 >= 0)
 	{
-		objA0.sprite_attributes &= 0x9fff
-		D1.u16 = (D0.u8 == competition_mode.menu.game_mode) ? 0x4000 : 0x2000
+		objA0.sprite_attributes &= ~sprite_attribute.PALETTE
+		D1.u16 = (D0.u8 == competition_mode.menu.game_mode) ? sprite_attribute.PALETTE.LINE2 : sprite_attribute.PALETTE.LINE1
 		objA0.sprite_attributes |= D1.u16
 	}
 	DrawObject()
@@ -410,7 +410,7 @@ function void CompetitionMode.StageSelect()
 		objA0.position.x.frac = u16[(A1+=2)-2]
 		objA0.position.y.u16 = u16[A1]
 		objA0.position.y.frac = u16[(A1+=2)-2]
-		objA0.sprite_attributes = 0x829f + u16[(A1+=2)-2]
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x029f) + u16[(A1+=2)-2]
 		objA0.animation.sprite = u8[(A1+=1)-1]
 		objA0.flags2e = u8[(A1+=1)-1]
 		A0 += 0x4a
@@ -440,7 +440,7 @@ function void CompetitionMode.StageSelect()
 	A0 = 0xffffb378
 	u32[A0] = 0x00af58
 	objA0.mapping_offset = 0x20a6e4
-	objA0.sprite_attributes += 0xc29f
+	objA0.sprite_attributes += (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x029f)
 	objA0.position.x.u16 = 0xb0 + getScreenExtend()
 	playMusic(MUSIC_COMPETITIONMENU)
 
@@ -839,7 +839,7 @@ function void fn00b2cc()
 		objA0.position.x.frac = u16[(A1+=2)-2]
 		objA0.position.y.u16 = u16[A1]
 		objA0.position.y.frac = u16[(A1+=2)-2]
-		objA0.sprite_attributes = 0x829f + u16[(A1+=2)-2]
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x029f) + u16[(A1+=2)-2]
 		objA0.animation.sprite = u8[(A1+=1)-1]
 		objA0.flags2e = u8[(A1+=1)-1]
 		A0 += 0x4a
@@ -1106,7 +1106,7 @@ function void fn00b64e()
 function void fn00b656()
 {
 	objA0.mapping_offset = 0x3a1aee
-	objA0.sprite_attributes = 0x25c9
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x05c9)
 	D0 = 0
 	D1 = 0xffffffab
 	D2 = objA0.flags2e
@@ -1328,7 +1328,7 @@ function void fn00b74e()
 		objA0.position.x.frac = u16[(A1+=2)-2]
 		objA0.position.y.u16 = u16[A1]
 		objA0.position.y.frac = u16[(A1+=2)-2]
-		objA0.sprite_attributes = u16[(A1+=2)-2] + 0x829f
+		objA0.sprite_attributes = u16[(A1+=2)-2] + (sprite_attribute.PRIORITY | 0x029f)
 		objA0.animation.sprite = u8[(A1+=1)-1]
 		objA0.flags2e = u8[(A1+=1)-1]
 		A0 += 0x4a
@@ -1427,7 +1427,7 @@ function void fn00b9a6()
 {
 	// Character icon
 	objA0.mapping_offset = 0x3a1aee
-	objA0.sprite_attributes = 0xa5c9
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x05c9)
 	objA0.animation.sprite = (objA0.flags2e == 0) ? competition_mode.character.player1 : competition_mode.character.player2
 	fn00b4f6()
 }
@@ -1439,7 +1439,7 @@ function void fn00b9a6()
 //# address-hook(0x00b9ca) end(0x00ba02)
 function void fn00b9ca()
 {
-	objA0.sprite_attributes = 0xa34a
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x034a)
 	D0.u8 = u8[0xffffeea2]
 	D1.u8 = u8[0xffffeea3]
 	if (objA0.flags2e != 0)
@@ -1720,7 +1720,7 @@ function void fn00bc08()
 		objA0.position.x.frac = u16[(A1+=2)-2]
 		objA0.position.y.u16 = u16[A1]
 		objA0.position.y.frac = u16[(A1+=2)-2]
-		objA0.sprite_attributes = 0x829f + u16[(A1+=2)-2]
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x029f) + u16[(A1+=2)-2]
 		objA0.animation.sprite = u8[(A1+=1)-1]
 		objA0.flags2e = u8[(A1+=1)-1]
 		A0 += 0x4a
@@ -1808,13 +1808,13 @@ function void fn00beb2()
 function void fn00bef8()
 {
 	objA0.mapping_offset = 0x02f26a
-	objA0.sprite_attributes = 0x9fd5
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.FLIP_Y | sprite_attribute.FLIP_X | 0x07d5)
 
 	A1 = 0xffffe60c + ((global.zone - 0x0e) << 4)
 	D0 = u8[A1 + objA0.flags2e]
 	if (D0.u16 == 0x02)
 	{
-		objA0.sprite_attributes += 0x2000
+		objA0.sprite_attributes += sprite_attribute.PALETTE.LINE1
 	}
 	D0.u16 += 0x29
 	objA0.animation.sprite = D0.u8

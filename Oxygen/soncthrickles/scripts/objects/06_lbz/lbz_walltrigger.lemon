@@ -16,7 +16,7 @@
 function void fn025cbe()
 {
 	objA0.mapping_offset = 0x2249a8
-	objA0.sprite_attributes = 0x4433
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0433)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10

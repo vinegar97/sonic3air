@@ -350,7 +350,7 @@ function void fn013b26()
 	tails.flight_target.x = px
 	tails.flight_target.y = py
 
-	char.sprite_attributes |= 0x8000
+	char.sprite_attributes |= sprite_attribute.PRIORITY
 	char.sprite_priority = 0x100
 	char.velocity.x = 0
 	char.velocity.y = 0
@@ -489,7 +489,7 @@ function void fn013bf8()
 				char.flags &= char.flag.UNDERWATER
 				char.flags |= char.flag.IN_AIR
 				char.hlock_countdown = 0
-				char.sprite_attributes = (char.sprite_attributes & 0x7fff) | (objA1.sprite_attributes & 0x8000)
+				char.sprite_attributes = (char.sprite_attributes & ~sprite_attribute.PRIORITY) | (objA1.sprite_attributes & sprite_attribute.PRIORITY)
 				char.layer_flags1 = u8[A1 + 0x46]
 				char.layer_flags2 = u8[A1 + 0x47]
 
@@ -783,7 +783,7 @@ function void fn013ffa()
 		u16[A0 + 0x1c] = 0
 		objA0.flags2a = char.flag.IN_AIR
 		objA0.value32 = 0
-		objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u8[A1 + 0x0a] & 0x8000)
+		objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u8[A1 + 0x0a] & sprite_attribute.PRIORITY)
 
 		char.layer_flags1 = u8[A1 + 0x46]
 		char.layer_flags2 = u8[A1 + 0x47]
@@ -883,7 +883,7 @@ function void fn01425c()
 		objA0.flags2e = 0
 		objA0.state = 0
 		objA0.value32 = 0
-		objA0.sprite_attributes &= 0x7fff
+		objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 	}
 }
 
@@ -904,6 +904,6 @@ function void fn014286()
 		u16[A0 + 0x1c] = 0
 		objA0.flags2a = char.flag.IN_AIR
 		objA0.value32 = 0
-		objA0.sprite_attributes &= 0x7fff
+		objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 	}
 }

@@ -16,7 +16,7 @@
 function void fn04a3dc()
 {
 	objA0.mapping_offset = 0x04a3d2
-	objA0.sprite_attributes = 0x6378
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0378)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
@@ -241,12 +241,12 @@ function void fn04a5e0()
 	if (D0.s8 < 0)
 	{
 		u16[A1 + 0x08] = 0x0280
-		u16[A1 + 0x0a] &= 0x7fff
+		u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
 	}
 	else
 	{
 		u16[A1 + 0x08] = 0x0100
-		u16[A1 + 0x0a] |= 0x8000
+		u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
 	}
 	D0.u8 += 4
 	u8[A2 + 0x04] = D0.u8

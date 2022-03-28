@@ -754,7 +754,7 @@ function void fn04c0aa()
 			// Spawn a spike ball
 			objA1.update_address = 0x04c374
 			u32[A1 + 0x0c] = 0x04c3e6
-			u16[A1 + 0x0a] = 0x2490
+			u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x0490)
 			u8[A1 + 0x04] = render_flag.WORLD
 			u8[A1 + 0x07] = 0x10
 			u16[A1 + 0x08] = 0x0200
@@ -801,7 +801,7 @@ function void fn04c0aa()
 		u8[A1 + 0x04] = render_flag.WORLD
 		u8[A1 + 0x07] = 0x08
 		u16[A1 + 0x08] = 0x0180
-		u16[A1 + 0x0a] = 0x26bc
+		u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x06bc)
 		u32[A1 + 0x0c] = 0x01a99a
 		u16[A1 + 0x32] = objA0.value32
 		objA0.value32 += 0x89

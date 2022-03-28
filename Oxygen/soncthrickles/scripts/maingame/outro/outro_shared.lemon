@@ -875,7 +875,7 @@ function void fn05fa58()
 {
 	objA0.update_address = 0x05fa8c
 	objA0.mapping_offset = 0x053518
-	objA0.sprite_attributes = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x03b6 : 0x23b6
+	objA0.sprite_attributes = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x03b6 : (sprite_attribute.PALETTE.LINE1 | 0x03b6)
 	objA0.sprite_priority = 0x0300
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x10

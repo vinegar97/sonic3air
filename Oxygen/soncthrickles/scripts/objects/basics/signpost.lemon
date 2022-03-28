@@ -76,7 +76,7 @@ function void fn083708()
 					if (objA0.render_flags & render_flag.FLIP_X)
 					{
 						objA0.render_flags &= ~render_flag.FLIP_X
-						objA0.sprite_attributes |= 0x8000
+						objA0.sprite_attributes |= sprite_attribute.PRIORITY
 						objA0.flags2a = 0
 					}
 

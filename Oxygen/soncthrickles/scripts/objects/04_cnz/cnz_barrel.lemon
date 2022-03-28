@@ -27,7 +27,7 @@ function void CNZBarrel.Init()
 	D0.u16 = (D0.u16 * 2) & 0x1e
 	u16[A0 + 0x3a] = D0.u16
 	objA0.mapping_offset = 0x2317b0
-	objA0.sprite_attributes = 0x438e
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x038e)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x20

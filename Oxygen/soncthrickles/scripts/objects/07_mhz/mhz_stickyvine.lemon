@@ -21,7 +21,7 @@ function void fn03ea56()
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		u32[A1 + 0x0c] = 0x03ed10
-		u16[A1 + 0x0a] = 0x440a
+		u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x040a)
 		u8[A1 + 0x04] |= 0x04
 		u16[A1 + 0x08] = 0x0200
 		objA1.box_size.x = 0x80

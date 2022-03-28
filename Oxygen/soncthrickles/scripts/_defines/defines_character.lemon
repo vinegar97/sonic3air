@@ -55,6 +55,15 @@ define char.box_size.x			=  u8[A0 + 0x07]	// Width
 
 define char.sprite_priority		= u16[A0 + 0x08]	// Sprite priority: 0x100 by default, always a multiple of 0x80
 define char.sprite_attributes	= u16[A0 + 0x0a]	// Sprite attributes: start pattern index (lower 11 bits), atex (highest 4 bits)
+	constant u16 sprite_attribute.PRIORITY	= 0x8000
+	constant u16 sprite_attribute.PALETTE	= 0x6000
+	constant u16 sprite_attribute.PALETTE.LINE3	= 0x6000	// Fourth palette line
+	constant u16 sprite_attribute.PALETTE.LINE2	= 0x4000	// Third palette line
+	constant u16 sprite_attribute.PALETTE.LINE1	= 0x2000	// Second palette line
+	//constant u16 sprite_attribute.PALETTE.LINE0	= 0x0000	// First palette line
+	constant u16 sprite_attribute.FLIP_Y	= 0x1000
+	constant u16 sprite_attribute.FLIP_X	= 0x800
+	constant u16 sprite_attribute.VRAM	= 0x7ff
 define char.mapping_offset		= u32[A0 + 0x0c]
 
 // Position and velocity

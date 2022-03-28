@@ -39,7 +39,7 @@ function void fn02ff2a()
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0300
 	objA0.mapping_offset = 0x22ee10
-	objA0.sprite_attributes = 0x4500
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0500)
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x20
 	objA0.render_flags |= render_flag.COMPOUND
@@ -76,7 +76,7 @@ function void fn02ff7c()
 			// Wall bricks broken off by geyser
 			objA1.update_address = 0x03011a
 			objA1.mapping_offset = 0x22ef0e
-			objA1.sprite_attributes = 0x4558
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0558)
 			objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 			objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
 			objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
@@ -119,7 +119,7 @@ function void fn03003c()
 		objA1.position.x.u16 += D0.u16
 		objA1.position.y.u16 += 0x18
 		D1.u16 = (D1.u16 >> 4) & 0x03
-		u16[A1 + 0x0a] = (D1.u16 == 0) ? 0x045c : 0x4530
+		u16[A1 + 0x0a] = (D1.u16 == 0) ? 0x045c : (sprite_attribute.PALETTE.LINE2 | 0x0530)
 		u8[A1 + 0x20] = D1.u8
 		u16[A1 + 0x08] = 0x0380
 		u8[A1 + 0x07] = 0x18
@@ -186,7 +186,7 @@ function void fn03011a()
 			u8[A1 + 0x06] = 0x18
 			u8[A1 + 0x07] = 0x18
 			u16[A1 + 0x08] = 0x0200
-			u16[A1 + 0x0a] = 0x2530
+			u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x0530)
 			u32[A1 + 0x0c] = 0x22ee10
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = water.height.current
@@ -316,7 +316,7 @@ function void fn0302e6()
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0300
 	objA0.mapping_offset = 0x22ee10
-	objA0.sprite_attributes = 0x4500
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0500)
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x60
 	u16[A0 + 0x30] = 0x60
@@ -378,7 +378,7 @@ function void fn030338()
 
 			objA1.update_address = 0x03011a
 			u32[A1 + 0x0c] = 0x22ef0e
-			u16[A1 + 0x0a] = 0x4558
+			u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x0558)
 			u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
 			objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
 			objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
@@ -467,7 +467,7 @@ function void fn0304da()
 	objA1.position.y.u16 = objA0.position.y.u16 - 0x50
 
 	D2.u16 = (D2.u16 >> 4) & 0x03
-	u16[A1 + 0x0a] = (D2.u16 == 0) ? 0x045c : 0x4530
+	u16[A1 + 0x0a] = (D2.u16 == 0) ? 0x045c : (sprite_attribute.PALETTE.LINE2 | 0x0530)
 	u8[A1 + 0x20] = D2.u8
 }
 

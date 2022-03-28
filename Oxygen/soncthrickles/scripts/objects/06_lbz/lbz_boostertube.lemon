@@ -103,7 +103,7 @@ function void fn029620()
 		{
 		#if STANDALONE
 			// Remove priority flag for character
-			objA1.sprite_attributes &= ~0x8000
+			objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 
 			// Update achievement
 			if (A1 == 0xffffb000)
@@ -324,7 +324,7 @@ function void fn029818()
 function void fn029896()
 {
 	objA0.mapping_offset = 0x029c8a
-	objA0.sprite_attributes = 0x42ea
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02ea)
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.render_flags |= render_flag.WORLD
@@ -376,7 +376,7 @@ function void fn02990a()
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 			u32[A1 + 0x0c] = 0x029c8a
-			u16[A1 + 0x0a] = 0x42ea
+			u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x02ea)
 			u8[A1 + 0x07] = 0x10
 			u8[A1 + 0x06] = 0x10
 			u16[A1 + 0x08] = 0x0380
@@ -430,7 +430,7 @@ function void fn029a54()
 			u8[A1 + 0x06] = 0x10
 			u8[A1 + 0x07] = 0x10
 			u16[A1 + 0x08] = 0x0380
-			u16[A1 + 0x0a] = 0x42ea
+			u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x02ea)
 			u32[A1 + 0x0c] = 0x029c8a
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16

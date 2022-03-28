@@ -172,7 +172,7 @@ function void fn05e890()
 
 	objA0.base_state = 0x0a
 	objA0.mapping_offset = 0x060486
-	objA0.sprite_attributes = 0x826e
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x026e)
 	objA0.animation.sprite = 0x01
 	objA0.render_flags |= 0x01
 	objA0.flags2a |= 0x80
@@ -212,7 +212,7 @@ function void fn05e916()
 		return
 
 	objA0.base_state = 0x0c
-	objA0.sprite_attributes = 0x226e
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x026e)
 	objA0.animation.sprite = 0x06
 	objA0.render_flags &= ~0x01
 	objA0.flags38 |= 0x10
@@ -304,7 +304,7 @@ function void fn05eb9e()
 {
 	// Knuckles
 	objA0.mapping_offset = 0x060486
-	objA0.sprite_attributes = 0x826e
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x026e)
 	objA0.animation.sprite = 0x12
 }
 
@@ -317,7 +317,7 @@ function void fn05ebc6()
 {
 	objA0.update_address = 0x05ebe4
 	setupObjectAttributesFull(0x07d450)
-	objA0.sprite_attributes += 0x4000
+	objA0.sprite_attributes += sprite_attribute.PALETTE.LINE2
 	objA0.animation.sprite = 2
 	fn05ebe4()
 }

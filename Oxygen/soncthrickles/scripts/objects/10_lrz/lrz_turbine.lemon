@@ -18,7 +18,7 @@
 //# address-hook(0x04429c) end(0x0442ec)
 function void fn04429c()
 {
-	objA0.sprite_attributes = 0xa3ad
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x03ad)
 	objA0.render_flags |= 0x04
 	objA0.sprite_priority = 0x0200
 
@@ -127,7 +127,7 @@ function void fn0443c4()
 	if (D0.s16 < 0)
 	{
 		u16[A1 + 0x20] = 0x1000
-		u16[A1 + 0x0a] |= 0x8000
+		u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
 	}
 
 	u8[A2] = 0
@@ -214,13 +214,13 @@ function void fn04450a()
 	D0.u16 &= 0x1f
 	objA1.position.y.u16 = objA0.position.y.u16 + s8[0x044572 + D0.s16]
 	u16[A1 + 0x08] = 0x0100
-	u16[A1 + 0x0a] |= 0x8000
+	u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
 
 	D0.u8 = u8[A2 + 0x04]
 	if (D0.s8 < 0)
 	{
 		u16[A1 + 0x08] = 0x0280
-		u16[A1 + 0x0a] &= 0x7fff
+		u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
 	}
 	D0.u8 += 4
 	u8[A2 + 0x04] = D0.u8

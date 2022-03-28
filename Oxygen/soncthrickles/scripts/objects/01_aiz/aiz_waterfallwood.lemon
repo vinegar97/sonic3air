@@ -59,12 +59,12 @@ function void AIZWaterfall.spawnPlatform()
 		if (global.act == 0)
 		{
 			objA1.mapping_offset = 0x22ae30
-			objA1.sprite_attributes = 0x43cf
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03cf)
 		}
 		else
 		{
 			objA1.mapping_offset = 0x22ae20
-			objA1.sprite_attributes = 0x42e9
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e9)
 		}
 		objA1.box_size.x = 0x18
 		objA1.box_size.y = 8
@@ -81,12 +81,12 @@ function void AIZWaterfall.spawnPlatform()
 			if (global.act == 0)
 			{
 				objA1.mapping_offset = 0x22aeb0
-				objA1.sprite_attributes = 0x43cf
+				objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03cf)
 			}
 			else
 			{
 				objA1.mapping_offset = 0x22ae40
-				objA1.sprite_attributes = 0x62e9
+				objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x02e9)
 			}
 			objA1.box_size.x = 0x20
 			objA1.box_size.y = 0x10

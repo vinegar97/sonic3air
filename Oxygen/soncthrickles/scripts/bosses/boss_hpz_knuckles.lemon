@@ -81,7 +81,7 @@ function void fn063d1a()
 
 	objA0.update_address = 0x063de0
 	objA0.mapping_offset = 0x14a8d6
-	objA0.sprite_attributes = 0x24da
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x04da)
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18

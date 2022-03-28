@@ -49,7 +49,7 @@ function void fn0471d6()
 				u8[A1 + 0x06] = 0x08
 				u8[A1 + 0x07] = 0x08
 				u16[A1 + 0x08] = 0x0300
-				u16[A1 + 0x0a] = 0x2373
+				u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x0373)
 				u32[A1 + 0x0c] = objA0.mapping_offset
 				objA1.position.x.u16 = objA0.position.x.u16
 				objA1.position.y.u16 = objA0.position.y.u16

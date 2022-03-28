@@ -15,7 +15,7 @@
 //# address-hook(0x0204fe) end(0x02058e)
 function void CollapsingCliff.Init()
 {
-	objA0.sprite_attributes = 0x4001
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 	if (global.zone == 0x05)
 	{
 		// IceCap Zone

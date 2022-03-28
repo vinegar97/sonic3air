@@ -26,7 +26,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 	//  -> So if an object's sprites should be replaced with a new loaded graphics, this here is the place to go
 
 	u8 gameMode = global.game_mode & 0x7f
-	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 
 	// Check for characters first
 	{
@@ -798,7 +798,7 @@ function u64 Standalone.renderWithStandardPacking(s16 px, s16 py, u32 patternRom
 {
 	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
 	u64 key = Renderer.setupCustomObjectSprite(u32[patternRomAddress], u32[patternRomAddress + 4], objA0.mapping_offset, objA0.animation.sprite, 0x00)
-	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 	Renderer.drawCustomSprite(key, px, py, atex, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
 	return key
 }
@@ -808,7 +808,7 @@ function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patter
 {
 	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
 	u64 key = Renderer.setupKosinskiCompressedSprite(patternRomAddress, objA0.mapping_offset, objA0.animation.sprite, 0x00)
-	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 	Renderer.drawCustomSprite(key, px, py, atex, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
 	return key
 }
@@ -821,7 +821,7 @@ function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patter
 	//  -> An example is the CNZ balloons
 	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
 	u64 key = Renderer.setupKosinskiCompressedSprite(patternRomAddress, objA0.mapping_offset, objA0.animation.sprite, 0x00, originalVramAddress / 0x20 - objA0.sprite_attributes)
-	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 	Renderer.drawCustomSprite(key, px, py, atex, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
 	return key
 }
@@ -829,7 +829,7 @@ function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patter
 
 function void Standalone.renderCutsceneKnuckles(u8 variant, s16 px, s16 py, u16 renderQueue)
 {
-	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 	u64 key = stringformat("cutscene_knuckles_%d_0x%02x", variant, objA0.animation.sprite)
 	if (Renderer.hasCustomSprite(key))
 	{

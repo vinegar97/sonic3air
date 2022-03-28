@@ -33,7 +33,7 @@ function void fn04763e()
 	{
 		// Spawn staircase segments
 		u32[A1 + 0x0c] = 0x046f7a
-		u16[A1 + 0x0a] = 0x2480
+		u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x0480)
 		u8[A1 + 0x04] = objA0.render_flags
 		u16[A1 + 0x08] = 0x0180
 		u8[A1 + 0x07] = 0x10

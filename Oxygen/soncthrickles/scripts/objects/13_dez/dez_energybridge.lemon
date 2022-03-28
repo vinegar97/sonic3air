@@ -17,7 +17,7 @@
 //# address-hook(0x047dde) end(0x047e2c)
 function void fn047dde()
 {
-	objA0.sprite_attributes = 0x23ff
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x03ff)
 	objA0.render_flags |= 0x04
 	objA0.sprite_priority = 0x0300
 

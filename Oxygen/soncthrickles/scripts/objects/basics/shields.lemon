@@ -57,7 +57,7 @@ function void InstaShield.Update()
 		objA0.flags2a = u8[A2 + 0x2a] & char.flag.FACING_LEFT
 		if (global.inv_gravity)
 			objA0.flags2a |= 0x02
-		objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+		objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 
 		Object.animationUpdate(0x0199ea)
 
@@ -160,7 +160,7 @@ function void FireShield.Update()
 		if (global.inv_gravity)
 			objA0.flags2a |= 0x02
 
-		objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+		objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 	}
 
 	Object.animationUpdate(0x019a02)
@@ -250,7 +250,7 @@ function void LightningShield.Update()
 	if (global.inv_gravity)
 		objA0.flags2a |= 0x02
 
-	objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+	objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 
 	if (objA0.state != 0)
 	{
@@ -375,7 +375,7 @@ function void BubbleShield.Update()
 	if (global.inv_gravity)
 		objA0.flags2a |= 0x02
 
-	objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+	objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 
 	Object.animationUpdate(0x019a7a)
 
@@ -440,10 +440,10 @@ function void fn018868()
 	if (objA1.state == char.state.DISAPPEARED)
 		return
 
-	if (objA1.sprite_attributes & 0x8000)
-		objA0.sprite_attributes |= 0x8000
+	if (objA1.sprite_attributes & sprite_attribute.PRIORITY)
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
 	else
-		objA0.sprite_attributes &= 0x7fff
+		objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 #endif
 
 	objA0.position.x.u16 = objA1.position.x.u16
@@ -502,10 +502,10 @@ function void fn0188e8()
 	if (objA1.state == char.state.DISAPPEARED)
 		return
 
-	if (u16[A1 + 0x0a] & 0x8000)
-		objA0.sprite_attributes |= 0x8000
+	if (u16[A1 + 0x0a] & sprite_attribute.PRIORITY)
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
 	else
-		objA0.sprite_attributes &= 0x7fff
+		objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 #endif
 
 	D1.u16 = u16(u8[A0 + 0x36]) * 12

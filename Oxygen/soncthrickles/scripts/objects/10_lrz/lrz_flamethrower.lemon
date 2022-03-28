@@ -16,7 +16,7 @@
 function void fn043d68()
 {
 	objA0.mapping_offset = 0x04408a
-	objA0.sprite_attributes = 0x2090
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0090)
 	objA0.render_flags |= 0x04
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x10
@@ -118,7 +118,7 @@ function void fn043ddc()
 					objA1.position.x.u16 += 0x10
 					u8[A1 + 0x04] = objA0.render_flags
 					u32[A1 + 0x0c] = objA0.mapping_offset
-					u16[A1 + 0x0a] = 0x240d
+					u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x040d)
 					u16[A1 + 0x08] = 0x0300
 					u8[A1 + 0x07] = 0x0c
 					u8[A1 + 0x06] = 0x0c
@@ -221,7 +221,7 @@ function void fn043f12()
 					objA1.position.y.u16 += 0x10
 					u8[A1 + 0x04] = objA0.render_flags
 					u32[A1 + 0x0c] = objA0.mapping_offset
-					u16[A1 + 0x0a] = 0x240d
+					u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x040d)
 					u16[A1 + 0x08] = 0x0300
 					u8[A1 + 0x07] = 0x0c
 					u8[A1 + 0x06] = 0x0c

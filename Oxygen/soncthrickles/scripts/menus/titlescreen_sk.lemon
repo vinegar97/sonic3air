@@ -364,7 +364,7 @@ function void fn00565a()
 
 	if (u16[0xffffeec0] == 0x03)
 	{
-		objA0.sprite_attributes |= 0x8000
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
 		if (camera.position.y.u16 >= 0xe0)
 		{
 			if (camera.position.y.u16 == 0xe0)
@@ -478,7 +478,7 @@ function void fn00576e()
 function void fn005770()
 {
 	objA0.mapping_offset = 0x0cb924
-	objA0.sprite_attributes = 0x4680
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0680)
 	objA0.position.x.u16 = 0x0140 + getScreenExtend()
 	objA0.position.y.u16 = 0xb0
 	objA0.sprite_priority = 0x0180
@@ -559,7 +559,7 @@ function void fn005802()
 function void fn005856()
 {
 	objA0.mapping_offset = 0x0cba4c
-	objA0.sprite_attributes = 0x67a0
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x07a0)
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x30
 	objA0.box_size.y = 0x08
@@ -603,7 +603,7 @@ function void fn0058a8()
 		return
 
 	objA0.mapping_offset = 0x0cb994
-	objA0.sprite_attributes = 0x84ee
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x04ee)
 	objA0.sprite_priority = 0
 	objA0.box_size.x = 0x7c
 	objA0.box_size.y = 0x28
@@ -776,7 +776,7 @@ function void fn005ae4()
 	u16[A0 + 0x44] = objA0.position.x.u16
 	u16[A0 + 0x46] = objA0.position.y.u16
 	objA0.mapping_offset = 0x005ed8
-	objA0.sprite_attributes = 0x8462
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0462)
 	objA0.render_flags |= 0x40
 
 	A2 = A0 + 0x18
@@ -885,7 +885,7 @@ function void fn005c10()
 	objA0.position.x.u16 = 0xd0 + getScreenExtend()
 	objA0.position.y.u16 = 0x014c
 	objA0.mapping_offset = 0x005ed8
-	objA0.sprite_attributes = 0x8462
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0462)
 	D0.u8 = titlescreen.selection
 	objA0.state = D0.u8
 	objA0.state.former = D0.u8
@@ -913,7 +913,7 @@ function void fn005c42()
 function void fn005c70()
 {
 	objA0.mapping_offset = 0x005f62
-	objA0.sprite_attributes = 0x8462
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0462)
 	objA0.position.x.u16 = 0x01a2 + getScreenExtend()
 	objA0.position.y.u16 = 0x011d
 	objA0.sprite_priority = 0x80
@@ -942,7 +942,7 @@ function void fn005ca2()
 function void fn005cb0()
 {
 	objA0.mapping_offset = 0x005f6c
-	objA0.sprite_attributes = 0x8462
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0462)
 	objA0.position.x.u16 = 0x017f
 	objA0.position.y.u16 = 0x0152
 	objA0.sprite_priority = 0x80

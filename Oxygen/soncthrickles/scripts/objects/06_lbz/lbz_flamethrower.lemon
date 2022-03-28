@@ -64,7 +64,7 @@ function void fn0263dc()
 function void fn0263aa()
 {
 	u32[A1 + 0x0c] = 0x22544e
-	u16[A1 + 0x0a] = 0x43ac
+	u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x03ac)
 	u8[A1 + 0x07] = 0x10
 	u8[A1 + 0x06] = 0x10
 	u8[A1 + 0x04] |= 0x04

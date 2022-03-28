@@ -16,7 +16,7 @@
 function void fn04945c()
 {
 	objA0.mapping_offset = 0x0495d8
-	objA0.sprite_attributes = 0x230d
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x030d)
 	objA0.render_flags |= 0x04
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10

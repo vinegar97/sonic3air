@@ -118,7 +118,7 @@ function void fn0193ec()
 			D2.s16 = -D2.s16
 		objA0.position.x.u16 = u16[0xffffb000 + 0x10] + D2.s16
 		objA0.position.y.u16 = u16[0xffffb000 + 0x14] + s8[A0 + 0x34]
-		objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[0xffffb000 + 0x0a] & 0x8000)
+		objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[0xffffb000 + 0x0a] & sprite_attribute.PRIORITY)
 
 	#if STANDALONE
 		// Do not render stars if Sonic is outside the screen (e.g. MGZ 2 boss)

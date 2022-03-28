@@ -256,7 +256,7 @@ function void fn073056()
 	{
 		objA0.position.y.u16 = D1.u16
 		objA0.flags38 |= 0x20				// Stop the explosions
-		objA0.sprite_attributes &= 0x7fff	// Draw him in background
+		objA0.sprite_attributes &= ~sprite_attribute.PRIORITY	// Draw him in background
 		objA0.update_address = 0x073058
 	}
 }

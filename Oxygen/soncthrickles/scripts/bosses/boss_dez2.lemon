@@ -893,7 +893,7 @@ function void fn07009a()
 		objA0.update_address = objA0.countdown_callback
 		objA0.position.y.u16 -= 0x04
 		objA0.velocity.x = 0x0200
-		objA0.sprite_attributes = 0x84a9
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x04a9)
 	#if STANDALONE
 		if (global.zone_act == 0x0b01)		// DEZ 2 boss is always Robotnik
 			objA0.mapping_offset = 0x06837e

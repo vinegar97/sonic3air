@@ -537,7 +537,7 @@ function void fn04cf82()
 function void fn04d03e()
 {
 	objA0.mapping_offset = 0x04d7be
-	objA0.sprite_attributes = 0x854e
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x054e)
 	objA0.position.x.u16 = 0x0120
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x14
@@ -853,7 +853,7 @@ function void fn04d302()
 function void fn04d30e()
 {
 	objA0.mapping_offset = 0x04d7be
-	objA0.sprite_attributes = 0x854e
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x054e)
 	objA0.position.x.u16 = 0xd4 + getScreenExtend()
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x14
@@ -937,7 +937,7 @@ function void fn04d3ce()
 	D0.u16 = u16[A0 + 0x30] + 1
 	D0 = u32(D0.u16) * 0x4a
 	A1 += D0.u16
-	objA1.sprite_attributes = 0x854e
+	objA1.sprite_attributes = (sprite_attribute.PRIORITY | 0x054e)
 
 	D1.u8 = control.pad1.pressed
 #if STANDALONE
@@ -974,7 +974,7 @@ function void fn04d3ce()
 		D0.u16 = u16[A0 + 0x30] + 1
 		D0 = u32(D0.u16) * 0x4a
 		A1 += D0.u16
-		objA1.sprite_attributes = 0x8562
+		objA1.sprite_attributes = (sprite_attribute.PRIORITY | 0x0562)
 	}
 
 	if (control.pad1.pressed & CONTROL_DPAD)
@@ -1096,7 +1096,7 @@ function void fn04d5bc()
 function void fn04d5c2()
 {
 	objA0.mapping_offset = 0x04d8ae
-	objA0.sprite_attributes = 0x854e
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x054e)
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x08
@@ -1153,7 +1153,7 @@ function void fn04d602()
 function void fn04d610()
 {
 	objA0.mapping_offset = 0x04d7be
-	objA0.sprite_attributes = 0x854e
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x054e)
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0128
 	objA0.sprite_priority = 0x80
@@ -1180,10 +1180,10 @@ function void fn04d648()
 function void fn04d64e()
 {
 	objA0.mapping_offset = 0x04d926
-	objA0.sprite_attributes = (levelselect.characters == CHARS_KNUCKLES_ALONE) ? 0x8598 : 0xe598
+	objA0.sprite_attributes = (levelselect.characters == CHARS_KNUCKLES_ALONE) ? (sprite_attribute.PRIORITY | 0x0598) : (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0598)
 #if STANDALONE
 	if (levelselect.characters == CHARS_TAILS_ALONE)
-		objA0.sprite_attributes = 0xc598
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0598)
 #endif
 
 	objA0.position.x.u16 = ((objA0.render_flags & render_flag.FLIP_X) ? 0x140 : 0x100) + getScreenExtend()
@@ -1332,23 +1332,23 @@ function void fn04d6b8()
 	if (control.pad1.pressed & CONTROL_ABC)
 	{
 		D0.u16 = objA0.sprite_attributes
-		if (D0.u16 == 0x8598)
+		if (D0.u16 == (sprite_attribute.PRIORITY | 0x0598))
 		{
 			levelselect.characters = CHARS_SONIC_ALONE
-			objA0.sprite_attributes = 0xe598
+			objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0598)
 		}
 		else
 	#if STANDALONE
-		if (D0.u16 == 0xe598)
+		if (D0.u16 == (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0598))
 		{
 			levelselect.characters = CHARS_TAILS_ALONE
-			objA0.sprite_attributes = 0xc598
+			objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0598)
 		}
 		else
 	#endif
 		{
 			levelselect.characters = CHARS_KNUCKLES_ALONE
-			objA0.sprite_attributes = 0x8598
+			objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0598)
 		}
 	}
 
@@ -1368,7 +1368,7 @@ function void fn04d986()
 	while (D1.s16 >= 0)
 	{
 		objA1.mapping_offset = 0x188e7c
-		objA1.sprite_attributes = 0x20fe
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x00fe)
 		objA1.position.x.u16 = u16[(A2+=2)-2] + getScreenExtend()
 		objA1.position.y.u16 = u16[(A2+=2)-2]
 		if (bluespheregame.menu_flags != 0 && bluespheregame.fully_unlocked != 0)
@@ -1416,7 +1416,7 @@ function void fn04d9ec()
 function void fn04da30()
 {
 	objA0.mapping_offset = 0x04da68
-	objA0.sprite_attributes = 0x85b2
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x05b2)
 	objA0.position.x.u16 = 0x0180 + getScreenExtend() * 2
 	objA0.position.y.u16 = 0x0152
 	objA0.sprite_priority = 0x80
@@ -1708,7 +1708,7 @@ function void fn04df52()
 //# address-hook(0x04df86) end(0x04dfe8)
 function void fn04df86()
 {
-	objA0.sprite_attributes = 0x8680
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0680)
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0100
 	objA0.sprite_priority = 0x80
@@ -1729,7 +1729,7 @@ function void fn04df86()
 	{
 		objA0.mapping_offset = 0x148eb8
 		objA0.state = char.state.WIN_POSE
-		objA0.sprite_attributes = 0x86a0
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x06a0)
 
 		objA0.update_address = 0x04dffe
 		fn04dffe()
@@ -1844,7 +1844,7 @@ function void fn04e0a4()
 {
 	// "Difficulty" text
 	objA0.mapping_offset = 0x04d7be
-	objA0.sprite_attributes = 0x854e
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x054e)
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0140
 	objA0.sprite_priority = 0x80
@@ -1955,7 +1955,7 @@ function void fn04e1b4()
 function void fn04e1c4()
 {
 	objA0.mapping_offset = 0x146620
-	objA0.sprite_attributes = 0x8680
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0680)
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0120
 	objA0.render_flags |= 0x01
@@ -2026,7 +2026,7 @@ function void fn04e24c()
 function void fn04e264()
 {
 	objA0.mapping_offset = 0x04e2a2
-	objA0.sprite_attributes = 0xa7a0
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x07a0)
 	objA0.position.x.u16 = 0xfc + getScreenExtend()
 	objA0.position.y.u16 = 0x011b
 	objA0.render_flags |= 0x01
@@ -2053,7 +2053,7 @@ function void fn04e29c()
 function void fn04e2b8()
 {
 	objA0.mapping_offset = 0x14a8d6
-	objA0.sprite_attributes = 0xa6a0
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06a0)
 	objA0.position.x.u16 = 0x0138 + getScreenExtend()
 	objA0.position.y.u16 = 0x0118
 	objA0.sprite_priority = 0x80
@@ -2089,7 +2089,7 @@ function void fn04e2f0()
 function void fn05fb56()
 {
 	objA0.mapping_offset = 0x060a14
-	objA0.sprite_attributes = 0x2232
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0232)
 	objA0.render_flags |= 0x01
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x20
@@ -2129,7 +2129,7 @@ function void fn07cfc6()
 {
 	SetupObjectAttributesSlotted(0x07d3ea)	// TODO: This is only "translated" for a reason!
 
-	objA0.sprite_attributes = 0x43f4
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03f4)
 	objA0.render_flags &= ~0x04
 	objA0.render_flags |= 0x01
 	objA0.position.x.u16 = 0xd8 + getScreenExtend()
@@ -2151,7 +2151,7 @@ function void fn0680a4()
 {
 	objA0.update_address = 0x0680ec
 	objA0.mapping_offset = 0x06820c
-	objA0.sprite_attributes = 0x226f
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x026f)
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x20
@@ -2211,7 +2211,7 @@ function void fn02cd3c()
 {
 	objA0.update_address = 0x02cd6e
 	objA0.mapping_offset = 0x02ceba
-	objA0.sprite_attributes = 0x22c1
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x02c1)
 	A1 = 0x02cd5e
 	fn02ce76()
 	fn06001e()
@@ -2258,7 +2258,7 @@ function void fn02cdb0()
 {
 	objA0.update_address = 0x02cdea
 	objA0.mapping_offset = 0x02ced8
-	objA0.sprite_attributes = 0x22cf
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x02cf)
 	objA0.render_flags |= 0x01
 	A1 = 0x02cdda
 	fn02ce76()
@@ -2303,7 +2303,7 @@ function void fn02ce42()
 {
 	objA0.update_address = 0x02cdea
 	objA0.mapping_offset = 0x02cf32
-	objA0.sprite_attributes = 0x22e1
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x02e1)
 	A1 = 0x02ce66
 	fn02ce76()
 	u16[A0 + 0x3a] = objA0.position.y.u16
@@ -2343,7 +2343,7 @@ function void fn02cea2()
 function void fn07cff0()
 {
 	objA0.mapping_offset = 0x07d712
-	objA0.sprite_attributes = 0x61ee
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x01ee)
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x18
@@ -2370,7 +2370,7 @@ function void fn07d050()
 function void fn05face()
 {
 	objA0.mapping_offset = 0x060644
-	objA0.sprite_attributes = 0x6180
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0180)
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x40
 	objA0.box_size.y = 0x14
@@ -2407,7 +2407,7 @@ function void fn05fb1a()
 	}
 
 	objA0.mapping_offset = 0x060938
-	objA0.sprite_attributes = 0x61c8
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x01c8)
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x04

@@ -190,10 +190,10 @@ function void fn033cac()
 				objA1.position.x.u16 = D1.u16
 				objA1.position.y.u16 = u16[A2] + objA0.position.y.u16
 				D0 = 0
-				u16[A1 + 0x0a] &= 0x7fff
+				u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
 				if (D2.u8 < 0x80)
 				{
-					u16[A1 + 0x0a] |= 0x8000
+					u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
 				}
 				D2.u16 = u8(0x40 - D2.u8)
 				D2.u16 = D2 / 0x0b
@@ -260,5 +260,5 @@ function void fn033cac()
 	objA0.flags2a &= ~bit
 	u8[A1 + 0x2e] &= ~0x40
 	u8[A1 + 0x2e] &= ~0x02
-	u16[A1 + 0x0a] &= 0x7fff
+	u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
 }

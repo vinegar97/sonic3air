@@ -758,7 +758,7 @@ function void fn055732()
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x80
 	objA0.sprite_priority = 0x0380
-	objA0.sprite_attributes = 0x6580
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0580)
 	objA0.mapping_offset = 0x055908
 	objA0.position.y.u16 = 0x0300
 	objA0.animation.sprite = 1
@@ -794,7 +794,7 @@ function void fn05577c()
 	objA0.render_flags = render_flag.WORLD | render_flag.COMPOUND
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
-	objA0.sprite_attributes = 0x23af
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x03af)
 	objA0.mapping_offset = 0x055908
 	u8[A0 + 0x28] = (collision.flag.THREAT | collision.size.8x8)
 

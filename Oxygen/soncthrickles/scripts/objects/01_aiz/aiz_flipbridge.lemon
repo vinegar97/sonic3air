@@ -16,7 +16,7 @@
 function void fn02a94c()
 {
 	objA0.mapping_offset = 0x22a310
-	objA0.sprite_attributes = 0x42e9
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e9)
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x04
 	objA0.render_flags = render_flag.WORLD
@@ -40,7 +40,7 @@ function void fn02a94c()
 	{
 		objA1.update_address = 0x02aa78
 		objA1.mapping_offset = 0x22a310
-		objA1.sprite_attributes = 0x42e9
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e9)
 		objA1.render_flags = render_flag.WORLD
 		objA1.box_size.x = 0x80
 		objA1.box_size.y = 0x40

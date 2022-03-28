@@ -133,7 +133,7 @@ function void fn03db68()
 	if (u8[0xfffff7c1] == 0)
 	{
 		u32[A1 + 0x0c] = 0x03dc5c
-		u16[A1 + 0x0a] = 0xe368
+		u16[A1 + 0x0a] = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0368)
 		return
 	}
 
@@ -144,12 +144,12 @@ function void fn03db68()
 	if (D0.u8 == 0)
 	{
 		u32[A1 + 0x0c] = 0x03dc74
-		u16[A1 + 0x0a] = 0xe363
+		u16[A1 + 0x0a] = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0363)
 	}
 	else
 	{
 		u32[A1 + 0x0c] = 0x03dc5c
-		u16[A1 + 0x0a] = 0xe363
+		u16[A1 + 0x0a] = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0363)
 	}
 }
 

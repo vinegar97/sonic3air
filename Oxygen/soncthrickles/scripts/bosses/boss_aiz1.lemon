@@ -357,7 +357,7 @@ function void fn068cd0()
 	{
 		// For Knuckles' AIZ 1 boss fight on Sonic's route (Act is 1 here already!)
 		//  -> Draw in foreground because of the palmtrees
-		objA0.sprite_attributes |= 0x8000
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
 	}
 #endif
 }
@@ -460,14 +460,14 @@ function void fn068d9c()
 
 	if (global.zone != 0x00)
 	{
-		objA0.sprite_attributes = 0x500
+		objA0.sprite_attributes = 0x0500
 	}
 #if STANDALONE
 	else if (global.act == 1)
 	{
 		// For Knuckles' AIZ 1 boss fight on Sonic's route (Act is 1 here already!)
 		//  -> Draw in foreground because of the palmtrees
-		objA0.sprite_attributes |= 0x8000
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
 	}
 #endif
 

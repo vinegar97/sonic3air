@@ -21,7 +21,7 @@ function void fn053ad4()
 	objA0.box_size.y = 0x10
 	objA0.box_size.x = 0x20
 	objA0.sprite_priority = 0x80
-	objA0.sprite_attributes = 0x2347
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0347)
 	objA0.mapping_offset = 0x363c44
 	objA0.position.x.u16 = 0x3640
 	objA0.position.y.u16 = 0x0670
@@ -35,7 +35,7 @@ function void fn053ad4()
 	u8[A1 + 0x06] = 0x80
 	u8[A1 + 0x07] = 0x18
 	u16[A1 + 0x08] = 0x80
-	u16[A1 + 0x0a] = 0x255e
+	u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x055e)
 	u32[A1 + 0x0c] = 0x046b3c
 	objA1.position.x.u16 = objA0.position.x.u16
 	objA1.position.y.u16 = objA0.position.y.u16

@@ -658,7 +658,7 @@ function void fn004352()
 function void fn00482c()
 {
 	objA0.mapping_offset = 0x3501e0
-	objA0.sprite_attributes = 0xe500
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0500)
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x40
@@ -781,7 +781,7 @@ function void fn004a5c()
 	objA0.position.x.u16 = 0xf0 + getScreenExtend()
 	objA0.position.y.u16 = 0x0140
 	objA0.mapping_offset = 0x004c9c
-	objA0.sprite_attributes = 0xc680
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0680)
 	titlescreen.selection &= 0x01
 	objA0.animation.sprite = titlescreen.selection
 
@@ -836,7 +836,7 @@ function void fn004a88()
 function void fn004924()
 {
 	objA0.mapping_offset = 0x3501e0
-	objA0.sprite_attributes = 0xe500
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0500)
 	objA0.position.x.u16 = 0x0188 + getScreenExtend()
 	objA0.position.y.u16 = 0xec
 	objA0.sprite_priority = 0x80
@@ -880,7 +880,7 @@ function void fn00496a()
 #endif
 
 	objA0.mapping_offset = 0x0049ae
-	objA0.sprite_attributes = 0xe4c0
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x04c0)
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0108
 	objA0.sprite_priority = 0x80
@@ -908,7 +908,7 @@ function void fn00499c()
 function void fn004a1e()
 {
 	objA0.mapping_offset = 0x004c9c
-	objA0.sprite_attributes = 0xe680
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0680)
 	objA0.position.x.u16 = 0x0158 + getScreenExtend() * 2
 	objA0.position.y.u16 = 0x014c
 	objA0.sprite_priority = 0x80
@@ -935,7 +935,7 @@ function void fn004a56()
 function void fn004ae4()
 {
 	objA0.mapping_offset = 0x004f8c
-	objA0.sprite_attributes = 0xa400
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0400)
 	objA0.position.x.u16 = 0x0148 + getScreenExtend()
 	objA0.position.y.u16 = 0xdc
 	objA0.sprite_priority = 0x0180
@@ -965,7 +965,7 @@ function void fn004b16()
 function void fn004b54()
 {
 	objA0.mapping_offset = 0x004f8c
-	objA0.sprite_attributes = 0xa400
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0400)
 	objA0.position.x.u16 = 0xf8 + getScreenExtend()
 	objA0.position.y.u16 = 0xc8
 	objA0.sprite_priority = 0x0180
@@ -995,7 +995,7 @@ function void fn004b86()
 function void fn004bb2()
 {
 	objA0.mapping_offset = 0x004fe8
-	objA0.sprite_attributes = 0x6400
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0400)
 	objA0.position.x.u16 = 0
 	objA0.position.y.u16 = 0xc0
 	objA0.sprite_priority = 0x0380

@@ -21,7 +21,7 @@ function void fn03e836()
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		u32[A1 + 0x0c] = 0x03ea4c
-		u16[A1 + 0x0a] = 0x4353
+		u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x0353)
 		u8[A1 + 0x04] |= 0x04
 		u16[A1 + 0x08] = 0x0280
 		u8[A1 + 0x07] = 0x40

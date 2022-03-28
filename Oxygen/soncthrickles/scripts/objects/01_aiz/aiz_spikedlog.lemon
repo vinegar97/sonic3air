@@ -16,7 +16,7 @@
 function void AIZSpikedLog.Init()
 {
 	objA0.mapping_offset = 0x22b0f0
-	objA0.sprite_attributes = 0x42e9
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e9)
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x08
 	objA0.render_flags = render_flag.WORLD

@@ -16,7 +16,7 @@
 function void fn029338()
 {
 	objA0.mapping_offset = 0x228394
-	objA0.sprite_attributes = 0x42ea
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02ea)
 	objA0.box_size.x = 0x1c
 	objA0.box_size.y = 0x04
 	objA0.render_flags |= render_flag.WORLD
@@ -68,7 +68,7 @@ function void fn0293d0()
 	objA1.position.y.u16 = objA0.position.y.u16
 	u16[A1 + 0x2e] = objA0.countdown_value
 	u32[A1 + 0x0c] = 0x228394
-	u16[A1 + 0x0a] = 0x42ea
+	u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x02ea)
 	u8[A1 + 0x07] = 0x1c
 	u8[A1 + 0x06] = 0x04
 	u8[A1 + 0x04] = objA0.render_flags

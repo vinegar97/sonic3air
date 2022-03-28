@@ -12,7 +12,7 @@
 function void fn034bf8()
 {
 	objA0.mapping_offset = 0x035964
-	objA0.sprite_attributes = 0x235f
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x035f)
 	objA0.render_flags |= 0x04
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x18
@@ -1112,7 +1112,7 @@ function void fn035868()
 function void fn03598e()
 {
 	objA0.mapping_offset = 0x035964
-	objA0.sprite_attributes = 0x43ff
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03ff)
 	objA0.render_flags |= 0x04
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x0c

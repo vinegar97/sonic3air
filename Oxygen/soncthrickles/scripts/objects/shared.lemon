@@ -594,7 +594,7 @@ function void Object.LoadSpritePatterns()
 
 		u32 sourceBase = u32[A2]
 		u32 tableAddress = u32[A2+4]
-		u16 targetInVRAM = (objA0.sprite_attributes & 0x07ff) << 5
+		u16 targetInVRAM = (objA0.sprite_attributes & sprite_attribute.VRAM) << 5
 
 		A2 = tableLookupAddress(tableAddress, u16(objA0.animation.sprite) * 2)
 		u16 numSprites = u16[A2] + 1

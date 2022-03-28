@@ -12,7 +12,7 @@
 function void fn0340cc()
 {
 	objA0.mapping_offset = 0x233572
-	objA0.sprite_attributes = 0x235f
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x035f)
 	objA0.render_flags |= 0x04
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x20
@@ -26,7 +26,7 @@ function void fn0340cc()
 	{
 		objA1.update_address = 0x034244
 		u32[A1 + 0x0c] = 0x233572
-		u16[A1 + 0x0a] = 0x235f
+		u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x035f)
 		u8[A1 + 0x04] = objA0.render_flags
 		u8[A1 + 0x07] = 0x50
 		u8[A1 + 0x06] = 0x50

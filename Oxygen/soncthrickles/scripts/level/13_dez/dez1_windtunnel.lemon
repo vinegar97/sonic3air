@@ -142,7 +142,7 @@ function void fn04964a()
 function void fn049766()
 {
 	objA0.mapping_offset = 0x0498c2
-	objA0.sprite_attributes = 0x232d
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x032d)
 	objA0.render_flags |= 0x04
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x20
@@ -285,7 +285,7 @@ function void fn049850()
 function void fn0498d2()
 {
 	objA0.mapping_offset = 0x049a6c
-	objA0.sprite_attributes = 0x232d
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x032d)
 	objA0.render_flags |= 0x04
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x30

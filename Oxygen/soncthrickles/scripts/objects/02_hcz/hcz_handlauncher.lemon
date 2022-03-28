@@ -18,7 +18,7 @@ function void fn030ad0()
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.mapping_offset = 0x22f998
-	objA0.sprite_attributes = 0x23e4
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x03e4)
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x40
 	objA0.value32 = objA0.position.y.u16
@@ -30,7 +30,7 @@ function void fn030ad0()
 	{
 		objA1.update_address = 0x030dec
 		objA1.mapping_offset = 0x22f998
-		objA1.sprite_attributes = 0x23e4
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x03e4)
 		objA1.render_flags = objA0.render_flags
 		objA1.box_size.x = 0x20
 		objA1.box_size.x = 0x30

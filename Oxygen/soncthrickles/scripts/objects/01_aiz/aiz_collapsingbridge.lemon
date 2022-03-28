@@ -22,7 +22,7 @@ function void fn02acdc()
 		u8[A0 + 0x35] = D0.u8 + 0x30
 		u8[A0 + 0x37] = 0x08
 		objA0.mapping_offset = 0x02b070
-		objA0.sprite_attributes = 0x42e9
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e9)
 		objA0.box_size.x = 0x5a
 		objA0.box_size.y = 0x08
 		objA0.render_flags = render_flag.WORLD
@@ -32,7 +32,7 @@ function void fn02acdc()
 		{
 			objA1.update_address = 0x02aeb4
 			objA1.mapping_offset = 0x02b070
-			objA1.sprite_attributes = 0x42e9
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e9)
 			objA1.render_flags |= render_flag.WORLD
 			objA1.box_size.x = 0x5a
 			objA1.box_size.y = 0x08
@@ -68,7 +68,7 @@ function void fn02acdc()
 		u8[A0 + 0x35] = D0.u8 + 0x30
 		u8[A0 + 0x37] = 0x08
 		objA0.mapping_offset = 0x02b092
-		objA0.sprite_attributes = 0xc2e9
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x02e9)
 		objA0.box_size.x = 0x60
 		objA0.box_size.y = 0x08
 		objA0.render_flags = render_flag.WORLD
@@ -78,7 +78,7 @@ function void fn02acdc()
 		{
 			objA1.update_address = 0x02aeb4
 			objA1.mapping_offset = 0x02b092
-			objA1.sprite_attributes = 0xc2e9
+			objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x02e9)
 			objA1.render_flags |= render_flag.WORLD
 			objA1.box_size.x = 0x60
 			objA1.box_size.y = 0x08

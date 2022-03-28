@@ -352,7 +352,7 @@ function void DataSelect.setup()
 	while (D0.s16 >= 0)
 	{
 		objA0.update_address = u32[(A1+=4)-4]
-		objA0.sprite_attributes = 0x829f
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x029f)
 		objA0.mapping_offset = 0x00ce0e
 		objA0.position.x.u16 = u16[A1] + getScreenExtend()		// Adding the screen extend only really has an effect on the "Data Select" text
 		u16[A0 + 0x12] = u16[(A1+=2)-2]
@@ -1154,7 +1154,7 @@ function void fn00d6d0()
 function void fn00d70c()
 {
 	objA0.render_flags = render_flag.COMPOUND
-	objA0.sprite_attributes = 0x829f
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x029f)
 	objA0.mapping_offset = 0x00ce0e
 	objA0.box_size.x = 0x40
 	u16[A0 + 0x16] = 0x07

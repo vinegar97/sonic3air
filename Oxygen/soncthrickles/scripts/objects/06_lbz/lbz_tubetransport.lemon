@@ -16,7 +16,7 @@
 function void fn029c9e()
 {
 	objA0.mapping_offset = 0x2291a4
-	objA0.sprite_attributes = 0x2455
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0455)
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x30
 	objA0.render_flags |= render_flag.WORLD
@@ -44,7 +44,7 @@ function void fn029c9e()
 			u8[A1 + 0x04] |= 0x04
 			u8[A1 + 0x06] = 0x18
 			u8[A1 + 0x07] = 0x18
-			u16[A1 + 0x0a] = 0x2455
+			u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x0455)
 			u32[A1 + 0x0c] = 0x2291a4
 			u16[A1 + 0x08] = 0x0280
 			u8[A1 + 0x22] = 0x06

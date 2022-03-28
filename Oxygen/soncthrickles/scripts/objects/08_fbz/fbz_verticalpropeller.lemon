@@ -112,9 +112,9 @@ function void fn03c010()
 {
 	D0 = u8[A2 + 0x04]
 	if (D0.s8 >= 0)
-		u16[A1 + 0x0a] |= 0x8000
+		u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
 	else
-		u16[A1 + 0x0a] &= 0x7fff
+		u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
 
 	D0.u8 >>= 4
 	D1.u8 = u8[0x03c048 + D0.s16]
@@ -149,7 +149,7 @@ function void fn03c096()
 	u8[A2] = 0
 	u8[A2 + 0x02] = 0x1e
 
-	u16[A1 + 0x0a] &= 0x7fff
+	u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
 	u8[A1 + 0x27] = 0
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
@@ -223,7 +223,7 @@ function void fn03c0d0()
 function void fn03c1a6()
 {
 	objA0.mapping_offset = 0x03c20c
-	objA0.sprite_attributes = 0x22e5
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x02e5)
 	objA0.render_flags |= 0x04
 	objA0.box_size.x = 0x68
 	objA0.box_size.y = 0x08

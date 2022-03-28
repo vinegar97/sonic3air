@@ -629,7 +629,7 @@ function void fn0487f0()
 			u8[A1 + 0x06] = 0x10
 			u8[A1 + 0x07] = 0x10
 			u16[A1 + 0x08] = 0x80
-			u16[A1 + 0x0a] = 0x2385
+			u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x0385)
 			u32[A1 + 0x0c] = 0x0489cc
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16

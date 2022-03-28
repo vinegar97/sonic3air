@@ -15,12 +15,12 @@ function void fn043502()
 	if (global.act == 0)
 	{
 		objA0.mapping_offset = 0x043666
-		objA0.sprite_attributes = 0xa3a1
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x03a1)
 	}
 	else
 	{
 		objA0.mapping_offset = 0x04367e
-		objA0.sprite_attributes = 0xa40d
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x040d)
 	}
 	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.x = 0x10
@@ -35,7 +35,7 @@ function void fn043502()
 		objA1.update_address = 0x0435fe
 		u32[A1 + 0x0c] = objA0.mapping_offset
 		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u16[A1 + 0x0a] &= 0x9fff
+		u16[A1 + 0x0a] &= ~sprite_attribute.PALETTE.LINE3
 		u8[A1 + 0x04] = objA0.render_flags
 		u8[A1 + 0x07] = 0x50
 		u8[A1 + 0x06] = 0x50

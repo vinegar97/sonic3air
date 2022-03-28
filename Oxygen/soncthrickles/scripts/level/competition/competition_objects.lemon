@@ -151,7 +151,7 @@ function void fn032d16()
 function void fn035a7a()
 {
 	objA0.mapping_offset = 0x035bbc
-	objA0.sprite_attributes = 0x6300
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0300)
 	objA0.render_flags |= 0x04
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x20
@@ -716,7 +716,7 @@ function void fn035d22()
 function void fn035d80()
 {
 	objA0.mapping_offset = 0x035e9a
-	objA0.sprite_attributes = 0x6300
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0300)
 	objA0.render_flags |= 0x04
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x10
@@ -817,7 +817,7 @@ function void fn036a1a()
 function void fn0380f8()
 {
 	objA0.mapping_offset = 0x038252
-	objA0.sprite_attributes = 0x6300
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0300)
 	objA0.render_flags = 0x04
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x08
@@ -827,7 +827,7 @@ function void fn0380f8()
 
 	if (objA0.flags2a & 0x01)
 	{
-		objA0.sprite_attributes = 0xc300
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0300)
 		objA0.animation.sprite = 0x03
 
 		objA0.update_address = 0x01abc6
@@ -857,7 +857,7 @@ function void fn038150()
 			}
 
 			u32[A1] = 0x03818e
-			u16[A1 + 0x0a] = 0x4300
+			u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x0300)
 			u8[A1 + 0x22] = 0x01
 			D0 = 0
 		}
@@ -951,7 +951,7 @@ function void fn038234()
 function void fn035f3a()
 {
 	objA0.mapping_offset = 0x03609a
-	objA0.sprite_attributes = 0x4280
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0280)
 	objA0.render_flags |= 0x04
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x20
@@ -1031,7 +1031,7 @@ function void fn035f8c()
 function void fn0362a2()
 {
 	objA0.mapping_offset = 0x036350
-	objA0.sprite_attributes = 0x4280
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0280)
 	objA0.render_flags |= 0x04
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x0c

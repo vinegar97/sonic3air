@@ -115,7 +115,7 @@ function void fn021d4c()
 			objA0.velocity.x = 0x800
 			objA0.velocity.y = 0x200
 			objA0.mapping_offset = 0x02bfda
-			objA0.sprite_attributes = 0x62e9
+			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x02e9)
 			objA0.box_size.x = 8
 			objA0.box_size.y = 12
 			objA0.animation.sprite = 0
@@ -694,7 +694,7 @@ function void AIZZipLineEndPole.Init()
 	objA0.sprite_priority = 0x380
 	objA0.box_size.x = 0x20
 	objA0.render_flags = render_flag.WORLD
-	objA0.sprite_attributes = 0x4324
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0324)
 	objA0.update_address = 0x01e7dc
 	AIZZipLineEndPole.Update()
 }

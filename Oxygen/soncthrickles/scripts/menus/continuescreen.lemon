@@ -320,7 +320,7 @@ function void fn05c528()
 function void fn05c52a()
 {
 	objA0.mapping_offset = 0x05cc4a
-	objA0.sprite_attributes = 0x8c
+	objA0.sprite_attributes = 0x008c
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x14
@@ -525,7 +525,7 @@ function void fn05c6f4()
 function void fn05c718()
 {
 	objA0.mapping_offset = 0x05cc4a
-	objA0.sprite_attributes = 0x8c
+	objA0.sprite_attributes = 0x008c
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x14
@@ -665,7 +665,7 @@ function void fn05c838()
 	{
 		A1 = 0x05c85a
 		objA0.mapping_offset = 0x05cc4a
-		objA0.sprite_attributes = 0x608c
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x008c)
 		objA0.sprite_priority = 0x0200
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x18
@@ -721,7 +721,7 @@ function void fn05c8ea()
 {
 	objA0.base_state += 2
 	objA0.mapping_offset = 0x14a8d6
-	objA0.sprite_attributes = 0x64da
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x04da)
 	objA0.sprite_priority = 0x80
 	objA0.animation.sprite = 7
 	objA0.box_size.x = 0x20
@@ -818,7 +818,7 @@ function void fn05c9c4()
 function void fn05c9dc()
 {
 	objA0.mapping_offset = 0x05cc4a
-	objA0.sprite_attributes = 0x408c
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x008c)
 	objA0.sprite_priority = 0x0380
 	objA0.animation.sprite = 7
 	objA0.box_size.x = 0x08
@@ -845,7 +845,7 @@ function void fn05ca14()
 function void fn05ca1a()
 {
 	objA0.mapping_offset = 0x05cd00
-	objA0.sprite_attributes = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x60d9 : 0x00d9
+	objA0.sprite_attributes = (global.characters == CHARS_KNUCKLES_ALONE) ? (sprite_attribute.PALETTE.LINE3 | 0x00d9) : 0x00d9
 	objA0.sprite_priority = 0x0380
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x08

@@ -104,7 +104,7 @@ function void SpringVertical.initInternal(bool flipY)
 			objA0.mapping_offset = 0x023904
 			objA0.sprite_attributes = 0x0391
 			if (global.zone == 0x12)
-				objA0.sprite_attributes |= 0x8000
+				objA0.sprite_attributes |= sprite_attribute.PRIORITY
 		}
 		else
 		{

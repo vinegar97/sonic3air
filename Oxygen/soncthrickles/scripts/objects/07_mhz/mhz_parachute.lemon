@@ -16,7 +16,7 @@
 function void fn03f4b0()
 {
 	objA0.mapping_offset = 0x03f852
-	objA0.sprite_attributes = 0xc3cd
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x03cd)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x20

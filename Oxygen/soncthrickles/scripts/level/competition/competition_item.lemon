@@ -245,9 +245,9 @@ function void fn036612()
 	u32[A1] = 0x03669c
 	u8[A1 + 0x20] = 0x04
 	u16[A1 + 0x46] = u16[A2 + 0x46]
-	if (u16[A2 + 0x0a] & 0x8000)
+	if (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 	{
-		u16[A1 + 0x0a] |= 0x8000
+		u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
 	}
 }
 

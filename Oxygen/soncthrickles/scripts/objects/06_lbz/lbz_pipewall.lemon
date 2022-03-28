@@ -13,7 +13,7 @@ function void fn0273e4()
 {
 	objA0.hitbox_extends.y = 0x10
 	objA0.mapping_offset = 0x226854
-	objA0.sprite_attributes = 0x42e6
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e6)
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x20
 	u32[A0 + 0x3c] = 0x0276d8

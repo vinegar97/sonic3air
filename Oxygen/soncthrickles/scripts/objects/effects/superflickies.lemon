@@ -42,7 +42,7 @@ function void fn01a19c()
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x08
-	objA0.sprite_attributes = 0x8680
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0680)
 	objA0.position.x.u16 = u16[0xffffb000 + 0x10] - 0xc0
 	objA0.position.y.u16 = u16[0xffffb000 + 0x14] - 0xc0
 	objA0.velocity.x = 0

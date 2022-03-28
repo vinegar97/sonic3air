@@ -532,7 +532,7 @@ function void fn02e9f6()
 {
 	if (global.characters == CHARS_KNUCKLES_ALONE && global.lock_on_state == 0 && global.sk_bluespheres != 0)
 	{
-		objA0.sprite_attributes = 0x2000
+		objA0.sprite_attributes = sprite_attribute.PALETTE.LINE1
 	}
 	fn02ea10()
 }
@@ -728,11 +728,11 @@ function void fn02eaf6()
 	objA0.position.x.u16 += D0.u16
 	u16[A0 + 0x46] += D0.u16
 	objA0.animation.sprite += D1.u8
-	objA0.sprite_attributes = 0xff79
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | sprite_attribute.FLIP_Y | sprite_attribute.FLIP_X | 0x0779)
 
 	if (global.lock_on_state == 0 && global.sk_bluespheres && global.characters == CHARS_KNUCKLES_ALONE)
 	{
-		objA0.sprite_attributes -= 0xe000
+		objA0.sprite_attributes -= (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3)
 	}
 
 	fn02ea4a()
@@ -965,7 +965,7 @@ function void fn02ecbc()
 {
 	if (global.lock_on_state != 0 || !global.sk_bluespheres)
 	{
-		objA0.sprite_attributes = 0x6000
+		objA0.sprite_attributes = sprite_attribute.PALETTE.LINE3
 	}
 }
 
@@ -978,7 +978,7 @@ function void fn02ecd0()
 {
 	objA0.update_address = 0x02ed2a
 	objA0.render_flags = render_flag.WORLD | render_flag.COMPOUND
-	objA0.sprite_attributes = 0x879c
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x079c)
 	objA0.mapping_offset = 0x018aea
 
 	u16[A0 + 0x16] = 2

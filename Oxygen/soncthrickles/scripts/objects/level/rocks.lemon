@@ -31,12 +31,12 @@ function void Rocks.Init()
 	if (global.zone_act == 0x0001)	// Angel Island Act 2
 	{
 		objA0.mapping_offset = 0x21dd64
-		objA0.sprite_attributes = 0x42e9
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e9)
 	}
 	else if (global.zone_act == 0x1200)	// ?
 	{
 		objA0.mapping_offset = 0x21ddec
-		objA0.sprite_attributes = 0xe300
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0300)
 		objA0.animation.sprite = 0
 	}
 	else if (global.zone == 0x09)	// Lava Reef
@@ -44,19 +44,19 @@ function void Rocks.Init()
 		if (global.act == 0)
 		{
 			objA0.mapping_offset = 0x0203d8
-			objA0.sprite_attributes = 0x40d3
+			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x00d3)
 		}
 		else
 		{
 			objA0.mapping_offset = 0x02047a
-			objA0.sprite_attributes = 0x640d
+			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x040d)
 		}
 		objA0.animation.sprite += 4
 	}
 	else
 	{
 		objA0.mapping_offset = 0x21dcdc
-		objA0.sprite_attributes = 0x2333
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0333)
 	}
 
 	D2.u16 &= 0x0f
@@ -666,7 +666,7 @@ function void fn02015c_internal(bool doAllocation)
 		u8[A1 + 0x04] = D5.u8
 		objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
 		objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
-		u16[A1 + 0x0a] = u16[A0 + 0x0a] | 0x8000
+		u16[A1 + 0x0a] = u16[A0 + 0x0a] | sprite_attribute.PRIORITY
 		u16[A1 + 0x08] = 0x80
 		u8[A1 + 0x07] = 0x18
 		objA1.velocity.x = u16[(A4+=2)-2]
@@ -835,7 +835,7 @@ function void fn0201de()
 		objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
 		objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
 		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u16[A1 + 0x0a] |= 0x8000
+		u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
 		u16[A1 + 0x08] = 0x80
 		u8[A1 + 0x07] = 0x20
 		objA1.velocity.x = u16[(A4+=2)-2]

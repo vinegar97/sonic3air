@@ -32,7 +32,7 @@ function void fn02131c()
 
 	objA0.animation.sprite = objA0.subtype2c & 0x0f
 	objA0.mapping_offset = 0x21fd52
-	objA0.sprite_attributes = 0x4001
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x28
 	objA0.countdown_callback = 0x02193a
@@ -42,7 +42,7 @@ function void fn02131c()
 	{
 		// Hydrocity Zone
 		objA0.mapping_offset = 0x21ffd8
-		objA0.sprite_attributes = 0x6001
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0001)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x20
 		objA0.countdown_callback = 0x02199a
@@ -50,7 +50,7 @@ function void fn02131c()
 
 		if (objA0.animation.sprite == 0x02)
 		{
-			objA0.sprite_attributes = 0x4350
+			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0350)
 			objA0.box_size.x = 0x18
 			objA0.box_size.y = 0x20
 			objA0.countdown_callback = 0x02199a
@@ -63,7 +63,7 @@ function void fn02131c()
 	{
 		// Marble Garden Zone
 		objA0.mapping_offset = 0x21ff18
-		objA0.sprite_attributes = 0x4001
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 		objA0.box_size.x = 0x20
 		objA0.box_size.y = 0x28
 		objA0.countdown_callback = 0x021a2a
@@ -84,7 +84,7 @@ function void fn02131c()
 	{
 		// Carnival Night Zone
 		objA0.mapping_offset = 0x021aba
-		objA0.sprite_attributes = 0x4420
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0420)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x20
 		objA0.countdown_callback = 0x021a7a
@@ -100,7 +100,7 @@ function void fn02131c()
 	{
 		// Launch Base Zone
 		objA0.mapping_offset = 0x22005e
-		objA0.sprite_attributes = 0x22ea
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x02ea)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x20
 		objA0.countdown_callback = 0x02199a
@@ -113,7 +113,7 @@ function void fn02131c()
 	{
 		// Mushroom Hill Zone
 		objA0.mapping_offset = 0x021bce
-		objA0.sprite_attributes = 0x434b
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x034b)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x20
 		objA0.countdown_callback = 0x021a7a
@@ -126,7 +126,7 @@ function void fn02131c()
 	{
 		// Sandopolis Zone
 		objA0.mapping_offset = 0x021aba
-		objA0.sprite_attributes = 0x448c
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x048c)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x20
 		objA0.countdown_callback = 0x021a7a
@@ -145,7 +145,7 @@ function void fn02131c()
 	{
 		// Lava Reef Zone
 		objA0.mapping_offset = 0x021c1e
-		objA0.sprite_attributes = 0x640d
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x040d)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x20
 		objA0.countdown_callback = 0x021a7a
@@ -351,7 +351,7 @@ function void fn0216b8()
 		objA1.render_flags = D5.u8
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		objA1.sprite_attributes = objA0.sprite_attributes | 0x8000
+		objA1.sprite_attributes = objA0.sprite_attributes | sprite_attribute.PRIORITY
 		objA1.sprite_priority = objA0.sprite_priority
 		objA1.box_size.x = objA0.box_size.x
 		objA1.box_size.y = objA0.box_size.y

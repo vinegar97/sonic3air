@@ -14,7 +14,7 @@
 function void fn03703a()
 {
 	objA0.mapping_offset = 0x0370d6
-	objA0.sprite_attributes = 0x8700
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0700)
 	objA0.sprite_priority = 0
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x0c
@@ -67,7 +67,7 @@ function void fn0370b4()
 function void fn03713a()
 {
 	objA0.mapping_offset = 0x0375fa
-	objA0.sprite_attributes = 0x8756
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0756)
 	objA0.sprite_priority = 0
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x28
@@ -335,7 +335,7 @@ function void fn037430()
 function void fn0374b8()
 {
 	objA0.mapping_offset = 0x0375fa
-	objA0.sprite_attributes = 0x8756
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0756)
 	objA0.sprite_priority = 0
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x28
@@ -369,7 +369,7 @@ function void fn0374f0()
 function void fn037c8e()
 {
 	objA0.mapping_offset = 0xff7000
-	objA0.sprite_attributes = 0x8600
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0600)
 	objA0.sprite_priority = 0
 	objA0.box_size.x = 0x40
 	objA0.box_size.y = 0x10
@@ -412,7 +412,7 @@ function void fn037d00()
 #else
 	objA0.mapping_offset = 0xff7080		// Needs to be set that way for verification
 #endif
-	objA0.sprite_attributes = 0x8600
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0600)
 	objA0.sprite_priority = 0
 	objA0.box_size.x = 0x40
 	objA0.box_size.y = 0x10
@@ -547,7 +547,7 @@ function void fn00b0e4()
 function void fn037ec2()
 {
 	objA0.mapping_offset = 0x037f6a
-	objA0.sprite_attributes = 0x8750
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0750)
 	objA0.sprite_priority = 0
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10

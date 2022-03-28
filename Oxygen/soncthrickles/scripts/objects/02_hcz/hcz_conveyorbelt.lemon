@@ -279,7 +279,7 @@ function void fn031502()
 	u16[A0 + 0x3c] = u16[(A1+=2)-2]
 	objA0.value3e = u16[(A1+=2)-2]
 	objA0.mapping_offset = 0x23035e
-	objA0.sprite_attributes = 0x243e
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x043e)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x0c

@@ -16,7 +16,7 @@
 function void fn01ec18()
 {
 	objA0.mapping_offset = 0x01ecc6
-	objA0.sprite_attributes = 0x86bc
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x06bc)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x200
 	objA0.flags2a |= 0x80
@@ -79,7 +79,7 @@ function void fn01f3f2()
 function void fn01f3f8()
 {
 	objA0.mapping_offset = 0x01ecc6
-	objA0.sprite_attributes = 0x86bc
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x06bc)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.flags2a |= 0x80
@@ -175,7 +175,7 @@ function void BlockerElement.DoDamage()
 function void fn01f5a0()
 {
 	objA0.mapping_offset = 0x01ecc6
-	objA0.sprite_attributes = 0x86bc
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x06bc)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.flags2a |= 0x80

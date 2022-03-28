@@ -92,11 +92,11 @@ function void CompetitionMode.Character.Initialization.Sonic_Knuckles()
 			else
 			{
 				char.mapping_offset = 0x2a02aa
-				char.sprite_attributes = 0x2680
+				char.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0680)
 			}
 			if (global.zone == 0x12)
 			{
-				char.sprite_attributes |= 0x8000
+				char.sprite_attributes |= sprite_attribute.PRIORITY
 			}
 			checkpoint.x = char.position.x.u16
 			checkpoint.y = char.position.y.u16
@@ -113,11 +113,11 @@ function void CompetitionMode.Character.Initialization.Sonic_Knuckles()
 			else
 			{
 				char.mapping_offset = 0x2a02aa
-				char.sprite_attributes = 0x26a0
+				char.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x06a0)
 			}
 			if (global.zone == 0x12)
 			{
-				char.sprite_attributes |= 0x8000
+				char.sprite_attributes |= sprite_attribute.PRIORITY
 			}
 			u16[0xfffffe4c] = char.position.x.u16
 			u16[0xfffffe4e] = char.position.y.u16
@@ -432,7 +432,7 @@ function void CompetitionMode.Character.Initialization.Tails()
 			char.sprite_attributes = 0x0680
 			if (global.zone == 0x12)
 			{
-				char.sprite_attributes |= 0x8000
+				char.sprite_attributes |= sprite_attribute.PRIORITY
 			}
 			checkpoint.x = char.position.x.u16
 			checkpoint.y = char.position.y.u16
@@ -446,7 +446,7 @@ function void CompetitionMode.Character.Initialization.Tails()
 			char.sprite_attributes = 0x06a0
 			if (global.zone == 0x12)
 			{
-				char.sprite_attributes |= 0x8000
+				char.sprite_attributes |= sprite_attribute.PRIORITY
 			}
 			u16[0xfffffe4c] = char.position.x.u16
 			u16[0xfffffe4e] = char.position.y.u16

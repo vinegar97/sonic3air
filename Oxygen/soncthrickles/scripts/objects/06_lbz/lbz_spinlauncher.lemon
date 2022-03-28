@@ -16,7 +16,7 @@
 function void SpinLauncher.Init()
 {
 	objA0.mapping_offset = 0x227bc2
-	objA0.sprite_attributes = 0x42ea
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02ea)
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x20
 	objA0.render_flags |= render_flag.WORLD

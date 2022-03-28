@@ -16,7 +16,7 @@
 function void DynamicRing.Init()
 {
 	objA0.mapping_offset = 0x01a99a
-	objA0.sprite_attributes = 0xa6bc
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x100
 	objA0.collision_attributes = (collision.flag.ITEM | collision.size.6x6)
@@ -223,7 +223,7 @@ function void SpillRings()
 		objA1.base_state += 2
 		objA1.box_size.x = 8
 		objA1.sprite_priority = 0x180
-		objA1.sprite_attributes = 0xa6bc
+		objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
 		objA1.mapping_offset = 0x01a99a
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
@@ -405,7 +405,7 @@ function void fn01a532()
 {
 	objA0.base_state += 2
 	objA0.mapping_offset = 0x01a99a
-	objA0.sprite_attributes = (competition_mode.active) ? 0x63d2 :0xa6bc
+	objA0.sprite_attributes = (competition_mode.active) ? (sprite_attribute.PALETTE.LINE3 | 0x03d2) : (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0100
 	objA0.collision_attributes = (collision.flag.ITEM | collision.size.6x6)

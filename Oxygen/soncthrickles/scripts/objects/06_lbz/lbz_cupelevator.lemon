@@ -16,7 +16,7 @@
 function void CupElevator.Init()
 {
 	objA0.mapping_offset = 0x22619a
-	objA0.sprite_attributes = 0x440d
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x040d)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x20
@@ -38,7 +38,7 @@ function void CupElevator.Init()
 		u8[A1 + 0x07] = 0x20
 		u8[A1 + 0x06] = 0x10
 		u16[A1 + 0x08] = 0x80
-		u16[A1 + 0x0a] = 0x440d
+		u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x040d)
 		u32[A1 + 0x0c] = 0x22619a
 		objA1.position.x.u16 = objA0.position.x.u16
 		u16[A1 + 0x30] = objA0.position.x.u16
@@ -58,7 +58,7 @@ function void CupElevator.Init()
 			u8[A1 + 0x07] = 0x20
 			u8[A1 + 0x06] = 0x10
 			u16[A1 + 0x08] = 0x0100
-			u16[A1 + 0x0a] = 0x440d
+			u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x040d)
 			u32[A1 + 0x0c] = 0x22619a
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
@@ -696,7 +696,7 @@ function void fn02703e()
 function void fn027096()
 {
 	objA0.mapping_offset = 0x22619a
-	objA0.sprite_attributes = 0x440d
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x040d)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0180
 	objA0.box_size.x = 0x08

@@ -516,9 +516,9 @@ function void writeToSpriteTable(u16 renderQueue)
 
 		u16 index = u16[A1+2] + D5.u16
 		if (flipX)
-			index ^= 0x0800
+			index ^= sprite_attribute.FLIP_X
 		if (flipY)
-			index ^= 0x1000
+			index ^= sprite_attribute.FLIP_Y
 
 	#if STANDALONE
 		if (!Standalone.onDrawVdpSprite(px - 0x80, py - 0x80, size, index, renderQueue))
@@ -594,9 +594,9 @@ function void writeToSpriteTableCompound(u16 renderQueue)
 
 			u16 index = u16[A1+2] + D5.u16
 			if (flipX)
-				index ^= 0x0800
+				index ^= sprite_attribute.FLIP_X
 			if (flipY)
-				index ^= 0x1000
+				index ^= sprite_attribute.FLIP_Y
 
 		#if STANDALONE
 			// Note that clipping in x-direction is ignored for standalone rendering

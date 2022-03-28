@@ -116,7 +116,7 @@ function void fn019236()
 		objA1.box_size.y = 0x08
 		objA1.box_size.x = 0x08
 		objA1.sprite_priority = 0x0380
-		objA1.sprite_attributes = 0x879c
+		objA1.sprite_attributes = (sprite_attribute.PRIORITY | 0x079c)
 		objA1.mapping_offset = 0x0192ea
 		objA1.position.x.u16 = u16[A2 + 0x10]
 		objA1.position.y.u16 = u16[A2 + 0x14]
