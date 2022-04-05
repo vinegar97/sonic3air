@@ -2340,3 +2340,10 @@ function void AddRings()
 		playMusic(SFX_RING)
 	}
 }
+
+
+function void AddRings(u32 value)
+{
+	D0 = value
+	AddRings()
+}
