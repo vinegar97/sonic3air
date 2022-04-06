@@ -195,9 +195,9 @@ function void PathSwapperUpdateVertical()
 
 	// Affect priority flag (rendering on foreground)
 	if (objA0.subtype2c & (0x40 >> onPositiveSide))
-		u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
+		objA1.sprite_attributes |= sprite_attribute.PRIORITY
 	else
-		u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
+		objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 }
 
 
@@ -304,7 +304,7 @@ function void PathSwapperUpdateHorizontal()
 
 	// Affect priority flag (rendering on foreground)
 	if (objA0.subtype2c & (0x40 >> onPositiveSide))
-		u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
+		objA1.sprite_attributes |= sprite_attribute.PRIORITY
 	else
-		u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
+		objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 }

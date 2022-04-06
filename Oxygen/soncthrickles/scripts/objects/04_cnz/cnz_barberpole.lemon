@@ -139,10 +139,10 @@ function void fn033392()
 					D0.u16 = 0x80
 				}
 
-				u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
+				objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 				if (D0.u8 < 0x34)
 				{
-					u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
+					objA1.sprite_attributes |= sprite_attribute.PRIORITY
 				}
 				if (u16[A2 + 0x04] != 0)
 				{
@@ -179,7 +179,7 @@ function void fn033392()
 	objA0.flags2a &= ~bit
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x31] = 0x04
-	u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
+	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 }
 
 
@@ -293,10 +293,10 @@ function void fn0335c4()
 					D0.u16 = 0x80
 				}
 
-				u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
+				objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 				if (D0.u8 >= 0x4c)
 				{
-					u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
+					objA1.sprite_attributes |= sprite_attribute.PRIORITY
 				}
 				if (u16[A2 + 0x04] != 0)
 				{
@@ -334,7 +334,7 @@ function void fn0335c4()
 	objA0.flags2a &= ~bit
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x31] = 0x04
-	u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
+	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 }
 
 

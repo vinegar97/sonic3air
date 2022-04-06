@@ -637,7 +637,7 @@ function void fn04bf62()
 	objA0.position.y.u16 = 0x0430
 	objA0.mapping_offset = 0x04c2a0
 	objA0.sprite_attributes = 0x0481
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x80
@@ -753,11 +753,11 @@ function void fn04c0aa()
 
 			// Spawn a spike ball
 			objA1.update_address = 0x04c374
-			u32[A1 + 0x0c] = 0x04c3e6
-			u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x0490)
-			u8[A1 + 0x04] = render_flag.WORLD
-			u8[A1 + 0x07] = 0x10
-			u16[A1 + 0x08] = 0x0200
+			objA1.mapping_offset = 0x04c3e6
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0490)
+			objA1.render_flags = render_flag.WORLD
+			objA1.box_size.x = 0x10
+			objA1.sprite_priority = 0x0200
 			u16[A1 + 0x40] = 0x1e
 			u16[A1 + 0x32] = objA0.value32
 			objA0.value32 += 0x90
@@ -798,11 +798,11 @@ function void fn04c0aa()
 
 		// Spawn a ring
 		objA1.update_address = 0x01a9ee
-		u8[A1 + 0x04] = render_flag.WORLD
-		u8[A1 + 0x07] = 0x08
-		u16[A1 + 0x08] = 0x0180
-		u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x06bc)
-		u32[A1 + 0x0c] = 0x01a99a
+		objA1.render_flags = render_flag.WORLD
+		objA1.box_size.x = 0x08
+		objA1.sprite_priority = 0x0180
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x06bc)
+		objA1.mapping_offset = 0x01a99a
 		u16[A1 + 0x32] = objA0.value32
 		objA0.value32 += 0x89
 		u16[A1 + 0x3c] = objA0.position.x.u16

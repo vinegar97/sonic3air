@@ -438,7 +438,7 @@ function void fn086a7a()
 	objA0.value3e = D2.u16
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u8[A1 + 0x04] & 0x02)
+	if (objA1.render_flags & render_flag.FLIP_Y)
 	{
 		objA0.update_address = 0x08689c
 		u8[A0 + 0x43] += 0x08

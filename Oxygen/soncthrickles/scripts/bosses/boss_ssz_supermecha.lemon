@@ -279,7 +279,7 @@ function void fn07bc32()
 	}
 
 	objA0.countdown_value = 0x1f
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 	playMusic(MUSIC_CTRL_FADEOUT)
 
 #if STANDALONE
@@ -577,12 +577,12 @@ function void fn07beb0()
 	if (D0.u16 < u16[0xfffffa88])
 	{
 		D1.u16 = u16[0xfffffa8e]
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	else
 	{
 		D1.u16 = u16[0xfffffa82]
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 	}
 	u16[A0 + 0x3c] = D1.u16
 
@@ -833,9 +833,9 @@ function void fn07c18c()
 
 	D0.u16 = objA0.position.x.u16
 	if (D0.u16 < u16[0xfffffa88])
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	else
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 
 	A1 = 0x07d538
 	fn084580()
@@ -1106,12 +1106,12 @@ function void fn07c46a()
 	objA0.base_state = 0x34
 	playSound(0x96)
 
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	D0.u16 = 0x0400
 	D1.u16 = objA0.position.x.u16
 	if (D1.u16 >= level.bossarea.right)
 	{
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 		D0.s16 = -D0.s16
 	}
 	objA0.velocity.x = D0.u16
@@ -1182,7 +1182,7 @@ function void fn07c522()
 
 	if (objA0.render_flags & render_flag.FLIP_X)
 	{
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 		objA0.animation.sprite = 0x0c
 		u32[A0 + 0x30] = 0x07d5d8
 	}
@@ -1548,9 +1548,9 @@ function void fn07c886()
 	setupObjectAttributesFull(0x07d41a)
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if ((u8[A1 + 0x04] & 0x04) == 0)
+	if ((objA1.render_flags & render_flag.WORLD) == 0)
 	{
-		objA0.render_flags &= ~0x04
+		objA0.render_flags &= ~render_flag.WORLD
 	}
 
 	objA0.update_address = 0x07c8ba
@@ -1635,7 +1635,7 @@ function void fn07ce90()
 	if (u8[A2 + 0x04] & 0x01)
 	{
 		D2.s16 = -D2.s16
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 
 	objA0.position.x.u16 += D1.u16

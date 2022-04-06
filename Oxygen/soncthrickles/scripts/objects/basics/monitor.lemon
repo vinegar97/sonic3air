@@ -509,7 +509,7 @@ function void MonitorIntact.Opening()
 		objA1.update_address = 0x01d7ba
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u8[A1 + 0x04] = objA0.render_flags
+		objA1.render_flags = objA0.render_flags
 	#if STANDALONE
 		objA1.state = objA0.subtype2c
 	#else
@@ -566,7 +566,7 @@ function void ItemEffect.Init()
 {
 	objA0.base_state += 2
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x04c4)
-	objA0.render_flags |= (render_flag.WORLD | render_flag.STATIC_MAPPIMG)
+	objA0.render_flags |= (render_flag.WORLD | render_flag.STATIC_MAPPING)
 	objA0.sprite_priority = 0x180
 	objA0.box_size.x = 8
 	objA0.velocity.y = (objA0.render_flags & render_flag.FLIP_Y) ? 0x300 : -0x300

@@ -67,7 +67,7 @@ function void fn0643f2()
 	u16[A0 + 0x44] = 0
 	objA0.mapping_offset = 0x14a8d6
 	objA0.animation.sprite = 0x56
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	objA0.countdown_value = 0x07
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
@@ -735,7 +735,7 @@ function void fn064a00()
 function void fn064a1c()
 {
 	objA0.base_state = 0x4e
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.velocity.x = 0
 
 	A1 = 0x06682f
@@ -759,7 +759,7 @@ function void fn064a36()
 function void fn064a3c()
 {
 	objA0.base_state = 0x50
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	u16[A0 + 0x44] = 0x02
 	objA0.mapping_offset = 0x066f36
 	objA0.animation.sprite = 0x0e
@@ -789,7 +789,7 @@ function void fn064a6e()
 function void fn064a8e()
 {
 	objA0.base_state = 0x52
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.countdown_callback = 0x064ae2
 	u16[A0 + 0x44] = 0
 	objA0.mapping_offset = 0x14a8d6
@@ -818,7 +818,7 @@ function void fn064ac0()
 function void fn064ae2()
 {
 	objA0.base_state = 0x54
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	u16[A0 + 0x44] = 0
 	objA0.mapping_offset = 0x14a8d6
 	objA0.animation.sprite = 0x07
@@ -847,7 +847,7 @@ function void fn064b22()
 	u16[A0 + 0x44] = 0x04
 	objA0.mapping_offset = 0x066b6a
 	objA0.animation.sprite = 0
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	objA0.position.x.u16 = 0x161c
 	objA0.position.y.u16 = 0x062c
 	screenmover_target.left = 0x1520
@@ -968,10 +968,10 @@ function void fn064c24()
 
 	objA0.position.x.u16 = objA1.position.x.u16
 	objA0.position.y.u16 = objA1.position.y.u16
-	if (u8[A1 + 0x04] & 0x01)
-		objA0.render_flags |= 0x01
+	if (objA1.render_flags & render_flag.FLIP_X)
+		objA0.render_flags |= render_flag.FLIP_X
 	else
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 
 	Object.animationProgress(0x06683a)
 	fn066236()
@@ -1146,7 +1146,7 @@ function void fn064e28()
 	{
 		objA0.update_address = 0x064e46
 		A1 = 0xffffb000
-		u8[A1 + 0x04] |= render_flag.FLIP_X
+		objA1.render_flags |= render_flag.FLIP_X
 		u8[A1 + 0x2a] |= 0x01
 	}
 }
@@ -1190,7 +1190,7 @@ function void fn064e88()
 
 	u16[0xfffffaae] = A0.u16
 	objA0.update_address = 0x064ec4
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.position.x.u16 = 0x1640
 	objA0.position.y.u16 = 0x02d0
 
@@ -1998,7 +1998,7 @@ function void fn065602()
 	setupObjectAttributesBasic(0x066548)
 
 	objA0.update_address = 0x06561c
-	objA0.render_flags |= 0x80
+	objA0.render_flags |= render_flag.VISIBLE
 	fn0662c0()
 }
 

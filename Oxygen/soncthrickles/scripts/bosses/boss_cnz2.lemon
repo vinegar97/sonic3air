@@ -132,11 +132,11 @@ function void fn06e574()
 	if (D2.u16 >= 0x20)
 	{
 		D1.u16 = 0x0100
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		if (D0.u16 == 0)
 		{
 			D1.s16 = -D1.s16
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 		}
 		objA0.velocity.x = D1.u16
 	}
@@ -179,12 +179,12 @@ function void fn06e5d8()
 		if (D0.u16 <= objA1.position.x.u16)
 		{
 			++D0.u16
-			objA0.render_flags |= 0x01
+			objA0.render_flags |= render_flag.FLIP_X
 		}
 		else
 		{
 			--D0.u16
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 		}
 		objA0.position.x.u16 = D0.u16
 	}
@@ -559,7 +559,7 @@ function void fn06e936()
 	objA0.update_address = 0x085102
 	if (objA0.subtype2c != 0)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 
 	D0 = 0x08
@@ -765,8 +765,8 @@ function void fn06eb34()
 	objA0.animation.sprite = 9
 	D0.u8 = objA0.value39 + 1
 	objA0.value39 = D0.u8
-	D0.u8 &= 0x03
-	objA0.render_flags &= 0xfc
+	D0.u8 &= (render_flag.FLIP_X | render_flag.FLIP_Y)
+	objA0.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	objA0.render_flags |= D0.u8
 }
 

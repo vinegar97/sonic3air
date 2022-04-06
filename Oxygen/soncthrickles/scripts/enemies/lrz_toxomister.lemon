@@ -25,7 +25,7 @@ function void Toxomister.PostInit()
 	setupObjectAttributesFull(0x09002e)
 
 	objA0.update_address = 0x08fd76
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 0x01
 
 	A1 = A0 + 0x18

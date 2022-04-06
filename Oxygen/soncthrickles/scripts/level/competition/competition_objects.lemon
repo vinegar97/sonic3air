@@ -21,7 +21,7 @@ function void fn032c6a()
 		objA0.box_size.y = 0x80
 	}
 
-	u32[A0] = 0x032c92
+	objA0.update_address = 0x032c92
 	fn032c92()
 }
 
@@ -152,7 +152,7 @@ function void fn035a7a()
 {
 	objA0.mapping_offset = 0x035bbc
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0300)
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x08
@@ -161,7 +161,7 @@ function void fn035a7a()
 
 	if (allocDynamicObjectAfterA0())
 	{
-		u32[A1] = 0x035b90
+		objA1.update_address = 0x035b90
 		u16[A1 + 0x10] = objA0.position.x.u16 - 0x10
 		u16[A1 + 0x14] = objA0.position.y.u16 + 0x0c
 		objA1.collision_attributes = (collision.flag.THREAT | collision.size.16x4)
@@ -169,7 +169,7 @@ function void fn035a7a()
 
 		if (allocDynamicObjectAfterA0())
 		{
-			u32[A1] = 0x035ba6
+			objA1.update_address = 0x035ba6
 			u16[A1 + 0x10] = objA0.position.x.u16 + 0x10
 			u16[A1 + 0x14] = objA0.position.y.u16 + 0x14
 			objA1.collision_attributes = (collision.flag.THREAT | collision.size.16x4)
@@ -177,7 +177,7 @@ function void fn035a7a()
 		}
 	}
 
-	u32[A0] = 0x035b16
+	objA0.update_address = 0x035b16
 	fn035b16()
 }
 
@@ -242,7 +242,7 @@ function void fn022d54()
 {
 	objA0.mapping_offset = 0x02375c
 	objA0.sprite_attributes = 0x04a4
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0200
@@ -262,24 +262,24 @@ function void fn023b38()
 	if (allocDynamicObjectAfterA0())
 	{
 		// Retracting spring
-		u32[A1] = 0x023ed0
-		u32[A1 + 0x0c] = 0x023f4a
-		u16[A1 + 0x0a] = 0x0391
+		objA1.update_address = 0x023ed0
+		objA1.mapping_offset = 0x023f4a
+		objA1.sprite_attributes = 0x0391
 		if (global.zone == 0x12)
 		{
-			u32[A1 + 0x0c] = 0x023f52
+			objA1.mapping_offset = 0x023f52
 		}
 		u8[A1 + 0x2c] = objA0.subtype2c
 
 		D0.u16 = (objA0.subtype2c >> 2) & 0x1c
 		A2 = 0x023b18 + D0.u16
-		u8[A1 + 0x07] = u8[(A2+=1)-1]
-		u8[A1 + 0x06] = u8[(A2+=1)-1]
+		objA1.box_size.x = u8[(A2+=1)-1]
+		objA1.box_size.y = u8[(A2+=1)-1]
 		D0.u8 = u8[(A2+=1)-1]
 		u8[A1 + 0x22] = D0.u8
 		if (u8[A1 + 0x22] == 0)
 		{
-			u32[A1] = 0x023f2a
+			objA1.update_address = 0x023f2a
 		}
 		objA0.subtype2c &= 0xf0
 		objA0.subtype2c |= u8[(A2+=1)-1]
@@ -315,8 +315,8 @@ function void fn023b38()
 			u8[A0 + 0x3c] = 0x01
 		}
 		u8[A1 + 0x2a] = objA0.flags2a
-		u8[A1 + 0x04] = objA0.render_flags | 0x04
-		u16[A1 + 0x08] = 0x0200
+		objA1.render_flags = objA0.render_flags | render_flag.WORLD
+		objA1.sprite_priority = 0x0200
 		u16[A1 + 0x3e] = A0.u16
 		objA0.value3e = A1.u16
 	}
@@ -345,7 +345,7 @@ function void fn023c12()
 //# address-hook(0x023c88) end(0x023c88)
 function void fn023c88()
 {
-	u32[A0] = 0x023c8e
+	objA0.update_address = 0x023c8e
 	fn023c8e()
 }
 
@@ -362,7 +362,7 @@ function void fn023c8e()
 //# address-hook(0x023ca4) end(0x023ca4)
 function void fn023ca4()
 {
-	u32[A0] = 0x023caa
+	objA0.update_address = 0x023caa
 	fn023caa()
 }
 
@@ -379,7 +379,7 @@ function void fn023caa()
 //# address-hook(0x023cc0) end(0x023cc0)
 function void fn023cc0()
 {
-	u32[A0] = 0x023cc6
+	objA0.update_address = 0x023cc6
 	fn023cc6()
 }
 
@@ -459,10 +459,10 @@ function void fn023cdc()
 				{
 					objA0.position.y.u16 += 0x16
 					objA0.flags2a ^= 0x02
-					objA0.render_flags ^= 0x02
+					objA0.render_flags ^= render_flag.FLIP_Y
 					objA0.subtype2c &= 0x0f
 					objA0.subtype2c |= 0xf0
-					u32[A0] = 0x023c12
+					objA0.update_address = 0x023c12
 					A1 = 0xffff0000 + objA0.value3e
 					s16[A1 + 0x32] = -s16[A1 + 0x32]
 				}
@@ -470,10 +470,10 @@ function void fn023cdc()
 				{
 					objA0.position.y.u16 -= 0x16
 					objA0.flags2a ^= 0x02
-					objA0.render_flags ^= 0x02
+					objA0.render_flags ^= render_flag.FLIP_Y
 					objA0.subtype2c &= 0x0f
 					objA0.subtype2c |= 0xe0
-					u32[A0] = 0x023c12
+					objA0.update_address = 0x023c12
 					A1 = 0xffff0000 + objA0.value3e
 					s16[A1 + 0x32] = -s16[A1 + 0x32]
 				}
@@ -525,10 +525,10 @@ function void fn023cdc()
 				{
 					objA0.position.y.u16 += 0x16
 					objA0.flags2a ^= 0x02
-					objA0.render_flags ^= 0x02
+					objA0.render_flags ^= render_flag.FLIP_Y
 					objA0.subtype2c &= 0x0f
 					objA0.subtype2c |= 0xf0
-					u32[A0] = 0x023c12
+					objA0.update_address = 0x023c12
 					A1 = 0xffff0000 + objA0.value3e
 					s16[A1 + 0x32] = -s16[A1 + 0x32]
 				}
@@ -536,10 +536,10 @@ function void fn023cdc()
 				{
 					objA0.position.y.u16 -= 0x16
 					objA0.flags2a ^= 0x02
-					objA0.render_flags ^= 0x02
+					objA0.render_flags ^= render_flag.FLIP_Y
 					objA0.subtype2c &= 0x0f
 					objA0.subtype2c |= 0xe0
-					u32[A0] = 0x023c12
+					objA0.update_address = 0x023c12
 					A1 = 0xffff0000 + objA0.value3e
 					s16[A1 + 0x32] = -s16[A1 + 0x32]
 				}
@@ -588,12 +588,12 @@ function void fn035bf8()
 {
 	objA0.mapping_offset = 0x035d5a
 	objA0.sprite_attributes = 0x0300
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x30
 	objA0.box_size.y = 0x10
 	u16[A0 + 0x30] = objA0.position.x.u16
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	objA0.position.y.frac = 0x01
 
 	A2 = A0 + 0x18
@@ -609,12 +609,12 @@ function void fn035bf8()
 		u16[A0 + 0x34] = D0.u16
 		objA0.value3a = 0x01
 
-		u32[A0] = 0x035cca
+		objA0.update_address = 0x035cca
 		fn035cca()
 	}
 	else
 	{
-		u32[A0] = 0x035c72
+		objA0.update_address = 0x035c72
 		fn035c72()
 	}
 }
@@ -717,13 +717,13 @@ function void fn035d80()
 {
 	objA0.mapping_offset = 0x035e9a
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0300)
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 
-	u32[A0] = 0x035db2
+	objA0.update_address = 0x035db2
 	fn035db2()
 }
 
@@ -818,7 +818,7 @@ function void fn0380f8()
 {
 	objA0.mapping_offset = 0x038252
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0300)
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x08
@@ -856,8 +856,8 @@ function void fn038150()
 				D0.u16 -= 2
 			}
 
-			u32[A1] = 0x03818e
-			u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x0300)
+			objA1.update_address = 0x03818e
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0300)
 			u8[A1 + 0x22] = 0x01
 			D0 = 0
 		}
@@ -875,7 +875,7 @@ function void fn03818e()
 	CheckGroundCollision()
 	if (D1.s16 < 0)
 	{
-		u32[A0] = 0x038234
+		objA0.update_address = 0x038234
 		objA0.velocity.x = 0x0100
 		objA0.velocity.y = -objA0.velocity.y >> 2
 		objA0.animation.sprite = 0x02
@@ -952,7 +952,7 @@ function void fn035f3a()
 {
 	objA0.mapping_offset = 0x03609a
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0280)
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x10
@@ -965,7 +965,7 @@ function void fn035f3a()
 	u8[A0 + 0x3c] = u8[A0 + 0x3d]
 	objA0.flags2a |= 0x80
 
-	u32[A0] = 0x035f8c
+	objA0.update_address = 0x035f8c
 	fn035f8c()
 }
 
@@ -1032,12 +1032,12 @@ function void fn0362a2()
 {
 	objA0.mapping_offset = 0x036350
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0280)
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x08
 
-	u32[A0] = 0x0362ce
+	objA0.update_address = 0x0362ce
 	fn0362ce()
 }
 

@@ -30,13 +30,13 @@ function void fn03703a()
 		}
 
 		objA0.render_flags |= render_flag.COMPETITION_P2_SCREEN
-		u32[A0] = 0x0370b4
+		objA0.update_address = 0x0370b4
 		fn0370b4()
 	}
 	else
 	{
 		objA0.render_flags |= render_flag.COMPETITION_P1_SCREEN
-		u32[A0] = 0x037092
+		objA0.update_address = 0x037092
 		fn037092()
 	}
 }
@@ -71,7 +71,7 @@ function void fn03713a()
 	objA0.sprite_priority = 0
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x28
-	u32[A0] = 0x03716c
+	objA0.update_address = 0x03716c
 	if (competition_mode.multiplay == 0)
 	{
 		objA0.render_flags |= render_flag.COMPETITION_P1_SCREEN
@@ -281,7 +281,7 @@ function void fn037406()
 	if (allocDynamicObjectAfterA0())
 	{
 		// Spawn "finish" neon text
-		u32[A1] = 0x03713a
+		objA1.update_address = 0x03713a
 		u16[A1 + 0x10] = 0x0120 + getScreenExtend()
 		u16[A1 + 0x14] = 0xb8
 		u8[A1 + 0x20] = 0x02
@@ -343,7 +343,7 @@ function void fn0374b8()
 	objA0.position.y.u16 = 0xb8
 	objA0.state = 0x07
 
-	u32[A0] = 0x0374f0
+	objA0.update_address = 0x0374f0
 	fn0374f0()
 }
 
@@ -379,7 +379,7 @@ function void fn037c8e()
 
 	copyMemory(0xffff7000, 0x037e8e, 0x34)
 
-	u32[A0] = 0x037cdc
+	objA0.update_address = 0x037cdc
 	fn037cdc()
 }
 
@@ -422,7 +422,7 @@ function void fn037d00()
 
 	copyMemory(0xffff7080, 0x037e8e, 0x34)
 
-	u32[A0] = 0x037d5a
+	objA0.update_address = 0x037d5a
 	fn037d5a()
 }
 
@@ -563,13 +563,13 @@ function void fn037ec2()
 		}
 
 		objA0.render_flags |= render_flag.COMPETITION_P2_SCREEN
-		u32[A0] = 0x037f42
+		objA0.update_address = 0x037f42
 		fn037f42()
 	}
 	else
 	{
 		objA0.render_flags |= render_flag.COMPETITION_P1_SCREEN
-		u32[A0] = 0x037f1a
+		objA0.update_address = 0x037f1a
 		fn037f1a()
 	}
 }

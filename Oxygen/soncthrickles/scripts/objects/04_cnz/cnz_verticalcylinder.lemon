@@ -124,7 +124,7 @@ function void fn0338c4()
 						u8[A2] = 0
 					}
 
-					u8[A1 + 0x04] &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+					objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 					u8[A1 + 0x20] = 0
 					u8[A1 + 0x2a] &= ~0x01
 					u8[A1 + 0x2e] |= 0x40
@@ -197,9 +197,9 @@ function void fn0338c4()
 
 				D0 = u8[A2]
 				if (D0.u8 >= 0x80)
-					u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
+					objA1.sprite_attributes |= sprite_attribute.PRIORITY
 				else
-					u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
+					objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 				D0.u8 += 0x40
 				D0.s8 = -D0.s8
 				D0.u16 &= 0xff
@@ -221,7 +221,7 @@ function void fn0338c4()
 	objA0.flags2a &= ~bit
 	u8[A1 + 0x2e] &= ~0x40
 	u8[A1 + 0x2e] &= ~0x02
-	u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
+	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	u8[A2 + 0x01] = 0x10
 }
 
@@ -293,7 +293,7 @@ function void fn033ade()
 	u8[A1 + 0x2e] &= ~0x40
 	u8[A1 + 0x2e] &= ~0x02
 	u8[A1 + 0x2e] &= ~0x01
-	u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
+	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	u8[A2 + 0x01] = 0x10
 }
 
@@ -313,10 +313,10 @@ function void fn033bba()
 	D1.u16 += D0.u16
 	objA1.position.x.u16 = D1.u16
 	D0 = u8[A2]
-	u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
+	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	if (D0.u8 >= 0x80)
 	{
-		u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
+		objA1.sprite_attributes |= sprite_attribute.PRIORITY
 	}
 	D0.u8 += 0x40
 	D0.s8 = -D0.s8

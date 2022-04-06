@@ -183,7 +183,7 @@ function void fn089d44()
 	spilled_rings.speed = 0xff
 	objA0.hitbox_extends.x = 0x08
 	objA0.hitbox_extends.y = 0x08
-	objA0.render_flags = 0x84
+	objA0.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 
 	D0 = 4
 	fn0852d0()
@@ -301,9 +301,9 @@ function void fn089dee()
 		D1.s16 = -D1.s16
 	}
 	objA0.velocity.x = D1.u16
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	if (objA0.velocity.x < 0)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 }

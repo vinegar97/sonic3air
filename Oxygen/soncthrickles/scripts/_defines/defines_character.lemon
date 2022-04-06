@@ -37,7 +37,7 @@ constant u8 render_flag.FLIP_Y	=  0x02		// Flipped vertically
 constant u8 render_flag.WORLD	=  0x04		// Usually set, so the object is positioned in world, not on screen
 constant u8 render_flag.COMPETITION_P1_SCREEN	=  0x08		// Indicates sprites that belong on the top half / player 1's side of the screen in competition mode
 constant u8 render_flag.COMPETITION_P2_SCREEN	=  0x10		// Indicates sprites that belong on the bottom half / player 2's side of the screen in competition mode
-constant u8 render_flag.STATIC_MAPPIMG	=  0x20		// Implies that the object's sprite consists of only one 8x8 tile
+constant u8 render_flag.STATIC_MAPPING	=  0x20		// Implies that the object's sprite consists of only one 8x8 tile
 constant u8 render_flag.COMPOUND	=  0x40		// Used for multiple child object rendering
 constant u8 render_flag.VISIBLE	=  0x80		// Object visible on screen if set
 
@@ -55,16 +55,17 @@ define char.box_size.x			=  u8[A0 + 0x07]	// Width
 
 define char.sprite_priority		= u16[A0 + 0x08]	// Sprite priority: 0x100 by default, always a multiple of 0x80
 define char.sprite_attributes	= u16[A0 + 0x0a]	// Sprite attributes: start pattern index (lower 11 bits), atex (highest 5 bits)
+	constant u16 sprite_attribute.FLIP_X	= 0x800
+	constant u16 sprite_attribute.FLIP_Y	= 0x1000
+	//constant u16 sprite_attribute.PALETTE.LINE0	= 0x0000	// First palette line
+	constant u16 sprite_attribute.PALETTE.LINE1	= 0x2000	// Second palette line
+	constant u16 sprite_attribute.PALETTE.LINE2	= 0x4000	// Third palette line
+	constant u16 sprite_attribute.PALETTE.LINE3	= 0x6000	// Fourth palette line
+	constant u16 sprite_attribute.PRIORITY	= 0x8000
+
 	constant u16 sprite_attribute.PALETTE	= 0x6000	// Bit mask for palette
 	constant u16 sprite_attribute.VRAM	= 0x7ff		// Bit mask for starting tile RAM location
 
-	constant u16 sprite_attribute.PRIORITY	= 0x8000
-	constant u16 sprite_attribute.PALETTE.LINE3	= 0x6000	// Fourth palette line
-	constant u16 sprite_attribute.PALETTE.LINE2	= 0x4000	// Third palette line
-	constant u16 sprite_attribute.PALETTE.LINE1	= 0x2000	// Second palette line
-	//constant u16 sprite_attribute.PALETTE.LINE0	= 0x0000	// First palette line
-	constant u16 sprite_attribute.FLIP_Y	= 0x1000
-	constant u16 sprite_attribute.FLIP_X	= 0x800
 define char.mapping_offset		= u32[A0 + 0x0c]
 
 // Position and velocity

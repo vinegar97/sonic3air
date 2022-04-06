@@ -572,7 +572,7 @@ function void fn062800()
 	}
 
 	u8[A1 + 0x2e] = 0x81
-	u8[A1 + 0x04] &= ~render_flag.FLIP_X
+	objA1.render_flags &= ~render_flag.FLIP_X
 	u8[A1 + 0x2a] &= ~0x01
 }
 

@@ -181,7 +181,7 @@ function void fn083146()
 	objA0.animation.sprite = u8[(A1+=1)-1]
 	objA0.collision_attributes = u8[(A1+=1)-1]
 	u32[A0 + 0x30] = u32[(A1+=4)-4]
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	D1.u16 = (D1.u16 & 0x0f) * 2
 	objA0.velocity.x = u16[0x08317e + D1.s16]
 }

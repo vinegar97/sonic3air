@@ -86,7 +86,7 @@ function void fn0891f2()
 function void fn089212()
 {
 	objA0.base_state = 0x08
-	objA0.render_flags ^= 0x02
+	objA0.render_flags ^= render_flag.FLIP_Y
 	objA0.position.y.u16 += (objA0.render_flags & render_flag.FLIP_Y) ? -0x68 : 0x68
 
 	objA0.countdown_value = 0x20
@@ -128,7 +128,7 @@ function void fn08926c()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0 = 0x34
-	if ((u8[A1 + 0x04] & 0x02) == 0)
+	if ((objA1.render_flags & render_flag.FLIP_Y) == 0)
 		D0.s16 = -D0.s16
 	objA0.position.y.u16 += D0.u16
 }
@@ -163,7 +163,7 @@ function void fn0892b8()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 
 	D0.u16 = 0x0600
-	if ((u8[A1 + 0x04] & 0x02) == 0)
+	if ((objA1.render_flags & render_flag.FLIP_Y) == 0)
 		D0.s16 = -D0.s16
 	objA0.velocity.y = D0.u16
 

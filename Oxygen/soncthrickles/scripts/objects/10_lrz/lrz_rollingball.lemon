@@ -221,12 +221,12 @@ function void fn0439ec()
 			objA1.update_address = 0x043a6c
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16 + 0x20
-			u32[A1 + 0x0c] = 0x043b12
-			u16[A1 + 0x0a] = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x00d3)
-			u8[A1 + 0x04] |= 0x84
-			u16[A1 + 0x08] = 0
-			u8[A1 + 0x07] = 4
-			u8[A1 + 0x06] = 4
+			objA1.mapping_offset = 0x043b12
+			objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x00d3)
+			objA1.render_flags |= (render_flag.WORLD | render_flag.VISIBLE)
+			objA1.sprite_priority = 0
+			objA1.box_size.x = 4
+			objA1.box_size.y = 4
 
 			GetRandomNumber()
 			D0.u16 = (D0.u16 & 0x01ff) - 0x100

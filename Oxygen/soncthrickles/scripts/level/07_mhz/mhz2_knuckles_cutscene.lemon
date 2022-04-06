@@ -312,7 +312,7 @@ function void fn06338e()
 	objA0.position.y.u16 = objA1.position.y.u16
 	u8[A1 + 0x2e] = 0x81
 	objA1.state = char.state.LIFTED
-	u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+	objA1.render_flags &= ~render_flag.FLIP_Y
 	u8[A1 + 0x0a] |= 0x80
 	u8[0xffffee39] = 0xff
 }
@@ -380,7 +380,7 @@ function void fn065e72()
 	u8[A1 + 0x20] = char.state.STANDING
 	if (objA0.animation.frame >= 0x0c)
 	{
-		u8[A1 + 0x04] |= render_flag.FLIP_Y
+		objA1.render_flags |= render_flag.FLIP_Y
 		u8[A1 + 0x20] = char.state.RUNNING
 		u8[A1 + 0x2e] = 0x83
 

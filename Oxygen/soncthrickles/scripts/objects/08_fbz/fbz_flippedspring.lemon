@@ -13,7 +13,7 @@ function void fn03cb3a()
 {
 	objA0.mapping_offset = 0x03cc5a
 	objA0.sprite_attributes = 0x030f
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x80
@@ -141,7 +141,7 @@ function void fn023ab8()
 	if (u16[A0 + 0x3a] != 0)
 	{
 		--u16[A0 + 0x3a]
-		if (u16[A0 + 0x3a] == 0 && u8[A0 + 0x04] & 0x80)
+		if (u16[A0 + 0x3a] == 0 && objA0.render_flags & render_flag.VISIBLE)
 		{
 			playSound(SFX_SPIKESMOVE)
 		}

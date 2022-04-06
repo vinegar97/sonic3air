@@ -20,7 +20,7 @@ function void fn01f202()
 	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x08
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 
 	#if STANDALONE
 	{

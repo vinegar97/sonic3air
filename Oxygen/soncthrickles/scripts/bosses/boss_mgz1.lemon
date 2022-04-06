@@ -135,7 +135,7 @@ function void fn08867a()
 function void fn08867e()
 {
 	objA0.base_state = 0x0c
-	objA0.render_flags |= 0x02
+	objA0.render_flags |= render_flag.FLIP_Y
 	camera.screenshake.state.hi = 0xff
 	objA0.countdown_value = 0x7f
 	objA0.countdown_callback = 0x088716
@@ -153,7 +153,7 @@ function void fn08867e()
 		spawnChildObjects(0x088b62)
 		if (D3.u16 < 0x08)
 		{
-			u8[A1 + 0x04] |= render_flag.FLIP_X
+			objA1.render_flags |= render_flag.FLIP_X
 		}
 	}
 }
@@ -245,7 +245,7 @@ function void fn088790()
 //# address-hook(0x0887a4) end(0x0887b8)
 function void fn0887a4()
 {
-	objA0.render_flags &= ~0x02
+	objA0.render_flags &= ~render_flag.FLIP_Y
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x0887ba
 }

@@ -194,7 +194,7 @@ function void fn06b064()
 	if (s16[A0 + 0x30] < 0)
 	{
 		objA0.velocity.x = -objA0.velocity.x
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 		u16[A0 + 0x30] = 0x013f
 	}
 }
@@ -245,7 +245,7 @@ function void fn06b0cc()
 function void fn06b0e8()
 {
 	objA0.update_address = 0x06b154
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 	level.wait_for_results = 0xff
 	level.boss_encounter = 0
 	screenmover_target.right = level.bossarea.left + 0x0180 + getScreenExtend() * 2
@@ -831,7 +831,7 @@ function void fn06b6ba()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u8[A1 + 0x38] &= ~0x02
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		objA0.velocity.x = -objA0.velocity.x
 	}
@@ -1394,14 +1394,14 @@ function void fn06bcb2()
 			break
 
 		objA1.update_address = 0x03011a
-		u32[A1 + 0x0c] = 0x22ef0e
-		u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x03c3)
-		u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+		objA1.mapping_offset = 0x22ef0e
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03c3)
+		objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 		objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
 		objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
-		u16[A1 + 0x08] = 0x0280
-		u8[A1 + 0x07] = 0x18
-		u8[A1 + 0x06] = 0x18
+		objA1.sprite_priority = 0x0280
+		objA1.box_size.x = 0x18
+		objA1.box_size.y = 0x18
 		objA1.velocity.x = u16[(A3+=2)-2]
 		objA1.velocity.y = u16[(A3+=2)-2]
 		u8[A1 + 0x22] = D1.u8

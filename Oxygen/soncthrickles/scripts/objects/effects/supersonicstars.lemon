@@ -112,7 +112,7 @@ function void fn019236()
 			return
 
 		objA1.update_address = 0x0192c0
-		objA1.render_flags = (render_flag.VISIBLE | render_flag.WORLD)
+		objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 		objA1.box_size.y = 0x08
 		objA1.box_size.x = 0x08
 		objA1.sprite_priority = 0x0380

@@ -502,7 +502,7 @@ function void fn0188e8()
 	if (objA1.state == char.state.DISAPPEARED)
 		return
 
-	if (u16[A1 + 0x0a] & sprite_attribute.PRIORITY)
+	if (objA1.sprite_attributes & sprite_attribute.PRIORITY)
 		objA0.sprite_attributes |= sprite_attribute.PRIORITY
 	else
 		objA0.sprite_attributes &= ~sprite_attribute.PRIORITY

@@ -173,7 +173,7 @@ function void fn091d6c()
 	objA0.countdown_callback = 0x091e46
 	if (objA0.subtype2c != 0)
 	{
-		objA0.render_flags |= 0x02
+		objA0.render_flags |= render_flag.FLIP_Y
 	}
 }
 
@@ -185,7 +185,7 @@ function void fn091d8c()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x02)
 	{
-		D0.u8 = (u8[A1 + 0x04] & 0x02) ? 0xff : 0x00
+		D0.u8 = (objA1.render_flags & render_flag.FLIP_Y) ? 0xff : 0x00
 		if (objA0.subtype2c != 0)
 			D0.u8 ^= 0xff
 
@@ -194,7 +194,7 @@ function void fn091d8c()
 			objA0.base_state = 0x04
 			objA0.collision_attributes = collision.size.4x4_2
 			u8[A0 + 0x29] = 0xff
-			objA0.velocity.y = (u8[A1 + 0x04] & 0x02) ? -8 : 8
+			objA0.velocity.y = (objA1.render_flags & render_flag.FLIP_Y) ? -8 : 8
 			u16[A0 + 0x3a] = objA0.position.y.u16
 			objA0.countdown_value = 0x17
 		}

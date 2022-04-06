@@ -15,7 +15,7 @@
 //# address-hook(0x044f52) end(0x044fa0)
 function void fn044f52()
 {
-	objA0.render_flags = 0x44
+	objA0.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 	objA0.box_size.y = 0x10
 	objA0.box_size.x = 0x60
 	objA0.sprite_priority = 0x0180

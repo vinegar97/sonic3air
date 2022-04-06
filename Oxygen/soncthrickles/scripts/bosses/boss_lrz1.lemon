@@ -351,7 +351,7 @@ function void fn0787e0()
 //# address-hook(0x0787fe) end(0x078804)
 function void fn0787fe()
 {
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.countdown_value = 0x10
 	fn07880a()
 }
@@ -747,7 +747,7 @@ function void fn078baa()
 {
 	u32[A0 + 0x18] = u32[0x078bc6 + objA0.subtype2c * 4]
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		objA0.velocity.x = -objA0.velocity.x
 	}

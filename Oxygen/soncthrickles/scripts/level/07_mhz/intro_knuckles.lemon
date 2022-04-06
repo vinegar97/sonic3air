@@ -127,7 +127,7 @@ function void fn0634ca()
 	if (allocDynamicObjectStd())
 	{
 		// Spawn check for cutscene skip
-		u32[A1] = 0x063682
+		objA1.update_address = 0x063682
 	}
 
 	// "spawnSimpleChildObjects(0x066656)" replaced by:
@@ -151,7 +151,7 @@ function void fn063526()
 			if (allocDynamicObjectStd())
 			{
 				// Spawn bomb
-				u32[A1] = 0x063790
+				objA1.update_address = 0x063790
 			}
 		}
 
@@ -408,7 +408,7 @@ function void fn063694()
 	objA0.update_address = u32[(A1+=4)-4]
 	objA0.mapping_offset = u32[(A1+=4)-4]
 	objA0.sprite_attributes = u16[(A1+=2)-2]
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
@@ -538,7 +538,7 @@ function void fn063846()
 		if (allocDynamicObjectStd())
 		{
 			u16[A0 + 0x44] = A1.u16
-			u32[A1] = 0x085e64
+			objA1.update_address = 0x085e64
 			u16[A1 + 0x3a] = 0x07
 			u8[A1 + 0x2c] = 0xff
 
@@ -561,7 +561,7 @@ function void fn0638a2()
 	u8[0xfffffab8] |= 0x04
 	if (allocDynamicObjectStd())
 	{
-		u32[A1] = 0x0639c8
+		objA1.update_address = 0x0639c8
 	}
 	copyMemory(0xfffffca0, 0x0a973c, 0x20)
 
@@ -726,7 +726,7 @@ function void fn065e02()
 	bool skip = false
 	if ((u8[0xfffffab8] & 0x04) == 0)
 	{
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 		D2.u16 = objA0.position.x.u16
 		if (D2.u16 < u16[A0 + 0x3a])
 		{
@@ -741,7 +741,7 @@ function void fn065e02()
 	if (!skip)
 	{
 		D1.s16 = -D1.s16
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	objA0.velocity.x = D1.u16
 }

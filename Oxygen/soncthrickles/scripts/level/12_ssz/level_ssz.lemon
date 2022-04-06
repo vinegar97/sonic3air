@@ -555,8 +555,8 @@ function void InitLevelScrolling.SSZ()
 
 			objA1.update_address = 0x057b8e
 			D2.u16 = u16[(A5+=2)-2]
-			u8[A1 + 0x04] = D2.u8
-			u8[A1 + 0x06] = 0x80
+			objA1.render_flags = D2.u8
+			objA1.box_size.y = 0x80
 			objA1.position.x.u16 = u16[(A5+=2)-2]
 			objA1.velocity.y = u16[(A5+=2)-2]
 			u16[A1 + 0x2e] = u16[(A5+=2)-2]

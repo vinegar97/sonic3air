@@ -232,7 +232,7 @@ function void fn06c962()
 	setupObjectAttributesBasic(0x06d782)
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u32[A1] == 0x06c31a)
+	if (objA1.update_address == 0x06c31a)
 	{
 		u8[A0 + 0x0a] &= ~0x80
 	}
@@ -588,8 +588,8 @@ function void fn06cce6()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u16[A0 + 0x26] = u16[A1 + 0x26]
-	objA0.render_flags = u8[A1 + 0x04]
-	objA0.render_flags &= ~0x80
+	objA0.render_flags = objA1.render_flags
+	objA0.render_flags &= ~render_flag.VISIBLE
 	objA0.countdown_value = 0x04
 }
 
@@ -705,7 +705,7 @@ function void fn06ceb0()
 	{
 		objA0.sprite_priority = 0x0380
 		A1 = 0xffff0000 + u16[A0 + 0x46]
-		if (u32[A1] == 0x06c31a)
+		if (objA1.update_address == 0x06c31a)
 		{
 			u8[A0 + 0x0a] &= ~0x80
 		}
@@ -871,7 +871,7 @@ function void fn06d334()
 {
 	D0.u16 = u16[A0 + 0x26] * 2
 	u32[A0 + 0x18] = u32[0x06d34e + D0.s16]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		objA0.velocity.x = -objA0.velocity.x
 	}

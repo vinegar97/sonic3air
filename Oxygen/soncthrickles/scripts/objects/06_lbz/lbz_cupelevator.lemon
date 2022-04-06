@@ -34,12 +34,12 @@ function void CupElevator.Init()
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x02703e
-		u8[A1 + 0x04] = render_flag.WORLD
-		u8[A1 + 0x07] = 0x20
-		u8[A1 + 0x06] = 0x10
-		u16[A1 + 0x08] = 0x80
-		u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x040d)
-		u32[A1 + 0x0c] = 0x22619a
+		objA1.render_flags = render_flag.WORLD
+		objA1.box_size.x = 0x20
+		objA1.box_size.y = 0x10
+		objA1.sprite_priority = 0x80
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x040d)
+		objA1.mapping_offset = 0x22619a
 		objA1.position.x.u16 = objA0.position.x.u16
 		u16[A1 + 0x30] = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
@@ -54,12 +54,12 @@ function void CupElevator.Init()
 		if (allocDynamicObjectAfterA0())
 		{
 			objA1.update_address = 0x02702e
-			u8[A1 + 0x04] = render_flag.WORLD
-			u8[A1 + 0x07] = 0x20
-			u8[A1 + 0x06] = 0x10
-			u16[A1 + 0x08] = 0x0100
-			u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE2 | 0x040d)
-			u32[A1 + 0x0c] = 0x22619a
+			objA1.render_flags = render_flag.WORLD
+			objA1.box_size.x = 0x20
+			objA1.box_size.y = 0x10
+			objA1.sprite_priority = 0x0100
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x040d)
+			objA1.mapping_offset = 0x22619a
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 			u8[A1 + 0x22] = 0x02
@@ -534,7 +534,7 @@ function void fn026eb4()
 	if (objA0.flags2a & bit)
 	{
 		objA0.flags2a &= ~bit
-		u16[A1 + 0x08] = 0x0100
+		objA1.sprite_priority = 0x0100
 		u8[A1 + 0x2e] = 0
 		u8[A1 + 0x2a] &= ~0x08
 		u8[A1 + 0x2a] &= ~0x20
@@ -594,7 +594,7 @@ function void fn026eda()
 		{
 			objA0.flags2a &= ~bit
 			u8[A1 + 0x2a] &= ~0x08
-			u16[A1 + 0x08] = 0x0100
+			objA1.sprite_priority = 0x0100
 			u8[A1 + 0x2e] = 0
 			u8[A2] = 0
 			u8[A2 + 0x02] = 0x3c
@@ -605,7 +605,7 @@ function void fn026eda()
 		if (D0.u8 != 0 && u8[0xfffffaa9] == 0)
 		{
 			// Jumping out of the cup
-			u16[A1 + 0x08] = 0x0100
+			objA1.sprite_priority = 0x0100
 			u8[A1 + 0x2e] = 0
 			objA0.flags2a &= ~bit
 			u8[A1 + 0x2a] &= ~0x08
@@ -640,7 +640,7 @@ function void fn026eda()
 	objA1.position.x.u16 = objA0.position.x.u16
 	objA1.position.y.u16 = objA0.position.y.u16 - 0x10
 	D0.u8 = objA0.value26 + 0x20
-	u16[A1 + 0x08] = (D0.u8 >= 0xc0) ? 0x0100 : 0x0280
+	objA1.sprite_priority = (D0.u8 >= 0xc0) ? 0x0100 : 0x0280
 
 	D0 = objA0.value26
 	fn032610()

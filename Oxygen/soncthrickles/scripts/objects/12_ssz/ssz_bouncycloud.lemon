@@ -12,7 +12,7 @@
 function void fn0450a4()
 {
 	objA0.update_address = 0x0450ec
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.y = 0x10
 	objA0.box_size.x = 0x20
 	objA0.sprite_priority = 0x80
@@ -265,7 +265,7 @@ function void fn0452da()
 	}
 
 	objA0.update_address = 0x045336
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.y = 0x04
 	objA0.box_size.x = 0x04
 	objA0.sprite_priority = 0x80

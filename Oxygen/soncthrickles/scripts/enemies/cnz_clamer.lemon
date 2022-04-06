@@ -103,7 +103,7 @@ function void fn089064()
 	A1 = 0x089185
 	fn0845a0()
 
-	if (D2.u16 != 0 && objA0.animation.sprite == 8 && u8[A0 + 0x04] & 0x80)
+	if (D2.u16 != 0 && objA0.animation.sprite == 8 && objA0.render_flags & render_flag.VISIBLE)
 	{
 		spawnProjectileChildObjectsInDir(0x089150)
 	}
@@ -115,7 +115,7 @@ function void fn08908c()
 {
 	setupObjectAttributesBasic(0x089136)
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	objA0.render_flags = u8[A1 + 0x04]
+	objA0.render_flags = objA1.render_flags
 	objA0.sprite_attributes = 0
 	objA0.update_address = 0x0890aa
 }

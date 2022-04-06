@@ -236,7 +236,7 @@ function bool fn08e2ea()
 	{
 		D0.u16 = u16[0x08e364 + (D0.s16 & 0x06)]
 		D4.u16 = -0x20
-		if ((u8[A1 + 0x04] & 0x01) == 0)
+		if ((objA1.render_flags & render_flag.FLIP_X) == 0)
 		{
 			objA0.render_flags |= render_flag.FLIP_X
 			D0.s16 = -D0.s16

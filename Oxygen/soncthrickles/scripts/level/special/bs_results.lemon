@@ -463,10 +463,10 @@ function void fn02e802()
 	// Create objects for the result screen
 	while (D1.s16 >= 0)
 	{
-		u32[A1] = u32[A2]
-		u8[A1 + 0x04] = render_flag.COMPOUND
-		u8[A1 + 0x07] = u8[A2+11]
-		u32[A1 + 0x0c] = 0x02f26a
+		objA1.update_address = u32[A2]
+		objA1.render_flags = render_flag.COMPOUND
+		objA1.box_size.x = u8[A2+11]
+		objA1.mapping_offset = 0x02f26a
 		objA1.position.x.u16 = u16[A2+6] + getScreenExtend()
 		objA1.position.y.u16 = u16[A2+8]
 		u8[A1 + 0x22] = u8[A2+10]
@@ -977,7 +977,7 @@ function void fn02ecbc()
 function void fn02ecd0()
 {
 	objA0.update_address = 0x02ed2a
-	objA0.render_flags = render_flag.WORLD | render_flag.COMPOUND
+	objA0.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x079c)
 	objA0.mapping_offset = 0x018aea
 

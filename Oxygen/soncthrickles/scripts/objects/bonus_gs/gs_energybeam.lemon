@@ -27,12 +27,12 @@ function void fn049f20()
 {
 	while (true)
 	{
-		u32[A1 + 0x0c] = 0x04a08a
-		u16[A1 + 0x0a] = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0352)
-		u8[A1 + 0x04] |= 0x04
-		u8[A1 + 0x07] = 0x08
-		u8[A1 + 0x06] = 0x18
-		u16[A1 + 0x08] = 0
+		objA1.mapping_offset = 0x04a08a
+		objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0352)
+		objA1.render_flags |= render_flag.WORLD
+		objA1.box_size.x = 0x08
+		objA1.box_size.y = 0x18
+		objA1.sprite_priority = 0
 
 		--D1.s16
 		if (D1.s16 < 0)

@@ -385,7 +385,7 @@ function void fn01f188()
 	{
 		// Spawn broken pole pieces
 		objA1.update_address = objA0.update_address
-		u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+		objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.position.x.u16 = objA0.position.x.u16

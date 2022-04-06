@@ -689,9 +689,9 @@ function void fn084258()
 			return
 
 		u16[A1 + 0x46] = A0.u16
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u32[A1] = u32[(A2+=4)-4]
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.update_address = u32[(A2+=4)-4]
 		u8[A1 + 0x2c] = D2.u8
 		D1.s8 = s8[(A2+=1)-1]
 		u8[A1 + 0x42] = D1.s8
@@ -1496,7 +1496,7 @@ function void fn084b82()
 {
 	objA0.render_flags &= ~render_flag.FLIP_X
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		objA0.render_flags |= render_flag.FLIP_X
 	}
@@ -1593,7 +1593,7 @@ function void fn084c72()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D2 = u32[A1 + 0x10]
 	D3 = u32[A1 + 0x14]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		D0.s32 = -D0.s32
 	}
@@ -1864,7 +1864,7 @@ function void fn084e8c()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D2.u16 = objA1.position.x.u16 + s8[A0 + 0x42]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 		D1.s16 = -D1.s16
 	objA0.position.x.u16 = D2.u16 + D1.s16
 	objA0.position.y.u16 = objA1.position.y.u16 + s8[A0 + 0x43]

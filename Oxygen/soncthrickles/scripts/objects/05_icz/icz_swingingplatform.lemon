@@ -385,10 +385,10 @@ function void fn08aeea()
 	objA0.position.y.u16 -= 0x80
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 		objA0.render_flags |= render_flag.FLIP_X
 
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 0x07
 	A1 = A0 + 0x1c
 	D6 = 6
@@ -569,7 +569,7 @@ function void fn08af3e()
 	D1.s16 = -D1.s16
 	objA0.velocity.y = D1.u16
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if ((u8[A1 + 0x04] & 0x01) == 0)
+	if ((objA1.render_flags & render_flag.FLIP_X) == 0)
 		D1.s16 = -D1.s16
 
 	objA0.velocity.x = D1.u16

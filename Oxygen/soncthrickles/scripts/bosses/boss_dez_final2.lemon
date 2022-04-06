@@ -169,7 +169,7 @@ function void fn08060c()
 	setupObjectAttributesFull(0x0812aa)
 
 	objA0.update_address = 0x080634
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.value42 = 0x7c
 	u16[A0 + 0x44] = 0x28
 	u8[0xfffffaa9] = 0x01
@@ -304,7 +304,7 @@ function void fn080810()
 	fn084580()
 
 	objA0.countdown_callback = 0x080888
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 
 	playSound(0x4e)
 	fn08086c()
@@ -423,7 +423,7 @@ function void fn080940()
 function void fn080956()
 {
 	objA0.base_state = 0x02
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.value39 = 0
 	objA0.animation.frame = 0
 	objA0.value42 = 0xb0
@@ -505,7 +505,7 @@ function void fn080a60()
 	D0 = objA0.subtype2c
 	if (D0.u8 == 2)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	D0.u16 <<= 2
 	u32[A0 + 0x30] = u32[0x080a8c + D0.s16]

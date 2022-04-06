@@ -716,7 +716,7 @@ function void fn0515a4()
 		{
 			// Mid-level Robotnik encounter
 			objA1.update_address = 0x06bf2a
-			u8[A1 + 0x04] |= render_flag.FLIP_X
+			objA1.render_flags |= render_flag.FLIP_X
 			objA1.position.x.u16 = 0x2fa0
 			objA1.position.y.u16 = 0x02d0
 			camera.screenshake.state.hi = 0xff
@@ -742,7 +742,7 @@ function void fn05160e()
 			{
 				// Mid-level Robotnik encounter
 				objA1.update_address = 0x06bf2a
-				u8[A1 + 0x04] |= render_flag.FLIP_X
+				objA1.render_flags |= render_flag.FLIP_X
 				objA1.position.x.u16 = 0x3300
 				objA1.position.y.u16 = 0x0790
 				camera.screenshake.state.hi = 0xff
@@ -1040,7 +1040,7 @@ function void InitLevelScrolling.MGZ2()
 			{
 				if (allocDynamicObjectStd())
 				{
-					u32[A1] = D1
+					objA1.update_address = D1
 				}
 			}
 			else
@@ -1059,7 +1059,7 @@ function void InitLevelScrolling.MGZ2()
 			{
 				if (allocDynamicObjectStd())
 				{
-					u32[A1] = D1
+					objA1.update_address = D1
 				}
 			}
 			else
@@ -1391,7 +1391,7 @@ function void fn051a6a()
 
 		if (allocDynamicObjectStd())
 		{
-			u32[A1] = D1
+			objA1.update_address = D1
 		}
 	}
 	_setZeroFlagByValue(newLevelDisplayRoutine)

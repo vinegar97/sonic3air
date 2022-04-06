@@ -41,12 +41,12 @@ function void fn029c9e()
 			objA1.update_address = 0x029dec
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
-			u8[A1 + 0x04] |= 0x04
-			u8[A1 + 0x06] = 0x18
-			u8[A1 + 0x07] = 0x18
-			u16[A1 + 0x0a] = (sprite_attribute.PALETTE.LINE1 | 0x0455)
-			u32[A1 + 0x0c] = 0x2291a4
-			u16[A1 + 0x08] = 0x0280
+			objA1.render_flags |= render_flag.WORLD
+			objA1.box_size.y = 0x18
+			objA1.box_size.x = 0x18
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0455)
+			objA1.mapping_offset = 0x2291a4
+			objA1.sprite_priority = 0x0280
 			u8[A1 + 0x22] = 0x06
 			u16[A1 + 0x42] = A0.u16
 		}
@@ -490,9 +490,9 @@ function void fn02a106()
 		{
 			D0 = objA0.value26
 			u8[A1 + 0x22] = u8[0x02a218 + D0.s16]
-			u8[A1 + 0x04] &= 0xfc
+			objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 			D0.u8 = u8[0x02a224 + D0.s16]
-			u8[A1 + 0x04] |= D0.u8
+			objA1.render_flags |= D0.u8
 			D0 = u8[A1 + 0x22]
 
 			u32 backupA2 = A2

@@ -15,7 +15,7 @@ function void fn036364()
 {
 	objA0.mapping_offset = 0x036aa6
 	objA0.sprite_attributes = 0x03c6
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x08
@@ -30,7 +30,7 @@ function void fn036364()
 	objA0.state = 0x07
 	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.6x6)
 
-	u32[A0] = 0x0363d0
+	objA0.update_address = 0x0363d0
 	fn0363d0()
 }
 
@@ -242,12 +242,12 @@ function void fn036612()
 
 	copyMemory(0xffffcb2c, A0, 0x2e)
 
-	u32[A1] = 0x03669c
+	objA1.update_address = 0x03669c
 	u8[A1 + 0x20] = 0x04
 	u16[A1 + 0x46] = u16[A2 + 0x46]
 	if (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 	{
-		u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
+		objA1.sprite_attributes |= sprite_attribute.PRIORITY
 	}
 }
 

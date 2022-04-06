@@ -138,7 +138,7 @@ function void fn06ef88()
 		return
 	}
 
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 	objA0.countdown_value = 119
 
 	if (allocDynamicObjectStd())
@@ -407,7 +407,7 @@ function void fn06f1a6()
 	if (objA0.subtype2c != 0)
 	{
 		D0.s16 = -D0.s16
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		objA0.countdown_value = 0x3f
 	}
 	objA0.velocity.x = D0.s16
@@ -682,9 +682,9 @@ function void fn06f46a()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u16[A0 + 0x30] = u16[A1 + 0x30]
 	objA0.value32 = u16[A1 + 0x32]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		objA0.velocity.x = -objA0.velocity.x
 	}
 }

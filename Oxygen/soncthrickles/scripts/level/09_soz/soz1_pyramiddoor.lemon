@@ -135,7 +135,7 @@ function void fn055fda()
 //# address-hook(0x056012) end(0x05602e)
 function void fn056012()
 {
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 	if (u16[0xffffeed4] == 0)
 		return
 
@@ -171,7 +171,7 @@ function void fn056056()
 		return
 	}
 
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 	if (u16[0xffffeed4] == 0)
 		return
 

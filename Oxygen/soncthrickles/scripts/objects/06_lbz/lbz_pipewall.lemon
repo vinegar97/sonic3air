@@ -209,12 +209,12 @@ function void fn0275f2()
 			return
 		}
 
-		u32[A1] = D4
-		u32[A1 + 0x0c] = A3
-		u8[A1 + 0x04] = D5.u8
-		u16[A1 + 0x0a] = objA0.sprite_attributes
+		objA1.update_address = D4
+		objA1.mapping_offset = A3
+		objA1.render_flags = D5.u8
+		objA1.sprite_attributes = objA0.sprite_attributes
 		u8[A1 + 0x08] = u8[A0 + 0x08]
-		u8[A1 + 0x07] = objA0.box_size.x
+		objA1.box_size.x = objA0.box_size.x
 		objA1.velocity.x = u16[(A4+=2)-2]
 		objA1.velocity.y = u16[(A4+=2)-2]
 		u8[A1 + 0x22] = u8[(A5+=1)-1]
@@ -232,21 +232,21 @@ function void fn0275f2()
 	A3 = objA0.mapping_offset + u16[A3 + D0.s16]
 	D1.u16 = u16[(A3+=2)-2] - 1		// Only "A3 += 2" seems relevant here
 	D1 = 3
-	objA0.render_flags |= render_flag.STATIC_MAPPIMG
+	objA0.render_flags |= render_flag.STATIC_MAPPING
 	D4 = objA0.update_address
 	D5.u8 = objA0.render_flags
 	A1 = A0
 
 	while (true)
 	{
-		u32[A1] = D4
-		u32[A1 + 0x0c] = A3
-		u8[A1 + 0x04] = D5.u8
+		objA1.update_address = D4
+		objA1.mapping_offset = A3
+		objA1.render_flags = D5.u8
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u16[A1 + 0x0a] = objA0.sprite_attributes
+		objA1.sprite_attributes = objA0.sprite_attributes
 		u8[A1 + 0x08] = u8[A0 + 0x08]
-		u8[A1 + 0x07] = objA0.box_size.x
+		objA1.box_size.x = objA0.box_size.x
 		objA1.velocity.x = u16[(A4+=2)-2]
 		objA1.velocity.y = u16[(A4+=2)-2]
 
@@ -272,7 +272,7 @@ function void fn0299f4()
 {
 	if ((level.framecounter.low & 1) == 0)
 	{
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 	}
 
 	UpdateMovementSimple()
@@ -297,7 +297,7 @@ function void fn029abe()
 
 	if ((level.framecounter.low & 1) == 0)
 	{
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 	}
 
 	UpdateMovementSimple()

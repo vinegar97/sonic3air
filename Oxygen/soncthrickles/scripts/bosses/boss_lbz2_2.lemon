@@ -672,8 +672,8 @@ function void fn0733e2()
 {
 	D0.u8 = objA0.value39 + 1
 	objA0.value39 = D0.u8
-	objA0.render_flags &= 0xfc
-	objA0.render_flags |= (D0.u8 & 0x03)
+	objA0.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+	objA0.render_flags |= (D0.u8 & (render_flag.FLIP_X | render_flag.FLIP_Y))
 }
 
 
@@ -685,7 +685,7 @@ function void fn0733fc()
 	if (objA0.countdown_value < 0)
 	{
 		A1 = 0xffff0000 + u16[A0 + 0x44]
-		if (u8[A1 + 0x04] & 0x01)
+		if (objA1.render_flags & render_flag.FLIP_X)
 		{
 			D2.u8 = 0xff
 			--D0.u8
@@ -965,10 +965,10 @@ function void fn0844ce()
 		}
 
 		u8[A1 + 0x22] = D1.u8
-		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		objA1.render_flags &= ~render_flag.FLIP_X
 		if (u8[A2 + D0.s16 + 0x02] != 0)
 		{
-			u8[A1 + 0x04] |= render_flag.FLIP_X
+			objA1.render_flags |= render_flag.FLIP_X
 		}
 	}
 	fn085fc4()

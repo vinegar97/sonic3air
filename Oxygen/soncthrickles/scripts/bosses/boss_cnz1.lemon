@@ -436,7 +436,7 @@ function void fn06dc50()
 		{
 			if (objA0.velocity.x >= 0)
 			{
-				u8[A1 + 0x04] |= render_flag.FLIP_X
+				objA1.render_flags |= render_flag.FLIP_X
 			}
 		}
 

@@ -148,7 +148,7 @@ function void fn088c9a()
 
 	if (objA0.subtype2c == 0)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 }
 

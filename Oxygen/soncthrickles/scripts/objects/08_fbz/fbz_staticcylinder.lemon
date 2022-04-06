@@ -134,7 +134,7 @@ function void fn03a314()
 					{
 						u16[A2] = D0.u16 - 0xc0
 						u16[A2 + 0x02] = 0
-						u8[A1 + 0x04] |= (render_flag.FLIP_X | render_flag.FLIP_Y)
+						objA1.render_flags |= (render_flag.FLIP_X | render_flag.FLIP_Y)
 
 						fn03a480()
 						return
@@ -147,7 +147,7 @@ function void fn03a314()
 						u16[A2] = D0.u16 + objA0.value42 - 0xc0
 						u16[A2 + 0x02] = 0
 						u16[A2 + 0x06] = -s16[A0 + 0x40]
-						u8[A1 + 0x04] &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+						objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 
 						fn03a480()
 						return
@@ -212,8 +212,8 @@ function void fn03a480()
 		u8[A2 + 0x04] = 0
 		u16[A2 + 0x06] = -s16[A0 + 0x40]
 
-		u8[A1 + 0x04] |= render_flag.FLIP_X
-		u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+		objA1.render_flags |= render_flag.FLIP_X
+		objA1.render_flags &= ~render_flag.FLIP_Y
 
 		fn03a314()
 		return
@@ -226,8 +226,8 @@ function void fn03a480()
 		u8[A2 + 0x04] = render_flag.FLIP_X
 		u16[A2 + 0x06] = u16[A0 + 0x40]
 
-		u8[A1 + 0x04] &= ~render_flag.FLIP_X
-		u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+		objA1.render_flags &= ~render_flag.FLIP_X
+		objA1.render_flags &= ~render_flag.FLIP_Y
 
 		fn03a314()
 		return

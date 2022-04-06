@@ -158,7 +158,7 @@ function void fn04a4f6()
 	u8[A2] = 0
 	u8[A2 + 0x02] = 0x1e
 
-	u16[A1 + 0x08] = 0x0100
+	objA1.sprite_priority = 0x0100
 	u8[A1 + 0x1e] = 0x0e
 	u8[A1 + 0x1f] = 0x07
 	u8[A1 + 0x20] = 0x02
@@ -178,7 +178,7 @@ function void fn04a53a()
 		--u8[A2 + 0x02]
 		if (u8[A2 + 0x02] == 0)
 		{
-			u16[A1 + 0x08] = 0x0100
+			objA1.sprite_priority = 0x0100
 		}
 		return
 	}
@@ -203,7 +203,7 @@ function void fn04a53a()
 			u8[A2 + 0x04] = D1.u8
 			u8[A2 + 0x06] = D0.u8 - 0x40
 
-			u8[A1 + 0x04] &= 0xfd
+			objA1.render_flags &= ~render_flag.FLIP_Y
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
 			u16[A1 + 0x1c] = 0x0800
@@ -240,13 +240,13 @@ function void fn04a5e0()
 	D0.u8 = u8[A2 + 0x04]
 	if (D0.s8 < 0)
 	{
-		u16[A1 + 0x08] = 0x0280
-		u16[A1 + 0x0a] &= ~sprite_attribute.PRIORITY
+		objA1.sprite_priority = 0x0280
+		objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	}
 	else
 	{
-		u16[A1 + 0x08] = 0x0100
-		u16[A1 + 0x0a] |= sprite_attribute.PRIORITY
+		objA1.sprite_priority = 0x0100
+		objA1.sprite_attributes |= sprite_attribute.PRIORITY
 	}
 	D0.u8 += 4
 	u8[A2 + 0x04] = D0.u8

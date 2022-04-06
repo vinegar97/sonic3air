@@ -342,7 +342,7 @@ function void fn0713e8()
 	fn085ba8()
 
 	A1 = 0xffff0000 + u16[0xfffffaae]
-	if (u32[A1] == 0x08b660)
+	if (objA1.update_address == 0x08b660)
 	{
 		u8[A1 + 0x38] |= 0x20
 	}

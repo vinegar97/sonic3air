@@ -12,7 +12,7 @@
 function void fn044a68()
 {
 	objA0.update_address = 0x044aa0
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.y = 0x11
 	objA0.box_size.x = 0x20
 	objA0.sprite_priority = 0x0180

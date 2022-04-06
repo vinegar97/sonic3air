@@ -77,7 +77,7 @@ function void fn07a72c()
 {
 	objA0.mapping_offset = 0x06820c
 	objA0.sprite_attributes = 0x052e
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0180
 	objA0.position.x.u16 = 0x1700
 	objA0.position.y.u16 = 0x0300
@@ -153,13 +153,13 @@ function void fn07a800()
 		{
 			s16[0xfffffaf8] = SSZ_MidBoss2.getHorizontalMovementSpeed()
 			objA0.flags2e |= 0x80
-			objA0.render_flags |= 0x01
+			objA0.render_flags |= render_flag.FLIP_X
 		}
 		else
 		{
 			s16[0xfffffaf8] = -SSZ_MidBoss2.getHorizontalMovementSpeed()
 			objA0.flags2e &= ~0x80
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 		}
 	}
 
@@ -190,7 +190,7 @@ function void fn07a874()
 		{
 			objA0.flags2e ^= 0x80
 			s16[0xfffffaf8] = SSZ_MidBoss2.getHorizontalMovementSpeed()
-			objA0.render_flags |= 0x01
+			objA0.render_flags |= render_flag.FLIP_X
 			if (objA0.flags2e & 0x40)
 			{
 				objA0.value26 += 2
@@ -205,7 +205,7 @@ function void fn07a874()
 		{
 			objA0.flags2e ^= 0x80
 			s16[0xfffffaf8] = -SSZ_MidBoss2.getHorizontalMovementSpeed()
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 			if (objA0.flags2e & 0x40)
 			{
 				objA0.value26 += 2
@@ -378,12 +378,12 @@ function void fn07a9d4()
 		if (objA0.flags2e & 0x80)
 		{
 			s16[0xfffffaf8] = SSZ_MidBoss2.getHorizontalMovementSpeed()
-			objA0.render_flags |= 0x01
+			objA0.render_flags |= render_flag.FLIP_X
 		}
 		else
 		{
 			s16[0xfffffaf8] = -SSZ_MidBoss2.getHorizontalMovementSpeed()
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 		}
 
 		objA0.value26 = 0x0e
@@ -433,7 +433,7 @@ function void fn07aa66()
 			u16[0xfffffafa] = 0x180
 			u8[A0 + 0x31] = 0x03
 			u16[0xfffffafc] = 0x1e
-			objA0.render_flags |= 0x01
+			objA0.render_flags |= render_flag.FLIP_X
 		}
 	}
 	else
@@ -444,7 +444,7 @@ function void fn07aa66()
 			u16[0xfffffafa] = 0x180
 			u8[A0 + 0x31] = 0x03
 			u16[0xfffffafc] = 0x1e
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 		}
 	}
 
@@ -612,7 +612,7 @@ function void fn07ac06()
 function void fn07ac7a()
 {
 	objA0.update_address = 0x07ac92
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.velocity.x = 0x400
 	objA0.velocity.y = 0
 }
@@ -713,13 +713,13 @@ function void fn07ada2()
 	D2 = 0
 	while (D3.s16 >= 0)
 	{
-		u8[A1 + 0x07] = 0x20
+		objA1.box_size.x = 0x20
 		u32[A1 + 0x34] = objA0.countdown_callback
 		objA1.update_address = 0x07ad8a
-		u32[A1 + 0x0c] = 0x186dac
-		u16[A1 + 0x0a] = 0x041f
-		u8[A1 + 0x04] |= 0x04
-		u16[A1 + 0x08] = 0x0180
+		objA1.mapping_offset = 0x186dac
+		objA1.sprite_attributes = 0x041f
+		objA1.render_flags |= render_flag.WORLD
+		objA1.sprite_priority = 0x0180
 		u8[A1 + 0x05] += 0x02
 		u8[A1 + 0x22] = 0
 		u8[A1 + 0x2e] = u8[0x07ae14 + D2.s16]
@@ -772,9 +772,9 @@ function void fn07ae22()
 		objA0.velocity.x = D1.u16
 
 		if (D1.s16 >= 0)
-			objA0.render_flags |= 0x01
+			objA0.render_flags |= render_flag.FLIP_X
 		else
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 	}
 
 	fn07aeb0()
@@ -982,9 +982,9 @@ function void fn07b0a8()
 {
 	D0.u16 = u16[0xffffb000 + 0x10] - objA0.position.x.u16
 	if (D0.s16 < 0)
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 	else
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 }
 
 

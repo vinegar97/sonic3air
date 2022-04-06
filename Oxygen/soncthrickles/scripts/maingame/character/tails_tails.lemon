@@ -91,7 +91,7 @@ function void CompetitionMode.TailsTails.Init()
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 
 	objA0.update_address = 0x016232
 	CompetitionMode.TailsTails.Update()

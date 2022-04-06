@@ -837,7 +837,7 @@ function void fn075a48()
 function void fn075a6c()
 {
 	UpdateMovementStraightSimple()
-	if (u8[A0 + 0x04] & 0x80)
+	if (objA0.render_flags & render_flag.VISIBLE)
 	{
 		DrawObject()
 	}
@@ -865,7 +865,7 @@ function void fn075a94()
 	if (u16[0xfffffaa4] != 0)
 	{
 		A1 = 0xffff0000 + u16[0xfffffaa4]
-		if (u32[A1] == 0x0751ca)
+		if (objA1.update_address == 0x0751ca)
 		{
 			if (!(objA0.render_flags & render_flag.VISIBLE))
 			{

@@ -82,7 +82,7 @@ function void fn0883e6()
 	if (D3.u16 != 0)
 	{
 		objA0.velocity.x = -objA0.velocity.x
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 	}
 	UpdateMovementStraightSimple()
 }

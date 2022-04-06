@@ -12,7 +12,7 @@
 function void fn03d448()
 {
 	objA0.update_address = 0x03d4c2
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.y = 0x10
 	objA0.box_size.x = 0x10
 	objA0.sprite_priority = 0x0180
@@ -290,7 +290,7 @@ function void fn03d4c2()
 function void fn03d736()
 {
 	objA0.update_address = 0x03d78c
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.y = 0x10
 	objA0.box_size.x = 0x10
 	objA0.sprite_priority = 0x0180
@@ -477,7 +477,7 @@ function void fn03d78c()
 function void fn03d908()
 {
 	objA0.update_address = 0x03d93a
-	objA0.render_flags = 0x44
+	objA0.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 	objA0.box_size.y = 0x70
 	objA0.box_size.x = 0x70
 	objA0.sprite_priority = 0x0180

@@ -278,12 +278,12 @@ function void fn090b84()
 {
 	if (u8[A2] != 0)
 	{
-		u8[A1 + 0x04] |= render_flag.FLIP_X
+		objA1.render_flags |= render_flag.FLIP_X
 		u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 	}
 	else
 	{
-		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		objA1.render_flags &= ~render_flag.FLIP_X
 		u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 	}
 
@@ -472,7 +472,7 @@ function void fn090d5e()
 function void fn090d78()
 {
 	objA0.update_address = 0x090da2
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.velocity.y = -0x80
 	objA0.countdown_value = 0x7f
 
@@ -539,7 +539,7 @@ function void fn090dfc()
 	setupObjectAttributesFull(0x090fd8)
 
 	objA0.update_address = 0x090e1c
-	objA0.render_flags |= 0x80
+	objA0.render_flags |= render_flag.VISIBLE
 	objA0.countdown_value = 0x7f
 
 	if (fn090f0a())

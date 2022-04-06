@@ -61,7 +61,7 @@ function void fn08bc6c()
 	{
 		objA0.velocity.x = -objA0.velocity.x
     	s16[A0 + 0x40] = -s16[A0 + 0x40]
-    	objA0.render_flags ^= 0x01
+    	objA0.render_flags ^= render_flag.FLIP_X
 	}
 	else if (D1.s16 >= 12)
 	{
@@ -127,7 +127,7 @@ function void fn08bcba()
 	{
 		objA0.velocity.x = -objA0.velocity.x
     	s16[A0 + 0x40] = -s16[A0 + 0x40]
-    	objA0.render_flags ^= 0x01
+    	objA0.render_flags ^= render_flag.FLIP_X
 	}
 	else if (D1.s16 >= 12)
 	{
@@ -163,7 +163,7 @@ function void fn08bcf4()
 	D0 = objA0.subtype2c
 	objA0.countdown_value = D0.u16
 	objA0.countdown_callback = 0x08bb24
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 }
 
 
@@ -262,7 +262,7 @@ function void fn08bbf4()
 {
 	objA0.velocity.x = -objA0.velocity.x
 	s16[A0 + 0x40] = -s16[A0 + 0x40]
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 }
 
 
@@ -311,7 +311,7 @@ function void fn08bc26()
 		{
 			objA0.velocity.x = -objA0.velocity.x
 			s16[A0 + 0x40] = -s16[A0 + 0x40]
-			objA0.render_flags ^= 0x01
+			objA0.render_flags ^= render_flag.FLIP_X
 		}
 	}
 

@@ -1468,7 +1468,7 @@ function void fn04da7e()
 
 	A1 = 0x04de88	// "CONGRATULATIONS!"
 	D2.u16 = 0x030a
-	D6.u16 = 0x85bf
+	D6.u16 = (sprite_attribute.PRIORITY | 0x05bf)
 	fn05b318()
 
 	Enigma.decompress(0x189c4e, 0xffff8000, 0x6197)
@@ -1650,7 +1650,7 @@ function void fn04df04()
 		#endif
 			A1 = 0x04de9a	// "PERFECT"
 			D2.u16 = 0x049a
-			D6.u16 = 0x85bf
+			D6.u16 = (sprite_attribute.PRIORITY | 0x05bf)
 			fn05b318()
 		#if !STANDALONE
 			set_status_register(0x2300)
@@ -1958,7 +1958,7 @@ function void fn04e1c4()
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0680)
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0120
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
@@ -2029,7 +2029,7 @@ function void fn04e264()
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x07a0)
 	objA0.position.x.u16 = 0xfc + getScreenExtend()
 	objA0.position.y.u16 = 0x011b
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
@@ -2090,7 +2090,7 @@ function void fn05fb56()
 {
 	objA0.mapping_offset = 0x060a14
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0232)
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x20
@@ -2130,8 +2130,8 @@ function void fn07cfc6()
 	SetupObjectAttributesSlotted(0x07d3ea)	// TODO: This is only "translated" for a reason!
 
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03f4)
-	objA0.render_flags &= ~0x04
-	objA0.render_flags |= 0x01
+	objA0.render_flags &= ~render_flag.WORLD
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.position.x.u16 = 0xd8 + getScreenExtend()
 	objA0.position.y.u16 = 0x0104
 }
@@ -2259,7 +2259,7 @@ function void fn02cdb0()
 	objA0.update_address = 0x02cdea
 	objA0.mapping_offset = 0x02ced8
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x02cf)
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	A1 = 0x02cdda
 	fn02ce76()
 	u16[A0 + 0x3a] = objA0.position.y.u16

@@ -696,7 +696,7 @@ function void fn0523ca()
 function void fn0458b4()
 {
 	objA0.update_address = 0x045916
-	objA0.render_flags = render_flag.WORLD | render_flag.COMPOUND
+	objA0.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 	objA0.box_size.y = 0x80
 	objA0.box_size.x = 0x18
 	objA0.sprite_priority = 0x80

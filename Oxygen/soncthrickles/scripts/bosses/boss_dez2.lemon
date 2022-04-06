@@ -211,7 +211,7 @@ function void fn07f220()
 	}
 
 	objA0.update_address = 0x07f266
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 
 	spawnSimpleChildObjects(0x07fcce)
 	spawnSimpleChildObjects(0x07fcc8)
@@ -655,7 +655,7 @@ function void fn07f5d2()
 	--objA0.value42
 	if (objA0.value42 == 0)
 	{
-		objA0.render_flags ^= 0x02
+		objA0.render_flags ^= render_flag.FLIP_Y
 	}
 
 	fn07f8a0()
@@ -904,7 +904,7 @@ function void fn07009a()
 		objA0.animation.sprite = 0
 		objA0.animation.timer = 0
 		objA0.animation.frame = 0
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 
 	DrawObject()
@@ -1289,10 +1289,10 @@ function void fn07facc()
 	}
 
 	objA0.animation.sprite = D3.u8
-	D0.u8 = objA0.render_flags & 0xfc
+	D0.u8 = objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	if (D2.u8 != 0)
 	{
-		D0.u8 |= 0x03
+		D0.u8 |= (render_flag.FLIP_X | render_flag.FLIP_Y)
 	}
 	objA0.render_flags = D0.u8
 }

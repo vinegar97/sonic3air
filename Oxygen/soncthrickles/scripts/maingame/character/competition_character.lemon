@@ -415,7 +415,7 @@ function void CompetitionMode.Character.Initialization.Tails()
 	char.sprite_priority = 0x0100
 	char.box_size.x = 0x0c
 	char.box_size.y = 0x0c
-	char.render_flags = render_flag.WORLD | render_flag.VISIBLE
+	char.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 	char.character = CHARACTER_TAILS
 
 	A1 = 0x1e3c00 + char.character * 8

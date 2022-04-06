@@ -159,8 +159,8 @@ function void fn08f1ac()
 		return
 	}
 
-	objA0.render_flags &= ~0x04
-	objA0.render_flags |= 0x80
+	objA0.render_flags &= ~render_flag.WORLD
+	objA0.render_flags |= render_flag.VISIBLE
 	u8[A0 + 0x42] = u8[0xfffff7c3]
 	u8[A0 + 0x43] = u8[0xfffffaad]
 
@@ -297,7 +297,7 @@ function void fn08f2e0()
 	if (attackNow)
 	{
 		objA0.base_state = 0x0e
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 		objA0.velocity.x = -objA0.velocity.x
 		objA0.countdown_value = 0x3b
 	}
@@ -314,7 +314,7 @@ function void fn08f322()
 
 	objA0.base_state = 0x10
 	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 
 	objA0.position.x.u16 = camera.position.x.u16 + objA0.position.x.u16 - 0x80
 	objA0.position.y.u16 = camera.position.y.u16 + objA0.position.y.u16 - 0x80
@@ -465,7 +465,7 @@ function void fn08f4f0()
 	{
 		if (D0.u16 > 0x01a0 + (getScreenWidth() - 320))
 		{
-			objA0.render_flags ^= 0x01
+			objA0.render_flags ^= render_flag.FLIP_X
 			objA0.velocity.x = -objA0.velocity.x
 		}
 	}
@@ -473,7 +473,7 @@ function void fn08f4f0()
 	{
 		if (D0.u16 < 0xa0)
 		{
-			objA0.render_flags ^= 0x01
+			objA0.render_flags ^= render_flag.FLIP_X
 			objA0.velocity.x = -objA0.velocity.x
 		}
 	}
@@ -511,7 +511,7 @@ function void fn08f538()
 	D2.u16 = u16[0x08f582 + D1.s16]
 	if (D0.u16 < 0x0120)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		D2.s16 = -D2.s16
 	}
 	objA0.velocity.x = D2.u16

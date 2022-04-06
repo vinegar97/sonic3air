@@ -129,7 +129,7 @@ function void fn08eb2e()
 function void fn08eb7e()
 {
 	objA0.base_state = 0x02
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	fn08eaaa()
 }
 
@@ -172,7 +172,7 @@ function void fn08ebe2()
 
 	D0 = objA0.subtype2c * 4
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if ((u8[A1 + 0x04] & 0x01) == 0)
+	if ((objA1.render_flags & render_flag.FLIP_X) == 0)
 	{
 		D0.s16 = -D0.s16
 	}

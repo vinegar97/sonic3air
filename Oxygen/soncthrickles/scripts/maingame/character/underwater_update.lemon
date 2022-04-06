@@ -38,7 +38,7 @@ function void fn018184()
 	objA0.base_state += 2
 	objA0.mapping_offset = (u8[A0 + 0x43] == 0) ? 0x02fcb2 : 0x02fce0
 	objA0.sprite_attributes = 0x045c
-	objA0.render_flags = (render_flag.VISIBLE | render_flag.WORLD)
+	objA0.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 	objA0.box_size.x = 0x10
 	objA0.sprite_priority = 0x80
 
@@ -289,7 +289,7 @@ function void fn018466()
 	objA0.value3e = 8 + (getRandomNumber() & 0x0f)
 	if (allocDynamicObjectStd())
 	{
-		u32[A1] = objA0.update_address
+		objA1.update_address = objA0.update_address
 		objA1.position.x.u16 = u16[A2 + 0x10]
 		D0 = 6
 		if (u8[A2 + 0x2a] & char.flag.FACING_LEFT)

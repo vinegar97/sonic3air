@@ -185,7 +185,7 @@ function void fn05c2e0()
 
 	A1 = 0x05cb9e	// "CONTINUE"
 	D2.u16 = 0x0292
-	D6.u16 = 0x8347
+	D6.u16 = (sprite_attribute.PRIORITY | 0x0347)
 	fn05b318()
 
 	if (global.characters != CHARS_KNUCKLES_ALONE)
@@ -398,9 +398,9 @@ function void fn05c5d0()
 		A2 = 0x05c622 + D0.s16
 		objA0.animation.sprite = u8[(A2+=1)-1]
 		if (u8[A2] != 0)
-			objA0.render_flags |= 0x01
+			objA0.render_flags |= render_flag.FLIP_X
 		else
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 	}
 }
 
@@ -785,8 +785,8 @@ function void fn05c972()
 {
 	setupObjectAttributesFull(0x0919a6)
 
-	objA0.render_flags &= ~0x04
-	objA0.render_flags |= 0x01
+	objA0.render_flags &= ~render_flag.WORLD
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.update_address = 0x05c9c4
 	objA0.position.x.u16 = 0x60
 	objA0.position.y.u16 = 0xf0

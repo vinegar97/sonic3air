@@ -226,7 +226,7 @@ function void fn054cf4()
 					u8[A5] = 0
 				}
 			}
-			if (u8[A1 + 0x04] & 0x04)
+			if (objA1.render_flags & render_flag.WORLD)
 			{
 				objA1.position.x.u16 -= D0.u16
 				objA1.position.y.u16 -= D1.u16

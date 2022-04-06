@@ -82,7 +82,7 @@ function void fn08e6b8()
 function void fn08e706()
 {
 	objA0.velocity.x = -objA0.velocity.x
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	objA0.countdown_value = u16[A0 + 0x3a]
 }
 

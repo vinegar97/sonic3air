@@ -112,7 +112,7 @@ function void fn062194()
 function void fn0621d6()
 {
 	objA0.base_state = 0x06
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x062216
 	level.vertical_wrap = 0x05c0
@@ -144,7 +144,7 @@ function void fn062216()
 function void fn062232()
 {
 	objA0.base_state = 0x0a
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	fn062080()
 }
 

@@ -268,7 +268,7 @@ function void fn0142e2()
 	{
 		A1 = 0xffffb000
 		bool skipPart = false
-		if (u8[A1 + 0x04] & render_flag.VISIBLE)
+		if (objA1.render_flags & render_flag.VISIBLE)
 		{
 			if (tails.control_counter != 0)
 			{

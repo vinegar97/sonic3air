@@ -44,9 +44,9 @@ function void fn089842()
 		setupObjectAttributesFull(0x089b06)
 
 		u32[A0 + 0x30] = 0x089b2c
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		if (objA0.subtype2c == 2)
-			objA0.render_flags |= 0x02
+			objA0.render_flags |= render_flag.FLIP_Y
 
 		// "spawnChildObjects(0x089b24)" replaced by:
 		spawnChildObject(0x0899b4, 0x00, 20, 4)
@@ -63,7 +63,7 @@ function void fn089842()
 
 		objA0.base_state = 0x06
 		u32[A0 + 0x30] = 0x089b52
-		objA0.render_flags |= 0x02
+		objA0.render_flags |= render_flag.FLIP_Y
 
 		// "spawnChildObjects(0x089b24)" replaced by:
 		spawnChildObject(0x0899b4, 0x00, 20, 4)

@@ -32,7 +32,7 @@ function void fn02f952()
 	objA0.base_state += 2
 	objA0.mapping_offset = 0x02fcb2
 	objA0.sprite_attributes = 0x045c
-	objA0.render_flags = render_flag.WORLD | render_flag.VISIBLE
+	objA0.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 	objA0.box_size.x = 0x10
 #if STANDALONE
 	objA0.box_size.y = 0x10
@@ -301,7 +301,7 @@ function void fn02fbb2()
 
 	if (u8[A1 + 0x2a] & char.flag.ROLLING)
 	{
-		if (u32[A1] == 0x010a94)
+		if (objA1.update_address == 0x010a94)
 		{
 			u8[A1 + 0x2a] &= ~0x04
 			u8[A1 + 0x1e] = 0x13

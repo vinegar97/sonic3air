@@ -138,7 +138,7 @@ function void fn048fa4()
 
 			if (global.inv_gravity)
 			{
-				u8[A1 + 0x04] ^= 0x02
+				objA1.render_flags ^= render_flag.FLIP_Y
 			}
 
 			if ((level.framecounter.low & 0x0f) == 0)
@@ -166,7 +166,7 @@ function void fn048fa4()
 	if (global.inv_gravity)
 	{
 		u8[A1 + 0x27] = 0x80 - u8[A1 + 0x27]
-		u8[A1 + 0x04] ^= 0x02
+		objA1.render_flags ^= render_flag.FLIP_Y
 	}
 }
 
@@ -228,7 +228,7 @@ function void fn049090()
 			s16[A1 + 0x1c] = -objA1.velocity.y
 		}
 
-		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		objA1.render_flags &= ~render_flag.FLIP_X
 		u8[A1 + 0x2a] &= ~0x01
 		u8[A1 + 0x2e] |= 0x40
 		u8[A1 + 0x2e] |= 0x02
@@ -254,9 +254,9 @@ function void fn049090()
 		return
 
 	if (objA1.velocity.y >= 0)
-		u8[A1 + 0x04] |= render_flag.FLIP_Y
+		objA1.render_flags |= render_flag.FLIP_Y
 	else
-		u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+		objA1.render_flags &= ~render_flag.FLIP_Y
 
 	D0.u8 = u8[A2]
 	LookupSinCos()

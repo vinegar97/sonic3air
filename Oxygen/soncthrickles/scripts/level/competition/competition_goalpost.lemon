@@ -15,7 +15,7 @@ function void fn036be0()
 {
 	objA0.mapping_offset = 0x036ffa
 	objA0.sprite_attributes = 0x06bc
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x20
@@ -40,32 +40,32 @@ function void fn036be0()
 
 	if (allocDynamicObjectAfterA0())
 	{
-		u32[A1] = 0x037ec2		// Spawn Item Display for player 1
+		objA1.update_address = 0x037ec2		// Spawn Item Display for player 1
 		if (allocDynamicObjectAfterA0())
 		{
-			u32[A1] = 0x037ec2		// Spawn Item Display for player 2
+			objA1.update_address = 0x037ec2		// Spawn Item Display for player 2
 			u8[A1 + 0x2c] = 0x01
 			if (allocDynamicObjectAfterA0())
 			{
-				u32[A1] = 0x03703a		// Spawn lap Display for player 1
+				objA1.update_address = 0x03703a		// Spawn lap Display for player 1
 				if (allocDynamicObjectAfterA0())
 				{
-					u32[A1] = 0x03703a		// Spawn lap Display for player 1
+					objA1.update_address = 0x03703a		// Spawn lap Display for player 1
 					u8[A1 + 0x2c] = 0x01
 					if (allocDynamicObjectAfterA0())
 					{
-						u32[A1] = 0x03713a		// Spawn "finish" neon text
+						objA1.update_address = 0x03713a		// Spawn "finish" neon text
 						u16[A1 + 0x10] = 0x0120 + getScreenExtend()
 						u16[A1 + 0x14] = 0xb8
 						if (allocDynamicObjectAfterA0())
 						{
-							u32[A1] = 0x037c8e		// Spawn time Display for player 1
+							objA1.update_address = 0x037c8e		// Spawn time Display for player 1
 							if (allocDynamicObjectAfterA0())
 							{
-								u32[A1] = 0x037d00		// Spawn time Display for player 2
+								objA1.update_address = 0x037d00		// Spawn time Display for player 2
 								if (allocDynamicObjectAfterA0())
 								{
-									u32[A1] = 0x03827a
+									objA1.update_address = 0x03827a
 								}
 							}
 						}
@@ -75,7 +75,7 @@ function void fn036be0()
 		}
 	}
 
-	u32[A0] = 0x036cea
+	objA0.update_address = 0x036cea
 	fn036cea()
 }
 
@@ -117,7 +117,7 @@ function void fn036d3e()
 		A1 = 0xffffb000
 		u16[A1 + 0x10] = checkpoint.x
 		u16[A1 + 0x14] = checkpoint.y
-		u16[A1 + 0x0a] = checkpoint.sprite_attr
+		objA1.sprite_attributes = checkpoint.sprite_attr
 		u16[A1 + 0x46] = checkpoint.layer_flags
 		u16[A1 + 0x18] = 0
 		u16[A1 + 0x1a] = 0
@@ -130,7 +130,7 @@ function void fn036d3e()
 			A1 = 0xffffb04a
 			u16[A1 + 0x10] = u16[0xfffffe4c]
 			u16[A1 + 0x14] = u16[0xfffffe4e]
-			u16[A1 + 0x0a] = u16[0xfffffe56]
+			objA1.sprite_attributes = u16[0xfffffe56]
 			u16[A1 + 0x46] = u16[0xfffffe58]
 			u16[A1 + 0x18] = 0
 			u16[A1 + 0x1a] = 0
@@ -148,7 +148,7 @@ function void fn036d3e()
 		player2.control_override = 0
 		fn036f5a()
 		u16[0xffffeee6] = 0
-		u32[A0] = 0x036cea
+		objA0.update_address = 0x036cea
 	}
 
 	Object.animationUpdate(0x036ff2)
@@ -216,7 +216,7 @@ function void fn036dfc()
 				player2.control_override = 0x01
 				control.player1 = 0
 				control.tails = 0
-				u32[A0] = 0x036d3e
+				objA0.update_address = 0x036d3e
 				u16[A0 + 0x3c] = 0x78
 				u8[0xffffeee6] = 0xff
 
@@ -224,11 +224,11 @@ function void fn036dfc()
 				if (allocDynamicObjectAfterA0())
 				{
 					// "Fault" neon text
-					u32[A1] = 0x0374b8
-					u8[A1 + 0x04] = 0x08
+					objA1.update_address = 0x0374b8
+					objA1.render_flags = render_flag.COMPETITION_P1_SCREEN
 					if (A6.u16 != 0xb000)
 					{
-						u8[A1 + 0x04] ^= 0x18
+						objA1.render_flags ^= (render_flag.COMPETITION_P1_SCREEN | render_flag.COMPETITION_P2_SCREEN)
 					}
 					playSound(0xb2)
 				}
@@ -313,7 +313,7 @@ function void fn036faa()
 	while (D0.s16 >= 0)
 	{
 		A1 += 0x4a
-		if (u32[A1] == 0x0363d0)
+		if (objA1.update_address == 0x0363d0)
 		{
 			u8[A1 + 0x20] = u8[(A4+=1)-1]
 			u8[A1 + 0x28] = (collision.flag.SPECIAL | collision.size.6x6)

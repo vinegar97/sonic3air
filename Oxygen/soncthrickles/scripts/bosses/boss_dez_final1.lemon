@@ -39,7 +39,7 @@ function void fn07fd68()
 function void fn07fd9e()
 {
 	objA0.base_state = 0x02
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	u16[0xfffffaa4] = A0.u16
 	u32[0xfffffa84] = 0
 
@@ -431,7 +431,7 @@ function void fn080562()
 	else
 	{
 		objA0.update_address = 0x080512
-		objA0.render_flags &= ~0x80
+		objA0.render_flags &= ~render_flag.VISIBLE
 	}
 }
 
@@ -497,7 +497,7 @@ function void fn080730()
 		}
 		else
 		{
-			objA0.render_flags &= ~0x80
+			objA0.render_flags &= ~render_flag.VISIBLE
 		}
 	}
 }

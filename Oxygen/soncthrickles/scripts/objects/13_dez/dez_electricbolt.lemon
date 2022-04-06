@@ -13,7 +13,7 @@ function void fn047892()
 {
 	objA0.mapping_offset = 0x04792e
 	objA0.sprite_attributes = 0x0379
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x18
 	objA0.sprite_priority = 0x0280

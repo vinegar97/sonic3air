@@ -218,7 +218,7 @@ function void fn032784()
 	}
 
 	u8[A1 + 0x2a] |= 0x02
-	u16[A1 + 0x08] = 0x0100
+	objA1.sprite_priority = 0x0100
 	u8[A1 + 0x2e] = 0
 	u8[A2] = 0
 }

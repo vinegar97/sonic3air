@@ -777,7 +777,7 @@ function void fn005ae4()
 	u16[A0 + 0x46] = objA0.position.y.u16
 	objA0.mapping_offset = 0x005ed8
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0462)
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 
 	A2 = A0 + 0x18
 	objA0.position.y.frac = 0x02

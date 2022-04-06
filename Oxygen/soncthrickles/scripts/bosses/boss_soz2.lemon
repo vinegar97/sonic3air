@@ -195,7 +195,7 @@ function void fn077822()
 	{
 		objA0.update_address = 0x077848
 		objA0.flags2a &= ~0x80
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	DrawObject()
 }
@@ -248,7 +248,7 @@ function void fn07789a()
 	objA0.update_address = 0x0778f2
 	level.wait_for_results = 0xff
 	objA0.flags38 |= 0x30
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 }
 
 

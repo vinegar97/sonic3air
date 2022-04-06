@@ -40,7 +40,7 @@ function void fn063a96()
 	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.mapping_offset = 0x14a8d6
 	objA0.animation.sprite = 0x56
 	objA0.position.x.u16 = 0x3a38
@@ -294,7 +294,7 @@ function void fn065ed4()
 		objA0.animation.timer = 4
 		D0.u8 = objA0.animation.frame + 1
 		objA0.animation.frame = D0.u8
-		objA0.render_flags = (objA0.render_flags & 0xfc) | (D0.u8 & 0x03)
+		objA0.render_flags = (objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (D0.u8 & (render_flag.FLIP_X | render_flag.FLIP_Y))
 	}
 }
 
@@ -343,10 +343,10 @@ function void fn065f2e()
 		u8[A1 + 0x24] = 8
 		D0.u8 = u8[A1 + 0x23]
 		++u8[A1 + 0x23]
-		D0.u8 &= 0x03
-		D1.u8 = u8[A1 + 0x04] & 0xfc
+		D0.u8 &= (render_flag.FLIP_X | render_flag.FLIP_Y)
+		D1.u8 = objA1.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 		D1.u8 |= D0.u8
-		u8[A1 + 0x04] = D1.u8
+		objA1.render_flags = D1.u8
 	}
 
 	D0.u8 = u8[A0 + D3.s16]

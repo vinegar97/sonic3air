@@ -33,13 +33,13 @@ function void fn0264c0()
 		objA1.update_address = 0x02668e
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u8[A1 + 0x04] = objA0.render_flags
-		u16[A1 + 0x08] = objA0.sprite_priority
-		u8[A1 + 0x04] |= 0x40
-		u8[A1 + 0x07] = 0x10
-		u8[A1 + 0x06] = 0x20
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.render_flags = objA0.render_flags
+		objA1.sprite_priority = objA0.sprite_priority
+		objA1.render_flags |= render_flag.COMPOUND
+		objA1.box_size.x = 0x10
+		objA1.box_size.y = 0x20
 
 		D1 = 5
 		u16[A1 + 0x16] = 6
@@ -153,7 +153,7 @@ function void fn0266b0()
 			}
 
 			objA0.flags2a = u8[A1 + 0x2a]
-			u8[A1 + 0x04] = (u8[A1 + 0x04] & ~char.flag.FACING_LEFT) | (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
+			objA1.render_flags = (objA1.render_flags & ~char.flag.FACING_LEFT) | (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 			objA1.position.x.u16 = u16[A3 + 0x10]
 			objA1.position.y.u16 = u16[A3 + 0x14] + 0x24
 

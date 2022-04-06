@@ -428,7 +428,7 @@ function void fn058fbc()
 function void fn0591d6()
 {
 	objA0.update_address = 0x059208
-	objA0.render_flags = 0x40
+	objA0.render_flags = render_flag.COMPOUND
 	objA0.box_size.y = 0x40
 	objA0.sprite_priority = 0x0380
 	objA0.mapping_offset = 0x059270
@@ -1161,7 +1161,7 @@ function void fn07cd82()
 		u8[0xfffffab8] |= 0x04
 		objA0.animation.sprite = 2
 
-		u8[A1 + 0x04] |= render_flag.FLIP_X
+		objA1.render_flags |= render_flag.FLIP_X
 		objA1.animation.sprite = 0xcb
 		u8[A1 + 0x2a] &= ~0x08
 		u8[A1 + 0x2e] = 0x83

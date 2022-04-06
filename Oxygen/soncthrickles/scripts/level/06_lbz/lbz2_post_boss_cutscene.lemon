@@ -113,7 +113,7 @@ function void fn072c0a()
 			u8[0xfffffa88] = 0
 			StopObjectA1()
 
-			u8[A1 + 0x04] &= ~render_flag.FLIP_X
+			objA1.render_flags &= ~render_flag.FLIP_X
 			u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 
 			// control.player1.state = CONTROL_UP
@@ -468,7 +468,7 @@ function void fn072f7a()
 	{
 		++objA0.value39
 		D0.u8 = objA0.value39 & 0x03
-		D1.u8 = objA0.render_flags & 0xfc
+		D1.u8 = objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 		D1.u8 |= D0.u8
 		objA0.render_flags = D1.u8
 	}

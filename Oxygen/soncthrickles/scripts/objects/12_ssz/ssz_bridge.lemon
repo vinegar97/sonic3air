@@ -14,7 +14,7 @@
 function void fn044c44()
 {
 	objA0.update_address = 0x044c76
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.y = 0x10
 	objA0.box_size.x = 0x20
 	objA0.sprite_priority = 0x0180
@@ -62,7 +62,7 @@ function void fn044c76()
 			while (D5.s16 >= 0)
 			{
 				objA1.update_address = 0x045052
-				u8[A1 + 0x04] = objA0.render_flags
+				objA1.render_flags = objA0.render_flags
 				objA1.position.x.u16 = D1.u16
 				objA1.position.y.u16 = objA0.position.y.u16
 				u8[A1 + 0x22] = D3.u8
@@ -126,7 +126,7 @@ function void fn044d22()
 function void fn044d60()
 {
 	objA0.update_address = 0x044d98
-	objA0.render_flags |= 0x44
+	objA0.render_flags |= (render_flag.COMPOUND | render_flag.WORLD)
 	objA0.box_size.y = 0x20
 	objA0.box_size.x = 0x40
 	objA0.sprite_priority = 0x0180
@@ -203,8 +203,8 @@ function void fn044d98()
 				while (D5.s16 >= 0)
 				{
 					objA1.update_address = 0x045052
-					D7.u16 = objA0.render_flags & 0xbf
-					u8[A1 + 0x04] = D7.u8
+					D7.u16 = objA0.render_flags & ~render_flag.COMPOUND
+					objA1.render_flags = D7.u8
 					objA1.position.x.u16 = D1.u16
 					D7.u16 = objA0.position.y.u16 + D6.u16
 					objA1.position.y.u16 = D7.u16
@@ -308,7 +308,7 @@ function void fn044eba()
 function void fn045052()
 {
 	objA0.update_address = 0x04507e
-	objA0.render_flags |= 0x80
+	objA0.render_flags |= render_flag.VISIBLE
 	objA0.box_size.y = 0x10
 	objA0.box_size.x = 0x08
 	objA0.sprite_priority = 0x0200

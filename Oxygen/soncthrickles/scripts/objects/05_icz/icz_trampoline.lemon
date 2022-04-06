@@ -227,7 +227,7 @@ function void fn08b8c2()
 	if (objA0.subtype2c != 0)
 		objA0.render_flags |= render_flag.FLIP_X
 
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 0x02
 	fn08b8fa()
 

@@ -82,7 +82,7 @@ function void fn042278()
 					u8[A1 + 0x39] = 0
 					u8[A1 + 0x2f] = 0
 					u8[A1 + 0x2a] &= ~0x01
-					u8[A1 + 0x04] &= 0xfc
+					objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 					u8[A1 + 0x2e] = 0x43
 					u8[A1 + 0x20] = 0
 				}

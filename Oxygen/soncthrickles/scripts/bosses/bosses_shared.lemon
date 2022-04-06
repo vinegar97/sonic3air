@@ -344,7 +344,7 @@ function void fn0694aa()
 	// "spawnSimpleChildObjects(0x069d8c)" replaced by:
 	spawnSimpleChildObjects(0x086540, 1)		// Capsule
 
-	u8[A1 + 0x04] |= render_flag.FLIP_Y
+	objA1.render_flags |= render_flag.FLIP_Y
 	StartLoadingPatternsForZone()
 }
 

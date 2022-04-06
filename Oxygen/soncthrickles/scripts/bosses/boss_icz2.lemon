@@ -129,7 +129,7 @@ function void fn071caa()
 	if (s16[A0 + 0x44] < 0)
 	{
 		objA0.velocity.x = -objA0.velocity.x
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 		u16[A0 + 0x44] = 0x017f + getScreenExtend() * 2		// Adding 2x screen extend is not very precise, but does the trick
 	}
 
@@ -648,7 +648,7 @@ function void fn07225c()
 		objA0.update_address = 0x085668
 		objA0.countdown_callback = 0x071d80
 		A1 = 0xffff0000 + u16[0xfffffaae]
-		if (u32[A1] == 0x08b660)
+		if (objA1.update_address == 0x08b660)
 		{
 			u8[A1 + 0x38] |= 0x20
 		}

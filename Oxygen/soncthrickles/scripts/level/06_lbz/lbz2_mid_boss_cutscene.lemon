@@ -43,7 +43,7 @@ function void fn08d2b6()
 				objA0.countdown_value = 0x3f
 				objA0.countdown_callback = 0x08d344
 
-				u8[A1 + 0x04] &= ~render_flag.FLIP_X
+				objA1.render_flags &= ~render_flag.FLIP_X
 				u8[A1 + 0x0a] |= 0x80
 				objA1.state = char.state.STANDING
 				objA1.flags2a &= ~char.flag.FACING_LEFT
@@ -278,7 +278,7 @@ function void fn08d47c()
 //# address-hook(0x08d4cc) end(0x08d500)
 function void fn08d4cc()
 {
-	if (u8[A0 + 0x04] & 0x80)
+	if (objA0.render_flags & render_flag.VISIBLE)
 	{
 		fn0847e6()
 		UpdateMovementStraightSimple()

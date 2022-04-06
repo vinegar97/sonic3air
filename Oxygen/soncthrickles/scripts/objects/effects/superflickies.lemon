@@ -86,15 +86,15 @@ function void fn01a228()
 	if (objA0.velocity.x != 0)
 	{
 		if (objA0.velocity.x < 0)
-			objA0.render_flags |= 0x01
+			objA0.render_flags |= render_flag.FLIP_X
 		else
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 	}
 
-	objA0.render_flags &= 0xfd
+	objA0.render_flags &= ~render_flag.FLIP_Y
 	if (global.inv_gravity)
 	{
-		objA0.render_flags |= 0x02
+		objA0.render_flags |= render_flag.FLIP_Y
 	}
 
 	--objA0.animation.timer

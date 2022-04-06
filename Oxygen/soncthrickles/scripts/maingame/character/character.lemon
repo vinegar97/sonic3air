@@ -957,13 +957,13 @@ function void Tails.UpdateCarrySonic()
 				objA1.position.x.u16 = char.position.x.u16
 				objA1.position.y.u16 = char.position.y.u16 + (global.inv_gravity ? -0x1c : 0x1c)
 
-				objA1.render_flags &= 0xfc
+				objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 				u8[A1 + 0x2a] &= 0xfe
 				D0.u8 = char.flags & 0x01
 				objA1.render_flags |= D0.u8
 				u8[A1 + 0x2a] |= D0.u8
 				if (global.inv_gravity)
-					objA1.render_flags ^= 0x02
+					objA1.render_flags ^= render_flag.FLIP_Y
 
 				--u8[A1 + 0x24]
 				if (s8[A1 + 0x24] < 0)
@@ -1113,7 +1113,7 @@ function void fn01459e()
 	objA1.flags2a &= ~(char.flag.FACING_LEFT | char.flag.CONTROL_LOCK)
 	objA1.flags2a |= char.flag.IN_AIR
 	u8[A1 + 0x3d] = 0
-	objA1.render_flags &= 0xfc
+	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	D0.u8 = char.flags & 0x01
 	objA1.render_flags |= D0.u8
 	u8[A1 + 0x2a] |= D0.u8
@@ -1125,7 +1125,7 @@ function void fn01459e()
 	if (global.inv_gravity)
 	{
 		objA1.position.y.u16 -= 0x38
-		objA1.render_flags ^= 0x02
+		objA1.render_flags ^= render_flag.FLIP_Y
 	}
 }
 
@@ -6493,7 +6493,7 @@ function void Character.CheckDiedStateEnd()
 			char.position.x.u16 = u16[0xfffffe4c]
 			char.position.y.u16 = u16[0xfffffe4e]
 			char.sprite_attributes = u16[0xfffffe56]
-			u16[A0 + 0x46] = u16[0xfffffe58]
+			char.layer_flags = u16[0xfffffe58]
 			ring_counter.player2 = 0
 			u8[0xfffff74b] = 1
 		}

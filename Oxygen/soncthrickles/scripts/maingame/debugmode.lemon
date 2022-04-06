@@ -186,14 +186,14 @@ function void DebugMode.EvaluateInput()
 		{
 			objA1.position.x.u16 = char.position.x.u16
 			objA1.position.y.u16 = char.position.y.u16
-			u8[A1 + 0x04] = char.render_flags
-			u8[A1 + 0x2a] = char.render_flags & 0x7f
+			objA1.render_flags = char.render_flags
+			u8[A1 + 0x2a] = char.render_flags & ~render_flag.VISIBLE
 
 			D0 = debug_mode.selection * 10
 			u8[A1 + 0x2c] = u8[A2 + D0.u16 + 4]
-			u32[A1] = u32[A2 + D0.u16]
+			objA1.update_address = u32[A2 + D0.u16]
 			u8[A1] = 0
-			if (u32[A1] == 0x01d566)	// S-Monitor
+			if (objA1.update_address == 0x01d566)	// S-Monitor
 			{
 				u8[A1 + 0x2c] = 0x09
 			}

@@ -94,22 +94,22 @@ function void fn020c24()
 function void fn020c38()
 {
 	D0 = objA0.animation.sprite * 2
-	A3 = u32[A0 + 0x0c]
+	A3 = objA0.mapping_offset
 	A3.u16 += u16[A3 + D0.s16]
 	D1.u16 = u16[(A3+=2)-2]
-	objA0.render_flags |= render_flag.STATIC_MAPPIMG
+	objA0.render_flags |= render_flag.STATIC_MAPPING
 	D5.u8 = objA0.render_flags
 	A1 = A0
 
 	while (true)
 	{
 		// Spawn cliff debris
-		u8[A1 + 0x04] = D5.u8
-		u8[A1 + 0x06] = objA0.box_size.y
-		u8[A1 + 0x07] = objA0.box_size.x
-		u16[A1 + 0x08] = objA0.sprite_priority
-		u16[A1 + 0x0a] = u16[A0 + 0x0a]
-		u32[A1 + 0x0c] = A3
+		objA1.render_flags = D5.u8
+		objA1.box_size.y = objA0.box_size.y
+		objA1.box_size.x = objA0.box_size.x
+		objA1.sprite_priority = objA0.sprite_priority
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.mapping_offset = A3
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		u8[A1 + 0x38] = u8[(A4+=1)-1]
@@ -121,7 +121,7 @@ function void fn020c38()
 			break
 
 		A3 += 6
-		u32[A1] = D4
+		objA1.update_address = D4
 	}
 
 	DrawObject()

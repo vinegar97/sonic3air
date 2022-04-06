@@ -658,7 +658,7 @@ function void fn07e384()
 		u8[A1 + 0x20] = char.state.RUNNING
 		StopObjectA1()
 
-		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		objA1.render_flags &= ~render_flag.FLIP_X
 		objA1.flags2a |= char.flag.IN_AIR
 		objA1.flags2a &= ~(char.flag.FACING_LEFT | char.flag.PUSHING)
 	}
@@ -711,7 +711,7 @@ function void fn07e420()
 		fn05fd88()
 
 		A1 = 0xffffb000
-		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		objA1.render_flags &= ~render_flag.FLIP_X
 		objA1.state = char.state.STANDING
 		objA1.state.former = char.state.RUNNING
 		objA1.flags2a &= ~char.flag.FACING_LEFT
@@ -1139,7 +1139,7 @@ function void fn07e79c()
 	fn07ed6c()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u32[A1] != 0x07de6e)
+	if (objA1.update_address != 0x07de6e)
 		return
 
 	objA0.base_state = 0x04
@@ -1429,7 +1429,7 @@ function void fn07ea6c()
 	if (objA0.subtype2c != 0)
 	{
 		D0.s16 = -D0.s16
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	u16[A0 + 0x3a] = D0.u16
 	fn07ea9a()
@@ -1477,7 +1477,7 @@ function void fn07eacc()
 	D0.s16 = -0x200
 	if (objA0.subtype2c != 0)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		D0.s16 = -D0.s16
 	}
 	objA0.velocity.x = D0.s16
@@ -1727,7 +1727,7 @@ function void fn07ecf4()
 	{
 		D0.s16 = -D0.s16
 		objA0.velocity.x = -objA0.velocity.x
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	objA0.position.x.u16 += D0.u16
 	D0 = (D0 << 16) + (D0 >> 16)
@@ -1763,10 +1763,10 @@ function void fn07ed6c()
 
 	A2 = 0x07edba + D0.s16
 	D0.u8 = u8[(A2+=1)-1]
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	if (D2.u8 != 0)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		D0.s16 = -D0.s16
 	}
 	D1.u16 += D0.u16
@@ -1889,10 +1889,10 @@ function void fn07eeee()
 	D0 = u8[A0 + 0x3c]
 	A1 = 0xffffb000
 	u8[A1 + 0x22] = u8[0x07ef2e + D0.s16]
-	u8[A1 + 0x04] &= 0xfc
+	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 
 	D0.u8 = u8[0x07ef3a + D0.s16]
-	u8[A1 + 0x04] |= D0.u8
+	objA1.render_flags |= D0.u8
 
 	D0 = u8[A1 + 0x22]
 	UpdatePlayer1SpritePatterns()

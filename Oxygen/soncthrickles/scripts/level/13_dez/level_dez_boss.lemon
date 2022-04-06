@@ -665,7 +665,7 @@ function void fn05a7ec()
 function void fn05a872()
 {
 	objA0.update_address = 0x05a8b2
-	objA0.render_flags = 0x84
+	objA0.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 	objA0.box_size.y = 0x10
 	objA0.box_size.x = 0x0c
 	objA0.sprite_priority = 0x80
@@ -681,7 +681,7 @@ function void fn05a872()
 //# address-hook(0x05a8b2) end(0x05a8e0)
 function void fn05a8b2()
 {
-	if ((u8[A0 + 0x04] & 0x80) == 0)
+	if ((objA0.render_flags & render_flag.VISIBLE) == 0)
 	{
 		objA0.position.x.u16 = level.despawn_position.x + 0x0400
 	}
@@ -804,7 +804,7 @@ function void fn080de0()
 
 	objA0.position.x.u16 = 0x70
 	objA0.position.y.u16 = 0xc0
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	fn080e02()
 }
 

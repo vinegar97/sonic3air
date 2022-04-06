@@ -86,7 +86,7 @@ function void fn08bee6()
 	if ((global.framecounter & 0x01) == 0)
 	{
 		A1 = 0xffff0000 + u16[A0 + 0x46]
-		if (u8[A1 + 0x04] & 0x01)
+		if (objA1.render_flags & render_flag.FLIP_X)
 			++u8[A0 + 0x3c]
 		else
 			--u8[A0 + 0x3c]

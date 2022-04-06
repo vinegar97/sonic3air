@@ -20,7 +20,7 @@ function void fn03a7cc()
 		return
 	}
 
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x80
 	objA0.sprite_priority = 0x80
@@ -114,8 +114,8 @@ function void fn03a8b8()
 				{
 					objA1.flags2a &= ~char.flag.FACING_LEFT
 				}
-				u8[A1 + 0x04] &= ~char.flag.FACING_LEFT
-				u8[A1 + 0x04] |= (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
+				objA1.render_flags &= ~char.flag.FACING_LEFT
+				objA1.render_flags |= (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 				objA1.position.y.u16 = objA0.position.y.u16 + 0x9c
 			}
 			else
@@ -278,8 +278,8 @@ function void fn03aa7e()
 					}
 
 					D0.u8 = u8[A1 + 0x2a] & char.flag.FACING_LEFT
-					u8[A1 + 0x04] &= 0xfc
-					u8[A1 + 0x04] |= D0.u8
+					objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+					objA1.render_flags |= D0.u8
 					objA1.position.y.u16 = objA0.position.y.u16 + 0x12
 					if (u8[A2 + 0x04] == 0)
 					{
@@ -455,7 +455,7 @@ function void fn03ac86()
 			}
 
 			// Character grabs the monkey bar
-			u8[A1 + 0x04] &= 0xfd
+			objA1.render_flags &= ~render_flag.FLIP_Y
 			objA1.position.x.u16 = objA0.position.x.u16 + 0x10 + D0.u16 - objA0.value3e
 			objA1.position.y.u16 = objA0.position.y.u16 + 0x12
 			objA1.velocity.x = 0

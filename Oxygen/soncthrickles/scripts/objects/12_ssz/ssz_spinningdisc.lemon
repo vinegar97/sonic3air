@@ -17,7 +17,7 @@
 function void fn045dae()
 {
 	objA0.update_address = 0x045dfe
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.y = 0x20
 	objA0.box_size.x = 0x0c
 	objA0.sprite_priority = 0x0100
@@ -234,7 +234,7 @@ function void fn045f74()
 				}
 
 				u8[A3 + 0x01] = 0
-				u16[A1 + 0x08] = 0x0100
+				objA1.sprite_priority = 0x0100
 			}
 		}
 		else
@@ -322,7 +322,7 @@ function void fn045f74()
 		}
 	}
 
-	u16[A1 + 0x08] = D1.u16
+	objA1.sprite_priority = D1.u16
 	LookupSinCos()
 	D1.s32 = s32(D1.s16) * s16[A3 + 0x04]
 	D1.s32 >>= 8
@@ -345,8 +345,8 @@ function void fn0460a6()
 
 	A2 = 0x0468c4 + D0.u16
 	D0.u8 = u8[(A2+=1)-1]
-	u8[A1 + 0x04] &= 0xfc
-	u8[A1 + 0x04] |= D0.u8
+	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+	objA1.render_flags |= D0.u8
 	D0.u8 = u8[A2]
 	u8[A1 + 0x22] = D0.u8
 	SetCharacterSpritePatterns()

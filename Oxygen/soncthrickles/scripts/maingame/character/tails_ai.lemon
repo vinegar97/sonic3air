@@ -31,7 +31,7 @@ function void Character.TailsAI.Update()
 			// Reset Tails next to Player 1
 			u32 positionLookupAddress = 0xffffe500 + u32(u8(posbackup.offset.player1 - 20))
 
-			char.render_flags = (char.render_flags & ~0x03) | (objA1.render_flags & 0x03)
+			char.render_flags = (char.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (objA1.render_flags & (render_flag.FLIP_X | render_flag.FLIP_Y))
 			char.position.x.u16 = u16[positionLookupAddress]
 			char.position.y.u16 = u16[positionLookupAddress + 2]
 			char.velocity.x = objA1.velocity.x

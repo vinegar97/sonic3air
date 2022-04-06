@@ -169,7 +169,7 @@ function void fn05b204()
 			if (D3.u16 == D0.u16)
 			{
 				// Next actual text line
-				D6.u16 = (D2.u16 & 0x0001) ? 0xa347 : 0x8347	// Includes base sprite VRAM address + the palette to use
+				D6.u16 = (D2.u16 & 0x0001) ? (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0347) : (sprite_attribute.PRIORITY | 0x0347)	// Includes base sprite VRAM address + the palette to use
 				D2.u16 &= 0x0ffe	// This is the start offset from the left side inside plane A
 
 				// Print next characters, read from address A1 (using ASCII encoding)
@@ -434,12 +434,12 @@ function void fn05eb32()
 	objA0.update_address = 0x05ebb4
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	objA0.sprite_priority = u16[A1 + 0x08]
+	objA0.sprite_priority = objA1.sprite_priority
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x20
-	if (u8[A1 + 0x04] & 0x04)
+	if (objA1.render_flags & render_flag.WORLD)
 	{
-		objA0.render_flags |= 0x04
+		objA0.render_flags |= render_flag.WORLD
 	}
 
 	// Targets:
@@ -619,7 +619,7 @@ function void fn05f31c()
 {
 	setupObjectAttributesMost(0x060160)
 
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x05f376
 
 	A1 = 0x05f36e
@@ -665,7 +665,7 @@ function void fn05f39e()
 function void fn05f3aa()
 {
 	setupObjectAttributesMost(0x060168)
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x05f3da
 
 	A1 = 0x05f3d2
@@ -689,7 +689,7 @@ function void fn05f3ea()
 {
 	// And this is Tails' tails
 	setupObjectAttributesBasic(0x060170)
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x05f400
 	fn05f400()
 }
@@ -709,7 +709,7 @@ function void fn05f400()
 function void fn05f410()
 {
 	setupObjectAttributesFull(0x060176)
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x05f46a
 #if STANDALONE
 	// Make sure Knuckles is rendered in front of Sonic
@@ -756,7 +756,7 @@ function void fn05f4fa()
 
 	setupObjectAttributesFull(0x060130)
 
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x084920
 
 	A1 = 0x05f520
@@ -772,7 +772,7 @@ function void fn05f526()
 {
 	setupObjectAttributesFull(0x06013c)
 
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x084920
 
 	A1 = 0x05f544
@@ -788,7 +788,7 @@ function void fn05f546()
 {
 	setupObjectAttributesFull(0x060148)
 
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x084920
 
 	A1 = 0x05f564

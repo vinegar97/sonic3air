@@ -226,7 +226,7 @@ function void fn062cf8()
 
 	objA1.position.x.u16 = D0.u16
 	u8[0xfffffab8] = 0x04
-	u8[A1 + 0x04] &= ~render_flag.FLIP_X
+	objA1.render_flags &= ~render_flag.FLIP_X
 	u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 	player1.control_override = 0xff
 	control.player1 = 0

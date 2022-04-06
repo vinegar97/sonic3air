@@ -87,7 +87,7 @@ function void fn063d1a()
 	objA0.box_size.y = 0x18
 	objA0.hitbox_extends.x = 0x09
 	objA0.hitbox_extends.y = 0x13
-	objA0.render_flags = render_flag.WORLD | render_flag.FLIP_X
+	objA0.render_flags = (render_flag.WORLD | render_flag.FLIP_X)
 	objA0.animation.sprite = 0xd8
 	boss.remaining_hits = 8
 	u32[A0 + 0x30] = 0x066771
@@ -580,7 +580,7 @@ function void fn0641ec()
 
 	if (objA0.velocity.x == 0)
 	{
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 		objA0.position.y.u16 -= 4
 		fn063ebe()
 	}
@@ -764,9 +764,9 @@ function void fn06438a()
 function void fn066094()
 {
 	if (D0.u16 != 0)
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 	else
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 }
 
 

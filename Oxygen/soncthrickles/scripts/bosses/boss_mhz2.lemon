@@ -606,7 +606,7 @@ function void fn07675c()
 	objA0.position.x.u16 = objA1.position.x.u16
 	objA0.position.y.u16 = objA1.position.y.u16
 	objA0.render_flags &= ~render_flag.FLIP_X
-	objA0.render_flags |= (u8[A1 + 0x04] & 0x01)
+	objA0.render_flags |= (objA1.render_flags & render_flag.FLIP_X)
 }
 
 
@@ -754,7 +754,7 @@ function void fn0768fe()
 function void fn055732()
 {
 	objA0.update_address = 0x05576a
-	objA0.render_flags = render_flag.WORLD | render_flag.COMPOUND
+	objA0.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x80
 	objA0.sprite_priority = 0x0380
@@ -791,7 +791,7 @@ function void fn05576a()
 function void fn05577c()
 {
 	objA0.update_address = 0x0557c8
-	objA0.render_flags = render_flag.WORLD | render_flag.COMPOUND
+	objA0.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x03af)
