@@ -998,7 +998,7 @@ function void fn059b18()
 //# address-hook(0x059b1c) end(0x059b42)
 function void fn059b1c()
 {
-	// Reset ring counter and time to LRZ 2 values after entering  LRZ boss act
+	// Reset ring counter and time to LRZ 2 values after entering LRZ boss act
 	D0.u16 = level.backup.rings
 	if (D0.u16 != 0)
 	{

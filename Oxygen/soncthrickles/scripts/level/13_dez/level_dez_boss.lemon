@@ -95,6 +95,7 @@ function void fn05a496()
 //# address-hook(0x05a49a) end(0x05a4c0)
 function void fn05a49a()
 {
+	// Reset ring counter and time to DEZ 2 values after entering DEZ boss act
 	D0.u16 = level.backup.rings
 	if (D0.u16 != 0)
 	{

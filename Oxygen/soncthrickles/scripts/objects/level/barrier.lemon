@@ -269,7 +269,7 @@ function void fn0209b8()
 //# address-hook(0x0209d0) end(0x020a52)
 function void fn0209d0()
 {
-	// Horizonlat barrier towards the end of MGZ 1
+	// Horizontal barrier towards the end of MGZ 1
 
 	D1 = objA0.box_size.x
 	D3.u16 = 0x10

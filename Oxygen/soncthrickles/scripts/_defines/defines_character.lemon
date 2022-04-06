@@ -54,7 +54,7 @@ define char.box_size.y			=  u8[A0 + 0x06]	// Height
 define char.box_size.x			=  u8[A0 + 0x07]	// Width
 
 define char.sprite_priority		= u16[A0 + 0x08]	// Sprite priority: 0x100 by default, always a multiple of 0x80
-define char.sprite_attributes	= u16[A0 + 0x0a]	// Sprite attributes: start pattern index (lower 11 bits), atex (highest 4 bits)
+define char.sprite_attributes	= u16[A0 + 0x0a]	// Sprite attributes: start pattern index (lower 11 bits), atex (highest 5 bits)
 	constant u16 sprite_attribute.PALETTE	= 0x6000	// Bit mask for palette
 	constant u16 sprite_attribute.VRAM	= 0x7ff		// Bit mask for starting tile RAM location
 
