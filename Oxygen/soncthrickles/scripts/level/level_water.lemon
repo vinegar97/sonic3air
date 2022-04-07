@@ -195,7 +195,7 @@ function void fn00723e()
 	{
 		D1.u16 = 4
 		D0.u16 = u16[A1 + 0x1c]
-		if (D2 & 0x04)
+		if (D2 & CONTROL_LEFT)
 		{
 			u8[A1 + 0x20] = 0
 			u8[A1 + 0x2a] |= 0x01
@@ -203,7 +203,7 @@ function void fn00723e()
 			if (D0.s16 < 0)
 				D0.u16 -= D1.u16
 		}
-		if (D2 & 0x08)
+		if (D2 & CONTROL_RIGHT)
 		{
 			u8[A1 + 0x20] = 0
 			u8[A1 + 0x2a] &= ~0x01
@@ -457,22 +457,22 @@ function void fn006f90()
 				u8[A1 + 0x2f] = 0
 				if (u8[A2 + 0x0c] != 0)
 				{
-					if (D6 & 0x04)
+					if (D6 & CONTROL_LEFT)
 					{
 						--objA1.position.x.u16
 					}
-					if (D6 & 0x08)
+					if (D6 & CONTROL_RIGHT)
 					{
 						++objA1.position.x.u16
 					}
 				}
 				else
 				{
-					if (D6 & 0x01)
+					if (D6 & CONTROL_UP)
 					{
 						--objA1.position.y.u16
 					}
-					if (D6 & 0x02)
+					if (D6 & CONTROL_DOWN)
 					{
 						++objA1.position.y.u16
 					}

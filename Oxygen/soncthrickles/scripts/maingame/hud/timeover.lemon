@@ -68,7 +68,7 @@ function void fn02d638()
 	u16[0xffffe380] = 0
 	if ((objA0.animation.sprite & 0x01) == 0)
 	{
-		D0.u8 = (control.pad1.pressed | control.pad2.pressed) & 0xf0
+		D0.u8 = (control.pad1.pressed | control.pad2.pressed) & (CONTROL_START | CONTROL_ABC)
 		if (D0.u8 == 0 && u16[A0 + 0x24] != 0)
 		{
 			--u16[A0 + 0x24]

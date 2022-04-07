@@ -100,7 +100,8 @@ function void fn0290f2()
 	{
 		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04)
 		{
-			if ((D0.u8 & 0x70) == 0)
+			// Check if jump button pressed
+			if ((D0.u8 & CONTROL_ABC) == 0)
 			{
 				objA1.position.y.u16 = objA0.position.y.u16 + 0x94
 				return
@@ -108,12 +109,12 @@ function void fn0290f2()
 
 			u8[A1 + 0x2e] = 0
 			u8[A2] = 0
-			u8[A2+2] = ((D0.u16 & 0x0f00) == 0) ? 0x12 : 0x3c
-			if (D0 & 0x0400)
+			u8[A2+2] = ((D0.u16 & 0x0f00) == 0) ? 0x12 : 0x3c	// Any direction held?
+			if (D0 & 0x0400)		// CONTROL_LEFT held
 			{
 				objA1.velocity.x = -0x200
 			}
-			if (D0 & 0x0800)
+			if (D0 & 0x0800)		// CONTROL_RIGHT held
 			{
 				objA1.velocity.x = 0x200
 			}

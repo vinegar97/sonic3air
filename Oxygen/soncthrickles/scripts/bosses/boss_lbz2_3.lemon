@@ -573,11 +573,11 @@ function void fn07473a()
 function void fn074768()
 {
 	A1 = 0xffffb000
-	D0.u16 = 0x0808
+	D0.u16 = 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 	D1.u16 = camera.position.x.u16 - objA1.position.x.u16 + 0x50 + getScreenExtend()
 	if (D1.s16 < 0)
 	{
-		D0.u16 = 0x0404
+		D0.u16 = 0x0404		// CONTROL_LEFT, CONTROL_LEFT
 		D1.s16 = -D1.s16
 	}
 
@@ -605,9 +605,7 @@ function void fn074768()
 //# address-hook(0x0747d6) end(0x074816)
 function void fn0747d6()
 {
-	// control.player1.state = CONTROL_UP
-	// control.player1.pressed = CONTROL_UP
-	control.player1 = 0x0101
+	control.player1 = 0x0101		// CONTROL_UP, CONTROL_UP
 
 	D0.u16 = objA0.position.y.u16 + 1
 	D1.u16 = camera.position.y.u16 + 0x40
@@ -632,9 +630,7 @@ function void fn0747d6()
 //# address-hook(0x07481c) end(0x07488e)
 function void fn07481c()
 {
-	// control.player1.state = CONTROL_UP
-	// control.player1.pressed = CONTROL_UP
-	control.player1 = 0x0101
+	control.player1 = 0x0101		// CONTROL_UP, CONTROL_UP
 
 	fn0847e6()
 	UpdateMovementStraightSimple()
@@ -716,10 +712,7 @@ function void fn0748f4()
 	if (objA0.flags38 & 0x08)
 	{
 		objA0.update_address = 0x07490a
-
-		// control.player1.state = CONTROL_RIGHT
-		// control.player1.pressed = CONTROL_RIGHT
-		control.player1 = 0x0808
+		control.player1 = 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 	}
 }
 
@@ -738,10 +731,7 @@ function void fn07490a()
 		objA1.animation.sprite = 0x8c
 	#if STANDALONE
 		// This makes AI Tails jump
-
-		// control.player1.state = CONTROL_B
-		// control.player1.pressed = CONTROL_B
-		control.player1 = 0x1010
+		control.player1 = 0x1010		// CONTROL_B, CONTROL_B
 	#endif
 		UpdatePlayer1SpritePatterns()
 

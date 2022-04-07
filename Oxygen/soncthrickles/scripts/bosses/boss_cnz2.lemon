@@ -399,9 +399,7 @@ function void fn06e7e4()
 
 	objA0.update_address = 0x06e80c
 
-	// control.player1.state = CONTROL_ABC
-	// control.player1.pressed = CONTROL_ABC
-	control.player1 = 0x7070
+	control.player1 = 0x7070		// CONTROL_ABC, CONTROL_ABC
 
 	player1.control_override = 0xff
 }

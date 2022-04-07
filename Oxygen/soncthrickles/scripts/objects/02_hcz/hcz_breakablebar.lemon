@@ -87,7 +87,7 @@ function void fn01edec()
 	if (u8[A2] != 0)
 	{
 		D0.u16 = objA0.position.y.u16 - u16[A0 + 0x36]
-		if (D1 & 0x0100)		// Checking for CONTROL_UP
+		if (D1 & 0x0100)		// CONTROL_UP held
 		{
 			--objA1.position.y.u16
 			if (D0.u16 >= objA1.position.y.u16)
@@ -97,7 +97,7 @@ function void fn01edec()
 		}
 
 		D0.u16 += u16[A0 + 0x38]
-		if (D1 & 0x0200)		// Checking for CONTROL_DOWN
+		if (D1 & 0x0200)		// CONTROL_DOWN held
 		{
 			++objA1.position.y.u16
 			if (D0.u16 < objA1.position.y.u16)
@@ -106,6 +106,7 @@ function void fn01edec()
 			}
 		}
 
+		// Check if jump button pressed
 		D1.u16 &= CONTROL_ABC
 		if (D1.u16 == 0)
 			return
@@ -261,7 +262,7 @@ function void fn01efa0()
 	if (u8[A2] != 0)
 	{
 		D0.u16 = objA0.position.x.u16 - u16[A0 + 0x36]
-		if (D1 & 0x0400)		// Checking for CONTROL_LEFT
+		if (D1 & 0x0400)		// CONTROL_LEFT held
 		{
 			--objA1.position.x.u16
 			if (D0.u16 >= objA1.position.x.u16)
@@ -271,7 +272,7 @@ function void fn01efa0()
 		}
 
 		D0.u16 += u16[A0 + 0x38]
-		if (D1 & 0x0800)		// Checking for CONTROL_RIGHT
+		if (D1  & 0x0800)		// CONTROL_RIGHT held
 		{
 			++objA1.position.x.u16
 			if (D0.u16 < objA1.position.x.u16)
@@ -280,6 +281,7 @@ function void fn01efa0()
 			}
 		}
 
+		// Check if jump button pressed
 		D1.u16 &= CONTROL_ABC
 		if (D1.u16 == 0)
 			return

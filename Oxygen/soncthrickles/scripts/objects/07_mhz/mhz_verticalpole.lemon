@@ -83,7 +83,8 @@ function void fn03f0d8()
 		return
 	}
 
-	D1.u16 &= 0x70
+	// Check if jump button pressed
+	D1.u16 &= CONTROL_ABC
 	if (D1.u16 != 0)
 	{
 		fn03f166()

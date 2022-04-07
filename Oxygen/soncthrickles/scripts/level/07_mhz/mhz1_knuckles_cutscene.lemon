@@ -258,9 +258,7 @@ function void fn062d42()
 	u8[0xfffffab8] = 0x08
 	player1.camera_lock = 0xff
 
-	// control.player1.state = CONTROL_DOWN
-	// control.player1.pressed = CONTROL_DOWN
-	control.player1 = 0x0202
+	control.player1 = 0x0202		// CONTROL_DOWN, CONTROL_DOWN
 
 	fn062d5a()
 }

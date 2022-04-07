@@ -96,7 +96,7 @@ function void fn031226()
 	{
 		if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
 		{
-			if (D1 & 0x0400)
+			if (D1 & 0x0400)		// CONTROL_LEFT held
 			{
 				--objA1.position.x.u16
 				--u8[A2 + 0x06]
@@ -108,7 +108,7 @@ function void fn031226()
 				}
 			}
 
-			if (D1 & 0x0800)
+			if (D1 & 0x0800)		// CONTROL_RIGHT held
 			{
 				++objA1.position.x.u16
 				--u8[A2 + 0x06]
@@ -120,7 +120,8 @@ function void fn031226()
 				}
 			}
 
-			D1.u16 &= 0x70
+			// Check if jump button pressed
+			D1.u16 &= CONTROL_ABC
 			if (D1.u16 == 0)
 			{
 				D0 = 0x02

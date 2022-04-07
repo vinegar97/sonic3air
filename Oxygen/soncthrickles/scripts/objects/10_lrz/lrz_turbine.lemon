@@ -81,7 +81,8 @@ function void fn044338()
 
 	if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
 	{
-		if (D1.u16 & 0x70)
+		// Check if jump button pressed
+		if (D1.u16 & CONTROL_ABC)
 		{
 			fn0443c4()
 			return

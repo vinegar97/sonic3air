@@ -65,7 +65,7 @@ function void fn04964a()
 			D5.u16 = 0x18
 			D0.u16 = objA1.velocity.y
 
-			if (D4 & 0x0100)
+			if (D4 & 0x0100)		// CONTROL_UP held
 			{
 				D0.u16 -= D5.u16
 				D1.s16 = -D6.s16
@@ -79,7 +79,7 @@ function void fn04964a()
 				}
 			}
 
-			if (D4 & 0x0200)
+			if (D4 & 0x0200)		// CONTROL_DOWN held
 			{
 				D0.u16 += D5.u16
 				if (D0.s16 >= D6.s16)

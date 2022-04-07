@@ -377,7 +377,7 @@ function void fn03984e()
 	objA0.position.x.u16 = u16[A2 + 0x10]
 	objA0.position.y.u16 = u16[A2 + 0x14]
 
-	D0.u16 = control.pad1 & 0xf0f0
+	D0.u16 = control.pad1 & 0xf0f0		// (CONTROL_START | CONTROL_ABC), (CONTROL_START | CONTROL_ABC)
 	control.player1 = D0.u16
 	if (u8[A2 + 0x2e] == 0)
 	{

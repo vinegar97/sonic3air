@@ -168,7 +168,7 @@ function void fn04aac8()
 	/*
 		// Allow for jumping off
 		// TODO: Does not work yet
-		if (control.player1.state & 0x0f)
+		if (control.player1.state & CONTROL_DPAD)
 		{
 			objA1.hitbox_extends.x = 0x07
 			objA1.hitbox_extends.y = 0x0e
@@ -734,11 +734,11 @@ function void fn04af80()
 				objA1.velocity.y = (objA0.position.y.u16 - u16[A0 + 0x40]) << 8
 
 				u8[A2 + 0x02] = 0x3c
-				if (D0 & 0x0800)
+				if (D0 & 0x0800)		// CONTROL_RIGHT held
 				{
 					objA1.velocity.x = 0x200
 				}
-				else if (D0 & 0x0400)
+				else if (D0 & 0x0400)		// CONTROL_LEFT held
 				{
 					objA1.velocity.x = -0x200
 				}

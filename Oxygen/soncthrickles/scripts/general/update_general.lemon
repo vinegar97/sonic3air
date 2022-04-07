@@ -656,7 +656,7 @@ function void UpdateRollingDemo()
 	D1.u8 ^= D0.u8
 	D1.u8 &= D0.u8
 	control.pad1.pressed = D1.u8
-	control.pad2 &= 0x8080
+	control.pad2 &= 0x8080		// CONTROL_START, CONTROL_START
 	u32[0xffffef52] = A0
 }
 

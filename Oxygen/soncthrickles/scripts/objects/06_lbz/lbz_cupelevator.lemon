@@ -601,6 +601,7 @@ function void fn026eda()
 			return
 		}
 
+		// Check if jump button pressed
 		D0.u8 &= CONTROL_ABC
 		if (D0.u8 != 0 && u8[0xfffffaa9] == 0)
 		{

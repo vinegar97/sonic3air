@@ -574,9 +574,9 @@ function void fn07e298()
 			D1 = 0
 			if (u8[A1 + 0x2a] & 0x20)
 			{
-				D1.u16 |= 0x4040
+				D1.u16 |= 0x4040		// CONTROL_A, CONTROL_A
 			}
-			D1.u16 |= 0x0808
+			D1.u16 |= 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 			control.player1 = D1.u16
 			return
 		}
@@ -588,9 +588,9 @@ function void fn07e298()
 			D1 = 0
 			if (u8[A1 + 0x2a] & 0x20)
 			{
-				D1.u16 |= 0x4040
+				D1.u16 |= 0x4040		// CONTROL_A, CONTROL_A
 			}
-			D1.u16 |= 0x0404
+			D1.u16 |= 0x0404		// CONTROL_LEFT, CONTROL_LEFT
 			control.player1 = D1.u16
 			return
 		}

@@ -374,11 +374,7 @@ function void fn069526()
 	if (D0.u16 > objA1.position.x.u16)
 	{
 		// Move right
-
-		// control.player1.state = CONTROL_RIGHT
-		// control.player1.pressed = CONTROL_RIGHT
-		control.player1 = 0x0808
-
+		control.player1 = 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 		return
 	}
 
@@ -399,10 +395,7 @@ function void fn069526()
 	else
 	{
 		objA0.update_address = 0x0695ce
-
-		// control.player1.state = CONTROL_C
-		// control.player1.pressed = CONTROL_C
-		control.player1 = 0x2020
+		control.player1 = 0x2020		// CONTROL_C, CONTROL_C
 	}
 }
 
@@ -425,10 +418,7 @@ function void fn069588()
 		}
 	#endif
 
-		// control.player1.state = CONTROL_UP
-		// control.player1.pressed = CONTROL_UP
-		control.player1 = 0x0101
-
+		control.player1 = 0x0101		// CONTROL_UP, CONTROL_UP
 		control.tails = 0
 	}
 	else
@@ -462,9 +452,7 @@ function void fn0695ae()
 //# address-hook(0x0695ce) end(0x069610)
 function void fn0695ce()
 {
-	// control.player1.state = CONTROL_C
-	// control.player1.pressed = 0
-	control.player1 = 0x2000
+	control.player1 = 0x2000		// CONTROL_C, 0
 
 	A1 = 0xffffb000
 	u8[A1 + 0x0a] |= 0x80

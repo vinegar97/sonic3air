@@ -196,7 +196,8 @@ function void fn03fe70()
 		{
 			if (u8[A1 + 0x2a] & 0x02)
 			{
-				D5.u16 &= 0x70
+				// Check if jump button pressed
+				D5.u16 &= CONTROL_ABC
 				if (D5.u16 != 0)
 				{
 					objA1.velocity.y = 0x0400

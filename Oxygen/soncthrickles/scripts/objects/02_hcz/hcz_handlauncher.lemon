@@ -216,6 +216,7 @@ function void fn030cf8()
 
 	if (u8[A0 + 0x35] & bit)
 	{
+		// Check if jump button pressed
 		if (D0.u8 & CONTROL_ABC)
 		{
 			u8[A0 + 0x35] &= ~bit

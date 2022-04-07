@@ -941,7 +941,7 @@ function void fn04d3ce()
 
 	D1.u8 = control.pad1.pressed
 #if STANDALONE
-	D1.u8 ^= CONTROL_UP | CONTROL_DOWN	// Reverse up/down, it just feels wrong otherwise
+	D1.u8 ^= (CONTROL_UP | CONTROL_DOWN)	// Reverse up/down, it just feels wrong otherwise
 #endif
 	if (D1 & CONTROL_UP)
 	{
@@ -1329,6 +1329,7 @@ function void fn04d6b8()
 	}
 #endif
 
+	// Check if jump button pressed
 	if (control.pad1.pressed & CONTROL_ABC)
 	{
 		D0.u16 = objA0.sprite_attributes

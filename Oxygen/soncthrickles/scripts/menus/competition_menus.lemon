@@ -140,7 +140,7 @@ function void CompetitionMode.MainMenu()
 			return
 		}
 
-		if (D0.u8 & 0xf0)
+		if (D0.u8 & (CONTROL_START | CONTROL_ABC))
 		{
 			D2 = competition_mode.menu.game_mode * 2
 			call 0x00aa28 + D2.s16
@@ -209,7 +209,7 @@ function void fn00aa36()
 {
 	competition_mode.game_mode = 0
 	competition_mode.item_flag = competition_mode.menu.items_toggle
-	competition_mode.multiplay = (control.pad2.pressed & 0xe0) ? 0xff : 0x00
+	competition_mode.multiplay = (control.pad2.pressed & (CONTROL_START | CONTROL_A | CONTROL_C)) ? 0xff : 0x00
 	global.game_mode = 0x3c
 	fn00aa8e()
 }
@@ -220,7 +220,7 @@ function void fn00aa54()
 {
 	competition_mode.game_mode = 0x03
 	competition_mode.item_flag = competition_mode.menu.items_toggle
-	competition_mode.multiplay = (control.pad2.pressed & 0xe0) ? 0xff : 0x00
+	competition_mode.multiplay = (control.pad2.pressed & (CONTROL_START | CONTROL_A | CONTROL_C)) ? 0xff : 0x00
 	global.game_mode = 0x40
 	fn00aa8e()
 }
@@ -229,7 +229,7 @@ function void fn00aa54()
 //# address-hook(0x00aa74) end(0x00aaa0)
 function void fn00aa74()
 {
-	if (control.pad1.pressed & 0xe0)
+	if (control.pad1.pressed & (CONTROL_START | CONTROL_A | CONTROL_C))
 	{
 		// competition_mode.item_flag = 0xff
 		// competition_mode.game_mode = 0xff
@@ -533,7 +533,7 @@ function void CompetitionMode.StageSelect()
 			u8[0xffffeee3] = 0xff
 		}
 		D1.u8 |= D2.u8
-		D2.u16 = D1.u8 & 0x03
+		D2.u16 = D1.u8 & (CONTROL_UP | CONTROL_DOWN)
 		if (D2.u16 != 0)
 		{
 			if ((D2.u8 & CONTROL_UP) == 0)
@@ -1765,7 +1765,7 @@ function void fn00bc08()
 		}
 		else
 		{
-			if (control.pad1.pressed & 0xe0)
+			if (control.pad1.pressed & (CONTROL_START | CONTROL_A | CONTROL_C))
 			{
 				global.game_mode = 0xc0
 				return

@@ -104,6 +104,7 @@ function void fn040f52()
 	{
 		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04)
 		{
+			// Check if jump button pressed
 			D0.u8 &= CONTROL_ABC
 			if (D0.u8 == 0)
 			{
@@ -131,16 +132,16 @@ function void fn040f52()
 				u8[A2] = 0
 				u8[A2+2] = 0x12
 
-				if (D0.u16 & 0x0f00)		// CONTROL_DPAD
+				if (D0.u16 & 0x0f00)		// Any direction held?
 				{
 					u8[A2+2] = 0x3c
 				}
 
-				if (D0.u16 & 0x0800)		// CONTROL_RIGHT
+				if (D0.u16 & 0x0800)		// CONTROL_RIGHT held
 				{
 					objA1.velocity.x = 0x200
 				}
-				else if (D0.u16 & 0x0400)		// CONTROL_LEFT
+				else if (D0.u16 & 0x0400)		// CONTROL_LEFT held
 				{
 					objA1.velocity.x = -0x200
 				}

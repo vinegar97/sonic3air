@@ -1004,13 +1004,13 @@ function void Tails.UpdateCarrySonic()
 				u8[A1 + 0x2e] = 0
 				u8[A2] = 0
 
-				if (D0.u16 & 0x0f00)	// Any direction pressed?
+				if (D0.u16 & 0x0f00)	// Any direction held?
 				{
 					u8[A2+1] = catchTimeout
 
-					if (D0 & 0x0400)
+					if (D0 & 0x0400)	// CONTROL_LEFT held
 						objA1.velocity.x = -0x200
-					if (D0 & 0x0800)
+					if (D0 & 0x0800)	// CONTROL_RIGHT held
 						objA1.velocity.x = 0x200
 				}
 				else
@@ -4384,7 +4384,7 @@ function void Character.updateUprightOnGroundInner()
 				// Can only look up/down when state was not changed to balancing
 				if (char.state == char.state.STANDING)
 				{
-					if (input_state & (CONTROL_DOWN | CONTROL_UP))
+					if (input_state & (CONTROL_UP | CONTROL_DOWN))
 					{
 						cameraMoveState = 1
 						char.state = (input_state & CONTROL_DOWN) ? char.state.COWERING : char.state.LOOKING_UP

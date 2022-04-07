@@ -200,7 +200,8 @@ function void fn032784()
 			}
 		}
 
-		D5.u8 &= 0x70
+		// Check if jump button pressed
+		D5.u8 &= CONTROL_ABC
 		if (D5.u8 == 0)
 		{
 			fn03260a()

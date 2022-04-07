@@ -77,13 +77,13 @@ function void fn045dfe()
 		PlatformCheckClimbOn()
 
 		A1 = 0xffffb000
-		A2 = 0xfffff602
+		A2 = 0xfffff602		// Address of "control.player1"
 		A3 = A0 + 0x2e
 		D6 = 3		// object.flag.P1_ON_OBJECT
 		fn045e6e()
 
 		A1 = 0xffffb04a
-		A2 = 0xfffff66a
+		A2 = 0xfffff66a		// Address of "control.tails"
 		A3 = A0 + 0x30
 		D6 = 4		// object.flag.P2_ON_OBJECT
 		fn045e6e()
@@ -127,7 +127,7 @@ function void fn045e6e()
 		u8[A1 + 0x2e] = 0x03
 		u8[A1 + 0x3d] = 0
 
-		D0.u16 = u16[A2] & 0x70
+		D0.u16 = u16[A2] & CONTROL_ABC
 		if (D0.u16 != 0)
 		{
 			u8[A3] = 0
@@ -197,14 +197,14 @@ function void fn045f2e()
 		PlatformCheckClimbOn()
 
 		A1 = 0xffffb000
-		A2 = 0xfffff602
+		A2 = 0xfffff602		// Address of "control.player1"
 		A3 = A0 + 0x2e
 		A4 = A0 + 0x34
 		D6 = 3		// object.flag.P1_ON_OBJECT
 		fn045f74()
 
 		A1 = 0xffffb04a
-		A2 = 0xfffff66a
+		A2 = 0xfffff66a		// Address of "control.tails"
 		A3 = A0 + 0x34
 		A4 = A0 + 0x2e
 		D6 = 4		// object.flag.P2_ON_OBJECT
@@ -274,7 +274,7 @@ function void fn045f74()
 	u8[A1 + 0x2e] = 0x03
 	u8[A1 + 0x3d] = 0
 
-	D0.u16 = u16[A2] & 0x70
+	D0.u16 = u16[A2] & CONTROL_ABC
 	if (D0.u16 != 0)
 	{
 		u8[A3] = 0

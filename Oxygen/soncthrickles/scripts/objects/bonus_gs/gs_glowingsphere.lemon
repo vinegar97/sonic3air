@@ -81,17 +81,18 @@ function void fn04a428()
 		return
 	}
 
-	if (D1 & 0x70)
+	// Check if jump button pressed
+	if (D1 & CONTROL_ABC)
 	{
 		fn04a4b4()
 		return
 	}
 
-	if (D1 & 0x0400)
+	if (D1 & 0x0400)		// CONTROL_LEFT held
 	{
 		--u8[A2 + 0x06]
 	}
-	if (D1 & 0x0800)
+	if (D1 & 0x0800)		// CONTROL_RIGHT held
 	{
 		++u8[A2 + 0x06]
 	}

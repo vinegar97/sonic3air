@@ -233,7 +233,8 @@ function void fn033ade()
 
 	if (debug_mode.state == 0)
 	{
-		D5.u16 &= 0x70
+		// Check if jump button pressed
+		D5.u16 &= CONTROL_ABC
 		if (D5.u16 != 0)
 		{
 			objA1.velocity.x = -0x800

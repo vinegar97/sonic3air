@@ -466,7 +466,8 @@ function void fn0220c2()
 	{
 		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 4)
 		{
-			D1.u8 = D0.u8 & 0x70
+			// Check if jump button pressed
+			D1.u8 = D0.u8 & CONTROL_ABC
 			if (D1.u8 == 0)
 			{
 				fn0221ec()
@@ -482,11 +483,11 @@ function void fn0220c2()
 				D1.s16 = s16(objA0.position.y.u16 - u16[A0 + 0x44]) << 7
 				objA1.velocity.y = D1.u16
 				u8[A2 + 0x02] = 0x3c
-				if (D0 & 0x0400)
+				if (D0 & 0x0400)		// CONTROL_LEFT held
 				{
 					objA1.velocity.x = -0x200
 				}
-				if (D0 & 0x0800)
+				if (D0 & 0x0800)		// CONTROL_RIGHT held
 				{
 					objA1.velocity.x = 0x200
 				}

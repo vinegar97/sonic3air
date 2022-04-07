@@ -171,14 +171,14 @@ function void fn057fc0()
 function void fn057fe2()
 {
 	A1 = 0xffffb000
-	A2 = 0xfffff602
+	A2 = 0xfffff602		// Address of "control.player1"
 	A3 = A0 + 0x30
 	fn058002()
 
 	if (getNumPlayers() == 2)
 	{
 		A1 = 0xffffb04a
-		A2 = 0xfffff66a
+		A2 = 0xfffff66a		// Address of "control.tails"
 		A3 = A0 + 0x31
 		fn058002()
 	}
@@ -193,7 +193,7 @@ function void fn058002()
 			--u8[A3]
 			if (s8[A3] < 0)
 			{
-				u16[A2] = 0x2020
+				u16[A2] = 0x2020		// CONTROL_C, CONTROL_C
 			}
 		}
 		else if (objA1.velocity.y >= 0)
@@ -205,10 +205,10 @@ function void fn058002()
 		}
 		else
 		{
-			D0.u16 = 0x2800
+			D0.u16 = 0x2800		// (CONTROL_C | CONTROL_RIGHT), 0
 			if (objA1.position.x.u16 >= 0x1a40)
 			{
-				D0.u16 = 0x2400
+				D0.u16 = 0x2400		// (CONTROL_C | CONTROL_LEFT), 0
 			}
 			u16[A2] = D0.u16
 		}

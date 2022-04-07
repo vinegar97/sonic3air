@@ -248,6 +248,7 @@ function void fn04bb84()
 //# address-hook(0x04bbb2) end(0x04bbf2)
 function void fn04bbb2()
 {
+	// Check if jump button pressed
 	if (control.player1.pressed & CONTROL_ABC)
 	{
 		D0.u8 = -(0x40 + slotmachine.rotation.u8 & 0xfc)

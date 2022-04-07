@@ -133,6 +133,7 @@ function void fn03f5c2()
 		{
 			if (u16[A0 + 0x34] == objA1.velocity.x && u16[A0 + 0x36] == objA1.velocity.y)
 			{
+				// Check if jump button pressed
 				if ((D0.u8 & CONTROL_ABC) == 0)
 				{
 					objA1.position.x.u16 = objA0.position.x.u16
@@ -154,15 +155,15 @@ function void fn03f5c2()
 					u8[A2] = 0
 					u8[A2 + 0x02] = 0x12
 
-					if (D0 & 0x0f00)
+					if (D0 & 0x0f00)	// Any direction held?
 					{
 						u8[A2 + 0x02] = 0x3c
 					}
-					if (D0 & 0x0400)
+					if (D0 & 0x0400)		// CONTROL_LEFT held
 					{
 						objA1.velocity.x = -0x200
 					}
-					if (D0 & 0x0800)
+					if (D0 & 0x0800)		// CONTROL_RIGHT held
 					{
 						objA1.velocity.x = 0x0200
 					}

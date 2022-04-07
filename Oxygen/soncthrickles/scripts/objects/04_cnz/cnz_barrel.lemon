@@ -418,6 +418,7 @@ function void fn0324c0()
 			u16[A1 + 0x1c] = 0x800
 		}
 
+		// Check if jump button pressed
 		if ((D5.u8 & CONTROL_ABC) == 0)
 		{
 			fn03260a()

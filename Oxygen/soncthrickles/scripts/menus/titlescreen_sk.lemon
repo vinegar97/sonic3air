@@ -825,7 +825,7 @@ function void fn005b42()
 		}
 		titlescreen.selection = D2.u8
 
-		if (D0.u8 & 0x03)
+		if (D0.u8 & (CONTROL_UP | CONTROL_DOWN))
 		{
 			playSound(SFX_CLICK)
 		}

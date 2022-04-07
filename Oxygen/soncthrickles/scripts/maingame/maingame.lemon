@@ -39,8 +39,8 @@ function void GameMode.MainGame()
 
 		global.fade_timer = 0x16
 		u16[0xffffb250 + 0x2e] = 0x16
-		control.pad1 = 0x7f00
-		control.pad2 = 0x7f00
+		control.pad1 = 0x7f00		// ~CONTROL_START, 0
+		control.pad2 = 0x7f00		// ~CONTROL_START, 0
 		checkpoint.number &= 0x7f
 		global.game_mode &= ~0x80
 
@@ -2251,12 +2251,8 @@ function void fn0075d2()
 	u32[0xffffef52] = A0
 	rolling_demo.last_input = 0
 
-	// control.pad1.state = CONTROL_START
-	// control.pad1.pressed = 0
-	// control.pad2.state = CONTROL_START
-	// control.pad2.pressed = 0
-	control.pad1 = 0x8000
-	control.pad2 = 0x8000
+	control.pad1 = 0x8000		// CONTROL_START, 0
+	control.pad2 = 0x8000		// CONTROL_START, 0
 
 	u8[0xffffef50] = 0xff
 }

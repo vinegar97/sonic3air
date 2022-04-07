@@ -18,7 +18,7 @@ function void Character.TailsAI.Update()
 	A1 = 0xffffb000		// Player 1
 
 	// When player 2 presses any key, that disables the AI for 10 seconds
-	if (control.tails.state & 0x7f)
+	if (control.tails.state & ~CONTROL_START)
 	{
 		tails.control_counter = 600		// 10 sec
 	}
@@ -164,14 +164,14 @@ function bool updateTailsAssist()
 			}
 
 			control.tails = 0
-			control.tails.state = (input & 0x0c)
+			control.tails.state = (input & (CONTROL_RIGHT | CONTROL_LEFT))
 			if (input & CONTROL_DOWN)
 			{
 				// Nothing here, just fly down
 			}
 			else if (input & CONTROL_UP)
 			{
-				control.tails |= 0x7070
+				control.tails |= 0x7070		// CONTROL_ABC, CONTROL_ABC
 			}
 			else
 			{
@@ -182,7 +182,7 @@ function bool updateTailsAssist()
 				if (tails.up_press_timer >= 0x58)
 				{
 					tails.up_press_timer = 0
-					control.tails |= 0x7070
+					control.tails |= 0x7070		// CONTROL_ABC, CONTROL_ABC
 				}
 			*/
 			}
@@ -329,7 +329,7 @@ function void fn013b26()
 	}
 #endif
 
-	if ((control.tails.state & 0xf0) == 0)	// Check buttons, but not D-pad
+	if ((control.tails.state & (CONTROL_START | CONTROL_ABC)) == 0)	// Check buttons, but not D-pad
 	{
 		// Check only every 64 frames
 		if ((level.framecounter & 0x3f) != 0)
@@ -556,7 +556,7 @@ function void fn013d4a()
 		#endif
 			if ((level.framecounter.low & 0x3f) == 0 && char.state != char.state.COWERING)
 			{
-				control.tails |= 0x7070
+				control.tails |= 0x7070		// CONTROL_ABC, CONTROL_ABC
 				tails.ai_jumping = 1
 			}
 		}
@@ -572,7 +572,7 @@ function void fn013d4a()
 				{
 					if (relativeTargetPosX <= -0x30)
 					{
-						control.tails = (control.tails & 0xf3f3) | 0x0404		// Move left
+						control.tails = (control.tails & ~0x0c0c) | 0x0404		// Move left
 					}
 
 					if (char.groundspeed != 0 && (char.flags & char.flag.FACING_LEFT) != 0 && (char.control_flags & 0x01) == 0)
@@ -584,7 +584,7 @@ function void fn013d4a()
 				{
 					if (relativeTargetPosX >= 0x30)
 					{
-						control.tails = (control.tails & 0xf3f3) | 0x0808		// Move right
+						control.tails = (control.tails & ~0x0c0c) | 0x0808		// Move right
 					}
 
 					if (char.groundspeed != 0 && (char.flags & char.flag.FACING_LEFT) == 0 && (char.control_flags & 0x01) == 0)
@@ -596,7 +596,7 @@ function void fn013d4a()
 
 			if (tails.ai_jumping != 0)
 			{
-				control.tails |= 0x7000
+				control.tails |= 0x7000		// CONTROL_ABC, 0
 				if (char.flags & char.flag.IN_AIR)
 					return
 
@@ -610,7 +610,7 @@ function void fn013d4a()
 				{
 					if (((level.framecounter.low & 0x3f) == 0) && (char.state != char.state.COWERING))
 					{
-						control.tails |= 0x7070
+						control.tails |= 0x7070		// CONTROL_ABC, CONTROL_ABC
 						tails.ai_jumping = 1
 					}
 				}
@@ -629,7 +629,7 @@ function void fn013d4a()
 				// Start charging a spindash if the main player does so as well
 				if (char.spindash == 0 && u8[A1 + 0x3d] != 0 && char.state == char.state.COWERING)
 				{
-					control.tails |= 0x0020
+					control.tails |= 0x0020		// 0, CONTROL_C
 				}
 			}
 		#endif
@@ -701,9 +701,7 @@ function void fn013f40()
 		else
 			objA0.flags2a &= ~char.flag.FACING_LEFT
 
-		// control.tails.state = CONTROL_DOWN
-		// control.tails.pressed = CONTROL_DOWN
-		control.tails = 0x0202
+		control.tails = 0x0202		// CONTROL_DOWN, CONTROL_DOWN
 
 		D0.u8 = level.framecounter.low & 0x7f
 		if (D0.u8 == 0)
@@ -713,16 +711,12 @@ function void fn013f40()
 		}
 		else if (char.state == char.state.COWERING)
 		{
-			// control.tails.state = (CONTROL_ABC | CONTROL_DOWN)
-			// control.tails.pressed = (CONTROL_ABC | CONTROL_DOWN)
-			control.tails = 0x7272
+			control.tails = 0x7272		// (CONTROL_ABC | CONTROL_DOWN), (CONTROL_ABC | CONTROL_DOWN)
 		}
 	}
 	else
 	{
-		// control.tails.state = CONTROL_DOWN
-		// control.tails.pressed = CONTROL_DOWN
-		control.tails = 0x0202
+		control.tails = 0x0202		// CONTROL_DOWN, CONTROL_DOWN
 
 		D0.u8 = level.framecounter.low & 0x7f
 		if (D0.u8 == 0)
@@ -732,9 +726,7 @@ function void fn013f40()
 		}
 		else if ((D0.u8 & 0x1f) == 0)
 		{
-			// control.tails.state = (CONTROL_ABC | CONTROL_DOWN)
-			// control.tails.pressed = (CONTROL_ABC | CONTROL_DOWN)
-			control.tails = 0x7272
+			control.tails = 0x7272		// (CONTROL_ABC | CONTROL_DOWN), (CONTROL_ABC | CONTROL_DOWN)
 		}
 	}
 }
@@ -769,7 +761,7 @@ function void fn013fc2()
 function void fn013ffa()
 {
 	tails.control_counter = 0
-	control.tails = (level.framecounter.low & 0x1f) ? 0 : 0x0808
+	control.tails = (level.framecounter.low & 0x1f) ? 0 : 0x0808		// Move right
 
 	A2 = 0xfffff73e
 	A1 = 0xffffb000
@@ -803,7 +795,7 @@ function void fn01408a()
 {
 	tails.control_counter = 0
 	tails.flight_countdown = 0xf0
-	control.tails = (level.framecounter.low & 0x0f) ? 0 : 0x7878
+	control.tails = (level.framecounter.low & 0x0f) ? 0 : 0x7878		// (CONTROL_ABC | CONTROL_RIGHT), (CONTROL_ABC | CONTROL_RIGHT)
 
 	if (!(objA0.render_flags & render_flag.VISIBLE))
 	{
@@ -846,7 +838,7 @@ function void fn014106()
 {
 	tails.control_counter = 0
 	tails.flight_countdown = 0xf0
-	control.tails = (level.framecounter.low & 0x07) ? 0 : 0x7070
+	control.tails = (level.framecounter.low & 0x07) ? 0 : 0x7070		// CONTROL_ABC, CONTROL_ABC
 
 	if (objA0.position.y.u16 <= camera.position.y.u16 + 0x90)
 	{
@@ -869,7 +861,7 @@ function void fn01425c()
 	tails.flight_countdown = 0xf0
 	objA0.value2f = 0x01
 	tails.control_counter = 0
-	control.tails = (level.framecounter.low & 0x1f) ? 0 : 0x0808
+	control.tails = (level.framecounter.low & 0x1f) ? 0 : 0x0808		// Move right
 
 	if (objA0.flags2a & char.flag.IN_AIR)
 	{
@@ -892,7 +884,7 @@ function void fn01425c()
 function void fn014286()
 {
 	tails.control_counter = 0
-	control.tails = (level.framecounter.low & 0x1f) ? 0 : 0x0808
+	control.tails = (level.framecounter.low & 0x1f) ? 0 : 0x0808		// Move right
 
 	if ((objA0.flags2a & char.flag.IN_AIR) == 0)
 	{

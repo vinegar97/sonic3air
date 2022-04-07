@@ -95,7 +95,8 @@ function void fn049cfe()
 			return
 		}
 
-		D5.u16 &= 0x70
+		// Check if jump button pressed
+		D5.u16 &= CONTROL_ABC
 		if (D5.u16 != 0)
 		{
 			objA0.flags38 = 0x01

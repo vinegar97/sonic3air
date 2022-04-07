@@ -193,6 +193,7 @@ function void fn0319f4()
 				u16[A0 + 0x34] = 1
 			}
 
+			// Check if jump button pressed
 			if ((D1.u16 & CONTROL_ABC) == 0)
 				return
 		}

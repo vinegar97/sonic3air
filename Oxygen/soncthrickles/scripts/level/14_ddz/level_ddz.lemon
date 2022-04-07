@@ -683,6 +683,8 @@ function void fn082772()
 		if (control.pad1 != 0 && player1.control_override == 0)
 		{
 			D0.u16 = (control.pad1.state & CONTROL_DPAD) * 4
+
+			// Check if jump button pressed
 			if (control.pad1.pressed & CONTROL_ABC)
 			{
 				if (u8[A1 + 0x34] == 0)

@@ -323,16 +323,10 @@ function void fn076270()
 	PlayMusicAfterLevelResults()
 
 	player1.control_override = 0xff
-
-	// control.player1.state = CONTROL_UP
-	// control.player1.pressed = CONTROL_UP
-	control.player1 = 0x0101
+	control.player1 = 0x0101		// CONTROL_UP, CONTROL_UP
 
 	player2.control_override = 0xff
-
-	// control.tails.state = CONTROL_UP
-	// control.tails.pressed = CONTROL_UP
-	control.tails = 0x0101
+	control.tails = 0x0101		// CONTROL_UP, CONTROL_UP
 	fn08638a()
 
 	objA0.countdown_value = 0x01bf
@@ -732,9 +726,7 @@ function void fn0768d2()
 //# address-hook(0x0768fe) end(0x076922)
 function void fn0768fe()
 {
-	// control.player1.state = CONTROL_RIGHT
-	// control.player1.pressed = CONTROL_RIGHT
-	control.player1 = 0x0808
+	control.player1 = 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 
 	A1 = 0xffffb000
 	if (objA1.position.x.u16 < 0x4600)

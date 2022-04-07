@@ -1010,9 +1010,7 @@ function void fn064ca6()
 	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 		return
 
-	// control.player1.state = CONTROL_RIGHT
-	// control.player1.pressed = CONTROL_RIGHT
-	control.player1 = 0x0808
+	control.player1 = 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 
 	if (objA1.position.x.u16 < 0x15a8)
 		return
@@ -1060,9 +1058,7 @@ function void fn064d38()
 		u8[A1 + 0x2e] = 0
 		player1.control_override = 0xff
 
-		// control.player1.state = CONTROL_RIGHT
-		// control.player1.pressed = CONTROL_RIGHT
-		control.player1 = 0x0808
+		control.player1 = 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 	}
 }
 
@@ -1125,7 +1121,7 @@ function void fn064de0()
 {
 	A1 = 0xffffb000
 	D1.u16 = objA1.position.x.u16 - 0x1892
-	control.player1 = (D1.s16 >= 0) ? 0x0404 : 0x0808
+	control.player1 = (D1.s16 >= 0) ? 0x0404 : 0x0808		// CONTROL_LEFT, CONTROL_LEFT : CONTROL_RIGHT, CONTROL_RIGHT
 	if (abs(D1.s16) > 4)
 		return
 

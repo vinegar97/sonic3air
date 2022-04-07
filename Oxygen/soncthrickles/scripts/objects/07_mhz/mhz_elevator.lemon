@@ -253,6 +253,7 @@ function void fn03e508()
 
 	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
 	{
+		// Check if jump button pressed
 		D1.u16 = D0.u16 & CONTROL_ABC
 		if (D1.u8 == 0)
 		{
@@ -269,16 +270,16 @@ function void fn03e508()
 		u8[A2] = 0
 		u8[A2 + 0x02] = 0x12
 
-		D0.u16 &= 0x0f00
+		D0.u16 &= 0x0f00	// Any direction held?
 		if (D0.u16 != 0)
 		{
 			u8[A2 + 0x02] = 0x3c
 		}
-		if (D0 & 0x0400)	// CONTROL_LEFT
+		if (D0 & 0x0400)	// CONTROL_LEFT held
 		{
 			objA1.velocity.x = -0x200
 		}
-		if (D0 & 0x0800)	// CONTROL_RIGHT
+		if (D0 & 0x0800)	// CONTROL_RIGHT held
 		{
 			objA1.velocity.x = 0x200
 		}
@@ -348,11 +349,11 @@ function void fn03e5f2()
 	// Check for cheat first
 	fn03e598()
 
-	if (D0 & 0x0400)	// CONTROL_LEFT
+	if (D0 & 0x0400)	// CONTROL_LEFT held
 	{
 		objA1.flags2a |= char.flag.FACING_LEFT
 	}
-	if (D0 & 0x0800)	// CONTROL_RIGHT
+	if (D0 & 0x0800)	// CONTROL_RIGHT held
 	{
 		objA1.flags2a &= ~char.flag.FACING_LEFT
 	}

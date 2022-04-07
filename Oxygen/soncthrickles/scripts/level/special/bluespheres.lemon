@@ -1021,7 +1021,7 @@ function void fn00937c()
 	u16[A1] = control.pad1
 	u8[A1 + 0x02] = bluespheres.jumping_flags.player1
 	u8[0xffffee27] += 4
-	D0.u8 = control.pad2.state & 0x7f
+	D0.u8 = control.pad2.state & ~CONTROL_START
 	if (D0.u8 != 0)
 	{
 		tails.control_counter = 600

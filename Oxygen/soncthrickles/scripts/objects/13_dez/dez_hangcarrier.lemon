@@ -104,14 +104,14 @@ function void fn04703e()
 			u8[A2] = 0
 			u8[A2 + 0x02] = 0x12
 
-			if (D0.u16 & 0x0f00)
+			if (D0.u16 & 0x0f00)	// Any direction held?
 			{
 				u8[A2 + 0x02] = 0x3c
-				if (D0 & 0x0800)
+				if (D0 & 0x0800)		// CONTROL_RIGHT held
 				{
 					objA1.velocity.x = 0x200
 				}
-				else if (D0 & 0x0400)
+				else if (D0 & 0x0400)		// CONTROL_LEFT held
 				{
 					objA1.velocity.x = -0x200
 				}

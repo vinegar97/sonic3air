@@ -206,7 +206,7 @@ function void CompetitionMode.Character.UpdateUprightOnGround.Sonic_Knuckles()
 		if (char.state == 0x05 && char.animation.frame >= 0x1e)
 		{
 			Character.UpdateUprightSlopeEffect()
-			if (control.player1.state & 0x7f)
+			if (control.player1.state & ~CONTROL_START)
 			{
 				char.state = (char.animation.frame < 0xac) ? 0x0a : 0x0b
 			}

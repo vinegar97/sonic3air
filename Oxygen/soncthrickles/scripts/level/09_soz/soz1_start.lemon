@@ -89,6 +89,8 @@ function void fn0420a6()
 	player2.control_override = 1
 	control.player1 = 0
 	control.tails = 0
+
+	// Check if jump button pressed
 	if ((control.pad1.pressed & CONTROL_ABC) == 0)
 		return
 

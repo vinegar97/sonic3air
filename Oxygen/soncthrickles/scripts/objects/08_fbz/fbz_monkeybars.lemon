@@ -103,14 +103,15 @@ function void fn03a8b8()
 	{
 		if ((objA1.render_flags & render_flag.VISIBLE) && debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
 		{
+			// Check if jump button pressed
 			D0.u8 &= CONTROL_ABC
 			if (D0.u8 == 0)
 			{
-				if (D0 & 0x0400)
+				if (D0 & 0x0400)		// CONTROL_LEFT held
 				{
 					objA1.flags2a |= char.flag.FACING_LEFT
 				}
-				if (D0 & 0x0800)
+				if (D0 & 0x0800)		// CONTROL_RIGHT held
 				{
 					objA1.flags2a &= ~char.flag.FACING_LEFT
 				}
@@ -123,16 +124,16 @@ function void fn03a8b8()
 				u8[A1 + 0x2e] = 0
 				u8[A2] = 0
 				u8[A2 + 0x02] = 0x12
-				D0.u16 &= 0x0f00
+				D0.u16 &= 0x0f00			// Any direction held?
 				if (D0.u16 != 0)
 				{
 					u8[A2 + 0x02] = 0x3c
 				}
-				if (D0 & 0x0400)
+				if (D0 & 0x0400)		// CONTROL_LEFT held
 				{
 					objA1.velocity.x = -0x200
 				}
-				if (D0 & 0x0800)
+				if (D0 & 0x0800)		// CONTROL_RIGHT held
 				{
 					objA1.velocity.x = 0x0200
 				}
@@ -248,6 +249,7 @@ function void fn03aa7e()
 
 	if ((objA1.render_flags & render_flag.VISIBLE) && debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
 	{
+		// Check if jump button pressed
 		D0.u8 &= CONTROL_ABC
 		if (D0.u8 == 0)
 		{
@@ -256,7 +258,7 @@ function void fn03aa7e()
 				if (u8[A2 + 0x04] == 0)
 				{
 					D2.u16 = objA0.value3e - 0x10
-					if (D0 & 0x0400)
+					if (D0 & 0x0400)		// CONTROL_LEFT held
 					{
 						objA1.flags2a |= char.flag.FACING_LEFT
 						D1.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D2.u16
@@ -266,7 +268,7 @@ function void fn03aa7e()
 							u8[A2 + 0x02] = 1
 						}
 					}
-					if (D0 & 0x0800)
+					if (D0 & 0x0800)		// CONTROL_RIGHT held
 					{
 						objA1.flags2a &= ~char.flag.FACING_LEFT
 						D1.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D2.u16
@@ -331,16 +333,16 @@ function void fn03aa7e()
 			u8[A2] = 0
 			u8[A2 + 0x02] = 0x12
 
-			D0.u16 &= 0x0f00
+			D0.u16 &= 0x0f00		// Any direction held?
 			if (D0.u16 != 0)
 			{
 				u8[A2 + 0x02] = 0x3c
 			}
-			if (D0 & 0x0400)
+			if (D0 & 0x0400)		// CONTROL_LEFT held
 			{
 				objA1.velocity.x = -0x200
 			}
-			if (D0 & 0x0800)
+			if (D0 & 0x0800)		// CONTROL_RIGHT held
 			{
 				objA1.velocity.x = 0x200
 			}

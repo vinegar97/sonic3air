@@ -251,6 +251,7 @@ function void fn03d4c2()
 					u16[A2 + 0x18] = D1.u16
 					u16[A2 + 0x1a] = D0.u16
 
+					// Check if jump button pressed
 					D0.u16 = control.player1.pressed & CONTROL_ABC
 					if (D0.u16 != 0)
 					{

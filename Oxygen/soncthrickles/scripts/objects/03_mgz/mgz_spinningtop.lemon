@@ -351,7 +351,8 @@ function void fn034fbc()
 {
 	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
 	{
-		if ((D5.u16 & 0x70) == 0)
+		// Check if jump button pressed
+		if ((D5.u16 & CONTROL_ABC) == 0)
 		{
 			if ((D5.u16 & 0x0c00) == 0 && objA0.velocity.x != 0)
 			{
@@ -776,11 +777,11 @@ function void fn035504()
 	D5.u16 = 0x0c
 	D4.u16 = 0x80
 
-	if (D3 & 0x0400)
+	if (D3 & 0x0400)		// CONTROL_LEFT held
 	{
 		fn03555c()
 	}
-	if (D3 & 0x0800)
+	if (D3 & 0x0800)		// CONTROL_RIGHT held
 	{
 		fn0355e4()
 	}

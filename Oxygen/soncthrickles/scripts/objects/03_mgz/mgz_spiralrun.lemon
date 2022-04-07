@@ -109,6 +109,7 @@ function void fn033cac()
 
 	if (debug_mode.state == 0)
 	{
+		// Check if jump button pressed
 		if (D5.u16 & CONTROL_ABC)
 		{
 			u8[A2 + 0x04] = 0x08

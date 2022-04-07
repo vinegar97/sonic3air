@@ -540,7 +540,7 @@ function void fn076e5c()
 //# address-hook(0x076e94) end(0x076f08)
 function void fn076e94()
 {
-	A1 = 0xfffff602
+	A1 = 0xfffff602		// Address of "control.player1"
 	A2 = 0xffffb000
 	D0.u16 = 0x43a0
 	if ((objA0.flags38 & 0x08) == 0)
@@ -550,9 +550,9 @@ function void fn076e94()
 			D1 = 0
 			if (u8[A2 + 0x2a] & 0x20)
 			{
-				D1.u16 |= 0x4040
+				D1.u16 |= 0x4040		// CONTROL_A, CONTROL_A
 			}
-			D1.u16 |= 0x0808
+			D1.u16 |= 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 			u16[A1] = D1.u16
 			return
 		}
@@ -564,9 +564,9 @@ function void fn076e94()
 			D1 = 0
 			if (u8[A2 + 0x2a] & 0x20)
 			{
-				D1.u16 |= 0x4040
+				D1.u16 |= 0x4040		// CONTROL_A, CONTROL_A
 			}
-			D1.u16 |= 0x0404
+			D1.u16 |= 0x0404		// CONTROL_LEFT, CONTROL_LEFT
 			u16[A1] = D1.u16
 			return
 		}
