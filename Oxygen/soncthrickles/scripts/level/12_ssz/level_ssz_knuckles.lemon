@@ -1163,7 +1163,7 @@ function void fn07cd82()
 
 		objA1.render_flags |= render_flag.FLIP_X
 		objA1.animation.sprite = 0xcb
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		u8[A1 + 0x2e] = 0x83
 		u8[A1 + 0x3d] = 0
 		u8[A1 + 0x40] = 0

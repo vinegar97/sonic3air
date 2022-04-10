@@ -39,7 +39,7 @@ function void fn04279e()
 //# address-hook(0x0427e2) end(0x04282e)
 function void fn0427e2()
 {
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 == 0)
 	{
 		if (objA0.flags2e != 0)

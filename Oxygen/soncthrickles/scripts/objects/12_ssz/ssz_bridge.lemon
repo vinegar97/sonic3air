@@ -34,9 +34,9 @@ function void fn044c76()
 	D4.u16 = objA0.position.x.u16
 	PlatformCheckClimbOn()
 
-	if (s8[A0 + 0x2c] >= 0 && objA0.flags2a & 0x18)
+	if (s8[A0 + 0x2c] >= 0 && objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 	{
-		A1 = (objA0.flags2a & 0x08) ? 0xffffb000 : 0xffffb04a
+		A1 = (objA0.flags2a & object.flag.P1_ON_OBJECT) ? 0xffffb000 : 0xffffb04a
 
 		D1 = 0x18
 		D2 = 0x10
@@ -149,28 +149,28 @@ function void fn044d98()
 	fn01e2fe()
 	D0.u16 = backupD0
 
-	if (D0 & 0x08)
+	if (D0 & object.flag.P1_ON_OBJECT)
 	{
 		A1 = 0xffffb000
 		if (u8[A1 + 0x2a] & 0x02 && u8[A1 + 0x40] == 0)
 		{
-			u8[A1 + 0x2a] &= ~0x02
+			u8[A1 + 0x2a] &= ~char.flag.IN_AIR
 		}
 	}
-	if (D0 & 0x10)
+	if (D0 & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
 		if (u8[A1 + 0x2a] & 0x02 && u8[A1 + 0x40] == 0)
 		{
-			u8[A1 + 0x2a] &= ~0x02
+			u8[A1 + 0x2a] &= ~char.flag.IN_AIR
 		}
 	}
 	if (s8[A0 + 0x2c] >= 0)
 	{
-		D0.u16 = objA0.flags2a & 0x18
+		D0.u16 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 		if (D0.u16 != 0)
 		{
-			A1 = (D0 & 0x08) ? 0xffffb000 : 0xffffb04a
+			A1 = (D0 & object.flag.P1_ON_OBJECT) ? 0xffffb000 : 0xffffb04a
 			D1 = 0x38
 			D2 = 0x10
 			D3.u16 = 0x0405
@@ -280,20 +280,20 @@ function void fn044eba()
 	fn01e2fe()
 
 	D0.u16 = backupD0
-	if (D0 & 0x08)
+	if (D0 & object.flag.P1_ON_OBJECT)
 	{
 		A1 = 0xffffb000
 		if (u8[A1 + 0x2a] & 0x02 && u8[A1 + 0x40] == 0)
 		{
-			u8[A1 + 0x2a] &= ~0x02
+			u8[A1 + 0x2a] &= ~char.flag.IN_AIR
 		}
 	}
-	if (D0 & 0x10)
+	if (D0 & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
 		if (u8[A1 + 0x2a] & 0x02 && u8[A1 + 0x40] == 0)
 		{
-			u8[A1 + 0x2a] &= ~0x02
+			u8[A1 + 0x2a] &= ~char.flag.IN_AIR
 		}
 	}
 

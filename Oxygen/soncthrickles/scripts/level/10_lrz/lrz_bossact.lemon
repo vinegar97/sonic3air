@@ -183,7 +183,7 @@ function void fn059fdc()
 	}
 
 	u32[0xffffeee6] = D0
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		A1 = 0xffffb000
 		if (!level.results_done && (u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE) == 0 && !level.capsule_opened)
@@ -195,7 +195,7 @@ function void fn059fdc()
 		u32[A1 + 0x10] += D0
 	}
 
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
 		if (!level.results_done && !level.capsule_opened)

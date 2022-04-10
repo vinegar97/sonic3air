@@ -199,7 +199,7 @@ function void fn06f010()
 	if ((u8[A1 + 0x2a] & 0x80) == 0)
 	{
 		D0.u16 = objA0.value3e
-		if ((objA0.flags2a & 0x08) == 0 && (u8[A1 + 0x38] & 0x04) == 0)
+		if ((objA0.flags2a & object.flag.P1_ON_OBJECT) == 0 && (u8[A1 + 0x38] & 0x04) == 0)
 		{
 			u8[A1 + 0x38] &= ~0x01
 		}

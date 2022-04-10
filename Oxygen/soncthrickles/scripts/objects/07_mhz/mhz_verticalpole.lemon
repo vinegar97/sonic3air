@@ -241,7 +241,7 @@ function void fn03f246()
 
 				if (u8[A1 + 0x2a] & 0x04)
 				{
-					u8[A1 + 0x2a] &= ~0x04
+					u8[A1 + 0x2a] &= ~char.flag.ROLLING
 					D0.u8 -= u8[A1 + 0x44]
 					objA1.position.y.u16 += D0.s8
 				}

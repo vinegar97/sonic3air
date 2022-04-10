@@ -72,12 +72,12 @@ function void fn0450ec()
 
 	A1 = 0xffffb000
 	A2 = A0 + 0x38
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn045170()
 
 	A1 = 0xffffb04a
 	A2 = A0 + 0x40
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn045170()
 
 	Object.animationUpdate(0x046ac4)
@@ -136,8 +136,8 @@ function void fn045170()
 			objA1.velocity.x = u16[A2 + 0x02]
 			u16[A1 + 0x1c] = u16[A2 + 0x04]
 			objA1.velocity.y = -0x700
-			u8[A1 + 0x2a] |= 0x02
-			u8[A1 + 0x2a] &= ~0x08
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 			u8[A1 + 0x40] = 0
 			u8[A1 + 0x3d] = 0
 			u8[A1 + 0x05] = 0x02

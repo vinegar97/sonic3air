@@ -33,7 +33,7 @@ function void fn044ae0()
 //# address-hook(0x044b30) end(0x044b8a)
 function void fn044b30()
 {
-	D0.u16 = objA0.flags2a & 0x18
+	D0.u16 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u16 != 0)
 	{
 		objA0.base_state = 0

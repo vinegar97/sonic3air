@@ -195,14 +195,14 @@ function void fn0497c2()
 	if (D6.u16 & 0x01)
 	{
 		A1 = 0xffffb000
-		D5 = 5
+		D5 = 5		// object.flag.P1_PUSHING
 		fn049848()
 	}
 
 	if (D6.u16 & 0x02)
 	{
 		A1 = 0xffffb04a
-		D5 = 6
+		D5 = 6		// object.flag.P2_PUSHING
 		fn049848()
 	}
 
@@ -223,14 +223,14 @@ function void fn049804()
 	if (D6.u16 & 0x01)
 	{
 		A1 = 0xffffb000
-		D5 = 5
+		D5 = 5		// object.flag.P1_PUSHING
 		fn049848()
 	}
 
 	if (D6.u16 & 0x02)
 	{
 		A1 = 0xffffb04a
-		D5 = 6
+		D5 = 6		// object.flag.P2_PUSHING
 		fn049848()
 	}
 
@@ -369,7 +369,7 @@ function void fn049986()
 	{
 		A1 = 0xffffb000
 		fn049a0e()
-		D5 = 5
+		D5 = 5		// object.flag.P1_PUSHING
 		fn049a02()
 	}
 
@@ -377,7 +377,7 @@ function void fn049986()
 	{
 		A1 = 0xffffb04a
 		fn049a0e()
-		D5 = 6
+		D5 = 6		// object.flag.P2_PUSHING
 		fn049a02()
 	}
 

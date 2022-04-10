@@ -207,14 +207,14 @@ function void fn0462b6()
 	A1 = 0xffffb000
 	A2 = 0xfffff602
 	A3 = A0 + 0x30
-	D5 = 3
+	D5 = 3		// object.flag.P1_ON_OBJECT
 	fn046324()
 
 	D6.u16 = backupD6 >> 1
 	A1 = 0xffffb04a
 	A2 = 0xfffff66a
 	A3 = A0 + 0x32
-	D5 = 4
+	D5 = 4		// object.flag.P2_ON_OBJECT
 	fn046324()
 
 	DrawObject()
@@ -242,7 +242,7 @@ function void fn046324()
 			u8[A1 + 0x1e] = 0x0e
 			u8[A1 + 0x1f] = 0x07
 			objA1.state = char.state.ROLLING
-			u8[A1 + 0x2a] |= 0x04
+			u8[A1 + 0x2a] |= char.flag.ROLLING
 			u8[A1 + 0x2e] = 0x01
 			u8[A1 + 0x3d] = 0
 
@@ -287,7 +287,7 @@ function void fn046324()
 				u8[A3] = 0
 				objA0.flags2a &= ~bit
 				u8[A1 + 0x2e] = 0
-				u8[A1 + 0x2a] &= ~0x08
+				u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 				D0.s16 = (objA0.flags2a & 0x01) ? -0x800 : 0x800
 				objA1.velocity.x = D0.u16
 				u16[A1 + 0x1c] = D0.u16
@@ -304,7 +304,7 @@ function void fn046324()
 		u8[A3] = 0
 		objA1.velocity.y = -0x680
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		u8[A1 + 0x40] = 0x01
 
 		playSound(SFX_JUMP)

@@ -260,7 +260,7 @@ function void fn03d4c2()
 						u8[A2 + 0x2a] |= 0x02
 						u8[A2 + 0x40] = 0x01
 						u8[A2 + 0x2a] |= 0x04
-						u8[A2 + 0x20] = 0x02
+						u8[A2 + 0x20] = char.state.ROLLING
 						u8[A2 + 0x1e] = 0x0e
 						u8[A2 + 0x1f] = 0x07
 						u16[A2 + 0x1c] = 0

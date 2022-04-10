@@ -48,7 +48,7 @@ function void fn039ca8()
 		--u8[A0 + 0x30]
 	}
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 != 0)
 	{
 		u8[A0 + 0x32] = 0x01
@@ -75,11 +75,11 @@ function void fn039ce8()
 		return
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn039d1a()
 
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn039d1a()
 
 	UnloadObject()
@@ -94,10 +94,10 @@ function void fn039d1a()
 	if (objA0.flags2a & bit)
 	{
 		objA0.flags2a &= ~bit
-		u8[A1 + 0x2a] &= ~0x08
-		u8[A1 + 0x2a] &= ~0x20
-		u8[A1 + 0x2a] |= 0x02
-		u8[A1 + 0x21] = 0x01
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[A1 + 0x2a] &= ~char.flag.PUSHING
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
+		u8[A1 + 0x21] = char.state.RUNNING2
 	}
 }
 

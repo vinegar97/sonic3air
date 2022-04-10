@@ -834,7 +834,7 @@ function void fn055250()
 		return
 	}
 
-	if (u16[0xffffb000 + 0x14] > 0x0420 && u8[0xffffb000 + 0x2a] & 0x02)
+	if (u16[0xffffb000 + 0x14] > 0x0420 && u8[0xffffb000 + 0x2a] & char.flag.IN_AIR)
 	{
 		fn0554b8()
 		fn0552e4()

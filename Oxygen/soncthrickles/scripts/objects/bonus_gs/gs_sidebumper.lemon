@@ -44,7 +44,7 @@ function void fn049ada()
 		if (D0.u16 != 0)
 		{
 			A1 = 0xffffb000
-			D5 = 5
+			D5 = 5		// object.flag.P1_PUSHING
 			fn049b76()
 		}
 
@@ -52,7 +52,7 @@ function void fn049ada()
 		if (D6.u16 != 0)
 		{
 			A1 = 0xffffb04a
-			D5 = 6
+			D5 = 6		// object.flag.P2_PUSHING
 			fn049b76()
 		}
 	}

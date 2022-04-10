@@ -82,7 +82,7 @@ function void fn029620()
 		u8[A4] += 2
 		u8[A4 + 0x01] = 0
 
-		objA0.flags2a &= ~0x20
+		objA0.flags2a &= ~object.flag.P1_PUSHING
 
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16

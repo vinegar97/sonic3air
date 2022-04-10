@@ -743,12 +743,12 @@ function void fn04af80()
 					objA1.velocity.x = -0x200
 				}
 				objA1.velocity.y -= 0x380
-				u8[A1 + 0x2a] |= 0x02
+				u8[A1 + 0x2a] |= char.flag.IN_AIR
 				u8[A1 + 0x40] = 1
 				u8[A1 + 0x1e] = 0x0e
 				u8[A1 + 0x1f] = 0x07
 				objA1.state = char.state.ROLLING
-				u8[A1 + 0x2a] |= 0x04
+				u8[A1 + 0x2a] |= char.flag.ROLLING
 
 				playSound(SFX_JUMP)
 			}
@@ -759,7 +759,7 @@ function void fn04af80()
 	{
 		objA1.velocity.x = 0x0300
 		objA1.velocity.y = 0x0200
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 
 // 0x04b03c:

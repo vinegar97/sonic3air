@@ -145,7 +145,7 @@ function void fn0455cc_sub()
 		}
 	}
 
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		A2 = 0xffffb000
 		D0.u16 = u16[A2 + 0x10] - objA0.position.x.u16 + 0x0c
@@ -261,7 +261,7 @@ function void fn0457be()
 	{
 		u8[A1 + 0x2e] = 0x01
 		u8[A1 + 0x20] = char.state.ROLLING
-		u8[A1 + 0x2a] |= 0x04
+		u8[A1 + 0x2a] |= char.flag.ROLLING
 		objA0.value3e = objA1.position.y.u16
 		u32[A0 + 0x2e] = 0
 		u32[A0 + 0x32] = 0
@@ -670,7 +670,7 @@ function void fn05234a()
 		else
 		{
 			u8[A1 + 0x2e] = 1
-			u8[A1 + 0x2a] |= 0x04
+			u8[A1 + 0x2a] |= char.flag.ROLLING
 			u8[A1 + 0x20] = char.state.ROLLING
 		}
 	}

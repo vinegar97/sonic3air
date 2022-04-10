@@ -202,7 +202,7 @@ function void fn021568()
 		else
 		{
 			// Does this wall allow for rolling into the wall? Otherwise the fire shield will do
-			if ((objA0.flags2a & 0x20) || (u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE))
+			if ((objA0.flags2a & object.flag.P1_PUSHING) || (u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE))
 			{
 				canBreakWall = (objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x0480)
 			}
@@ -210,13 +210,13 @@ function void fn021568()
 
 		if (canBreakWall)
 		{
-			objA0.flags2a &= ~0x20
+			objA0.flags2a &= ~object.flag.P1_PUSHING
 			fn02165a()
 
 			A1 = 0xffffb04a
-			if ((objA0.flags2a & 0x40) && objA1.state == char.state.ROLLING)
+			if ((objA0.flags2a & object.flag.P2_PUSHING) && objA1.state == char.state.ROLLING)
 			{
-				objA0.flags2a &= ~0x40
+				objA0.flags2a &= ~object.flag.P2_PUSHING
 				objA1.velocity.x = objA0.value32
 				u16[A1 + 0x1c] = objA1.velocity.x
 				objA1.flags2a &= ~char.flag.PUSHING
@@ -229,9 +229,9 @@ function void fn021568()
 
 	A1 = 0xffffb04a
 	D1.u16 = objA0.value32
-	if ((objA0.flags2a & 0x40) && objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x0480)
+	if ((objA0.flags2a & object.flag.P2_PUSHING) && objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x0480)
 	{
-		objA0.flags2a &= ~0x40
+		objA0.flags2a &= ~object.flag.P2_PUSHING
 		fn02165a()
 
 	#if STANDALONE
@@ -403,7 +403,7 @@ function void fn021758()
 			objA1.velocity.x = u16[A0 + 0x30]
 			u16[A1 + 0x1c] = objA1.velocity.x
 			objA1.flags2a &= ~char.flag.PUSHING
-			objA0.flags2a &= ~0x20
+			objA0.flags2a &= ~object.flag.P1_PUSHING
 
 			fn0217ee()
 			hitByPlayer1 = true
@@ -419,7 +419,7 @@ function void fn021758()
 			objA1.velocity.x = objA0.value32
 			u16[A1 + 0x1c] = objA1.velocity.x
 			objA1.flags2a &= ~char.flag.PUSHING
-			objA0.flags2a &= ~0x40
+			objA0.flags2a &= ~object.flag.P2_PUSHING
 
 			if (!hitByPlayer1)
 			{
@@ -486,11 +486,11 @@ function void fn021818()
 	D1.u16 = u16[A0 + 0x30]
 	if ((D6.u16 & 0x01) && (u8[A1 + 0x38] == CHARACTER_KNUCKLES))
 	{
-		objA0.flags2a &= ~0x20
+		objA0.flags2a &= ~object.flag.P1_PUSHING
 		fn0218ce()
 
 		A1 = 0xffffb04a
-		if ((objA0.flags2a & 0x40) == 0)
+		if ((objA0.flags2a & object.flag.P2_PUSHING) == 0)
 		{
 			DrawOrUnloadObject()
 			return
@@ -498,7 +498,7 @@ function void fn021818()
 
 		objA1.velocity.x = objA0.value32
 		u16[A1 + 0x1c] = objA1.velocity.x
-		objA0.flags2a &= ~0x40
+		objA0.flags2a &= ~object.flag.P2_PUSHING
 		objA1.flags2a &= ~char.flag.PUSHING
 		DrawOrUnloadObject()
 	}
@@ -506,13 +506,13 @@ function void fn021818()
 	{
 		A1 = 0xffffb04a
 		D1.u16 = objA0.value32
-		if ((objA0.flags2a & 0x40) == 0 || u8[A1 + 0x38] != CHARACTER_KNUCKLES)
+		if ((objA0.flags2a & object.flag.P2_PUSHING) == 0 || u8[A1 + 0x38] != CHARACTER_KNUCKLES)
 		{
 			DrawOrUnloadObject()
 			return
 		}
 
-		objA0.flags2a &= ~0x40
+		objA0.flags2a &= ~object.flag.P2_PUSHING
 		fn0218ce()
 	}
 }

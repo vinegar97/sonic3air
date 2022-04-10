@@ -38,7 +38,7 @@ function void fn027424()
 	D4.u16 = objA0.position.x.u16
 	fn01dc56()
 
-	D0.u8 = objA0.flags2a & 0x60
+	D0.u8 = objA0.flags2a & (object.flag.P1_PUSHING | object.flag.P2_PUSHING)
 	if (D0.u8 == 0)
 	{
 		DrawOrUnloadObject()
@@ -47,11 +47,11 @@ function void fn027424()
 
 	A1 = 0xffffb000
 	D1.u16 = u16[A0 + 0x30]
-	if (objA0.flags2a & 0x20 && objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x0480)
+	if (objA0.flags2a & object.flag.P1_PUSHING && objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x0480)
 	{
-		if (objA0.flags2a & 0x40)
+		if (objA0.flags2a & object.flag.P2_PUSHING)
 		{
-			objA0.flags2a &= ~0x40
+			objA0.flags2a &= ~object.flag.P2_PUSHING
 
 			A2 = 0xffffb04a
 			u8[A2 + 0x2a] &= ~char.flag.PUSHING
@@ -66,23 +66,23 @@ function void fn027424()
 	{
 		A1 = 0xffffb04a
 		D1.u16 = objA0.value32
-		if ((objA0.flags2a & 0x40) == 0 || u8[A1 + 0x20] != char.state.ROLLING || abs(D1.s16) < 0x0480)
+		if ((objA0.flags2a & object.flag.P2_PUSHING) == 0 || u8[A1 + 0x20] != char.state.ROLLING || abs(D1.s16) < 0x0480)
 		{
 			DrawOrUnloadObject()
 			return
 		}
 
-		if (objA0.flags2a & 0x40)	// Isn't this always true here?
+		if (objA0.flags2a & object.flag.P2_PUSHING)	// Isn't this always true here?
 		{
-			objA0.flags2a &= ~0x40
-			u8[0xffffb04a + 0x2a] &= ~0x20
+			objA0.flags2a &= ~object.flag.P2_PUSHING
+			u8[0xffffb04a + 0x2a] &= ~char.flag.PUSHING
 		}
 	}
 
-	if (objA0.flags2a & 0x20)
+	if (objA0.flags2a & object.flag.P1_PUSHING)
 	{
-		objA0.flags2a &= ~0x20
-		u8[0xffffb000 + 0x2a] &= ~0x20
+		objA0.flags2a &= ~object.flag.P1_PUSHING
+		u8[0xffffb000 + 0x2a] &= ~char.flag.PUSHING
 	}
 	objA1.velocity.x = D1.u16
 

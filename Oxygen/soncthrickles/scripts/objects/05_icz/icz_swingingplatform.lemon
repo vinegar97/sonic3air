@@ -85,18 +85,18 @@ function void fn08b080()
 	fn08b054()
 
 	D0.u8 = objA0.value39
-	D1.u8 = objA0.flags2a & 0x18
+	D1.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D1.u8 != 0)
 	{
 		A2 = 0xffff0000 + u16[A0 + 0x46]
 
 		A1 = 0xffffb000
-		D2 = 3
+		D2 = 3		// object.flag.P1_ON_OBJECT
 		if (fn08b0b0())
 			return
 
 		A1 = 0xffffb04a
-		D2 = 4
+		D2 = 4		// object.flag.P2_ON_OBJECT
 		if (fn08b0b0())
 			return
 	}

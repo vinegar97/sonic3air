@@ -111,7 +111,7 @@ function void fn088c38()
 		u8[A1 + 0x05] = 0x02
 		objA1.velocity.y = -0x600
 		objA1.flags2a |= char.flag.IN_AIR
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		u8[A1 + 0x40] = 0
 	}
 }

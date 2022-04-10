@@ -478,7 +478,7 @@ function void fn08671c()
 function void fn08672a()
 {
 	fn086a3e()
-	if (objA0.flags2a & 0x18)
+	if (objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 	{
 		objA0.update_address = 0x086754
 		A1 = 0xffff0000 + u16[A0 + 0x46]
@@ -569,6 +569,6 @@ function void StartCharacterWinPose()
 	u8[A1 + 0x2e] = 0x81
 	u8[A1 + 0x3d] = 0
 
-	objA0.flags2a &= ~0x20
-	objA0.flags2a &= ~0x40
+	objA0.flags2a &= ~object.flag.P1_PUSHING
+	objA0.flags2a &= ~object.flag.P2_PUSHING
 }

@@ -579,7 +579,7 @@ function void fn056ec2()
 	D4.u16 = objA0.position.x.u16
 	PlatformCheckClimbOn()
 
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		A1 = 0xffffb000
 		if ((u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE) == 0)
@@ -588,7 +588,7 @@ function void fn056ec2()
 		}
 	}
 
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
 		DamageCharacter()

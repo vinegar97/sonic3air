@@ -316,7 +316,7 @@ function void MonitorIntact.UpdateDefault()
 	D2.u16 = height - 1
 	D3.u16 = height
 	D4.u16 = objA0.position.x.u16
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	MonitorIntact.CheckBlocking()
 
 	// Collision check against player 2
@@ -325,7 +325,7 @@ function void MonitorIntact.UpdateDefault()
 	D2.u16 = height - 1
 	D3.u16 = height
 	D4.u16 = objA0.position.x.u16
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	MonitorIntact.CheckBlocking.player2()
 
 	AddAsDynamicObject()

@@ -96,11 +96,11 @@ function void fn089c86()
 	objA0.animation.sprite = 0x05
 	fn086a3e()
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 != 0)
 	{
 		//objA0.animation.sprite = 0x06		// Will get overwritten in any case, so what's the point?
-		if (D0 & 0x08)
+		if (D0 & object.flag.P1_ON_OBJECT)
 		{
 			objA0.animation.sprite = 0x0c
 			A1 = 0xffffb000
@@ -110,9 +110,9 @@ function void fn089c86()
 
 	#if STANDALONE
 		// Bug fix
-		D0.u8 = objA0.flags2a & 0x18
+		D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	#endif
-		if (D0 & 0x10)
+		if (D0 & object.flag.P2_ON_OBJECT)
 		{
 			objA0.animation.sprite = 0x0c
 			A1 = 0xffffb04a

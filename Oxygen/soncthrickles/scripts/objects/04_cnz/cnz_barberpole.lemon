@@ -34,12 +34,12 @@ function void CNZBarberPole.UpdateVariantLeftToRight()
 {
 	A2 = A0 + 0x30
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn033392()
 
 	A2 += 6
 	A1 = 0xffffb04a
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn033392()
 
 	CheckForUnloadObject()
@@ -111,7 +111,7 @@ function void fn033392()
 
 	if (u16[A2 + 0x04] == 0 && abs(s16[A1 + 0x1c]) < 0x0118)
 	{
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 	else if ((u8[A1 + 0x2a] & 0x02) == 0)
 	{
@@ -175,7 +175,7 @@ function void fn033392()
 		}
 	}
 
-	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x31] = 0x04
@@ -188,12 +188,12 @@ function void CNZBarberPole.UpdateVariantRightToLeft()
 {
 	A2 = A0 + 0x30
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn0335c4()
 
 	A2 += 6
 	A1 = 0xffffb04a
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn0335c4()
 
 	CheckForUnloadObject()
@@ -265,7 +265,7 @@ function void fn0335c4()
 
 	if (u16[A2 + 0x04] == 0 && abs(s16[A1 + 0x1c]) < 0x0118)
 	{
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 	else if ((u8[A1 + 0x2a] & 0x02) == 0)
 	{
@@ -330,7 +330,7 @@ function void fn0335c4()
 		}
 	}
 
-	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x31] = 0x04
@@ -362,7 +362,7 @@ function void fn0337d8()
 		A0 = backupA0
 	}
 
-	u8[A1 + 0x2a] |= 0x08
-	u8[A1 + 0x2a] &= ~0x02
+	u8[A1 + 0x2a] |= char.flag.ON_OBJECT
+	u8[A1 + 0x2a] &= ~char.flag.IN_AIR
 	objA0.flags2a |= bit
 }

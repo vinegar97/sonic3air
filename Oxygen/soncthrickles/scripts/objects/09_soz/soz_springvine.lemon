@@ -88,12 +88,12 @@ function void fn040878()
 
 	A2 = A0 + 0x35
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn04093e()
 
 	--A2
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn04093e()
 
 	u16[A0 + 0x30] = D5.u16

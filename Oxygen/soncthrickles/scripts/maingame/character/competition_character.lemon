@@ -370,11 +370,7 @@ function void fn010a38()
 	if (control.player1.pressed & CONTROL_ABC)
 	{
 		// Charge up
-
-		// char.state = char.state.SPINDASH
-		// char.state.former = char.state.RUNNING
-		char.state.both = 0x0900
-
+		char.state.both = 0x0900		// char.state.SPINDASH, char.state.RUNNING
 		playSound(SFX_SPINDASH_CHARGE)
 		char.spindash_charge = min(char.spindash_charge + 0x200, 0x800)
 	}
@@ -721,11 +717,7 @@ function void fn013600()
 	if (control.tails.pressed & CONTROL_ABC)
 	{
 		// Charge up
-
-		// char.state = char.state.SPINDASH
-		// char.state.former = char.state.RUNNING
-		char.state.both = 0x0900
-
+		char.state.both = 0x0900		// char.state.SPINDASH, char.state.RUNNING
 		playSound(SFX_SPINDASH_CHARGE)
 		char.spindash_charge = min(char.spindash_charge + 0x200, 0x800)
 	}

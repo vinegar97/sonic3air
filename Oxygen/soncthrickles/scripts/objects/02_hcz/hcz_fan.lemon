@@ -456,7 +456,7 @@ function void fn030a38()
 		D1.u16 += u16[A0 + 0x36]
 		D1.s16 = -D1.s16 >> 6
 		u16[A1 + 0x14] += D1.u16
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		objA1.flags2a &= ~char.flag.CONTROL_LOCK
 		u16[A1 + 0x1a] = 0
 		u8[A1 + 0x2f] = 0

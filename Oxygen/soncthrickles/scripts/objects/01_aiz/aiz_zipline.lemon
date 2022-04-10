@@ -511,7 +511,7 @@ function void fn0220c2()
 	}
 	else
 	{
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		objA1.velocity.x = 0x300
 		objA1.velocity.y = 0x200
 	}

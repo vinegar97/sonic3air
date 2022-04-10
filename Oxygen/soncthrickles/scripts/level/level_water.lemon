@@ -221,7 +221,7 @@ function void fn00723e()
 				if (D0.s16 <= 0)
 				{
 					D0.u16 = 0
-					u8[A1 + 0x20] = 0x05
+					u8[A1 + 0x20] = char.state.STANDING
 				}
 			}
 			else
@@ -230,7 +230,7 @@ function void fn00723e()
 				if (D0.s16 <= 0)
 				{
 					D0.u16 = 0
-					u8[A1 + 0x20] = 0x05
+					u8[A1 + 0x20] = char.state.STANDING
 				}
 			}
 		}

@@ -959,7 +959,7 @@ function void Tails.UpdateCarrySonic()
 
 				objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 				u8[A1 + 0x2a] &= 0xfe
-				D0.u8 = char.flags & 0x01
+				D0.u8 = char.flags & char.flag.FACING_LEFT
 				objA1.render_flags |= D0.u8
 				u8[A1 + 0x2a] |= D0.u8
 				if (global.inv_gravity)
@@ -1114,7 +1114,7 @@ function void fn01459e()
 	objA1.flags2a |= char.flag.IN_AIR
 	u8[A1 + 0x3d] = 0
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
-	D0.u8 = char.flags & 0x01
+	D0.u8 = char.flags & char.flag.FACING_LEFT
 	objA1.render_flags |= D0.u8
 	u8[A1 + 0x2a] |= D0.u8
 
@@ -1891,10 +1891,7 @@ function void fn016fa8()
 {
 	char.animation.timer = 0x20
 	char.animation.frame = 0
-
-	// char.state = char.state.KNUX_FLYCLIMB
-	// char.state.former = char.state.KNUX_FLYCLIMB
-	char.state.both = 0x2020
+	char.state.both = 0x2020		// char.state.KNUX_FLYCLIMB, char.state.KNUX_FLYCLIMB
 
 	char.flags &= ~(char.flag.FACING_LEFT | char.flag.PUSHING)
 
@@ -2402,7 +2399,7 @@ function void Character.updateRotationOnGround0x00()
 				{
 					char.flags |= char.flag.IN_AIR
 					char.flags &= ~char.flag.PUSHING
-					char.state.former = 0x01
+					char.state.former = char.state.RUNNING2
 					return
 				}
 			}
@@ -2444,7 +2441,7 @@ function void Character.updateRotationOnGround0xc0()
 				{
 					char.flags |= char.flag.IN_AIR
 					char.flags &= ~char.flag.PUSHING
-					char.state.former = 0x01
+					char.state.former = char.state.RUNNING2
 					return
 				}
 			}
@@ -2505,7 +2502,7 @@ function void Character.updateRotationOnGround0x40()
 				{
 					char.flags |= char.flag.IN_AIR
 					char.flags &= ~char.flag.PUSHING
-					char.state.former = 0x01
+					char.state.former = char.state.RUNNING2
 					return
 				}
 			}
@@ -2546,7 +2543,7 @@ function void Character.updateRotationOnGround0x80()
 				{
 					char.flags |= char.flag.IN_AIR
 					char.flags &= ~char.flag.PUSHING
-					char.state.former = 0x01
+					char.state.former = char.state.RUNNING2
 					return
 				}
 			}
@@ -3206,7 +3203,7 @@ function void Character.cancelSuperTransformation()
 		objA0.mapping_offset = 0x146620
 	}
 
-	char.state.former = 0x01
+	char.state.former = char.state.RUNNING2
 	char.invinc.countdown = 1
 
 	// Reset physics
@@ -3852,11 +3849,7 @@ function bool Character.UpdateSpindash()
 			if (input_pressed & CONTROL_ABC)
 			{
 				// Charge up
-
-				// char.state = char.state.SPINDASH
-				// char.state.former = char.state.RUNNING
-				char.state.both = 0x0900
-
+				char.state.both = 0x0900		// char.state.SPINDASH, char.state.RUNNING
 				char.spindash_charge = min(char.spindash_charge + 0x200, 0x800)
 				playSound(SFX_SPINDASH_CHARGE)
 			}
@@ -4258,7 +4251,7 @@ function void PressedLeftWhileUprightOnGround()
 		{
 			char.flags |= char.flag.FACING_LEFT
 			char.flags &= ~char.flag.PUSHING
-			char.state.former = 0x01
+			char.state.former = char.state.RUNNING2
 		}
 
 		D0.u16 -= D5.u16
@@ -4310,7 +4303,7 @@ function void PressedRightWhileUprightOnGround()
 		{
 			char.flags &= ~char.flag.FACING_LEFT
 			char.flags &= ~char.flag.PUSHING
-			char.state.former = 0x01
+			char.state.former = char.state.RUNNING2
 		}
 
 		D0.u16 += D5.u16

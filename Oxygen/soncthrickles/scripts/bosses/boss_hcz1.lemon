@@ -1201,7 +1201,7 @@ function void fn06aa00()
 {
 	u8[A2 + 0x2a] |= 0x02
 	u8[A2 + 0x2e] = 0x01
-	u8[A2 + 0x20] = 0x0f
+	u8[A2 + 0x20] = char.state.LIFTED
 	u8[A2 + 0x3d] = 0
 	u16[A2 + 0x18] = 0
 	u16[A2 + 0x1a] = 0

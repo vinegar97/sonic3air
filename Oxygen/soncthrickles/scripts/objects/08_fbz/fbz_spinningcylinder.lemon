@@ -38,12 +38,12 @@ function void fn039f58()
 
 	A1 = 0xffffb000
 	A2 = 0xfffff7b0
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn039f7e()
 
 	A1 = 0xffffb04a
 	A2 = 0xfffff7b1
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn039f7e()
 
 	CheckForUnloadObject()
@@ -91,7 +91,7 @@ function void fn039f7e()
 						objA1.position.y.u16 = D2.u16
 						LetSonicClimbOnObject()
 						u8[A1 + 0x2d] = 0x80
-						u16[A1 + 0x20] = 0x01
+						u16[A1 + 0x20] = char.state.RUNNING2
 						u8[A2] = 0
 						u8[A2 + 0x02] = 0
 						if (u16[A1 + 0x1c] == 0)
@@ -145,11 +145,11 @@ function void fn039f7e()
 			}
 		}
 
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		objA0.flags2a &= ~bit
 		u8[A1 + 0x30] = 0
 		u8[A1 + 0x31] = 0x04
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		u8[A1 + 0x2d] = 0
 	}
 }
@@ -166,12 +166,12 @@ function void fn03a0b0()
 
 	A1 = 0xffffb000
 	A2 = 0xfffff7b0
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn03a0d6()
 
 	A1 = 0xffffb04a
 	A2 = 0xfffff7b1
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn03a0d6()
 
 	CheckForUnloadObject()
@@ -221,7 +221,7 @@ function void fn03a0d6()
 		}
 		u8[A1 + 0x2e] |= 0x40
 		u8[A1 + 0x2e] |= 0x02
-		u16[A1 + 0x20] = 0x01
+		u16[A1 + 0x20] = char.state.RUNNING2
 		u8[A1 + 0x27] = 0
 		u8[A2 + 0x02] = 0
 	}
@@ -230,12 +230,12 @@ function void fn03a0d6()
 	if (D1.u16 >= D5.u16)
 	{
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		objA0.flags2a &= ~bit
 		u8[A1 + 0x27] = 0x01
 		u8[A1 + 0x30] = 0
 		u8[A1 + 0x31] = 0x04
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		return
 	}
 

@@ -1925,7 +1925,7 @@ function void fn0530f0()
 
 		u16[0xffffb000 + 0x10] -= moveX
 		u16[0xffffb04a + 0x10] -= moveX
-		if (u8[0xffffb000 + 0x2a] & 0x02)
+		if (u8[0xffffb000 + 0x2a] & char.flag.IN_AIR)
 		{
 			u16[0xffffb000 + 0x14] += moveY
 			u16[0xffffb04a + 0x14] += moveY

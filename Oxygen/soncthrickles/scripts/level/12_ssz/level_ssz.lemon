@@ -476,7 +476,7 @@ function void fn0575ea()
 			{
 				move_area.left = 0x0160 - getScreenExtend()
 				move_area.right = 0x19a0 + getScreenExtend()
-				if (D0.u16 < 0x07c0 || camera.position.x.u16 != move_area.left || u8[0xffffb000 + 0x2a] & 0x02)
+				if (D0.u16 < 0x07c0 || camera.position.x.u16 != move_area.left || u8[0xffffb000 + 0x2a] & char.flag.IN_AIR)
 					return
 
 				move_area.right = 0x0160 + getScreenExtend()
@@ -514,7 +514,7 @@ function void fn0575ea()
 				D1 = (level.display_routine == 0) ? 0x0160 : 0
 
 				move_area.left = D1.u16
-				if (D0.u16 < 0x0420 || camera.position.x.u16 != 0x1660 - getScreenExtend() || u8[0xffffb000 + 0x2a] & 0x02)
+				if (D0.u16 < 0x0420 || camera.position.x.u16 != 0x1660 - getScreenExtend() || u8[0xffffb000 + 0x2a] & char.flag.IN_AIR)
 					return
 
 				move_area.left = 0x1660 - getScreenExtend()

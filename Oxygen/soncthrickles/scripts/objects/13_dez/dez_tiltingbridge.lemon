@@ -92,11 +92,11 @@ function void fn046e4c()
 
 	D0 = u32[A0 + 0x3a]
 	objA0.position.y += D0
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		u16[A1 + 0x34] = u16[A0 + 0x38]
 	}
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		u16[A1 + 0x36] = u16[A0 + 0x38]
 	}

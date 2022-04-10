@@ -137,7 +137,7 @@ function void fn049fe4()
 	}
 
 	u8[A1 + 0x2e] = 0x81
-	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	if (A1 == 0xffffb000)
 	{
 		objA0.subtype2c = 1

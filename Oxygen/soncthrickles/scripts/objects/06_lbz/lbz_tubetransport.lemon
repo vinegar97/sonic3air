@@ -359,7 +359,7 @@ function void fn02a018()
 	D4.u16 = objA0.position.x.u16
 	fn01de20()
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 == 0)
 	{
 		u8[A4] += 2
@@ -429,7 +429,7 @@ function void fn02a106()
 		if (debug_mode.state != 0)
 			return
 
-		if (A1 != 0xffffb04a || (objA0.flags2a & 0x10) == 0 || u8[A2-1] == 0)
+		if (A1 != 0xffffb04a || (objA0.flags2a & object.flag.P2_ON_OBJECT) == 0 || u8[A2-1] == 0)
 		{
 			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 3
 			if (objA0.flags2a & 0x01)
@@ -464,7 +464,7 @@ function void fn02a106()
 		u16[A1 + 0x42] = A0.u16
 	#endif
 
-		objA0.flags2a &= ~0x20
+		objA0.flags2a &= ~object.flag.P1_PUSHING
 	}
 	else
 	{
@@ -521,7 +521,7 @@ function void fn01de20()
 	u32 backupD4 = D4
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn01de36()
 
 	D1 = backupD1
@@ -530,7 +530,7 @@ function void fn01de20()
 	D4 = backupD4
 
 	A1 = 0xffffb04a
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn01de36()
 }
 

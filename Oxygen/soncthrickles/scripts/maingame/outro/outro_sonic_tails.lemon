@@ -1015,7 +1015,7 @@ function void fn05e2c2()
 	objA1.render_flags &= ~render_flag.FLIP_X
 	u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 	u8[A1 + 0x2e] = 0x81
-	u16[A1 + 0x20] = 0x0200
+	u16[A1 + 0x20] = 0x0200		// char.state.ROLLING, char.state.RUNNING
 	u32[0xffffcc0a] = 0
 
 	D0 = (global.characters == CHARS_TAILS_ALONE) ? 0 : (outro.ending_type < 0) ? 4 : 8

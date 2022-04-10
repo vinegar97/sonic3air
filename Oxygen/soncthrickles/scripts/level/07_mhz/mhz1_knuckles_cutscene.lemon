@@ -452,7 +452,7 @@ function void fn062f0a()
 {
 	fn065dec()
 
-	if (objA0.flags2a & 0x18)
+	if (objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 	{
 		objA0.update_address = 0x062f4c
 		objA0.animation.sprite = 1
@@ -476,7 +476,7 @@ function void fn062f4c()
 	objA0.flags38 &= ~0x02
 	fn065dec()
 
-	if ((objA0.flags2a & 0x18) == 0)
+	if ((objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)) == 0)
 	{
 		objA0.update_address = 0x062f0a
 		objA0.animation.sprite = 0

@@ -1001,7 +1001,7 @@ function void fn06b882()
 	D0.u16 = objA0.position.y.u16 - 0x60
 	if (D0.u16 < objA1.position.y.u16)
 	{
-		u8[A1 + 0x20] = 0x1a
+		u8[A1 + 0x20] = char.state.GOT_HURT
 		u8[A1 + 0x2e] = 0x81
 		objA0.update_address = 0x06b8c8
 		objA0.countdown_value = 0x5f
@@ -1213,7 +1213,7 @@ function void fn06bada()
 	u8[A0 + D4.s16] = 0xff
 	u8[A2 + 0x2a] |= 0x02
 	u8[A2 + 0x2e] = 0x01
-	u8[A2 + 0x20] = 0x18
+	u8[A2 + 0x20] = char.state.DIED
 	u8[A2 + 0x3d] = 0
 	u16[A2 + 0x18] = 0
 	u16[A2 + 0x1a] = 0

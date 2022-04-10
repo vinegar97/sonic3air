@@ -43,16 +43,16 @@ function void fn03cb66()
 	}
 
 	A1 = 0xffffb000
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
-		objA0.flags2a &= ~0x08
+		objA0.flags2a &= ~object.flag.P1_ON_OBJECT
 		fn03cbce()
 	}
 
 	A1 = 0xffffb04a
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
-		objA0.flags2a &= ~0x10
+		objA0.flags2a &= ~object.flag.P2_ON_OBJECT
 		fn03cbce()
 	}
 
@@ -73,8 +73,8 @@ function void fn03cbce()
 	u8[A1 + 0x05] = 0x02
 	objA1.velocity.y = (objA0.subtype2c & 0x02) ? -0xa00 : -0x1000
 	objA1.state = char.state.STRAIGHTJUMP
-	u8[A1 + 0x2a] |= 0x02
-	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	u8[A1 + 0x3d] = 0
 	u8[A1 + 0x40] = 0
 

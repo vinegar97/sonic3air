@@ -155,14 +155,14 @@ function void fn08ba1c()
 		objA0.flags38 |= 0x04
 		objA0.value39 = 0
 
-		D4 = 3
+		D4 = 3		// object.flag.P1_ON_OBJECT
 		if (D2 & (u32(1) << D4))
 		{
 			A1 = 0xffffb000
 			fn08ba7e()
 		}
 
-		D4 = 4
+		D4 = 4		// object.flag.P2_ON_OBJECT
 		if (D2 & (u32(1) << D4))
 		{
 			D0 = (D0 << 16) + (D0 >> 16)

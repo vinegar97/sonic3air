@@ -308,8 +308,8 @@ function void fn08d8e6()
 				u16[A2 + 0x18] = D0.u16
 				u16[A2 + 0x1c] = D0.u16
 				u16[A2 + 0x1a] = -0x200
-				u8[A2 + 0x2a] |= 0x02
-				u8[A2 + 0x20] = 0x1a
+				u8[A2 + 0x2a] |= char.flag.IN_AIR
+				u8[A2 + 0x20] = char.state.GOT_HURT
 				u8[A2 + 0x3d] = 0
 			}
 		}
@@ -336,9 +336,9 @@ function void fn08d94a()
 				objA0.sprite_priority = 0
 				objA0.countdown_callback = 0x08d846
 				playSound(0xae)
-				u8[A2 + 0x2a] |= 0x02
+				u8[A2 + 0x2a] |= char.flag.IN_AIR
 				u8[A2 + 0x2e] = 0x01
-				u8[A2 + 0x20] = 0x1a
+				u8[A2 + 0x20] = char.state.GOT_HURT
 				u8[A2 + 0x3d] = 0
 			}
 		}

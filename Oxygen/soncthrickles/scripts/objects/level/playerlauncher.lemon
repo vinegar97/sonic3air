@@ -61,11 +61,11 @@ function void fn03b97a()
 	}
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn03b9d8()
 
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn03b9d8()
 
 	D1.u16 = 0x10
@@ -99,7 +99,7 @@ function void fn03b9d8()
 		if (u8[A0 + 0x32] != 0)
 		{
 			u8[A1 + 0x20] = 0
-			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			objA1.velocity.y = 0
 			return
 		}

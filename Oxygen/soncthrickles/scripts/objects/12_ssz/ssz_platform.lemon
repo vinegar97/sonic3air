@@ -29,7 +29,7 @@ function void fn044a68()
 function void fn044aa0()
 {
 	D0.u16 = objA0.countdown_value
-	D1.u16 = objA0.flags2a & 0x18
+	D1.u16 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D1.u16 == 0)
 	{
 		if (D0.u16 > 0)

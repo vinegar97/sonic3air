@@ -152,7 +152,7 @@ function void fn03ce1a()
 	if (s8[A0 + 0x2c] < 0)
 		return
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 == 0)
 	{
 		u16[A0 + 0x30] = 0
@@ -167,16 +167,16 @@ function void fn03ce1a()
 			return
 
 		A1 = 0xffffb000
-		if (objA0.flags2a & 0x08)
+		if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 		{
-			objA0.flags2a &= ~0x08
+			objA0.flags2a &= ~object.flag.P1_ON_OBJECT
 			fn03cbce()
 		}
 
 		A1 = 0xffffb04a
-		if (objA0.flags2a & 0x10)
+		if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 		{
-			objA0.flags2a &= ~0x10
+			objA0.flags2a &= ~object.flag.P2_ON_OBJECT
 			fn03cbce()
 		}
 	}

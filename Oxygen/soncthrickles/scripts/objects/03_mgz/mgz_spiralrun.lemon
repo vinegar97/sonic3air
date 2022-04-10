@@ -26,13 +26,13 @@ function void fn033c86()
 {
 	A1 = 0xffffb000
 	A2 = A0 + 0x30
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	D5.u16 = control.player1
 	fn033cac()
 
 	A1 = 0xffffb04a
 	A2 = A0 + 0x36
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	D5.u16 = control.tails
 	fn033cac()
 
@@ -252,11 +252,11 @@ function void fn033cac()
 		u8[A1 + 0x26] += 0x80
 	}
 
-	u8[A1 + 0x2a] &= ~0x04
+	u8[A1 + 0x2a] &= ~char.flag.ROLLING
 	u8[A1 + 0x1e] = 0x13
 	u8[A1 + 0x1f] = 0x09
-	u16[A1 + 0x20] = 0x01
-	u8[A1 + 0x2a] &= ~0x08
+	u16[A1 + 0x20] = char.state.RUNNING2
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
 	u8[A1 + 0x2e] &= ~0x40
 	u8[A1 + 0x2e] &= ~0x02

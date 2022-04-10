@@ -138,7 +138,7 @@ function void fn08e37c()
 
 function void fn08e388()
 {
-	if (u8[A1 + 0x20] != 0x08 && u8[A1 + 0x3d] == 0 && u8[A1 + 0x2e] == 0)
+	if (u8[A1 + 0x20] != char.state.COWERING && u8[A1 + 0x3d] == 0 && u8[A1 + 0x2e] == 0)
 	{
 		CheckDistanceToObjectA1()
 		if (D2.u16 < 0x0100 && D3.u16 < 0x40)

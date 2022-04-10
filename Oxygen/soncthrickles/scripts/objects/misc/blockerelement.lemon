@@ -111,12 +111,12 @@ function void fn01f45e()
 	D4.u16 = objA0.position.x.u16
 	CheckCharacterOnClimbableObject()
 
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		A1 = 0xffffb000
 		BlockerElement.DoDamage()
 	}
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
 		BlockerElement.DoDamage()
@@ -210,12 +210,12 @@ function void fn01f606()
 	D4.u16 = objA0.position.x.u16
 	CheckCharacterOnClimbableObject()
 
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		A1 = 0xffffb000
 		BlockerElement.KillCharacter()
 	}
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
 		BlockerElement.KillCharacter()

@@ -267,7 +267,7 @@ function void fn018466()
 	}
 	else
 	{
-		u8[A2 + 0x20] = 0x17
+		u8[A2 + 0x20] = char.state.DROWNED
 		--u16[A0 + 0x30]
 		if (u16[A0 + 0x30] == 0)
 		{

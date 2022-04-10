@@ -188,7 +188,7 @@ function void fn03d278()
 			A1 = 0xffffb000
 			u8[A1 + 0x20] = 0
 			u8[A1 + 0x2e] = 0
-			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			objA0.update_address = 0x03d2f6
 			objA0.animation.sprite = 0x0a
 			A1 = 0xffff0000 + u16[A0 + 0x3c]

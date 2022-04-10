@@ -65,13 +65,13 @@ function void CorkFloor.Init()
 		}
 	}
 
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		A1 = 0xffffb000
 		objA1.flags2a |= char.flag.IN_AIR
 		objA1.flags2a &= ~char.flag.ON_OBJECT
 	}
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
 		objA1.flags2a |= char.flag.IN_AIR
@@ -107,7 +107,7 @@ function void fn02a5c0()
 function void fn02a5d8()
 {
 	score.bonus_counter = u16[A0 + 0x38]
-	objA0.flags2a &= 0xe7
+	objA0.flags2a &= ~(object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 
 	A4 = u32[A0 + 0x3c]
 	++objA0.animation.sprite
@@ -223,14 +223,14 @@ function void fn02a502()
 	D4.u16 = objA0.position.x.u16
 	fn01dc56()
 
-	D0.u16 = objA0.flags2a & 0x18
+	D0.u16 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u16 == 0)
 	{
 		DrawOrUnloadObject()
 		return
 	}
 
-	if (D0.u8 == 0x18)
+	if (D0.u8 == (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 	{
 		if (u8[A0 + 0x34] != 2 && u8[A0 + 0x36] != 2)
 		{
@@ -250,7 +250,7 @@ function void fn02a502()
 	}
 	else
 	{
-		D1.u8 = D0.u8 & 0x08
+		D1.u8 = D0.u8 & object.flag.P1_ON_OBJECT
 		if (D1.u8 == 0)
 		{
 			fn02a5c0()
@@ -286,8 +286,8 @@ function void fn02a588()
 	}
 	else
 	{
-		u8[A1 + 0x2a] |= 0x02
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		u8[A1 + 0x05] = 2
 	}
 }
@@ -297,7 +297,7 @@ function void fn02a588()
 function void fn02a58e()
 {
 	u8[A1 + 0x2a] |= 0x06
-	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	u8[A1 + 0x1e] = 14
 	u8[A1 + 0x1f] = 7
 	u8[A1 + 0x20] = 2
@@ -324,12 +324,12 @@ function void fn02a6d4()
 	D4.u16 = objA0.position.x.u16
 	fn01ddc6()
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 == 0)
 	{
 		DrawOrUnloadObject()
 	}
-	else if (D0.u8 == 0x18)
+	else if (D0.u8 == (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 	{
 		bool goto02a762 = false
 		if (u8[A0 + 0x34] == 0x02)
@@ -374,10 +374,10 @@ function void fn02a6d4()
 	}
 	else
 	{
-		D1.u8 = D0.u8 & 0x08
+		D1.u8 = D0.u8 & object.flag.P1_ON_OBJECT
 		if (D1.u8 == 0)
 		{
-			D0.u8 &= 0x10
+			D0.u8 &= object.flag.P2_ON_OBJECT
 			if (D0.u8 == 0)
 			{
 				DrawOrUnloadObject()
@@ -422,7 +422,7 @@ function void fn02a6d4()
 function void fn02a816()
 {
 	score.bonus_counter = u16[A0 + 0x38]
-	objA0.flags2a &= 0xe7
+	objA0.flags2a &= ~(object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	D0 = objA0.animation.sprite
 	++objA0.animation.sprite
 	D1 = D0
@@ -442,7 +442,7 @@ function void fn01ddc6()
 	u32 backupD4 = D4
 
 	A1 = 0xffffb000
-	D6 = 0x03
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn01dddc()
 
 	D1 = backupD1
@@ -451,7 +451,7 @@ function void fn01ddc6()
 	D4 = backupD4
 
 	A1 = 0xffffb04a
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn01dddc()
 }
 
@@ -480,7 +480,7 @@ function void fn01dddc()
 				return
 			}
 		}
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		objA0.flags2a &= ~bit
 		D4 = 0
 	}
@@ -530,8 +530,8 @@ function void fn02a7b0()
 	}
 	else
 	{
-		u8[A1 + 0x2a] |= 0x02
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		u8[A1 + 0x05] = 0x02
 	}
 }

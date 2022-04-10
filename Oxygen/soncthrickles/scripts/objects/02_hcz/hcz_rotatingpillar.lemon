@@ -40,13 +40,13 @@ function void fn0326b6()
 
 	A2 = A0 + 0x32
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	D5.u16 = control.player1
 	fn032784()
 
 	A2 += 4
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	D5.u16 = control.tails
 	fn032784()
 
@@ -210,14 +210,14 @@ function void fn032784()
 		u8[A1 + 0x40] = 0x01
 		u8[A1 + 0x1e] = 0x0e
 		u8[A1 + 0x1f] = 0x07
-		u8[A1 + 0x20] = 0x02
-		u8[A1 + 0x2a] |= 0x04
+		u8[A1 + 0x20] = char.state.ROLLING
+		u8[A1 + 0x2a] |= char.flag.ROLLING
 		objA1.velocity.y = objA0.velocity.y - 0x680
 		objA1.velocity.x = 0
 		u16[A1 + 0x1c] = 0
 	}
 
-	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	objA1.sprite_priority = 0x0100
 	u8[A1 + 0x2e] = 0
 	u8[A2] = 0

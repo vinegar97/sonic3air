@@ -69,12 +69,12 @@ function void MushroomHead.Update()
 
 	A1 = 0xffffb000
 	D5 = 0x30
-	D6 = 0x03
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn03e172()
 
 	A1 = 0xffffb04a
 	D5 = 0x32
-	D6 = 0x04
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn03e172()
 
 	DrawOrUnloadObject()

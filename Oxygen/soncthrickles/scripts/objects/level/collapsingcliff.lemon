@@ -58,7 +58,7 @@ function void CollapsingCliff.Update()
 		--objA0.flags38
 	}
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 != 0)
 	{
 		objA0.value3a = 1
@@ -168,7 +168,7 @@ function void fn0205de()
 				objA1.flags2a &= ~char.flag.ON_OBJECT
 				objA1.flags2a &= ~char.flag.PUSHING
 				objA1.flags2a |= char.flag.IN_AIR
-				u8[A1 + 0x21] = 1
+				u8[A1 + 0x21] = char.state.RUNNING2
 			}
 		}
 	}

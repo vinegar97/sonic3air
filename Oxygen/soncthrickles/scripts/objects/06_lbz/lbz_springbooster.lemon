@@ -127,9 +127,9 @@ function void fn0261f2()
 
 			u16[A1 + 0x32] = 0x0f
 			u16[A1 + 0x1c] = objA1.velocity.x
-			objA0.flags2a &= ~0x20
-			objA0.flags2a &= ~0x40
-			u8[A1 + 0x2a] &= ~0x20
+			objA0.flags2a &= ~object.flag.P1_PUSHING
+			objA0.flags2a &= ~object.flag.P2_PUSHING
+			u8[A1 + 0x2a] &= ~char.flag.PUSHING
 		}
 
 		playSound(SFX_SPRING)

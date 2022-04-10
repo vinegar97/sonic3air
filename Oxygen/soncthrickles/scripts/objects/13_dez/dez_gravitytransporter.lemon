@@ -66,12 +66,12 @@ function void fn048c44()
 			u16[A1 + 0x1c] = 0
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
-			u8[A1 + 0x2a] &= ~0x20
-			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] &= ~char.flag.PUSHING
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			objA1.position.x.u16 = objA0.position.x.u16
 			if (u8[A1 + 0x2a] & 0x04)
 			{
-				u8[A1 + 0x2a] &= ~0x04
+				u8[A1 + 0x2a] &= ~char.flag.ROLLING
 				D0.u8 = u8[A1 + 0x1e] - u8[A1 + 0x44]
 				u8[A1 + 0x1e] = u8[A1 + 0x44]
 				u8[A1 + 0x1f] = u8[A1 + 0x45]

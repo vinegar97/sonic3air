@@ -38,13 +38,13 @@ function void fn049c8a()
 	A3 = A0 + 0x36
 	A1 = 0xffffb000
 	D5.u16 = control.player1
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn049cfe()
 
 	A3 = A0 + 0x37
 	A1 = 0xffffb04a
 	D5.u16 = control.tails
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn049cfe()
 
 	if (objA0.flags38 != 0)
@@ -53,12 +53,12 @@ function void fn049c8a()
 
 		A3 = A0 + 0x36
 		A1 = 0xffffb000
-		D6 = 3
+		D6 = 3		// object.flag.P1_ON_OBJECT
 		fn049d72()
 
 		A3 = A0 + 0x37
 		A1 = 0xffffb04a
-		D6 = 4
+		D6 = 4		// object.flag.P2_ON_OBJECT
 		fn049d72()
 
 		objA0.state = 0x01
@@ -81,14 +81,14 @@ function void fn049cfe()
 			if (objA0.flags2a & bit)
 			{
 				++u8[A3]
-				u16[A1 + 0x20] = 0x0200
+				u16[A1 + 0x20] = 0x0200		// char.state.ROLLING, char.state.RUNNING
 				u8[A1 + 0x2e] = 0x01
 				u8[A1 + 0x1e] = 0x0e
 				u8[A1 + 0x1f] = 0x07
-				u8[A1 + 0x20] = 0x02
+				u8[A1 + 0x20] = char.state.ROLLING
 				if ((u8[A1 + 0x2a] & 0x04) == 0)
 				{
-					u8[A1 + 0x2a] |= 0x04
+					u8[A1 + 0x2a] |= char.flag.ROLLING
 					objA1.position.y.u16 += 5
 				}
 			}
@@ -199,8 +199,8 @@ function void fn049d72()
 		D1.s16 = -D1.s16
 
 	objA1.velocity.x = D1.u16
-	u8[A1 + 0x2a] |= 0x02
-	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	u8[A1 + 0x05] = 0x02
 	u8[A1 + 0x2e] = 0
 	u8[A3] = 0

@@ -268,7 +268,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 				angle = lookupAngleByVector(s16[characterAddress + 0x18], s16[characterAddress + 0x1a])
 
 				flags = 0
-				if (objA0.flags2a & 0x01)
+				if (char.flags & char.flag.FACING_LEFT)
 				{
 					flags |= SPRITE_FLAG_FLIP_X
 					angle += 0x80

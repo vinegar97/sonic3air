@@ -39,7 +39,7 @@ function void fn032c92()
 	push(D2)
 	push(D1)
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn01dccc()
 
 	if (D4.u8 == 0x01 && (u8[A1 + 0x2a] & char.flag.IN_AIR))
@@ -62,7 +62,7 @@ function void fn032c92()
 	D3 = pop()
 	D4 = pop()
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn01dccc()
 
 	if (D4.u8 == 0x01 && (u8[A1 + 0x2a] & char.flag.IN_AIR))
@@ -137,8 +137,8 @@ function void fn032d16()
 	}
 	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
 
-	objA0.flags2a &= ~0x20
-	objA0.flags2a &= ~0x40
+	objA0.flags2a &= ~object.flag.P1_PUSHING
+	objA0.flags2a &= ~object.flag.P2_PUSHING
 	playSound(0x7b)
 }
 
@@ -185,10 +185,10 @@ function void fn035a7a()
 //# address-hook(0x035b16) end(0x035b8a)
 function void fn035b16()
 {
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 != 0)
 	{
-		u16[A0 + 0x36] += (D0.u8 == 0x18) ? 0x100 : 0x80
+		u16[A0 + 0x36] += (D0.u8 == (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)) ? 0x100 : 0x80
 		if (u16[A0 + 0x36] >= 0x8000)
 		{
 			u16[A0 + 0x36] = 0x8000
@@ -773,7 +773,7 @@ function void fn035dde()
 		objA0.state = 0x02
 	}
 
-	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
 	u8[A1 + 0x40] = 0
 	playSound(0x7b)
@@ -975,7 +975,7 @@ function void fn035f8c()
 {
 	if (objA0.state == 0)
 	{
-		if (objA0.flags2a & 0x18)
+		if (objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 		{
 			objA0.value3a = 0x01
 		}
@@ -998,19 +998,19 @@ function void fn035f8c()
 	if (D3.u8 == 0)
 	{
 		A1 = 0xffffb000
-		if (objA0.flags2a & 0x08)
+		if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 		{
-			objA0.flags2a &= ~0x08
-			u8[A1 + 0x2a] &= ~0x08
-			u8[A1 + 0x2a] |= 0x02
+			objA0.flags2a &= ~object.flag.P1_ON_OBJECT
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 		}
 
 		A1 = 0xffffb04a
-		if (objA0.flags2a & 0x10)
+		if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 		{
-			objA0.flags2a &= ~0x10
-			u8[A1 + 0x2a] &= ~0x08
-			u8[A1 + 0x2a] |= 0x02
+			objA0.flags2a &= ~object.flag.P2_ON_OBJECT
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 		}
 	}
 	else
@@ -1056,7 +1056,7 @@ function void fn0362ce()
 	A3 = 0xfffff7e0 + D0.u16
 	D3 = 0
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 == 0)
 	{
 		u8[A3] &= ~(u8(1) << D3.u8)

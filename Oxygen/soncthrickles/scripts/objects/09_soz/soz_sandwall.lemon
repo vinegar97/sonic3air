@@ -154,31 +154,31 @@ function void fn040c2a()
 		objA0.animation.sprite = 1
 
 		A1 = 0xffffb000
-		if (objA0.flags2a & 0x08)
+		if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 		{
-			objA0.flags2a &= ~0x08
-			u8[A1 + 0x2a] &= ~0x08
-			u8[A1 + 0x2a] |= 0x02
+			objA0.flags2a &= ~object.flag.P1_ON_OBJECT
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 		}
 
-		if (objA0.flags2a & 0x20)
+		if (objA0.flags2a & object.flag.P1_PUSHING)
 		{
-			objA0.flags2a &= ~0x20
-			u8[A1 + 0x2a] &= ~0x20
+			objA0.flags2a &= ~object.flag.P1_PUSHING
+			u8[A1 + 0x2a] &= ~char.flag.PUSHING
 		}
 
 		A1 = 0xffffb04a
-		if (objA0.flags2a & 0x10)
+		if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 		{
-			objA0.flags2a &= ~0x10
-			u8[A1 + 0x2a] &= ~0x08
-			u8[A1 + 0x2a] |= 0x02
+			objA0.flags2a &= ~object.flag.P2_ON_OBJECT
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 		}
 
-		if (objA0.flags2a & 0x40)
+		if (objA0.flags2a & object.flag.P2_PUSHING)
 		{
-			objA0.flags2a &= ~0x40
-			u8[A1 + 0x2a] &= ~0x20
+			objA0.flags2a &= ~object.flag.P2_PUSHING
+			u8[A1 + 0x2a] &= ~char.flag.PUSHING
 		}
 	}
 

@@ -89,11 +89,11 @@ function void fn047e8c()
 	if (u16[A0 + 0x34] == 0)
 	{
 		A1 = 0xffffb000
-		D6 = 3
+		D6 = 3		// object.flag.P1_ON_OBJECT
 		fn047ee8()
 
 		A1 = 0xffffb04a
-		D6 = 4
+		D6 = 4		// object.flag.P2_ON_OBJECT
 		fn047ee8()
 
 		objA0.update_address = 0x047e62
@@ -126,8 +126,8 @@ function void fn047ee8()
 	if (objA0.flags2a & bit)
 	{
 		objA0.flags2a &= ~bit
-		u8[A1 + 0x2a] &= ~0x08
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 }
 
@@ -188,11 +188,11 @@ function void fn047f56()
 	}
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn047f9c()
 
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn047f9c()
 
 	objA0.animation.sprite = (level.framecounter.low & 0x03)
@@ -234,7 +234,7 @@ function void fn047f9c()
 		objA0.flags2a &= ~bit
 		if (u16[A0 + 0x34] == 0)
 		{
-			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 		}
 		u8[A1 + 0x46] = 0x0c
 		u8[A1 + 0x47] = 0x0d

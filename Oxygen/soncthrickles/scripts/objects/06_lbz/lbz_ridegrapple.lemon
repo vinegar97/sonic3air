@@ -169,9 +169,9 @@ function void fn0266b0()
 			objA1.velocity.y = -0x380
 			u8[A1 + 0x1e] = 0x0e
 			u8[A1 + 0x1f] = 0x07
-			u8[A1 + 0x20] = 0x02
-			u8[A1 + 0x2a] |= 0x02
-			u8[A1 + 0x2a] |= 0x04
+			u8[A1 + 0x20] = char.state.ROLLING
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
+			u8[A1 + 0x2a] |= char.flag.ROLLING
 			u8[A1 + 0x40] = 0x01
 		}
 	}
@@ -401,7 +401,7 @@ function void fn02666a()
 	{
 		objA1.velocity.x = objA0.velocity.x
 		objA1.velocity.y = 0
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		u8[A1 + 0x2e] = 0
 		u8[A2] = 0
 		u8[A2 + 0x02] = 0x3c

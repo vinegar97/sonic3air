@@ -198,7 +198,7 @@ function void fn04757a()
 {
 	if (u16[A0 + 0x34] != 0)
 	{
-		if ((objA0.flags2a & 0x08) == 0)
+		if ((objA0.flags2a & object.flag.P1_ON_OBJECT) == 0)
 		{
 			--u16[A0 + 0x34]
 		}
@@ -207,7 +207,7 @@ function void fn04757a()
 	{
 		if (u8[A0 + 0x31] == 0)
 		{
-			if ((objA0.flags2a & 0x08) == 0 || debug_mode.state != 0)
+			if ((objA0.flags2a & object.flag.P1_ON_OBJECT) == 0 || debug_mode.state != 0)
 			{
 				D0.u8 = objA0.value26
 				return
