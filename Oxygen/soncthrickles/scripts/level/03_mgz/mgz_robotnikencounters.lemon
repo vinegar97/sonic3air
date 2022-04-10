@@ -743,7 +743,7 @@ function void fn06cf20()
 	setupObjectAttributesMost(0x06d7a0)
 
 	objA0.update_address = 0x06cf62
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u16[A0 + 0x44] = u16[A1 + 0x46]

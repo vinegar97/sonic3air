@@ -524,7 +524,7 @@ function void fn076652()
 function void fn07665e()
 {
 	setupObjectAttributesFull(0x07694c)
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 
 	objA0.update_address = 0x076674
 	fn076674()

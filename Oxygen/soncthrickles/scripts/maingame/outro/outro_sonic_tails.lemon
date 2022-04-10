@@ -2040,7 +2040,7 @@ function void fn08648c()
 		u32[0xffffcbc0] = 0x01a494		// After-images effect
 	}
 
-	u8[0xffffb000 + 0x2b] |= 0x02
+	u8[0xffffb000 + 0x2b] |= char.bonus.INVINCIBLE
 	u8[0xffffb000 + 0x2e] = 0x81
 	u8[0xffffb000 + 0x35] = 0
 }

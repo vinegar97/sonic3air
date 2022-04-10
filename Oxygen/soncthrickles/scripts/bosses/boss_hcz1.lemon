@@ -616,7 +616,7 @@ function void fn06a460()
 	setupObjectAttributesMost(0x06ad08)
 
 	objA0.update_address = 0x06a478
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 }
 
 
@@ -652,7 +652,7 @@ function void fn06a4a8()
 	setupObjectAttributesMost(0x06ad10)
 
 	objA0.update_address = 0x06a4c0
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 }
 
 

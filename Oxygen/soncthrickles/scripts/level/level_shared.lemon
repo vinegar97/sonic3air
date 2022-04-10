@@ -368,7 +368,7 @@ function void TriggerNextZone()
 
 	if (Game.getSetting(SETTING_MAINTAIN_SHIELDS))
 	{
-		global.shields_backup_1 = u8[0xffffb000 + 0x2b] & 0x71
+		global.shields_backup_1 = u8[0xffffb000 + 0x2b] & char.bonus.ALL_SHIELDS
 	}
 #endif
 

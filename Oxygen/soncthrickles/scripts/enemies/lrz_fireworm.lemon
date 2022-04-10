@@ -275,7 +275,7 @@ function void fn08f97c()
 
 	u32[A0 + 0x30] = 0x08fa56
 	objA0.countdown_callback = 0x08f9a4
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 }
 
 

@@ -736,7 +736,7 @@ function void fn069844()
 	setupObjectAttributesBasic(0x069cec)
 
 	objA0.update_address = 0x06989e
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	objA0.countdown_callback = 0x0698bc
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	A2 = 0xffff0000 + u16[A1 + 0x46]
@@ -790,7 +790,7 @@ function void fn0698c6()
 function void fn0698d2()
 {
 	setupObjectAttributesBasic(0x069cf2)
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	playSound(0x4d)
 	objA0.hitbox_extends.y = 0x0c
 	objA0.countdown_value = 0x9f

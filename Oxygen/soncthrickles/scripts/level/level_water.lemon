@@ -126,7 +126,7 @@ function void fn00717c()
 	if (s8[A1 + 0x2b] < 0)
 	{
 		u16[A1 + 0x32] = 0x05
-		u8[A1 + 0x2b] &= 0x7f
+		u8[A1 + 0x2b] &= ~char.bonus.INFINITE_INERTIA
 	}
 }
 
@@ -162,7 +162,7 @@ function void fn0071e4()
 	if (s8[A1 + 0x2b] < 0)
 	{
 		u16[A1 + 0x32] = 0x05
-		u8[A1 + 0x2b] &= 0x7f
+		u8[A1 + 0x2b] &= ~char.bonus.INFINITE_INERTIA
 	}
 }
 
@@ -189,7 +189,7 @@ function void fn00723e()
 			u8[A1 + 0x2a] |= 0x01
 
 		u8[A1 + 0x20] = (global.zone == 0x05) ? 0x19 : 0x1b
-		u8[A1 + 0x2b] |= 0x80
+		u8[A1 + 0x2b] |= char.bonus.INFINITE_INERTIA
 	}
 	else
 	{
@@ -235,7 +235,7 @@ function void fn00723e()
 			}
 		}
 		u16[A1 + 0x1c] = D0.u16
-		u8[A1 + 0x2b] |= 0x80
+		u8[A1 + 0x2b] |= char.bonus.INFINITE_INERTIA
 	}
 }
 
@@ -372,7 +372,7 @@ function void fn00730c()
 	if (s8[A1 + 0x2b] < 0)
 	{
 		u16[A1 + 0x32] = 0x05
-		u8[A1 + 0x2b] &= 0x7f
+		u8[A1 + 0x2b] &= ~char.bonus.INFINITE_INERTIA
 		if ((u8[A1 + 0x2a] & 0x02) == 0)
 		{
 			u8[A1 + 0x1e] = u8[A1 + 0x44]

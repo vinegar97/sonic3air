@@ -579,7 +579,7 @@ function void fn078a02()
 	setupObjectAttributesBasic(0x078d72)
 
 	objA0.update_address = 0x078a1c
-	objA0.flags2b |= 0x08
+	objA0.flags2b |= char.bonus.DEFLECTABLE
 
 	fn078baa()
 	fn078a1c()

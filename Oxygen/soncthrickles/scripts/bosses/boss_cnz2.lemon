@@ -730,7 +730,7 @@ function void fn06eada()
 {
 	setupObjectAttributesFull(0x06edc0)
 
-	objA0.flags2b |= 0x20
+	objA0.flags2b |= char.bonus.SHIELD_LIGHTNING
 	u32[A0 + 0x30] = 0x06ee2c
 	objA0.countdown_callback = 0x06eb34
 	objA0.update_address = (objA0.subtype2c & 0x02) ? 0x06eb0c : 0x06eb16

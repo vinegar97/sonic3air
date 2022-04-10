@@ -289,7 +289,7 @@ function void fn0611d6()
 	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 
-	D0 = 4
+	D0 = 4		// char.bonus.SHIELD_FIRE
 	fn061254()
 	playMusic(SFX_FIRESHIELD)
 }
@@ -304,7 +304,7 @@ function void fn061200()
 	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 
-	D0 = 6
+	D0 = 6		// char.bonus.SHIELD_BUBBLE
 	fn061254()
 	playMusic(SFX_BUBBLESHIELD)
 }
@@ -319,7 +319,7 @@ function void fn06122a()
 	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 
-	D0 = 5
+	D0 = 5		// char.bonus.SHIELD_LIGHTNING
 	fn061254()
 	playMusic(SFX_LIGHTNINGSHIELD)
 }
@@ -328,8 +328,10 @@ function void fn06122a()
 //# address-hook(0x061254) end(0x061262)
 function void fn061254()
 {
-	u8[A1 + 0x2b] |= (1 << D0.u8)
+	u8 shield = (1 << D0.u8)
+
+	u8[A1 + 0x2b] |= shield
 	A2 = 0xfffffe47
 	u8[A2] &= ~char.bonus.ELEMENTAL_SHIELDS
-	u8[A2] |= (1 << D0.u8)
+	u8[A2] |= shield
 }

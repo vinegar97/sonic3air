@@ -21,7 +21,7 @@ function void fn047892()
 
 #if STANDALONE
 	// Lightning shield protects from the bolt damage
-	u8[A0 + 0x2b] = char.bonus.SHIELD_LIGHTNING
+	objA0.flags2b = char.bonus.SHIELD_LIGHTNING
 #endif
 
 	fn0478be()

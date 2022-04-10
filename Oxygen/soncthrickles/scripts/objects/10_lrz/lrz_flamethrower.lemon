@@ -123,7 +123,7 @@ function void fn043ddc()
 					objA1.box_size.x = 0x0c
 					objA1.box_size.y = 0x0c
 					objA1.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
-					u8[A1 + 0x2b] |= 0x10
+					u8[A1 + 0x2b] |= char.bonus.SHIELD_FIRE
 					D0.u8 = objA0.flags2e
 					LookupSinCos()
 					D1.s16 <<= 2
@@ -226,7 +226,7 @@ function void fn043f12()
 					objA1.box_size.x = 0x0c
 					objA1.box_size.y = 0x0c
 					objA1.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
-					u8[A1 + 0x2b] |= 0x10
+					u8[A1 + 0x2b] |= char.bonus.SHIELD_FIRE
 					D0.u8 = objA0.flags2e
 					LookupSinCos()
 					D1.s16 <<= 2

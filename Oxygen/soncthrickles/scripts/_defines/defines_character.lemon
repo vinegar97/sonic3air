@@ -180,9 +180,10 @@ constant u8 char.bonus.DEFLECTABLE		=  0x08		// Seems unused for player characte
 constant u8 char.bonus.SHIELD_FIRE		=  0x10
 constant u8 char.bonus.SHIELD_LIGHTNING	=  0x20
 constant u8 char.bonus.SHIELD_BUBBLE	=  0x40
-constant u8 char.bonus.ELEMENTAL_SHIELDS	=  0x70		// = char.bonus.SHIELD_FIRE | char.bonus.SHIELD_LIGHTNING | char.bonus.SHIELD_BUBBLE
-constant u8 char.bonus.ALL_SHIELDS		=  0x71		// =  char.bonus.ANY_SHIELD | char.bonus.ELEMENTAL_SHIELDS
 constant u8 char.bonus.INFINITE_INERTIA	=  0x80
+
+constant u8 char.bonus.ELEMENTAL_SHIELDS	=  0x70		// Any of the three elemental shields
+constant u8 char.bonus.ALL_SHIELDS		=  0x71		// Any of the four shields
 
 // Drowning countdown
 define char.drown_countdown		=  u8[A0 + 0x2c]	// In seconds; when not in water (or immune), this is 30; terror music starts below 12

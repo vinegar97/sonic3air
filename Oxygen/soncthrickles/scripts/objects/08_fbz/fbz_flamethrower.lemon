@@ -232,7 +232,7 @@ function void fn03cec0()
 		objA1.box_size.x = 0x0c
 		objA1.box_size.y = 0x0c
 		objA1.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
-		u8[A1 + 0x2b] |= 0x10
+		u8[A1 + 0x2b] |= char.bonus.SHIELD_FIRE
 
 		if (objA0.subtype2c & 0x40)
 		{

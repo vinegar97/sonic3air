@@ -47,7 +47,7 @@ function void fn042e00()
 				objA1.box_size.x = 0x04
 				objA1.box_size.y = 0x04
 				objA1.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
-				u8[A1 + 0x2b] |= 0x08
+				u8[A1 + 0x2b] |= char.bonus.DEFLECTABLE
 				u8[A1 + 0x22] = 0x01
 				objA1.velocity.x = 0x0200
 				objA1.velocity.y = 0x0200

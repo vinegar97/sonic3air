@@ -559,7 +559,7 @@ function void fn0757a0()
 function void fn0757c0()
 {
 	objA0.update_address = 0x0757d6
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	setupObjectAttributesMost(0x075e5e)
 }
 

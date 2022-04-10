@@ -625,7 +625,7 @@ function void fn073364()
 {
 	setupObjectAttributesMost(0x0736f0)
 
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	objA0.update_address = 0x073384
 	u32[A0 + 0x30] = 0x073844
 }

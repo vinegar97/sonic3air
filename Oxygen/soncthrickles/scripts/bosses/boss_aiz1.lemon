@@ -677,7 +677,7 @@ function void fn0686be()
 	MoveAndFlipWithParent()
 	setupObjectAttributesMost(0x06900a)
 
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	u32[A0 + 0x30] = 0x069126
 	objA0.update_address = 0x0686e8
 	fn0849a2()
@@ -948,7 +948,7 @@ function void fn0688f4()
 function void fn06890e()
 {
 	setupObjectAttributesFull(0x06903e)
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	objA0.countdown_callback = 0x06893e
 	D1 = 6
 	fn068928()

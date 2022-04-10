@@ -53,7 +53,7 @@ function void fn042bf6()
 				objA1.box_size.x = 0x0c
 				objA1.box_size.y = 0x08
 				objA1.collision_attributes = (collision.flag.THREAT | collision.size.8x4)
-				u8[A1 + 0x2b] |= 0x10
+				u8[A1 + 0x2b] |= char.bonus.SHIELD_FIRE
 				objA1.velocity.x = 0x0200
 				if (objA0.flags2a & 0x01)
 				{

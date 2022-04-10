@@ -811,7 +811,7 @@ function void fn070d10()
 	A1 = u32[0x070d88 + D0.s16]
 	SetupObjectAttributesFull()
 
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	MoveWithParent()
 }
 
