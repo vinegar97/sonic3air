@@ -33,6 +33,13 @@ function u16 makeExtendedPackedColor(u16 color)
 #endif
 
 
+function void SetPaletteFadedOut(u16 range)
+{
+	palette_fade.range = range
+	SetPaletteFadedOut()
+}
+
+
 //# address-hook(0x003b80) end(0x003b94)
 function void SetPaletteFadedOut()
 {
@@ -153,11 +160,11 @@ function void FadeInColor()
 			}
 		}
 		else
-		{
-			color = makeNormalPackedColor(color)
-	#else
-		{
 	#endif
+		{
+		#if STANDALONE
+			color = makeNormalPackedColor(color)
+		#endif
 			if (color + 0x0200 <= target)
 			{
 				color += 0x0200

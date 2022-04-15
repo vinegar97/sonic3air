@@ -34,8 +34,7 @@ function void GameMode.MainGame()
 			StartLoadingPatternsForZone()
 		}
 
-		palette_fade.range = 0x202f		// Only palette entries 0x10...0x3f
-		SetPaletteFadedOut()
+		SetPaletteFadedOut(0x202f)		// Only palette entries 0x10...0x3f
 
 		global.fade_timer = 0x16
 		u16[0xffffb250 + 0x2e] = 0x16
@@ -136,8 +135,7 @@ function void GameMode.MainGame()
 			u16[0xffffff7e] = levelselect.soundtest << 8
 		}
 
-		palette_fade.range = 0x003f
-		SetPaletteFadedOut()
+		SetPaletteFadedOut(0x003f)
 		global.fade_timer = 0x16
 		u16[0xffffff7c] = 0
 		global.game_mode &= ~0x80
@@ -340,7 +338,7 @@ function void UpdateGamePause()
 		// In competition mode, button B during pause quits the stage
 		if (global.zone >= 0x0e && global.zone <= 0x12)
 		{
-			if ((control.pad1.pressed & CONTROL_B) && s8[0xffffff8b] < 0)
+			if ((control.pad1.pressed & CONTROL_B) && s8(competition_mode.game_mode) < 0)
 			{
 				global.game_mode = 0xc0
 				break
@@ -2248,13 +2246,13 @@ function void fn0075d2()
 	A0 = u32[0x0075fa + D0.u16]
 	rolling_demo.input_timer = u8[A0]
 	++A0
-	u32[0xffffef52] = A0
+	rolling_demo.progress = A0
 	rolling_demo.last_input = 0
 
 	control.pad1 = 0x8000		// CONTROL_START, 0
 	control.pad2 = 0x8000		// CONTROL_START, 0
 
-	u8[0xffffef50] = 0xff
+	rolling_demo.pressed_start = 0xff
 }
 
 

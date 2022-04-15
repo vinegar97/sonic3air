@@ -96,7 +96,7 @@ function void TitleScreen_SK()
 
 	Kosinski.addToDMAQueue(0x0cd910, 0x1c40)
 
-	palette_fade.range = 0x3f
+	palette_fade.range = 0x003f
 	global.fade_timer = 0x16
 	u32[0xffffb000] = 0x005628		// Sonic jumping down
 	u32[0xffffb04a] = 0x005770		// The Death Egg

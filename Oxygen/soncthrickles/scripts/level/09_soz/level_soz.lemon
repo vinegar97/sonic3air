@@ -204,7 +204,7 @@ function void fn055b70()
 		{
 			if (global.characters != CHARS_SONIC_AND_TAILS || u16[0xffffb04a + 0x10] > D0.u16 || u16[0xffffb04a + 0x14] >= 0x09a8)
 			{
-				palette_fade.range = 0x0f
+				palette_fade.range = 0x000f		// Only first 0x10 palette entries
 				u16[0xffffeed6] = 0x15
 				u16[0xffffeed8] = 0x10
 				global.fade_timer |= 0xff00
@@ -1016,9 +1016,9 @@ function void fn056324()
 		A0 = backupA0
 
 		--level.display_routine
-		if (s16[0xffffeed2] < 0)
+		if (s16(level.display_routine) < 0)
 		{
-			palette_fade.range = 0x401f	// Only entries 0x20...0x3f
+			palette_fade.range = 0x401f		// Only entries 0x20...0x3f
 			level.display_routine = 0x15
 			level.scrolling_routine += 4
 
@@ -1041,7 +1041,7 @@ function void fn056366()
 		A0 = backupA0
 
 		--level.display_routine
-		if (s16[0xffffeed2] < 0)
+		if (s16(level.display_routine) < 0)
 		{
 			move_area.left = 0
 			move_area.right = 0x6000

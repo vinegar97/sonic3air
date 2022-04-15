@@ -295,7 +295,7 @@ function void fn04bc1e()
 	u16[0xffffe402] += 0x40
 	if (u16[0xffffe402] == 0x1800)
 	{
-		palette_fade.range = 0x3f
+		palette_fade.range = 0x003f
 		global.fadeout_countdown = 0
 		objA0.update_address = 0x04bc54
 		slotmachine.fadeout.countdown = 60
