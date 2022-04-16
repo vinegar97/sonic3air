@@ -88,14 +88,17 @@ function void fn01f3f8()
 
 	if (objA0.flags2a & 0x01)
 	{
+		// Damages character entering from the sides
 		objA0.update_address = 0x01f4c4
 	}
 	else if (objA0.flags2a & 0x02)
 	{
+		// Damages character entering from below
 		objA0.update_address = 0x01f528
 	}
 	else
 	{
+		// Damages character entering from the top
 		objA0.update_address = 0x01f45e
 		fn01f45e()
 	}
@@ -126,6 +129,29 @@ function void fn01f45e()
 }
 
 
+//# address-hook(0x01f4c4) end(0x01f526)
+function void fn01f4c4()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	CheckCharacterOnClimbableObject()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	if (D6.u8 & 0x01)
+	{
+		A1 = 0xffffb000
+		BlockerElement.DoDamage()
+	}
+	if (D6.u8 & 0x02)
+	{
+		A1 = 0xffffb04a
+		BlockerElement.DoDamage()
+	}
+
+	BlockerElement.checkForUnloadAndDebugRender(0xffa0ffff)
+}
 
 // Object that is (flipped) GTGT
 
@@ -249,6 +275,7 @@ function void fn01f66c()
 	BlockerElement.checkForUnloadAndDebugRender(0xffffc080)
 }
 
+// Object that is (flipped) GTGT
 
 //# address-hook(0x01f6d0) end(0x01f732)
 function void fn01f6d0()
