@@ -202,6 +202,11 @@ function void fn015cd6()
 	CompetitionMode.UpdateTailsAnimation_inner()
 }
 
+function void fn015d1e()
+{
+	CompetitionMode.updateTailsAnimation_shared()
+}
+
 function void fn016050()
 {
 	CompetitionMode.Character.UpdateSpritePatterns.Tails()

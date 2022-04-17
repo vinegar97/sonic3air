@@ -165,10 +165,10 @@ function void CompetitionMode.Character.UpdateNormalState.Sonic_Knuckles()
 	if ((char.control_flags & 0x01) == 0)
 	{
 		// Targets:
-		//  - 0x0107f6	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00
-		//  - 0x010868	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR
-		//  - 0x010896	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING
-		//  - 0x0108b8	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)
+		//  - 0x0107f6	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> CompetitionMode.Character.UpdateUprightOnGround.Sonic_Knuckles()
+		//  - 0x010868	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> CompetitionMode.Character.UpdateUprightInAir.Sonic_Knuckles()
+		//  - 0x010896	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> CompetitionMode.Character.UpdateRollingOnGround.Sonic_Knuckles()
+		//  - 0x0108b8	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> CompetitionMode.Character.UpdateRollingInAir.Sonic_Knuckles()
 		call tableLookupAddress(0x0107ee, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 	}
 
@@ -495,10 +495,10 @@ function void CompetitionMode.Character.UpdateNormalState.Tails()
 	if ((char.control_flags & 0x01) == 0)
 	{
 		// Targets:
-		//  - 0x013336	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00
-		//  - 0x01335a	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR
-		//  - 0x01346a	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING
-		//  - 0x01348c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)
+		//  - 0x013336	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> CompetitionMode.Character.UpdateUprightOnGround.Tails()
+		//  - 0x01335a	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> CompetitionMode.Character.UpdateUprightInAir.Tails()
+		//  - 0x01346a	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> CompetitionMode.Character.UpdateRollingOnGround.Tails()
+		//  - 0x01348c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> CompetitionMode.Character.UpdateRollingInAir.Tails()
 		call tableLookupAddress(0x01332e, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 	}
 
