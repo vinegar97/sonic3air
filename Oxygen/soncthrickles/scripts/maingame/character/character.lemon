@@ -3039,12 +3039,12 @@ function void KnucklesPressedJumpInMidAir()
 	if (char.flags & char.flag.FACING_LEFT)
 	{
 		char.velocity.x = -char.groundspeed
-		s8(knuckles.glide_direction) = -0x80
+		knuckles.glide_direction = -0x80
 	}
 	else
 	{
 		char.velocity.x = char.groundspeed
-		s8(knuckles.glide_direction) = 0
+		knuckles.glide_direction = 0
 	}
 	char.rotation.both = 0
 	knuckles.glideclimbstate = 0x02
