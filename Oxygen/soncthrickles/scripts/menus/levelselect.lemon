@@ -478,17 +478,9 @@ function void fn007e64()
 	{
 		u16[0xffffff80] = 11
 		if (control.pad1.state & CONTROL_UP)
-		{
-			--levelselect.selection
-			if (s16(levelselect.selection) < 0)
-				levelselect.selection = 0x20
-		}
+			levelselect.selection = (s16(levelselect.selection) < 0) ? 0x20 : --levelselect.selection
 		if (control.pad1.state & CONTROL_DOWN)
-		{
-			++levelselect.selection
-			if (levelselect.selection > 0x20)
-				levelselect.selection = 0
-		}
+			levelselect.selection = (levelselect.selection > 0x20) ? 0 : ++levelselect.selection
 		return
 	}
 
@@ -536,9 +528,7 @@ function void fn007e64()
 			}
 		#endif
 
-			++levelselect.characters
-			if (levelselect.characters > maxCharacterSelection)
-				levelselect.characters = 0
+			levelselect.characters = (levelselect.characters < maxCharacterSelection) ? ++levelselect.characters : CHARS_SONIC_AND_TAILS
 		}
 	}
 

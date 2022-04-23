@@ -1132,12 +1132,12 @@ function void fn00d6d0()
 
 		if (control.pad1.pressed & CONTROL_UP)
 		{
-			character = (character < maxCharacterSelection) ? (character + 1) : 0
+			character = (character < maxCharacterSelection) ? (character++) : CHARS_SONIC_AND_TAILS
 			playSound(SFX_CLICK)
 		}
 		else if (control.pad1.pressed & CONTROL_DOWN)
 		{
-			character = (character > 0) ? (character - 1) : maxCharacterSelection
+			character = (character > CHARS_SONIC_AND_TAILS) ? (character--) : maxCharacterSelection
 			playSound(SFX_CLICK)
 		}
 	}
