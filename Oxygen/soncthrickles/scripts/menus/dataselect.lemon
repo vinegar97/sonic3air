@@ -747,7 +747,7 @@ function void fn00d30c()
 	u8[A0 + 0x1d] = 0x0f
 	objA0.animation.sprite = dataselect.nosave_characters + 4
 
-	if (dataselect.slot_selected == 0 && u16[0xffffb078] == 0 && u16[0xffffeee4] == 0)
+	if (dataselect.slot_selected == 0 && u16[0xffffb04a + 0x2e] == 0 && u16[0xffffeee4] == 0)
 	{
 		if (control.pad1.pressed & DataSelect.CONTROLS_ACCEPT)
 		{
@@ -896,7 +896,7 @@ function bool fn00d458()
 		// Empty save slot
 		u8[A0 + 0x1d] = 0x0f
 		objA0.animation.frame = 0
-		if (u16[0xffffb078] != 0 || u16[0xffffeee4] != 0)
+		if (u16[0xffffb04a + 0x2e] != 0 || u16[0xffffeee4] != 0)
 		{
 			return 2
 		}
@@ -940,7 +940,7 @@ function bool fn00d458()
 
 		if (u16[A0 + 0x38] == 0 && objA0.value3b == 0)
 		{
-			if (u16[0xffffb078] != 0)
+			if (u16[0xffffb04a + 0x2e] != 0)
 			{
 				return 2
 			}
@@ -954,7 +954,7 @@ function bool fn00d458()
 				objA0.flags38 = 0xff
 			}
 
-			if (u16[0xffffb078] != 0)
+			if (u16[0xffffb04a + 0x2e] != 0)
 			{
 				return 2
 			}
@@ -1119,7 +1119,7 @@ function void fn00d6d0()
 {
 	// Character selection
 	u8 character = D0.u8
-	if (u16[0xffffb07a] == 0)
+	if (u16[0xffffb04a + 0x30] == 0)
 	{
 		u8 maxCharacterSelection = 3
 	#if STANDALONE
@@ -1296,7 +1296,7 @@ function void fn00d7ea()
 	fn00d912()
 	fn00d94a()
 
-	if (u16[0xffffb078] == 0)
+	if (u16[0xffffb04a + 0x2e] == 0)
 	{
 		if (control.pad1.pressed & DataSelect.CONTROLS_CANCEL)
 		{
@@ -1335,7 +1335,7 @@ function void fn00d7ea()
 		}
 	}
 
-	D0.u16 = u16[0xffffb05a]
+	D0.u16 = u16[0xffffb04a + 0x10]
 	objA0.position.x.u16 = D0.u16
 	objA0.velocity.x = D0.u16
 	objA0.velocity.y = objA0.position.y.u16
@@ -1354,7 +1354,7 @@ function void fn00d854()
 	objA0.animation.sprite = 0x0d
 	u8[A0 + 0x1d] = 0x08
 
-	u16[A0 + 0x12] = u16[0xffffb05a] + camera.foreground.x.u16
+	u16[A0 + 0x12] = u16[0xffffb04a + 0x10] + camera.foreground.x.u16
 	objA0.base_state += 4
 
 	fn00d69e()
