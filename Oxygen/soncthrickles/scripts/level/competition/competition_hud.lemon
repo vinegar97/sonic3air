@@ -126,7 +126,7 @@ function void fn0371be()
 
 	if (objA0.value3a == 0x01)
 	{
-		D0 = 0x093b63	// That's 9 minutes 59 seconds 99 centiseconds
+		D0 = 0x93b63		// That is 9'59"99
 		if (D0 <= competition_mode.time_record.player1 || D0 <= competition_mode.time_record.player2)
 		{
 			objA0.value3a = 0x02
@@ -211,13 +211,13 @@ function void fn0371be()
 		--u16[0xffffeee8]
 		if (s16[0xffffeee8] >= 0)
 		{
-			if (competition_mode.time_record.player1 < 0x093b63 && competition_mode.time_record.player2 < 0x093b63)
+			if (competition_mode.time_record.player1 < 0x93b63 && competition_mode.time_record.player2 < 0x93b63)		// That is 9'59"99
 				return
 		}
 	}
 	else
 	{
-		if (competition_mode.time_record.player1 < 0x093b63 && competition_mode.time_record.player2 < 0x093b63)
+		if (competition_mode.time_record.player1 < 0x93b63 && competition_mode.time_record.player2 < 0x93b63)		// That is 9'59"99
 			return
 	}
 
@@ -228,11 +228,11 @@ function void fn0371be()
 	u32[A1 + D0.s16 + 0x14] = competition_mode.time_record.player2
 	if (s8(hud.dirty.timer) >= 0)
 	{
-		u32[A1 + D0.s16] = 0x093b63
+		u32[A1 + D0.s16] = 0x93b63		// That is 9'59"99
 	}
 	if (s8(hud.dirty.timer.player2) >= 0)
 	{
-		u32[A1 + D0.s16 + 0x14] = 0x093b63
+		u32[A1 + D0.s16 + 0x14] = 0x93b63		// That is 9'59"99
 	}
 
 	D0.u8 = global.zone - 0x0e
@@ -447,10 +447,10 @@ function void fn037d7c()
 	bool goto037dd0 = false
 	if (s8[A4] > 0)
 	{
-		if (u32[A5] >= 0x093b63)
+		if (u32[A5] >= 0x93b63)		// That is 9'59"99
 		{
 			u8[A4] = 0x80
-			u32[A5] = 0x093b63
+			u32[A5] = 0x93b63		// That is 9'59"99
 			goto037dd0 = true
 		}
 		else
