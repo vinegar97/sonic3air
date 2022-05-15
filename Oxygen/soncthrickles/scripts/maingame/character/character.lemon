@@ -2374,6 +2374,7 @@ function void Character.UpdateRotationOnGround_partial()
 
 function void Character.updateRotationOnGround0x00()
 {
+	// Moving horizontally on the floor
 	D3 = char.position.x.u16 + char.hitbox_extends.x
 	D2 = char.position.y.u16 + char.hitbox_extends.y
 	s16 result1 = checkStaticCollisionVertical(D3, D2, 0xfffff768, 0x10, 0)
@@ -2518,6 +2519,7 @@ function void Character.updateRotationOnGround0x40()
 //# address-hook(0x00ee5a) end(0x00ef06)
 function void Character.updateRotationOnGround0x80()
 {
+	// Moving horizontally on the ceiling
 	D3 = char.position.x.u16 + char.hitbox_extends.x
 	D2 = (char.position.y.u16 - char.hitbox_extends.y) ^ 0x0f
 	s16 result1 = checkStaticCollisionVertical(D3, D2, 0xfffff768, -0x10, 0x800)
@@ -3723,7 +3725,7 @@ function void UpdateMusicOnWaterTransition()
 	{
 	#if STANDALONE
 		playMusic(MUSIC_CTRL_FADEOUT)	// Make sure that drowning jingle is really stopped (needed in case the super theme is active and it's fast level music)
-		u8[A1 + 0x2c] = 30				// Needs to be done before chhosing the music
+		u8[A1 + 0x2c] = 30				// Needs to be done before choosing the music
 	#endif
 		chooseFittingMusic()
 	}

@@ -896,7 +896,7 @@ function void copyPaletteDataFromTable(u8 index, u16 ramAddress)
 	//  - index = 0x17				-> LBZ 2 level palette
 	//  - index = 0x18				-> MHZ 1 level palette
 	//  - index = 0x19				-> MHZ 2 level palette
-	//  - index = 0x1a, 0x3c		-> SOZ 1 level palette (0x3c is a different address, but with the exact same colours)
+	//  - index = 0x1a, 0x3c		-> SOZ 1 level palette (0x3c is a different address, but with the exact same colors)
 	//  - index = 0x1b				-> SOZ 2 level palette
 	//  - index = 0x1c				-> LRZ 1 level palette
 	//  - index = 0x1d				-> LRZ 2 level palette
@@ -1779,10 +1779,7 @@ function void fn0067ee()
 		objA1.state = char.state.FALLING_PANIC
 		if (global.characters == CHARS_KNUCKLES_ALONE)
 		{
-			// objA1.state = char.state.KNUX_FALLING
-			// objA1.state.former = char.state.KNUX_FALLING
-			objA1.state.both = 0x2121
-
+			objA1.state.both = 0x2121	// char.state.KNUX_FALLING, char.state.KNUX_FALLING
 			objA1.animation.frame = 1
 			objA1.animation.timer = 0	// This is A0 instead of A1 in original, thanks to Clownacy (https://forums.sonicretro.org/index.php?showtopic=30778&view=findpost&p=893997)
 		}

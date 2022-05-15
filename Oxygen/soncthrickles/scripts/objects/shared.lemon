@@ -943,10 +943,7 @@ function void stopCharacterWinPose(u32 address)
 //# address-hook(0x085b8e) end(0x085ba6)
 function void StopCharacterWinPose()
 {
-	// objA1.state = char.state.STANDING
-	// objA1.state.former = char.state.STANDING
-	objA1.state.both = 0x0505
-
+	objA1.state.both = 0x0505	// char.state.STANDING, char.state.STANDING
 	objA1.animation.frame = 0
 	objA1.animation.timer = 0
 	objA1.flags2a &= ~char.flag.IN_AIR
