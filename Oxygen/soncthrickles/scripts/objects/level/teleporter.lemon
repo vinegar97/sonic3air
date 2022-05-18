@@ -575,7 +575,7 @@ function void fn0522a0()
 	A1 = 0xffffb000
 	if (objA1.position.x.u16 >= 0x4a38)
 	{
-		if (u8[A1 + 0x2a] & 0x02)
+		if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 		{
 			D0.u16 = 0x4a40
 			if (D0.u16 > objA1.position.x.u16)
@@ -606,7 +606,7 @@ function void fn052300()
 	if (kosinski.waiting_modules == 0)
 	{
 		A1 = 0xffffb000
-		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
 			if (allocDynamicObjectAfterA0())
 			{

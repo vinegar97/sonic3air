@@ -110,7 +110,7 @@ function void CompetitionMode.TailsTails.Update()
 	objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 
 	D0 = u8[A2 + 0x20]
-	if ((u8[A2 + 0x2a] & 0x20) && D0.u8 != 0x05)
+	if ((u8[A2 + 0x2a] & char.flag.PUSHING) && D0.u8 != 0x05)
 	{
 		D0 = 0x04
 	}
