@@ -116,11 +116,10 @@ function void DebugMode.EvaluateInput()
 			--debug_mode.move_delay
 			if (debug_mode.move_delay == 0)
 			{
-				debug_mode.move_delay = 1	// Tha's basically no delay at all
+				debug_mode.move_delay = 1	// That's basically no delay at all
 
 				// Increase movement speed, up to 0xff
-				if (debug_mode.move_speed < 0xff)
-					++debug_mode.move_speed
+				debug_mode.move_speed = min(debug_mode.move_speed + 1, 0xff)
 				D4 = control.pad1.state
 			}
 		}
@@ -164,11 +163,7 @@ function void DebugMode.EvaluateInput()
 	if (control.pad1.state & CONTROL_A)
 	{
 		// Change selection
-		s8 change = 0
-		if (control.pad1.pressed & CONTROL_C)
-			change = -1
-		else if (control.pad1.pressed & CONTROL_A)
-			change = 1
+		s8 change = (control.pad1.pressed & CONTROL_C) ? -1 : (control.pad1.pressed & CONTROL_A) ? 1 : 0
 
 		if (change != 0)
 		{
@@ -190,12 +185,12 @@ function void DebugMode.EvaluateInput()
 			u8[A1 + 0x2a] = char.render_flags & ~render_flag.VISIBLE
 
 			D0 = debug_mode.selection * 10
-			u8[A1 + 0x2c] = u8[A2 + D0.u16 + 4]
+			objA1.subtype2c = u8[A2 + D0.u16 + 4]
 			objA1.update_address = u32[A2 + D0.u16]
 			u8[A1] = 0
-			if (objA1.update_address == 0x01d566)	// S-Monitor
+			if (objA1.update_address == 0x01d566)	// Monitor
 			{
-				u8[A1 + 0x2c] = 0x09
+				objA1.subtype2c = 0x09	// S-Monitor
 			}
 			return
 		}
