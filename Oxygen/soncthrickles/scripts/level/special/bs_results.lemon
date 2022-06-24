@@ -981,7 +981,7 @@ function void fn02ecd0()
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x079c)
 	objA0.mapping_offset = 0x018aea
 
-	u16[A0 + 0x16] = 2
+	objA0.compound.count = 2
 	if (u16[A0 + 0x36] != 0)
 	{
 		objA0.position.x.u16 = 0x1640

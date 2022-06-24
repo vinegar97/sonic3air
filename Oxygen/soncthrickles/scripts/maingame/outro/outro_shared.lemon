@@ -369,7 +369,7 @@ function void fn05ea74()
 	}
 
 	objA0.render_flags |= render_flag.COMPOUND
-	u16[A0 + 0x16] = 0x02
+	objA0.compound.count = 0x02
 
 	// "spawnChildObjects(0x0601c2)" replaced by:
 	spawnChildObject(0x05eb32, 0x00, 0, -16)
