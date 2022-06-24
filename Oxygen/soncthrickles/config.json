@@ -1,8 +1,4 @@
 {
-
-	// Enter the path to the game ROM here if it can't be found automatically
-	"RomPath": "___internal/Sonic_Knuckles_wSonic3.bin",
-
 	// Paths
 	"ScriptsDir":     "scripts",
 	"MainScriptName": "main.lemon",
@@ -12,7 +8,7 @@
 	"PlatformFlags": "-1",
 
 	// Game
-	"StartPhase": "3",				// 0: Disclaimer, 1: Title Screen, 2: Main Menu, 3: In-game (loading a save state)
+	"StartPhase": "2",				// 0: Disclaimer, 1: Title Screen, 2: Main Menu, 3: In-game (loading a save state)
 	"GameRecording": "-1",
 	"GameRecPlayFrom": "0",
 	"GameRecIgnoreKeys": "0",
@@ -25,18 +21,6 @@
 	// Audio
 	"AudioSampleRate": "48000",
 
-	// Game server
-	"GameServer":
-	{
-		"ServerAddress": "gameserver.sonic3air.org:21094-21095",
-		"GhostSync":
-		{
-			"Enabled": "1",				// Enable the ghost sync feature by setting this to "1"
-			"ChannelName": "world-dev",	// To use your own private channel, enter an arbitrary string here; "world" is the default channel
-			"ShowOffscreenGhosts": "1"	// Show other players on the screen border while they're not on the screen
-		}
-	},
-	
 	// Dev mode
 	"DevMode":
 	{
@@ -46,7 +30,8 @@
 		"LoadSaveState": "state_01",	// Load save state (requires "StartPhase": "3")
 		//"LoadLevel": "0x0601",		// Load level (requires "StartPhase": "3")
 		//"UseCharacters": "2",			// Use character for level loading: 0: Sonic & Tails, 1: Sonic, 2: Tails, 3: Knuckles, 4: Knuckles & Tails
-		"": ""
+
+		"EnableROMDataAnalyser": "0"	// Enables the "ROMDataAnalyser" script functions (which can have a certain performance impact)
 	},
 
 	// Input recorder
@@ -60,6 +45,5 @@
 	// Script / Debug
 	"ScriptOptimizationLevel": "3",
 	"CompileScripts": "0",
-	"EnableROMDataAnalyzer": "0",
 	"WaitForDebugger": "0"
 }

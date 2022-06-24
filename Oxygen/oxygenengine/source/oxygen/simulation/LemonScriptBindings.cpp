@@ -214,6 +214,16 @@ namespace
 	}
 
 
+	bool System_callFunctionByName(lemon::StringRef functionName)
+	{
+		if (!functionName.isValid())
+			return false;
+
+		CodeExec* codeExec = CodeExec::getActiveInstance();
+		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return false);
+		return codeExec->getLemonScriptRuntime().callFunctionByName(functionName, false);
+	}
+
 	void System_setupCallFrame2(lemon::StringRef functionName, lemon::StringRef labelName)
 	{
 		if (!functionName.isValid())
@@ -227,6 +237,20 @@ namespace
 	void System_setupCallFrame1(lemon::StringRef functionName)
 	{
 		System_setupCallFrame2(functionName, lemon::StringRef());
+	}
+
+	int64 System_getGlobalVariableValueByName(lemon::StringRef variableName)
+	{
+		CodeExec* codeExec = CodeExec::getActiveInstance();
+		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return 0);
+		return codeExec->getLemonScriptRuntime().getGlobalVariableValue_int64(variableName);
+	}
+
+	void System_setGlobalVariableValueByName(lemon::StringRef variableName, int64 value)
+	{
+		CodeExec* codeExec = CodeExec::getActiveInstance();
+		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return);
+		codeExec->getLemonScriptRuntime().setGlobalVariableValue_int64(variableName, value);
 	}
 
 	uint32 System_rand()
@@ -352,6 +376,13 @@ namespace
 		}
 	}
 
+	void debugLogValueStack()
+	{
+		const size_t valueStackSize = Application::instance().getSimulation().getCodeExec().getLemonScriptRuntime().getInternalLemonRuntime().getActiveControlFlow()->getValueStackSize();
+		const std::string valueString = *String(0, "Value Stack Size = %d", valueStackSize);
+		debugLogInternal(valueString);
+	}
+
 
 	uint16 Input_getController(uint8 controllerIndex)
 	{
@@ -457,7 +488,7 @@ namespace
 		{
 			case WriteTarget::VRAM:
 			{
-				result = *(uint16*)(EmulatorInterface::instance().getVRam() + mWriteAddress);
+				result = EmulatorInterface::instance().readVRam16(mWriteAddress);
 				break;
 			}
 
@@ -494,8 +525,7 @@ namespace
 				if (nullptr != gDebugNotificationInterface)
 					gDebugNotificationInterface->onVRAMWrite(mWriteAddress, 2);
 
-				uint16* dst = (uint16*)(EmulatorInterface::instance().getVRam() + mWriteAddress);
-				*dst = value;
+				EmulatorInterface::instance().writeVRam16(mWriteAddress, value);
 				break;
 			}
 
@@ -535,13 +565,7 @@ namespace
 				gDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes);
 			}
 
-			uint16* dst = (uint16*)(emulatorInterface.getVRam() + mWriteAddress);
-			const uint16* src = (uint16*)(emulatorInterface.getMemoryPointer(address, false, bytes));
-			const uint16* end = src + (bytes / 2);
-			for (; src != end; ++src, ++dst)
-			{
-				*dst = swapBytes16(*src);
-			}
+			emulatorInterface.copyFromMemoryToVRam(mWriteAddress, address, bytes);
 			mWriteAddress += bytes;
 		}
 		else
@@ -554,8 +578,8 @@ namespace
 
 			for (uint16 i = 0; i < bytes; i += 2)
 			{
-				uint16* dst = (uint16*)(emulatorInterface.getVRam() + mWriteAddress);
-				*dst = emulatorInterface.readMemory16(address);
+				const uint16 value = emulatorInterface.readMemory16(address);
+				EmulatorInterface::instance().writeVRam16(mWriteAddress, value);
 				mWriteAddress += mWriteIncrement;
 				address += 2;
 			}
@@ -569,12 +593,7 @@ namespace
 		if (nullptr != gDebugNotificationInterface)
 			gDebugNotificationInterface->onVRAMWrite(vramAddress, bytes);
 
-		uint16* dst = (uint16*)(EmulatorInterface::instance().getVRam() + vramAddress);
-		for (uint16 i = 0; i < bytes; i += 2)
-		{
-			*dst = fillValue;
-			++dst;
-		}
+		EmulatorInterface::instance().fillVRam(vramAddress, fillValue, bytes);
 		mWriteAddress = vramAddress + bytes;
 	}
 
@@ -684,12 +703,12 @@ namespace
 
 	uint16 getVRAM(uint16 vramAddress)
 	{
-		return *(uint16*)(&EmulatorInterface::instance().getVRam()[vramAddress]);
+		return EmulatorInterface::instance().readVRam16(vramAddress);
 	}
 
 	void setVRAM(uint16 vramAddress, uint16 value)
 	{
-		*(uint16*)(&EmulatorInterface::instance().getVRam()[vramAddress]) = value;
+		EmulatorInterface::instance().writeVRam16(vramAddress, value);
 	}
 
 
@@ -880,9 +899,9 @@ namespace
 	}
 
 
-	bool Audio_isPlayingAudio(uint64 id)
+	bool Audio_isPlayingAudio(uint64 sfxId)
 	{
-		return EngineMain::instance().getAudioOut().isPlayingSfxId(id);
+		return EngineMain::instance().getAudioOut().isPlayingSfxId(sfxId);
 	}
 
 	void Audio_playAudio1(uint64 sfxId, uint8 contextId)
@@ -1049,12 +1068,12 @@ namespace
 
 	bool ROMDataAnalyser_isEnabled()
 	{
-		return Configuration::instance().mEnableROMDataAnalyzer;
+		return Configuration::instance().mEnableROMDataAnalyser;
 	}
 
 	bool ROMDataAnalyser_hasEntry(lemon::StringRef category, uint32 address)
 	{
-		if (Configuration::instance().mEnableROMDataAnalyzer)
+		if (Configuration::instance().mEnableROMDataAnalyser)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
@@ -1070,7 +1089,7 @@ namespace
 
 	void ROMDataAnalyser_beginEntry(lemon::StringRef category, uint32 address)
 	{
-		if (Configuration::instance().mEnableROMDataAnalyzer)
+		if (Configuration::instance().mEnableROMDataAnalyser)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
@@ -1085,7 +1104,7 @@ namespace
 
 	void ROMDataAnalyser_endEntry()
 	{
-		if (Configuration::instance().mEnableROMDataAnalyzer)
+		if (Configuration::instance().mEnableROMDataAnalyser)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
@@ -1097,7 +1116,7 @@ namespace
 
 	void ROMDataAnalyser_addKeyValue(lemon::StringRef key, lemon::StringRef value)
 	{
-		if (Configuration::instance().mEnableROMDataAnalyzer)
+		if (Configuration::instance().mEnableROMDataAnalyser)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
@@ -1112,7 +1131,7 @@ namespace
 
 	void ROMDataAnalyser_beginObject(lemon::StringRef key)
 	{
-		if (Configuration::instance().mEnableROMDataAnalyzer)
+		if (Configuration::instance().mEnableROMDataAnalyser)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
@@ -1127,7 +1146,7 @@ namespace
 
 	void ROMDataAnalyser_endObject()
 	{
-		if (Configuration::instance().mEnableROMDataAnalyzer)
+		if (Configuration::instance().mEnableROMDataAnalyser)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
@@ -1298,12 +1317,22 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 
 		// System
-		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame1))	// Should not get inline executed
+		module.addUserDefinedFunction("System.callFunctionByName", lemon::wrap(&System_callFunctionByName))	// Should not get inline executed
 			.setParameterInfo(0, "functionName");
 
-		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame2))	// Should not get inline executed
+		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame1))		// Should not get inline executed
+			.setParameterInfo(0, "functionName");
+
+		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame2))		// Should not get inline executed
 			.setParameterInfo(0, "functionName")
 			.setParameterInfo(1, "labelName");
+
+		module.addUserDefinedFunction("System.getGlobalVariableValueByName", lemon::wrap(&System_getGlobalVariableValueByName), defaultFlags)
+			.setParameterInfo(0, "variableName");
+
+		module.addUserDefinedFunction("System.setGlobalVariableValueByName", lemon::wrap(&System_setGlobalVariableValueByName), defaultFlags)
+			.setParameterInfo(0, "variableName")
+			.setParameterInfo(1, "value");
 
 		module.addUserDefinedFunction("System.rand", lemon::wrap(&System_rand), defaultFlags);
 
@@ -1716,7 +1745,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		// Audio
 		module.addUserDefinedFunction("Audio.isPlayingAudio", lemon::wrap(&Audio_isPlayingAudio), defaultFlags)
-			.setParameterInfo(0, "id");
+			.setParameterInfo(0, "sfxId");
 
 		module.addUserDefinedFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio1), defaultFlags)
 			.setParameterInfo(0, "sfxId")
@@ -1780,6 +1809,11 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(0, "name")
 			.setParameterInfo(1, "startAddress")
 			.setParameterInfo(2, "numColors");
+
+	#if 0
+		// Only for debugging value stack issues in lemonscript itself
+		module.addUserDefinedFunction("debugLogValueStack", lemon::wrap(&debugLogValueStack), defaultFlags);
+	#endif
 
 
 		// Debug keys

@@ -208,51 +208,56 @@ void GameApp::openMainMenu()
 	if (mTimeAttackResultsMenu->getParent() == mGameView)
 		mGameView->removeChild(mTimeAttackResultsMenu);
 
-	// Coming from the title screen? (Especially after Game Over or when game was completed)
-	const bool enforceOpenMainMenu = (mCurrentState == State::INGAME && Game::instance().getCurrentMode() == Game::Mode::TITLE_SCREEN);
-
 	mCurrentState = State::MAIN_MENU;
 	mGameView->addChild(mMenuBackground);
 	mGameView->startFadingIn();
 
-	if (enforceOpenMainMenu)
-	{
-		mGameMenuManager->forceRemoveAll();
-		mMenuBackground->openMainMenu();
-	}
+	mGameMenuManager->forceRemoveAll();
+	mMenuBackground->openGameStartedMenu();
 
 	Game::instance().setCurrentMode(Game::Mode::UNDEFINED);		// Needed for Discord integration
 }
 
-void GameApp::openOptionsMenu(bool noBackgroundAnimation)
+void GameApp::openOptionsMenuInGame()
 {
 	mCurrentState = State::INGAME_OPTIONS;
 
 	mPauseMenu->setEnabled(false);
 	mGameView->addChild(mMenuBackground);
 	mGameView->startFadingIn();
-	mMenuBackground->openOptions(noBackgroundAnimation);
+	mMenuBackground->openOptions(true);
 }
 
 void GameApp::onExitOptions()
 {
-	// Coming from in-game options, then just go back into the game
 	if (mCurrentState == State::INGAME_OPTIONS)
 	{
+		// Only start fading to black - see "onFadedOutOptions" for the actual change of state after complete fade-out
+		GameApp::instance().getGameView().startFadingOut(0.1666f);
+	}
+	else
+	{
+		mMenuBackground->openMainMenu();
+	}
+}
+
+void GameApp::onFadedOutOptions()
+{
+	if (mCurrentState == State::INGAME_OPTIONS)
+	{
+		// Coming from in-game options, then go back into the game
 		if (mMenuBackground->getParent() == mGameView)
 			mGameView->removeChild(mMenuBackground);
 
 		mPauseMenu->setEnabled(true);
 		mPauseMenu->onReturnFromOptions();
 
+		GameApp::instance().getGameView().startFadingIn(0.1f);
+
 		// TODO: Fade out the context instead
 		AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
 
 		mCurrentState = State::INGAME;
-	}
-	else
-	{
-		mMenuBackground->openMainMenu();
 	}
 }
 
@@ -315,7 +320,7 @@ void GameApp::showTimeAttackResults(int hundreds, const std::vector<int>& otherT
 
 void GameApp::enableStillImageBlur(bool enable, float timeout)
 {
-	mGameView->setBlurringStillImage(enable, timeout);
+	mGameView->setStillImageMode(enable ? GameView::StillImageMode::BLURRING : GameView::StillImageMode::NONE, timeout);
 }
 
 void GameApp::showUnlockedWindow(SecretUnlockedWindow::EntryType entryType, const std::string& title, const std::string& content)
@@ -362,11 +367,7 @@ void GameApp::gotoPhase(int phaseNumber)
 		{
 			// Start with the intro & title screen
 			mCurrentState = State::TITLE_SCREEN;
-			Game::instance().setCurrentMode(Game::Mode::TITLE_SCREEN);
-			Simulation& simulation = Application::instance().getSimulation();
-			simulation.resetState();
-			simulation.setRunning(true);
-			simulation.setSpeed(simulation.getDefaultSpeed());
+			Game::instance().startIntoTitleScreen();
 			break;
 		}
 

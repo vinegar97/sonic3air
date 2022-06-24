@@ -36,18 +36,24 @@ namespace
 	#endif
 	}
 
-	const char* getReleaseChannelNameForBuild()
+	const char* getReleaseChannelName()
 	{
-		const constexpr uint32 buildVariantHash = rmx::compileTimeFNV_32(BUILD_VARIANT);
-		if (buildVariantHash == rmx::compileTimeFNV_32("TEST"))
-			return "test";
-		else if (buildVariantHash == rmx::compileTimeFNV_32("PREVIEW") || buildVariantHash == rmx::compileTimeFNV_32("BETA"))	// Treat betas as previews
-			return "preview";
-		else
-			return "stable";
+		const char* RELEASE_CHANNEL_NAMES[3] = { "stable", "preview", "test" };
+		int& releaseChannel = ConfigurationImpl::instance().mGameServer.mUpdateCheck.mReleaseChannel;
+		releaseChannel = clamp(releaseChannel, 0, 2);
+		return RELEASE_CHANNEL_NAMES[releaseChannel];
 	}
 }
 
+
+void UpdateCheck::reset()
+{
+	if (mState > State::READY_TO_START && mState != State::FAILED)
+		mState = State::READY_TO_START;
+	mUpdateRequested = false;
+	mAppUpdateCheckRequest = network::AppUpdateCheckRequest();
+	mLastUpdateCheckTimestamp = 0;
+}
 
 bool UpdateCheck::hasUpdate() const
 {
@@ -67,28 +73,58 @@ const network::AppUpdateCheckRequest::Response* UpdateCheck::getResponse() const
 
 void UpdateCheck::startUpdateCheck()
 {
-	if (mState != State::READY_TO_START)
-		return;
-
-	// No update check if the last update check in the last 60 seconds
-	if (mLastUpdateCheckTimestamp != 0 && mGameClient.getCurrentTimestamp() < mLastUpdateCheckTimestamp + 60 * 1000)
-		return;
-
-	mState = State::SEND_QUERY;
+	if (!mGameClient.isConnected())
+	{
+		// Start connecting, the rest is done later in "performUpdate"
+		mGameClient.connectToServer();
+		mState = State::CONNECTING;
+	}
+	mUpdateRequested = true;
 }
 
 void UpdateCheck::performUpdate()
 {
-	if (mState == State::INACTIVE)
+	if (!mGameClient.isConnected())
+	{
+		// TODO: Start a connection if needed
 		return;
+	}
 
 	switch (mState)
 	{
+		case State::INACTIVE:
+			return;
+
+		case State::CONNECTING:
+		{
+			// Wait for "evaluateServerFeaturesResponse" to be called, and only check for errors here
+			if (mGameClient.getConnectionState() == GameClient::ConnectionState::FAILED)
+			{
+				mState = State::FAILED;
+			}
+			break;
+		}
+
+		case State::READY_TO_START:
+		{
+			if (!mUpdateRequested)
+				break;
+
+			mUpdateRequested = false;
+
+			// Don't start a new update check if the last one was in the last 20 seconds (for the same update channel)
+			if (mLastUpdateCheckTimestamp != 0 && mGameClient.getCurrentTimestamp() < mLastUpdateCheckTimestamp + 20 * 1000)
+				break;
+
+			mState = State::SEND_QUERY;
+			[[fallthrough]];
+		}
+
 		case State::SEND_QUERY:
 		{
 			mAppUpdateCheckRequest.mQuery.mAppName = "sonic3air";
 			mAppUpdateCheckRequest.mQuery.mPlatform = ::getPlatformName();
-			mAppUpdateCheckRequest.mQuery.mReleaseChannel = ::getReleaseChannelNameForBuild();	// TODO: Save selection in config and make it configurable in Options
+			mAppUpdateCheckRequest.mQuery.mReleaseChannel = ::getReleaseChannelName();
 			mAppUpdateCheckRequest.mQuery.mInstalledAppVersion = BUILD_NUMBER;
 			mAppUpdateCheckRequest.mQuery.mInstalledContentVersion = BUILD_NUMBER;
 			mGameClient.getServerConnection().sendRequest(mAppUpdateCheckRequest);
@@ -133,7 +169,7 @@ void UpdateCheck::evaluateServerFeaturesResponse(const network::GetServerFeature
 
 	if (supportsUpdate)
 	{
-		if (mState == State::INACTIVE)
+		if (mState <= State::CONNECTING)
 			mState = State::READY_TO_START;
 	}
 	else

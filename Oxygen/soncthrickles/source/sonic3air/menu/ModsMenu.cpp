@@ -11,6 +11,7 @@
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/MenuBackground.h"
 #include "sonic3air/audio/AudioOut.h"
+#include "sonic3air/Game.h"
 
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
@@ -63,6 +64,17 @@ GameMenuBase::BaseState ModsMenu::getBaseState() const
 		case State::APPLYING_CHANGES: return BaseState::SHOW;
 		case State::FADE_TO_MENU:	  return BaseState::FADE_OUT;
 		default:					  return BaseState::INACTIVE;
+	}
+}
+
+void ModsMenu::setBaseState(BaseState baseState)
+{
+	switch (baseState)
+	{
+		case BaseState::INACTIVE: mState = State::INACTIVE;  break;
+		case BaseState::FADE_IN:  mState = State::APPEAR;  break;
+		case BaseState::SHOW:	  mState = State::SHOW;  break;
+		case BaseState::FADE_OUT: mState = State::FADE_TO_MENU;  break;
 	}
 }
 
@@ -155,10 +167,10 @@ void ModsMenu::initialize()
 				Bitmap icon16px;
 				Bitmap icon64px;
 				{
-					FileHelper::loadBitmap(icon16px, modEntry.mMod->mFullPath + L"icon-16px.png");
-					FileHelper::loadBitmap(icon64px, modEntry.mMod->mFullPath + L"icon-64px.png");
+					FileHelper::loadBitmap(icon16px, modEntry.mMod->mFullPath + L"icon-16px.png", false);
+					FileHelper::loadBitmap(icon64px, modEntry.mMod->mFullPath + L"icon-64px.png", false);
 					if (icon64px.empty())
-						FileHelper::loadBitmap(icon64px, modEntry.mMod->mFullPath + L"icon.png");
+						FileHelper::loadBitmap(icon64px, modEntry.mMod->mFullPath + L"icon.png", false);
 				}
 
 				Bitmap* sourceLarge = !icon64px.empty() ? &icon64px : !icon16px.empty() ? &icon16px : nullptr;
@@ -236,7 +248,7 @@ void ModsMenu::initialize()
 	else
 	{
 		GameMenuEntries& entries = mTabs[0].mMenuEntries;
-	#if !defined(PLATFORM_ANDROID) && !defined(PLATFORM_WEB)
+	#if !defined(PLATFORM_ANDROID) && !defined(PLATFORM_WEB) && !defined(PLATFORM_IOS)
 		entries.addEntry("Open mods " DIRECTORY_STRING, 0xfff0);
 	#endif
 		entries.addEntry("Open Manual in web browser", 0xfff1);
@@ -800,6 +812,7 @@ bool ModsMenu::applyModChanges(bool dryRun)
 	{
 		modManager.setActiveMods(activeMods);
 		modManager.saveActiveMods();
+		Game::instance().setCurrentMode(Game::Mode::UNDEFINED);		// Only used to signal MenuBackground that it needs to reload the animated background
 	}
 	return anyChange;
 }

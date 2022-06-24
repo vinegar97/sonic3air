@@ -13,11 +13,29 @@
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
 
 
+namespace
+{
+	bool resolveGameServerHostName(const std::string& hostName, std::string& outServerIP)
+	{
+	#if !defined(GAME_CLIENT_USE_WSS)
+		// For UDP/TCP, try the "gameserver" subdomain first
+		//  -> This does not work for emscripten websockets, see implementation of "resolveToIp"
+		//  -> It allows for having different servers for UDP/TCP, and websockets
+		if (Sockets::resolveToIP("gameserver." + hostName, outServerIP))
+			return true;
+	#endif
+
+		// Use the host name itself
+		return Sockets::resolveToIP(hostName, outServerIP);
+	}
+}
+
+
 GameClient::GameClient() :
-#if defined(GAME_CLIENT_USE_TCP)
-	mConnectionManager(nullptr, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
-#else
+#if defined(GAME_CLIENT_USE_UDP)
 	mConnectionManager(&mUDPSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
+#else
+	mConnectionManager(nullptr, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
 #endif
 	mGhostSync(*this),
 	mUpdateCheck(*this)
@@ -41,41 +59,119 @@ void GameClient::setupClient()
 	{
 		Sockets::startupSockets();
 
-	#if !defined(GAME_CLIENT_USE_TCP)
+	#if defined(GAME_CLIENT_USE_UDP)
 		// Setup socket & connection manager
 		if (!mUDPSocket.bindToAnyPort())
 			RMX_ERROR("Socket bind to any port failed", return);
 	#endif
 
-		// Start connection
-		startConnectingToServer(getCurrentTimestamp());
 		mState = State::STARTED;
 	}
 }
 
 void GameClient::updateClient(float timeElapsed)
 {
-	if (mServerConnection.getState() == NetConnection::State::EMPTY)
-		return;
-
-	// Check for new packets
-	updateReceivePackets(mConnectionManager);
-
 	const uint64 currentTimestamp = getCurrentTimestamp();
-	mConnectionManager.updateConnections(currentTimestamp);
+	if (mServerConnection.getState() != NetConnection::State::EMPTY)
+	{
+		// Check for new packets
+		updateReceivePackets(mConnectionManager);
+		mConnectionManager.updateConnections(currentTimestamp);
+	}
 
 	if (mServerConnection.getState() != NetConnection::State::CONNECTED)
 	{
-		if (mServerConnection.getState() == NetConnection::State::DISCONNECTED)
-		{
-			// Try connecting once again after a minute
-			if (currentTimestamp > mLastConnectionAttemptTimestamp + 60000)
-			{
-				startConnectingToServer(currentTimestamp);
-			}
-		}
-		return;
+		updateNotConnected(currentTimestamp);
 	}
+	else
+	{
+		updateConnected();
+	}
+
+	// Regular update for the sub-systems
+	mGhostSync.performUpdate();
+	mUpdateCheck.performUpdate();
+}
+
+void GameClient::connectToServer()
+{
+	if (mConnectionState == ConnectionState::NOT_CONNECTED || mConnectionState == ConnectionState::FAILED)
+	{
+		// Start connecting now
+		startConnectingToServer(getCurrentTimestamp());
+	}
+}
+
+bool GameClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
+{
+	if (mGhostSync.onReceivedPacket(evaluation))
+		return true;
+	return false;
+}
+
+void GameClient::startConnectingToServer(uint64 currentTimestamp)
+{
+	SocketAddress serverAddress;
+	{
+		const ConfigurationImpl::GameServer& config = ConfigurationImpl::instance().mGameServer;
+		std::string serverIP;
+		if (!resolveGameServerHostName(config.mServerHostName, serverIP))
+		{
+			mConnectionState = ConnectionState::FAILED;
+			return;
+		}
+
+	#if defined(GAME_CLIENT_USE_UDP)
+		serverAddress.set(serverIP, (uint16)config.mServerPortUDP);
+	#elif defined(GAME_CLIENT_USE_TCP)
+		serverAddress.set(serverIP, (uint16)config.mServerPortTCP);
+	#elif defined(GAME_CLIENT_USE_WSS)
+		serverAddress.set(serverIP, (uint16)config.mServerPortWSS);
+	#endif
+	}
+
+	mServerConnection.startConnectTo(mConnectionManager, serverAddress, currentTimestamp);
+	mLastConnectionAttemptTimestamp = currentTimestamp;
+	mConnectionState = ConnectionState::CONNECTING;
+}
+
+void GameClient::updateNotConnected(uint64 currentTimestamp)
+{
+	// TODO: This method certainly needs to handle more cases
+
+	switch (mConnectionState)
+	{
+		case ConnectionState::CONNECTING:
+		{
+			// Wait until connected
+			break;
+		}
+
+		case ConnectionState::ESTABLISHED:
+		{
+			// Connection was lost
+			mConnectionState = ConnectionState::NOT_CONNECTED;
+			break;
+		}
+
+		default:
+			break;
+	}
+
+	if (mServerConnection.getState() == NetConnection::State::DISCONNECTED)
+	{
+		// Try connecting once again after a minute
+		if (currentTimestamp > mLastConnectionAttemptTimestamp + 60000)
+		{
+			startConnectingToServer(currentTimestamp);
+		}
+	}
+}
+
+void GameClient::updateConnected()
+{
+	// Currently connected to server
+	mConnectionState = ConnectionState::ESTABLISHED;
 
 	switch (mState)
 	{
@@ -110,40 +206,10 @@ void GameClient::updateClient(float timeElapsed)
 
 		case State::READY:
 		{
-			// Regular update for the update check, so we stay updated on updates
-			mGhostSync.performUpdate();
-			mUpdateCheck.performUpdate();
 			break;
 		}
 
 		default:
 			break;
 	}
-}
-
-bool GameClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
-{
-	if (mGhostSync.onReceivedPacket(evaluation))
-		return true;
-	return false;
-}
-
-void GameClient::startConnectingToServer(uint64 currentTimestamp)
-{
-	SocketAddress serverAddress;
-	{
-		const ConfigurationImpl::GameServer& config = ConfigurationImpl::instance().mGameServer;
-		std::string serverIP;
-		if (!Sockets::resolveToIP(config.mServerHostName, serverIP))
-			RMX_ERROR("Unable to resolve server URL " << config.mServerHostName, return);
-
-	#if defined(GAME_CLIENT_USE_TCP)
-		serverAddress.set(serverIP, (uint16)config.mServerPortTCP);
-	#else
-		serverAddress.set(serverIP, (uint16)config.mServerPortUDP);
-	#endif
-	}
-
-	mServerConnection.startConnectTo(mConnectionManager, serverAddress, currentTimestamp);
-	mLastConnectionAttemptTimestamp = currentTimestamp;
 }

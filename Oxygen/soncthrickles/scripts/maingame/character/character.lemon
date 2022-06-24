@@ -1222,7 +1222,7 @@ function void UpdateKnucklesGlide()
 		char.velocity.x = (dx * char.groundspeed) >> 8
 		char.velocity.y += (char.velocity.y >= 0x80) ? -0x20 : 0x20
 
-		// drastically reduce glide speed around the top boundary of level
+		// Drastically reduce glide speed around the top boundary of level
 		if (level.vertical_wrap != 0xff00)	// ...but only if vertical wrap is disabled
 		{
 			D0.s16 = level.vertical_wrap + 0x10
@@ -1811,10 +1811,10 @@ function void fn016e10()
 
 	if (D1.s16 != 0)
 	{
-		--s8(knuckles.glide_direction)
+		--knuckles.glide_direction
 		if (s8(knuckles.glide_direction) < 0)
 		{
-			s8(knuckles.glide_direction) = 3
+			knuckles.glide_direction = 3
 
 			D1.u8 += char.animation.sprite
 			if (D1.u8 < 0xb7)
@@ -2374,7 +2374,6 @@ function void Character.UpdateRotationOnGround_partial()
 
 function void Character.updateRotationOnGround0x00()
 {
-	// Moving horizontally on the floor
 	D3 = char.position.x.u16 + char.hitbox_extends.x
 	D2 = char.position.y.u16 + char.hitbox_extends.y
 	s16 result1 = checkStaticCollisionVertical(D3, D2, 0xfffff768, 0x10, 0)
@@ -2519,7 +2518,6 @@ function void Character.updateRotationOnGround0x40()
 //# address-hook(0x00ee5a) end(0x00ef06)
 function void Character.updateRotationOnGround0x80()
 {
-	// Moving horizontally on the ceiling
 	D3 = char.position.x.u16 + char.hitbox_extends.x
 	D2 = (char.position.y.u16 - char.hitbox_extends.y) ^ 0x0f
 	s16 result1 = checkStaticCollisionVertical(D3, D2, 0xfffff768, -0x10, 0x800)
@@ -3228,6 +3226,12 @@ function void Character.cancelSuperTransformation()
 		updateSpritePattern(0x18f8e4, 0xf760, 0x50)
 	}
 
+	// Special handling for Knuckles while climbing - without this, he would change to a falling animation
+	if (char.character == CHARACTER_KNUCKLES && char.state == char.state.KNUX_FLYCLIMB)
+	{
+		char.state.former = char.state.KNUX_FLYCLIMB
+	}
+
 	Standalone.setFastMusicFlag(FastMusicFlag.SUPER_THEME, false)   // Disable fast music by Super Theme (if this was active)
 #endif
 }
@@ -3455,8 +3459,7 @@ function void CollectLevelRing()
 //# address-hook(0x01a596) end(0x01a5e8)
 function void CollectRing()
 {
-	player.total_rings = min(++player.total_rings, 999)	// This is a different ring counter I guess?
-
+	player.total_rings = min(player.total_rings + 1, 999)
 	if (ring_counter < 999)
 	{
 		++ring_counter
@@ -3725,7 +3728,7 @@ function void UpdateMusicOnWaterTransition()
 	{
 	#if STANDALONE
 		playMusic(MUSIC_CTRL_FADEOUT)	// Make sure that drowning jingle is really stopped (needed in case the super theme is active and it's fast level music)
-		u8[A1 + 0x2c] = 30				// Needs to be done before choosing the music
+		u8[A1 + 0x2c] = 30				// Needs to be done before chhosing the music
 	#endif
 		chooseFittingMusic()
 	}

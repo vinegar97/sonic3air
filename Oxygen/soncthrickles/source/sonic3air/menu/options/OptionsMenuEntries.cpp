@@ -91,12 +91,19 @@ void SectionMenuEntry::renderEntry(RenderContext& renderContext_)
 }
 
 
+OptionsMenuEntry& OptionsMenuEntry::setUseSmallFont(bool useSmallFont)
+{
+	mUseSmallFont = useSmallFont;
+	return *this;
+}
+
 void OptionsMenuEntry::renderEntry(RenderContext& renderContext_)
 {
 	OptionsMenuRenderContext& renderContext = renderContext_.as<OptionsMenuRenderContext>();
 	Drawer& drawer = *renderContext.mDrawer;
 	const int baseX = renderContext.mCurrentPosition.x;
 	int& py = renderContext.mCurrentPosition.y;
+	Font& font = (mUseSmallFont || renderContext.mIsModsTab) ? global::mFont5 : global::mFont10;
 
 	const bool isSelected = renderContext.mIsSelected;
 	const bool isDisabled = !isInteractable();
@@ -114,21 +121,21 @@ void OptionsMenuEntry::renderEntry(RenderContext& renderContext_)
 
 		if (mData == option::CONTROLLER_SETUP)
 		{
-			drawer.printText(global::mFont10, Recti(baseX, py, 0, 10), Application::instance().hasKeyboard() ? "Setup Keyboard & Game Controllers..." : "Setup Game Controllers...", 5, color);
+			drawer.printText(font, Recti(baseX, py, 0, 10), Application::instance().hasKeyboard() ? "Setup Keyboard & Game Controllers..." : "Setup Game Controllers...", 5, color);
 		}
 		else
 		{
-			drawer.printText(global::mFont10, Recti(baseX, py, 0, 10), mText, 5, color);
+			drawer.printText(font, Recti(baseX, py, 0, 10), mText, 5, color);
 		}
 
 		if (isSelected)
 		{
 			// Draw arrows
-			const int halfTextWidth = global::mFont10.getWidth(mText) / 2;
+			const int halfTextWidth = font.getWidth(mText) / 2;
 			const int offset = (int)std::fmod(FTX::getTime() * 6.0f, 6.0f);
 			const int arrowDistance = 16 + ((offset > 3) ? (6 - offset) : offset);
-			drawer.printText(global::mFont10, Recti(baseX - halfTextWidth - arrowDistance, py, 0, 10), ">>", 5, color);
-			drawer.printText(global::mFont10, Recti(baseX + halfTextWidth + arrowDistance, py, 0, 10), "<<", 5, color);
+			drawer.printText(font, Recti(baseX - halfTextWidth - arrowDistance, py, 0, 10), ">>", 5, color);
+			drawer.printText(font, Recti(baseX + halfTextWidth + arrowDistance, py, 0, 10), "<<", 5, color);
 		}
 
 		if (mData == option::CONTROLLER_SETUP)
@@ -137,12 +144,10 @@ void OptionsMenuEntry::renderEntry(RenderContext& renderContext_)
 	else
 	{
 		// It's an actual options entry, with multiple options to choose from
-		Font& font = renderContext.mIsModsTab ? global::mFont5 : global::mFont10;
-
 		const bool canGoLeft  = !isDisabled && (mSelectedIndex > 0);
 		const bool canGoRight = !isDisabled && (mSelectedIndex < mOptions.size() - 1);
 
-		const int center = baseX + 88;
+		const int center = mText.empty() ? baseX : (baseX + 88);
 		int arrowDistance = 75;
 		if (isSelected)
 		{
@@ -151,7 +156,10 @@ void OptionsMenuEntry::renderEntry(RenderContext& renderContext_)
 		}
 
 		// Description
-		drawer.printText(font, Recti(baseX - 40, py, 0, 10), mText, 6, color);
+		if (!mText.empty())
+		{
+			drawer.printText(font, Recti(baseX - 40, py, 0, 10), mText, 6, color);
+		}
 
 		// Value text
 		const AudioCollection::AudioDefinition* audioDefinition = nullptr;
@@ -185,47 +193,48 @@ void OptionsMenuEntry::renderEntry(RenderContext& renderContext_)
 	}
 }
 
-void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext)
+void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext_)
 {
+	OptionsMenuRenderContext& renderContext = renderContext_.as<OptionsMenuRenderContext>();
 	Drawer& drawer = *renderContext.mDrawer;
 	const int baseX = renderContext.mCurrentPosition.x;
 	int& py = renderContext.mCurrentPosition.y;
+	const float alpha = renderContext.mTabAlpha;
 
-	drawer.printText(global::mFont5, Recti(baseX - 100, py, 0, 10), "Your Game Version:", 4, Color::WHITE);
-	drawer.printText(global::mFont5, Recti(baseX + 100, py, 0, 10), "v" BUILD_STRING, 6, Color(0.8f, 1.0f, 0.8f));
+	drawer.printText(global::mFont5, Recti(baseX - 100, py, 0, 10), "Your Game Version:", 4, Color(1.0f, 1.0f, 1.0f, alpha));
+	drawer.printText(global::mFont5, Recti(baseX + 100, py, 0, 10), "v" BUILD_STRING, 6, Color(0.8f, 1.0f, 0.8f, alpha));
 	py += 12;
 
 	UpdateCheck& updateCheck = GameClient::instance().getUpdateCheck();
 	switch (updateCheck.getState())
 	{
-		case UpdateCheck::State::INACTIVE:
 		case UpdateCheck::State::FAILED:
 		{
-			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Can't connect to server", 5, Color::RED);
+			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Can't connect to server", 5, Color(1.0f, 0.0f, 0.0f, alpha));
 			break;
 		}
 		case UpdateCheck::State::SEND_QUERY:
 		case UpdateCheck::State::WAITING_FOR_RESPONSE:
 		{
-			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "No connection to server", 5, Color::WHITE);
+			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Connecting to server...", 5, Color(1.0f, 1.0f, 1.0f, alpha));
 			break;
 		}
 		case UpdateCheck::State::HAS_RESPONSE:
 		{
 			if (updateCheck.hasUpdate())
 			{
-				drawer.printText(global::mFont5, Recti(baseX - 100, py, 0, 10), "Update available:", 4, Color::WHITE);
-				drawer.printText(global::mFont5, Recti(baseX + 100, py, 0, 10), getVersionString(updateCheck.getResponse()->mAvailableAppVersion), 6, Color(1.0f, 1.0f, 0.6f));
+				drawer.printText(global::mFont5, Recti(baseX - 100, py, 0, 10), "Update available:", 4, Color(1.0f, 1.0f, 1.0f, alpha));
+				drawer.printText(global::mFont5, Recti(baseX + 100, py, 0, 10), getVersionString(updateCheck.getResponse()->mAvailableAppVersion), 6, Color(1.0f, 1.0f, 0.6f, alpha));
 			}
 			else
 			{
-				drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "You're using the latest version", 5, Color(0.8f, 1.0f, 0.8f));
+				drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "You're using the latest version", 5, Color(0.8f, 1.0f, 0.8f, alpha));
 			}
 			break;
 		}
 		default:
 		{
-			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Last check for updates: unknown", 5, Color(1.0f, 1.0f, 1.0f));
+			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Ready to check for updates", 5, Color(0.8f, 0.8f, 0.8f, alpha));
 			break;
 		}
 	}

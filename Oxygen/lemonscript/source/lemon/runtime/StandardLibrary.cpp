@@ -53,9 +53,11 @@ namespace
 			}
 			else if (value == 0)
 			{
-				RMX_CHECK(mLength < 0x100, "Too long string", return);
-				mBuffer[mLength] = '0';
-				++mLength;
+				const int numDigits = std::max(1, minDigits);
+				RMX_CHECK(mLength + numDigits <= 0x100, "Too long string", return);
+				for (int k = 0; k < numDigits; ++k)
+					mBuffer[mLength+k] = '0';
+				mLength += numDigits;
 				return;
 			}
 
@@ -143,7 +145,7 @@ namespace lemon
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
 			RMX_CHECK(str1.isValid(), "Unable to resolve string", return StringRef());
 			RMX_CHECK(str2.isValid(), "Unable to resolve string", return StringRef());
-			
+
 			static FastStringStream result;
 			result.clear();
 			result.addString(str1.getStringRef());

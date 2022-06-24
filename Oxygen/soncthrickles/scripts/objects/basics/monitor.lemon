@@ -10,6 +10,7 @@
 define objA0.monitor.character_address		= u16[A0 + 0x42]
 define objA1.monitor.character_address		= u16[A1 + 0x42]
 
+
 //-------------------------------------------------------//
 // Monitor (a.k.a. Item Box)                             //
 //-------------------------------------------------------//
@@ -459,7 +460,7 @@ function void MonitorIntact.CheckBlocking.player2()
 function void fn01d6dc()
 {
 	D2.u16 = D1.u16 * 2
-	if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+	if ((u8[A1 + 0x2a] & 0x02) == 0)
 	{
 		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
 		if (D0.s16 >= 0 && D0.u16 < D2.u16)
@@ -614,21 +615,6 @@ function void ItemEffect.UpdateDefault()
 }
 
 
-//# address-hook(0x01db2e) end(0x01db36)
-function void fn01db2e()
-{
-	--s16[A0 + 0x24]
-	if (s16[A0 + 0x24] < 0)
-	{
-		UnloadObject()
-	}
-	else
-	{
-		DrawObject()
-	}
-}
-
-
 //# address-hook(0x01d820) end(0x01d878)
 function void ItemEffect.UpdateDefaultInternal()
 {
@@ -692,19 +678,19 @@ function void ItemEffect.UpdateDefaultInternal()
 }
 
 
-//# address-hook(0x01d898) end(0x01d8a6)
-function void ItemEffect.ApplyExtraLifePlayer1()
-{
-	++player.item_count
-	gainExtraLife()
-}
-
-
 //# address-hook(0x01d890) end(0x01d892)
 function void ItemEffect.ApplyRobotnik()
 {
 	++u16[A2]
 	DamageCharacter()
+}
+
+
+//# address-hook(0x01d898) end(0x01d8a6)
+function void ItemEffect.ApplyExtraLifePlayer1()
+{
+	++player.item_count
+	gainExtraLife()
 }
 
 
@@ -837,12 +823,12 @@ function void ItemEffect.ApplyInvincibility()
 
 		if (u8[A0 + 0x43] == 0)
 		{
-			u32[0xffffcd7c] = 0x0187f0	// invincibility stars
+			u32[0xffffcd7c] = 0x0187f0	// Invincibility stars
 			u16[0xffffcd7c + 0x42] = A1.u16
 		}
 		else
 		{
-			u32[0xffffcea4] = 0x0187f0	// invincibility stars
+			u32[0xffffcea4] = 0x0187f0	// Invincibility stars
 			u16[0xffffcea4 + 0x42] = A1.u16
 		}
 	}
@@ -908,4 +894,19 @@ function void ItemEffect.ApplySuperTransformation()
 #else
 	playMusic(MUSIC_INVINCIBLE)
 #endif
+}
+
+
+//# address-hook(0x01db2e) end(0x01db36)
+function void fn01db2e()
+{
+	--s16[A0 + 0x24]
+	if (s16[A0 + 0x24] < 0)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		DrawObject()
+	}
 }

@@ -347,12 +347,16 @@ function void fn0216b8()
 	{
 		// Spawn wall debris
 		objA1.update_address = D4
-		objA0.mapping_offset = A3
+		objA1.mapping_offset = A3
 		objA1.render_flags = D5.u8
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		objA1.sprite_attributes = objA0.sprite_attributes | sprite_attribute.PRIORITY
+	#if STANDALONE
 		objA1.sprite_priority = objA0.sprite_priority
+	#else
+		u8[A1 + 0x08] = u8[A0 + 0x08]	// Original code only copies the upper byte of the sprite priority for some reason
+	#endif
 		objA1.box_size.x = objA0.box_size.x
 		objA1.box_size.y = objA0.box_size.y
 		objA1.velocity.x = u16[A4]

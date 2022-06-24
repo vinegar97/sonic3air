@@ -32,7 +32,8 @@ public:
 		ACT_SELECT,		// Act Select mode
 		TIME_ATTACK,	// Time Attack mode
 		COMPETITION,	// Competition mode
-		BLUE_SPHERE		// Blue Sphere game mode
+		BLUE_SPHERE,	// Blue Sphere game mode
+		MAIN_MENU_BG	// Main menu background
 	};
 
 public:
@@ -49,6 +50,7 @@ public:
 
 	void checkForUnlockedSecrets();
 
+	void startIntoTitleScreen();
 	void startIntoDataSelect();
 	void startIntoLevel(Mode mode, uint32 submode, uint16 zoneAndAct, uint8 characters);
 	void restartLevel();
@@ -57,6 +59,7 @@ public:
 	void startIntoCompetitionMode();
 	void startIntoBlueSphere();
 	void startIntoLevelSelect();
+	void startIntoMainMenuBG();
 
 	void onPreUpdateFrame();
 	void onPostUpdateFrame();
@@ -64,14 +67,13 @@ public:
 
 	void updateSpecialInput(float timeElapsed);
 
-	void enableGamePauseByApplication();
-
 	inline Mode getCurrentMode() const			{ return mMode; }
 	inline void setCurrentMode(Mode mode)		{ mMode = mode; }
 
 	inline bool isTimeAttackMode() const		{ return mMode == Mode::TIME_ATTACK; }
 	inline PlayerRecorder& getPlayerRecorder()	{ return mPlayerRecorder; }
 
+	bool shouldPauseOnFocusLoss() const;
 	bool isDebugModeActive() const;
 
 	void fillDebugVisualization(Bitmap& bitmap, int& mode);

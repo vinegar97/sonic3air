@@ -295,6 +295,7 @@ function void UpdateGamePause()
 		{
 			bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb000 + 0x05] <= 0x04) && !competition_mode.active
 			Game.onGamePause(canRestart)
+			Standalone.onResumeAfterPause()
 		}
 	}
 
@@ -338,7 +339,7 @@ function void UpdateGamePause()
 		// In competition mode, button B during pause quits the stage
 		if (global.zone >= 0x0e && global.zone <= 0x12)
 		{
-			if ((control.pad1.pressed & CONTROL_B) && s8(competition_mode.game_mode) < 0)
+			if ((control.pad1.pressed & CONTROL_B) && (competition_mode.game_mode < 0))
 			{
 				global.game_mode = 0xc0
 				break
@@ -896,7 +897,7 @@ function void copyPaletteDataFromTable(u8 index, u16 ramAddress)
 	//  - index = 0x17				-> LBZ 2 level palette
 	//  - index = 0x18				-> MHZ 1 level palette
 	//  - index = 0x19				-> MHZ 2 level palette
-	//  - index = 0x1a, 0x3c		-> SOZ 1 level palette (0x3c is a different address, but with the exact same colors)
+	//  - index = 0x1a, 0x3c		-> SOZ 1 level palette (0x3c is a different address, but with the exact same colours)
 	//  - index = 0x1b				-> SOZ 2 level palette
 	//  - index = 0x1c				-> LRZ 1 level palette
 	//  - index = 0x1d				-> LRZ 2 level palette
@@ -1779,7 +1780,10 @@ function void fn0067ee()
 		objA1.state = char.state.FALLING_PANIC
 		if (global.characters == CHARS_KNUCKLES_ALONE)
 		{
-			objA1.state.both = 0x2121	// char.state.KNUX_FALLING, char.state.KNUX_FALLING
+			// objA1.state = char.state.KNUX_FALLING
+			// objA1.state.former = char.state.KNUX_FALLING
+			objA1.state.both = 0x2121
+
 			objA1.animation.frame = 1
 			objA1.animation.timer = 0	// This is A0 instead of A1 in original, thanks to Clownacy (https://forums.sonicretro.org/index.php?showtopic=30778&view=findpost&p=893997)
 		}
@@ -2314,6 +2318,12 @@ function void AddScore()
 
 // Rings (used by giant ring granting 50 rings, and inside bonus stages)
 
+function void addRings(u32 value)
+{
+	D0 = value
+	AddRings()
+}
+
 //# address-hook(0x0860f2) end(0x086148)
 function void AddRings()
 {
@@ -2330,11 +2340,4 @@ function void AddRings()
 	{
 		playMusic(SFX_RING)
 	}
-}
-
-
-function void AddRings(u32 value)
-{
-	D0 = value
-	AddRings()
 }

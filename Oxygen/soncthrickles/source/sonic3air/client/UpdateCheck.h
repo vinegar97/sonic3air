@@ -19,6 +19,7 @@ public:
 	enum class State
 	{
 		INACTIVE,
+		CONNECTING,
 		READY_TO_START,
 		SEND_QUERY,
 		WAITING_FOR_RESPONSE,
@@ -28,6 +29,8 @@ public:
 
 public:
 	inline UpdateCheck(GameClient& gameClient) : mGameClient(gameClient) {}
+
+	void reset();
 
 	inline State getState() const  { return mState; }
 	bool hasUpdate() const;
@@ -41,6 +44,7 @@ public:
 private:
 	GameClient& mGameClient;
 	State mState = State::INACTIVE;
+	bool mUpdateRequested = false;
 	network::AppUpdateCheckRequest mAppUpdateCheckRequest;
 	uint64 mLastUpdateCheckTimestamp = 0;
 };

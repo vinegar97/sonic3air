@@ -28,6 +28,63 @@
 #include "oxygen/helper/Utils.h"
 
 
+namespace
+{
+	struct ConditionalOption
+	{
+		int mOptionId = 0;
+		bool mHideInGame = false;
+		bool mDependsOnSecret = false;
+		SharedDatabase::Secret::Type mSecret = (SharedDatabase::Secret::Type)0xff;
+
+		inline ConditionalOption(int optionId, bool hideInGame) : mOptionId(optionId), mHideInGame(hideInGame) {}
+		inline ConditionalOption(int optionId, bool hideInGame, SharedDatabase::Secret::Type secret) : mOptionId(optionId), mHideInGame(hideInGame), mDependsOnSecret(true), mSecret(secret) {}
+
+		bool shouldBeVisible(bool enteredFromIngame) const
+		{
+			if (mHideInGame && enteredFromIngame)
+				return false;
+			if (mDependsOnSecret && !PlayerProgress::instance().isSecretUnlocked(mSecret))
+				return false;
+			return true;
+		}
+	};
+
+	static const std::vector<ConditionalOption> CONDITIONAL_OPTIONS =
+	{
+		ConditionalOption(option::SOUNDTRACK,				 true),
+		ConditionalOption(option::SOUND_TEST,				 true),
+		ConditionalOption(option::TITLE_THEME,				 true),
+		ConditionalOption(option::OUTRO_MUSIC,				 true),
+		ConditionalOption(option::COMPETITION_MENU_MUSIC,	 true),
+
+		ConditionalOption(option::ANTI_FLICKER,				 true),
+		ConditionalOption(option::ICZ_NIGHTTIME,			 true),
+		ConditionalOption(option::MONITOR_STYLE,			 true),
+
+		ConditionalOption(option::LEVEL_LAYOUTS,			 true),
+		ConditionalOption(option::AIZ_BLIMPSEQUENCE,		 true),
+		ConditionalOption(option::LBZ_BIGARMS,				 true),
+		ConditionalOption(option::SOZ_GHOSTSPAWN,			 true),
+		ConditionalOption(option::LRZ2_BOSS,				 true),
+		ConditionalOption(option::TIMEATTACK_GHOSTS,		 true),
+		ConditionalOption(option::TIMEATTACK_INSTANTRESTART, true),
+
+		ConditionalOption(option::DROP_DASH, 				 false, SharedDatabase::Secret::SECRET_DROPDASH),
+		ConditionalOption(option::SUPER_PEELOUT,			 false, SharedDatabase::Secret::SECRET_SUPER_PEELOUT),
+
+		ConditionalOption(option::DEBUG_MODE,				 true,  SharedDatabase::Secret::SECRET_DEBUGMODE),
+		ConditionalOption(option::TITLE_SCREEN,				 true,  SharedDatabase::Secret::SECRET_TITLE_SK),
+		ConditionalOption(option::SHIELD_TYPES,				 true),
+		ConditionalOption(option::RANDOM_MONITORS,			 true),
+		ConditionalOption(option::RANDOM_SPECIALSTAGES,		 true),
+		ConditionalOption(option::SPECIAL_STAGE_REPEAT,		 true),
+		ConditionalOption(option::REGION,					 true),
+		ConditionalOption(option::GAME_SPEED,				 false, SharedDatabase::Secret::SECRET_GAME_SPEED)
+	};
+}
+
+
 OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	mMenuBackground(&menuBackground)
 {
@@ -36,6 +93,8 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	mOptionEntries.resize(option::_NUM);
 	{
 		ConfigurationImpl& config = ConfigurationImpl::instance();
+
+		setupOptionEntryInt(option::RELEASE_CHANNEL,			&config.mGameServer.mUpdateCheck.mReleaseChannel);
 
 		setupOptionEntryEnum8(option::FRAME_SYNC,				&config.mFrameSync);
 
@@ -143,6 +202,12 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 		entries.addEntry<TitleMenuEntry>().initEntry("Update");
 		entries.addEntry<UpdateCheckMenuEntry>().initEntry("Check for updates", option::_CHECK_FOR_UPDATE);
+		entries.addEntry<OptionsMenuEntry>()
+			.setUseSmallFont(true)
+			.initEntry("", option::RELEASE_CHANNEL)
+			.addOption("Stable updates", 0)
+			.addOption("Stable & preview", 1)
+			.addOption("All incl. test builds", 2);
 
 		entries.addEntry<TitleMenuEntry>().initEntry("More Info");
 		entries.addEntry<OptionsMenuEntry>().initEntry("Open Game Homepage", option::_OPEN_HOMEPAGE);
@@ -664,7 +729,19 @@ GameMenuBase::BaseState OptionsMenu::getBaseState() const
 		case State::APPEAR:		   return BaseState::FADE_IN;
 		case State::SHOW:		   return BaseState::SHOW;
 		case State::FADE_TO_MENU:  return BaseState::FADE_OUT;
+		case State::FADE_TO_GAME:  return BaseState::FADE_OUT;
 		default:				   return BaseState::INACTIVE;
+	}
+}
+
+void OptionsMenu::setBaseState(BaseState baseState)
+{
+	switch (baseState)
+	{
+		case BaseState::INACTIVE: mState = State::INACTIVE;  break;
+		case BaseState::FADE_IN:  mState = State::APPEAR;  break;
+		case BaseState::SHOW:	  mState = State::SHOW;  break;
+		case BaseState::FADE_OUT: mState = State::FADE_TO_MENU;  break;
 	}
 }
 
@@ -684,17 +761,6 @@ void OptionsMenu::onFadeIn()
 	{
 		optionEntry.loadValue();
 	}
-
-	// Show / hide options
-	mOptionEntries[option::DROP_DASH].mGameMenuEntry->setVisible(PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_DROPDASH));
-	mOptionEntries[option::SUPER_PEELOUT].mGameMenuEntry->setVisible(PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_SUPER_PEELOUT));
-	mOptionEntries[option::DEBUG_MODE].mGameMenuEntry->setVisible(PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_DEBUGMODE));
-	mOptionEntries[option::TITLE_SCREEN].mGameMenuEntry->setVisible(PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_TITLE_SK));
-	mOptionEntries[option::GAME_SPEED].mGameMenuEntry->setVisible(PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_GAME_SPEED));
-#if defined(PLATFORM_ANDROID)
-	mOptionEntries[option::WINDOW_MODE].mGameMenuEntry->setVisible(false);
-	mOptionEntries[option::WINDOW_MODE_STARTUP].mGameMenuEntry->setVisible(false);
-#endif
 
 	AudioOut::instance().setMenuMusic(0x2f);
 	mPlayingSoundTest = nullptr;
@@ -784,14 +850,9 @@ void OptionsMenu::initialize()
 			optionEntry.mGameMenuEntry = &entry;
 		}
 
-		const bool anyModOptions = (nextOptionId > option::_NUM + 1);
-		if (!anyModOptions && mActiveTab == Tab::Id::MODS)
-		{
-			++mActiveTab;
-			mActiveTabAnimated = (float)mActiveTab;
-		}
+		entries.addEntry<OptionsMenuEntry>().initEntry("Back", option::_BACK);
 
-		mTabMenuEntries[0].mOptions[Tab::Id::MODS].mVisible = anyModOptions;
+		mHasAnyModOptions = (nextOptionId > option::_NUM + 1);
 		mTabMenuEntries[0].mSelectedIndex = mActiveTab;
 	}
 
@@ -821,6 +882,8 @@ void OptionsMenu::initialize()
 
 	// Fill gamepad lists
 	refreshGamepadLists(true);
+
+	mEnteredFromIngame = false;
 }
 
 void OptionsMenu::deinitialize()
@@ -880,6 +943,13 @@ void OptionsMenu::update(float timeElapsed)
 					const uint32 selectedData = selectedEntry.mData;
 					switch (selectedData)
 					{
+						case option::RELEASE_CHANNEL:
+						{
+							mOptionEntries[selectedData].applyValue();
+							GameClient::instance().getUpdateCheck().reset();
+							break;
+						}
+
 						case option::WINDOW_MODE:
 						{
 							Application::instance().setWindowMode((Application::WindowMode)selectedEntry.selected().mValue);
@@ -942,6 +1012,11 @@ void OptionsMenu::update(float timeElapsed)
 									EngineMain::instance().setVSyncMode((Configuration::FrameSyncType)selectedEntry.selected().mValue);
 								}
 							}
+							if (mEnteredFromIngame && !mShowedAudioWarningMessage && selectedData >= option::TITLE_THEME && selectedData <= option::OUTRO_MUSIC)
+							{
+								mAudioWarningMessageTimeout = 4.0f;
+								mShowedAudioWarningMessage = true;
+							}
 							break;
 						}
 					}
@@ -992,6 +1067,7 @@ void OptionsMenu::update(float timeElapsed)
 					}
 
 					case option::_CHECK_FOR_UPDATE:
+					case option::RELEASE_CHANNEL:
 					{
 						UpdateCheck& updateCheck = GameClient::instance().getUpdateCheck();
 						if (updateCheck.hasUpdate())
@@ -1053,8 +1129,19 @@ void OptionsMenu::update(float timeElapsed)
 		mVisibility = saturate(mVisibility - timeElapsed * 6.0f);
 		if (mVisibility <= 0.0f)
 		{
+			GameApp::instance().onFadedOutOptions();
 			mState = State::INACTIVE;
 		}
+	}
+
+	// Update warning message timeout
+	if (mWarningMessageTimeout > 0.0f)
+	{
+		mWarningMessageTimeout = std::max(0.0f, mWarningMessageTimeout - timeElapsed);
+	}
+	if (mAudioWarningMessageTimeout > 0.0f)
+	{
+		mAudioWarningMessageTimeout = std::max(0.0f, mAudioWarningMessageTimeout - timeElapsed);
 	}
 
 	// Check for changes in connected gamepads
@@ -1075,7 +1162,7 @@ void OptionsMenu::render()
 	int anchorX = 200;
 	int anchorY = 0;
 	float alpha = 1.0f;
-	if (mState != State::SHOW)
+	if (mState != State::SHOW && mState != State::FADE_TO_GAME)
 	{
 		anchorX += roundToInt((1.0f - mVisibility) * 300.0f);
 		alpha = mVisibility;
@@ -1119,10 +1206,28 @@ void OptionsMenu::render()
 
 					if (entry.getMenuEntryType() == TitleMenuEntry::MENU_ENTRY_TYPE)
 					{
-						if (!isTitleShown(tabIndex, (int)line))
+						if (!isTitleShown(tabIndex, (int)line))		// TODO: This check might be obsolete now thanks to the else part below (but that needs to be tested first)
 						{
 							// Skip this title
 							continue;
+						}
+						else
+						{
+							// Automatically skip titles that don't have any real option below them
+							bool valid = false;
+							for (size_t nextLine = line + 1; nextLine < tab.mMenuEntries.size(); ++nextLine)
+							{
+								const GameMenuEntry& nextEntry = tab.mMenuEntries[nextLine];
+								if (nextEntry.getMenuEntryType() == TitleMenuEntry::MENU_ENTRY_TYPE || nextEntry.mData == option::_BACK)
+									break;
+								if (nextEntry.isFullyInteractable())
+								{
+									valid = true;
+									break;
+								}
+							}
+							if (!valid)
+								continue;
 						}
 					}
 
@@ -1190,6 +1295,32 @@ void OptionsMenu::render()
 			}
 		}
 
+		if (mEnteredFromIngame)
+		{
+			if (mWarningMessageTimeout > 0.0f)
+			{
+				const float visibility = saturate(mWarningMessageTimeout / 0.3f);
+				const Recti rect(0, 210 + roundToInt((1.0f - visibility) * 16.0f), 400, 16);
+				drawer.drawRect(rect, Color(1.0f, 0.75f, 0.5f, alpha * 0.95f));
+				drawer.printText(global::mFont5, rect, "Note: Some options are hidden while in-game.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
+				drawer.drawRect(Recti(rect.x, rect.y-1, rect.width, 1), Color(0.4f, 0.2f, 0.0f, alpha * 0.95f));
+				drawer.drawRect(Recti(rect.x, rect.y-2, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.9f));
+				drawer.drawRect(Recti(rect.x, rect.y-3, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.6f));
+				drawer.drawRect(Recti(rect.x, rect.y-4, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.3f));
+			}
+			if (mAudioWarningMessageTimeout > 0.0f)
+			{
+				const float visibility = saturate(mAudioWarningMessageTimeout / 0.3f);
+				const Recti rect(0, 210 + roundToInt((1.0f - visibility) * 16.0f), 400, 16);
+				drawer.drawRect(rect, Color(1.0f, 0.75f, 0.5f, alpha * 0.95f));
+				drawer.printText(global::mFont5, rect, "Note: Music changes don't affect already playing tracks.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
+				drawer.drawRect(Recti(rect.x, rect.y-1, rect.width, 1), Color(0.4f, 0.2f, 0.0f, alpha * 0.95f));
+				drawer.drawRect(Recti(rect.x, rect.y-2, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.9f));
+				drawer.drawRect(Recti(rect.x, rect.y-3, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.6f));
+				drawer.drawRect(Recti(rect.x, rect.y-4, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.3f));
+			}
+		}
+
 		drawer.performRendering();
 	}
 
@@ -1197,9 +1328,42 @@ void OptionsMenu::render()
 	GameMenuBase::render();
 }
 
-void OptionsMenu::onEnteredFromIngame()
+void OptionsMenu::setupOptionsMenu(bool enteredFromIngame)
 {
-	// TODO: Disable options not available in-game
+	mEnteredFromIngame = enteredFromIngame;
+
+	for (const ConditionalOption& option : CONDITIONAL_OPTIONS)
+	{
+		const bool visible = option.shouldBeVisible(enteredFromIngame);
+		mOptionEntries[option.mOptionId].mGameMenuEntry->setVisible(visible);
+	}
+
+#if defined(PLATFORM_ANDROID)
+	// These options don't work on Android, so hide them
+	mOptionEntries[option::WINDOW_MODE].mGameMenuEntry->setVisible(false);
+	mOptionEntries[option::WINDOW_MODE_STARTUP].mGameMenuEntry->setVisible(false);
+#endif
+
+	// Hide Mods and System tabs
+	mTabMenuEntries[0].mOptions[Tab::Id::MODS].mVisible = !enteredFromIngame && mHasAnyModOptions;
+	mTabMenuEntries[0].mOptions[Tab::Id::SYSTEM].mVisible = !enteredFromIngame;
+
+	// Corrections in case a now hidden entry was previously selected
+	{
+		mTabMenuEntries[0].sanitizeSelectedIndex();
+		mActiveTab = mTabMenuEntries[0].mSelectedIndex;
+		mActiveTabAnimated = (float)mActiveTab;
+
+		mTabs[mActiveTab].mMenuEntries.sanitizeSelectedIndex();
+		if (mTabs[mActiveTab].mMenuEntries.mSelectedEntryIndex == 0)
+		{
+			mActiveMenu = &mTabMenuEntries;
+		}
+	}
+
+	mWarningMessageTimeout = enteredFromIngame ? 4.0f : 0.0f;		
+	mAudioWarningMessageTimeout = 0.0f;
+	mShowedAudioWarningMessage = false;
 }
 
 void OptionsMenu::removeControllerSetupMenu()
@@ -1326,5 +1490,5 @@ void OptionsMenu::goBack()
 	Configuration::instance().saveSettings();
 
 	GameApp::instance().onExitOptions();
-	mState = State::FADE_TO_MENU;
+	mState = mEnteredFromIngame ? State::FADE_TO_GAME : State::FADE_TO_MENU;
 }

@@ -40,7 +40,7 @@ function void fn02acdc()
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 			objA1.render_flags |= render_flag.COMPOUND
-			u16[A1 + 0x16] = 6		// number of bridge segments
+			u16[A1 + 0x16] = 6		// Number of bridge segments
 			D2.u16 = objA0.position.y.u16
 			D3.u16 = objA0.position.x.u16 - 0x4b
 
@@ -86,7 +86,7 @@ function void fn02acdc()
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 			objA1.render_flags |= render_flag.COMPOUND
-			u16[A1 + 0x16] = 6		// number of bridge segments
+			u16[A1 + 0x16] = 6		// Number of bridge segments
 			D2.u16 = objA0.position.y.u16
 			D3.u16 = objA0.position.x.u16 - 0x50
 
@@ -261,7 +261,7 @@ function void fn02af9c()
 	if (objA0.flags2a & bit)
 	{
 		D2.u16 = D1.u16 * 2
-		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+		if ((u8[A1 + 0x2a] & 0x02) == 0)
 		{
 			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
 			if (D0.s16 >= 0 && D0.u16 < D2.u16)

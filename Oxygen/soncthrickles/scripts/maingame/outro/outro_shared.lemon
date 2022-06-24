@@ -288,7 +288,7 @@ function void fn05b514()
 	outro.wait_time = u16[0x05b656 + D1.u16]
 
 #if STANDALONE
-	u32 lines = 0x26a			// Number of text lines in credits
+	u32 lines = 0x26b			// Number of text lines in credits
 	u32 syncPoint = 0x2cce		// Sync point in credits music (in frames from music start)
 
 	// Credits start and end measured in frames from credits music start

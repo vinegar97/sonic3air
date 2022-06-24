@@ -8,6 +8,7 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/EngineDelegate.h"
+#include "sonic3air/ConfigurationImpl.h"
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/SharedResources.h"
@@ -16,6 +17,7 @@
 	#include "sonic3air/generator/ResourceScriptGenerator.h"
 #endif
 
+#include "oxygen/application/Application.h"
 #include "oxygen/application/GameProfile.h"
 #include "oxygen/base/CrashHandler.h"
 #include "oxygen/simulation/CodeExec.h"
@@ -39,7 +41,8 @@ const EngineDelegateInterface::AppMetaData& EngineDelegate::getAppMetaData()
 		mAppMetaData.mTitle = "Sonic 3 A.I.R.";
 		mAppMetaData.mIconFile = L"data/images/icon.png";
 		mAppMetaData.mWindowsIconResource = 101;
-		mAppMetaData.mBuildVersion = BUILD_STRING;
+		mAppMetaData.mBuildVersionString = BUILD_STRING;
+		mAppMetaData.mBuildVersionNumber = BUILD_NUMBER;
 		mAppMetaData.mAppDataFolder = L"Sonic3AIR";
 	}
 	return mAppMetaData;
@@ -58,12 +61,13 @@ AudioOutBase& EngineDelegate::createAudioOut()
 bool EngineDelegate::onEnginePreStartup()
 {
 	CrashHandler::setApplicationInfo(std::string("Sonic 3 A.I.R. v") + BUILD_STRING);
+	oxygen::Logging::setAssertBreakCaption(std::string("Sonic 3 A.I.R. - v") + BUILD_STRING);
 
 #ifdef ENDUSER
 	// Sanity check if the game is even extracted
 	{
 		// One of these two files must exist
-	#if defined(PLATFORM_MAC)
+	#if defined(PLATFORM_MAC) || defined(PLATFORM_IOS)
 		Configuration& config = Configuration::instance();
 		const bool check = FTX::FileSystem->exists(config.mGameDataPath + L"/gamedata.bin");
 	#else
@@ -86,16 +90,14 @@ bool EngineDelegate::onEnginePreStartup()
 
 bool EngineDelegate::setupCustomGameProfile()
 {
+	GameProfile& gameProfile = GameProfile::instance();
+
 #ifdef ENDUSER
 	// Setup game profile data -- this is done so that no oxygenproject.json is needed for the end-user version of S3AIR
-	GameProfile& gameProfile = GameProfile::instance();
+	ConfigurationImpl::fillDefaultGameProfile(gameProfile);
 
 	gameProfile.mAsmStackRange.first = 0xfffffd00;
 	gameProfile.mAsmStackRange.second = 0xfffffe00;
-
-	gameProfile.mRomCheck.mSize = 0x400000;
-	gameProfile.mRomCheck.mOverwrites.emplace_back(0x2001f0, 0x4a);
-	gameProfile.mRomCheck.mChecksum = 0x0c06aa82;
 
 	gameProfile.mDataPackages.clear();
 	gameProfile.mDataPackages.emplace_back(L"enginedata.bin",    true);
@@ -105,7 +107,7 @@ bool EngineDelegate::setupCustomGameProfile()
 #else
 
 	// Just load from the oxygenproject.json file
-	GameProfile::instance().loadOxygenProjectFromFile(L"oxygenproject.json");
+	gameProfile.loadOxygenProjectFromFile(L"oxygenproject.json");
 #endif
 
 	// Return true, so the engine won't load the oxygenprofile.json by itself
@@ -177,7 +179,10 @@ void EngineDelegate::onPreSaveStateLoad()
 
 void EngineDelegate::onApplicationLostFocus()
 {
-	mGame.enableGamePauseByApplication();
+	if (mGame.shouldPauseOnFocusLoss())
+	{
+		Application::instance().enablePauseOnFocusLoss();
+	}
 }
 
 bool EngineDelegate::mayLoadScriptMods()

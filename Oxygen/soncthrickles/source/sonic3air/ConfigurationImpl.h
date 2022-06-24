@@ -10,11 +10,18 @@
 
 #include "oxygen/application/Configuration.h"
 
+class GameProfile;
+
 
 class ConfigurationImpl : public ::Configuration
 {
 public:
 	inline static ConfigurationImpl& instance() { return static_cast<ConfigurationImpl&>(::Configuration::instance()); }
+
+	static void fillDefaultGameProfile(GameProfile& gameProfile);
+
+public:
+	ConfigurationImpl();
 
 protected:
 	void preLoadInitialization() override;
@@ -39,17 +46,23 @@ public:
 	std::string mGameVersionInSettings;
 
 	// Game server
+	struct UpdateCheck
+	{
+		int mReleaseChannel = 0;	// 0 = stable, 1 = preview, 2 = test builds
+	};
 	struct GhostSync
 	{
 		bool mEnabled = false;
-		std::string mChannelName;
-		bool mShowOffscreenGhosts = false;
+		std::string mChannelName = "world";
+		bool mShowOffscreenGhosts = true;
 	};
 	struct GameServer
 	{
-		std::string mServerHostName;
-		int mServerPortUDP = 0;
-		int mServerPortTCP = 0;
+		std::string mServerHostName = "sonic3air.org";
+		int mServerPortUDP = 21094;		// Used by most platforms
+		int mServerPortTCP = 21095;		// Used only as a fallback for UDP
+		int mServerPortWSS = 21096;		// Used by the web version
+		UpdateCheck mUpdateCheck;
 		GhostSync mGhostSync;
 	};
 	GameServer mGameServer;

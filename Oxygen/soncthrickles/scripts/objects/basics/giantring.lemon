@@ -166,7 +166,7 @@ function void GiantRing.Grant50Rings()
 	level.giantrings_clear |= (1 << objA0.subtype2c)
 	objA0.flags38 |= 0x20
 
-	AddRings(50)
+	addRings(50)
 }
 
 

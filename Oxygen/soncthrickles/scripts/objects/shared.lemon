@@ -215,11 +215,11 @@ function void SetupObjectAttributesMost()
 //# address-hook(0x084040) end(0x08405e)
 function void SetupObjectAttributesBasic()
 {
-	objA0.sprite_priority  = u16[A1]
-	objA0.box_size.x       = u8[A1+2]
-	objA0.box_size.y       = u8[A1+3]
-	objA0.animation.sprite = u8[A1+4]
-	objA0.collision_attributes          = u8[A1+5]
+	objA0.sprite_priority      = u16[A1]
+	objA0.box_size.x           = u8[A1+2]
+	objA0.box_size.y           = u8[A1+3]
+	objA0.animation.sprite     = u8[A1+4]
+	objA0.collision_attributes = u8[A1+5]
 	objA0.render_flags |= render_flag.WORLD
 	objA0.base_state += 2
 	A1 += 6
@@ -275,6 +275,22 @@ function void Object.CountdownAndTrigger()
 	{
 		A1 = objA0.countdown_callback
 		call A1
+	}
+}
+
+
+//# address-hook(0x084898) end(0x0848b4)
+function void Object.TriggerOnGroundHit()
+{
+	if (objA0.velocity.y >= 0)
+	{
+		CheckGroundCollision()
+		if (D1.s16 <= 0)
+		{
+			objA0.position.y.u16 += D1.s16
+			A1 = objA0.countdown_callback
+			call A1
+		}
 	}
 }
 
@@ -928,11 +944,10 @@ function void PlayMusicAfterLevelResults()
 
 
 //# address-hook(0x085b8a) end(0x085b8a)
-function void stopCharacterWinPose.player1()
+function void StopCharacterWinPose.player1()
 {
 	stopCharacterWinPose(0xffffb000)
 }
-
 
 function void stopCharacterWinPose(u32 address)
 {
@@ -943,7 +958,10 @@ function void stopCharacterWinPose(u32 address)
 //# address-hook(0x085b8e) end(0x085ba6)
 function void StopCharacterWinPose()
 {
-	objA1.state.both = 0x0505	// char.state.STANDING, char.state.STANDING
+	// objA1.state = char.state.STANDING
+	// objA1.state.former = char.state.STANDING
+	objA1.state.both = 0x0505
+
 	objA1.animation.frame = 0
 	objA1.animation.timer = 0
 	objA1.flags2a &= ~char.flag.IN_AIR
@@ -1579,7 +1597,7 @@ function void fn01e36c()
 	}
 
 	D2.u16 = D1.u16 * 2
-	if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+	if ((u8[A1 + 0x2a] & 0x02) == 0)
 	{
 		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
 		if (D0.s16 >= 0 && D0.u16 < D2.u16)
@@ -1827,7 +1845,7 @@ function void fn084428()
 //# address-hook(0x084434) end(0x084434)
 function void fn084434()
 {
-	// Loop Animation from the start
+	// Loop animation from the start
 	fn08444e()
 }
 
@@ -1882,7 +1900,6 @@ function void Object.AnimationProgressByLocalA1.CheckFlipX()		// "Animate_RawAdj
 }
 
 
-
 //# address-hook(0x084468) end(0x084496)
 function void Object.AnimationProgress.CheckFlipX()		// "Animate_RawNoSSTAdjustFlipX" in skdisasm
 {
@@ -1916,6 +1933,78 @@ function void Object.AnimationProgress.CheckFlipX(u32 address)
 {
 	A1 = address
 	Object.AnimationProgress.CheckFlipX()
+}
+
+
+//# address-hook(0x084498) end(0x084498)
+function void Object.AnimationProgressByLocalA1.CheckFlipY()		// "Animate_RawAdjustFlipY" in skdisasm
+{
+	Object.AnimationProgress.CheckFlipY(u32[A0 + 0x30])
+}
+
+
+//# address-hook(0x08449c) end(0x0844cc)
+function void Object.AnimationProgress.CheckFlipY()		// "Animate_RawNoSStAdjustFlipY" in skdisasm
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		++objA0.animation.frame
+		D0 = objA0.animation.frame
+
+		D1 = u8[A1 + objA0.animation.frame + 1]
+		if (D1.s8 < 0)
+		{
+			fn084428()
+		}
+		else
+		{
+			if (D1 & 0x40)
+			{
+				D1 &= ~0x40
+				objA0.render_flags ^= render_flag.FLIP_Y
+			}
+
+			// Advance to next frame
+			objA0.animation.timer = u8[A1]
+			objA0.animation.sprite = D1.u8
+		}
+	}
+}
+
+function void Object.AnimationProgress.CheckFlipY(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.CheckFlipY()
+}
+
+
+//# address-hook(0x0844ce) end(0x08450c)
+function void fn0844ce()
+{
+	--u8[A1 + 0x24]
+	if (s8[A1 + 0x24] < 0)
+	{
+		u8[A1 + 0x24] = u8[A2]
+		D0 = u8[A1 + 0x23] + 2
+		u8[A1 + 0x23] = D0.u8
+		D1.u8 = u8[A2 + D0.s16 + 0x01]
+		if (D1.u8 == 0)
+		{
+			fn085fc4()
+			A1 = objA0.countdown_callback
+			call A1
+			return
+		}
+
+		u8[A1 + 0x22] = D1.u8
+		objA1.render_flags &= ~render_flag.FLIP_X
+		if (u8[A2 + D0.s16 + 0x02] != 0)
+		{
+			objA1.render_flags |= render_flag.FLIP_X
+		}
+	}
+	fn085fc4()
 }
 
 

@@ -153,6 +153,7 @@ function void fn01f4c4()
 	BlockerElement.checkForUnloadAndDebugRender(0xffa0ffff)
 }
 
+
 // Object that is (flipped) GTGT
 
 //# address-hook(0x01f528) end(0x01f58a)
@@ -292,7 +293,7 @@ function void fn01f6d0()
 		A1 = 0xffffb000
 		BlockerElement.KillCharacter()
 	}
-	if (D6.u8 &= 0x08)
+	if (D6.u8 & 0x08)
 	{
 		A1 = 0xffffb04a
 		BlockerElement.KillCharacter()

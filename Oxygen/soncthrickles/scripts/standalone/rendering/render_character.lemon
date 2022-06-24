@@ -162,19 +162,19 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 			// Character
 			if (animationSprite >= 0x01 && animationSprite <= 0x20)
 			{
-				// walking animation
+				// Walking animation
 				animationSprite = 0x01 + (animationSprite - 0x01) % 8
 				rotationMode = 1
 			}
 			else if (animationSprite >= 0x21 && animationSprite <= 0x30)
 			{
-				// running animation
+				// Running animation
 				animationSprite = 0x21 + (animationSprite - 0x21) % 4
 				rotationMode = 1
 			}
 			else if (animationSprite >= 0x78 && animationSprite <= 0x7f)
 			{
-				// swinging animation
+				// Swinging animation
 				animationSprite = 0x78
 				rotationMode = 2
 			}

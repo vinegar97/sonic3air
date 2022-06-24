@@ -1,8 +1,4 @@
 {
-
-	// Enter the path to the game ROM here if it can't be found automatically
-	"RomPath": "",
-
 	// Default window size
 	"WindowSize": "1200 x 672",
 
@@ -17,18 +13,6 @@
 
 	// Script optimizations (use "3" as default = maximum optimization)
 	"ScriptOptimizationLevel": "3",
-
-	// Game server
-	"GameServer":
-	{
-		"ServerAddress": "gameserver.sonic3air.org:21094-21095",
-		"GhostSync":
-		{
-			"Enabled": "0",				// Enable the ghost sync feature by setting this to "1"
-			"ChannelName": "world",		// To use your own private channel, enter an arbitrary string here; "world" is the default channel
-			"ShowOffscreenGhosts": "1"	// Show other players on the screen border while they're not on the screen
-		}
-	},
 
 	// Dev mode
 	"DevMode":

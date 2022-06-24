@@ -279,5 +279,5 @@ function void fn0193ca()
 
 function void fn085b8a()
 {
-	stopCharacterWinPose.player1()
+	StopCharacterWinPose.player1()
 }

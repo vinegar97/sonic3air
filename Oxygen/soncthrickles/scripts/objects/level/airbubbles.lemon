@@ -284,7 +284,7 @@ function void fn02fbb2()
 		return
 
 	if (u8[A1 + 0x2b] & char.bonus.SHIELD_BUBBLE)
-		return	// ignore if player has a bubble shield
+		return	// Ignore if player has a bubble shield
 
 	// Collect bubble
 	UpdateMusicOnWaterTransition()

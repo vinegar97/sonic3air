@@ -230,7 +230,7 @@ function void fn06114c()
 function void fn06114e()
 {
 	checkpoint.rings += 20
-	AddRings(10)
+	addRings(10)
 }
 
 

@@ -44,7 +44,6 @@ function void fn072400()
 	spawnChildObject(0x072596, 0x00, 0, 0)
 
 	spawnChildObjectChain(0x072976)
-
 	spawnChildObjectChain(0x07297c)
 }
 

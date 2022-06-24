@@ -928,7 +928,7 @@ function void fn005c70()
 //# address-hook(0x005ca2) end(0x005cae)
 function void fn005ca2()
 {
-	if (s8(global.region_code) < 0)
+	if (global.region_code & 0x80)
 	{
 		DrawObject()
 	}

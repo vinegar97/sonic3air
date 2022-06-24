@@ -340,7 +340,7 @@ function void CompetitionMode.Character.UpdateSpindash.Sonic_Knuckles()
 
 	D0 = u8[A0 + 0x3e] * 2
 	char.groundspeed = u16[0x010a14 + D0.u16]
-	A1 = (A0 == 0xffffb000) ? 0xffffee24 : 0xffffee28	// address of camera.locktime.*
+	A1 = (A0 == 0xffffb000) ? 0xffffee24 : 0xffffee28	// Address of camera.locktime.*
 	u16[A1] = 0x2000 - (((u16(char.groundspeed) - 0x0800) * 2) & 0x1f00)
 	if (char.flags & char.flag.FACING_LEFT)
 	{
@@ -683,7 +683,7 @@ function void CompetitionMode.Character.UpdateSpindash.Tails()
 
 	D0 = u8[A0 + 0x3e] * 2
 	char.groundspeed = u16[0x0135ee + D0.u16]
-	A1 = (A0 == 0xffffb000) ? 0xffffee24 : 0xffffee28	// address of camera.locktime.*
+	A1 = (A0 == 0xffffb000) ? 0xffffee24 : 0xffffee28	// Address of camera.locktime.*
 	u16[A1] = 0x2000 - (((u16(char.groundspeed) - 0x0800) * 2) & 0x1f00)
 	if (char.flags & char.flag.FACING_LEFT)
 	{

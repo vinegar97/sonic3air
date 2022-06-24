@@ -79,6 +79,17 @@ GameMenuBase::BaseState MainMenu::getBaseState() const
 	}
 }
 
+void MainMenu::setBaseState(BaseState baseState)
+{
+	switch (baseState)
+	{
+		case BaseState::INACTIVE: mState = State::INACTIVE;  break;
+		case BaseState::FADE_IN:  mState = State::APPEAR;  break;
+		case BaseState::SHOW:	  mState = State::SHOW;  break;
+		case BaseState::FADE_OUT: mState = State::FADE_TO_EXIT;  break;
+	}
+}
+
 void MainMenu::onFadeIn()
 {
 	mState = State::APPEAR;
@@ -223,6 +234,7 @@ void MainMenu::update(float timeElapsed)
 			switch (mState)
 			{
 				case State::FADE_TO_TITLESCREEN:
+					mMenuBackground->setGameStartedMenu();
 					GameApp::instance().openTitleScreen();
 					break;
 
@@ -324,6 +336,7 @@ void MainMenu::startNormalGame()
 	// Init simulation
 	Game::instance().startIntoDataSelect();
 	GameApp::instance().onStartGame();
+	mMenuBackground->setGameStartedMenu();
 }
 
 void MainMenu::openActSelectMenu()

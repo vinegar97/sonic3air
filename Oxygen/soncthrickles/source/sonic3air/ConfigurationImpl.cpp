@@ -15,6 +15,42 @@
 #include "oxygen/helper/JsonHelper.h"
 
 
+namespace
+{
+	int getReleaseChannelValueForBuild()
+	{
+		const constexpr uint32 buildVariantHash = rmx::compileTimeFNV_32(BUILD_VARIANT);
+		if (buildVariantHash == rmx::compileTimeFNV_32("TEST"))
+			return 2;
+		else if (buildVariantHash == rmx::compileTimeFNV_32("PREVIEW") || buildVariantHash == rmx::compileTimeFNV_32("BETA"))	// Treat betas as previews
+			return 1;
+		else
+			return 0;
+	}
+}
+
+
+void ConfigurationImpl::fillDefaultGameProfile(GameProfile& gameProfile)
+{
+	gameProfile.mShortName = "Sonic 3 A.I.R.";
+	gameProfile.mFullName = "Sonic 3 - Angel Island Revisited";
+
+	gameProfile.mRomCheck.mSize = 0x400000;
+	gameProfile.mRomCheck.mChecksum = 0x344983ffcfeff8cb;
+
+	gameProfile.mRomInfos.resize(1);
+	gameProfile.mRomInfos[0].mSteamGameName = "Sonic 3 & Knuckles";
+	gameProfile.mRomInfos[0].mSteamRomName = L"Sonic_Knuckles_wSonic3.bin";
+	gameProfile.mRomInfos[0].mOverwrites.clear();
+	gameProfile.mRomInfos[0].mOverwrites.emplace_back(0x2001f0, 0x4a);
+}
+
+ConfigurationImpl::ConfigurationImpl()
+{
+	// Setup defaults
+	mGameServer.mUpdateCheck.mReleaseChannel = getReleaseChannelValueForBuild();
+}
+
 void ConfigurationImpl::preLoadInitialization()
 {
 	SharedDatabase::initialize();
@@ -33,16 +69,7 @@ bool ConfigurationImpl::loadConfigurationInternal(JsonHelper& jsonHelper)
 	mPreprocessorDefinitions.setDefinition("GAMEAPP", BUILD_NUMBER);
 
 	// Setup the default game profile data accordingly
-	{
-		GameProfile& gameProfile = GameProfile::instance();
-		gameProfile.mShortName = "Sonic 3 A.I.R.";
-		gameProfile.mFullName = "Sonic 3 - Angel Island Revisited";
-		gameProfile.mRomAutoDiscover.mSteamGameName = "Sonic 3 & Knuckles";
-		gameProfile.mRomAutoDiscover.mSteamRomName = L"Sonic_Knuckles_wSonic3.bin";
-		gameProfile.mRomCheck.mSize = 0x400000;
-		gameProfile.mRomCheck.mOverwrites.emplace_back(0x2001f0, 0x4a);
-		gameProfile.mRomCheck.mChecksum = 0x0c06aa82;
-	}
+	fillDefaultGameProfile(GameProfile::instance());
 
 #ifndef ENDUSER
 	// Explicitly set a (non-empty) project path, so that "oxygenproject.json" gets loaded
@@ -67,37 +94,20 @@ void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 		{
 			// General game server settings
 			JsonHelper gameServerHelper(gameServerJson);
-			std::string serverAddress;
-			if (gameServerHelper.tryReadString("ServerAddress", serverAddress))
+			gameServerHelper.tryReadString("ServerAddress", mGameServer.mServerHostName);
+			gameServerHelper.tryReadInt("ServerPortUDP", mGameServer.mServerPortUDP);
+			gameServerHelper.tryReadInt("ServerPortTCP", mGameServer.mServerPortTCP);
+			gameServerHelper.tryReadInt("ServerPortWSS", mGameServer.mServerPortWSS);
+
+			// Update Check settings
+			const Json::Value& updateCheckJson = gameServerHelper.mJson["UpdateCheck"];
+			if (!updateCheckJson.isNull())
 			{
-				// Setup default ports, they might be overwritten
-				mGameServer.mServerPortUDP = 21094;
-				mGameServer.mServerPortTCP = 21095;
-
-				const String str = serverAddress;
-				const int colonPosition = str.findChar(':', 0, +1);
-				if (colonPosition >= 0 && colonPosition < str.length())
-				{
-					mGameServer.mServerHostName = *str.getSubString(0, colonPosition);
-
-					const int hyphenPosition = str.findChar('-', colonPosition+1, +1);
-					if (hyphenPosition >= 0 && hyphenPosition < str.length())
-					{
-						mGameServer.mServerPortUDP = str.getSubString(colonPosition+1, hyphenPosition-colonPosition-1).parseInt();
-						mGameServer.mServerPortTCP = str.getSubString(hyphenPosition+1).parseInt();
-					}
-					else
-					{
-						mGameServer.mServerPortUDP = str.getSubString(colonPosition+1).parseInt();
-					}
-				}
-				else
-				{
-					mGameServer.mServerHostName = *str;
-				}
+				JsonHelper jsonHelper(updateCheckJson);
+				jsonHelper.tryReadInt("UpdateChannel", mGameServer.mUpdateCheck.mReleaseChannel);
 			}
 
-			// Ghost sync settings
+			// Ghost Sync settings
 			const Json::Value& ghostSyncJson = gameServerHelper.mJson["GhostSync"];
 			if (!ghostSyncJson.isNull())
 			{
@@ -302,7 +312,6 @@ void ConfigurationImpl::saveSettingsInternal(Json::Value& root, SettingsType set
 	// Game settings
 	{
 		Json::Value gameSettingsJson;
-
 		const auto& settingsMap = SharedDatabase::getSettings();
 		for (auto& pair : settingsMap)
 		{
@@ -311,10 +320,30 @@ void ConfigurationImpl::saveSettingsInternal(Json::Value& root, SettingsType set
 				continue;
 			if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::HIDDEN && setting.mValue == setting.mDefaultValue)
 				continue;
-
 			gameSettingsJson[setting.mIdentifier] = setting.mValue;
 		}
-
 		root["GameSettings"] = gameSettingsJson;
+	}
+
+	// Game server
+	{
+		Json::Value gameServerJson;
+		{
+			gameServerJson["ServerAddress"] = mGameServer.mServerHostName;
+			gameServerJson["ServerPortUDP"] = mGameServer.mServerPortUDP;
+			gameServerJson["ServerPortTCP"] = mGameServer.mServerPortTCP;
+			gameServerJson["ServerPortWSS"] = mGameServer.mServerPortWSS;
+
+			Json::Value ghostSyncJson;
+			ghostSyncJson["Enabled"] = mGameServer.mGhostSync.mEnabled ? 1 : 0;
+			ghostSyncJson["ChannelName"] = mGameServer.mGhostSync.mChannelName;
+			ghostSyncJson["ShowOffscreenGhosts"] = mGameServer.mGhostSync.mShowOffscreenGhosts ? 1 : 0;
+			gameServerJson["GhostSync"] = ghostSyncJson;
+
+			Json::Value updateCheckJson;
+			updateCheckJson["ReleaseChannel"] = mGameServer.mUpdateCheck.mReleaseChannel;
+			gameServerJson["UpdateCheck"] = updateCheckJson;
+		}
+		root["GameServer"] = gameServerJson;
 	}
 }

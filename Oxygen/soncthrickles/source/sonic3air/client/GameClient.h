@@ -16,14 +16,25 @@
 #include "oxygen_netcore/serverclient/Packets.h"
 
 
-// Emscripten does not support UDP, so we need to use TCP (via WebSockets there)
 #if defined(PLATFORM_WEB)
-	#define GAME_CLIENT_USE_TCP
+	#define GAME_CLIENT_USE_WSS		// Emscripten does not support UDP, so we need to use WebSockets
+#else
+	#define GAME_CLIENT_USE_UDP		// This is the default
+	//#define GAME_CLIENT_USE_TCP	// This is just a fallback for platforms which don't support UDP, but TCP (of which we have none at the moment)
 #endif
 
 
 class GameClient : public ServerClientBase, public SingleInstance<GameClient>
 {
+public:
+	enum class ConnectionState
+	{
+		NOT_CONNECTED,
+		CONNECTING,
+		ESTABLISHED,
+		FAILED
+	};
+
 public:
 	GameClient();
 	~GameClient();
@@ -34,6 +45,10 @@ public:
 
 	void setupClient();
 	void updateClient(float timeElapsed);
+
+	inline ConnectionState getConnectionState() const  { return mConnectionState; }
+	inline bool isConnected() const					   { return (mConnectionState == ConnectionState::ESTABLISHED); }
+	void connectToServer();
 
 protected:
 	virtual NetConnection* createNetConnection(ConnectionManager& connectionManager, const SocketAddress& senderAddress) override
@@ -60,10 +75,14 @@ private:
 private:
 	void startConnectingToServer(uint64 currentTimestamp);
 
+	void updateNotConnected(uint64 currentTimestamp);
+	void updateConnected();
+
 private:
 	UDPSocket mUDPSocket;
 	ConnectionManager mConnectionManager;
 	NetConnection mServerConnection;
+	ConnectionState mConnectionState = ConnectionState::NOT_CONNECTED;
 	State mState = State::NONE;
 	uint64 mLastConnectionAttemptTimestamp = 0;
 

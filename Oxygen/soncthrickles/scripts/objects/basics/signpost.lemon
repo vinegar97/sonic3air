@@ -525,7 +525,6 @@ function void fn086932()
 }
 
 
-
 //# address-hook(0x086a3e) end(0x086a4e)
 function void fn086a3e()
 {
@@ -535,7 +534,6 @@ function void fn086a3e()
 	D4.u16 = objA0.position.x.u16
 	fn01dc56()
 }
-
 
 
 function void StartCharacterWinPose(u32 address)

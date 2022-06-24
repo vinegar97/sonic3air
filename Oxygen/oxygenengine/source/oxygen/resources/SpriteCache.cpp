@@ -206,11 +206,11 @@ const SpriteCache::CacheItem* SpriteCache::getSprite(uint64 key)
 			const std::string_view* str = LemonScriptRuntime::tryResolveStringHash(key);
 			if (nullptr != str)
 			{
-				RMX_ERROR("Invalid cache key with string '" << *str << "' (hash is " << rmx::hexString(key) << ")", );
+				RMX_ERROR("Invalid sprite cache key with string '" << *str << "' (hash is " << rmx::hexString(key) << ")", );
 			}
 			else
 			{
-				RMX_ERROR("Invalid cache key with hash " << rmx::hexString(key), );
+				RMX_ERROR("Invalid sprite cache key with hash " << rmx::hexString(key), );
 			}
 		}
 		return nullptr;
@@ -477,8 +477,6 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 					}
 					item.mSprite->mOffset = -center;
 				}
-
-				RMX_CHECK(success, "Failed to load sprite from '" << *WString(fullpath).toString() << "'", continue);
 			}
 		}
 	}

@@ -167,9 +167,8 @@ function void fn0739e6()
 //# address-hook(0x0739f2) end(0x0739fe)
 function void fn0739f2()
 {
-	objA0.flags38 |= 0x04
 	objA0.collision_attributes = collision.size.24x24
-	objA0.flags38 |= 0x08
+	objA0.flags38 |= (0x04 | 0x08)
 	fn073a04()
 }
 

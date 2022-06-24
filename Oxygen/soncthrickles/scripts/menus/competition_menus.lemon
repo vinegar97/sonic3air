@@ -218,7 +218,7 @@ function void fn00aa36()
 //# address-hook(0x00aa54) end(0x00aa72)
 function void fn00aa54()
 {
-	competition_mode.game_mode = 0x03
+	competition_mode.game_mode = 3
 	competition_mode.item_flag = competition_mode.menu.items_toggle
 	competition_mode.multiplay = (control.pad2.pressed & (CONTROL_START | CONTROL_A | CONTROL_C)) ? 0xff : 0x00
 	global.game_mode = 0x40
@@ -231,7 +231,7 @@ function void fn00aa74()
 {
 	if (control.pad1.pressed & (CONTROL_START | CONTROL_A | CONTROL_C))
 	{
-		u16[0xffffff8a] = 0xffff	// items off (competition_mode.item_flag = 0xff), set game mode to time attack (competition_mode.game_mode = 0xff)
+		u16[0xffffff8a] = 0xffff	// Items off (competition_mode.item_flag = 0xff), set game mode to time attack (competition_mode.game_mode = -1)
 
 		competition_mode.multiplay = 0
 		global.game_mode = 0xc0
@@ -256,7 +256,7 @@ function void fn00aa8e()
 function void fn00aaa6()
 {
 	D1.u8 = competition_mode.menu.game_mode
-	if (D0.u16 & CONTROL_UP)
+	if (D0.u16 & 0x01)
 	{
 		playSound(SFX_CLICK)
 		if (D1.s8 <= 0)
@@ -264,7 +264,7 @@ function void fn00aaa6()
 		else
 			--D1.u8
 	}
-	else if (D0.u16 & CONTROL_DOWN)
+	else if (D0.u16 & 0x02)
 	{
 		playSound(SFX_CLICK)
 		++D1.u8
@@ -416,11 +416,13 @@ function void CompetitionMode.StageSelect()
 	}
 
 	D0 = u32(competition_mode.character.player1) * 0x55
-	u8[0xffffb094 + 0x2e] = 0x40 + D0.u8
+	D0.u8 += 0x40
+	u8[0xffffb094 + 0x2e] = D0.u8
 	if (s8(global.game_mode) >= 0)
 	{
 		D0 = u32(competition_mode.character.player2) * 0x55
-		u8[0xffffb206 + 0x2e] = 0x40 + D0.u8
+		D0.u8 += 0x40
+		u8[0xffffb206 + 0x2e] = D0.u8
 	}
 
 	fn01aa6e()
@@ -919,7 +921,7 @@ function void fn00b508()
 {
 	A1 = 0xfffff607		// Address of control.pad2.pressed
 	A2 = 0xffffeee3
-	A3 = 0xffffffeb		// Address of competition_mode.character.player2
+	A3 = 0xffffffeb
 	if (competition_mode.multiplay)
 	{
 		fn00b538()
@@ -941,7 +943,7 @@ function void fn00b52c()
 {
 	A1 = 0xfffff605		// Address of control.pad1.pressed
 	A2 = 0xffffeee2
-	A3 = 0xffffffea		// Address of competition_mode.character.player1
+	A3 = 0xffffffea
 	fn00b538()
 }
 
@@ -968,7 +970,7 @@ function void fn00b538()
 			bool skip = false
 			if (u8[A0 + 0x30] == 0)
 			{
-				if ((u8[A1] & (CONTROL_LEFT | CONTROL_RIGHT)) == 0)
+				if ((u8[A1] & 0x0c) == 0)
 				{
 					bool pressedB = (u8[A1] & CONTROL_B)
 				#if STANDALONE
@@ -980,7 +982,7 @@ function void fn00b538()
 					}
 					else
 					{
-						D0.u16 = u8[A1] & (CONTROL_START | CONTROL_A | CONTROL_C)
+						D0.u16 = u8[A1] & 0xe0
 						if (D0.u16 != 0)
 						{
 							objA0.value2f = 0xff
@@ -997,13 +999,13 @@ function void fn00b538()
 
 					u8[A0 + 0x34] = 0
 					u8[A0 + 0x35] = objA0.flags2e
-					D0.u16 = u8[A1] & (CONTROL_LEFT | CONTROL_RIGHT)
-					if ((D0 & CONTROL_LEFT) == 0)
+					D0.u16 = u8[A1] & 0x0c
+					if ((D0 & 0x04) == 0)
 					{
 						u8[A0 + 0x30] = 0x01
 						D0.u8 = u8[A3] + 1
-						if (D0.u8 > CHARACTER_KNUCKLES)
-							D0 = CHARACTER_SONIC
+						if (D0.u8 > 0x02)
+							D0 = 0
 						u8[A3] = D0.u8
 						D0 = u32(D0.u16) * 0x55
 						if (D0 == 0)
@@ -1015,8 +1017,8 @@ function void fn00b538()
 					{
 						u8[A0 + 0x30] = 0xff
 						D0.u8 = u8[A3] - 1
-						if (D0.s8 < CHARACTER_SONIC)
-							D0 = CHARACTER_KNUCKLES
+						if (D0.s8 < 0)
+							D0 = 0x02
 						u8[A3] = D0.u8
 						D0 = u32(D0.u16) * 0x55
 						if (D0.u16 >= 0x80)
@@ -1104,7 +1106,7 @@ function void fn00b656()
 	objA0.mapping_offset = 0x3a1aee
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x05c9)
 	D0 = 0
-	D1 = 0x55
+	D1.s32 = -0x55
 	D2 = objA0.flags2e
 	while (D2.s16 >= 0)
 	{
@@ -1388,7 +1390,7 @@ function void fn00b74e()
 			{
 				if (u16[0xffffe000] == endScreenOffset)
 				{
-					if (D0.u16 & (CONTROL_START | CONTROL_A | CONTROL_C))
+					if (D0.u16 & 0xe0)
 					{
 						global.game_mode = 0x38
 						return
@@ -1401,7 +1403,7 @@ function void fn00b74e()
 			}
 			else
 			{
-				if (D0.u16 & (CONTROL_START | CONTROL_A | CONTROL_C))
+				if (D0.u16 & 0xe0)
 				{
 					u16[0xffffe000] -= 8
 				}
