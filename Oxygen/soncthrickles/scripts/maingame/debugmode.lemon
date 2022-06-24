@@ -43,9 +43,20 @@ function void DebugMode.Enter()
 		char.flags &= ~char.flag.UNDERWATER
 		A1 = A0
 		UpdateMusicOnWaterTransition()
+	#if STANDALONE
+		if (global.characters != CHARS_TAILS_ALONE)
+		{
+			setSpeedCapProperties(0xfffff760)
+		}
+		else
+		{
+			setSpeedCapProperties(0xfffffec0)
+		}
+	#else
 		global.move.speedcap = 0x600
 		global.move.acceleration = 0x0c
 		global.move.deceleration = 0x80
+	#endif
 	}
 
 	char.animation.sprite = 0
