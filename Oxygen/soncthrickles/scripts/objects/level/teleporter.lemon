@@ -58,7 +58,7 @@ function void fn045528()
 		}
 
 		objA0.sprite_attributes = 0x052e
-		if (global.characters == CHARS_KNUCKLES_ALONE)
+		if (isMainCharacter(CHARACTER_KNUCKLES))
 		{
 			objA0.subtype2c = 0x4a
 		}
@@ -369,7 +369,7 @@ function void fn045866()
 //# address-hook(0x045b94) end(0x045bf2)
 function void fn045b94()
 {
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		// Knuckles' HPZ teleporter
 		if (camera.position.y.u16 >= 0x0240 || u16[0xffffb000 + 0x10] < 0x0b00)

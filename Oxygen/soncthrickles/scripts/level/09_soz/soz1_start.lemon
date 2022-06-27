@@ -50,7 +50,7 @@ function void fn042028()
 	}
 
 	A2 = 0xffffb000
-	D0.u16 = (global.characters == CHARS_TAILS_ALONE) ? 0x0694 : 0x0690
+	D0.u16 = (isMainCharacter(CHARACTER_TAILS)) ? 0x0694 : 0x0690
 	if (D0.u16 == u16[A2 + 0x14])
 	{
 		fn042180()

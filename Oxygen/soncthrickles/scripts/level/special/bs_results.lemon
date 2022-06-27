@@ -530,7 +530,7 @@ function void fn02e9d8()
 //# address-hook(0x02e9f6) end(0x02ea0a)
 function void fn02e9f6()
 {
-	if (global.characters == CHARS_KNUCKLES_ALONE && global.lock_on_state == 0 && global.sk_bluespheres != 0)
+	if (isMainCharacter(CHARACTER_KNUCKLES) && global.lock_on_state == 0 && global.sk_bluespheres != 0)
 	{
 		objA0.sprite_attributes = sprite_attribute.PALETTE.LINE1
 	}
@@ -556,7 +556,7 @@ function void fn02ea1e()
 {
 	if (global.lock_on_state == 0 && global.sk_bluespheres)
 	{
-		if (global.characters == CHARS_KNUCKLES_ALONE)
+		if (isMainCharacter(CHARACTER_KNUCKLES))
 		{
 			objA0.animation.sprite += 0x1f
 		}
@@ -730,7 +730,7 @@ function void fn02eaf6()
 	objA0.animation.sprite += D1.u8
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | sprite_attribute.FLIP_Y | sprite_attribute.FLIP_X | 0x0779)
 
-	if (global.lock_on_state == 0 && global.sk_bluespheres && global.characters == CHARS_KNUCKLES_ALONE)
+	if (global.lock_on_state == 0 && global.sk_bluespheres && isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		objA0.sprite_attributes -= (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3)
 	}

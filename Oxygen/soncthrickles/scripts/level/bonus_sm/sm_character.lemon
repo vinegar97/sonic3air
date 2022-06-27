@@ -89,7 +89,7 @@ function void fn04b9ce()
 	objA0.flags2a |= 0x04
 	objA0.flags2a |= 0x02
 
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		// Tails' tails object
 		objA0.sprite_attributes = 0x06a0

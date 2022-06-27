@@ -371,7 +371,7 @@ function void fn03d78c()
 							{
 								D0 = 0x22
 								D1 = 0x26
-								if (global.characters == CHARS_TAILS_ALONE)
+								if (isMainCharacter(CHARACTER_TAILS))
 								{
 									D0 = 0x1e
 									D1 = 0x22
@@ -420,7 +420,7 @@ function void fn03d78c()
 							{
 								D0 = 0x22
 								D1 = 0x26
-								if (global.characters == CHARS_TAILS_ALONE)
+								if (isMainCharacter(CHARACTER_TAILS))
 								{
 									D0 = 0x1e
 									D1 = 0x22

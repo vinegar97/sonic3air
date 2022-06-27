@@ -44,7 +44,7 @@ function void DebugMode.Enter()
 		A1 = A0
 		UpdateMusicOnWaterTransition()
 	#if STANDALONE
-		if (global.characters != CHARS_TAILS_ALONE)
+		if (isMainCharacter(CHARACTER_TAILS) == 0)
 		{
 			setSpeedCapProperties(0xfffff760)
 		}
@@ -324,7 +324,7 @@ function bool updateDebugModeInput(bool playingAsTails)
 	if (!debug_mode.enabled)
 		return false
 
-	if (playingAsTails && global.characters != CHARS_TAILS_ALONE)
+	if (playingAsTails && (isMainCharacter(CHARACTER_TAILS) == 0))
 		return false
 
 	// Gravity toggle

@@ -731,7 +731,7 @@ function void ItemEffect.ApplySpeedUp()
 #if STANDALONE
 	u32 backupA0 = A0
 	A0 = A1
-	if (A0 == 0xffffb000 && global.characters != CHARS_TAILS_ALONE)
+	if (A0 == 0xffffb000 && (isMainCharacter(CHARACTER_TAILS) == 0))
 	{
 		setSpeedCapProperties(0xfffff760)
 	}
@@ -741,7 +741,7 @@ function void ItemEffect.ApplySpeedUp()
 	}
 	A0 = backupA0
 #else
-	if (A1 == 0xffffb000 && global.characters != CHARS_TAILS_ALONE)
+	if (A1 == 0xffffb000 && (isMainCharacter(CHARACTER_TAILS) == 0))
 	{
 		global.move.speedcap = 0xc00
 		global.move.acceleration = 0x18

@@ -54,7 +54,7 @@ function void Character.BaseUpdate.Tails()
 	A6 = 0xffffcc9e		// Base address of dust cloud object for Tails
 
 	// Check for debug mode
-	if (debug_mode.state == 0 || global.characters != CHARS_TAILS_ALONE)	// Maybe a check if it's second player Tails?
+	if (debug_mode.state == 0 || (isMainCharacter(CHARACTER_TAILS) == 0))	// Maybe a check if it's second player Tails?
 	{
 		// Targets:
 		//  - 0x0136ca	-> char.base_state = 0x00	-> Character.Initialization.Tails()		-> Initialization
@@ -163,7 +163,7 @@ function void Character.Initialization.shared(u8 character)
 
 	if (character == CHARACTER_TAILS)
 	{
-		if (global.characters == CHARS_TAILS_ALONE)
+		if (isMainCharacter(CHARACTER_TAILS))
 		{
 			if (checkpoint.number == 0)
 			{
@@ -2976,7 +2976,7 @@ function void TailsPressedJumpInMidAir()
 #endif
 
 	// Tails is manually controlled?
-	if (global.characters == CHARS_TAILS_ALONE || tails.control_counter != 0)
+	if (isMainCharacter(CHARACTER_TAILS) || tails.control_counter != 0)
 	{
 		TailsStartFlight()
 	}
@@ -6260,7 +6260,7 @@ function void SonicUpdateAnimationHurt()
 function void Character.UpdateGotHurtState.Tails()
 {
 	// Tails is first player?
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		if (debugModeRescue())
 			return
@@ -6412,7 +6412,7 @@ function void Character.UpdateDiedState.Sonic()
 function void Character.UpdateDiedState.Tails()
 {
 	// Tails is first player?
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		if (debugModeRescue())
 			return
@@ -6514,7 +6514,7 @@ function void Character.CheckDiedStateEnd()
 	else
 	{
 		// Normal game
-		if (char.character == CHARACTER_TAILS && global.characters != CHARS_TAILS_ALONE)
+		if (char.character == CHARACTER_TAILS && (isMainCharacter(CHARACTER_TAILS) == 0))
 		{
 			// Second player Tails
 			char.base_state = 0x02
