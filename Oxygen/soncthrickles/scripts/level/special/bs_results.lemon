@@ -858,6 +858,10 @@ function void fn02ebe8()
 	objA0.position.y.u16 = 0x014c
 	objA0.animation.sprite = 0x28 + max(global.characters, 1)	// 0x29 for Sonic (with or without Tails), 0x2a for Tails, 0x2b for Knuckles
 
+	#if STANDALONE
+		objA0.animation.sprite = 0x29 + min(getMainCharacter(), 2)
+	#endif
+
 	if (level.framecounter.low & 0x08)
 	{
 		DrawObject()

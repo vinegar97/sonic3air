@@ -211,7 +211,7 @@ function u64 Monitor.getIconSpriteKey(u8 type)
 	if (type == 0)
 		return "monitor_icon_static"
 	else if (type == 0x01)
-		return (getMainCharacter() == CHARACTER_SONIC) ? "monitor_icon_sonic" : (getMainCharacter() == CHARACTER_TAILS) ? "monitor_icon_tails" : "monitor_icon_knuckles"
+		return (isMainCharacter(CHARACTER_SONIC)) ? "monitor_icon_sonic" : (isMainCharacter(CHARACTER_TAILS)) ? "monitor_icon_tails" : "monitor_icon_knuckles"
 	else if (type == 0x02)
 		return "monitor_icon_robotnik"
 	else if (type == 0x03)
