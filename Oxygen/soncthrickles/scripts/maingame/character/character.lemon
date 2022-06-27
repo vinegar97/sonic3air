@@ -134,20 +134,7 @@ function void Character.Initialization.shared(u8 character)
 	char.hitbox_extends.y = characterHeight
 	char.hitbox.default.x = 9
 	char.hitbox.default.y = characterHeight
-
-	if (character == CHARACTER_SONIC)
-	{
-		char.mapping_offset = 0x146620
-	}
-	else if (character == CHARACTER_TAILS)
-	{
-		char.mapping_offset = 0x148eb8
-	}
-	else  // if (character == CHARACTER_KNUCKLES)
-	{
-		char.mapping_offset = 0x14a8d6
-	}
-
+	char.mapping_offset = u32[0x04b9c2 + (character & 0x02) * 4]
 	char.sprite_priority = 0x100
 	char.box_size.x = 0x18
 	char.box_size.y = 0x18
@@ -254,20 +241,12 @@ function void Character.UpdateNormalState.Sonic()
 	{
 		// Call update function depending on flags
 		pushA456()
-		if (char.flags & char.flag.IN_AIR)
-		{
-			if (char.flags & char.flag.ROLLING)
-				Character.UpdateSonicRollingInAir()
-			else
-				Character.UpdateSonicUprightInAir()
-		}
-		else
-		{
-			if (char.flags & char.flag.ROLLING)
-				Character.UpdateSonicRollingOnGround()
-			else
-				Character.UpdateSonicUprightOnGround()
-		}
+		// Targets:
+		//  - 0x010f2c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> Character.UpdateSonicUprightOnGround()
+		//  - 0x010fb6	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> Character.UpdateSonicUprightInAir()
+		//  - 0x010fe0	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> Character.UpdateSonicRollingOnGround()
+		//  - 0x011036	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> Character.UpdateSonicRollingInAir()
+		call tableLookupAddress(0x010c90, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 		popA456()
 	}
 
@@ -397,20 +376,12 @@ function void Character.UpdateNormalState.Tails()
 	{
 		// Call update function depending on flags
 		pushA456()
-		if (char.flags & char.flag.IN_AIR)
-		{
-			if (char.flags & char.flag.ROLLING)
-				Character.UpdateTailsRollingInAir()
-			else
-				Character.UpdateTailsUprightInAir()
-		}
-		else
-		{
-			if (char.flags & char.flag.ROLLING)
-				Character.UpdateTailsRollingOnGround()
-			else
-				Character.UpdateTailsUprightOnGround()
-		}
+		// Targets:
+		//  - 0x014748	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> Character.UpdateTailsUprightOnGround()
+		//  - 0x0147b8	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> Character.UpdateTailsUprightInAir()
+		//  - 0x014934	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> Character.UpdateTailsRollingOnGround()
+		//  - 0x0149a2	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> Character.UpdateTailsRollingInAir()
+		call tableLookupAddress(0x0138f6, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 		popA456()
 	}
 
@@ -471,20 +442,12 @@ function void Character.UpdateNormalState.Knuckles()
 	{
 		// Call update function depending on flags
 		pushA456()
-		if (char.flags & char.flag.IN_AIR)
-		{
-			if (char.flags & char.flag.ROLLING)
-				Character.UpdateKnucklesRollingInAir()
-			else
-				Character.UpdateKnucklesUprightInAir()
-		}
-		else
-		{
-			if (char.flags & char.flag.ROLLING)
-				Character.UpdateKnucklesRollingOnGround()
-			else
-				Character.UpdateKnucklesUprightOnGround()
-		}
+		// Targets:
+		//  - 0x0167f4	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> Character.UpdateKnucklesUprightOnGround()
+		//  - 0x01684c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> Character.UpdateKnucklesUprightInAir()
+		//  - 0x0170c2	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> Character.UpdateKnucklesRollingOnGround()
+		//  - 0x017118	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> Character.UpdateKnucklesRollingInAir()
+		call tableLookupAddress(0x016642, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 		popA456()
 	}
 
