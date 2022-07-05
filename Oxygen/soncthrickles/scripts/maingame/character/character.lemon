@@ -2872,6 +2872,16 @@ function void SonicPressedJumpInMidAir()
 				char.velocity.y = 0
 				char.groundspeed = vx
 			}
+
+		#if STANDALONE
+			if ((super.active & 0x80) == 0)
+			{
+				// Reduce dash speed for Super Sonic
+				char.velocity.x = (char.velocity.x > 0) ? (char.velocity.x - 0x200) : (char.velocity.x < 0) ? (char.velocity.x + 0x200) : 0
+				char.velocity.y = (char.velocity.y > 0) ? (char.velocity.y - 0x200) : (char.velocity.y < 0) ? (char.velocity.y + 0x200) : 0
+				char.groundspeed = char.velocity.x
+			}
+		#endif
 		}
 		else
 		{
