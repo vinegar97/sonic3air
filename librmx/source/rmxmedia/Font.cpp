@@ -11,9 +11,21 @@
 
 Font::CodecList Font::mCodecs;
 
+
+int FontKey::compare(const FontKey& other) const
+{
+	if (mProcessors.size() != other.mProcessors.size())
+		return (mProcessors.size() < other.mProcessors.size() ? -1 : 1);
+	for (size_t k = 0; k < mProcessors.size(); ++k)
+		COMPARE_CASCADE(::compare(mProcessors[k].get(), other.mProcessors[k].get()));
+	COMPARE_CASCADE(FontSourceKey::compare(other));
+	return 0;
+}
+
+
 FontSource* FontSourceStdFactory::construct(const FontSourceKey& key)
 {
-	if (key.mName.empty())
+	if (key.mName.empty() && key.mSize > 0.0f)
 	{
 		return new FontSourceStd(key.mSize);
 	}
@@ -30,47 +42,65 @@ FontSource* FontSourceBitmapFactory::construct(const FontSourceKey& key)
 }
 
 
+
+Font::Font()
+{
+}
+
 Font::Font(const String& filename, float size)
 {
 	loadFromFile(filename, size);
 }
 
-Font::Font(float size)
+Font::Font(float size) :
+	Font("", size)
 {
-	loadFromFile("", size);
 }
 
 Font::~Font()
 {
-	delete mFontSource;
+	if (mOwnsFontSource)
+		delete mFontSource;
 }
 
 bool Font::loadFromFile(const String& name, float size)
 {
 	mKey.mName = name;
 	mKey.mSize = size;
-	return rebuildFontSource();
+	invalidateFontSource();
+	return (nullptr != getFontSource());
 }
 
 void Font::setSize(float size)
 {
 	mKey.mSize = size;
-	rebuildFontSource();
+	invalidateFontSource();
 }
 
-void Font::setShadow(bool enable, const Vec2f offset, float blur, float alpha)
+void Font::injectFontSource(FontSource* fontSource)
 {
-	mKey.mShadowEnabled = enable;
-	mKey.mShadowOffset = offset;
-	mKey.mShadowBlur = blur;
-	mKey.mShadowAlpha = alpha;
-	rebuildFontSource();
+	invalidateFontSource();
+
+	if (nullptr != fontSource)
+	{
+		mFontSource = fontSource;
+		mFontSourceDirty = false;
+		mOwnsFontSource = false;
+	}
 }
 
-void Font::addFontProcessor(FontProcessor& processor)
+void Font::clearFontProcessors()
 {
-	mKey.mProcessor = &processor;
-	rebuildFontSource();
+	mKey.mProcessors.clear();
+	mCharacterMap.clear();
+	++mChangeCounter;
+}
+
+void Font::addFontProcessor(const std::shared_ptr<FontProcessor>& processor)
+{
+	mKey.mProcessors.emplace_back(processor);
+	mCharacterMap.clear();
+	++mChangeCounter;
 }
 
 int Font::getWidth(const StringReader& text)
@@ -80,7 +110,8 @@ int Font::getWidth(const StringReader& text)
 
 int Font::getWidth(const StringReader& text, int pos, int len)
 {
-	if (nullptr == mFontSource)
+	FontSource* fontSource = getFontSource();
+	if (nullptr == fontSource)
 		return 0;
 
 	if (pos < 0 || pos >= (int)text.mLength)
@@ -92,11 +123,11 @@ int Font::getWidth(const StringReader& text, int pos, int len)
 	for (int i = 0; i < len; ++i)
 	{
 		const uint32 ch = text[pos+i];
-		const FontSource::GlyphInfo* info = mFontSource->getGlyph(ch);
+		const FontSource::GlyphInfo* info = fontSource->getGlyph(ch);
 		if (nullptr == info)
 			continue;
 
-		width += info->advance;
+		width += info->mAdvance;
 	}
 
 	width += roundToInt((len - 1) * mAdvance);
@@ -105,18 +136,21 @@ int Font::getWidth(const StringReader& text, int pos, int len)
 
 int Font::getHeight()
 {
-	return (nullptr == mFontSource) ? 0 : mFontSource->getHeight();
+	FontSource* fontSource = getFontSource();
+	return (nullptr == fontSource) ? 0 : fontSource->getHeight();
 }
 
 int Font::getLineHeight()
 {
-	return (nullptr == mFontSource) ? 0 : mFontSource->getLineHeight();
+	FontSource* fontSource = getFontSource();
+	return (nullptr == fontSource) ? 0 : fontSource->getLineHeight();
 }
 
 Vec2f Font::alignText(const Rectf& rect, const StringReader& text, int alignment)
 {
 	Vec2f result(rect.x, rect.y);
-	if (nullptr == mFontSource)
+	FontSource* fontSource = getFontSource();
+	if (nullptr == fontSource)
 		return result;
 
 	if (alignment >= 2 && alignment <= 9)
@@ -129,7 +163,7 @@ Vec2f Font::alignText(const Rectf& rect, const StringReader& text, int alignment
 			result.x += ((int)rect.width - getWidth(text)) * align_x / 2;
 
 		if (align_y > 0)
-			result.y += ((int)rect.height - mFontSource->getHeight()) * align_y / 2;
+			result.y += ((int)rect.height - fontSource->getHeight()) * align_y / 2;
 	}
 
 	return result;
@@ -137,7 +171,8 @@ Vec2f Font::alignText(const Rectf& rect, const StringReader& text, int alignment
 
 void Font::wordWrapText(std::vector<std::wstring>& output, int maxLineWidth, const StringReader& text, int spacing)
 {
-	if (nullptr == mFontSource)
+	FontSource* fontSource = getFontSource();
+	if (nullptr == fontSource)
 		return;
 
 	struct TextAndWidth
@@ -182,7 +217,7 @@ void Font::wordWrapText(std::vector<std::wstring>& output, int maxLineWidth, con
 		}
 		else
 		{
-			const FontSource::GlyphInfo* info = mFontSource->getGlyph(ch);
+			const FontSource::GlyphInfo* info = fontSource->getGlyph(ch);
 			if (nullptr == info)
 				continue;
 
@@ -196,12 +231,12 @@ void Font::wordWrapText(std::vector<std::wstring>& output, int maxLineWidth, con
 				}
 
 				whitespaceBeforeWord.mText += ch;
-				whitespaceBeforeWord.mWidth += info->advance + spacing;
+				whitespaceBeforeWord.mWidth += info->mAdvance + spacing;
 			}
 			else
 			{
 				// Check if line break is needed now
-				const int newCombinedLineWidth = currentLine.mWidth + whitespaceBeforeWord.mWidth + currentWord.mWidth + info->advance;
+				const int newCombinedLineWidth = currentLine.mWidth + whitespaceBeforeWord.mWidth + currentWord.mWidth + info->mAdvance;
 				if (newCombinedLineWidth > maxLineWidth)
 				{
 					if (currentLine.empty())
@@ -219,7 +254,7 @@ void Font::wordWrapText(std::vector<std::wstring>& output, int maxLineWidth, con
 				}
 
 				currentWord.mText += ch;
-				currentWord.mWidth += info->advance + spacing;
+				currentWord.mWidth += info->mAdvance + spacing;
 			}
 		}
 	}
@@ -238,7 +273,8 @@ void Font::wordWrapText(std::vector<std::wstring>& output, int maxLineWidth, con
 
 void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringReader& text, int spacing)
 {
-	if (nullptr == mFontSource)
+	FontSource* fontSource = getFontSource();
+	if (nullptr == fontSource)
 		return;
 
 	output.resize(text.mLength);
@@ -246,34 +282,60 @@ void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringRe
 	for (size_t k = 0; k < text.mLength; ++k)
 	{
 		const uint32 ch = text[k];
-		output[k].unicode = ch;
-		output[k].bitmap = nullptr;
+		output[k].mUnicode = ch;
+		output[k].mBitmap = nullptr;
 
-		const FontSource::GlyphInfo* info = mFontSource->getGlyph(ch);
+		const FontSource::GlyphInfo* info = fontSource->getGlyph(ch);
 		if (nullptr == info)
 			continue;
 
-		output[k].bitmap = &info->bitmap;
-		output[k].pos.x = pos.x + (float)info->leftIndent;
-		output[k].pos.y = pos.y + (float)info->topIndent;
+		output[k].mBitmap = &info->mBitmap;
+		output[k].mPosition = pos;
 
-		pos.x += info->advance + spacing;
+		pos.x += info->mAdvance + spacing;
 	}
 }
 
-void Font::print(int x, int y, const StringReader& text, int alignment)
+void Font::applyToTypeInfos(std::vector<ExtendedTypeInfo>& outTypeInfos, const std::vector<TypeInfo>& inTypeInfos)
 {
-	FTX::Painter->print(*this, Rectf((float)x, (float)y, 0.0f, 0.0f), text, alignment);
+	outTypeInfos.reserve(inTypeInfos.size());
+	for (size_t i = 0; i < inTypeInfos.size(); ++i)
+	{
+		const TypeInfo& typeInfo = inTypeInfos[i];
+		if (nullptr == typeInfo.mBitmap)
+			continue;
+
+		CharacterInfo& characterInfo = applyEffects(typeInfo);
+
+		ExtendedTypeInfo& extendedTypeInfo = vectorAdd(outTypeInfos);
+		extendedTypeInfo.mCharacter = typeInfo.mUnicode;
+		extendedTypeInfo.mBitmap = &characterInfo.mCachedBitmap;
+		extendedTypeInfo.mDrawPosition = Vec2i(typeInfo.mPosition) - Vec2i(characterInfo.mBorderLeft, characterInfo.mBorderTop);
+	}
 }
 
-void Font::print(int x, int y, int w, int h, const StringReader& text, int alignment)
+Font::CharacterInfo& Font::applyEffects(const TypeInfo& typeInfo)
 {
-	FTX::Painter->print(*this, Rectf((float)x, (float)y, (float)w, (float)h), text, alignment);
-}
+	const uint32 character = typeInfo.mUnicode;
+	CharacterInfo& characterInfo = mCharacterMap[character];
+	if (characterInfo.mCachedBitmap.empty())
+	{
+		FontProcessingData fontProcessingData;
+		fontProcessingData.mBitmap = *typeInfo.mBitmap;
 
-void Font::print(const Rectf& rect, const StringReader& text, int alignment)
-{
-	FTX::Painter->print(*this, rect, text, alignment);
+		// Run font processors
+		for (const std::shared_ptr<FontProcessor>& processor : mKey.mProcessors)
+		{
+			processor->process(fontProcessingData);
+		}
+
+		characterInfo.mBorderLeft = fontProcessingData.mBorderLeft;
+		characterInfo.mBorderRight = fontProcessingData.mBorderRight;
+		characterInfo.mBorderTop = fontProcessingData.mBorderTop;
+		characterInfo.mBorderBottom = fontProcessingData.mBorderBottom;
+		characterInfo.mCachedBitmap.swap(fontProcessingData.mBitmap);
+	}
+	return characterInfo;
 }
 
 void Font::printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& drawRect, const StringReader& text, int alignment, int spacing)
@@ -286,18 +348,18 @@ void Font::printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& d
 void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReader& text, int spacing)
 {
 	// Render text into a bitmap
-	if (nullptr == mFontSource || text.mLength == 0)
+	FontSource* fontSource = getFontSource();
+	if (nullptr == fontSource || text.mLength == 0)
 	{
 		outBitmap.clear();
 		return;
 	}
 
-	std::vector<Font::TypeInfo> typeInfos;
-	std::vector<FontOutput::ExtendedTypeInfo> extendedTypeInfos;
+	std::vector<TypeInfo> typeInfos;
+	std::vector<ExtendedTypeInfo> extendedTypeInfos;
 	getTypeInfos(typeInfos, Vec2f(0.0f, 0.0f), text, spacing);
 
-	FontOutput* output = FTX::Painter->getFontOutput(*this);
-	output->applyToTypeInfos(extendedTypeInfos, typeInfos);
+	applyToTypeInfos(extendedTypeInfos, typeInfos);
 	if (extendedTypeInfos.empty())
 	{
 		outBitmap.clear();
@@ -307,7 +369,7 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 	// Get bounds
 	Vec2i boundsMin(+10000, +10000);
 	Vec2i boundsMax(-10000, -10000);
-	for (const FontOutput::ExtendedTypeInfo& extendedTypeInfo : extendedTypeInfos)
+	for (const ExtendedTypeInfo& extendedTypeInfo : extendedTypeInfos)
 	{
 		const Vec2i minPos = extendedTypeInfo.mDrawPosition;
 		const Vec2i maxPos = minPos + extendedTypeInfo.mBitmap->getSize();
@@ -320,7 +382,7 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 	// Setup and fill bitmap
 	outBitmap.create(boundsMax.x - boundsMin.x, boundsMax.y - boundsMin.y, 0);
 
-	for (const FontOutput::ExtendedTypeInfo& extendedTypeInfo : extendedTypeInfos)
+	for (const ExtendedTypeInfo& extendedTypeInfo : extendedTypeInfos)
 	{
 		outBitmap.insertBlend(extendedTypeInfo.mDrawPosition.x - boundsMin.x, extendedTypeInfo.mDrawPosition.y - boundsMin.y, *extendedTypeInfo.mBitmap);
 	}
@@ -331,13 +393,13 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 	outInnerRect.width = (int)(text.mLength - 1) * spacing;
 	for (size_t i = 0; i < text.mLength; ++i)
 	{
-		const FontSource::GlyphInfo* info = mFontSource->getGlyph(text[i]);
+		const FontSource::GlyphInfo* info = fontSource->getGlyph(text[i]);
 		if (nullptr != info)
 		{
-			outInnerRect.width += info->advance;
+			outInnerRect.width += info->mAdvance;
 		}
 	}
-	outInnerRect.height = mFontSource->getHeight();
+	outInnerRect.height = fontSource->getHeight();
 }
 
 Vec2i Font::applyAlignment(const Recti& drawRect, const Recti& innerRect, int alignment)
@@ -371,16 +433,31 @@ Vec2i Font::applyAlignment(const Recti& drawRect, const Recti& innerRect, int al
 	return outPosition;
 }
 
-bool Font::rebuildFontSource()
+void Font::invalidateFontSource()
 {
-	delete mFontSource;
-	mFontSource = nullptr;
+	if (mOwnsFontSource)
+		SAFE_DELETE(mFontSource);
+	mFontSourceDirty = true;
+	mOwnsFontSource = false;
+	mCharacterMap.clear();
+	++mChangeCounter;
+}
 
-	for (IFontSourceFactory* factory : Font::mCodecs.mList)
+FontSource* Font::getFontSource()
+{
+	if (mFontSourceDirty)
 	{
-		mFontSource = factory->construct(mKey);
-		if (nullptr != mFontSource)
-			return true;
+		mFontSourceDirty = false;
+		RMX_ASSERT(nullptr == mFontSource, "Font source is expected to be a null pointer");
+		for (IFontSourceFactory* factory : Font::mCodecs.mList)
+		{
+			mFontSource = factory->construct(mKey);
+			if (nullptr != mFontSource)
+			{
+				mOwnsFontSource = true;
+				break;
+			}
+		}
 	}
-	return false;
+	return mFontSource;
 }

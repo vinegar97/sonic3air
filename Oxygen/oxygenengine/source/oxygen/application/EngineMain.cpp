@@ -20,6 +20,7 @@
 #include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/software/SoftwareDrawer.h"
+#include "oxygen/resources/FontCollection.h"
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/file/PackedFileProvider.h"
 #include "oxygen/helper/FileHelper.h"
@@ -36,6 +37,24 @@
 #if !defined(PLATFORM_MAC) && !defined(PLATFORM_ANDROID)	// Maybe other platforms can be excluded as well? Possibly only Windows and Linux need this
 	#define LOAD_APP_ICON_PNG
 #endif
+
+
+struct EngineMain::Internal
+{
+	GameProfile		mGameProfile;
+	InputManager	mInputManager;
+	LogDisplay		mLogDisplay;
+	ModManager		mModManager;
+	ResourcesCache	mResourcesCache;
+	FontCollection	mFontCollection;
+	PersistentData	mPersistentData;
+	VideoOut		mVideoOut;
+	ControlsIn		mControlsIn;
+
+#if defined(PLATFORM_ANDROID)
+	AndroidJavaInterface mAndroidJavaInterface;
+#endif
+};
 
 
 void EngineMain::earlySetup()
@@ -59,33 +78,13 @@ void EngineMain::earlySetup()
 
 EngineMain::EngineMain(EngineDelegateInterface& delegate_) :
 	mDelegate(delegate_),
-	mGameProfile(*new GameProfile()),
-	mInputManager(*new InputManager()),
-	mLogDisplay(*new LogDisplay()),
-	mModManager(*new ModManager()),
-	mResourcesCache(*new ResourcesCache()),
-	mPersistentData(*new PersistentData()),
-	mVideoOut(*new VideoOut()),
-	mControlsIn(*new ControlsIn())
-#if defined (PLATFORM_ANDROID)
-	, mAndroidJavaInterface(*new AndroidJavaInterface())
-#endif
+	mInternal(*new Internal())
 {
 }
 
 EngineMain::~EngineMain()
 {
-	delete &mGameProfile;
-	delete &mInputManager;
-	delete &mLogDisplay;
-	delete &mModManager;
-	delete &mResourcesCache;
-	delete &mPersistentData;
-	delete &mVideoOut;
-	delete &mControlsIn;
-#if defined (PLATFORM_ANDROID)
-	delete &mAndroidJavaInterface;
-#endif
+	delete &mInternal;
 }
 
 void EngineMain::execute(int argc, char** argv)
@@ -116,8 +115,11 @@ void EngineMain::onActiveModsChanged()
 	// Update the resource cache -> palettes, raw data
 	ResourcesCache::instance().loadAllResources();
 
+	// Update fonts
+	mInternal.mFontCollection.collectFromMods();
+
 	// Update video
-	mVideoOut.handleActiveModsChanged();
+	mInternal.mVideoOut.handleActiveModsChanged();
 
 	// Update audio
 	mAudioOut->handleActiveModsChanged();
@@ -310,14 +312,14 @@ bool EngineMain::startupEngine()
 	}
 
 	RMX_LOG_INFO("Startup of VideoOut");
-	mVideoOut.startup();
+	mInternal.mVideoOut.startup();
 
 	// Input manager startup after config is loaded
 	RMX_LOG_INFO("Input initialization...");
 	InputManager::instance().startup();
 
 	RMX_LOG_INFO("Startup of ControlsIn");
-	mControlsIn.startup();
+	mInternal.mControlsIn.startup();
 
 	// Audio
 	RMX_LOG_INFO("Audio initialization...");
@@ -348,13 +350,13 @@ void EngineMain::shutdown()
 	destroyWindow();
 
 	// Shutdown subsystems
-	mVideoOut.shutdown();
+	mInternal.mVideoOut.shutdown();
 	if (nullptr != mAudioOut)
 	{
 		mAudioOut->shutdown();
 		SAFE_DELETE(mAudioOut);
 	}
-	mControlsIn.shutdown();
+	mInternal.mControlsIn.shutdown();
 
 	// Shutdown drawer
 	mDrawer.shutdown();
@@ -364,7 +366,7 @@ void EngineMain::shutdown()
 	FTX::Audio->exit();
 	FTX::System->exit();
 
-	mModManager.copyModSettingsToConfig();
+	mInternal.mModManager.copyModSettingsToConfig();
 	Configuration::instance().saveSettings();
 	oxygen::Logging::shutdown();
 }
@@ -394,7 +396,7 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 		if (!config.mProjectPath.empty())
 		{
 			RMX_LOG_INFO("Loading game profile");
-			const bool loadedProject = mGameProfile.loadOxygenProjectFromFile(config.mProjectPath + L"oxygenproject.json");
+			const bool loadedProject = mInternal.mGameProfile.loadOxygenProjectFromFile(config.mProjectPath + L"oxygenproject.json");
 			RMX_CHECK(loadedProject, "Failed to load game profile from '" << *WString(config.mProjectPath).toString() << "oxygenproject.json'", );
 		}
 	}
@@ -518,28 +520,37 @@ bool EngineMain::createWindow()
 	{
 		// Set SDL OpenGL attributes
 		RMX_LOG_INFO("Setup of OpenGL attributes...");
-	#ifndef RMX_USE_GLES2
+	#if !defined(RMX_USE_GLES2)
 		{
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-
-		#ifdef PLATFORM_MAC
+			// OpenGL 3.1 or 3.2
+			const int majorVersion = 3;
+		#if defined(PLATFORM_MAC)
 			// macOS needs OpenGL 3.2 for GLSL 140 shaders to work. https://stackoverflow.com/a/31805596
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+			const int minorVersion = 2;
 		#else
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+			const int minorVersion = 1;
 
 			SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		#endif
+
+			RMX_LOG_INFO("Using OpenGL " << majorVersion << "." << minorVersion);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minorVersion);
 		}
 	#else
 		{
+			// GL ES 2.0
+			const int majorVersion = 2;
+			const int minorVersion = 0;
+
+			RMX_LOG_INFO("Using OpenGL ES " << majorVersion << "." << minorVersion);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minorVersion);
 		}
 	#endif
 	}
@@ -672,7 +683,7 @@ bool EngineMain::createWindow()
 
 void EngineMain::destroyWindow()
 {
-	mVideoOut.destroyRenderer();
+	mInternal.mVideoOut.destroyRenderer();
 	mDrawer.destroyDrawer();
 	SDL_DestroyWindow(mSDLWindow);
 	mSDLWindow = nullptr;

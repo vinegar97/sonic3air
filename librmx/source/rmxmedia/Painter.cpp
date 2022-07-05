@@ -151,7 +151,7 @@ namespace rmx
 
 	void Painter::print(Font& font, const Rectf& rect, const StringReader& text, const PrintOptions& printOptions)
 	{
-		FontOutput* output = getFontOutput(font);
+		OpenGLFontOutput& fontOutput = getOpenGLFontOutput(font);
 		const Vec2f pos = font.alignText(rect, text, printOptions.mAlignment);
 
 		std::vector<Font::TypeInfo> typeinfos;
@@ -159,21 +159,18 @@ namespace rmx
 
 		enableTextures(true);
 		setColor(printOptions.mTintColor);
-		output->print(typeinfos);
+		fontOutput.print(typeinfos);
 	}
 
-	FontOutput* Painter::getFontOutput(Font& font)
+	OpenGLFontOutput& Painter::getOpenGLFontOutput(Font& font)
 	{
-		// Get or create FontOutput instance
-		const FontKey& key = font.getKey();
-		OutputInfoMap::iterator it = mOutputInfoMap.find(key);
-		if (it == mOutputInfoMap.end())
-		{
-			OutputInfo info;
-			info.output = new FontOutput(key);
-			it = mOutputInfoMap.emplace(key, info).first;
-		}
-		return it->second.output;
+		// Get or create OpenGLFontOutput instance
+		OpenGLFontOutput* fontOutput = mapFind(mFontOutputMap, &font);
+		if (nullptr != fontOutput)
+			return *fontOutput;
+
+		const auto pair = mFontOutputMap.emplace(&font, font);
+		return pair.first->second;
 	}
 
 	void Painter::resetScissor()

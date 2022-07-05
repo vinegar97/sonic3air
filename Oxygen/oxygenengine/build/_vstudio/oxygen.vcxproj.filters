@@ -247,9 +247,6 @@
     <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteDump.cpp">
       <Filter>rendering\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\helper\PackageFileCrawler.cpp">
-      <Filter>helper</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\utils\Kosinski.cpp">
       <Filter>rendering\utils</Filter>
     </ClCompile>
@@ -395,6 +392,9 @@
       <Filter>application\input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\resources\PrintedTextCache.cpp">
+      <Filter>resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\resources\FontCollection.cpp">
       <Filter>resources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -577,9 +577,6 @@
     <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteDump.h">
       <Filter>rendering\utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\helper\PackageFileCrawler.h">
-      <Filter>helper</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\utils\Kosinski.h">
       <Filter>rendering\utils</Filter>
     </ClInclude>
@@ -741,6 +738,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\helper\ChangeBitSet.h">
       <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\resources\FontCollection.h">
+      <Filter>resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

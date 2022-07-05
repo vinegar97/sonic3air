@@ -588,7 +588,7 @@ function void fn05c7b2()
 	objA0.sprite_priority = 0x0280
 	char.animation.sprite.backup.tails = 0
 	objA0.state.both = 0x0500	// char.state.STANDING, char.state.RUNNING
-	u16[A0 + 0x22] = 0xad00	// objA0.animation.sprite = 0xad, objA0.animation.frame = 0x00
+	u16[A0 + 0x22] = 0xad00		// objA0.animation.sprite = 0xad, objA0.animation.frame = 0x00
 	objA0.countdown_value = 0x27
 }
 

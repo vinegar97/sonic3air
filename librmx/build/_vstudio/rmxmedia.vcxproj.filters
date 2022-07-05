@@ -69,7 +69,7 @@
     <ClCompile Include="..\..\source\rmxmedia\Font.cpp">
       <Filter>Font</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\rmxmedia\FontOutput.cpp">
+    <ClCompile Include="..\..\source\rmxmedia\OpenGLFontOutput.cpp">
       <Filter>Font</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\rmxmedia\FontSource.cpp">
@@ -102,6 +102,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\rmxmedia\FileProviderSDL.cpp">
       <Filter>FileIO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\FontProcessor.cpp">
+      <Filter>Font</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -144,7 +147,7 @@
     <ClInclude Include="..\..\source\rmxmedia\Font.h">
       <Filter>Font</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\rmxmedia\FontOutput.h">
+    <ClInclude Include="..\..\source\rmxmedia\OpenGLFontOutput.h">
       <Filter>Font</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\rmxmedia\FontSource.h">
@@ -184,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\rmxmedia\FileProviderSDL.h">
       <Filter>FileIO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\FontProcessor.h">
+      <Filter>Font</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

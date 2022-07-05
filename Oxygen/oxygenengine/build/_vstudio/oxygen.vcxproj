@@ -71,7 +71,6 @@
     <ClCompile Include="..\..\source\oxygen\file\PackedFileProvider.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\ZipFileProvider.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\HighResolutionTimer.cpp" />
-    <ClCompile Include="..\..\source\oxygen\helper\PackageFileCrawler.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Profiling.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Transform2D.cpp" />
     <ClCompile Include="..\..\source\oxygen\pch.cpp">
@@ -108,6 +107,7 @@
     <ClCompile Include="..\..\source\oxygen\rendering\utils\RenderUtils.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteBase.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteDump.cpp" />
+    <ClCompile Include="..\..\source\oxygen\resources\FontCollection.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\PrintedTextCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\ResourcesCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\SpriteCache.cpp" />
@@ -184,7 +184,6 @@
     <ClInclude Include="..\..\source\oxygen\helper\ChangeBitSet.h" />
     <ClInclude Include="..\..\source\oxygen\helper\DrawerHelper.h" />
     <ClInclude Include="..\..\source\oxygen\helper\HighResolutionTimer.h" />
-    <ClInclude Include="..\..\source\oxygen\helper\PackageFileCrawler.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Profiling.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Transform2D.h" />
     <ClInclude Include="..\..\source\oxygen\pch.h" />
@@ -222,6 +221,7 @@
     <ClInclude Include="..\..\source\oxygen\rendering\utils\RenderUtils.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteBase.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteDump.h" />
+    <ClInclude Include="..\..\source\oxygen\resources\FontCollection.h" />
     <ClInclude Include="..\..\source\oxygen\resources\PrintedTextCache.h" />
     <ClInclude Include="..\..\source\oxygen\resources\ResourcesCache.h" />
     <ClInclude Include="..\..\source\oxygen\resources\SpriteCache.h" />

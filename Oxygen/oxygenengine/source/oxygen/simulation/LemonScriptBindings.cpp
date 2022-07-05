@@ -23,6 +23,7 @@
 #include "oxygen/application/overlays/DebugSidePanel.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/rendering/parts/RenderParts.h"
+#include "oxygen/resources/FontCollection.h"
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/resources/SpriteCache.h"
 
@@ -919,8 +920,7 @@ namespace
 					const std::string_view textString = str->getString();
 
 					// Does the string contain any uppercase letters?
-					const auto it = std::find_if(textString.begin(), textString.end(), [](char ch) { return (ch >= 'A' && ch <= 'Z'); } );
-					if (it != textString.end())
+					if (containsByPredicate(textString, [](char ch) { return (ch >= 'A' && ch <= 'Z'); } ))
 					{
 						// Convert to lowercase and try again
 						String str = textString;
@@ -1019,6 +1019,19 @@ namespace
 		{
 			RenderParts::instance().getOverlayManager().addText(fontKey.getString(), fontKey.getHash(), Vec2i(px, py), text.getString(), text.getHash(), Color::fromRGBA32(tintColor), (int)alignment, (int)spacing, renderQueue, useWorldSpace ? OverlayManager::Space::WORLD : OverlayManager::Space::SCREEN);
 		}
+	}
+
+	int32 Renderer_getTextWidth(lemon::StringRef fontKey, lemon::StringRef text)
+	{
+		if (fontKey.isValid() && text.isValid())
+		{
+			Font* font = FontCollection::instance().getFontByKey(fontKey.getHash());
+			if (nullptr != font)
+			{
+				return font->getWidth(text.getString());
+			}
+		}
+		return 0;
 	}
 
 
@@ -1742,6 +1755,10 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(7, "renderQueue")
 			.setParameterInfo(8, "useWorldSpace");
 
+		module.addUserDefinedFunction("Renderer.getTextWidth", lemon::wrap(&Renderer_getTextWidth), defaultFlags)
+			.setParameterInfo(0, "fontKey")
+			.setParameterInfo(1, "text");
+		
 
 		// Audio
 		module.addUserDefinedFunction("Audio.isPlayingAudio", lemon::wrap(&Audio_isPlayingAudio), defaultFlags)
