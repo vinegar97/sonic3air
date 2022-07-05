@@ -2827,6 +2827,8 @@ function void SonicPressedJumpInMidAir()
 		bool performHyperDash = (super.active & 0x80)		// Hyper Sonic active
 		u8 input = control.player1.state & CONTROL_DPAD		// Only directions
 	#if STANDALONE
+		performHyperDash = (super.active)		// This allows Super Sonic to use the dash as well
+
 		if (performHyperDash && Game.getSetting(SETTING_HYPER_DASH_CONTROLS) == 1)
 		{
 			// Hyper Dash requires also pressing D-pad in any direction
@@ -2837,13 +2839,21 @@ function void SonicPressedJumpInMidAir()
 
 		if (performHyperDash)
 		{
-			Character.ClearEnemiesOnScreen()
+		#if STANDALONE
+			if (super.active & 0x80)	// Super Sonic's dash does not cause a screen flash
+		#endif
+				Character.ClearEnemiesOnScreen()
 
 			camera.locktime.player1 = 0x2000
 			ClearPositionBackup()
 
 			char.double_jump_state = 1
-			u8[0xffffcd7c + 0x20] = 1
+		#if STANDALONE
+			if ((super.active & 0x80) == 0)
+				u8[0xffffcbc0 + 0x20] = 1
+			else
+		#endif
+				u8[0xffffcd7c + 0x20] = 1
 
 			playSound(SFX_SPINDASH_RELEASE)
 
