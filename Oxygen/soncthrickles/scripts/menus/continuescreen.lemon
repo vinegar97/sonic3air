@@ -7,6 +7,9 @@
 */
 
 
+constant u16 ContinueScreen.Numbers.targetInVRAM = 0x0020
+constant u16 ContinueScreen.Characters.targetInVRAM = 0x1180
+constant u16 ContinueScreen.ContinueIcons.targetInVRAM = 0x1b20
 constant u16 ContinueScreen.TextTiles.targetInVRAM = 0x68e0
 
 // Background containing the text "Continue" and the countdown
@@ -166,7 +169,7 @@ function void fn05c2e0()
 	ClearPatternLoadingQueue()
 	fn0011ca()
 
-	Nemesis.loadDataToVRAM(0x05d788, 0x0020)
+	Nemesis.loadDataToVRAM(0x05d788, ContinueScreen.Numbers.targetInVRAM)		// Countdown digits
 	Nemesis.loadDataToVRAM(0x0dde34, ContinueScreen.TextTiles.targetInVRAM)
 	Nemesis.loadDataToVRAM(0x05cd66, 0x1180)
 	Nemesis.loadDataToVRAM(0x05d3c6, 0x1b20)
