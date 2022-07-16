@@ -10,11 +10,13 @@
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
+#include "oxygen/drawing/opengl/OpenGLSpriteTextureManager.h"
 #include "oxygen/drawing/opengl/Upscaler.h"
 #include "oxygen/drawing/DrawCollection.h"
 #include "oxygen/drawing/DrawCommand.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/Logging.h"
+#include "oxygen/resources/SpriteCache.h"
 
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
@@ -90,14 +92,15 @@ namespace opengldrawer
 	public:
 		Internal()
 		{
-			// Register oxygen-specific callback for shader source code post-processing
-			//  -> Must be done before loading first shaders in "OpenGLDrawerResources::startup" and "Upscaler::startup"
-			Shader::mShaderSourcePostProcessCallback = std::bind(&opengldrawer::performShaderSourcePostProcessing, std::placeholders::_1, std::placeholders::_2);
-
 		#if defined(RMX_USE_GLEW)
 			// GLEW initialization
 			RMX_LOG_INFO("GLEW initialization...");
-			glewInit();
+			const GLenum result = glewInit();
+			if (result != GLEW_OK)
+			{
+				RMX_ERROR("Error in OpenGL initialization (glewInit):\n" << glewGetErrorString(result), );
+				return;
+			}
 		#endif
 
 		#if defined(RMX_USE_GLAD)
@@ -105,6 +108,10 @@ namespace opengldrawer
 			RMX_LOG_INFO("GLAD initialization...");
 			gladLoadGL();
 		#endif
+
+			// Register oxygen-specific callback for shader source code post-processing
+			//  -> Must be done before loading first shaders in "OpenGLDrawerResources::startup" and "Upscaler::startup"
+			Shader::mShaderSourcePostProcessCallback = std::bind(&opengldrawer::performShaderSourcePostProcessing, std::placeholders::_1, std::placeholders::_2);
 
 		#ifdef USE_OPENGL_MESSAGE_CALLBACK
 			// Register OpenGL message callback for debugging
@@ -123,12 +130,17 @@ namespace opengldrawer
 			// Startup upscaler
 			RMX_LOG_INFO("Upscaler startup");
 			mUpscaler.startup();
+
+			mSetupSuccessful = true;
 		}
 
 		~Internal()
 		{
-			mUpscaler.shutdown();
-			OpenGLDrawerResources::shutdown();
+			if (mSetupSuccessful)
+			{
+				mUpscaler.shutdown();
+				OpenGLDrawerResources::shutdown();
+			}
 		}
 
 		OpenGLDrawerTexture* createTexture()
@@ -273,8 +285,10 @@ namespace opengldrawer
 		}
 
 	public:
+		bool mSetupSuccessful = false;
 		SDL_Window* mOutputWindow = nullptr;
 		Upscaler mUpscaler;
+		OpenGLSpriteTextureManager mSpriteTextureManager;
 
 		Recti mCurrentViewport;
 		Vec4f mPixelToViewSpaceTransform;	// Transformation from pixel-based coordinates view space, in the form: (x, y) = offset; (z, w) = scale
@@ -289,7 +303,7 @@ namespace opengldrawer
 		opengl::VertexArrayObject mMeshVAO;			// Always using the same instances with different contents -- TODO: Some kind of caching could be useful
 
 	private:
-		std::map<Font*, OpenGLFontOutput> mFontOutputMap;
+		std::unordered_map<Font*, OpenGLFontOutput> mFontOutputMap;
 	};
 }
 
@@ -303,6 +317,11 @@ OpenGLDrawer::OpenGLDrawer() :
 OpenGLDrawer::~OpenGLDrawer()
 {
 	delete &mInternal;
+}
+
+bool OpenGLDrawer::wasSetupSuccessful()
+{
+	return mInternal.mSetupSuccessful;
 }
 
 void OpenGLDrawer::createTexture(DrawerTexture& outTexture)
@@ -437,6 +456,31 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 
 				UpscaledRectDrawCommand& dc = drawCommand->as<UpscaledRectDrawCommand>();
 				mInternal.mUpscaler.renderImage(dc.mRect, dc.mTexture->getImplementation<OpenGLDrawerTexture>()->getTextureHandle(), dc.mTexture->getSize());
+				break;
+			}
+
+			case DrawCommand::Type::SPRITE:
+			{
+				SpriteDrawCommand& sc = drawCommand->as<SpriteDrawCommand>();
+				const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(sc.mSpriteKey);
+				if (nullptr == item)
+					break;
+				if (!item->mUsesComponentSprite)
+					break;
+
+				OpenGLTexture* texture = mInternal.mSpriteTextureManager.getComponentSpriteTexture(*item);
+				if (nullptr == texture)
+					break;
+
+				ComponentSprite& sprite = *static_cast<ComponentSprite*>(item->mSprite);
+				const Vec4f rectParam = mInternal.getTransformOfRectInViewport(Recti(sc.mPosition + sprite.mOffset, sprite.getBitmap().getSize()));
+
+				Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(false, mInternal.mCurrentBlendMode == DrawerBlendMode::ALPHA);
+				shader.bind();
+				shader.setParam("Transform", rectParam);
+				shader.setTexture("Texture", texture->getHandle(), GL_TEXTURE_2D);
+
+				OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
 				break;
 			}
 

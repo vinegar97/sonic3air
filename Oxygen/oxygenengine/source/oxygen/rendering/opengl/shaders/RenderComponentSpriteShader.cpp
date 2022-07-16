@@ -7,11 +7,12 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/rendering/hardware/shaders/RenderComponentSpriteShader.h"
-#include "oxygen/rendering/hardware/HardwareRenderResources.h"
+#include "oxygen/rendering/opengl/shaders/RenderComponentSpriteShader.h"
+#include "oxygen/rendering/opengl/OpenGLRenderResources.h"
 #include "oxygen/rendering/Geometry.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/application/Configuration.h"
+#include "oxygen/drawing/opengl/OpenGLSpriteTextureManager.h"
 #include "oxygen/helper/FileHelper.h"
 
 
@@ -20,7 +21,7 @@ void RenderComponentSpriteShader::initialize()
 	FileHelper::loadShader(mShader, L"data/shader/render_sprite_component.shader", "Standard");
 }
 
-void RenderComponentSpriteShader::refresh(const Vec2i& gameResolution, const HardwareRenderResources& resources)
+void RenderComponentSpriteShader::refresh(const Vec2i& gameResolution)
 {
 	mShader.bind();
 
@@ -47,10 +48,10 @@ void RenderComponentSpriteShader::refresh(const Vec2i& gameResolution, const Har
 	mInitialized = true;
 }
 
-void RenderComponentSpriteShader::draw(const SpriteManager::ComponentSpriteInfo& spriteInfo, HardwareRenderResources& resources)
+void RenderComponentSpriteShader::draw(const SpriteManager::ComponentSpriteInfo& spriteInfo, OpenGLRenderResources& resources)
 {
 	glActiveTexture(GL_TEXTURE0);
-	OpenGLTexture* texture = resources.getComponentSpriteTexture(spriteInfo);
+	const OpenGLTexture* texture = OpenGLSpriteTextureManager::instance().getComponentSpriteTexture(*spriteInfo.mCacheItem);
 	if (nullptr == texture)
 		return;
 

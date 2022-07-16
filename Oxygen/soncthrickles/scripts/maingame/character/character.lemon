@@ -11,6 +11,9 @@
 #if STANDALONE
 	// Positive if Sonic's fast run animation is active
 	global u8 sonic.fastrunanim.timer
+
+	// Countdown to zero; while positive, AI Tails will keep holding the jump buttons to gain more jump height
+	global u8 tails_assist.trigger_countdown
 #endif
 
 
@@ -54,7 +57,7 @@ function void Character.BaseUpdate.Tails()
 	A6 = 0xffffcc9e		// Base address of dust cloud object for Tails
 
 	// Check for debug mode
-	if (debug_mode.state == 0 || (isMainCharacter(CHARACTER_TAILS) == 0))	// Maybe a check if it's second player Tails?
+	if (debug_mode.state == 0 || !isMainCharacter(CHARACTER_TAILS))	// Maybe a check if it's second player Tails?
 	{
 		// Targets:
 		//  - 0x0136ca	-> char.base_state = 0x00	-> Character.Initialization.Tails()		-> Initialization
@@ -921,10 +924,10 @@ function void Tails.UpdateCarrySonic()
 				objA1.position.y.u16 = char.position.y.u16 + (global.inv_gravity ? -0x1c : 0x1c)
 
 				objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
-				u8[A1 + 0x2a] &= 0xfe
+				objA1.flags2a &= ~char.flag.FACING_LEFT
 				D0.u8 = char.flags & char.flag.FACING_LEFT
 				objA1.render_flags |= D0.u8
-				u8[A1 + 0x2a] |= D0.u8
+				objA1.flags2a |= D0.u8
 				if (global.inv_gravity)
 					objA1.render_flags ^= render_flag.FLIP_Y
 
@@ -1079,7 +1082,7 @@ function void fn01459e()
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	D0.u8 = char.flags & char.flag.FACING_LEFT
 	objA1.render_flags |= D0.u8
-	u8[A1 + 0x2a] |= D0.u8
+	objA1.flags2a |= D0.u8
 
 	tails.carried_velocity_x = char.velocity.x
 	tails.carried_velocity_y = char.velocity.y
@@ -2778,15 +2781,37 @@ function bool onCharacterPressedJumpInMidAir(u8 input_state, u8 input_pressed)
 		if (Game.getSetting(SETTING_TAILS_ASSIST_MODE) != 0 && (input_state & CONTROL_UP))
 		{
 			// Tails must be AI controlled and not too far away
-			if (tails.control_counter == 0 && tails.ai_routine == 0x06 && abs(s16[0xffffb04a + 0x10] - s16[0xffffb000 + 0x10]) < 0xc0 && abs(s16[0xffffb04a + 0x14] - s16[0xffffb000 + 0x14] + 0x40) < 0x80)
+			s16 dx = s16[0xffffb04a + 0x10] - s16[0xffffb000 + 0x10]
+			s16 dy = s16[0xffffb04a + 0x14] - s16[0xffffb000 + 0x14]
+			if (tails.control_counter == 0 && tails.ai_routine == 0x06 && abs(dx) < 0xc0 && abs(dy) < 0x80)
 			{
 				// Tails must not already be flying already, and ready for flying
+				bool startFlight = false
 				if (u8[0xffffb04a + 0x20] == char.state.ROLLING && u8[0xffffb04a + 0x40] == 1)	// char.jumping must be set
+				{
+					startFlight = true
+				}
+
+				// Alternatively, Tails can be standing or running and ready to jump
+				else if ((u8[0xffffb04a + 0x2a] & char.flag.IN_AIR) == 0)
+				{
+					A0 = 0xffffb04a
+					control.tails.pressed |= CONTROL_ABC
+					if (Character.CheckStartJump())
+					{
+						tails.ai_routine = 0x30		// No valid value in vanilla, but we're using it for the Tails Assist flight routine
+						tails_assist.trigger_countdown = 8	// Hold jump button for 8 frames before triggering flight
+					}
+					A0 = 0xffffb000
+				}
+
+				if (startFlight)
 				{
 					A0 = 0xffffb04a
 					TailsStartFlight()
 					char.velocity.y = max(char.velocity.y, -0x200)	// Limit Tails' velocity
 					tails.ai_routine = 0x30		// No valid value in vanilla, but we're using it for the Tails Assist flight routine
+					tails_assist.trigger_countdown = 0
 					tails.catch_timeout = 0
 					A0 = 0xffffb000
 
@@ -2820,17 +2845,24 @@ function void SonicPressedJumpInMidAir()
 	char.flags &= ~char.flag.CONTROL_LOCK
 #if STANDALONE
 	char.double_jump_state = 1	// Always set this flag; needed for Drop Dash
+#endif
 
+
+#if STANDALONE
 	if ((super.active && Game.getSetting(SETTING_SUPER_SONIC_ABILITY) != 1) || (super.active & 0x80))
 #else
 	if (super.active)
 #endif
 	{
-		bool performHyperDash = (super.active & 0x80)		// Hyper Sonic active
+		bool isHyperSonic = (super.active & 0x80)			// Hyper Sonic active
+		bool performHyperDash = isHyperSonic
 		u8 input = control.player1.state & CONTROL_DPAD		// Only directions
+
 	#if STANDALONE
 		if (Game.getSetting(SETTING_SUPER_SONIC_ABILITY) == 2)
-			performHyperDash = (super.active)		// This allows Super Sonic to use the dash as well
+		{
+			performHyperDash = (super.active)				// This allows Super Sonic to use the dash as well
+		}
 
 		if (performHyperDash && Game.getSetting(SETTING_HYPER_DASH_CONTROLS) == 1)
 		{
@@ -2843,16 +2875,18 @@ function void SonicPressedJumpInMidAir()
 		if (performHyperDash)
 		{
 		#if STANDALONE
-			if (super.active & 0x80)	// Super Sonic's dash does not cause a screen flash
+			if (isHyperSonic)	// Super Sonic's dash does not cause a screen flash
 		#endif
+			{
 				Character.ClearEnemiesOnScreen()
+			}
 
 			camera.locktime.player1 = 0x2000
 			ClearPositionBackup()
 
 			char.double_jump_state = 1
 		#if STANDALONE
-			if (!(super.active & 0x80))
+			if (!isHyperSonic)
 				u8[0xffffcbc0 + 0x20] = 1
 			else
 		#endif
@@ -2864,27 +2898,25 @@ function void SonicPressedJumpInMidAir()
 			{
 				// Perform Hyper Dash
 				A1 = 0x011afa + input * 4
-				char.velocity.x  = s16[A1]
-				char.velocity.y  = s16[A1+2]
-				char.groundspeed = s16[A1]
+				char.velocity.x = s16[A1]
+				char.velocity.y = s16[A1+2]
 			}
 			else
 			{
-				s16 vx = (char.flags & char.flag.FACING_LEFT) ? -0x800 : 0x800
-				char.velocity.x = vx
+				char.velocity.x = (char.flags & char.flag.FACING_LEFT) ? -0x800 : 0x800
 				char.velocity.y = 0
-				char.groundspeed = vx
 			}
 
 		#if STANDALONE
-			if (!(super.active & 0x80))
+			if (!isHyperSonic)
 			{
 				// Reduce dash speed for Super Sonic
 				char.velocity.x = (char.velocity.x > 0) ? (char.velocity.x - 0x200) : (char.velocity.x < 0) ? (char.velocity.x + 0x200) : 0
 				char.velocity.y = (char.velocity.y > 0) ? (char.velocity.y - 0x200) : (char.velocity.y < 0) ? (char.velocity.y + 0x200) : 0
-				char.groundspeed = char.velocity.x
 			}
 		#endif
+
+			char.groundspeed = char.velocity.x
 		}
 		else
 		{
@@ -5100,7 +5132,7 @@ function void Character.OnCollisionWithDynamicObject()
 			bool movingUp = (objA1.render_flags & render_flag.FLIP_Y) ? (vy > 0) : (vy < 0)
 			if (movingUp)
 			{
-				if (u8[A1 + 0x2a] & char.flag.IN_AIR)
+				if (objA1.flags2a & char.flag.IN_AIR)
 				{
 					if ((objA1.render_flags & render_flag.FLIP_Y) == 0)
 					{
@@ -5127,7 +5159,7 @@ function void Character.OnCollisionWithDynamicObject()
 					//  -> This is done to be more consistent with other Sonic games, incl. Sonic 1, 2, CD, Mania and even Sonic 3 alone
 					//  -> The first check above tells us if the character is on a side of the monitor
 					//  -> The second one makes sure that you can always ground-based roll into a monitor (see e.g. first invincibility in MHZ 1, when spindashing into it from the right)
-					if ((u8[A1 + 0x2a] & char.flag.PUSHING) && (char.flags & char.flag.IN_AIR))
+					if ((objA1.flags2a & char.flag.PUSHING) && (char.flags & char.flag.IN_AIR))
 					{
 						return
 					}
@@ -6538,7 +6570,7 @@ function void Character.CheckDiedStateEnd()
 	else
 	{
 		// Normal game
-		if (char.character == CHARACTER_TAILS && (isMainCharacter(CHARACTER_TAILS) == 0))
+		if (char.character == CHARACTER_TAILS && !isMainCharacter(CHARACTER_TAILS))
 		{
 			// Second player Tails
 			char.base_state = 0x02

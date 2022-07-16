@@ -404,7 +404,7 @@ function void fn051e60()
 		fn0076a6()
 
 		Level.InitializeWater()
-		if (isMainCharacter(CHARACTER_KNUCKLES) == 0)
+		if (!isMainCharacter(CHARACTER_KNUCKLES))
 		{
 			VDP.Config.enableHInt(true)
 		}

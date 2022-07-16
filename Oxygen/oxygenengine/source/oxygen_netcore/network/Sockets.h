@@ -30,6 +30,9 @@ private:
 struct SocketAddress
 {
 public:
+	static inline bool mPreventIPLogging = false;
+
+public:
 	inline SocketAddress() :
 		mHasSockAddr(false),
 		mHasIpPort(false),
@@ -49,6 +52,7 @@ public:
 	inline const std::string& getIP() const	 { assureIpPort();  return mIP; }
 	inline uint16 getPort() const			 { assureIpPort();  return mPort; }
 	inline std::string toString() const		 { assureIpPort();  return mIP + ':' + std::to_string(mPort); }
+	std::string toLoggedString() const;
 
 	inline bool isValid() const  { return (mHasSockAddr || mHasIpPort); }
 

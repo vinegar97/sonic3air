@@ -53,7 +53,7 @@ UpdateCheck::UpdateCheck()
 	// Test version (Windows only)
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x22050800;
+		definition.mVersionNumber = 0x22070300;
 		definition.mReleaseChannel = ReleaseChannel::TEST;
 		definition.addPlatform(Platform::WINDOWS);
 		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
@@ -65,9 +65,9 @@ UpdateCheck::Platform UpdateCheck::getPlatformFromString(const std::string& plat
 	if (platformString == "windows")	return Platform::WINDOWS;
 	if (platformString == "linux")		return Platform::LINUX;
 	if (platformString == "mac")		return Platform::MAC;
-	if (platformString == "web")		return Platform::WEB;
 	if (platformString == "android")	return Platform::ANDROID;
 	if (platformString == "ios")		return Platform::IOS;
+	if (platformString == "web")		return Platform::WEB;
 	if (platformString == "switch")		return Platform::SWITCH;
 	return Platform::UNKNOWN;
 }
@@ -91,7 +91,8 @@ bool UpdateCheck::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 			if (!evaluation.readQuery(request))
 				return false;
 
-			RMX_LOG_INFO("AppUpdateCheckRequest: " << request.mQuery.mAppName << ", " << request.mQuery.mPlatform << ", " << request.mQuery.mReleaseChannel << ", " << rmx::hexString(request.mQuery.mInstalledAppVersion, 8));
+			ServerNetConnection& connection = static_cast<ServerNetConnection&>(evaluation.mConnection);
+			RMX_LOG_INFO("AppUpdateCheckRequest: " << request.mQuery.mAppName << ", " << request.mQuery.mPlatform << ", " << request.mQuery.mReleaseChannel << ", " << rmx::hexString(request.mQuery.mInstalledAppVersion, 8) << " (from " << connection.getPlayerID() << ")");
 
 			request.mResponse.mHasUpdate = false;
 			if (request.mQuery.mAppName == "sonic3air")

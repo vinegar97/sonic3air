@@ -10,11 +10,11 @@
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
-#include "oxygen/drawing/DrawerTexture.h"
+#include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/Geometry.h"
 #include "oxygen/rendering/RenderResources.h"
-#include "oxygen/rendering/hardware/HardwareRenderer.h"
+#include "oxygen/rendering/opengl/OpenGLRenderer.h"
 #include "oxygen/rendering/software/SoftwareRenderer.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/resources/FontCollection.h"
@@ -31,7 +31,7 @@ VideoOut::VideoOut() :
 
 VideoOut::~VideoOut()
 {
-	delete mHardwareRenderer;
+	delete mOpenGLRenderer;
 	delete mSoftwareRenderer;
 	delete mRenderParts;
 	delete &mRenderResources;
@@ -84,7 +84,7 @@ void VideoOut::createRenderer(bool reset)
 
 void VideoOut::destroyRenderer()
 {
-	SAFE_DELETE(mHardwareRenderer);
+	SAFE_DELETE(mOpenGLRenderer);
 	SAFE_DELETE(mSoftwareRenderer);
 }
 
@@ -104,15 +104,15 @@ void VideoOut::setActiveRenderer(bool useSoftwareRenderer, bool reset)
 	}
 	else
 	{
-		if (nullptr == mHardwareRenderer)
+		if (nullptr == mOpenGLRenderer)
 		{
-			RMX_LOG_INFO("VideoOut: Creating hardware renderer");
-			mHardwareRenderer = new HardwareRenderer(*mRenderParts, mGameScreenTexture);
+			RMX_LOG_INFO("VideoOut: Creating OpenGL renderer");
+			mOpenGLRenderer = new OpenGLRenderer(*mRenderParts, mGameScreenTexture);
 
 			RMX_LOG_INFO("VideoOut: Renderer initialization");
-			mHardwareRenderer->initialize();
+			mOpenGLRenderer->initialize();
 		}
-		mActiveRenderer = mHardwareRenderer;
+		mActiveRenderer = mOpenGLRenderer;
 	}
 
 	if (reset)
@@ -208,9 +208,9 @@ bool VideoOut::updateGameScreen()
 
 void VideoOut::blurGameScreen()
 {
-	if (mActiveRenderer == mHardwareRenderer)
+	if (mActiveRenderer == mOpenGLRenderer)
 	{
-		mHardwareRenderer->blurGameScreen();
+		mOpenGLRenderer->blurGameScreen();
 	}
 }
 

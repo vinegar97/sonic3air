@@ -44,7 +44,7 @@ function void fn018b54()
 	{
 		// Effect object for Tails
 		objA0.flags38 = 1
-		if (isMainCharacter(CHARACTER_TAILS) == 0)
+		if (!isMainCharacter(CHARACTER_TAILS))
 		{
 			objA0.sprite_attributes = 0x07f0
 			objA0.dustcloud.character_address = 0xb04a

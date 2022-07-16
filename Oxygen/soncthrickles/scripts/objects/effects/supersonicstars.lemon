@@ -100,7 +100,8 @@ function void fn0191a4()
 function void SuperSonicStars.CreateSparks()
 {
 #if STANDALONE
-	// Scatter sparks when dashing. bypassing original broken behavior
+
+	// Scatter sparks when dashing, bypassing original broken behavior
 	objA0.state = 0
 	objA0.mapping_offset = 0x0192ea
 	objA0.position.x.u16 = u16[0xffffb000 + 0x10]
@@ -110,8 +111,8 @@ function void SuperSonicStars.CreateSparks()
 	Effects.CreateSparks()
 
 	objA0.mapping_offset = 0x0192de
-	return
-#endif
+
+#else
 
 	// This is all technically unused
 	objA0.state = 0
@@ -161,4 +162,5 @@ function void SuperSonicStars.CreateSparks()
 		D4.s16 = -D4.s16
 		--D5.s16
 	}
+#endif
 }

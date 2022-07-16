@@ -87,9 +87,6 @@
     <ClInclude Include="..\..\source\rmxbase\Basics.h">
       <Filter>Tools</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Sort.h">
-      <Filter>Tools</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\rmxbase\Tools.h">
       <Filter>Tools</Filter>
     </ClInclude>
@@ -196,6 +193,9 @@
     <ClInclude Include="..\..\source\rmxbase\BitmapCodecs.h">
       <Filter>Bitmap</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\RealFileProvider.h">
+      <Filter>FileIO</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\rmxbase\Math.cpp">
@@ -285,6 +285,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\rmxbase\OneTimeAllocPool.cpp">
       <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\RealFileProvider.cpp">
+      <Filter>FileIO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

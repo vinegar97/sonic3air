@@ -66,6 +66,11 @@ int main(int argc, char** argv)
 
 	randomize();
 	rmx::Logging::addLogger(*new rmx::StdCoutLogger(true));
+	rmx::Logging::addLogger(*new rmx::FileLogger(L"log/server.log", true, true));
+#ifndef DEBUG
+	// To protect users' privacy, do not log IPs at all on production servers
+	SocketAddress::mPreventIPLogging = true;
+#endif
 
 	Configuration config;
 	config.loadConfiguration(L"config.json");

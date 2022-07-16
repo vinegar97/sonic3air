@@ -7,7 +7,7 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/rendering/hardware/HardwareRenderResources.h"
+#include "oxygen/rendering/opengl/OpenGLRenderResources.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 
 
@@ -42,13 +42,13 @@ namespace
 }
 
 
-HardwareRenderResources::HardwareRenderResources(RenderParts& renderParts) :
+OpenGLRenderResources::OpenGLRenderResources(RenderParts& renderParts) :
 	mRenderParts(renderParts)
 {
 	setAllPatternsDirty();
 }
 
-void HardwareRenderResources::initialize()
+void OpenGLRenderResources::initialize()
 {
 	// Palettes
 	{
@@ -81,7 +81,7 @@ void HardwareRenderResources::initialize()
 	}
 }
 
-void HardwareRenderResources::refresh()
+void OpenGLRenderResources::refresh()
 {
 	const PlaneManager& planeManager = mRenderParts.getPlaneManager();
 
@@ -92,15 +92,15 @@ void HardwareRenderResources::refresh()
 		const uint32* palette1 = mRenderParts.getPaletteManager().getPalette(1);
 
 		// First check if there were any changes since the last refresh at all
-		const bool anyChange = (memcmp(&bitmap.mData[0], palette0, 0x400) != 0 || memcmp(&bitmap.mData[0x100], palette1, 0x400) != 0);
+		const bool anyChange = (memcmp(bitmap.getData(), palette0, 0x400) != 0 || memcmp(bitmap.getData() + 0x100, palette1, 0x400) != 0);
 		if (anyChange)
 		{
 			// Copy over the data and upload it to the GPU
-			memcpy(&bitmap.mData[0], palette0, 0x400);
-			memcpy(&bitmap.mData[0x100], palette1, 0x400);
+			memcpy(bitmap.getData(), palette0, 0x400);
+			memcpy(bitmap.getData() + 0x100, palette1, 0x400);
 
 			glBindTexture(GL_TEXTURE_2D, mPaletteTexture.getHandle());
-			glTexImage2D(GL_TEXTURE_2D, 0, rmx::OpenGLHelper::FORMAT_RGBA, bitmap.mWidth, bitmap.mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, bitmap.mData);
+			glTexImage2D(GL_TEXTURE_2D, 0, rmx::OpenGLHelper::FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, bitmap.getData());
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	}
@@ -224,12 +224,12 @@ void HardwareRenderResources::refresh()
 	}
 }
 
-void HardwareRenderResources::setAllPatternsDirty()
+void OpenGLRenderResources::setAllPatternsDirty()
 {
 	mAllPatternsDirty = true;
 }
 
-const BufferTexture& HardwareRenderResources::getHScrollOffsetsTexture(int scrollOffsetsIndex) const
+const BufferTexture& OpenGLRenderResources::getHScrollOffsetsTexture(int scrollOffsetsIndex) const
 {
 	if (scrollOffsetsIndex == 0xff)
 		return mEmptyScrollOffsetsTexture;
@@ -238,48 +238,11 @@ const BufferTexture& HardwareRenderResources::getHScrollOffsetsTexture(int scrol
 	return mHScrollOffsetsTexture[scrollOffsetsIndex];
 }
 
-const BufferTexture& HardwareRenderResources::getVScrollOffsetsTexture(int scrollOffsetsIndex) const
+const BufferTexture& OpenGLRenderResources::getVScrollOffsetsTexture(int scrollOffsetsIndex) const
 {
 	if (scrollOffsetsIndex == 0xff)
 		return mEmptyScrollOffsetsTexture;
 
 	RMX_ASSERT(scrollOffsetsIndex >= 0 && scrollOffsetsIndex < 4, "Invalid scroll offsets index " << scrollOffsetsIndex);
 	return mVScrollOffsetsTexture[scrollOffsetsIndex];
-}
-
-BufferTexture* HardwareRenderResources::getPaletteSpriteTexture(const SpriteManager::PaletteSpriteInfo& spriteInfo)
-{
-	const SpriteCache::CacheItem& cacheItem = *spriteInfo.mCacheItem;
-	RMX_CHECK(!cacheItem.mUsesComponentSprite, "Sprite is not a palette sprite", RMX_REACT_THROW);
-	const PaletteSprite& sprite = *static_cast<PaletteSprite*>(cacheItem.mSprite);
-
-	ChangeCounted<BufferTexture>& texture = mPaletteSpriteTextures[spriteInfo.mUseUpscaledSprite ? (spriteInfo.mKey + 0x123456) : spriteInfo.mKey];
-
-	// Check for change
-	if (texture.mChangeCounter != cacheItem.mChangeCounter)
-	{
-		const PaletteBitmap& bitmap = spriteInfo.mUseUpscaledSprite ? sprite.getUpscaledBitmap() : sprite.getBitmap();
-		texture.mTexture.create(BufferTexture::PixelFormat::UINT_8, bitmap.getWidth(), bitmap.getHeight(), bitmap.mData);
-		texture.mChangeCounter = cacheItem.mChangeCounter;
-	}
-
-	return &texture.mTexture;
-}
-
-OpenGLTexture* HardwareRenderResources::getComponentSpriteTexture(const SpriteManager::ComponentSpriteInfo& spriteInfo)
-{
-	const SpriteCache::CacheItem& cacheItem = *spriteInfo.mCacheItem;
-	RMX_CHECK(cacheItem.mUsesComponentSprite, "Sprite is not a component sprite", RMX_REACT_THROW);
-
-	ChangeCounted<OpenGLTexture>& texture = mComponentSpriteTextures[spriteInfo.mKey];
-
-	// Check for change
-	if (texture.mChangeCounter != cacheItem.mChangeCounter)
-	{
-		const Bitmap& bitmap = static_cast<ComponentSprite*>(cacheItem.mSprite)->getBitmap();
-		texture.mTexture.loadBitmap(bitmap);
-		texture.mChangeCounter = cacheItem.mChangeCounter;
-	}
-
-	return &texture.mTexture;
 }

@@ -139,7 +139,7 @@ uint32 EngineMain::getPlatformFlags() const
 		uint32 flags = 0;
 	#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
 		flags |= 0x0001;
-	#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
+	#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
 		flags |= 0x0002;
 	#endif
 		return flags;
@@ -152,17 +152,20 @@ void EngineMain::switchToRenderMethod(Configuration::RenderMethod newRenderMetho
 	const bool wasUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
 	config.mRenderMethod = newRenderMethod;
 
-	const bool nowUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
-	if (nowUsingOpenGL)
-	{
-		config.mAutoDetectRenderMethod = false;
-	}
-
+	bool nowUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
 	if (nowUsingOpenGL != wasUsingOpenGL)
 	{
 		// Need to recreate the window
 		destroyWindow();
 		createWindow();
+
+		// Check OpenGL in the config again, it could have changed - namely if OpenGL initialization failed
+		nowUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
+	}
+
+	if (nowUsingOpenGL)
+	{
+		config.mAutoDetectRenderMethod = false;
 	}
 
 	// Switch the renderer
@@ -427,7 +430,7 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 		config.mGameRecording = config.mFailSafeMode ? 0 : 1;
 	}
 
-#ifdef PLATFORM_ANDROID
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WEB)
 	// Use fullscreen, with no borders please
 	config.mWindowMode = Configuration::WindowMode::EXCLUSIVE_FULLSCREEN;
 
@@ -493,7 +496,7 @@ bool EngineMain::createWindow()
 {
 	Configuration& config = Configuration::instance();
 	const EngineDelegateInterface::AppMetaData& appMetaData = mDelegate.getAppMetaData();
-
+	
 	const bool useOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL) || (config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
 
 	// Setup video config
@@ -637,7 +640,13 @@ bool EngineMain::createWindow()
 	}
 	else
 	{
-		mDrawer.createDrawer<OpenGLDrawer>();
+		if (!mDrawer.createDrawer<OpenGLDrawer>())
+		{
+			// Fallback to software drawer
+			RMX_LOG_INFO("OpenGL drawer setup failed, using software rendering");
+			config.mRenderMethod = Configuration::RenderMethod::SOFTWARE;
+			mDrawer.createDrawer<SoftwareDrawer>();
+		}
 	}
 
 	// Tell FTX video manager that everything is okay
@@ -659,7 +668,7 @@ bool EngineMain::createWindow()
 		RMX_LOG_INFO("Setting window icon from loaded bitmap...");
 		Bitmap tmp;
 		Bitmap* bitmap = &videoConfig.iconBitmap;
-		if (bitmap->mData == nullptr)
+		if (bitmap->empty())
 		{
 			bitmap = nullptr;
 			if (tmp.load(videoConfig.iconSource.toWString()))
@@ -671,7 +680,7 @@ bool EngineMain::createWindow()
 		if (nullptr != bitmap)
 		{
 			bitmap->rescale(32, 32);
-			SDL_Surface* icon = SDL_CreateRGBSurfaceFrom(bitmap->mData, 32, 32, 32, bitmap->mWidth * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+			SDL_Surface* icon = SDL_CreateRGBSurfaceFrom(bitmap->getData(), 32, 32, 32, bitmap->getWidth() * sizeof(uint32), 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 			SDL_SetWindowIcon(mSDLWindow, icon);
 			SDL_FreeSurface(icon);
 		}

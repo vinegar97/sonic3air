@@ -7,14 +7,14 @@
 */
 
 
+// Background containing the text "Continue" and the countdown
+//  -> These functions are also used by the credits, and the Blue Spheres mode result screen
+
 constant u16 ContinueScreen.Numbers.targetInVRAM = 0x0020
 constant u16 ContinueScreen.Characters.targetInVRAM = 0x1180
 constant u16 ContinueScreen.ContinueIcons.targetInVRAM = 0x1b20
 constant u16 ContinueScreen.TextTiles.targetInVRAM = 0x68e0
 constant u16 ContinueScreen.Knuckles.targetInVRAM = 0x9b40
-
-// Background containing the text "Continue" and the countdown
-//  -> These functions are also used by the credits, and the Blue Spheres mode result screen
 
 //# address-hook(0x05b318) end(0x05b36a)
 function void fn05b318()
@@ -193,7 +193,7 @@ function void fn05c2e0()
 	D6.u16 = (sprite_attribute.PRIORITY | (ContinueScreen.TextTiles.targetInVRAM >> 5))
 	fn05b318()
 
-	if (isMainCharacter(CHARACTER_KNUCKLES) == 0)
+	if (!isMainCharacter(CHARACTER_KNUCKLES))
 	{
 	#if STANDALONE
 		if (global.characters == CHARS_SONIC_ALONE)
@@ -263,8 +263,9 @@ function void fn05c2e0()
 	player.next_life_score = 5000
 	unused.player2.next_life_score = 5000
 	--continues_counter
-	u8[0xffffef56] = 0xff
-	fn00c532()
+
+	sram.block_interrupts.u8 = 0xff
+	UpdateLivesContinuesInSaveGame()
 }
 
 
@@ -660,7 +661,7 @@ function void fn05c82c()
 //# address-hook(0x05c838) end(0x05c886)
 function void fn05c838()
 {
-	if (isMainCharacter(CHARACTER_KNUCKLES) == 0)
+	if (!isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		A1 = 0x05c8c8
 		objA0.position.x.u16 = 0x40
@@ -860,7 +861,7 @@ function void fn05ca14()
 function void fn05ca1a()
 {
 	objA0.mapping_offset = 0x05cd00
-	objA0.sprite_attributes = (isMainCharacter(CHARACTER_KNUCKLES)) ? (sprite_attribute.PALETTE.LINE3 | (ContinueScreen.ContinueIcons.targetInVRAM >> 5)) : (ContinueScreen.ContinueIcons.targetInVRAM >> 5)
+	objA0.sprite_attributes = isMainCharacter(CHARACTER_KNUCKLES) ? (sprite_attribute.PALETTE.LINE3 | (ContinueScreen.ContinueIcons.targetInVRAM >> 5)) : (ContinueScreen.ContinueIcons.targetInVRAM >> 5)
 	objA0.sprite_priority = 0x0380
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x08

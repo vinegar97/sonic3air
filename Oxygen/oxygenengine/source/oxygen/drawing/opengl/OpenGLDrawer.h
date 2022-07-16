@@ -10,7 +10,6 @@
 
 #include "oxygen/drawing/DrawerInterface.h"
 
-
 namespace opengldrawer
 {
 	struct Internal;
@@ -23,8 +22,8 @@ public:
 	OpenGLDrawer();
 	~OpenGLDrawer();
 
-public:
 	inline Drawer::Type getType() override  { return Drawer::Type::OPENGL; }
+	bool wasSetupSuccessful() override;
 
 	void createTexture(DrawerTexture& outTexture) override;
 	void refreshTexture(DrawerTexture& texture) override;

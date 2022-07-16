@@ -10,6 +10,7 @@
 constant u16 LevelSelect.Background.targetInVRAM = 0x0000
 constant u16 LevelSelect.Font.targetInVRAM = 0x0200
 
+
 //-------------------------------------------------------//
 // Level Select Main Function                            //
 //-------------------------------------------------------//
@@ -356,7 +357,7 @@ function bool fn007d6c()
 			}
 			else if (D0.u16 == 0x0c00)
 			{
-				fail = (isMainCharacter(CHARACTER_TAILS))
+				fail = isMainCharacter(CHARACTER_TAILS)
 			}
 		}
 

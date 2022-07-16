@@ -428,7 +428,7 @@ function void fn05ecb4()
 
 	objA0.update_address = 0x05ed18
 	u16 offset = global.characters
-	if ((isMainCharacter(CHARACTER_KNUCKLES)) && (outro.ending_type >= 0))
+	if (isMainCharacter(CHARACTER_KNUCKLES) && (outro.ending_type >= 0))
 	{
 		++offset	// Knuckles with Master Emerald
 	}

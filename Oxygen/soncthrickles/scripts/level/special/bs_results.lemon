@@ -556,14 +556,7 @@ function void fn02ea1e()
 {
 	if (global.lock_on_state == 0 && global.sk_bluespheres)
 	{
-		if (isMainCharacter(CHARACTER_KNUCKLES))
-		{
-			objA0.animation.sprite += 0x1f
-		}
-		else
-		{
-			objA0.animation.sprite += 0x1a
-		}
+		objA0.animation.sprite += isMainCharacter(CHARACTER_KNUCKLES) ? 0x1f : 0x1a
 	}
 
 	fn02ea4a()
@@ -856,11 +849,7 @@ function void fn02ebe8()
 	objA0.mapping_offset = 0x02f26a
 	objA0.position.x.u16 = 0x017c + getScreenExtend()
 	objA0.position.y.u16 = 0x014c
-	objA0.animation.sprite = 0x28 + max(global.characters, 1)	// 0x29 for Sonic (with or without Tails), 0x2a for Tails, 0x2b for Knuckles
-
-	#if STANDALONE
-		objA0.animation.sprite = 0x29 + min(getMainCharacter(), 2)
-	#endif
+	objA0.animation.sprite = 0x29 + min(getMainCharacter(), 2)	// 0x29 for Sonic (with or without Tails), 0x2a for Tails, 0x2b for Knuckles
 
 	if (level.framecounter.low & 0x08)
 	{

@@ -10,15 +10,15 @@
 
 #include "oxygen/rendering/parts/SpriteManager.h"
 
-class HardwareRenderResources;
+class OpenGLRenderResources;
 
 
-class RenderPaletteSpriteShader
+class RenderVdpSpriteShader
 {
 public:
 	void initialize();
-	void refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const HardwareRenderResources& resources);
-	void draw(const SpriteManager::PaletteSpriteInfo& spriteInfo, HardwareRenderResources& resources);
+	void refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const OpenGLRenderResources& resources);
+	void draw(const SpriteManager::VdpSpriteInfo& spriteInfo, const OpenGLRenderResources& resources);
 
 private:
 	bool  mInitialized = false;
@@ -26,15 +26,13 @@ private:
 	int   mLastWaterSurfaceHeight = 0;
 
 	Shader mShader;
+	GLuint mLocPatternCacheTex = 0;
 	GLuint mLocGameResolution = 0;
 	GLuint mLocWaterLevel = 0;
 	GLuint mLocPaletteTex = 0;
-	GLuint mLocSpriteTex = 0;
 	GLuint mLocPosition = 0;
-	GLuint mLocPivotOffset = 0;
 	GLuint mLocSize = 0;
-	GLuint mLocTransformation = 0;
-	GLuint mLocAtex = 0;
+	GLuint mLocFirstPattern = 0;
 	GLuint mLocTintColor = 0;
 	GLuint mLocAddedColor = 0;
 };

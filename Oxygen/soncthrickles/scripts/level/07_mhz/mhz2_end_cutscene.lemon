@@ -12,41 +12,6 @@
 // Level transition after MHZ 2 result screen            //
 //-------------------------------------------------------//
 
-//# address-hook(0x08638a) end(0x0863be)
-function void fn08638a()
-{
-	A1 = 0xffffb000
-	fn08639c()
-
-	A1 = 0xffffb04a
-	if (objA1.render_flags & render_flag.VISIBLE)
-	{
-		fn08639c()
-	}
-
-#if STANDALONE
-	Game.startSkippableCutscene()
-#endif
-}
-
-
-function void fn08639c()
-{
-	D0.u16 = objA0.position.x.u16
-	if (D0.u16 < objA1.position.x.u16)
-	{
-		objA1.render_flags |= render_flag.FLIP_X
-		u8[A1 + 0x2a] |= char.flag.FACING_LEFT
-	}
-	else
-	{
-		objA1.render_flags &= ~render_flag.FLIP_X
-		u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
-	}
-}
-
-
-
 // Pattern loading for flying battery
 
 //# address-hook(0x054e9c) end(0x054f62)
@@ -146,7 +111,7 @@ function void fn054f8c()
 	A1 = 0xffffb000
 	if (u8[A1 + 0x2e] == 0x81)
 	{
-		D3.u16 = (isMainCharacter(CHARACTER_KNUCKLES)) ? 0x02dc : 0x02cd
+		D3.u16 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x02dc : 0x02cd
 		D4.u16 = u16[0xffffeede] - D1.u16
 		objA1.position.y.u16 += D4.u16
 		D2.u16 -= D0.u16

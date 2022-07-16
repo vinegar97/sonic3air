@@ -63,11 +63,6 @@ namespace
 			DiscordIntegration::setModdedSmallImage(imageName.getString());
 	}
 
-	bool isModdedSound(uint8 sfxId)
-	{
-		return AudioOut::instance().isModdedSound(sfxId);
-	}
-
 	void setUnderwaterAudioEffect(uint8 value)
 	{
 		return AudioOut::instance().enableUnderwaterEffect((float)value / 255.0f);
@@ -99,6 +94,9 @@ void Game::update(float timeElapsed)
 {
 	// Update game client
 	mGameClient.updateClient(timeElapsed);
+
+	// Update sprite redirects (like input icons)
+	mDynamicSprites.updateSpriteRedirects();
 
 	// Discord rich presence update
 	{
@@ -239,9 +237,6 @@ void Game::registerScriptBindings(lemon::Module& module)
 
 	// Audio
 	{
-		module.addUserDefinedFunction("Game.isModdedSound", lemon::wrap(&isModdedSound), defaultFlags)
-			.setParameterInfo(0, "sfxId");
-
 		module.addUserDefinedFunction("Game.setUnderwaterAudioEffect", lemon::wrap(&setUnderwaterAudioEffect), defaultFlags)
 			.setParameterInfo(0, "value");
 	}
@@ -649,9 +644,9 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 	const int32 cameraTileY = cameraY / 16;
 
 	const int32 minX = cameraTileX;
-	const int32 maxX = cameraTileX + bitmap.mWidth / 16;
+	const int32 maxX = cameraTileX + bitmap.getWidth() / 16;
 	const int32 minY = cameraTileY;
-	const int32 maxY = cameraTileY + bitmap.mHeight / 16;
+	const int32 maxY = cameraTileY + bitmap.getHeight() / 16;
 
 	const uint16 filterByCharacterPath = (3 << EmulatorInterface::instance().readMemory8(0xffffb046));
 
@@ -693,13 +688,13 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 				for (int32 iy = 0; iy < 16; ++iy)
 				{
 					const int32 py = (screenY + iy);
-					if (py < 0 || py >= bitmap.mHeight)
+					if (py < 0 || py >= bitmap.getHeight())
 						continue;
 
 					for (int32 ix = 0; ix < 16; ++ix)
 					{
 						const int32 px = (screenX + ix);
-						if (px < 0 || px >= bitmap.mWidth)
+						if (px < 0 || px >= bitmap.getWidth())
 							continue;
 
 						bool pixelVisible = false;
@@ -742,7 +737,7 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 						}
 					#endif
 
-						uint32& dst = bitmap.mData[py * bitmap.mWidth + px];
+						uint32& dst = *bitmap.getPixelPointer(px, py);
 						switch (mode)
 						{
 							case 0:
@@ -835,6 +830,77 @@ void Game::onGameRecordingHeaderSave(std::vector<uint8>& buffer)
 	{
 		serializer.writeAs<uint32>(setting->mSettingId);
 		serializer.write(setting->mValue);
+	}
+}
+
+void Game::refreshInputIcons(InputManager::InputType inputType)
+{
+	static const uint64 INPUT_ICON_BUTTON_A     = rmx::getMurmur2_64(std::string_view("@input_icon_button_A"));
+	static const uint64 INPUT_ICON_BUTTON_B     = rmx::getMurmur2_64(std::string_view("@input_icon_button_B"));
+	static const uint64 INPUT_ICON_BUTTON_X     = rmx::getMurmur2_64(std::string_view("@input_icon_button_X"));
+	static const uint64 INPUT_ICON_BUTTON_Y     = rmx::getMurmur2_64(std::string_view("@input_icon_button_Y"));
+	static const uint64 INPUT_ICON_BUTTON_LEFT  = rmx::getMurmur2_64(std::string_view("@input_icon_button_left"));
+	static const uint64 INPUT_ICON_BUTTON_RIGHT = rmx::getMurmur2_64(std::string_view("@input_icon_button_right"));
+	static const uint64 INPUT_ICON_BUTTON_UP    = rmx::getMurmur2_64(std::string_view("@input_icon_button_up"));
+	static const uint64 INPUT_ICON_BUTTON_DOWN  = rmx::getMurmur2_64(std::string_view("@input_icon_button_down"));
+	static const uint64 INPUT_ICON_BUTTON_START = rmx::getMurmur2_64(std::string_view("@input_icon_button_start"));
+	static const uint64 INPUT_ICON_BUTTON_BACK  = rmx::getMurmur2_64(std::string_view("@input_icon_button_back"));
+
+	SpriteCache& spriteCache = SpriteCache::instance();
+	switch (inputType)
+	{
+		case InputManager::InputType::KEYBOARD:
+		{
+			// TODO: Use the correct key icons
+			static const uint64 INPUT_ICON_KEY_A     = rmx::getMurmur2_64(std::string_view("input_icon_key_A"));
+			static const uint64 INPUT_ICON_KEY_S     = rmx::getMurmur2_64(std::string_view("input_icon_key_S"));
+			static const uint64 INPUT_ICON_KEY_D     = rmx::getMurmur2_64(std::string_view("input_icon_key_D"));
+			static const uint64 INPUT_ICON_KEY_W     = rmx::getMurmur2_64(std::string_view("input_icon_key_W"));
+			static const uint64 INPUT_ICON_KEY_LEFT  = rmx::getMurmur2_64(std::string_view("input_icon_key_left"));
+			static const uint64 INPUT_ICON_KEY_RIGHT = rmx::getMurmur2_64(std::string_view("input_icon_key_right"));
+			static const uint64 INPUT_ICON_KEY_UP    = rmx::getMurmur2_64(std::string_view("input_icon_key_up"));
+			static const uint64 INPUT_ICON_KEY_DOWN  = rmx::getMurmur2_64(std::string_view("input_icon_key_down"));
+			static const uint64 INPUT_ICON_KEY_ENTER = rmx::getMurmur2_64(std::string_view("input_icon_key_enter"));
+			static const uint64 INPUT_ICON_KEY_BACK  = rmx::getMurmur2_64(std::string_view("input_icon_key_back"));
+
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     INPUT_ICON_KEY_A);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     INPUT_ICON_KEY_S);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     INPUT_ICON_KEY_D);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_Y,     INPUT_ICON_KEY_W);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  INPUT_ICON_KEY_LEFT);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, INPUT_ICON_KEY_RIGHT);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    INPUT_ICON_KEY_UP);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  INPUT_ICON_KEY_DOWN);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, INPUT_ICON_KEY_ENTER);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  INPUT_ICON_KEY_BACK);
+			break;
+		}
+
+		case InputManager::InputType::GAMEPAD:
+		{
+			static const uint64 INPUT_ICON_XBOX_A     = rmx::getMurmur2_64(std::string_view("input_icon_xbox_A"));
+			static const uint64 INPUT_ICON_XBOX_B     = rmx::getMurmur2_64(std::string_view("input_icon_xbox_B"));
+			static const uint64 INPUT_ICON_XBOX_X     = rmx::getMurmur2_64(std::string_view("input_icon_xbox_X"));
+			static const uint64 INPUT_ICON_XBOX_Y     = rmx::getMurmur2_64(std::string_view("input_icon_xbox_Y"));
+			static const uint64 INPUT_ICON_XBOX_LEFT  = rmx::getMurmur2_64(std::string_view("input_icon_xbox_left"));
+			static const uint64 INPUT_ICON_XBOX_RIGHT = rmx::getMurmur2_64(std::string_view("input_icon_xbox_right"));
+			static const uint64 INPUT_ICON_XBOX_UP    = rmx::getMurmur2_64(std::string_view("input_icon_xbox_up"));
+			static const uint64 INPUT_ICON_XBOX_DOWN  = rmx::getMurmur2_64(std::string_view("input_icon_xbox_down"));
+			static const uint64 INPUT_ICON_XBOX_START = rmx::getMurmur2_64(std::string_view("input_icon_xbox_start"));
+			static const uint64 INPUT_ICON_XBOX_BACK  = rmx::getMurmur2_64(std::string_view("input_icon_xbox_back"));
+
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     INPUT_ICON_XBOX_A);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     INPUT_ICON_XBOX_B);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     INPUT_ICON_XBOX_X);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_Y,     INPUT_ICON_XBOX_Y);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  INPUT_ICON_XBOX_LEFT);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, INPUT_ICON_XBOX_RIGHT);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    INPUT_ICON_XBOX_UP);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  INPUT_ICON_XBOX_DOWN);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, INPUT_ICON_XBOX_START);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  INPUT_ICON_XBOX_BACK);
+			break;
+		}
 	}
 }
 
@@ -1049,8 +1115,8 @@ void Game::renderBlueSpheresGround(uint16 px, uint16 py, uint8 rotation, uint16 
 
 	mBlueSpheresRendering.renderToBitmap(*bitmaps[0], *bitmaps[1], VideoOut::instance().getScreenWidth(), px, py, rotation, fieldColorA, fieldColorB);
 
-	items[0]->mSprite->mOffset.y = VideoOut::instance().getScreenHeight() - bitmaps[0]->mHeight;
-	items[1]->mSprite->mOffset.y = items[0]->mSprite->mOffset.y - bitmaps[1]->mHeight;
+	items[0]->mSprite->mOffset.y = VideoOut::instance().getScreenHeight() - bitmaps[0]->getHeight();
+	items[1]->mSprite->mOffset.y = items[0]->mSprite->mOffset.y - bitmaps[1]->getHeight();
 }
 
 uint64 Game::getBlueSpheresGroundSprite(uint8 part)

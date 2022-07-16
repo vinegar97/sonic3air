@@ -10,23 +10,23 @@
 
 #include "oxygen/rendering/Renderer.h"
 #include "oxygen/rendering/Geometry.h"
-#include "oxygen/rendering/hardware/HardwareRenderResources.h"
-#include "oxygen/rendering/hardware/shaders/DebugDrawPlaneShader.h"
-#include "oxygen/rendering/hardware/shaders/RenderPlaneShader.h"
-#include "oxygen/rendering/hardware/shaders/RenderVdpSpriteShader.h"
-#include "oxygen/rendering/hardware/shaders/RenderPaletteSpriteShader.h"
-#include "oxygen/rendering/hardware/shaders/RenderComponentSpriteShader.h"
+#include "oxygen/rendering/opengl/OpenGLRenderResources.h"
+#include "oxygen/rendering/opengl/shaders/DebugDrawPlaneShader.h"
+#include "oxygen/rendering/opengl/shaders/RenderPlaneShader.h"
+#include "oxygen/rendering/opengl/shaders/RenderVdpSpriteShader.h"
+#include "oxygen/rendering/opengl/shaders/RenderPaletteSpriteShader.h"
+#include "oxygen/rendering/opengl/shaders/RenderComponentSpriteShader.h"
 #include "oxygen/rendering/parts/SpriteManager.h"
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
 
 
-class HardwareRenderer : public Renderer
+class OpenGLRenderer : public Renderer
 {
 public:
 	static constexpr int8 RENDERER_TYPE_ID = 0x20;
 
 public:
-	HardwareRenderer(RenderParts& renderParts, DrawerTexture& outputTexture);
+	OpenGLRenderer(RenderParts& renderParts, DrawerTexture& outputTexture);
 
 	virtual void initialize() override;
 	virtual void reset() override;
@@ -45,7 +45,7 @@ private:
 	void copyGameScreenToProcessingBuffer();
 
 private:
-	HardwareRenderResources mResources;
+	OpenGLRenderResources mResources;
 
 	Vec2i mGameResolution;
 

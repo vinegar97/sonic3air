@@ -36,11 +36,11 @@ public:
 	Type getType() const;
 
 	template<typename T>
-	void createDrawer()
+	bool createDrawer()
 	{
 		destroyDrawer();
 		mActiveDrawer = new T();
-		onDrawerCreated();
+		return onDrawerCreated();
 	}
 
 	void destroyDrawer();
@@ -62,6 +62,7 @@ public:
 	void drawRect(const Rectf& rect, DrawerTexture& texture, const Color& tintColor);
 	void drawRect(const Rectf& rect, DrawerTexture& texture, const Vec2f& uv0, const Vec2f& uv1, const Color& tintColor);
 	void drawUpscaledRect(const Rectf& rect, DrawerTexture& texture);
+	void drawSprite(Vec2i position, uint64 spriteKey);
 	void drawMesh(const std::vector<DrawerMeshVertex>& triangles, DrawerTexture& texture);
 	void drawMesh(const std::vector<DrawerMeshVertex_P2_C4>& triangles);
 	void drawQuad(const DrawerMeshVertex* quad, DrawerTexture& texture);
@@ -79,7 +80,7 @@ public:
 	void presentScreen();
 
 private:
-	void onDrawerCreated();
+	bool onDrawerCreated();
 	void unregisterTexture(DrawerTexture& texture);
 
 private:

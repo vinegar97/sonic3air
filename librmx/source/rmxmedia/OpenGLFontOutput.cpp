@@ -72,10 +72,10 @@ void OpenGLFontOutput::buildVertexGroups(std::vector<VertexGroup>& outVertexGrou
 		if (!result)
 			continue;
 
-		if (sprite.texture != currentTexture)
+		if (sprite.mTexture != currentTexture)
 		{
-			currentTexture = sprite.texture;
-			vectorAdd(outVertexGroups).mTexture = sprite.texture;
+			currentTexture = sprite.mTexture;
+			vectorAdd(outVertexGroups).mTexture = sprite.mTexture;
 		}
 
 		std::vector<Vertex>& vertices = outVertexGroups.back().mVertices;
@@ -83,9 +83,9 @@ void OpenGLFontOutput::buildVertexGroups(std::vector<VertexGroup>& outVertexGrou
 		vertices.resize(firstIndex + 6);
 
 		const float x0 = info.mPosition.x - (float)spriteHandleInfo.mBorderLeft;
-		const float x1 = info.mPosition.x + (float)(info.mBitmap->mWidth + spriteHandleInfo.mBorderRight);
+		const float x1 = info.mPosition.x + (float)(info.mBitmap->getWidth() + spriteHandleInfo.mBorderRight);
 		const float y0 = info.mPosition.y - (float)spriteHandleInfo.mBorderTop;
-		const float y1 = info.mPosition.y + (float)(info.mBitmap->mHeight + spriteHandleInfo.mBorderBottom);
+		const float y1 = info.mPosition.y + (float)(info.mBitmap->getHeight() + spriteHandleInfo.mBorderBottom);
 
 		vertices[firstIndex + 0].mPosition.set(x0, y0);
 		vertices[firstIndex + 1].mPosition.set(x0, y1);
@@ -94,12 +94,12 @@ void OpenGLFontOutput::buildVertexGroups(std::vector<VertexGroup>& outVertexGrou
 		vertices[firstIndex + 4].mPosition.set(x1, y0);
 		vertices[firstIndex + 5].mPosition.set(x0, y0);
 
-		vertices[firstIndex + 0].mTexcoords.set(sprite.uvStart.x, sprite.uvStart.y);
-		vertices[firstIndex + 1].mTexcoords.set(sprite.uvStart.x, sprite.uvEnd.y);
-		vertices[firstIndex + 2].mTexcoords.set(sprite.uvEnd.x,   sprite.uvEnd.y);
-		vertices[firstIndex + 3].mTexcoords.set(sprite.uvEnd.x,   sprite.uvEnd.y);
-		vertices[firstIndex + 4].mTexcoords.set(sprite.uvEnd.x,   sprite.uvStart.y);
-		vertices[firstIndex + 5].mTexcoords.set(sprite.uvStart.x, sprite.uvStart.y);
+		vertices[firstIndex + 0].mTexcoords.set(sprite.mUVStart.x, sprite.mUVStart.y);
+		vertices[firstIndex + 1].mTexcoords.set(sprite.mUVStart.x, sprite.mUVEnd.y);
+		vertices[firstIndex + 2].mTexcoords.set(sprite.mUVEnd.x,   sprite.mUVEnd.y);
+		vertices[firstIndex + 3].mTexcoords.set(sprite.mUVEnd.x,   sprite.mUVEnd.y);
+		vertices[firstIndex + 4].mTexcoords.set(sprite.mUVEnd.x,   sprite.mUVStart.y);
+		vertices[firstIndex + 5].mTexcoords.set(sprite.mUVStart.x, sprite.mUVStart.y);
 	}
 }
 

@@ -157,7 +157,7 @@ function void UpdateLevelTiles.LBZ1()
 	if (u16[0xffffeec4] == 0x55)
 	{
 		u16[0xffffeec4] = 0
-		if (isMainCharacter(CHARACTER_KNUCKLES) == 0)
+		if (!isMainCharacter(CHARACTER_KNUCKLES))
 		{
 			A1 = 0xffff007d + u16[A3 + 0x08]
 			u8[A1] = 0xda

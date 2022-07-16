@@ -10,27 +10,32 @@
 
 #include "oxygen/rendering/parts/SpriteManager.h"
 
-class HardwareRenderResources;
+class OpenGLDrawer;
+class OpenGLRenderResources;
 
 
-class RenderComponentSpriteShader
+class RenderPaletteSpriteShader
 {
 public:
 	void initialize();
-	void refresh(const Vec2i& gameResolution, const HardwareRenderResources& resources);
-	void draw(const SpriteManager::ComponentSpriteInfo& spriteInfo, HardwareRenderResources& resources);
+	void refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const OpenGLRenderResources& resources);
+	void draw(const SpriteManager::PaletteSpriteInfo& spriteInfo, OpenGLRenderResources& resources);
 
 private:
 	bool  mInitialized = false;
 	Vec2i mLastGameResolution;
+	int   mLastWaterSurfaceHeight = 0;
 
 	Shader mShader;
 	GLuint mLocGameResolution = 0;
+	GLuint mLocWaterLevel = 0;
+	GLuint mLocPaletteTex = 0;
 	GLuint mLocSpriteTex = 0;
 	GLuint mLocPosition = 0;
 	GLuint mLocPivotOffset = 0;
 	GLuint mLocSize = 0;
 	GLuint mLocTransformation = 0;
+	GLuint mLocAtex = 0;
 	GLuint mLocTintColor = 0;
 	GLuint mLocAddedColor = 0;
 };

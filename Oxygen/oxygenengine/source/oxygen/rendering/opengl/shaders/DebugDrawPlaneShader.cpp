@@ -7,8 +7,8 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/rendering/hardware/shaders/DebugDrawPlaneShader.h"
-#include "oxygen/rendering/hardware/HardwareRenderResources.h"
+#include "oxygen/rendering/opengl/shaders/DebugDrawPlaneShader.h"
+#include "oxygen/rendering/opengl/OpenGLRenderResources.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/helper/FileHelper.h"
@@ -26,7 +26,7 @@ void DebugDrawPlaneShader::initialize()
 	mLocHighlightPrio	= mShader.getUniformLocation("HighlightPrio");
 }
 
-void DebugDrawPlaneShader::draw(int planeIndex, RenderParts& renderParts, const HardwareRenderResources& resources)
+void DebugDrawPlaneShader::draw(int planeIndex, RenderParts& renderParts, const OpenGLRenderResources& resources)
 {
 	mShader.bind();
 

@@ -557,7 +557,7 @@ function void initializeMainGame()
 	u16[0xfffffb00] = 0
 	u32[0xfffffbfc] = 0xfffffb00
 
-	Level.loadPaletteData((isMainCharacter(CHARACTER_KNUCKLES)) ? 5 : 3)
+	Level.loadPaletteData(isMainCharacter(CHARACTER_KNUCKLES) ? 5 : 3)
 	Level.InitializeWater()
 
 	zeroMemory(0xfffff0a0, 0x60)
@@ -987,19 +987,19 @@ function void copyPaletteDataFromTable(u8 index, u16 ramAddress)
 		}
 		else if (index == 0x2b || index == 0x2c)
 		{
-			paletteVariant = 1
+			paletteVariant = 1		// AIZ underwater
 		}
 		else if (index == 0x39)
 		{
-			paletteVariant = 2
+			paletteVariant = 2		// ICZ underwater
 		}
 		else if (index == 0x31 || index == 0x32)
 		{
-			paletteVariant = 3
+			paletteVariant = 3		// HCZ underwater
 		}
 		else if (index == 0x2d  || index == 0x2e || index == 0x3a)
 		{
-			paletteVariant = 4
+			paletteVariant = 4		// CNZ/LBZ underwater
 		}
 
 		if (paletteVariant != 0xff)
@@ -1902,7 +1902,7 @@ function void fn0067ee()
 	else if (global.zone_act == 0x0900)
 	{
 		// Lava Reef Zone
-		if (isMainCharacter(CHARACTER_KNUCKLES) == 0)
+		if (!isMainCharacter(CHARACTER_KNUCKLES))
 		{
 			objA1.state = char.state.FALLING_PANIC
 			objA1.flags2a |= char.flag.IN_AIR
@@ -2065,7 +2065,7 @@ function void InitializeGameCharacters()
 		u16[0xffffcce8 + 0x42] = 0xb000
 
 		// Also spawn Tails if needed
-		spawnSecondPlayerTails = (isSecondCharacter(CHARACTER_TAILS))
+		spawnSecondPlayerTails = isSecondCharacter(CHARACTER_TAILS)
 	}
 	else if (isMainCharacter(CHARACTER_TAILS))
 	{
@@ -2087,7 +2087,7 @@ function void InitializeGameCharacters()
 	#endif
 	}
 	else
-		assert(false, "Unsupported character selection")	// "global.characters" value not supported
+		assert(false, "Unsupported character selection")
 
 	if (spawnSecondPlayerTails)
 	{

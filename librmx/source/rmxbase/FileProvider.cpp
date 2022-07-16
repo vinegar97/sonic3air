@@ -20,38 +20,4 @@ namespace rmx
 		}
 	}
 
-
-	bool RealFileProvider::exists(const std::wstring& filename)
-	{
-		return FileIO::exists(filename);
-	}
-
-	bool RealFileProvider::readFile(const std::wstring& filename, std::vector<uint8>& outData)
-	{
-		return FileIO::readFile(filename, outData);
-	}
-
-	bool RealFileProvider::listFiles(const std::wstring& path, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries)
-	{
-		FileIO::listFiles(path, recursive, outFileEntries);
-		return true;
-	}
-
-	bool RealFileProvider::listFilesByMask(const std::wstring& filemask, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries)
-	{
-		FileIO::listFilesByMask(filemask, recursive, outFileEntries);
-		return true;
-	}
-
-	bool RealFileProvider::listDirectories(const std::wstring& path, std::vector<std::wstring>& outDirectories)
-	{
-		FileIO::listDirectories(path, outDirectories);
-		return true;
-	}
-
-	InputStream* RealFileProvider::createInputStream(const std::wstring& filename)
-	{
-		return FileIO::createInputStream(filename);
-	}
-
 }

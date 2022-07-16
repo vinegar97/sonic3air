@@ -242,12 +242,11 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 						// Not available for normal users, as this would crash the application if OpenGL is not supported
 						if (EngineMain::getDelegate().useDeveloperFeatures())
 						{
-							const Configuration::RenderMethod oldRenderMethod = Configuration::instance().mRenderMethod;
-							const Configuration::RenderMethod newRenderMethod = (oldRenderMethod == Configuration::RenderMethod::SOFTWARE) ? Configuration::RenderMethod::OPENGL_SOFT :
-																				(oldRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? Configuration::RenderMethod::OPENGL_FULL : Configuration::RenderMethod::SOFTWARE;
-							LogDisplay::instance().setLogDisplay((newRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Switching to pure software renderer" :
-																 (newRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Switching to opengl-soft renderer" : "Switching to opengl-full renderer");
+							const Configuration::RenderMethod newRenderMethod = (Configuration::instance().mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? Configuration::RenderMethod::OPENGL_SOFT :
+																				(Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? Configuration::RenderMethod::OPENGL_FULL : Configuration::RenderMethod::SOFTWARE;
 							EngineMain::instance().switchToRenderMethod(newRenderMethod);
+							LogDisplay::instance().setLogDisplay((Configuration::instance().mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Switched to pure software renderer" :
+																 (Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Switched to opengl-soft renderer" : "Switched to opengl-full renderer");
 						}
 						break;
 					}
@@ -542,7 +541,7 @@ void Application::render()
 	if (mPausedByFocusLoss)
 	{
 		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 0.8f));
-	#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
+	#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
 		drawer.printText(mLogDisplayFont, FTX::screenRect(), "Tap to continue", 5, Color(0.2f, 1.0f, 1.0f));
 	#else
 		drawer.printText(mLogDisplayFont, FTX::screenRect(), "Press any key to continue", 5, Color(0.2f, 1.0f, 1.0f));

@@ -74,12 +74,8 @@ function void fn04b9ce()
 	objA0.base_state += 2
 	objA0.hitbox_extends.x = 0x07
 	objA0.hitbox_extends.y = 0x0e
-	D0.u16 = (global.characters > CHARS_SONIC_AND_TAILS) ? (global.characters - 1) : CHARACTER_SONIC
 
-#if STANDALONE
 	D0.u16 = min(getMainCharacter(), 2)
-#endif
-
 	objA0.flags38 = D0.u8
 	objA0.mapping_offset = u32[0x04b9c2 + D0.s16 * 4]
 	objA0.sprite_attributes = (Char.Player1.targetInVRAM >> 5)
