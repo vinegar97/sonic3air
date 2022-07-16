@@ -182,14 +182,7 @@ function void RenderHUD()
 			u16 px = useMobilePosition ? (getScreenWidth() - baseX - 0x30) : baseX
 			u16 py = useMobilePosition ? baseY : 200
 
-			string characterName
-			if (isMainCharacter(CHARACTER_SONIC))
-				characterName = "sonic"
-			else if (isMainCharacter(CHARACTER_TAILS))
-				characterName = (global.region_code & 0x80) ? "tails" : "miles"
-			else
-				characterName = "knuckles"
-			HUD.drawSprite(stringformat("hud_lives_icon_%s", characterName), px, py, renderQueue)
+			HUD.drawSprite(getCharacterLivesIcon(getMainCharacter()), px, py, renderQueue)
 			++renderQueue
 
 			if (lives_counter >= 10)
