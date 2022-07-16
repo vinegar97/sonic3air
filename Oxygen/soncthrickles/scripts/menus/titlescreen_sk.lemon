@@ -332,7 +332,7 @@ function void fn00552e()
 	checkpoint.number.backup = 1
 	checkpoint.zone_act = D0.u16
 	checkpoint.zone_act.apparent = D0.u16
-	checkpoint.sprite_attr = 0x0680
+	checkpoint.sprite_attr = (Char.Player1.targetInVRAM >> 5)
 	checkpoint.layer_flags = 0x0c0d
 	checkpoint.rings = 0
 	checkpoint.lives_granted = 0

@@ -32,6 +32,7 @@ constant u16 BlueSphereGame.Emeralds.targetInVRAM		= 0x3b80
 constant u16 BlueSphereGame.Menu.targetInVRAM			= 0xa9c0
 constant u16 BlueSphereGame.Bumpers.targetInVRAM		= 0xb300		// (BlueSphereGame.Menu.targetInVRAM + 0x0940)
 constant u16 BlueSphereGame.TextTiles.targetInVRAM		= 0xb7e0
+constant u16 BlueSphereGame.Tails.targetInVRAM			= 0xf400
 
 #if STANDALONE
 function void BlueSphereGame.applyTailsPalette(u32 targetPaletteLineAddress)
@@ -1721,7 +1722,7 @@ function void fn04df52()
 //# address-hook(0x04df86) end(0x04dfe8)
 function void fn04df86()
 {
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0680)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (Char.Player1.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0100
 	objA0.sprite_priority = 0x80
@@ -1742,7 +1743,7 @@ function void fn04df86()
 	{
 		objA0.mapping_offset = 0x148eb8
 		objA0.state = char.state.WIN_POSE
-		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x06a0)
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | (Char.Tails.targetInVRAM >> 5))
 
 		objA0.update_address = 0x04dffe
 		fn04dffe()
@@ -1968,7 +1969,7 @@ function void fn04e1b4()
 function void fn04e1c4()
 {
 	objA0.mapping_offset = 0x146620
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0680)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (Char.Player1.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0120
 	objA0.render_flags |= render_flag.FLIP_X
@@ -2039,7 +2040,7 @@ function void fn04e24c()
 function void fn04e264()
 {
 	objA0.mapping_offset = 0x04e2a2
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x07a0)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (BlueSphereGame.Tails.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0xfc + getScreenExtend()
 	objA0.position.y.u16 = 0x011b
 	objA0.render_flags |= render_flag.FLIP_X
@@ -2066,7 +2067,7 @@ function void fn04e29c()
 function void fn04e2b8()
 {
 	objA0.mapping_offset = 0x14a8d6
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06a0)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (Char.Tails.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0138 + getScreenExtend()
 	objA0.position.y.u16 = 0x0118
 	objA0.sprite_priority = 0x80
@@ -2087,7 +2088,7 @@ function void fn04e2f0()
 	if (D0.u8 != u8[A0 + 0x30])
 	{
 		u8[A0 + 0x30] = D0.u8
-		D4.u16 = 0xd400
+		D4.u16 = Char.Tails.targetInVRAM
 		fn018122()
 	}
 	DrawObject()
