@@ -15,6 +15,7 @@ constant u16 SpecialStage.Tails_Tails.targetInVRAM	= 0xf600
 constant u16 SpecialStage.Player.targetInVRAM		= 0xfa80
 constant u16 SpecialStage.Tails.targetInVRAM		= 0xfd60
 
+
 //-------------------------------------------------------//
 // Blue Spheres Special Stage                            //
 //-------------------------------------------------------//

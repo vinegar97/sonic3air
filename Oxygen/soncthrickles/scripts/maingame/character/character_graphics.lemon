@@ -12,6 +12,7 @@ constant u16 Char.Tails.targetInVRAM				= 0xd400
 constant u16 Char.Player1_Tails.targetInVRAM		= 0xd200		// Used in Competition Mode when Player 1 is Tails
 constant u16 Char.Tails_Tails.targetInVRAM			= 0xd600
 
+
 //-------------------------------------------------------//
 // Character Sprites                                     //
 //-------------------------------------------------------//

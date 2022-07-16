@@ -16,6 +16,7 @@ constant u16 TitleScreenSK.SKTitleLogo.targetInVRAM			= 0x9dc0
 constant u16 TitleScreenSK.DeathEgg.targetInVRAM			= 0xd000
 constant u16 TitleScreenSK.Mountain.targetInVRAM			= 0xf400
 
+
 //# address-hook(0x005048) end(0x00552c)
 function void TitleScreen_SK()
 {

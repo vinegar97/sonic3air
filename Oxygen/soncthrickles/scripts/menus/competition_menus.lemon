@@ -12,6 +12,7 @@ constant u16 CompetitionMenu.MenuPart1.targetInVRAM = 0x53e0		// Includes common
 constant u16 CompetitionMenu.MenuPart2.targetInVRAM = 0x6940		// Includes main menu and results screen-related graphics
 constant u16 CompetitionMenu.characters.targetInVRAM = 0xb920
 
+
 function void CompetitionMode.drawBackground(u8 atex)
 {
 #if STANDALONE

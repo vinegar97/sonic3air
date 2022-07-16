@@ -14,6 +14,7 @@ constant u16 TitleScreen.AndKnucklesTitle.targetInVRAM	= 0x9800
 constant u16 TitleScreen.Banner.targetInVRAM			= 0xa000
 constant u16 TitleScreen.Menu.targetInVRAM				= 0xd000
 
+
 //-------------------------------------------------------//
 // SEGA Logo Screen                                      //
 //-------------------------------------------------------//
