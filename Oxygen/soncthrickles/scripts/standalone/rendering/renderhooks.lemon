@@ -193,24 +193,24 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		{
 			if (objA0.animation.sprite == 0x0b)
 			{
-				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+36, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
-				Renderer.drawCustomSprite("hud_text_total", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite(getCharacterBonusTextIcon(getMainCharacter()), px+36, py-5, renderQueue-1)
+				HUD.drawSprite("hud_text_total", px, py, renderQueue)
 				return true
 			}
 			else if (objA0.animation.sprite == 0x0c)
 			{
-				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+37, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
-				Renderer.drawCustomSprite("hud_text_bonus", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite(getCharacterBonusTextIcon(getMainCharacter()), px+37, py-5, renderQueue-1)
+				HUD.drawSprite("hud_text_bonus", px, py, renderQueue)
 				return true
 			}
 			else if (objA0.animation.sprite == 0x0d)
 			{
-				Renderer.drawCustomSprite("hud_text_ring", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite("hud_text_ring", px, py, renderQueue)
 				return true
 			}
 			else if (objA0.animation.sprite == 0x0e)
 			{
-				Renderer.drawCustomSprite("hud_text_time", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite("hud_text_time", px, py, renderQueue)
 				return true
 			}
 		}
@@ -477,30 +477,30 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			bool isSKStage = (global.lock_on_state == 0 && global.sk_bluespheres)
 			if (objA0.animation.sprite == 0x17 || objA0.animation.sprite == 0x31 || objA0.animation.sprite == 0x36)
 			{
-				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px-60, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
-				Renderer.drawCustomSprite(isSKStage ? "hud_text_score_superstage" : "hud_text_score_chaosstage", px - 96, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite(getCharacterBonusTextIcon(getMainCharacter()), px-60, py-5, renderQueue-1)
+				HUD.drawSprite(isSKStage ? "hud_text_score_superstage" : "hud_text_score_chaosstage", px - 96, py, renderQueue)
 				HUD.drawNumber(isSKStage ? "hud_digit_%d" : "hud_digit_%d_chaosstage", player.score * 10, px + 88, py, renderQueue)
 				return true
 			}
 			else if (objA0.animation.sprite == 0x18 || objA0.animation.sprite == 0x32 || objA0.animation.sprite == 0x37)
 			{
-				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+77, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
-				Renderer.drawCustomSprite(isSKStage ? "hud_text_ring_superstage" : "hud_text_ring_chaosstage", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
-				Renderer.drawCustomSprite(isSKStage ? "hud_text_bonus_superstage" : "hud_text_bonus_chaosstage", px + 40, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite(getCharacterBonusTextIcon(getMainCharacter()), px+77, py-5, renderQueue-1)
+				HUD.drawSprite(isSKStage ? "hud_text_ring_superstage" : "hud_text_ring_chaosstage", px, py, renderQueue)
+				HUD.drawSprite(isSKStage ? "hud_text_bonus_superstage" : "hud_text_bonus_chaosstage", px + 40, py, renderQueue)
 				HUD.drawNumber(isSKStage ? "hud_digit_%d" : "hud_digit_%d_chaosstage", results.ring_bonus * 10, px + 184, py, renderQueue)
 				return true
 			}
 			else if (objA0.animation.sprite == 0x19 || objA0.animation.sprite == 0x33 || objA0.animation.sprite == 0x38)
 			{
-				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+52, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
-				Renderer.drawCustomSprite(isSKStage ? "hud_text_perfect_superstage" : "hud_text_perfect_chaosstage", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite(getCharacterBonusTextIcon(getMainCharacter()), px+52, py-5, renderQueue-1)
+				HUD.drawSprite(isSKStage ? "hud_text_perfect_superstage" : "hud_text_perfect_chaosstage", px, py, renderQueue)
 				HUD.drawNumber(isSKStage ? "hud_digit_%d" : "hud_digit_%d_chaosstage", results.time_bonus * 10, px + 184, py, renderQueue)
 				return true
 			}
 			else if (objA0.animation.sprite == 0x1a || objA0.animation.sprite == 0x34 || objA0.animation.sprite == 0x39)
 			{
-				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+60, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
-				Renderer.drawCustomSprite(isSKStage ? "hud_text_continue_superstage" : "hud_text_continue_chaosstage", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite(getCharacterBonusTextIcon(getMainCharacter()), px+60, py-5, renderQueue-1)
+				HUD.drawSprite(isSKStage ? "hud_text_continue_superstage" : "hud_text_continue_chaosstage", px, py, renderQueue)
 				return true
 			}
 		}
