@@ -3397,6 +3397,7 @@ function void SonicUpdateRingCollection()
 	u16 box.size.x
 	u16 box.size.y
 
+	// Bounding box of ring attraction range
 	if (char.bonus_effect & char.bonus.SHIELD_LIGHTNING)
 	{
 		box.pos.x = char.position.x.u16 - 0x40
@@ -3412,6 +3413,11 @@ function void SonicUpdateRingCollection()
 		box.size.x = 0x10
 		box.size.y *= 2
 	}
+
+#if STANDALONE
+	if (DEBUG_DYNAMIC_COLLISIONS)
+		debugDrawRect(box.pos.x, box.pos.y, box.size.x, box.size.y, 0x80ffff00)
+#endif
 
 	// Cycle through list of all rings with x-position in screen area
 	A1 = rings.around.first
@@ -3446,6 +3452,11 @@ function void SonicUpdateRingCollection()
 					py -= (level.height.bitmask + 1)
 				}
 			}
+		#endif
+
+		#if STANDALONE
+			if (DEBUG_DYNAMIC_COLLISIONS)
+				debugDrawRect(px, py, ring.size, ring.size, 0x80ffff00)
 		#endif
 
 			if (checkBoxOverlap(box.pos.x, box.pos.y, box.size.x, box.size.y, px, py, ring.size, ring.size))
@@ -4888,6 +4899,7 @@ function void Character.CheckCollisionsWithDynamicObjects()
 function void Character.CheckCollisionsWithDynamicObjects_partial()
 {
 #if STANDALONE
+	// Bounding box of player
 	if (DEBUG_DYNAMIC_COLLISIONS)
 		debugDrawRect(D2.u16, D3.u16, D4.u16, D5.u16, 0x8000ff00)
 #endif
@@ -4974,7 +4986,16 @@ function void Character.CheckCollisionsWithDynamicObjects_partial()
 
 		#if STANDALONE
 			if (DEBUG_DYNAMIC_COLLISIONS)
-				debugDrawRect(px, py, sx, sy, 0x80ff0000)
+			{
+				if ((offset & collision_attributes.flags) == collision.flag.ITEM)
+					debugDrawRect(px, py, sx, sy, 0x8000ff00)
+				else if ((offset & collision_attributes.flags) == collision.flag.SPECIAL)
+					debugDrawRect(px, py, sx, sy, 0x80ff0000)
+				else if ((offset & collision_attributes.flags) == collision.flag.THREAT)
+					debugDrawRect(px, py, sx, sy, 0x800000ff)
+				else
+					debugDrawRect(px, py, sx, sy, 0x80ff00ff)
+			}
 		#endif
 
 			if (checkBoxOverlap(D2.u16, D3.u16, D4.u16, D5.u16, px, py, sx, sy))
@@ -5439,11 +5460,16 @@ function void UpdateShieldDeflecting()
 	if ((char.bonus_effect & char.bonus.ALL_SHIELDS) == 0)
 		return
 
-	// Bounding box of shield
+	// Bounding box of shield, or projectile deflection range
 	D2.u16 = char.position.x.u16 - 0x18
 	D3.u16 = char.position.y.u16 - 0x18
 	D4.u16 = 0x30
 	D5.u16 = 0x30
+
+#if STANDALONE
+	if (DEBUG_DYNAMIC_COLLISIONS)
+		debugDrawRect(D2.u16, D3.u16, D4.u16, D5.u16, 0x8000ffff)
+#endif
 
 	A4 = 0xffffe380
 	u16 numObjects = u16[A4]	// Actually it's twice the number of dynamic objects
@@ -5528,6 +5554,11 @@ function void UpdateShieldDeflecting()
 				u16 py = objA1.position.y.u16 - hitbox.y
 				u16 sx = hitbox.x * 2
 				u16 sy = hitbox.y * 2
+
+			#if STANDALONE
+				if (DEBUG_DYNAMIC_COLLISIONS)
+					debugDrawRect(px, py, sx, sy, 0x8000ffff)
+			#endif
 
 				if (checkBoxOverlap(D2.u16, D3.u16, D4.u16, D5.u16, px, py, sx, sy))
 				{
