@@ -12,6 +12,7 @@
 #include "lemon/compiler/TypeCasting.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/GlobalsLookup.h"
+#include "lemon/runtime/Runtime.h"
 #include "lemon/runtime/StandardLibrary.h"
 
 
@@ -922,6 +923,45 @@ namespace lemon
 					if (tryReplaceConstantsBinary(bot.mLeft->as<ConstantToken>(), bot.mRight->as<ConstantToken>(), bot.mOperator, resultValue))
 					{
 						const DataTypeDefinition* dataType = bot.mLeft->as<ConstantToken>().mDataType;	// Backup in case outTokenPtr is pointing to inputToken
+						ConstantToken& token = outTokenPtr.create<ConstantToken>();
+						token.mValue = resultValue;
+						token.mDataType = dataType;
+						return true;
+					}
+				}
+				break;
+			}
+
+			case Token::Type::FUNCTION:
+			{
+				FunctionToken& ft = inputToken.as<FunctionToken>();
+				bool allConstant = true;
+				for (TokenPtr<StatementToken>& parameterTokenPtr : ft.mParameters)
+				{
+					evaluateCompileTimeConstantsRecursive(*parameterTokenPtr, parameterTokenPtr);
+					if (parameterTokenPtr->getType() != Token::Type::CONSTANT)
+						allConstant = false;
+				}
+
+				if (allConstant)
+				{
+					// TEST: Compile-time evaluation of native functions that support it
+					if (ft.mFunction->getType() == Function::Type::NATIVE && ft.mFunction->hasFlag(Function::Flag::COMPILE_TIME_CONSTANT))
+					{
+						RMX_CHECK(ft.mParameters.size() == ft.mFunction->getParameters().size(), "Different number of parameters", );
+						Runtime emptyRuntime;
+						ControlFlow controlFlow(emptyRuntime);
+						for (size_t k = 0; k < ft.mParameters.size(); ++k)
+						{
+							const Function::Parameter& parameter = ft.mFunction->getParameters()[k];
+							controlFlow.pushValueStack(parameter.mType, ft.mParameters[k].as<ConstantToken>()->mValue);
+						}
+						static_cast<const NativeFunction*>(ft.mFunction)->mFunctionWrapper->execute(NativeFunction::Context(controlFlow));
+
+						// Get return value from the stack and write it as constant
+						const DataTypeDefinition* dataType = ft.mDataType;	// Backup in case outTokenPtr is pointing to inputToken
+						const int64 resultValue = controlFlow.popValueStack(ft.mFunction->getReturnType());
+
 						ConstantToken& token = outTokenPtr.create<ConstantToken>();
 						token.mValue = resultValue;
 						token.mDataType = dataType;

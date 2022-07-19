@@ -200,13 +200,13 @@ int main(int argc, char** argv)
 	UserDefinedVariable& var2 = module.addUserDefinedVariable("LogStr", &PredefinedDataTypes::INT_64);
 	var2.mSetter = logValueStr;
 
-	module.addUserDefinedFunction("debugLog", lemon::wrap(&debugLog));
-	module.addUserDefinedFunction("maximum", wrap(&testFunctionA));
-	module.addUserDefinedFunction("maximum", wrap(&testFunctionB));
+	module.addNativeFunction("debugLog", lemon::wrap(&debugLog));
+	module.addNativeFunction("maximum", wrap(&testFunctionA), Function::Flag::COMPILE_TIME_CONSTANT);
+	module.addNativeFunction("maximum", wrap(&testFunctionB), Function::Flag::COMPILE_TIME_CONSTANT);
 
 	SomeClass instance;
-	module.addUserDefinedFunction("sayHello", wrap(instance, &SomeClass::sayHello));
-	module.addUserDefinedFunction("incTen", wrap(instance, &SomeClass::incTen));
+	module.addNativeFunction("sayHello", wrap(instance, &SomeClass::sayHello));
+	module.addNativeFunction("incTen", wrap(instance, &SomeClass::incTen));
 
 	StandardLibrary::registerBindings(module);
 
@@ -214,6 +214,7 @@ int main(int argc, char** argv)
 	globalsLookup.addDefinitionsFromModule(module);
 
 	{
+		std::cout << "=== Compilation ===\r\n";
 		lemon::Compiler::CompileOptions options;
 		Compiler compiler(module, globalsLookup, options);
 		const bool compileSuccess = compiler.loadScript(L"script01.lemon");
@@ -225,6 +226,7 @@ int main(int argc, char** argv)
 			}
 			return 0;
 		}
+		std::cout << "\r\n";
 	}
 
 #if 0
@@ -240,8 +242,8 @@ int main(int argc, char** argv)
 		UserDefinedVariable& var = newModule.addUserDefinedVariable("Log", &PredefinedDataTypes::INT_64);
 		var.mSetter = logValue;
 
-		newModule.addUserDefinedFunction("max", wrap(&testFunctionA));
-		newModule.addUserDefinedFunction("max", wrap(&testFunctionB));
+		newModule.addNativeFunction("max", wrap(&testFunctionA));
+		newModule.addNativeFunction("max", wrap(&testFunctionB));
 
 		VectorBinarySerializer serializer2(true, buffer);
 		newModule.serialize(serializer2);
@@ -271,6 +273,7 @@ int main(int argc, char** argv)
 		const Function* func = program.getFunctionBySignature(rmx::getMurmur2_64(String("main")) + Function::getVoidSignatureHash());
 		RMX_CHECK(nullptr != func, "Function not found", RMX_REACT_THROW);
 
+		std::cout << "=== Execution ===\r\n";
 		Runtime runtime;
 		runtime.setProgram(program);
 		runtime.setMemoryAccessHandler(&memoryAccess);

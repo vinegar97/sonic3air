@@ -99,6 +99,10 @@ void ActSelectMenu::setBaseState(BaseState baseState)
 
 void ActSelectMenu::onFadeIn()
 {
+	// Update DDZ
+	mZoneEntry->getOptionByValue(0x0c00)->mVisible = PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE);
+	mActEntry->getOptionByValue(0x0c00)->mVisible = PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE);
+
 	mState = State::APPEAR;
 
 	mMenuBackground->showPreview(true);
@@ -235,8 +239,8 @@ void ActSelectMenu::render()
 	{
 		const auto& entry = mMenuEntries[line];
 		const std::string& text = entry.mOptions.empty() ? entry.mText : entry.mOptions[entry.mSelectedIndex].mText;
-		const bool canGoLeft  = entry.mOptions.empty() ? false : (entry.mSelectedIndex > 0);
-		const bool canGoRight = entry.mOptions.empty() ? false : (entry.mSelectedIndex < entry.mOptions.size() - 1);
+		const bool canGoLeft  = entry.mOptions.empty() ? false : (entry.getPreviousVisibleIndex() != entry.mSelectedIndex);
+		const bool canGoRight = entry.mOptions.empty() ? false : (entry.getNextVisibleIndex() != entry.mSelectedIndex);
 
 		const int py = positionY[line];
 		const bool isSelected = ((int)line == mMenuEntries.mSelectedEntryIndex);
@@ -268,37 +272,16 @@ void ActSelectMenu::render()
 	{
 		drawer.drawRect(Recti(anchorX - 162, 115, 80, 88), global::mCharSelectionBox, Color(1.0f, 1.0f, 1.0f, alpha));
 
-		struct CharIconData
+		static const uint64 charSpriteKey[5] =
 		{
-			int   mCharacter;
-			int   mOffset;
-			bool  mMirrored;
+			rmx::getMurmur2_64("menu_characters_sonic_tails"),		// Sonic & Tails
+			rmx::getMurmur2_64("menu_characters_sonic"),			// Sonic
+			rmx::getMurmur2_64("menu_characters_tails"),			// Tails
+			rmx::getMurmur2_64("menu_characters_knuckles"),			// Knuckles
+			rmx::getMurmur2_64("menu_characters_knuckles_tails")	// Knuckles & Tails
 		};
-		static const CharIconData charIconDataLookup[5][2] =
-		{
-			{ 0,-6, false,	 1, 8, true  },		// Sonic & Tails
-			{ 0, 0, false,	-1, 0, false },		// Sonic
-			{ 1, 0, false,	-1, 0, false },		// Tails
-			{ 2, 0, false,	-1, 0, false },		// Knuckles
-			{ 2,-7, true,	 1, 8, true  }		// Knuckles & Tails
-		};
-
-		const uint32 charSelection = mCharacterEntry->selected().mValue;
-		for (int i = 1; i >= 0; --i)
-		{
-			const CharIconData& player = charIconDataLookup[charSelection][i];
-			if (player.mCharacter >= 0)
-			{
-				if (player.mMirrored)
-				{
-					drawer.drawRect(Recti(anchorX - 105 + player.mOffset, 136 - i * 2, -40, 40), global::mCharactersIcon[player.mCharacter], Color(1.0f, 1.0f, 1.0f, alpha));
-				}
-				else
-				{
-					drawer.drawRect(Recti(anchorX - 145 + player.mOffset, 136 - i * 2, 40, 40), global::mCharactersIcon[player.mCharacter], Color(1.0f, 1.0f, 1.0f, alpha));
-				}
-			}
-		}
+		const uint32 charSelection = clamp(mCharacterEntry->selected().mValue, 0, 4);
+		drawer.drawSprite(Vec2i(anchorX - 125, 156), charSpriteKey[charSelection], Color(1.0f, 1.0f, 1.0f, alpha));
 	}
 
 	drawer.performRendering();
