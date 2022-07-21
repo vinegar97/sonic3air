@@ -1925,18 +1925,18 @@ function void fn04e160()
 	{
 		D1 = (bluespheregame.shown_difficulty - 1) * 4
 		// Targets:
-		//  - 0x04e1c4	-> bluespheregame.shown_difficulty = 0	-> Sonic in perfect screen
-		//  - 0x04e264	-> bluespheregame.shown_difficulty = 1	-> Tails in perfect screen
-		//  - 0x04e2b8	-> bluespheregame.shown_difficulty = 2	-> Knuckles in perfect screen
-		//  - 0x05fb56	-> bluespheregame.shown_difficulty = 3	-> Robotnik in perfect screen
-		//  - 0x07cfa4	-> bluespheregame.shown_difficulty = 4	-> Mecha Sonic in perfect screen
-		//  - 0x0680a4	-> bluespheregame.shown_difficulty = 5	-> Egg Robo and the Egg Mobile in Perfect screen
-		//  - 0x02cd26	-> bluespheregame.shown_difficulty = 6	-> Chickens in perfect screen
-		//  - 0x02cd9a	-> bluespheregame.shown_difficulty = 7	-> Squirrels in perfect screen
-		//  - 0x02ce2c	-> bluespheregame.shown_difficulty = 8	-> Rabbits in perfect screen
-		//  - 0x07cff0	-> bluespheregame.shown_difficulty = 9	-> Master Emerald in perfect screen
-		//  - 0x05face	-> bluespheregame.shown_difficulty = 10	-> Sonic & Knuckles title Logo in perfect screen
-		//  - 0x04e24c	-> bluespheregame.shown_difficulty = 11	-> Sonic going Super at MAX difficulty
+		//  - 0x04e1c4	-> D1.u16 = 0	-> Sonic in perfect screen
+		//  - 0x04e264	-> D1.u16 = 4	-> Tails in perfect screen
+		//  - 0x04e2b8	-> D1.u16 = 8	-> Knuckles in perfect screen
+		//  - 0x05fb56	-> D1.u16 = 12	-> Robotnik in perfect screen
+		//  - 0x07cfa4	-> D1.u16 = 16	-> Mecha Sonic in perfect screen
+		//  - 0x0680a4	-> D1.u16 = 20	-> Egg Robo and the Egg Mobile in Perfect screen
+		//  - 0x02cd26	-> D1.u16 = 24	-> Chickens in perfect screen
+		//  - 0x02cd9a	-> D1.u16 = 28	-> Squirrels in perfect screen
+		//  - 0x02ce2c	-> D1.u16 = 32	-> Rabbits in perfect screen
+		//  - 0x07cff0	-> D1.u16 = 36	-> Master Emerald in perfect screen
+		//  - 0x05face	-> D1.u16 = 42	-> Sonic & Knuckles title Logo in perfect screen
+		//  - 0x04e24c	-> D1.u16 = 48	-> Sonic going Super at MAX difficulty
 		objA1.update_address = u32[0x04e17a + D1.u16]
 	}
 }

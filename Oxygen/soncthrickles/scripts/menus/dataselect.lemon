@@ -10,7 +10,7 @@
 constant u16 DataSelect.Background.targetInVRAM = 0x0020
 constant u16 DataSelect.MenuPart1.targetInVRAM = 0x53e0		// Includes most Data Select menu graphics from Sonic 3
 constant u16 DataSelect.MenuPart2.targetInVRAM = 0x8a80		// Includes additional graphics needed for the Sonic 3 & Knuckles expansion
-constant u16 DataSelect.Font.targetInVRAM = 0xac40
+constant u16 DataSelect.TextTiles.targetInVRAM = 0xac40
 
 
 //-------------------------------------------------------//
@@ -131,12 +131,12 @@ function void fn00c890()
 				}
 				else
 				{
-					D1.u16 += (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (DataSelect.Font.targetInVRAM >> 5))
+					D1.u16 += (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (DataSelect.TextTiles.targetInVRAM >> 5))
 				}
 				VDP.writeData16(D1.u16)
 
 				// First digit (1, 2, etc)
-				D1 = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (DataSelect.Font.targetInVRAM >> 5)) + u8[0x00c95f + D0.s16]
+				D1 = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (DataSelect.TextTiles.targetInVRAM >> 5)) + u8[0x00c95f + D0.s16]
 				VDP.writeData16(D1.u16)
 			}
 		}
@@ -292,7 +292,7 @@ function void DataSelect.setup()
 	A0 = 0x00cd58
 	fn00c866()
 
-	Nemesis.loadDataToVRAM(0x0ca5e0, DataSelect.Font.targetInVRAM)		// Font used for the red labels
+	Nemesis.loadDataToVRAM(0x0ca5e0, DataSelect.TextTiles.targetInVRAM)		// Font used for the red labels
 
 	// Render "NO" label
 	A1 = 0x00db1c
