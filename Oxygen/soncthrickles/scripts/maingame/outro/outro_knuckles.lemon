@@ -440,6 +440,12 @@ function void fn05ecb4()
 			u16[0xfffffc08] = 0x0206
 			copyMemory(0xfffffc20, 0x0a8a3c, 0x20)
 		}
+
+		if (objA0.subtype2c == 0 && isSecondCharacter(CHARACTER_TAILS))
+		{
+			// Special handling for Knuckles & Tails game: Put Tails into the Tornado
+			objA0.animation.sprite = 0x0c
+		}
 	}
 #endif
 }
