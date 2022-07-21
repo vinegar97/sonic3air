@@ -3415,7 +3415,7 @@ function void SonicUpdateRingCollection()
 	}
 
 #if STANDALONE
-	if (DEBUG_DYNAMIC_COLLISIONS)
+	if (DEBUG_DYNAMIC_COLLISIONS >= 3)
 		debugDrawRect(box.pos.x, box.pos.y, box.size.x, box.size.y, 0x80ffff00)
 #endif
 
@@ -3455,7 +3455,7 @@ function void SonicUpdateRingCollection()
 		#endif
 
 		#if STANDALONE
-			if (DEBUG_DYNAMIC_COLLISIONS)
+			if (DEBUG_DYNAMIC_COLLISIONS >= 3)
 				debugDrawRect(px, py, ring.size, ring.size, 0x80ffff00)
 		#endif
 
@@ -5467,7 +5467,7 @@ function void UpdateShieldDeflecting()
 	D5.u16 = 0x30
 
 #if STANDALONE
-	if (DEBUG_DYNAMIC_COLLISIONS)
+	if (DEBUG_DYNAMIC_COLLISIONS >= 2)
 		debugDrawRect(D2.u16, D3.u16, D4.u16, D5.u16, 0x8000ffff)
 #endif
 
@@ -5556,7 +5556,7 @@ function void UpdateShieldDeflecting()
 				u16 sy = hitbox.y * 2
 
 			#if STANDALONE
-				if (DEBUG_DYNAMIC_COLLISIONS)
+				if (DEBUG_DYNAMIC_COLLISIONS >= 2)
 					debugDrawRect(px, py, sx, sy, 0x8000ffff)
 			#endif
 
