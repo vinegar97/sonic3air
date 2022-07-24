@@ -482,11 +482,16 @@ function void spawnChildObjects(u32 address)
 
 			for (u16 i = 0; i < count; ++i)
 			{
+				u32 updateAddress = u32[A2]
+				s8 offset_x = s8[A2 + 4]
+				s8 offset_y = s8[A2 + 5]
+				u8 subtype = (i * 2)
+
 				ROMDataAnalyser.beginObject(stringformat("%d", i))
-				ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", u32[A2]))
-				ROMDataAnalyser.addKeyValue("subtype", stringformat("0x%02x", i * 2))
-				ROMDataAnalyser.addKeyValue("offset_x", stringformat("0x%02x", u8[A2+4]))
-				ROMDataAnalyser.addKeyValue("offset_y", stringformat("0x%02x", u8[A2+5]))
+				ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+				ROMDataAnalyser.addKeyValue("subtype", stringformat("0x%02x", subtype))
+				ROMDataAnalyser.addKeyValue("offset_x", stringformat((offset_x < 0) ? "-%d" : "%d", abs(offset_x)))
+				ROMDataAnalyser.addKeyValue("offset_y", stringformat((offset_y < 0) ? "-%d" : "%d", abs(offset_y)))
 				ROMDataAnalyser.endObject()
 				A2 += 6
 			}
@@ -531,10 +536,13 @@ function void spawnSimpleChildObjects(u32 address)
 	{
 		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
 		{
+			u16 count = u16[address] + 1
+			u32 updateAddress = u32[address + 2]
+
 			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
 			ROMDataAnalyser.addKeyValue("function", "SpawnSimpleChildObjects")
-			ROMDataAnalyser.addKeyValue("count", stringformat("%d", u16[address] + 1))
-			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", u32[address + 2]))
+			ROMDataAnalyser.addKeyValue("count", stringformat("%d", count))
+			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
 			ROMDataAnalyser.endEntry()
 		}
 	}
