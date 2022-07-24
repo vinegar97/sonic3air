@@ -105,7 +105,7 @@ namespace lemon
 			const Function::Parameter& parameter = mFunction.getParameters()[index];
 			const Variable* variable = mFunction.getLocalVariableByIdentifier(parameter.mName.getHash());
 			RMX_ASSERT(nullptr != variable, "Variable not found");
-			RMX_ASSERT(variable->getDataType() == parameter.mType, "Variable has wrong type");
+			RMX_ASSERT(variable->getDataType() == parameter.mDataType, "Variable has wrong data type");
 
 			// Assume the variable value is on the stack
 			addOpcode(Opcode::Type::SET_VARIABLE_VALUE, variable->getDataType(), variable->getID());
@@ -650,10 +650,11 @@ namespace lemon
 				CHECK_ERROR(!isLValue, "Cannot assign value to a function call", mLineNumber);
 				const FunctionToken& ft = token.as<FunctionToken>();
 
-				// TODO: Check parameters vs. function signature?
-				for (const TokenPtr<StatementToken>& token : ft.mParameters)
+				for (size_t i = 0; i < ft.mParameters.size(); ++i)
 				{
+					const TokenPtr<StatementToken>& token = ft.mParameters[i];
 					compileTokenTreeToOpcodes(*token);
+					addCastOpcodeIfNecessary(token->mDataType, ft.mFunction->getParameters()[i].mDataType);
 				}
 
 				// Using the data type parameter here to encode whether or not this is a base function call
