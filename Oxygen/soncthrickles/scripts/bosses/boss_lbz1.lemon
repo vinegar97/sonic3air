@@ -681,7 +681,9 @@ function void fn08d02e()
 function void fn08d046()
 {
 	objA0.update_address = 0x08d056
-	spawnIdenticalChildObjects(0x08d25c)
+
+	// "spawnIdenticalChildObjects(0x08d25c)" replaced by:
+	spawnChildObjects(0x08ce34, 0, 0, 10)
 }
 
 

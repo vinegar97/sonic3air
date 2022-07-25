@@ -1255,7 +1255,8 @@ function void fn064f20()
 		objA0.collision_attributes = collision.size.24x24
 		u8[A0 + 0x29] = 0xff
 
-		spawnIdenticalChildObjects(0x066624)
+		// "spawnIdenticalChildObjects(0x066624)" replaced by:
+		spawnChildObjects(0x06531e, 8, -4, 2)
 	}
 
 	fn066348()

@@ -512,6 +512,27 @@ function void spawnIdenticalChildObjects(u32 address)
 {
 	A2 = address
 	SpawnIdenticalChildObjects()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			u16 count = u16[address] + 1
+			u32 updateAddress = u32[address + 2]
+			s8 offset_x = s8[address + 6]
+			s8 offset_y = s8[address + 7]
+
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnIdenticalChildObjects")
+			ROMDataAnalyser.addKeyValue("count", stringformat("%d", count))
+			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+			ROMDataAnalyser.addKeyValue("offset_x", stringformat((offset_x < 0) ? "-%d" : "%d", abs(offset_x)))
+			ROMDataAnalyser.addKeyValue("offset_y", stringformat((offset_y < 0) ? "-%d" : "%d", abs(offset_y)))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 function void spawnChildObjectChain(u32 address)
@@ -670,33 +691,24 @@ function void SpawnIdenticalChildObjects()
 	//  - Update routine
 	//  - Offset relative to parent
 
-	D2 = 0
 	u16 count = u16[A2] + 1
-	A2 += 2
+	u32 updateAddress = u32[A2 + 2]
+	s8 offset_x = s8[A2 + 6]
+	s8 offset_y = s8[A2 + 7]
+	spawnChildObjects(updateAddress, offset_x, offset_y, count)
+}
 
+function void spawnChildObjects(u32 updateAddress, s8 offset_x, s8 offset_y, u16 count)
+{
+	D2 = 0
 	for (u16 i = 0; i < count; ++i)
 	{
-		if (!allocDynamicObjectAfterA0())
-			return
-
 		// Basic initialization as above
-		objA1.update_address = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset
-		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
-		u16[A1 + 0x46] = A0.u16
-
-		s8 offset_x = s8[A2+4]
-		s8 offset_y = s8[A2+5]
-		s8[A1 + 0x42] = offset_x
-		s8[A1 + 0x43] = offset_y
-		objA1.position.x.u16 = objA0.position.x.u16 + offset_x
-		objA1.position.y.u16 = objA0.position.y.u16 + offset_y
+		if (!spawnChildObject(updateAddress, D2.u8, offset_x, offset_y))
+			return
 
 		D2.u16 += 2
 	}
-
-	_setZeroFlagByValue(false)
 }
 
 
