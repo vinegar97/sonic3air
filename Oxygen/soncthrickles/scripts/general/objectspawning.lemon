@@ -539,6 +539,23 @@ function void spawnChildObjectChain(u32 address)
 {
 	A2 = address
 	SpawnChildObjectChain()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			u16 count = u16[address] + 1
+			u32 updateAddress = u32[address + 2]
+
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnChildObjectChain")
+			ROMDataAnalyser.addKeyValue("count", stringformat("%d", count))
+			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 function void spawnProjectileChildObjectsInDir(u32 address)
@@ -765,22 +782,28 @@ function void SpawnChildObjectChain()
 	// Stored data, shared for all children:
 	//  - Update routine
 
-	A3 = A0
-	D2 = 0
 	u16 count = u16[A2] + 1
-	A2 += 2
+	u32 updateAddress = u32[A2+2]
+	spawnChildObjectsChain(updateAddress, count)
+}
 
+function void spawnChildObjectsChain(u32 updateAddress, u16 count)
+{
+	D2 = 0
 	for (u16 i = 0; i < count; ++i)
 	{
 		if (!allocDynamicObjectAfterA0())
 			return
+
+		if (D2.u8 == 0)
+			A3 = A0
 
 		// Add references to parent as usual, but also register there as a child, forming a double-linked list
 		u16[A1 + 0x46] = A3.u16
 		u16[A3 + 0x44] = A1.u16
 		A3 = A1
 
-		objA1.update_address = u32[A2]
+		objA1.update_address = updateAddress
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.subtype2c = D2.u8

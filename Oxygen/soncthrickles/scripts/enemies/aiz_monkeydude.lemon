@@ -45,9 +45,16 @@ function void fn087172()
 	objA0.countdown_value = 0x3b
 	objA0.countdown_callback = 0x0871c2
 
-	A2 = (objA0.render_flags & render_flag.FLIP_X) ? 0x087686 : 0x087680
-
-	SpawnChildObjectChain()
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		// "spawnChildObjectChain(0x087686)" replaced by:
+		spawnChildObjectsChain(0x087248, 5)		// Throwing arm facing right
+	}
+	else
+	{
+		// "spawnChildObjectChain(0x087680)" replaced by:
+		spawnChildObjectsChain(0x08724e, 5)		// Throwing arm facing left
+	}
 }
 
 

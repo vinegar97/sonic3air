@@ -43,8 +43,11 @@ function void fn072400()
 	// "spawnChildObjects(0x07296e)" replaced by:
 	spawnChildObject(0x072596, 0x00, 0, 0)
 
-	spawnChildObjectChain(0x072976)
-	spawnChildObjectChain(0x07297c)
+	// "spawnChildObjectChain(0x072976)" replaced by:
+	spawnChildObjectsChain(0x0725f4, 6)		// Bottom arm
+
+	// "spawnChildObjectChain(0x07297c)" replaced by:
+	spawnChildObjectsChain(0x0725ee, 6)		// Top arm
 }
 
 
