@@ -86,8 +86,11 @@ function void fn078562()
 	level.bossarea.top = 0x07a8
 	level.bossarea.bottom = objA0.position.y.u16
 
-	spawnChildObjectHierarchy(0x078d84)
-	spawnChildObjectHierarchy(0x078d8a)
+	// "spawnChildObjectHierarchy(0x078d84)" replaced by:
+	spawnChildObjectsHierarchy(0x07880a, 12)		// Wiggling shooting arm on the right
+
+	// "spawnChildObjectHierarchy(0x078d8a)" replaced by:
+	spawnChildObjectsHierarchy(0x0787fe, 12)		// Wiggling shooting arm on the left
 }
 
 

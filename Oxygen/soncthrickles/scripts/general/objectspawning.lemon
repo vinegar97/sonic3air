@@ -574,12 +574,58 @@ function void spawnChildObjectHierarchy(u32 address)
 {
 	A2 = address
 	SpawnChildObjectHierarchy()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			u16 count = u16[address] + 1
+			u32 updateAddress = u32[address + 2]
+
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnChildObjectHierarchy")
+			ROMDataAnalyser.addKeyValue("count", stringformat("%d", count))
+			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 function void spawnUniqueChildObjectHierarchy(u32 address)
 {
 	A2 = address
 	SpawnUniqueChildObjectHierarchy()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnUniqueChildObjectHierarchy")
+
+			A2 = address
+			u16 count = u16[A2] + 1
+			A2 += 2
+
+			for (u16 i = 0; i < count; ++i)
+			{
+				u32 updateAddress = u32[A2]
+				u8 subtype = (i * 2)
+
+				ROMDataAnalyser.beginObject(stringformat("%d", i))
+				ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+				ROMDataAnalyser.addKeyValue("subtype", stringformat("0x%02x", subtype))
+				ROMDataAnalyser.endObject()
+				A2 += 4
+			}
+
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 function void spawnChildObjectsInDir(u32 address)
@@ -842,33 +888,21 @@ function void SpawnChildObjectHierarchy()
 	// Stored data, shared for all children:
 	//  - Update routine
 
-	A3 = A0
-	D2 = 0
 	u16 count = u16[A2] + 1
-	A2 += 2
+	u32 updateAddress = u32[A2 + 2]
+	spawnChildObjectsHierarchy(updateAddress, count)
+}
 
+function void spawnChildObjectsHierarchy(u32 updateAddress, u16 count)
+{
+	D2 = 0
 	for (u16 i = 0; i < count; ++i)
 	{
-		if (!allocDynamicObjectAfterA0())
+		if (!spawnChildObjectHierarchy(updateAddress, D2.u8))
 			return
-
-		// Add references to the direct parent and to the root
-		u16[A1 + 0x46] = A3.u16
-		u16[A1 + 0x44] = A0.u16
-		A3 = A1
-
-		objA1.update_address = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset
-		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
-
-		objA1.position.x.u16 = objA0.position.x.u16
-		objA1.position.y.u16 = objA0.position.y.u16
 
 		D2.u16 += 2
 	}
-
-	_setZeroFlagByValue(false)
 }
 
 
@@ -879,33 +913,45 @@ function void SpawnUniqueChildObjectHierarchy()
 	// Stored data per child:
 	//  - Update routine
 
-	A3 = A0
 	D2 = 0
 	u16 count = u16[A2] + 1
 	A2 += 2
 
 	for (u16 i = 0; i < count; ++i)
 	{
-		if (!allocDynamicObjectAfterA0())
+		u32 updateAddress = u32[A2]
+
+		if (!spawnChildObjectHierarchy(updateAddress, D2.u8))
 			return
-
-		u16[A1 + 0x46] = A3.u16
-		u16[A1 + 0x44] = A0.u16
-		A3 = A1
-
-		objA1.update_address = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset
-		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
-
-		objA1.position.x.u16 = objA0.position.x.u16
-		objA1.position.y.u16 = objA0.position.y.u16
 
 		A2 += 4
 		D2.u16 += 2
 	}
+}
+
+function bool spawnChildObjectHierarchy(u32 updateAddress, u8 subtype)
+{
+	if (!allocDynamicObjectAfterA0())
+		return false
+
+	if (subtype == 0)
+		A3 = A0
+
+	// Add references to the direct parent and to the root
+	u16[A1 + 0x46] = A3.u16
+	u16[A1 + 0x44] = A0.u16
+	A3 = A1
+
+	objA1.update_address = updateAddress
+	objA1.mapping_offset = objA0.mapping_offset
+	objA1.sprite_attributes = objA0.sprite_attributes
+	objA1.subtype2c = subtype
+
+	objA1.position.x.u16 = objA0.position.x.u16
+	objA1.position.y.u16 = objA0.position.y.u16
 
 	_setZeroFlagByValue(false)
+	return true
 }
 
 
