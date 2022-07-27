@@ -568,7 +568,8 @@ function void fn0789ca()
 
 	playSound(0x98)
 
-	spawnChildObjectsInDir(0x078d90)
+	// "spawnChildObjectsInDir(0x078d90)" replaced by:
+	spawnChildObjectInDir(0x078a02, 0x00, 8, 0)		// Tiny bullets shot by the wiggling arms
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = objA0.value39
