@@ -506,6 +506,49 @@ function void spawnProjectileChildObjects(u32 address)
 {
 	A2 = address
 	SpawnProjectileChildObjects()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnProjectileChildObjects")
+
+			A2 = address
+			u16 count = u16[A2] + 1
+			A2 += 2
+
+			for (u16 i = 0; i < count; ++i)
+			{
+				u32 updateAddress = u32[A2]
+				u32 attributesOffset = u32[A2 + 4]
+				u32 animationOffset = u32[A2 + 8]
+				u32 callbackAddress = u32[A2 + 12]
+				s8 offset_x = s8[A2 + 16]
+				s8 offset_y = s8[A2 + 17]
+				s16 velocity_x = s16[A2 + 18]
+				s16 velocity_y = s16[A2 + 20]
+				u8 subtype = (i * 2)
+
+				ROMDataAnalyser.beginObject(stringformat("%d", i))
+				ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+				ROMDataAnalyser.addKeyValue("attributesOffset", stringformat("0x%06x", attributesOffset))
+				ROMDataAnalyser.addKeyValue("animationOffset", stringformat("0x%06x", animationOffset))
+				ROMDataAnalyser.addKeyValue("callbackAddress", stringformat("0x%06x", callbackAddress))
+				ROMDataAnalyser.addKeyValue("subtype", stringformat("0x%02x", subtype))
+				ROMDataAnalyser.addKeyValue("offset_x", stringformat((offset_x < 0) ? "-%d" : "%d", abs(offset_x)))
+				ROMDataAnalyser.addKeyValue("offset_y", stringformat((offset_y < 0) ? "-%d" : "%d", abs(offset_y)))
+				ROMDataAnalyser.addKeyValue("velocity_x", stringformat((velocity_x < 0) ? "-%d" : "%d", abs(velocity_x)))
+				ROMDataAnalyser.addKeyValue("velocity_y", stringformat((velocity_y < 0) ? "-%d" : "%d", abs(velocity_y)))
+				ROMDataAnalyser.endObject()
+				A2 += 22
+			}
+
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 function void spawnIdenticalChildObjects(u32 address)
@@ -562,6 +605,49 @@ function void spawnProjectileChildObjectsInDir(u32 address)
 {
 	A2 = address
 	SpawnProjectileChildObjectsInDir()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnProjectileChildObjectsInDir")
+
+			A2 = address
+			u16 count = u16[A2] + 1
+			A2 += 2
+
+			for (u16 i = 0; i < count; ++i)
+			{
+				u32 updateAddress = u32[A2]
+				u32 attributesOffset = u32[A2 + 4]
+				u32 animationOffset = u32[A2 + 8]
+				u32 callbackAddress = u32[A2 + 12]
+				s8 offset_x = s8[A2 + 16]
+				s8 offset_y = s8[A2 + 17]
+				s16 velocity_x = s16[A2 + 18]
+				s16 velocity_y = s16[A2 + 20]
+				u8 subtype = (i * 2)
+
+				ROMDataAnalyser.beginObject(stringformat("%d", i))
+				ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+				ROMDataAnalyser.addKeyValue("attributesOffset", stringformat("0x%06x", attributesOffset))
+				ROMDataAnalyser.addKeyValue("animationOffset", stringformat("0x%06x", animationOffset))
+				ROMDataAnalyser.addKeyValue("callbackAddress", stringformat("0x%06x", callbackAddress))
+				ROMDataAnalyser.addKeyValue("subtype", stringformat("0x%02x", subtype))
+				ROMDataAnalyser.addKeyValue("offset_x", stringformat((offset_x < 0) ? "-%d" : "%d", abs(offset_x)))
+				ROMDataAnalyser.addKeyValue("offset_y", stringformat((offset_y < 0) ? "-%d" : "%d", abs(offset_y)))
+				ROMDataAnalyser.addKeyValue("velocity_x", stringformat((velocity_x < 0) ? "-%d" : "%d", abs(velocity_x)))
+				ROMDataAnalyser.addKeyValue("velocity_y", stringformat((velocity_y < 0) ? "-%d" : "%d", abs(velocity_y)))
+				ROMDataAnalyser.endObject()
+				A2 += 22
+			}
+
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 function void spawnSimpleChildObjects(u32 address)
@@ -747,35 +833,49 @@ function void SpawnProjectileChildObjects()
 
 	for (u16 i = 0; i < count; ++i)
 	{
-		if (!allocDynamicObjectAfterA0())
+		u32 updateAddress = u32[A2]
+		u32 attributesOffset = u32[A2 + 4]
+		u32 animationOffset = u32[A2 + 8]
+		u32 callbackAddress = u32[A2 + 12]
+		s8 offset_x = s8[A2 + 16]
+		s8 offset_y = s8[A2 + 17]
+		s16 velocity_x = s16[A2 + 18]
+		s16 velocity_y = s16[A2 + 20]
+
+		if (!spawnProjectileChildObject(updateAddress, D2.u8, offset_x, offset_y, velocity_x, velocity_y, attributesOffset, animationOffset, callbackAddress))
 			return
-
-		// Basic initialization as above
-		objA1.update_address = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset
-		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
-		u16[A1 + 0x46] = A0.u16
-
-		u32[A1 + 0x3e] = u32[A2+4]
-		u32[A1 + 0x30] = u32[A2+8]
-		u32[A1 + 0x34] = u32[A2+12]
-
-		s8 offset_x = s8[A2+16]
-		s8 offset_y = s8[A2+17]
-		s8[A1 + 0x42] = offset_x
-		s8[A1 + 0x43] = offset_y
-		objA1.position.x.u16 = objA0.position.x.u16 + offset_x
-		objA1.position.y.u16 = objA0.position.y.u16 + offset_y
-
-		objA1.velocity.x = s16[A2+18]
-		objA1.velocity.y = s16[A2+20]
 
 		A2 += 22
 		D2.u16 += 2
 	}
+}
+
+function bool spawnProjectileChildObject(u32 updateAddress, u8 subtype, s8 offset_x, s8 offset_y, s16 velocity_x, s16 velocity_y, u32 attributesOffset, u32 animationOffset, u32 callbackAddress)
+{
+	if (!allocDynamicObjectAfterA0())
+		return false
+
+	// Basic initialization as above
+	objA1.update_address = updateAddress
+	objA1.mapping_offset = objA0.mapping_offset
+	objA1.sprite_attributes = objA0.sprite_attributes
+	objA1.subtype2c = subtype
+	u16[A1 + 0x46] = A0.u16
+
+	objA1.child_attributes_offset = attributesOffset
+	u32[A1 + 0x30] = animationOffset
+	objA1.countdown_callback = callbackAddress
+
+	s8[A1 + 0x42] = offset_x
+	s8[A1 + 0x43] = offset_y
+	objA1.position.x.u16 = objA0.position.x.u16 + offset_x
+	objA1.position.y.u16 = objA0.position.y.u16 + offset_y
+
+	objA1.velocity.x = velocity_x
+	objA1.velocity.y = velocity_y
 
 	_setZeroFlagByValue(false)
+	return true
 }
 
 
@@ -867,35 +967,49 @@ function void SpawnProjectileChildObjectsInDir()
 
 	for (u16 i = 0; i < count; ++i)
 	{
-		if (!allocDynamicObjectAfterA0())
+		u32 updateAddress = u32[A2]
+		u32 attributesOffset = u32[A2 + 4]
+		u32 animationOffset = u32[A2 + 8]
+		u32 callbackAddress = u32[A2 + 12]
+		s8 offset_x = s8[A2 + 16]
+		s8 offset_y = s8[A2 + 17]
+		s16 velocity_x = s16[A2 + 18]
+		s16 velocity_y = s16[A2 + 20]
+
+		if (!spawnProjectileChildObjectInDir(updateAddress, D2.u8, offset_x, offset_y, velocity_x, velocity_y, attributesOffset, animationOffset, callbackAddress))
 			return
-
-		// Basic initialization as above
-		objA1.update_address = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset
-		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
-		u16[A1 + 0x46] = A0.u16
-
-		u32[A1 + 0x3e] = u32[A2+4]
-		u32[A1 + 0x30] = u32[A2+8]
-		u32[A1 + 0x34] = u32[A2+12]
-
-		s8 offset_x = s8[A2+16]
-		s8 offset_y = s8[A2+17]
-		s8[A1 + 0x42] = offset_x
-		s8[A1 + 0x43] = offset_y
-		objA1.position.x.u16 = objA0.position.x.u16 + ((objA0.render_flags & render_flag.FLIP_X) ? -offset_x : offset_x)
-		objA1.position.y.u16 = objA0.position.y.u16 + offset_y
-
-		objA1.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? -s16[A2+18] : s16[A2+18]
-		objA1.velocity.y = s16[A2+20]
 
 		A2 += 22
 		D2.u16 += 2
 	}
+}
+
+function bool spawnProjectileChildObjectInDir(u32 updateAddress, u8 subtype, s8 offset_x, s8 offset_y, s16 velocity_x, s16 velocity_y, u32 attributesOffset, u32 animationOffset, u32 callbackAddress)
+{
+	if (!allocDynamicObjectAfterA0())
+		return false
+
+	// Basic initialization as above
+	objA1.update_address = updateAddress
+	objA1.mapping_offset = objA0.mapping_offset
+	objA1.sprite_attributes = objA0.sprite_attributes
+	objA1.subtype2c = subtype
+	u16[A1 + 0x46] = A0.u16
+
+	objA1.child_attributes_offset = attributesOffset
+	u32[A1 + 0x30] = animationOffset
+	objA1.countdown_callback = callbackAddress
+
+	s8[A1 + 0x42] = offset_x
+	s8[A1 + 0x43] = offset_y
+	objA1.position.x.u16 = objA0.position.x.u16 + ((objA0.render_flags & render_flag.FLIP_X) ? -offset_x : offset_x)
+	objA1.position.y.u16 = objA0.position.y.u16 + offset_y
+
+	objA1.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? -velocity_x : velocity_x
+	objA1.velocity.y = velocity_y
 
 	_setZeroFlagByValue(false)
+	return true
 }
 
 
