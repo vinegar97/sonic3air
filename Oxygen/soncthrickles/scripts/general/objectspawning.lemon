@@ -807,8 +807,8 @@ function bool spawnChildObject(u32 updateAddress, u8 subtype, s8 offset_x, s8 of
 	objA1.subtype2c = subtype							// Usually a simple enumeration of children (in steps of 2)
 	u16[A1 + 0x46] = A0.u16								// Reference to parent
 
-	u8[A1 + 0x42] = offset_x
-	u8[A1 + 0x43] = offset_y
+	s8[A1 + 0x42] = offset_x
+	s8[A1 + 0x43] = offset_y
 	objA1.position.x.u16 = objA0.position.x.u16 + offset_x
 	objA1.position.y.u16 = objA0.position.y.u16 + offset_y
 
@@ -857,10 +857,10 @@ function bool spawnProjectileChildObject(u32 updateAddress, u8 subtype, s8 offse
 
 	// Basic initialization as above
 	objA1.update_address = updateAddress
-	objA1.mapping_offset = objA0.mapping_offset
+	objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
 	objA1.sprite_attributes = objA0.sprite_attributes
-	objA1.subtype2c = subtype
-	u16[A1 + 0x46] = A0.u16
+	objA1.subtype2c = subtype							// Usually a simple enumeration of children (in steps of 2)
+	u16[A1 + 0x46] = A0.u16								// Reference to parent
 
 	objA1.child_attributes_offset = attributesOffset
 	u32[A1 + 0x30] = animationOffset
@@ -916,20 +916,18 @@ function void SpawnChildObjectChain()
 	//  - Update routine
 
 	u16 count = u16[A2] + 1
-	u32 updateAddress = u32[A2+2]
+	u32 updateAddress = u32[A2 + 2]
 	spawnChildObjectsChain(updateAddress, count)
 }
 
 function void spawnChildObjectsChain(u32 updateAddress, u16 count)
 {
+	A3 = A0
 	D2 = 0
 	for (u16 i = 0; i < count; ++i)
 	{
 		if (!allocDynamicObjectAfterA0())
 			return
-
-		if (D2.u8 == 0)
-			A3 = A0
 
 		// Add references to parent as usual, but also register there as a child, forming a double-linked list
 		u16[A1 + 0x46] = A3.u16
@@ -937,9 +935,9 @@ function void spawnChildObjectsChain(u32 updateAddress, u16 count)
 		A3 = A1
 
 		objA1.update_address = updateAddress
-		objA1.mapping_offset = objA0.mapping_offset
+		objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
 		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
+		objA1.subtype2c = D2.u8								// A simple enumeration of children (in steps of 2)
 
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
@@ -991,10 +989,10 @@ function bool spawnProjectileChildObjectInDir(u32 updateAddress, u8 subtype, s8 
 
 	// Basic initialization as above
 	objA1.update_address = updateAddress
-	objA1.mapping_offset = objA0.mapping_offset
+	objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
 	objA1.sprite_attributes = objA0.sprite_attributes
-	objA1.subtype2c = subtype
-	u16[A1 + 0x46] = A0.u16
+	objA1.subtype2c = subtype							// Usually a simple enumeration of children (in steps of 2)
+	u16[A1 + 0x46] = A0.u16								// Reference to parent
 
 	objA1.child_attributes_offset = attributesOffset
 	u32[A1 + 0x30] = animationOffset
@@ -1021,7 +1019,7 @@ function void SpawnSimpleChildObjects()
 	//  - Update routine
 
 	u16 count = u16[A2] + 1
-	u32 updateAddress = u32[A2+2]
+	u32 updateAddress = u32[A2 + 2]
 	spawnSimpleChildObjects(updateAddress, count)
 }
 
@@ -1113,9 +1111,9 @@ function bool spawnChildObjectHierarchy(u32 updateAddress, u8 subtype)
 	A3 = A1
 
 	objA1.update_address = updateAddress
-	objA1.mapping_offset = objA0.mapping_offset
+	objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from root
 	objA1.sprite_attributes = objA0.sprite_attributes
-	objA1.subtype2c = subtype
+	objA1.subtype2c = subtype							// Usually a simple enumeration of children (in steps of 2)
 
 	objA1.position.x.u16 = objA0.position.x.u16
 	objA1.position.y.u16 = objA0.position.y.u16
@@ -1158,9 +1156,9 @@ function bool spawnChildObjectInDir(u32 updateAddress, u8 subtype, s8 offset_x, 
 
 	// Basic initialization as above
 	objA1.update_address = updateAddress
-	objA1.mapping_offset = objA0.mapping_offset
+	objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
 	objA1.sprite_attributes = objA0.sprite_attributes
-	objA1.subtype2c = subtype
+	objA1.subtype2c = subtype							// Usually a simple enumeration of children (in steps of 2)
 	u16[A1 + 0x46] = A0.u16
 
 	if (objA0.render_flags & render_flag.FLIP_X)
@@ -1168,8 +1166,9 @@ function bool spawnChildObjectInDir(u32 updateAddress, u8 subtype, s8 offset_x, 
 		objA1.render_flags |= render_flag.FLIP_X
 		offset_x = -offset_x
 	}
+
 	s8[A1 + 0x42] = offset_x
-	u8[A1 + 0x43] = offset_y
+	s8[A1 + 0x43] = offset_y
 	objA1.position.x.u16 = objA0.position.x.u16 + offset_x
 	objA1.position.y.u16 = objA0.position.y.u16 + offset_y
 
