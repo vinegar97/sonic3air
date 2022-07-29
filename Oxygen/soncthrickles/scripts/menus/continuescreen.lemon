@@ -10,11 +10,12 @@
 // Background containing the text "Continue" and the countdown
 //  -> These functions are also used by the credits, and the Blue Spheres mode result screen
 
-constant u16 ContinueScreen.Numbers.targetInVRAM = 0x0020
-constant u16 ContinueScreen.Characters.targetInVRAM = 0x1180
-constant u16 ContinueScreen.ContinueIcons.targetInVRAM = 0x1b20
-constant u16 ContinueScreen.TextTiles.targetInVRAM = 0x68e0
-constant u16 ContinueScreen.Knuckles.targetInVRAM = 0x9b40
+constant u16 ContinueScreen.Numbers.targetInVRAM		= 0x0020
+constant u16 ContinueScreen.Characters.targetInVRAM		= 0x1180
+constant u16 ContinueScreen.ContinueIcons.targetInVRAM	= 0x1b20
+constant u16 ContinueScreen.TextTiles.targetInVRAM		= 0x68e0
+constant u16 ContinueScreen.Knuckles.targetInVRAM		= 0x9b40
+
 
 //# address-hook(0x05b318) end(0x05b36a)
 function void fn05b318()
@@ -170,7 +171,7 @@ function void fn05c2e0()
 	ClearPatternLoadingQueue()
 	fn0011ca()
 
-	Nemesis.loadDataToVRAM(0x05d788, ContinueScreen.Numbers.targetInVRAM)		// Countdown digits
+	Nemesis.loadDataToVRAM(0x05d788, ContinueScreen.Numbers.targetInVRAM)			// Countdown digits
 	Nemesis.loadDataToVRAM(0x0dde34, ContinueScreen.TextTiles.targetInVRAM)
 	Nemesis.loadDataToVRAM(0x05cd66, ContinueScreen.Characters.targetInVRAM)		// Unique character continue sprites + countdown stars
 	Nemesis.loadDataToVRAM(0x05d3c6, ContinueScreen.ContinueIcons.targetInVRAM)		// Continue icons

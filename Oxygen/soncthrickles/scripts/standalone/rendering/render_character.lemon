@@ -358,7 +358,6 @@ function string getCharacterSpriteKey(u8 character)
 	return getCharacterSpriteKey(character, isSuperActive)
 }
 
-
 function string getCharacterSpriteKey(u8 character, bool isSuperActive)
 {
 	return (character == CHARACTER_SONIC) ? (isSuperActive ? "character_supersonic" : "character_sonic") : (character == CHARACTER_TAILS) ? "character_tails" : "character_knuckles"

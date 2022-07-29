@@ -7,14 +7,14 @@
 */
 
 
-constant u16 TitleScreenSK.Background.targetInVRAM			= 0x0000
-constant u16 TitleScreenSK.characters.targetInVRAM			= 0x1c40
-constant u16 TitleScreenSK.Menu.targetInVRAM				= 0x8c40
-constant u16 TitleScreenSK.SEGALogo.targetInVRAM			= 0x9380
-constant u16 TitleScreenSK.SonicFall.targetInVRAM			= 0x9de0
-constant u16 TitleScreenSK.SKTitleLogo.targetInVRAM			= 0x9dc0
-constant u16 TitleScreenSK.DeathEgg.targetInVRAM			= 0xd000
-constant u16 TitleScreenSK.Mountain.targetInVRAM			= 0xf400
+constant u16 TitleScreenSK.Background.targetInVRAM	= 0x0000
+constant u16 TitleScreenSK.characters.targetInVRAM	= 0x1c40
+constant u16 TitleScreenSK.Menu.targetInVRAM		= 0x8c40
+constant u16 TitleScreenSK.SEGALogo.targetInVRAM	= 0x9380
+constant u16 TitleScreenSK.SonicFall.targetInVRAM	= 0x9de0
+constant u16 TitleScreenSK.SKTitleLogo.targetInVRAM	= 0x9dc0
+constant u16 TitleScreenSK.DeathEgg.targetInVRAM	= 0xd000
+constant u16 TitleScreenSK.Mountain.targetInVRAM	= 0xf400
 
 
 //# address-hook(0x005048) end(0x00552c)

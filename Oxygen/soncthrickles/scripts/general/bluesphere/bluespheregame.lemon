@@ -1541,13 +1541,13 @@ function void fn04da7e()
 
 	Nemesis.loadDataToVRAM(0x189c7c, BlueSphereGame.Background.targetInVRAM)		// Sonic & Knuckles head logo
 
-	Nemesis.LoadMultipleToVRAM(0x04dde8)			// Robotnik + Egg Mobile and critter art for perfect results screen
+	Nemesis.LoadMultipleToVRAM(0x04dde8)		// Robotnik + Egg Mobile and critter art for perfect results screen
 
-	Kosinski.decompress(0x16416e, 0xffff0000)		// Small Sonic & Knuckles title logo
-	Kosinski.decompress(0x0de364, A1)		// "& Knuckles" subtitle (might be loaded for the trademark sign?)
-	Kosinski.decompress(0x17fcbc, A1)		// Master Emerald sprite
-	Kosinski.decompress(0x163248, A1)		// Robotnik posing sprites
-	Kosinski.decompress(0x15fdde, A1)		// Egg Robo's Egg Mobile sprites
+	Kosinski.decompress(0x16416e, 0xffff0000)	// Small Sonic & Knuckles title logo
+	Kosinski.decompress(0x0de364, A1)			// "& Knuckles" subtitle (might be loaded for the trademark sign?)
+	Kosinski.decompress(0x17fcbc, A1)			// Master Emerald sprite
+	Kosinski.decompress(0x163248, A1)			// Robotnik posing sprites
+	Kosinski.decompress(0x15fdde, A1)			// Egg Robo's Egg Mobile sprites
 
 	updateSpritePattern(0xffff0000, BlueSphereGame.SKTitleLogo.targetInVRAM, A1.u16 >> 1)
 
@@ -1935,8 +1935,8 @@ function void fn04e160()
 		//  - 0x02cd9a	-> D1.u16 = 28	-> Squirrels in perfect screen
 		//  - 0x02ce2c	-> D1.u16 = 32	-> Rabbits in perfect screen
 		//  - 0x07cff0	-> D1.u16 = 36	-> Master Emerald in perfect screen
-		//  - 0x05face	-> D1.u16 = 42	-> Sonic & Knuckles title Logo in perfect screen
-		//  - 0x04e24c	-> D1.u16 = 48	-> Sonic going Super at MAX difficulty
+		//  - 0x05face	-> D1.u16 = 40	-> Sonic & Knuckles title Logo in perfect screen
+		//  - 0x04e24c	-> D1.u16 = 44	-> Sonic going Super at MAX difficulty
 		objA1.update_address = u32[0x04e17a + D1.u16]
 	}
 }

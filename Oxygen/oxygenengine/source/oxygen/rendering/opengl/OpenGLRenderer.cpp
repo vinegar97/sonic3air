@@ -55,8 +55,11 @@ void OpenGLRenderer::initialize()
 		}
 	}
 	mRenderVdpSpriteShader.initialize();
-	mRenderPaletteSpriteShader.initialize();
-	mRenderComponentSpriteShader.initialize();
+	for (int k = 0; k < 2; ++k)
+	{
+		mRenderPaletteSpriteShader[k].initialize(k == 1);
+		mRenderComponentSpriteShader[k].initialize(k == 1);
+	}
 	mDebugDrawPlaneShader.initialize();
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -67,7 +70,7 @@ void OpenGLRenderer::initialize()
 void OpenGLRenderer::reset()
 {
 	clearFullscreenBuffers(mGameScreenBuffer, mProcessingBuffer);
-	mResources.setAllPatternsDirty();
+	mResources.clearAllCaches();
 }
 
 void OpenGLRenderer::setGameResolution(const Vec2i& gameResolution)
@@ -341,10 +344,11 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				case SpriteManager::SpriteInfo::Type::PALETTE:
 				{
 					const SpriteManager::PaletteSpriteInfo& spriteInfo = static_cast<const SpriteManager::PaletteSpriteInfo&>(sg.mSpriteInfo);
-					RenderPaletteSpriteShader& shader = mRenderPaletteSpriteShader;
-					if (needsRefresh)
+					RenderPaletteSpriteShader& shader = mRenderPaletteSpriteShader[spriteInfo.mFullyOpaque ? 0 : 1];
+					if (needsRefresh || mLastUsedRenderPaletteSpriteShader != &shader)
 					{
 						shader.refresh(mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
+						mLastUsedRenderPaletteSpriteShader = &shader;
 					}
 					if (spriteInfo.mSize.x == 0 || spriteInfo.mSize.y == 0)
 					{
@@ -359,10 +363,11 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				case SpriteManager::SpriteInfo::Type::COMPONENT:
 				{
 					const SpriteManager::ComponentSpriteInfo& spriteInfo = static_cast<const SpriteManager::ComponentSpriteInfo&>(sg.mSpriteInfo);
-					RenderComponentSpriteShader& shader = mRenderComponentSpriteShader;
-					if (needsRefresh)
+					RenderComponentSpriteShader& shader = mRenderComponentSpriteShader[spriteInfo.mFullyOpaque ? 0 : 1];
+					if (needsRefresh || mLastUsedRenderComponentSpriteShader != &shader)
 					{
 						shader.refresh(mGameResolution);
+						mLastUsedRenderComponentSpriteShader = &shader;
 					}
 					shader.draw(spriteInfo, mResources);
 					break;

@@ -8,7 +8,7 @@
 
 
 constant u16 LevelSelect.Background.targetInVRAM = 0x0000
-constant u16 LevelSelect.TextTiles.targetInVRAM = 0x0200
+constant u16 LevelSelect.TextTiles.targetInVRAM	 = 0x0200
 
 
 //-------------------------------------------------------//

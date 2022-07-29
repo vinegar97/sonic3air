@@ -74,10 +74,12 @@ void main()
 	int paletteIndex = Atex + int(texture(SpriteTexture, vec2(((float(ix) + 0.5) / float(Size.x)), (float(iy) + 0.5) / float(Size.y))).x * 256.0);
 #endif
 
-	vec4 color = texture(PaletteTexture, vec2(float(paletteIndex) / 256.0, LocalOffset.z + 0.5));
+	vec4 color = texture(PaletteTexture, vec2(float(paletteIndex) / 512.0, LocalOffset.z + 0.5));
 	color = vec4(AddedColor.rgb, 0.0) + color * TintColor;
+#ifdef ALPHA_TEST
 	if (color.a < 0.01)
 		discard;
+#endif
 
 	FragColor = color;
 }
@@ -88,8 +90,14 @@ void main()
 
 technique Standard
 {
-	blendfunc = alpha;
+	blendfunc = opaque;
 	vs = Shared + Vertex;
 	fs = Shared + Fragment;
 	vertexattrib[0] = position;
+}
+
+technique Standard_AlphaTest : Standard
+{
+	blendfunc = alpha;
+	define = ALPHA_TEST;
 }
