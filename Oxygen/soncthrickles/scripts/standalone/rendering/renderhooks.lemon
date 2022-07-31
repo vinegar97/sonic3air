@@ -76,7 +76,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Sonic on the snowboard in ICZ 1
 		if (objA0.update_address == 0x03943a || objA0.update_address == 0x0394a0 || objA0.update_address == 0x0395fe)
 		{
-			u64 key = stringformat(stringformat("%s_snowboarding_0x%02x", getCharacterSpriteKey(CHARACTER_SONIC)), objA0.animation.sprite)
+			u64 key = stringformat(stringformat("%s_snowboarding_0x%02x", getCharacterSpriteKey(CHARACTER_SONIC, false)), objA0.animation.sprite)
 			if (!Renderer.hasCustomSprite(key))
 			{
 				key = Renderer.setupCustomCharacterSprite(0x345010, 0x347f8a, objA0.mapping_offset, objA0.animation.sprite, 0x00)
@@ -266,13 +266,6 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			return true
 		}
 
-		// Cutscene Knuckles in his own outro
-		if (objA0.update_address == 0x05e6c0 && objA0.mapping_offset == 0x0602d6)
-		{
-			Standalone.renderCutsceneKnuckles(6, px, py, renderQueue)
-			return true
-		}
-
 		// Cutscene Knuckles in LRZ 2, HPZ, SSZ
 		//  -> Sub-mode that uses "real" Knuckles sprites
 		if ((objA0.update_address == 0x063a6a) || (objA0.update_address == 0x063de0 && u16[A0 + 0x44] == 0) || (objA0.update_address == 0x0656da && (objA0.flags38 & 0x40) == 0) || (objA0.update_address == 0x063466 && objA0.value42 == 0x02))
@@ -349,6 +342,13 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				return true
 			}
 
+			// Cutscene Knuckles in his own outro
+			if (objA0.update_address == 0x05e6c0 && objA0.mapping_offset == 0x0602d6)
+			{
+				Standalone.renderCutsceneKnuckles(6, px, py, renderQueue)
+				return true
+			}
+
 			// Giant Ring
 			if (objA0.update_address == 0x061682)
 			{
@@ -408,6 +408,13 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			Standalone.drawCharacterSprite(CHARACTER_SONIC, 0, px, py, false)
 			return true
 		}
+
+		// Tails in Blue Sphere mini-game Perfect screen
+		if (objA0.update_address == 0x04e29c)
+		{
+			Standalone.drawCharacterSpriteDirect(CHARACTER_TAILS, px-6, py+4, 0xa6, SPRITE_FLAG_FLIP_X | (prioFlag ? SPRITE_FLAG_PRIO : 0), 0x00, renderQueue)
+			return true
+		}
 	}
 	//else if (gameMode == 0x34)
 	{
@@ -443,11 +450,11 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		if (objA0.update_address == 0x009488)
 		{
 			u8 atex = 0x10
-			u64 key = stringformat("bluesphere_tails_tails_0x%02x", objA0.animation.sprite)
+			u64 key = stringformat(stringformat("%s_tails_0x%02x", getCharacterBluesphereSpriteKey(CHARACTER_TAILS)), objA0.animation.sprite)
 			if (Renderer.hasCustomSprite(key))
 			{
 				// Check if there's also a custom palette
-				string paletteKey = "bluesphere_palette_tails"
+				string paletteKey = getCharacterBluespherePaletteKey(CHARACTER_TAILS)
 				if (System.hasExternalPaletteData(paletteKey, 0))
 				{
 					atex = 0x40 + CHARACTER_TAILS * 0x20
