@@ -138,6 +138,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::CAMERA_OUTRUN,				SharedDatabase::Setting::SETTING_CAMERA_OUTRUN);
 		setupOptionEntry(option::EXTENDED_CAMERA,			SharedDatabase::Setting::SETTING_EXTENDED_CAMERA);
 		setupOptionEntry(option::SPECIAL_STAGE_REPEAT,		SharedDatabase::Setting::SETTING_BS_REPEAT_ON_FAIL);
+		setupOptionEntry(option::MONITOR_BEHAVIOR,			SharedDatabase::Setting::SETTING_MONITOR_BEHAVIOR);
 		setupOptionEntry(option::RANDOM_MONITORS,			SharedDatabase::Setting::SETTING_RANDOM_MONITORS);
 		setupOptionEntry(option::RANDOM_SPECIALSTAGES,		SharedDatabase::Setting::SETTING_RANDOM_SPECIALSTAGES);
 		setupOptionEntry(option::AIZ_BLIMPSEQUENCE,			SharedDatabase::Setting::SETTING_AIZ_BLIMPSEQUENCE);
@@ -528,6 +529,10 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		entries.addEntry<OptionsMenuEntry>().initEntry("Keep Shield after Zone:", option::MAINTAIN_SHIELDS)
 			.addOption("Disabled", 0)
 			.addOption("Enabled", 1);
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Monitor Behavior:", option::MONITOR_BEHAVIOR)
+			.addOption("Sonic & Knuckles", 0)
+			.addOption("Sonic 3", 1);
 
 
 		entries.addEntry<TitleMenuEntry>().initEntry("Time Attack");

@@ -91,6 +91,7 @@ void SharedDatabase::initialize()
 		ADD_SETTING_ALLOW_TA(Setting::SETTING_CAMERA_OUTRUN);			// Allowed in Time Attack, even though it's not purely visual (it has a minimal impact on gameplay simulation)
 		ADD_SETTING_ALLOW_TA(Setting::SETTING_EXTENDED_CAMERA);			// Same here
 		ADD_SETTING_SERIALIZED(Setting::SETTING_MAINTAIN_SHIELDS);
+		ADD_SETTING_SERIALIZED(Setting::SETTING_MONITOR_BEHAVIOR);
 		ADD_SETTING_SERIALIZED(Setting::SETTING_BS_REPEAT_ON_FAIL);
 		ADD_SETTING_SERIALIZED(Setting::SETTING_DISABLE_GHOST_SPAWN);
 
