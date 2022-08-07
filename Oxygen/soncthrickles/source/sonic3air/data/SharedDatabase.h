@@ -92,6 +92,7 @@ public:
 			SETTING_CNZ_PROTOTYPE_MUSIC			= 0x80041100,
 			SETTING_ICZ_PROTOTYPE_MUSIC			= 0x80051100,
 			SETTING_LBZ_PROTOTYPE_MUSIC			= 0x80061100,
+			SETTING_FBZ2_MIDBOSS_TRACK			= 0x80080300,
 			SETTING_SSZ_BOSS_TRACKS				= 0x800c0100,
 
 			SETTING_GFX_ANTIFLICKER				= 0x00001a01,
@@ -114,13 +115,13 @@ public:
 		enum class SerializationType
 		{
 			NONE,		// Not serialized
-			HIDDEN,		// Hidden when default, i.e. doe snot get written in that case
+			HIDDEN,		// Hidden when default, i.e. does not get written in that case
 			ALWAYS		// Serialized
 		};
 
 		Type mSettingId;
 		std::string mIdentifier;
-		mutable uint32 mValue = 0;
+		mutable uint32 mCurrentValue = 0;
 		uint32 mDefaultValue = 0;
 		bool mPurelyVisual = false;
 		bool mAllowInTimeAttack = false;
@@ -209,6 +210,10 @@ public:
 
 	static Secret* getSecret(uint32 secretId);
 	static inline const std::vector<Secret>& getSecrets()  { return mSecrets; }
+
+private:
+	static Setting& addSetting(SharedDatabase::Setting::Type id, const char* identifier, SharedDatabase::Setting::SerializationType serializationType, bool enforceAllowInTimeAttack = false);
+	static void setupSettings();
 
 private:
 	static bool mIsInitialized;

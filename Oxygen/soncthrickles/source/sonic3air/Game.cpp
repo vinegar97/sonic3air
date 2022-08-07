@@ -269,13 +269,13 @@ uint32 Game::getSetting(uint32 settingId, bool ignoreGameMode) const
 		// Special handling for Debug Mode setting in dev mode
 		if (settingId == SharedDatabase::Setting::SETTING_DEBUG_MODE)
 		{
-			if (!setting->mValue)
+			if (!setting->mCurrentValue)
 			{
 				if (EngineMain::getDelegate().useDeveloperFeatures() && ConfigurationImpl::instance().mDevModeImpl.mEnforceDebugMode)
 					return true;
 			}
 		}
-		return setting->mValue;
+		return setting->mCurrentValue;
 	}
 	else
 	{
@@ -288,7 +288,7 @@ void Game::setSetting(uint32 settingId, uint32 value)
 {
 	const SharedDatabase::Setting* setting = SharedDatabase::getSetting(settingId);
 	RMX_CHECK(nullptr != setting, "Setting not found", return);
-	setting->mValue = value;
+	setting->mCurrentValue = value;
 }
 
 void Game::checkForUnlockedSecrets()
@@ -778,7 +778,7 @@ void Game::onGameRecordingHeaderLoaded(const std::string& buildString, const std
 		const auto it = settings.find(settingId);
 		if (it != settings.end())
 		{
-			it->second.mValue = value;
+			it->second.mCurrentValue = value;
 		}
 	}
 }
@@ -802,78 +802,7 @@ void Game::onGameRecordingHeaderSave(std::vector<uint8>& buffer)
 	for (const SharedDatabase::Setting* setting : relevantSettings)
 	{
 		serializer.writeAs<uint32>(setting->mSettingId);
-		serializer.write(setting->mValue);
-	}
-}
-
-void Game::refreshInputIcons(InputManager::InputType inputType)
-{
-	static const uint64 INPUT_ICON_BUTTON_A     = rmx::getMurmur2_64(std::string_view("@input_icon_button_A"));
-	static const uint64 INPUT_ICON_BUTTON_B     = rmx::getMurmur2_64(std::string_view("@input_icon_button_B"));
-	static const uint64 INPUT_ICON_BUTTON_X     = rmx::getMurmur2_64(std::string_view("@input_icon_button_X"));
-	static const uint64 INPUT_ICON_BUTTON_Y     = rmx::getMurmur2_64(std::string_view("@input_icon_button_Y"));
-	static const uint64 INPUT_ICON_BUTTON_LEFT  = rmx::getMurmur2_64(std::string_view("@input_icon_button_left"));
-	static const uint64 INPUT_ICON_BUTTON_RIGHT = rmx::getMurmur2_64(std::string_view("@input_icon_button_right"));
-	static const uint64 INPUT_ICON_BUTTON_UP    = rmx::getMurmur2_64(std::string_view("@input_icon_button_up"));
-	static const uint64 INPUT_ICON_BUTTON_DOWN  = rmx::getMurmur2_64(std::string_view("@input_icon_button_down"));
-	static const uint64 INPUT_ICON_BUTTON_START = rmx::getMurmur2_64(std::string_view("@input_icon_button_start"));
-	static const uint64 INPUT_ICON_BUTTON_BACK  = rmx::getMurmur2_64(std::string_view("@input_icon_button_back"));
-
-	SpriteCache& spriteCache = SpriteCache::instance();
-	switch (inputType)
-	{
-		case InputManager::InputType::KEYBOARD:
-		{
-			// TODO: Use the correct key icons
-			static const uint64 INPUT_ICON_KEY_A     = rmx::getMurmur2_64(std::string_view("input_icon_key_A"));
-			static const uint64 INPUT_ICON_KEY_S     = rmx::getMurmur2_64(std::string_view("input_icon_key_S"));
-			static const uint64 INPUT_ICON_KEY_D     = rmx::getMurmur2_64(std::string_view("input_icon_key_D"));
-			static const uint64 INPUT_ICON_KEY_W     = rmx::getMurmur2_64(std::string_view("input_icon_key_W"));
-			static const uint64 INPUT_ICON_KEY_LEFT  = rmx::getMurmur2_64(std::string_view("input_icon_key_left"));
-			static const uint64 INPUT_ICON_KEY_RIGHT = rmx::getMurmur2_64(std::string_view("input_icon_key_right"));
-			static const uint64 INPUT_ICON_KEY_UP    = rmx::getMurmur2_64(std::string_view("input_icon_key_up"));
-			static const uint64 INPUT_ICON_KEY_DOWN  = rmx::getMurmur2_64(std::string_view("input_icon_key_down"));
-			static const uint64 INPUT_ICON_KEY_ENTER = rmx::getMurmur2_64(std::string_view("input_icon_key_enter"));
-			static const uint64 INPUT_ICON_KEY_BACK  = rmx::getMurmur2_64(std::string_view("input_icon_key_back"));
-
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     INPUT_ICON_KEY_A);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     INPUT_ICON_KEY_S);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     INPUT_ICON_KEY_D);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_Y,     INPUT_ICON_KEY_W);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  INPUT_ICON_KEY_LEFT);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, INPUT_ICON_KEY_RIGHT);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    INPUT_ICON_KEY_UP);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  INPUT_ICON_KEY_DOWN);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, INPUT_ICON_KEY_ENTER);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  INPUT_ICON_KEY_BACK);
-			break;
-		}
-
-		case InputManager::InputType::GAMEPAD:
-		{
-			static const uint64 INPUT_ICON_XBOX_A     = rmx::getMurmur2_64(std::string_view("input_icon_xbox_A"));
-			static const uint64 INPUT_ICON_XBOX_B     = rmx::getMurmur2_64(std::string_view("input_icon_xbox_B"));
-			static const uint64 INPUT_ICON_XBOX_X     = rmx::getMurmur2_64(std::string_view("input_icon_xbox_X"));
-			static const uint64 INPUT_ICON_XBOX_Y     = rmx::getMurmur2_64(std::string_view("input_icon_xbox_Y"));
-			static const uint64 INPUT_ICON_XBOX_LEFT  = rmx::getMurmur2_64(std::string_view("input_icon_xbox_left"));
-			static const uint64 INPUT_ICON_XBOX_RIGHT = rmx::getMurmur2_64(std::string_view("input_icon_xbox_right"));
-			static const uint64 INPUT_ICON_XBOX_UP    = rmx::getMurmur2_64(std::string_view("input_icon_xbox_up"));
-			static const uint64 INPUT_ICON_XBOX_DOWN  = rmx::getMurmur2_64(std::string_view("input_icon_xbox_down"));
-			static const uint64 INPUT_ICON_XBOX_START = rmx::getMurmur2_64(std::string_view("input_icon_xbox_start"));
-			static const uint64 INPUT_ICON_XBOX_BACK  = rmx::getMurmur2_64(std::string_view("input_icon_xbox_back"));
-
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     INPUT_ICON_XBOX_A);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     INPUT_ICON_XBOX_B);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     INPUT_ICON_XBOX_X);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_Y,     INPUT_ICON_XBOX_Y);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  INPUT_ICON_XBOX_LEFT);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, INPUT_ICON_XBOX_RIGHT);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    INPUT_ICON_XBOX_UP);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  INPUT_ICON_XBOX_DOWN);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, INPUT_ICON_XBOX_START);
-			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  INPUT_ICON_XBOX_BACK);
-			break;
-		}
+		serializer.write(setting->mCurrentValue);
 	}
 }
 
