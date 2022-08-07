@@ -431,13 +431,6 @@ function void MonitorIntact.CheckBlocking()
 		{
 			canOpenMonitor = true
 		}
-	#endif
-		else if (u8[A1 + 0x38] == CHARACTER_KNUCKLES)
-		{
-			// Check if Knuckles glides into the monitor
-			canOpenMonitor = (u8[A1 + 0x2f] == 1 || u8[A1 + 0x2f] == 3)
-		}
-	#if STANDALONE
 		else if (objA1.state == char.state.SPINDASH)
 		{
 			canOpenMonitor = true
@@ -447,6 +440,11 @@ function void MonitorIntact.CheckBlocking()
 			canOpenMonitor = true
 		}
 	#endif
+		else if (u8[A1 + 0x38] == CHARACTER_KNUCKLES)
+		{
+			// Check if Knuckles glides into the monitor
+			canOpenMonitor = (u8[A1 + 0x2f] == 1 || u8[A1 + 0x2f] == 3)
+		}
 
 		if (!canOpenMonitor)
 		{
