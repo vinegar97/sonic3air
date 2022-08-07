@@ -5171,6 +5171,8 @@ function void Character.OnCollisionWithDynamicObject()
 				if (char.flags & char.flag.IN_AIR)
 					objA1.flags2a &= ~object.flag.P1_PUSHING
 			}
+
+			movingUp = (movingUp && (abs(char.position.x.u16 - objA1.position.x.u16) < 0x12 || char.state == char.state.ROLLING))		// only bounce at a certain distance, otherwise push the player away when falling, #contributed by GFX32
 		#endif
 			if (movingUp)
 			{
