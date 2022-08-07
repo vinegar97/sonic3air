@@ -442,6 +442,10 @@ function void MonitorIntact.CheckBlocking()
 		{
 			canOpenMonitor = true
 		}
+		else if (objA0.velocity.y != 0)
+		{
+			canOpenMonitor = true
+		}
 	#endif
 
 		if (!canOpenMonitor)
