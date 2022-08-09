@@ -400,6 +400,63 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			//}
 		}
 	}
+	else if (gameMode == 0x14)
+	{
+		// Continue screen after a game over
+
+		// Unique character sprites
+		if (objA0.update_address == 0x05c55c || objA0.update_address == 0x05c74a || objA0.update_address == 0x05c88c || (objA0.update_address == 0x05c8ac))
+		{
+			u8 character = (objA0.update_address == 0x05c55c) ? CHARACTER_SONIC : (objA0.update_address == 0x05c74a) ? CHARACTER_TAILS : CHARACTER_KNUCKLES
+			u8 atex = 0x40 + character * 0x20
+			u64 key = stringformat("%s_continue_0x%02x", getCharacterSpriteKey(character), objA0.animation.sprite)
+			if (Renderer.hasCustomSprite(key))
+			{
+				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+				return true
+			}
+		}
+
+		// Small character icon
+		if (objA0.update_address == 0x05ca5c || objA0.update_address == 0x05ca9e)
+		{
+			u8 character = getMainCharacter()
+			u8 atex = 0x40 + character * 0x20
+			u64 key = stringformat((objA0.update_address == 0x05ca9e) ? "%s_tails_wait_0x%02x" : "%s_wait_0x%02x", getCharacterContinueIcon(character), objA0.animation.sprite)
+			if (Renderer.hasCustomSprite(key))
+			{
+				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+				return true
+			}
+		}
+
+		// Main Sonic sprites
+		if (objA0.update_address == 0x05c588 || objA0.update_address == 0x05c660)
+		{
+			Standalone.drawCharacterSprite(CHARACTER_SONIC, 0, px, py, false)
+			return true
+		}
+
+		// Main Tails sprites
+		if (objA0.update_address == 0x05c790)
+		{
+			Standalone.drawCharacterSprite(CHARACTER_TAILS, 0, px, py, false)
+			return true
+		}
+
+		// Main Knuckles sprites
+		if (objA0.update_address == 0x05c8c8)
+		{
+			u64 key = stringformat(stringformat("%s_0x%02x", getCharacterSpriteKey(CHARACTER_KNUCKLES)), objA0.animation.sprite)
+			if (!Renderer.hasCustomSprite(key))
+			{
+				key = Renderer.setupCustomCharacterSprite(0x1200e0, 0x14bd0a, 0x14a8d6, objA0.animation.sprite, 0x00)
+			}
+			Renderer.drawCustomSprite(key, px, py, 0x80, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+			return true
+		}
+
+	}
 	else if (gameMode == 0x2c)
 	{
 		// (Super) Sonic in Blue Sphere mini-game Perfect screen
