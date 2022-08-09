@@ -213,6 +213,17 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				HUD.drawSprite("hud_text_time", px, py, renderQueue)
 				return true
 			}
+			else if (objA0.animation.sprite >= 0x13 && objA0.animation.sprite <= 0x16)
+			{
+				u8 character = getMainCharacter()
+				u64 key = getCharacterResultsNameplate(character)
+				u8 atex = 0x40 + character * 0x20
+				if (Renderer.hasCustomSprite(key))
+				{
+					Renderer.drawCustomSprite(key, px, py, atex, SPRITE_FLAG_PRIO, renderQueue)
+					return true
+				}
+			}
 		}
 
 		// ICZ 1 snowboard
@@ -566,6 +577,19 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				HUD.drawSprite(getCharacterBonusTextIcon(getMainCharacter()), px+60, py-5, renderQueue-1)
 				HUD.drawSprite(isSKStage ? "hud_text_continue_superstage" : "hud_text_continue_chaosstage", px, py, renderQueue)
 				return true
+			}
+			else if (objA0.animation.sprite >= 0x12 && objA0.animation.sprite <= 0x16)
+			{
+				u8 character = getMainCharacter()
+				u64 key = getCharacterResultsNameplate(character)
+				u8 atex = 0x40 + character * 0x20
+				if (objA0.animation.sprite == 0x12)
+					key = stringformat((global.super_emeralds < 7) ? "%s_super" : "%s_hyper", key)
+				if (Renderer.hasCustomSprite(key))
+				{
+					Renderer.drawCustomSprite(key, px, py, atex, SPRITE_FLAG_PRIO, renderQueue)
+					return true
+				}
 			}
 		}
 		else if (objA0.update_address == 0x02ea5a || objA0.update_address == 0x02ea64)
