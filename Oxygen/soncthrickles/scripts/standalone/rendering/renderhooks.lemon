@@ -14,6 +14,8 @@
 
 constant u8 SPRITE_FLAG_FLIP_X			= 0x01
 constant u8 SPRITE_FLAG_FLIP_Y			= 0x02
+constant u8 SPRITE_FLAG_PIXEL_UPSCALING	= 0x08
+constant u8 SPRITE_FLAG_FULLY_OPAQUE	= 0x10		// TODO: This is only supported by software renderer
 constant u8 SPRITE_FLAG_WORLDSPACE		= 0x20
 constant u8 SPRITE_FLAG_PRIO			= 0x40
 constant u8 SPRITE_FLAG_NO_GLOBAL_TINT	= 0x80
@@ -621,7 +623,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			}
 			else
 			{
-				key = Renderer.setupCustomCharacterSprite(0x2909e8, 0x291106, objA0.mapping_offset, objA0.animation.sprite, 0x10)
+				key = Renderer.setupCustomCharacterSprite(0x2909e8, 0x291106, objA0.mapping_offset, objA0.animation.sprite, atex)
 			}
 			Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
 			return true
@@ -841,7 +843,7 @@ function bool Standalone.onDrawVdpSprite(s16 px, s16 py, u8 size, u16 index, u16
 	}
 
 	// DEZ 1 Retractable Spring (the one added for S3AIR specifically)
-	if (objA0.update_address == 0x0480d4 && global.zone_act == 0x0b00 && index == 0x2b32)
+	if (objA0.update_address == 0x0480d4 && global.zone_act == 0x0b00 && index == (sprite_attribute.PALETTE.LINE1 | sprite_attribute.FLIP_X | 0x0332))
 	{
 		Renderer.drawCustomSprite("dez_retracting_spring_base", px + 0x10, py + 8, 0, objA0.render_flags, renderQueue + 1)
 		return true
@@ -870,25 +872,25 @@ function bool Standalone.onDrawVdpSpriteCompound(s16 px, s16 py, u8 size, u16 in
 	// Character icons in Data Select
 	if (objA0.update_address == 0x00d30c || objA0.update_address == 0x00d42c)
 	{
-		if (index == 0xa342)	// Icon for "Knuckles & Tails" (would actually be a broken "Del" sign)
+		if (index == (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0342))	// Icon for "Knuckles & Tails" (would actually be a broken "Del" sign)
 		{
 			// Draw Knuckles (flipped)
 			px += 2
 			py += 32
-			Renderer.drawVdpSprite(px,   py,    0x0e, 0xab2f ^ 0x0800, renderQueue)
-			Renderer.drawVdpSprite(px+8, py+24, 0x08, 0xab3b ^ 0x0800, renderQueue)
-			Renderer.drawVdpSprite(px,   py+32, 0x0c, 0xab3e ^ 0x0800, renderQueue)
+			Renderer.drawVdpSprite(px,   py,    0x0e, sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | sprite_attribute.FLIP_X | 0x032f ^ sprite_attribute.FLIP_X, renderQueue)
+			Renderer.drawVdpSprite(px+8, py+24, 0x08, sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | sprite_attribute.FLIP_X | 0x033b ^ sprite_attribute.FLIP_X, renderQueue)
+			Renderer.drawVdpSprite(px,   py+32, 0x0c, sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | sprite_attribute.FLIP_X | 0x033e ^ sprite_attribute.FLIP_X, renderQueue)
 
 			// Draw Tails
 			px += 18
 			py -= 2
-			Renderer.drawVdpSprite(px+8, py,    0x00, 0xab1d, renderQueue)
-			Renderer.drawVdpSprite(px,   py+8,  0x0d, 0xab1e, renderQueue)
-			Renderer.drawVdpSprite(px+8, py+24, 0x0d, 0xab26, renderQueue)
-			Renderer.drawVdpSprite(px,   py+32, 0x00, 0xab2e, renderQueue)
+			Renderer.drawVdpSprite(px+8, py,    0x00, sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | sprite_attribute.FLIP_X | 0x031d, renderQueue)
+			Renderer.drawVdpSprite(px,   py+8,  0x0d, sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | sprite_attribute.FLIP_X | 0x031e, renderQueue)
+			Renderer.drawVdpSprite(px+8, py+24, 0x0d, sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | sprite_attribute.FLIP_X | 0x0326, renderQueue)
+			Renderer.drawVdpSprite(px,   py+32, 0x00, sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | sprite_attribute.FLIP_X | 0x032e, renderQueue)
 			return true
 		}
-		else if (index == 0xa34e)	// Ignore right part of broken "Del" sign
+		else if (index == (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x034e))	// Ignore right part of broken "Del" sign
 		{
 			return true
 		}
