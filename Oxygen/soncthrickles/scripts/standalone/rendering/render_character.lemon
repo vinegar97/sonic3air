@@ -372,3 +372,8 @@ function string getCharacterBluesphereSpriteKey(u8 character)
 {
 	return (character == CHARACTER_SONIC) ? "bluesphere_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_tails" : "bluesphere_knuckles"
 }
+
+function string getCharacterTornadoSpriteKey(u8 character)
+{
+	return (character == CHARACTER_SONIC) ? "tornado_sonic" : (character == CHARACTER_TAILS) ? "tornado_tails" : "tornado_knuckles"
+}

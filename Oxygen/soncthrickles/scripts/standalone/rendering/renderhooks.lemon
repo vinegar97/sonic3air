@@ -270,6 +270,37 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			return true
 		}
 
+		// Character sprites for riding the Tornado
+		if (objA0.update_address == 0x05ebb4 || objA0.update_address == 0x05ed18)
+		{
+			u64 key = 0
+			u8 atex = 0
+			u8 character = isMainCharacter(CHARACTER_SONIC) ? CHARACTER_TAILS : isMainCharacter(CHARACTER_TAILS) ? CHARACTER_SONIC : isSecondCharacter(CHARACTER_TAILS) ? CHARACTER_TAILS : CHARACTER_SONIC
+			if (objA0.update_address == 0x05ebb4)
+			{
+				key = stringformat("%s_pilot", getCharacterTornadoSpriteKey(character))
+			}
+			else //if (objA0.update_address == 0x05ed18)
+			{
+				if (objA0.subtype2c != 0)
+					character = getMainCharacter()
+				key = stringformat((objA0.subtype2c == 0) ? "%s_pilot_small" : "%s_small", getCharacterTornadoSpriteKey(character))
+			}
+
+			atex = 0x40 + character * 0x20
+			if (Renderer.hasCustomSprite(key))
+			{
+				if (objA0.subtype2c != 0 && isMainCharacter(CHARACTER_KNUCKLES) && outro.ending_type >= 0)
+				{
+					// Render the Master Emerald sprite separately
+					Renderer.drawVdpSprite(px-18, py-24, 0x0d, sprite_attribute.PRIORITY | sprite_attribute.FLIP_X | sprite_attribute.PALETTE.LINE2 | 0x02e7, renderQueue-1)
+					Renderer.drawVdpSprite(px-10, py-8, 0x04, sprite_attribute.PRIORITY | sprite_attribute.FLIP_X | sprite_attribute.PALETTE.LINE2 | 0x02ef, renderQueue-1)
+				}
+				Renderer.drawCustomSprite(key, px, py, atex, (objA0.render_flags & render_flag.FLIP_X) | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+				return true
+			}
+		}
+
 		// Cutscene Sonic in intro
 		if (objA0.update_address == 0x067472)
 		{
