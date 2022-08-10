@@ -270,6 +270,22 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			return true
 		}
 
+		// Signpost
+		if (objA0.update_address == 0x0837b2)
+		{
+			u64 key = 0			
+			u8 character = (objA0.animation.sprite == 0) ? CHARACTER_SONIC : (objA0.animation.sprite == 1) ? CHARACTER_TAILS : (objA0.animation.sprite == 2) ? CHARACTER_KNUCKLES : 0xff
+			u8 atex = 0x40 + character * 0x20
+
+			if (character != 0xff)
+				key = getCharacterSignpostSpriteKey(character)
+			if (Renderer.hasCustomSprite(key))
+			{
+				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+				return true
+			}
+		}
+
 		// Character sprites in best ending final scene
 		if (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f3da || objA0.update_address == 0x05f400)
 		{
