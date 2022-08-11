@@ -561,21 +561,43 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		}
 
 	}
-	else if (gameMode == 0x2c)
+	else if (gameMode == 0x2c || gameMode == 0x30)
 	{
-		// (Super) Sonic in Blue Sphere mini-game Perfect screen
-		if (objA0.update_address == 0x04e222 || objA0.update_address == 0x04e23a)
+		// Blue Sphere mini-game
+
+		// (Super) Sonic in Blue Sphere mini-game Results and Perfect screen
+		if (objA0.update_address == 0x04e222 || objA0.update_address == 0x04e23a || objA0.update_address == 0x04dfee || objA0.update_address == 0x04e202)
 		{
 			Standalone.drawCharacterSprite(CHARACTER_SONIC, 0, px, py, false)
 			return true
 		}
 
-		// Tails in Blue Sphere mini-game Perfect screen
+		// "unique" Tails sprite in Blue Sphere mini-game Perfect screen
 		if (objA0.update_address == 0x04e29c)
 		{
 			Standalone.drawCharacterSpriteDirect(CHARACTER_TAILS, px-6, py+4, 0xa6, SPRITE_FLAG_FLIP_X | (prioFlag ? SPRITE_FLAG_PRIO : 0), 0x00, renderQueue)
 			return true
 		}
+
+		// Tails in Blue Sphere mini-game Results
+		if (objA0.update_address == 0x04dffe)
+		{
+			Standalone.drawCharacterSprite(CHARACTER_TAILS, 0, px, py, false)
+			return true
+		}
+
+		// Knuckles in Blue Sphere mini-game Results and Perfect screen
+		if ((objA0.update_address == 0x04e000) || (objA0.update_address == 0x04e2f0))
+		{
+			u64 key = stringformat(stringformat("%s_0x%02x", getCharacterSpriteKey(CHARACTER_KNUCKLES)), objA0.animation.sprite)
+			if (!Renderer.hasCustomSprite(key))
+			{
+				key = Renderer.setupCustomCharacterSprite(0x1200e0, 0x14bd0a, 0x14a8d6, objA0.animation.sprite, 0x00)
+			}
+			Renderer.drawCustomSprite(key, px, py, 0x80, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+			return true
+		}
+
 	}
 	//else if (gameMode == 0x34)
 	{
