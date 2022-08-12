@@ -502,6 +502,14 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			//	Standalone.renderWithKosinskiCompression(px, py, 0x37060e, 0xff, renderQueue, 0xae80)
 			//	return true
 			//}
+
+			// Elemental Shields + Insta-Shield
+			if (objA0.update_address == 0x01952a || objA0.update_address == 0x019602 || objA0.update_address == 0x019732 || objA0.update_address == 0x019922)
+			{
+				u64 key = Renderer.setupCustomCharacterSprite(objA0.shield.art_offset, objA0.shield.pattern_offset, objA0.mapping_offset, objA0.animation.sprite, 0x00)
+				Renderer.drawCustomSprite(key, px, py, 0x00, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+				return true
+			}
 		}
 	}
 	else if (gameMode == 0x14)
