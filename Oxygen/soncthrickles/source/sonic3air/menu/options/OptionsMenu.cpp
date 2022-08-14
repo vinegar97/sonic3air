@@ -26,6 +26,7 @@
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/Utils.h"
+#include "oxygen/simulation/Simulation.h"
 
 
 namespace
@@ -73,10 +74,11 @@ namespace
 		ConditionalOption(option::DROP_DASH, 				 false, SharedDatabase::Secret::SECRET_DROPDASH),
 		ConditionalOption(option::SUPER_PEELOUT,			 false, SharedDatabase::Secret::SECRET_SUPER_PEELOUT),
 
-		ConditionalOption(option::DEBUG_MODE,				 true,  SharedDatabase::Secret::SECRET_DEBUGMODE),
+		ConditionalOption(option::DEBUG_MODE,				 false, SharedDatabase::Secret::SECRET_DEBUGMODE),
 		ConditionalOption(option::TITLE_SCREEN,				 true,  SharedDatabase::Secret::SECRET_TITLE_SK),
 		ConditionalOption(option::SHIELD_TYPES,				 true),
 		ConditionalOption(option::RANDOM_MONITORS,			 true),
+		ConditionalOption(option::MONITOR_BEHAVIOR,			 true),
 		ConditionalOption(option::RANDOM_SPECIALSTAGES,		 true),
 		ConditionalOption(option::SPECIAL_STAGE_REPEAT,		 true),
 		ConditionalOption(option::REGION,					 true),
@@ -98,6 +100,8 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 		setupOptionEntryEnum8(option::FRAME_SYNC,				&config.mFrameSync);
 
+		setupOptionEntryInt(option::SCRIPT_OPTIMIZATION,		&config.mScriptOptimizationLevel);
+		setupOptionEntryInt(option::GAME_RECORDING_MODE,		&config.mGameRecorder.mRecordingMode);
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
 		setupOptionEntryInt(option::BACKDROP,					&config.mBackdrop);
 		setupOptionEntryInt(option::FILTERING,					&config.mFiltering);
@@ -129,6 +133,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::HYPER_TAILS,				SharedDatabase::Setting::SETTING_HYPER_TAILS);
 		setupOptionEntry(option::HYPER_DASH_CONTROLS,		SharedDatabase::Setting::SETTING_HYPER_DASH_CONTROLS);
 		setupOptionEntry(option::SUPER_SONIC_ABILITY,		SharedDatabase::Setting::SETTING_SUPER_SONIC_ABILITY);
+		setupOptionEntry(option::MONITOR_BEHAVIOR,			SharedDatabase::Setting::SETTING_MONITOR_BEHAVIOR);
 		setupOptionEntry(option::MAINTAIN_SHIELDS,			SharedDatabase::Setting::SETTING_MAINTAIN_SHIELDS);
 		setupOptionEntry(option::SHIELD_TYPES,				SharedDatabase::Setting::SETTING_SHIELD_TYPES);
 		setupOptionEntry(option::BUBBLE_SHIELD_BOUNCE,		SharedDatabase::Setting::SETTING_BUBBLE_SHIELD_BOUNCE);
@@ -138,7 +143,6 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::CAMERA_OUTRUN,				SharedDatabase::Setting::SETTING_CAMERA_OUTRUN);
 		setupOptionEntry(option::EXTENDED_CAMERA,			SharedDatabase::Setting::SETTING_EXTENDED_CAMERA);
 		setupOptionEntry(option::SPECIAL_STAGE_REPEAT,		SharedDatabase::Setting::SETTING_BS_REPEAT_ON_FAIL);
-		setupOptionEntry(option::MONITOR_BEHAVIOR,			SharedDatabase::Setting::SETTING_MONITOR_BEHAVIOR);
 		setupOptionEntry(option::RANDOM_MONITORS,			SharedDatabase::Setting::SETTING_RANDOM_MONITORS);
 		setupOptionEntry(option::RANDOM_SPECIALSTAGES,		SharedDatabase::Setting::SETTING_RANDOM_SPECIALSTAGES);
 		setupOptionEntry(option::AIZ_BLIMPSEQUENCE,			SharedDatabase::Setting::SETTING_AIZ_BLIMPSEQUENCE);
@@ -216,6 +220,23 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		entries.addEntry<TitleMenuEntry>().initEntry("More Info");
 		entries.addEntry<OptionsMenuEntry>().initEntry("Open Game Homepage", option::_OPEN_HOMEPAGE);
 		entries.addEntry<OptionsMenuEntry>().initEntry("Open Manual", option::_OPEN_MANUAL);
+
+		entries.addEntry<TitleMenuEntry>().initEntry("Debugging");
+		entries.addEntry<LabelMenuEntry>().initEntry("These settings are meant only for debugging very specific issues.\nIt's recommended to leave them at their default values.");
+
+		entries.addEntry<AdvancedOptionMenuEntry>()
+			.setDefaultValue(3)
+			.initEntry("Script Optimization", option::SCRIPT_OPTIMIZATION)
+			.addOption("Disabled", 0)
+			.addOption("Basic", 1)
+			.addOption("Full (Default)", 3);
+
+		entries.addEntry<AdvancedOptionMenuEntry>()
+			.setDefaultValue(-1)
+			.initEntry("Debug Game Recording", option::GAME_RECORDING_MODE)
+			.addOption("Auto", -1)
+			.addOption("Disabled", 0)
+			.addOption("Enabled", 1);
 	}
 
 	// Display tab
@@ -535,10 +556,6 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.addOption("Disabled", 0)
 			.addOption("Enabled", 1);
 
-		entries.addEntry<OptionsMenuEntry>().initEntry("Monitor Behavior:", option::MONITOR_BEHAVIOR)
-			.addOption("Sonic & Knuckles", 0)
-			.addOption("Sonic 3", 1);
-
 
 		entries.addEntry<TitleMenuEntry>().initEntry("Time Attack");
 
@@ -704,6 +721,10 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.addOption("Normal Monitors", 0)
 			.addOption("Random Shields", 1)
 			.addOption("Random Monitors", 2);
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Monitor Behavior:", option::MONITOR_BEHAVIOR)
+			.addOption("Default", 0)
+			.addOption("Fall down when hit", 1);
 
 
 		entries.addEntry<TitleMenuEntry>().initEntry("Special Stages");
@@ -909,6 +930,7 @@ void OptionsMenu::initialize()
 	refreshGamepadLists(true);
 
 	mEnteredFromIngame = false;
+	mOriginalScriptOptimizationLevel = Configuration::instance().mScriptOptimizationLevel;
 }
 
 void OptionsMenu::deinitialize()
@@ -1017,6 +1039,13 @@ void OptionsMenu::update(float timeElapsed)
 						{
 							mOptionEntries[selectedData].applyValue();
 							InputManager::instance().updatePlayerGamepadAssignments();
+							break;
+						}
+
+						case option::GAME_RECORDING_MODE:
+						{
+							mOptionEntries[selectedData].applyValue();
+							Configuration::instance().evaluateGameRecording();
 							break;
 						}
 
@@ -1514,6 +1543,12 @@ void OptionsMenu::goBack()
 	// Save changes
 	ModManager::instance().copyModSettingsToConfig();
 	Configuration::instance().saveSettings();
+
+	// Apply script optimization level if it got changed
+	if (mOriginalScriptOptimizationLevel != Configuration::instance().mScriptOptimizationLevel)
+	{
+		Application::instance().getSimulation().triggerFullScriptsReload();
+	}
 
 	GameApp::instance().onExitOptions();
 	mState = mEnteredFromIngame ? State::FADE_TO_GAME : State::FADE_TO_MENU;

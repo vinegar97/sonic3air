@@ -1050,15 +1050,23 @@ namespace lemon
 			// Process tokens
 			processTokens(tokens, function, scopeContext, lineNumber);
 
-			// Evaluate processed token tree
-			CHECK_ERROR(tokens.size() == 1, "Statement contains more than a single token tree root", lineNumber);
-			CHECK_ERROR(tokens[0].isStatement(), "Statement is no statement?", lineNumber);
+			if (!tokens.empty())	// An empty tokens list can occur when a base call was completely removed
+			{
+				// Evaluate processed token tree
+				CHECK_ERROR(tokens.size() == 1, "Statement contains more than a single token tree root", lineNumber);
+				CHECK_ERROR(tokens[0].isStatement(), "Statement is no statement?", lineNumber);
 
-			StatementNode& node = NodeFactory::create<StatementNode>();
-			node.mStatementToken = tokens[0].as<StatementToken>();
-			node.setLineNumber(lineNumber);
-			tokens.erase(0);
-			return &node;
+				StatementNode& node = NodeFactory::create<StatementNode>();
+				node.mStatementToken = tokens[0].as<StatementToken>();
+				node.setLineNumber(lineNumber);
+				tokens.erase(0);
+				return &node;
+			}
+			else
+			{
+				// Just return an empty block - this is relevant if the removed code was e.g. the content of an if-clause
+				return &NodeFactory::create<BlockNode>();
+			}
 		}
 
 		return nullptr;
@@ -1234,7 +1242,7 @@ namespace lemon
 		static const std::string PREFIX_FEATURE_LEVEL = "script-feature-level(";
 		String str(content);
 		str.trimWhitespace();
-		if (str.startsWith(PREFIX_FEATURE_LEVEL.c_str()) && str.endsWith(")"))
+		if (str.startsWith(PREFIX_FEATURE_LEVEL) && str.endsWith(")"))
 		{
 			str.remove(0, (int)PREFIX_FEATURE_LEVEL.size());
 			str.remove(str.length() - 1, 1);

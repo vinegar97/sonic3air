@@ -301,7 +301,6 @@ void SharedDatabase::setupSettings()
 	addSetting(IDPARAMS(Setting::SETTING_CAMERA_OUTRUN), Setting::SerializationType::ALWAYS, true);			// Allowed in Time Attack, even though it's not purely visual (it has a minimal impact on gameplay simulation)
 	addSetting(IDPARAMS(Setting::SETTING_EXTENDED_CAMERA), Setting::SerializationType::ALWAYS, true);		// Same here
 	addSetting(IDPARAMS(Setting::SETTING_MAINTAIN_SHIELDS), Setting::SerializationType::ALWAYS);
-	addSetting(IDPARAMS(Setting::SETTING_MONITOR_BEHAVIOR), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_BS_REPEAT_ON_FAIL), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_DISABLE_GHOST_SPAWN), Setting::SerializationType::ALWAYS);
 
@@ -309,6 +308,7 @@ void SharedDatabase::setupSettings()
 	addSetting(IDPARAMS(Setting::SETTING_MONITOR_STYLE), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_HYPER_DASH_CONTROLS), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_SUPER_SONIC_ABILITY), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_MONITOR_BEHAVIOR), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_LIVES_DISPLAY), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_BS_COUNTDOWN_RINGS), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_CONTINUE_MUSIC), Setting::SerializationType::ALWAYS);

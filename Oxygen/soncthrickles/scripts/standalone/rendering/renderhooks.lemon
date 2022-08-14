@@ -581,7 +581,6 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			Renderer.drawCustomSprite(key, px, py, 0x80, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
 			return true
 		}
-
 	}
 	else if (gameMode == 0x2c || gameMode == 0x30)
 	{
@@ -619,7 +618,6 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			Renderer.drawCustomSprite(key, px, py, 0x80, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
 			return true
 		}
-
 	}
 	//else if (gameMode == 0x34)
 	{

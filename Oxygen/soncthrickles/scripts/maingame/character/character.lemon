@@ -767,11 +767,11 @@ function bool UpdateTailsFlight_innerA()
 	// Cancel flight ("Tails Drop"): Stop flying and roll into a ball again
 	else if (Game.getSetting(SETTING_CANCEL_FLIGHT) && (control.tails.state & CONTROL_DOWN) && (control.tails.state & CONTROL_ABC))
 	{
-		Tails.CheckDropSonic()
-
 		char.double_jump_state = 0
 		char.state = char.state.ROLLING
 		char.jumping = 0			// Clear this flag to prevent a new flight while falling
+
+		Tails.CheckDropSonic()
 		updateTailsInAir_shared()
 		return false
 	}
@@ -4907,6 +4907,8 @@ function void Character.CheckCollisionsWithDynamicObjects_partial()
 	// Bounding box of player
 	if (DEBUG_DYNAMIC_COLLISIONS)
 		debugDrawRect(D2.u16, D3.u16, D4.u16, D5.u16, 0x8000ff00)
+	debugLog(stringformat((char.velocity.y >= 0) ? "char.velocity.y =  0x%04x" : "char.velocity.y = -0x%04x", abs(char.velocity.y)))
+	debugLog(stringformat("char.position.y.u16 =  0x%04x", char.position.y.u16))
 #endif
 
 	A4 = 0xffffe380
@@ -5218,7 +5220,7 @@ function void Character.OnCollisionWithDynamicObject()
 						if (objA1.render_flags & render_flag.FLIP_Y)
 							dy = (objA1.position.y.u16 - objA1.hitbox_extends.y) - (char.position.y.u16 + char.hitbox_extends.y)
 
-						// Only push the player when in midair.
+						// Only push the player when in midair
 						if (char.flags & char.flag.IN_AIR)
 						{
 							dy /= 2
@@ -5282,7 +5284,16 @@ function void Character.OnCollisionWithDynamicObject()
 			{
 				// Make monitors break over the player's head at different orientations. #contributed by Dynamic Lemons
 				if ((global.inv_gravity != (objA1.render_flags & render_flag.FLIP_Y) != 0))
+				{
+					/* objA1.render_flags &= ~render_flag.FLIP_Y
+					objA1.flags2a &= ~render_flag.FLIP_Y
+					if (global.inv_gravity)
+					{
+						objA1.render_flags |= render_flag.FLIP_Y
+						objA1.flags2a |= render_flag.FLIP_Y
+					} */
 					canOpenMonitor = true
+				}
 			}
 		#endif
 			else if (char.character == CHARACTER_KNUCKLES)
@@ -5300,7 +5311,7 @@ function void Character.OnCollisionWithDynamicObject()
 					// Bounce off
 					char.velocity.y = -char.velocity.y
 				}
-				objA1.base_state = 4		// Set monitor state to broken
+				objA1.base_state = 0x04		// Set monitor state to broken
 				objA1.monitor.character_address = A0.u16		// RAM address of character
 			}
 		}

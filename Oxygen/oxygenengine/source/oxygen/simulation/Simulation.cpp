@@ -75,7 +75,7 @@ bool Simulation::startup()
 		mInputRecorder.initFromConfig();
 	}
 
-	if (config.mGameRecording == 2)
+	if (config.mGameRecorder.mIsPlayback)
 	{
 		// Try the long and short name
 		if (mGameRecorder.loadRecording(L"gamerecording.bin"))
@@ -89,8 +89,8 @@ bool Simulation::startup()
 
 		if (mGameRecorder.isPlaying())
 		{
-			mGameRecorder.setIgnoreKeys(config.mGameRecIgnoreKeys);
-			mFastForwardTarget = config.mGameRecPlayFrom;
+			mGameRecorder.setIgnoreKeys(config.mGameRecorder.mPlaybackIgnoreKeys);
+			mFastForwardTarget = config.mGameRecorder.mPlaybackStartFrame;
 			config.setSettingsReadOnly(true);	// Do not overwrite settings
 		}
 	}
@@ -108,7 +108,7 @@ void Simulation::shutdown()
 
 void Simulation::reloadScriptsAfterModsChange()
 {
-	// Immediate reload the scripts (while the loading text box is shown)
+	// Immediate reload of the scripts (while the loading text box is shown)
 	if (mCodeExec.reloadScripts(false, false))
 	{
 		mCodeExec.reinitRuntime(nullptr, CodeExec::CallStackInitPolicy::RESET);
@@ -318,8 +318,8 @@ void Simulation::update(float timeElapsed)
 bool Simulation::generateFrame()
 {
 	ControlsIn& controlsIn = ControlsIn::instance();
-	const bool isGameRecorderPlayback = (Configuration::instance().mGameRecording == 2);
-	const bool isGameRecorderRecording = (Configuration::instance().mGameRecording == 1);
+	const bool isGameRecorderPlayback = Configuration::instance().mGameRecorder.mIsPlayback;
+	const bool isGameRecorderRecording = Configuration::instance().mGameRecorder.mIsRecording;
 
 	const bool beginningNewFrame = (mCodeExec.willBeginNewFrame() || isGameRecorderPlayback);
 	const float tickLength = 1.0f / getSimulationFrequency();
