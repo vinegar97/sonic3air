@@ -174,12 +174,6 @@ function void updateSonicAnimationRolling()
 		return
 
 	D2.u16 = abs(char.groundspeed)
-
-#if STANDALONE
-	if (char.flags & char.flag.IN_AIR)
-		D2.u16 = abs(char.velocity.x)
-#endif
-
 	// This snippet sets the character's rolling animation based on ground speed, just like the running animations. but the two rolling animations are exactly the same, so it's a bit pointless
 	if (char.character == CHARACTER_SONIC)
 	{

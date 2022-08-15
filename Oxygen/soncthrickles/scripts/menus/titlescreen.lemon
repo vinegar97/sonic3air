@@ -7,6 +7,7 @@
 */
 
 
+
 constant u16 TitleScreen.Intro_Background.targetInVRAM	= 0x0000
 constant u16 TitleScreen.IntroBuffer.targetInVRAM		= 0x6000
 constant u16 TitleScreen.Characters.targetInVRAM		= 0x8000

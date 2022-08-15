@@ -17,7 +17,7 @@ function void Debugging.setupDebugWatches()
 	// This function gets called on each script reload.
 	// It's a good place to temporarily add your custom debug watches when you need them.
 
-	//debugWatch(0xffffb000 + 0x2a, 1)
+	//debugWatch(0xffffb02a, 1)
 }
 
 

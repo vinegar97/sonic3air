@@ -7,6 +7,7 @@
 */
 
 
+
 constant u16 TitleScreenSK.Background.targetInVRAM	= 0x0000
 constant u16 TitleScreenSK.characters.targetInVRAM	= 0x1c40
 constant u16 TitleScreenSK.Menu.targetInVRAM		= 0x8c40
