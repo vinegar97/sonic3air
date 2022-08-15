@@ -1,4 +1,4 @@
-# ![Sonic 3 A.I.R.](Oxygen/soncthrickles/data/images/menu/sonic3air_logo.png)
+# ![Sonic 3 A.I.R.](Oxygen/soncthrickles/data/sprites/sonic3air_logo.png)
 
 Source code incl. dependencies for "Sonic 3 - Angel Island Revisited", a fan-made remaster of Sonic 3 & Knuckles.
 
