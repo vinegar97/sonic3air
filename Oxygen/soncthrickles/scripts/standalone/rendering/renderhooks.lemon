@@ -354,6 +354,12 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				if (objA0.subtype2c != 0)
 					character = getMainCharacter()
 				key = stringformat((objA0.subtype2c == 0) ? "%s_pilot_small" : "%s_small", getCharacterTornadoSpriteKey(character))
+
+				if (objA0.subtype2c != 0 && isMainCharacter(CHARACTER_KNUCKLES) && outro.ending_type < 0)
+				{
+					// Replace Knuckles' smaller tornado sprite with a more fitting sprite in bad ending
+					key = stringformat((global.zone_act == 0x0d01) ? "%s_small_standing" : "%s_small_exhausted", getCharacterTornadoSpriteKey(CHARACTER_KNUCKLES))
+				}
 			}
 
 			atex = 0x40 + character * 0x20
