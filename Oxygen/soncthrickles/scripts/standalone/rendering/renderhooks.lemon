@@ -602,7 +602,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// "unique" Tails sprite in Blue Sphere mini-game Perfect screen
 		if (objA0.update_address == 0x04e29c)
 		{
-			Standalone.drawCharacterSpriteDirect(CHARACTER_TAILS, px-6, py+4, 0xa6, SPRITE_FLAG_FLIP_X | (prioFlag ? SPRITE_FLAG_PRIO : 0), 0x00, renderQueue)
+			Standalone.drawCharacterSpriteDirect(CHARACTER_TAILS, px-6, py+4, 0xa6, SPRITE_FLAG_FLIP_X | (prioFlag ? SPRITE_FLAG_PRIO : 0), 0x60, renderQueue)
 			return true
 		}
 
