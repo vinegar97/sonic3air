@@ -234,9 +234,9 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		entries.addEntry<AdvancedOptionMenuEntry>()
 			.setDefaultValue(-1)
 			.initEntry("Debug Game Recording", option::GAME_RECORDING_MODE)
-			.addOption("Auto", -1)
 			.addOption("Disabled", 0)
-			.addOption("Enabled", 1);
+			.addOption("Enabled", 1)
+			.addOption("Auto (Default)", -1);
 	}
 
 	// Display tab
@@ -1014,15 +1014,18 @@ void OptionsMenu::update(float timeElapsed)
 						{
 							// Change soundtrack and restart music
 							config.mActiveSoundtrack = selectedEntry.selected().mValue;
-							AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
-							AudioOut::instance().onSoundtrackPreferencesChanged();
-							if (nullptr == mPlayingSoundTest)
+							if (AudioOut::instance().getAudioCollection().getNumSourcesByPackageType(AudioCollection::Package::REMASTERED) != 0)
 							{
-								AudioOut::instance().restartMenuMusic();
-							}
-							else
-							{
-								playSoundtest(*mPlayingSoundTest);
+								AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
+								AudioOut::instance().onSoundtrackPreferencesChanged();
+								if (nullptr == mPlayingSoundTest)
+								{
+									AudioOut::instance().restartMenuMusic();
+								}
+								else
+								{
+									playSoundtest(*mPlayingSoundTest);
+								}
 							}
 							break;
 						}
