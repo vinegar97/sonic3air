@@ -416,6 +416,16 @@ function bool fn084fa4()
 	return SetupObjectAttributesSlotted()
 }
 
+function void fn085590()
+{
+	FadeOutColorUniform()
+}
+
+function void fn0855f8()
+{
+	FadeInColorUniform()
+}
+
 function void fn085b8a()
 {
 	StopCharacterWinPose.player1()
