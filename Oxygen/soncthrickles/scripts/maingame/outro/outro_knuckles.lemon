@@ -1105,10 +1105,9 @@ function void fn08555e()
 	D0.u16 = u16[A0 + 0x3c]
 	D1 = 0x0e
 	D2 = -0x20
-	while (D0.s16 >= 0)
+	for (u8 i = 0; i <= D0.s16; ++i)
 	{
 		FadeOutColorUniform()
-		--D0.s16
 	}
 
 	--objA0.value39
@@ -1124,26 +1123,27 @@ function void fn08555e()
 function void FadeOutColorUniform()
 {
 	// Fade to black
+	u16 color = u16[A1]
 #if STANDALONE
-	u16[A1] = makeNormalPackedColor(u16[A1])
+	color = makeNormalPackedColor(color)
 #endif
-
-	D3.u8 = u8[A1] & D1.u8
-	if (D3.u8 != 0)
-		D3.u8 -= 2
-	u8[(A1+=1)-1] = D3.u8
-
-	D4.u8 = u8[A1]
-	D3.u8 = u8[A1] & D2.u8
-	if (D3.u8 != 0)
-		D3.u8 -= 0x20
-
-	D4.u8 &= D1.u8
-	if (D4.u8 != 0)
-		D4.u8 -= 2
-	D4.u8 |= D3.u8
-
-	u8[(A1+=1)-1] = D4.u8
+	if (color != 0)
+	{
+		if (color & D1.u8)
+		{
+			color -= 0x0002
+		}
+		if (color & D2.u8)
+		{
+			color -= 0x0020
+		}
+		if (color & (D1 << 8))
+		{
+			color -= (0x0002 << 8)
+		}
+		u16[A1] = color
+	}
+	A1 += 2
 }
 
 
