@@ -1841,7 +1841,7 @@ function void fn05fcce()
 
 
 
-// Tails
+// Tails palette effect
 
 //# address-hook(0x05fcdc) end(0x05fce6)
 function void fn05fcdc()
@@ -1862,13 +1862,20 @@ function void fn05fcec()
 	}
 	else
 	{
+	#if STANDALONE
+		if (u8[0xfffff650] != 0)
+			return
+
+		if (UpdatePaletteEffects.SuperForm.endpose() != 0)
+			return
+	#endif
 		fn08598a()
 	}
 }
 
 
 
-// Sonic
+// Super / Hyper Sonic palette effect
 
 //# address-hook(0x05fcfc) end(0x05fd10)
 function void fn05fcfc()
@@ -1888,6 +1895,11 @@ function void fn05fd16()
 		fn05ec36()
 		return
 	}
+
+#if STANDALONE
+	if (UpdatePaletteEffects.SuperForm.endpose() != 0)
+		return
+#endif
 
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)

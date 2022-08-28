@@ -866,6 +866,11 @@ function void fn05fba0()
 		return
 	}
 
+#if STANDALONE
+	if (UpdatePaletteEffects.SuperForm.endpose() != 0)
+		return
+#endif
+
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
 	{
@@ -1109,6 +1114,17 @@ function void fn08555e()
 	{
 		FadeOutColorUniform()
 	}
+
+#if STANDALONE
+	A1 = 0x802000
+	D0.u16 = 0xbf
+	D1 = 0x0e
+	D2 = -0x20
+	for (u8 i = 0; i <= D0.s16; ++i)
+	{
+		FadeOutColorUniform()
+	}
+#endif
 
 	--objA0.value39
 	if (s8(objA0.value39) < 0)

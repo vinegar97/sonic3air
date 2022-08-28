@@ -906,4 +906,90 @@ function void UpdatePaletteEffects.SuperForm.moddingVersion(u8 characterVersion)
 	}
 }
 
+
+// Used for the big character pose sprites after the credits
+
+function bool UpdatePaletteEffects.SuperForm.endpose()
+{
+	u8 characterVersion = isMainCharacter(CHARACTER_SONIC) ? ((objA0.subtype2c == 0x02) ? 0 : 1) : (getMainCharacter() + 1)
+	if (Game.getSetting(SETTING_GFX_ANTIFLICKER) != 0)
+	{
+		// Smoothed version of effects
+		UpdatePaletteEffects.SuperForm.endpose.smoothedVersion(characterVersion)
+		return true
+	}
+	return false
+}
+
+
+function void UpdatePaletteEffects.SuperForm.endpose.smoothedVersion(u8 characterVersion)
+{
+	// Update ongoing palette effect
+	if (characterVersion <= 1)
+	{
+		// Super/Hyper Sonic
+		u8 cycles = (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2) ? 0x18 : 0x0c
+		u16 nextFrame = (objA0.animation.frame + 6) % objA0.value3a
+		u32 address1 = u32[A0 + 0x30] + objA0.animation.frame
+		u32 address2 = u32[A0 + 0x30] + nextFrame
+		u16 blendFactor = objA0.animation.timer * 0x100 / cycles
+
+		for (u8 k = 0; k < 6; k += 2)
+		{
+			u16[0xfffffc44 + k] = blendColorsPacked(u16[address2 + k], u16[address1 + k], blendFactor)
+		}
+
+		--objA0.animation.timer
+		if (objA0.animation.timer < 0 || objA0.animation.timer > cycles)
+		{
+			objA0.animation.timer = cycles - 1
+			objA0.animation.frame = nextFrame
+		}
+	}
+	else if (characterVersion == 2)
+	{
+		// Super/Hyper Tails
+		u16 nextFrame = (objA0.animation.frame + 10) % 60
+		u32 address1 = 0x060c18 + objA0.animation.frame
+		u32 address2 = 0x060c18 + nextFrame
+		u8 cycles = 0x0c
+		u16 blendFactor = u16(objA0.animation.timer) * 0x100 / cycles
+
+		for (u8 k = 0; k < 8; k += 2)
+		{
+			u16[0xfffffc44 + k] = blendColorsPacked(u16[address2 + k], u16[address1 + k], blendFactor)
+		}
+
+		--objA0.animation.timer
+		if (objA0.animation.timer < 0 || objA0.animation.timer > cycles)
+		{
+			objA0.animation.timer = cycles - 1
+			objA0.animation.frame = nextFrame
+		}
+	}
+	else
+	{
+		// Super/Hyper Knuckles
+		u16 nextFrame = (u16[A0 + 0x3a] + 6) % 60
+		u8 cycles = (nextFrame == 0) ? 0x0f : 0x03
+		objA0.animation.timer = min(objA0.animation.timer, cycles - 1)
+		u32 address1 = 0x05fbe2 + u16[A0 + 0x3a]
+		u32 address2 = 0x05fbe2 + nextFrame
+		u16 blendFactor = objA0.animation.timer * 0x100 / cycles
+		u32 dest = 0xfffffc04
+
+		for (u8 k = 0; k < 4; k += 2)
+		{
+			u16[dest + k] = blendColorsPacked(u16[address2 + k], u16[address1 + k], blendFactor)
+		}
+		u16[dest + 6] = blendColorsPacked(u16[address2 + 4], u16[address1 + 4], blendFactor)
+		--objA0.animation.timer
+		if (objA0.animation.timer < 0 || objA0.animation.timer > cycles)
+		{
+			objA0.animation.timer = 0x10
+			u16[A0 + 0x3a] = nextFrame
+		}
+	}
+}
+
 #endif
