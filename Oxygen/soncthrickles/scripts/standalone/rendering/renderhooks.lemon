@@ -300,17 +300,25 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		{
 			u64 key = 0
 			u8 atex = 0
+			u8 flags = prioFlag ? SPRITE_FLAG_PRIO : 0
 
 			if (objA0.update_address == 0x05e18a)
 			{
 				atex = 0x20
 
 				if (objA0.animation.sprite >= 0x03)
+				{
 					key = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_TAILS, false), objA0.animation.sprite - 0x03)
-				if (objA0.animation.sprite == 0x02)
+					flags |= SPRITE_FLAG_FLIP_X
+				}
+				else if (objA0.animation.sprite == 0x02)
+				{
 					key = getCharacterEndPoseSpriteKey(CHARACTER_SONIC, true)
+				}
 				else // if (objA0.animation.sprite <= 0x01)
+				{
 					key = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_SONIC, false), objA0.animation.sprite - 0x00)
+				}
 			}
 
 			if (objA0.update_address == 0x05f4e4)
@@ -321,7 +329,13 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 
 			if (Renderer.hasCustomSprite(key))
 			{
-				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+				// Check if there's also a custom palette
+				string paletteKey = getCharacterEndPosePaletteKey(getMainCharacter())
+				if (System.hasExternalPaletteData(paletteKey, (objA0.subtype2c >= 0x00) ? 2 : 0))
+				{
+					atex = 0x40 + getMainCharacter() * 0x20
+				}
+				Renderer.drawCustomSprite(key, px, py, atex, flags, renderQueue)
 				return true
 			}
 		}

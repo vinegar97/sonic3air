@@ -633,6 +633,11 @@ function void fn05f480()
 
 	copyMemory(0xfffffc00, 0x060bea, 0x20)
 
+#if STANDALONE
+	loadCharacterEndPosePalette(CHARACTER_KNUCKLES, 0x802080, 0)
+	loadCharacterEndPosePalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+
 	if (outro.ending_type > 0)
 	{
 		if (allocDynamicObjectStd())
