@@ -334,11 +334,12 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		}
 
 		// Character sprites in best ending final scene
-		if (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f3da || objA0.update_address == 0x05f400)
+		if (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f39e || objA0.update_address == 0x05f3da || objA0.update_address == 0x05f400)
 		{
-			u8 character = (objA0.update_address == 0x05f376) ? CHARACTER_SONIC : CHARACTER_TAILS
+			u8 character = (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f39e) ? CHARACTER_SONIC : CHARACTER_TAILS
 			u8 atex = 0x40 + character * 0x20
-			u64 key = stringformat((objA0.update_address == 0x05f400) ? "%s_tails_ending_0x%02x" : "%s_ending_0x%02x", getCharacterSpriteKey(character, false), objA0.animation.frame)
+			u8 animationSprite = (objA0.animation.sprite <= 4) ? (objA0.animation.sprite-1) : (objA0.animation.sprite <= 9) ? (objA0.animation.sprite-5) : (objA0.animation.sprite-10)
+			u64 key = stringformat((objA0.update_address == 0x05f400) ? "%s_tails_ending_0x%02x" : "%s_ending_0x%02x", getCharacterSpriteKey(character, false), animationSprite)
 			if (Renderer.hasCustomSprite(key))
 			{
 				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
