@@ -484,7 +484,11 @@ function void UpdatePaletteEffects.UpdateSuperSonic.Original(u8 characterVersion
 
 		super.palettefx.timer = 6
 		super.palettefx.frame += 6
+	#if STANDALONE
+		if (super.palettefx.frame >= 60)		// Extend Super Sonic's palette effect
+	#else
 		if (super.palettefx.frame >= 54)
+	#endif
 			super.palettefx.frame = 36
 	}
 }
@@ -692,7 +696,7 @@ function void UpdatePaletteEffects.UpdateSuperSonic.Smoothed(u8 characterVersion
 {
 	// Note that this is used for Tails as well, but only to update Sonic's palette (affects the Flickies!)
 	u8 cycles = (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2) ? 0x18 : 0x0c
-	u16 nextFrame = (super.palettefx.frame < 48) ? (super.palettefx.frame + 6) : 36
+	u16 nextFrame = (super.palettefx.frame < 54) ? (super.palettefx.frame + 6) : 36
 	u32 address1 = 0x00398e + super.palettefx.frame
 	u32 address2 = 0x00398e + nextFrame
 	u16 blendFactor = super.palettefx.timer * 0x100 / cycles
