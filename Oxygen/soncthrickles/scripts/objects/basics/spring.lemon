@@ -35,8 +35,8 @@ function void Spring.BaseUpdate()
 	//  - 0x022e8e	-> objA0.subtype2c == 0x00 .. 0x0f	-> Vertical spring
 	//  - 0x022db0	-> objA0.subtype2c == 0x10 .. 0x1f	-> Horizontal spring
 	//  - 0x022dee	-> objA0.subtype2c == 0x20 .. 0x2f	-> Vertical spring, pointing down
-	//  - 0x022e28	-> objA0.subtype2c == 0x30 .. 0x3f	-> Diagonal spring pointing up
-	//  - 0x022e58	-> objA0.subtype2c == 0x40 .. 0x4f	-> Diagonal spring pointing down
+	//  - 0x022e28	-> objA0.subtype2c == 0x30 .. 0x3f	-> Diagonal spring, pointing up
+	//  - 0x022e58	-> objA0.subtype2c == 0x40 .. 0x4f	-> Diagonal spring, pointing down
 	D0.u16 = (objA0.subtype2c >> 3) & 0x0e
 	call tableLookupAddress(0x022d4a, D0.u16)
 }
