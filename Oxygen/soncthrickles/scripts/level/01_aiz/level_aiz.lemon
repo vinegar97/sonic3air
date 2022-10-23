@@ -331,7 +331,7 @@ function void fn04fbea()
 		u32[A1+4] = 0x00ae00ce
 		u32[A1+8] = 0x02ee0aee
 
-		camera.background.y = 0x0200000
+		camera.background.y = 0x200000
 		camera.background.y.old = 0x0010
 		level.display_routine = 0x0068
 		gfx.plane_update_routine = 0x04		// Enter vertical scroll mode

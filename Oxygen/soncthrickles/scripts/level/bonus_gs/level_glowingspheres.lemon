@@ -87,7 +87,7 @@ function void LevelTilesAnim.BonusGS()
 			--D0.s16
 		}
 
-		A3 = A3 + 0x80
+		A3 += 0x80
 		--D1.s16
 	}
 
@@ -121,7 +121,7 @@ function void LevelTilesAnim.BonusGS()
 			D7.u16 += 2
 			--D5.s16
 		}
-		A3 = A3 + 0x0200
+		A3 += 0x0200
 		--D6.s16
 	}
 
@@ -275,9 +275,8 @@ function void LevelPaletteUpdate.BonusGS()
 		{
 			u16[0xfffff652] = 0
 		}
-		A0 = 0xffff78fc
+		A0 = 0xffff78fc + D0.s16
 		A1 = 0xfffffc42
-		A0 = A0 + D0.s16
 		u32[(A1+=4)-4] = u32[A0 + 0x50]
 		u32[(A1+=4)-4] = u32[A0 + 0x54]
 		u16[(A1+=2)-2] = u16[A0 + 0x58]

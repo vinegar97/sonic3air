@@ -418,7 +418,7 @@ function void SpringHorizontal.Check()
 
 function void fn0230de()
 {
-	SpringHorizontal.Check.CompetitionMode()
+	SpringHorizontal.Update.CompetitionMode()
 }
 
 function void fn023160()
