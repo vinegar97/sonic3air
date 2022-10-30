@@ -149,8 +149,7 @@ function void AIZ1.ChangeBackgroundForKnuckles()
 //# address-hook(0x04fa4c) end(0x04fad6)
 function void fn04fa4c()
 {
-	u32[0xfffffcf0] = u32[0x04fae4]
-	u32[0xfffffcf4] = u32[0x04fae8]
+	copyMemory(0xfffffcf0, 0x04fae4, 8)
 
 	fillMemory_u16(0xffff4c70, 0x10, 0x004b)
 	fillMemory_u16(0xffff4cf0, 0x10, 0x004b)
@@ -1118,8 +1117,7 @@ function void fn01c46e()
 			{
 				A1 = 0xfffffc70
 				A2 = 0x04fae4
-				u32[(A1+=4)-4] = u32[(A2+=4)-4]
-				u32[A1] = u32[A2]
+				copyMemory((A1+=4)-4, (A2+=4)-4, 8)
 			}
 
 			// Make Tails fly in

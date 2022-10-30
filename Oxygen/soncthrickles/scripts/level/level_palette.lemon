@@ -51,7 +51,7 @@ function void UpdatePaletteEffects.Default()
 	//  - 0x0021be	-> offset = 0x00		-> AIZ 1
 	//  - 0x00227c	-> offset = 0x02		-> AIZ 2
 	//  - 0x002334	-> offset = 0x04		-> HCZ 1
-	//  - 0x002382	-> offset = 0x06		-> HCZ 2
+	//  - 0x002382	-> offset = 0x06		-> HCZ 2	 (empty function)
 	//  - 0x0021bc	-> offset = 0x08		-> MGZ 1	 (empty function)
 	//  - 0x0021bc	-> offset = 0x0a		-> MGZ 2	 (empty function)
 	//  - 0x002384	-> offset = 0x0c		-> CNZ 1
@@ -111,15 +111,13 @@ function void LevelPaletteUpdate.AIZ1()
 			u16[0xfffff632] += 8
 			D0.u16 &= 0x18
 
-			u32[0xfffffc56] = u32[0x002af6 + D0.u16]
-			u32[0xfffffc5a] = u32[0x002af6 + D0.u16 + 4]
+			copyMemory(0xfffffc56, 0x002af6 + D0.u16, 8)
 
 			if (u8[0xfffff650] == 0)
 			{
 				D0.u16 = u16[0xfffff652]
 				u16[0xfffff652] = (u16[0xfffff652] >= 42) ? 0 : (u16[0xfffff652] + 6)	// No modulo here, does not verify
-				u32[0xfffffc78] = u32[0x002bf6 + D0.s16]
-				u16[0xfffffc7c] = u16[0x002bf6 + D0.s16 + 4]
+				copyMemory(0xfffffc78, 0x002bf6 + D0.s16, 6)
 			}
 		}
 	}
@@ -131,13 +129,11 @@ function void LevelPaletteUpdate.AIZ1()
 			u16[0xfffff634] = 9
 			D0.u16 = u16[0xfffff632]
 			u16[0xfffff632] = (u16[0xfffff632] + 8) % 80
-			u32[0xfffffc64] = u32[0x002b16 + D0.s16]
-			u32[0xfffffc68] = u32[0x002b16 + D0.s16 + 4]
+			copyMemory(0xfffffc64, 0x002b16 + D0.s16, 8)
 
 			D0.u16 = u16[0xfffff652]
 			u16[0xfffff652] = (u16[0xfffff652] + 6) % 60
-			u32[0xfffffc7a] = u32[0x002b96 + D0.s16]
-			u16[0xfffffc7e] = u16[0x002b96 + D0.s16 + 4]
+			copyMemory(0xfffffc7a, 0x002b96 + D0.s16, 6)
 		}
 	}
 }
@@ -154,8 +150,7 @@ function void LevelPaletteUpdate.AIZ2()
 		u16[0xfffff632] += 8
 		D0.u16 &= 0x18
 
-		u32[0xfffffc78] = u32[0x002c26 + D0.s16]
-		u32[0xfffffc7c] = u32[0x002c26 + D0.s16 + 4]
+		copyMemory(0xfffffc78, 0x002c26 + D0.s16, 8)
 		D0.u16 = u16[0xfffff652]
 		u16[0xfffff652] = (u16[0xfffff652] + 6) % 48
 
@@ -197,10 +192,8 @@ function void LevelPaletteUpdate.HCZ1()
 		if (u16[0xfffff632] >= 0x20)
 			u16[0xfffff632] = 0
 
-		u32[0xfffffc46] = u32[A0 + D0.s16]
-		u32[0xfffffc4a] = u32[A0 + D0.s16 + 4]
-		u32[0xfffff0c6] = u32[A0 + D0.s16]
-		u32[0xfffff0ca] = u32[A0 + D0.s16 + 4]
+		copyMemory(0xfffffc46, A0 + D0.s16, 8)
+		copyMemory(0xfffff0c6, A0 + D0.s16, 8)
 	}
 }
 
@@ -224,12 +217,10 @@ function void LevelPaletteUpdate.CNZ()
 		if (u16[0xfffff632] >= 0x60)
 			u16[0xfffff632] = 0
 
-		u32[0xfffffc72] = u32[A0 + D0.s16]
-		u16[0xfffffc76] = u16[A0 + D0.s16 + 4]
+		copyMemory(0xfffffc72, A0 + D0.s16, 6)
 
 		A0 = 0x002e82
-		u32[0xfffff0f2] = u32[A0 + D0.s16]
-		u16[0xfffff0f6] = u16[A0 + D0.s16 + 4]
+		copyMemory(0xfffff0f2, A0 + D0.s16, 6)
 	}
 
 #if STANDALONE
@@ -247,12 +238,11 @@ function void LevelPaletteUpdate.CNZ()
 	{
 		u16[0xfffff652] = 0
 	}
-	u32[0xfffffc52] = u32[A0 + D0.s16]
-	u16[0xfffffc56] = u16[A0 + D0.s16 + 4]
+	copyMemory(0xfffffc52, 0x002d8e + D0.s16, 6)
 
 	A0 = 0x002ee2
-	u32[0xfffff0d2] = u32[A0 + D0.s16]
-	u16[0xfffff0d6] = u16[A0 + D0.s16 + 4]
+	copyMemory(0xfffff0d2, A0 + D0.s16, 6)
+
 	--u16[0xfffff658]
 	if (s16[0xfffff658] < 0)
 	{
@@ -338,13 +328,11 @@ function void LevelPaletteUpdate.LBZ_shared()
 		u16[0xfffff634] = 3
 		D0.u16 = u16[0xfffff632]
 		u16[0xfffff632] = (u16[0xfffff632] + 6) % 18
-		u32[0xfffffc50] = u32[A0 + D0.s16]
-		u16[0xfffffc54] = u16[A0 + D0.s16 + 4]
+		copyMemory(0xfffffc50, A0 + D0.s16, 6)
 
 	#if STANDALONE
 		// New for underwater palettes, #contributed by Thorn
-		u32[0xfffff0d0] = u32[A0 + D0.s16]
-		u16[0xfffff0d4] = u16[A0 + D0.s16 + 4]
+		copyMemory(0xfffff0d0, A0 + D0.s16, 6)
 	#endif
 	}
 }
@@ -389,8 +377,7 @@ function void LevelPaletteUpdate.SOZ1()
 		if (u16[0xfffff654] >= 0x20)
 			u16[0xfffff654] = 0
 
-		u32[0xfffffc58] = u32[A0 + D0.s16]
-		u32[0xfffffc5c] = u32[A0 + D0.s16 + 4]
+		copyMemory(0xfffffc58, A0 + D0.s16, 8)
 	}
 }
 
@@ -462,8 +449,7 @@ function void LevelPaletteUpdate.SOZ2()
 	{
 		D1.u16 = u16[0xfffff656] * 32
 		A0 = 0x0030da + D1.s16
-		u32[0xfffffc58] = u32[A0 + D0.s16]
-		u32[0xfffffc5c] = u32[A0 + D0.s16 + 4]
+		copyMemory(0xfffffc58, A0 + D0.s16, 8)
 	}
 }
 
@@ -481,8 +467,7 @@ function void LevelPaletteUpdate.LRZ1()
 			u16[0xfffff632] = 0
 
 		A0 = 0x00327e
-		u32[0xfffffc42] = u32[A0 + D0.s16]
-		u32[0xfffffc46] = u32[A0 + D0.s16 + 4]
+		copyMemory(0xfffffc42, A0 + D0.s16, 8)
 
 		D0.u16 = u16[0xfffff652]
 		u16[0xfffff652] += 4
@@ -523,8 +508,7 @@ function void LevelPaletteUpdate.LRZ2()
 			u16[0xfffff632] = 0
 
 		A0 = 0x00327e
-		u32[0xfffffc42] = u32[A0 + D0.s16]
-		u32[0xfffffc46] = u32[A0 + D0.s16 + 4]
+		copyMemory(0xfffffc42, A0 + D0.s16, 8)
 
 		D0.u16 = u16[0xfffff652]
 		u16[0xfffff652] += 4
@@ -573,8 +557,7 @@ function void LevelPaletteUpdate.LRZ_Boss()
 				u16[0xfffff632] = 0
 
 			A0 = 0x00327e
-			u32[0xfffffc42] = u32[A0 + D0.s16]
-			u32[0xfffffc46] = u32[A0 + D0.s16 + 4]
+			copyMemory(0xfffffc42, A0 + D0.s16, 8)
 		}
 
 		if (u8[0xfffff650] != 0)
@@ -633,8 +616,7 @@ function void LevelPaletteUpdate.DEZ1()
 			u16[0xfffff654] = 0
 
 		A0 = 0x00349c
-		u32[0xfffffc78] = u32[A0 + D0.s16]
-		u32[0xfffffc7c] = u32[A0 + D0.s16 + 4]
+		copyMemory(0xfffffc78, A0 + D0.s16, 8)
 	}
 
 	LevelPaletteUpdate.DEZ2()
@@ -670,9 +652,7 @@ function void LevelPaletteUpdate.DEZ2()
 
 		A0 = 0x003474 + D0.s16
 		A1 = 0xfffffc50
-		u32[(A1+=4)-4] = u32[(A0+=4)-4]
-		u32[(A1+=4)-4] = u32[(A0+=4)-4]
-		u16[(A1+=2)-2] = u16[(A0+=2)-2]
+		copyMemory((A1+=10)-10, (A0+=10)-10, 10)
 	}
 }
 
@@ -694,8 +674,7 @@ function void LevelPaletteUpdate.BPZ()
 		{
 			u16[0xfffff632] = 0
 		}
-		u32[0xfffffc5a] = u32[A0 + D0.u16]
-		u16[0xfffffc5e] = u16[A0 + D0.u16 + 0x04]
+		copyMemory(0xfffffc5a, A0 + D0.u16, 6)
 	}
 
 	--s16[0xfffff658]
@@ -709,8 +688,7 @@ function void LevelPaletteUpdate.BPZ()
 		{
 			u16[0xfffff652] = 0
 		}
-		u32[0xfffffc64] = u32[A0 + D0.s16]
-		u16[0xfffffc68] = u16[A0 + D0.s16 + 0x04]
+		copyMemory(0xfffffc64, A0 + D0.s16, 6)
 	}
 }
 
@@ -729,8 +707,7 @@ function void LevelPaletteUpdate.CGZ()
 		{
 			u16[0xfffff632] = 0
 		}
-		u32[0xfffffc44] = u32[A0 + D0.u16]
-		u32[0xfffffc48] = u32[A0 + D0.u16 + 0x04]
+		copyMemory(0xfffffc44, A0 + D0.u16, 8)
 	}
 }
 
