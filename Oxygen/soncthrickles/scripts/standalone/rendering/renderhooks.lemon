@@ -778,33 +778,33 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		if (characters == CHARS_SONIC_AND_TAILS)
 		{
 			// Sonic & Tails
-			Standalone.drawCharacterSpriteDirect(CHARACTER_SONIC, px-9, py-20, 0xb1, SPRITE_FLAG_FLIP_X, 0x40, renderQueue)
-			Standalone.drawCharacterSpriteDirect(CHARACTER_TAILS, px+6, py-18, 0xa6, SPRITE_FLAG_FLIP_X, 0x60, renderQueue)
+			Renderer.drawCustomSprite(getCharacterSelectSpriteKey(CHARACTER_SONIC), px-9, py-20, 0x40, SPRITE_FLAG_PRIO | SPRITE_FLAG_FLIP_X, renderQueue)
+			Renderer.drawCustomSprite(getCharacterSelectSpriteKey(CHARACTER_TAILS), px+6, py-18, 0x60, SPRITE_FLAG_PRIO | SPRITE_FLAG_FLIP_X, renderQueue)
 			objA0.animation.sprite = 0
 		}
 		else if (characters == CHARS_SONIC_ALONE)
 		{
 			// Sonic alone
-			Standalone.drawCharacterSpriteDirect(CHARACTER_SONIC, px-3, py-20, 0xb1, SPRITE_FLAG_FLIP_X, 0x40, renderQueue)
+			Renderer.drawCustomSprite(getCharacterSelectSpriteKey(CHARACTER_SONIC), px-3, py-20, 0x40, SPRITE_FLAG_PRIO | SPRITE_FLAG_FLIP_X, renderQueue)
 			objA0.animation.sprite = 0
 		}
 		else if (characters == CHARS_TAILS_ALONE)
 		{
 			// Tails alone
-			Standalone.drawCharacterSpriteDirect(CHARACTER_TAILS, px+1, py-16, 0xa6, 0x00, 0x60, renderQueue)
+			Renderer.drawCustomSprite(getCharacterSelectSpriteKey(CHARACTER_TAILS), px+1, py-16, 0x60, SPRITE_FLAG_PRIO, renderQueue)
 			objA0.animation.sprite = 0
 		}
 		else if (characters == CHARS_KNUCKLES_ALONE)
 		{
 			// Knuckles alone
-			Renderer.drawCustomSprite("charselect_knuckles", px, py-20, 0x80, 0x00, renderQueue)
+			Renderer.drawCustomSprite(getCharacterSelectSpriteKey(CHARACTER_KNUCKLES), px, py-20, 0x80, SPRITE_FLAG_PRIO, renderQueue)
 			objA0.animation.sprite = 0
 		}
 		else if (characters == CHARS_KNUCKLES_AND_TAILS)
 		{
 			// Knuckles & Tails
-			Renderer.drawCustomSprite("charselect_knuckles", px-7, py-20, 0x80, SPRITE_FLAG_FLIP_X, renderQueue)
-			Standalone.drawCharacterSpriteDirect(CHARACTER_TAILS, px+6, py-18, 0xa6, SPRITE_FLAG_FLIP_X, 0x60, renderQueue)
+			Renderer.drawCustomSprite(getCharacterSelectSpriteKey(CHARACTER_KNUCKLES), px-7, py-20, 0x80, SPRITE_FLAG_PRIO | SPRITE_FLAG_FLIP_X, renderQueue)
+			Renderer.drawCustomSprite(getCharacterSelectSpriteKey(CHARACTER_TAILS), px+6, py-18, 0x60, SPRITE_FLAG_PRIO | SPRITE_FLAG_FLIP_X, renderQueue)
 			objA0.animation.sprite = 0
 		}
 	}
@@ -939,9 +939,9 @@ function bool Standalone.onDrawVdpSpriteCompound(s16 px, s16 py, u8 size, u16 in
 			// Draw Knuckles (flipped)
 			px += 2
 			py += 32
-			Renderer.drawVdpSprite(px,   py,    0x0e, sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | sprite_attribute.FLIP_X | 0x032f ^ sprite_attribute.FLIP_X, renderQueue)
-			Renderer.drawVdpSprite(px+8, py+24, 0x08, sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | sprite_attribute.FLIP_X | 0x033b ^ sprite_attribute.FLIP_X, renderQueue)
-			Renderer.drawVdpSprite(px,   py+32, 0x0c, sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | sprite_attribute.FLIP_X | 0x033e ^ sprite_attribute.FLIP_X, renderQueue)
+			Renderer.drawVdpSprite(px,   py,    0x0e, sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x032f, renderQueue)
+			Renderer.drawVdpSprite(px+8, py+24, 0x08, sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x033b, renderQueue)
+			Renderer.drawVdpSprite(px,   py+32, 0x0c, sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x033e, renderQueue)
 
 			// Draw Tails
 			px += 18
