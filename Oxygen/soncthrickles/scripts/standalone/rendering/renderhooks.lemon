@@ -347,7 +347,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			}
 		}
 
-		// Character sprites for riding the Tornado
+		// Character sprites for riding the Tornado in the ending
 		if (objA0.update_address == 0x05ebb4 || objA0.update_address == 0x05ed18)
 		{
 			u64 key = 0
@@ -389,6 +389,19 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		{
 			Standalone.drawCharacterSprite(CHARACTER_SONIC, 0, px, py, false)
 			return true
+		}
+
+		// Character sprites for piloting the Tornado in Sonic's intro
+		if (objA0.update_address == 0x0677ce || objA0.update_address == 0x067800)
+		{
+			u8 character = isMainCharacter(CHARACTER_SONIC) ? CHARACTER_TAILS : isMainCharacter(CHARACTER_TAILS) ? CHARACTER_SONIC : isSecondCharacter(CHARACTER_TAILS) ? CHARACTER_TAILS : CHARACTER_SONIC
+			u8 atex = 0x40 + character * 0x20
+			u64 key = stringformat("%s_pilot", getCharacterTornadoSpriteKey(character))
+			if (Renderer.hasCustomSprite(key))
+			{
+				Renderer.drawCustomSprite(key, px, py-16, atex, prioFlag, renderQueue+2)
+				Renderer.addSpriteMask(px-12, py-24, 24, 16, renderQueue+1, 0)		// Masking off the original Tails pilot sprite, #contributed by iCloudius, based on scripts by GFX32
+			}
 		}
 
 		// Cutscene Knuckles in LRZ 2, HPZ, SSZ, and ending(s)
@@ -535,8 +548,8 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 					Renderer.extractCustomSprite(key, category, objA0.animation.sprite, 0x00)
 				}
 
-				Renderer.drawCustomSprite(key, px, py, 0x00, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
-				return true
+				/* Renderer.drawCustomSprite(key, px, py, 0x00, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+				return true */
 			}
 		}
 	}
@@ -549,7 +562,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		{
 			u8 character = (objA0.update_address == 0x05c55c) ? CHARACTER_SONIC : (objA0.update_address == 0x05c74a) ? CHARACTER_TAILS : CHARACTER_KNUCKLES
 			u8 atex = 0x40 + character * 0x20
-			u64 key = stringformat("%s_continue_0x%02x", getCharacterSpriteKey(character, false), objA0.animation.sprite)
+			u64 key = stringformat("%s_continue_0x%02x", getCharacterSpriteKey(character, false), (character == CHARACTER_SONIC) ? objA0.animation.sprite : (character == CHARACTER_TAILS) ? objA0.animation.sprite-5 : objA0.animation.frame)
 			if (Renderer.hasCustomSprite(key))
 			{
 				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
@@ -581,6 +594,13 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		if (objA0.update_address == 0x05c790)
 		{
 			Standalone.drawCharacterSprite(CHARACTER_TAILS, 0, px, py, false)
+			return true
+		}
+
+		// Tails' tails
+		if (objA0.update_address == 0x0160d2)
+		{
+			Standalone.drawCharacterSprite(CHARACTER_TAILS, 2, px, py, false)
 			return true
 		}
 
@@ -766,6 +786,16 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 	if (objA0.mapping_offset == 0x3a1aee && objA0.animation.sprite == 2)
 	{
 		Standalone.drawCharacterSpriteDirect(CHARACTER_KNUCKLES, px-4, py-20, 0xd9, 0x00, 0x80, renderQueue)
+		return true
+	}
+
+	// Character continue icons in Competition results menu
+	if (objA0.update_address == 0x00bf3e)
+	{
+		u8 character = u8[(0xffffe60c + ((global.zone - 0x0e) << 4)) + objA0.flags2e]
+		string key = getCharacterContinueIcon(character)
+		u8 atex = 0x40 + character * 0x20
+		Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
 		return true
 	}
 
