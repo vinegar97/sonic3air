@@ -13,87 +13,33 @@
 #include "oxygen/helper/Utils.h"
 
 #include <lemon/compiler/Compiler.h>
+#include <lemon/compiler/TokenHelper.h>
 #include <lemon/compiler/TokenManager.h>
 #include <lemon/program/GlobalsLookup.h>
 #include <lemon/program/Module.h>
 #include <lemon/program/Program.h>
-
-
-namespace
-{
-
-	bool isOperatorToken(const lemon::Token& token, lemon::Operator op)
-	{
-		return (token.getType() == lemon::Token::Type::OPERATOR) && (token.as<lemon::OperatorToken>().mOperator == op);
-	}
-
-
-	// TODO: Move this into a helper!
-	class PragmaSplitter
-	{
-	public:
-		struct Entry
-		{
-			std::string mArgument;
-			std::string mValue;
-		};
-		std::vector<Entry> mEntries;
-
-	public:
-		PragmaSplitter(const std::string& input)
-		{
-			size_t pos = 0;
-			while (pos < input.length())
-			{
-				// Skip all spaces
-				while (pos < input.length() && input[pos] == 32)
-					++pos;
-
-				if (pos < input.length())
-				{
-					const size_t startPos = pos;
-					while (pos < input.length() && input[pos] != 32)
-						++pos;
-
-					mEntries.emplace_back();
-
-					// Split part string into argument and value
-					const std::string part = input.substr(startPos, pos - startPos);
-					const size_t left = part.find_first_of('(');
-					if (left != std::string::npos)
-					{
-						RMX_CHECK(part.back() == ')', "No matching parentheses in pragma found", continue);
-
-						mEntries.back().mArgument = part.substr(0, left);
-						mEntries.back().mValue = part.substr(left + 1, part.length() - left - 2);
-					}
-					else
-					{
-						mEntries.back().mArgument = part;
-					}
-				}
-			}
-		}
-	};
-
-}
+#include <lemon/runtime/StandardLibrary.h>
+#include <lemon/utility/PragmaSplitter.h>
 
 
 struct LemonScriptProgram::Internal
 {
-	lemon::Module mCoreModule;
+	lemon::Module mLemonCoreModule;
+	lemon::Module mOxygenCoreModule;
 	lemon::Module mScriptModule;
 	std::vector<lemon::Module*> mModModules;
 	std::vector<const Mod*> mLastModSelection;
 	lemon::Program mProgram;
 	LemonScriptBindings	mLemonScriptBindings;
+	lemon::GlobalsLookup mGlobalsLookupCoreOnly;
 
 	Hook mPreUpdateHook;
 	Hook mPostUpdateHook;
 	LinearLookupTable<Hook, 0x400000, 6, 1024> mAddressHooks;
 
 	inline Internal() :
-		mCoreModule("OxygenCore"),
+		mLemonCoreModule("LemonCore"),
+		mOxygenCoreModule("OxygenCore"),
 		mScriptModule("GameScript")
 	{}
 };
@@ -102,7 +48,8 @@ struct LemonScriptProgram::Internal
 LemonScriptProgram::LemonScriptProgram() :
 	mInternal(*new Internal())
 {
-	mInternal.mCoreModule.clear();
+	mInternal.mLemonCoreModule.clear();
+	mInternal.mOxygenCoreModule.clear();
 
 	// Register game-specific nativized code
 	EngineMain::getDelegate().registerNativizedCode(mInternal.mProgram);
@@ -116,22 +63,37 @@ LemonScriptProgram::~LemonScriptProgram()
 void LemonScriptProgram::startup()
 {
 	Configuration& config = Configuration::instance();
+	mInternal.mGlobalsLookupCoreOnly = lemon::GlobalsLookup();
 
-	// Register script bindings (user-defined variables and native functions)
+	// Setup lemon core module -- containing lemonscript standard library
+	{
+		lemon::Module& module = mInternal.mLemonCoreModule;
+		module.startCompiling(mInternal.mGlobalsLookupCoreOnly);
+		lemon::StandardLibrary::registerBindings(module);
+
+		// Set preprocessor definitions in core module
+		for (const auto& pair : config.mPreprocessorDefinitions.getDefinitions())
+		{
+			module.addPreprocessorDefinition(pair.second.mIdentifier, pair.second.mValue);
+		}
+		mInternal.mGlobalsLookupCoreOnly.addDefinitionsFromModule(module);
+	}
+
+	// Setup oxygen core module -- with Oxygen Engine specific bindings
 	//  -> TODO: This has some dependency of the runtime, as the register variables directly access the emulator interface instance;
 	//           and this in turn is the reason why there's a need for this separate startup function at all...
-	mInternal.mLemonScriptBindings.registerBindings(mInternal.mCoreModule);
-
-	// Set preprocessor definitions in core module
-	for (const auto& pair : config.mPreprocessorDefinitions.getDefinitions())
 	{
-		mInternal.mCoreModule.addPreprocessorDefinition(pair.second.mIdentifier, pair.second.mValue);
+		lemon::Module& module = mInternal.mOxygenCoreModule;
+		module.startCompiling(mInternal.mGlobalsLookupCoreOnly);
+		mInternal.mLemonScriptBindings.registerBindings(module);
+		mInternal.mGlobalsLookupCoreOnly.addDefinitionsFromModule(module);
 	}
 
 	// Optionally dump the core module script bindings into a generated script file for reference
 	if (!config.mDumpCppDefinitionsOutput.empty())
 	{
-		mInternal.mCoreModule.dumpDefinitionsToScriptFile(config.mDumpCppDefinitionsOutput);
+		mInternal.mLemonCoreModule.dumpDefinitionsToScriptFile(config.mDumpCppDefinitionsOutput);
+		mInternal.mOxygenCoreModule.dumpDefinitionsToScriptFile(config.mDumpCppDefinitionsOutput, true);
 	}
 }
 
@@ -155,7 +117,7 @@ bool LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsL
 	try
 	{
 		// Compile script source
-		lemon::Compiler::CompileOptions options;
+		lemon::CompileOptions options;
 		//options.mOutputCombinedSource = L"combined_source.lemon";	// Just for debugging preprocessor issues
 		//options.mOutputTranslatedSource = L"output.cpp";			// For testing translation
 		lemon::Compiler compiler(module, globalsLookup, options);
@@ -226,8 +188,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 	}
 
 	Configuration& config = Configuration::instance();
-	lemon::GlobalsLookup globalsLookup;
-	globalsLookup.addDefinitionsFromModule(mInternal.mCoreModule);
+	lemon::GlobalsLookup globalsLookup = mInternal.mGlobalsLookupCoreOnly;	// Copy the definitions from the two core modules
 
 	// Clear program here already - in case compilation fails, it would be broken otherwise
 	mInternal.mProgram.clear();
@@ -236,7 +197,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 	if (mainScriptReloadNeeded)
 	{
 		mInternal.mScriptModule.clear();
-		const uint32 coreModuleDependencyHash = mInternal.mCoreModule.buildDependencyHash();
+		const uint32 coreModuleDependencyHash = mInternal.mLemonCoreModule.buildDependencyHash() + mInternal.mOxygenCoreModule.buildDependencyHash();
 
 		// Load scripts
 		std::vector<uint8> buffer;
@@ -337,7 +298,8 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 	}
 
 	// Build lemon script program from modules
-	mInternal.mProgram.addModule(mInternal.mCoreModule);
+	mInternal.mProgram.addModule(mInternal.mLemonCoreModule);
+	mInternal.mProgram.addModule(mInternal.mOxygenCoreModule);
 	mInternal.mProgram.addModule(mInternal.mScriptModule);
 	for (lemon::Module* module : mInternal.mModModules)
 	{
@@ -412,10 +374,9 @@ void LemonScriptProgram::evaluateFunctionPragmas()
 	{
 		for (const std::string& pragma : function->mPragmas)
 		{
-			PragmaSplitter splitter(pragma);
-			for (size_t index = 0; index < splitter.mEntries.size(); ++index)
+			lemon::PragmaSplitter pragmaSplitter(pragma);
+			for (const lemon::PragmaSplitter::Entry& entry : pragmaSplitter.mEntries)
 			{
-				const auto& entry = splitter.mEntries[index];
 				if (entry.mArgument == "update-hook" || entry.mArgument == "pre-update-hook")
 				{
 					RMX_CHECK(entry.mValue.empty(), "Update hook must not have any value", continue);
@@ -432,20 +393,14 @@ void LemonScriptProgram::evaluateFunctionPragmas()
 					Hook& hook = addHook(Hook::Type::POST_UPDATE, 0);
 					hook.mFunction = function;
 				}
-				else if (entry.mArgument == "address-hook" || entry.mArgument == "translated")
-				{
-					RMX_CHECK(!entry.mValue.empty(), "Address hook must have a value", continue);
-					const uint32 address = (uint32)rmx::parseInteger(entry.mValue);
-
-					// You can use "translated" to denote that some code was already put into script, but should not be an actual address hook
-					if (entry.mArgument == "address-hook")
-					{
-						// Create address hook
-						Hook& hook = addHook(Hook::Type::ADDRESS, address);
-						hook.mFunction = function;
-					}
-				}
 			}
+		}
+
+		// Create address hooks
+		for (uint32 addressHook : function->mAddressHooks)
+		{
+			Hook& hook = addHook(Hook::Type::ADDRESS, addressHook);
+			hook.mFunction = function;
 		}
 	}
 }
@@ -462,8 +417,8 @@ void LemonScriptProgram::evaluateDefines()
 		// Check for define with single memory access
 		if (tokens.size() >= 4 &&
 			tokens[0].getType() == lemon::Token::Type::VARTYPE &&
-			isOperatorToken(tokens[1], lemon::Operator::BRACKET_LEFT) &&
-			isOperatorToken(tokens.back(), lemon::Operator::BRACKET_RIGHT))
+			lemon::isOperator(tokens[1], lemon::Operator::BRACKET_LEFT) &&
+			lemon::isOperator(tokens.back(), lemon::Operator::BRACKET_RIGHT))
 		{
 			// Check for define with fixed address memory access, e.g. "u16[0xffffb000]"
 			if (tokens.size() == 4 &&

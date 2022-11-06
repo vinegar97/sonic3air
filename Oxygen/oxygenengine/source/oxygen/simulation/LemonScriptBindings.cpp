@@ -30,7 +30,6 @@
 #include <lemon/program/FunctionWrapper.h>
 #include <lemon/program/Module.h>
 #include <lemon/runtime/Runtime.h>
-#include <lemon/runtime/StandardLibrary.h>
 
 #include <rmxmedia.h>
 
@@ -421,6 +420,13 @@ namespace
 	void Input_setTouchInputMode(uint8 index)
 	{
 		return InputManager::instance().setTouchInputMode((InputManager::TouchInputMode)index);
+	}
+
+	void Input_setControllerRumble(uint8 playerIndex, uint16 lowFrequencyRumble, uint16 highFrequencyRumble, uint32 milliseconds)
+	{
+		// Limit length to 30 seconds
+		milliseconds = std::min<uint32>(milliseconds, 30000);
+		InputManager::instance().setControllerRumbleForPlayer(playerIndex, (float)lowFrequencyRumble / 65535.0f, (float)highFrequencyRumble / 65535.0f, milliseconds);
 	}
 
 	void Input_setControllerLEDs(uint8 playerIndex, uint32 color)
@@ -1240,8 +1246,6 @@ namespace
 void LemonScriptBindings::registerBindings(lemon::Module& module)
 {
 	// Standard library
-	lemon::StandardLibrary::registerBindings(module);
-
 	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
 	module.addNativeFunction("assert", lemon::wrap(&scriptAssert1), defaultFlags);
 	module.addNativeFunction("assert", lemon::wrap(&scriptAssert2), defaultFlags);
@@ -1425,6 +1429,12 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		module.addNativeFunction("Input.setTouchInputMode", lemon::wrap(&Input_setTouchInputMode), defaultFlags)
 			.setParameterInfo(0, "index");
+
+		module.addNativeFunction("Input.setControllerRumble", lemon::wrap(&Input_setControllerRumble), defaultFlags)
+			.setParameterInfo(0, "playerIndex")
+			.setParameterInfo(1, "lowFrequencyRumble")
+			.setParameterInfo(2, "highFrequencyRumble")
+			.setParameterInfo(3, "milliseconds");
 
 		module.addNativeFunction("Input.setControllerLEDs", lemon::wrap(&Input_setControllerLEDs), defaultFlags)
 			.setParameterInfo(0, "playerIndex")

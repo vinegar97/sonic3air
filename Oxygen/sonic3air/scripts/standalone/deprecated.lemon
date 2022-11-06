@@ -1,0 +1,519 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2022 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// C++ bindings that got removed or renamed              //
+//-------------------------------------------------------//
+
+function void Renderer.drawVdpSpriteWithTint(s16 px, s16 py, u8 encodedSize, u16 patternIndex, u16 renderQueue, u32 tintColor, u32 addedColor)
+{
+	// Convert colors from 0xAABBGGRR to 0xRRGGBBAA
+	tintColor = convertColors32(tintColor)
+	addedColor = convertColors32(addedColor)
+	Renderer.drawVdpSpriteTinted(px, py, encodedSize, patternIndex, renderQueue, tintColor, addedColor)
+}
+
+function void Renderer.drawCustomSprite(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue, u8 angle, u32 tintColor, s32 scale)
+{
+	// Convert color from 0xAABBGGRR to 0xRRGGBBAA
+	tintColor = convertColors32(tintColor)
+	Renderer.drawCustomSpriteTinted(key, px, py, atex, flags, renderQueue, angle, tintColor, scale)
+}
+
+function void Renderer.drawCustomSpriteWithTransform(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue, u32 tintColor, s32 transform11, s32 transform12, s32 transform21, s32 transform22)
+{
+	// Convert color from 0xAABBGGRR to 0xRRGGBBAA
+	tintColor = convertColors32(tintColor)
+	Renderer.drawCustomSpriteTransformed(key, px, py, atex, flags, renderQueue, tintColor, transform11, transform12, transform21, transform22)
+}
+
+function void debugDrawRect(s32 px, s32 py, s32 width, s32 height)
+{
+	Debug.drawRect(px, py, width, height)
+}
+
+function void debugDrawRect(s32 px, s32 py, s32 width, s32 height, u32 color)
+{
+	// Convert color from 0xAABBGGRR to 0xRRGGBBAA
+	color = convertColors32(color)
+	Debug.drawRect(px, py, width, height, color)
+}
+
+function void Game.onScreenFadedOutBeforeDataSelect()
+{
+	Game.returnToMainMenu()
+}
+
+function bool Game.isModdedSound(u64 sfxId)
+{
+	return (Audio.getAudioKeyType(sfxId) == AudioKeyType.MODDED)
+}
+
+
+
+// These are still actively used in the scripts, for compatibility with mods that overwrite these variants of the functions
+
+function void Renderer.setPaletteEntry(u8 index, u32 color)
+{
+	Renderer.setPaletteColor(u16(index), color)
+}
+
+function void Renderer.setPaletteEntryPacked(u8 index, u16 color)
+{
+	Renderer.setPaletteColorPacked(u16(index), color)
+}
+
+function void Renderer.setSecondaryPaletteEntryPacked(u8 index, u16 color)
+{
+	Renderer.setSecondaryPaletteColorPacked(u16(index), color)
+}
+
+function void Renderer.drawCustomSprite(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue)
+{
+	Renderer.drawSprite(key, px, py, u16(atex), flags, renderQueue)
+}
+
+function void Renderer.drawCustomSprite(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue, u8 angle, u8 alpha)
+{
+	Renderer.drawSprite(key, px, py, u16(atex), flags, renderQueue, angle, alpha)
+}
+
+function void Renderer.drawCustomSpriteTinted(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue, u8 angle, u32 tintColor, s32 scale)
+{
+	Renderer.drawSpriteTinted(key, px, py, u16(atex), flags, renderQueue, angle, tintColor, scale)
+}
+
+function void Renderer.drawCustomSpriteTransformed(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue, u32 tintColor, s32 transform11, s32 transform12, s32 transform21, s32 transform22)
+{
+	Renderer.drawSpriteTransformed(key, px, py, u16(atex), flags, renderQueue, tintColor, transform11, transform12, transform21, transform22)
+}
+
+
+
+//-------------------------------------------------------//
+// Functions that got proper names                       //
+//-------------------------------------------------------//
+
+// TODO: Replace all the rest here with alias pragmas for the functions
+
+function void fn00fe6e()
+{
+	CompetitionMode.Character.CheckCollisionsWithDynamicObjects()
+}
+
+function void fn01cdb2()
+{
+	PathSwapperCompetitionMode_UpdateVertical()
+}
+
+function void fn0105c4()
+{
+	CompetitionMode.Character.BaseUpdate.Sonic_Knuckles()
+}
+
+function void fn010628()
+{
+	CompetitionMode.Character.Initialization.Sonic_Knuckles()
+}
+
+function void fn010740()
+{
+	CompetitionMode.Character.UpdateNormalState.Sonic_Knuckles()
+}
+
+function void fn0107f6()
+{
+	CompetitionMode.Character.UpdateUprightOnGround.Sonic_Knuckles()
+}
+
+function void fn010868()
+{
+	CompetitionMode.Character.UpdateUprightInAir.Sonic_Knuckles()
+}
+
+function void fn010896()
+{
+	CompetitionMode.Character.UpdateRollingOnGround.Sonic_Knuckles()
+}
+
+function void fn0108b8()
+{
+	CompetitionMode.Character.UpdateRollingInAir.Sonic_Knuckles()
+}
+
+function void fn0108e6()
+{
+	CompetitionMode.Character.CheckForStartRolling.Sonic_Knuckles()
+}
+
+function void fn01094c()
+{
+	CompetitionMode.Character.UpdateSpindash.Sonic_Knuckles()
+}
+
+function void fn010a80()
+{
+	CompetitionMode.centerCameraYOffset.Sonic_Knuckles()
+}
+
+function void fn012006()
+{
+	Character.checkGroundEdgeCollision()
+}
+
+function void fn012d36()
+{
+	CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
+}
+
+function void fn01309a()
+{
+	CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
+}
+
+function void fn013102()
+{
+	CompetitionMode.Character.BaseUpdate.Tails()
+}
+
+function void fn013166()
+{
+	CompetitionMode.Character.Initialization.Tails()
+}
+
+function void fn013274()
+{
+	CompetitionMode.Character.UpdateNormalState.Tails()
+}
+
+function void fn013336()
+{
+	CompetitionMode.Character.UpdateUprightOnGround.Tails()
+}
+
+function void fn01335a()
+{
+	CompetitionMode.Character.UpdateUprightInAir.Tails()
+}
+
+function void fn01346a()
+{
+	CompetitionMode.Character.UpdateRollingOnGround.Tails()
+}
+
+function void fn01348c()
+{
+	CompetitionMode.Character.UpdateRollingInAir.Tails()
+}
+
+function void fn0134ba()
+{
+	CompetitionMode.Character.CheckForStartRolling.Tails()
+}
+
+function void fn013520()
+{
+	CompetitionMode.Character.UpdateSpindash.Tails()
+}
+
+function void fn013648()
+{
+	CompetitionMode.centerCameraYOffset.Tails()
+}
+
+function void fn015cd0()
+{
+	CompetitionMode.Character.UpdateAnimation.Tails()
+}
+
+function void fn015cd6()
+{
+	CompetitionMode.UpdateTailsAnimation_inner()
+}
+
+function void fn015d1e()
+{
+	CompetitionMode.updateTailsAnimation_shared()
+}
+
+function void fn016022()
+{
+	CompetitionMode.TailsTails.UpdateSpritePatterns()
+}
+
+function void fn016050()
+{
+	CompetitionMode.Character.UpdateSpritePatterns.Tails()
+}
+
+function void fn0161fa()
+{
+	CompetitionMode.TailsTails.Init()
+}
+
+function void fn016232()
+{
+	CompetitionMode.TailsTails.Update()
+}
+
+function void fn019236()
+{
+	SuperSonicStars.CreateSparks()
+}
+
+function void fn0193ca()
+{
+	HyperSonicStars.CreateSparks()
+}
+
+function void fn01c87e()
+{
+	UpdateCameraBounds.HCZ1()
+}
+
+function void fn01c8f6()
+{
+	UpdateCameraBounds.HCZ2()
+}
+
+function void fn01d6c2()
+{
+	MonitorIntact.CheckBlocking.player2()
+}
+
+function void fn01d890()
+{
+	ItemEffect.ApplyRobotnik()
+}
+
+function void SpringVertical.BaseUpdate()
+{
+	Spring.BaseUpdate()
+}
+
+function void SpringVertical.InitFlipped()
+{
+	SpringVerticalFlipped.Init()
+}
+
+function void SpringVertical.InitDiagonal()
+{
+	SpringDiagonal.Init()
+}
+
+function void SpringVertical.InitDiagonalFlipped()
+{
+	SpringDiagonalFlipped.Init()
+}
+
+function void fn022f46()
+{
+	SpringVertical.Update.CompetitionMode()
+}
+
+function void SpringHorizontal.Check()
+{
+	SpringHorizontal.Update()
+}
+
+function void fn0230de()
+{
+	SpringHorizontal.Update.CompetitionMode()
+}
+
+function void fn023160()
+{
+	SpringHorizontal.ApplyToCharacter.CompetitionMode()
+}
+
+function void fn023190()
+{
+	SpringHorizontal.ApplyToCharacter()
+}
+
+function void SpringVertical.UpdateFlipped()
+{
+	SpringVerticalFlipped.Update()
+}
+
+function void fn023374()
+{
+	SpringVerticalFlipped.Update.CompetitionMode()
+}
+
+function void fn0233da()
+{
+	SpringVerticalFlipped.ApplyToCharacter.CompetitionMode()
+}
+
+function void SpringDiagonal.UpdateFlipped()
+{
+	SpringDiagonalFlipped.Update()
+}
+
+function void fn0234e6()
+{
+	SpringDiagonal.ApplyToCharacter()
+}
+
+function void fn023624()
+{
+	SpringDiagonalFlipped.ApplyToCharacter()
+}
+
+function void fn02cfc0()
+{
+	Checkpoint.Init()
+}
+
+function void UpdateLevelScrolling.HCZ2()
+{
+	InitLevelScrolling.HCZ2()
+}
+
+function void fn050ef2()
+{
+	UpdateScrolling.HCZ2()
+}
+
+function void fn052fa8()
+{
+	InitLevelScrolling.FBZ2()
+}
+
+function void fn05301c()
+{
+	UpdateLevelScrolling.FBZ2()
+}
+
+function void fn0541f0()
+{
+	UpdateLevelScrolling.LBZ1()
+}
+
+function void fn0551aa()
+{
+	UpdateLevelScrolling.MHZ2()
+}
+
+function void fn05937e()
+{
+	InitLevelScrolling.DEZ1()
+}
+
+function void fn084464()
+{
+	Object.AnimationProgressByLocalA1.CheckFlipX()
+}
+
+function void fn084498()
+{
+	Object.AnimationProgressByLocalA1.CheckFlipY()
+}
+
+function void fn084700()
+{
+	Object.AnimationProgressByLocalA1.SpeedUp()
+}
+
+function void fn084780()
+{
+	Object.AnimationProgressByLocalA1.SlowDown()
+}
+
+function bool fn084fa4()
+{
+	return SetupObjectAttributesSlotted()
+}
+
+function void fn085590()
+{
+	FadeOutColorUniform()
+}
+
+function void fn0855f8()
+{
+	FadeInColorUniform()
+}
+
+function void fn085b8a()
+{
+	StopCharacterWinPose.player1()
+}
+
+function void fn23a63c()
+{
+	InitLevelTiles.CompetitonModeLevel_shared()
+}
+
+function void fn23a68a()
+{
+	UpdateLevelTiles.CompetitonModeLevel_shared()
+}
+
+function void fn23a6ac()
+{
+	UpdateLevelTiles.CGZ()
+}
+
+function void fn23a6cc()
+{
+	InitLevelScrolling.ALZ()
+}
+
+function void fn23a6d2()
+{
+	InitLevelScrolling.BPZ()
+}
+
+function void fn23a6d8()
+{
+	InitLevelScrolling.DPZ()
+}
+
+function void fn23a6de()
+{
+	InitLevelScrolling.CGZ()
+}
+
+function void fn23a716()
+{
+	InitLevelScrolling.EMZ()
+}
+
+function void fn23a73e()
+{
+	UpdateLevelScrolling.ALZ()
+}
+
+function void fn23a748()
+{
+	UpdateLevelScrolling.BPZ()
+}
+
+function void fn23a796()
+{
+	UpdateLevelScrolling.DPZ()
+}
+
+function void fn23a752()
+{
+	UpdateLevelScrolling.CGZ()
+}
+
+function void fn23a75c()
+{
+	UpdateLevelScrolling.EMZ()
+}
+
+function void fn23efec()
+{
+	InitLevelScrolling.BonusGM()
+}

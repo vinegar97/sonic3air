@@ -13,6 +13,7 @@
 #include "lemon/compiler/Parser.h"
 #include "lemon/compiler/ParserTokens.h"
 #include "lemon/compiler/Preprocessor.h"
+#include "lemon/compiler/TokenHelper.h"
 #include "lemon/compiler/TokenTypes.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/GlobalsLookup.h"
@@ -31,16 +32,6 @@ namespace lemon
 			T& node = blockStack.back()->mNodes.createBack<T>();
 			node.setLineNumber(lineNumber);
 			return node;
-		}
-
-		bool isOperator(const Token& token, Operator op)
-		{
-			return (token.getType() == Token::Type::OPERATOR && token.as<OperatorToken>().mOperator == op);
-		}
-
-		bool isKeyword(const Token& token, Keyword keyword)
-		{
-			return (token.getType() == Token::Type::KEYWORD && token.as<KeywordToken>().mKeyword == keyword);
 		}
 	}
 
@@ -80,8 +71,8 @@ namespace lemon
 		mModule(module),
 		mGlobalsLookup(globalsLookup),
 		mCompileOptions(compileOptions),
-		mTokenProcessing(globalsLookup, mGlobalCompilerConfig),
-		mPreprocessor(mGlobalCompilerConfig, mTokenProcessing)
+		mTokenProcessing(globalsLookup, compileOptions),
+		mPreprocessor(compileOptions, mTokenProcessing)
 	{
 	}
 
@@ -96,7 +87,6 @@ namespace lemon
 	{
 		mErrors.clear();
 		mModule.startCompiling(mGlobalsLookup);
-		mGlobalCompilerConfig.mExternalAddressType = mCompileOptions.mExternalAddressType;
 
 		// Read input file(s)
 		std::vector<std::string_view> inputLines;
@@ -176,7 +166,7 @@ namespace lemon
 				String output;
 				for (ScriptFunction* function : mModule.getScriptFunctions())
 				{
-					output << function->getName() << ":\r\n";
+					output << function->getName().getString() << ":\r\n";
 					for (const Opcode& opcode : function->mOpcodes)
 					{
 						String typeString = Opcode::GetTypeString(opcode.mType);
@@ -543,8 +533,11 @@ namespace lemon
 							// Add all pragmas associated with this function, i.e. all pragma nodes in front
 							for (PragmaNode* pragmaNode : currentPragmas)
 							{
-								function.mPragmas.push_back(pragmaNode->mContent);
+								function.addOrProcessPragma(pragmaNode->mContent, mCompileOptions.mConsumeProcessedPragmas);
 							}
+
+							// Now register the function
+							mGlobalsLookup.registerFunction(function);
 							break;
 						}
 
@@ -703,9 +696,8 @@ namespace lemon
 			}
 		}
 
-		// Create function in program
-		ScriptFunction& function = mModule.addScriptFunction(functionName, returnType, &parameters);
-		mGlobalsLookup.registerFunction(function);
+		// Create function in module
+		ScriptFunction& function = mModule.addScriptFunction(functionName, returnType, parameters);
 
 		// Create new variables for parameters
 		for (const Function::Parameter& parameter : function.getParameters())
@@ -740,7 +732,7 @@ namespace lemon
 		processUndefinedNodesInBlock(content, function, scopeContext);
 
 		// Build opcodes out of nodes inside the function's block
-		FunctionCompiler functionCompiler(function, mGlobalCompilerConfig);
+		FunctionCompiler functionCompiler(function, mCompileOptions);
 		functionCompiler.processParameters();
 		functionCompiler.buildOpcodesForFunction(content);
 	}
@@ -869,7 +861,7 @@ namespace lemon
 
 				case Keyword::IF:
 				{
-					if (mGlobalCompilerConfig.mScriptFeatureLevel >= 2)
+					if (mCompileOptions.mScriptFeatureLevel >= 2)
 						CHECK_ERROR(tokens.size() >= 2 && isOperator(tokens[1], Operator::PARENTHESIS_LEFT), "Expected parentheses after 'if' keyword", lineNumber);
 
 					// Process tokens
@@ -898,7 +890,7 @@ namespace lemon
 						if (nullptr != nextNode && nextNode->getType() == Node::Type::UNDEFINED)
 						{
 							UndefinedNode& nextNodeUndefined = nextNode->as<UndefinedNode>();
-							if (nextNodeUndefined.mTokenList.size() >= 1 && nextNodeUndefined.mTokenList[0].getType() == Token::Type::KEYWORD && nextNodeUndefined.mTokenList[0].as<KeywordToken>().mKeyword == Keyword::ELSE)
+							if (nextNodeUndefined.mTokenList.size() >= 1 && isKeyword(nextNodeUndefined.mTokenList[0], Keyword::ELSE))
 							{
 								// Special case: 'else if' (or anything where there's a statement directly after the 'else')
 								if (nextNodeUndefined.mTokenList.size() >= 2)
@@ -1121,7 +1113,7 @@ namespace lemon
 		static const uint64 ARRAY_NAME_HASH = rmx::getMurmur2_64(std::string_view("array"));
 
 		// Check for "constant array"
-		if (tokens[1].getType() == Token::Type::IDENTIFIER && tokens[1].as<IdentifierToken>().mName.getHash() == ARRAY_NAME_HASH)
+		if (isIdentifier(tokens[1], ARRAY_NAME_HASH))
 		{
 			CHECK_ERROR(tokens.size() >= 7, "Syntax error in constant array definition", lineNumber);
 			CHECK_ERROR(isOperator(tokens[2], Operator::COMPARE_LESS), "Expected a type in <> in constant array definition", lineNumber);
@@ -1255,7 +1247,7 @@ namespace lemon
 				{
 					REPORT_ERROR_CODE(CompilerError::Code::SCRIPT_FEATURE_LEVEL_TOO_HIGH, value, MAX_SCRIPT_FEATURE_LEVEL, "Script uses feature level " << value << ", but the highest supported level is " << MAX_SCRIPT_FEATURE_LEVEL);
 				}
-				mGlobalCompilerConfig.mScriptFeatureLevel = (uint32)value;
+				mCompileOptions.mScriptFeatureLevel = (uint32)value;
 			}
 			return true;
 		}

@@ -1,0 +1,34 @@
+
+=== Build under Linux ===
+
+Make sure the following packages are installed.
+If needed, install them via "sudo apt-get install" (for Debian-based systems, this may differ for other Linux distributions).
+	- g++
+	- cmake
+	- libgl1-mesa-dev
+	- libglu1-mesa-dev
+	- libasound2-dev
+	- libpulse-dev
+	- libxcomposite-dev
+	- libxxf86vm-dev
+	=> Complete line to copy:   sudo apt-get install g++ cmake libgl1-mesa-dev libglu1-mesa-dev libasound2-dev libpulse-dev libxcomposite-dev libxxf86vm-dev
+	=> More candidates that might be needed by SDL2 see https://github.com/libsdl-org/SDL/blob/3bdc10f842c3eba74b9837caa21339a68a19efbe/.github/workflows/main.yml
+
+Setup and build with CMake:
+	- cd ./Oxygen/sonic3air/source/_cmake/build
+	- cmake -DCMAKE_BUILD_TYPE=Release ..
+	- cmake --build .
+
+
+
+=== Run Linux Builds ===
+
+For both, place a copy of the S3&K ROM "Sonic_Knuckles_wSonic3.bin" inside "Oxygen/sonic3air/___internal".
+
+Run S3AIR:
+	- cd Oxygen/sonic3air
+	- ./sonic3air_linux
+
+Run Oxygen:
+	- cd Oxygen/oxygenengine
+	- ./oxygenapp_linux

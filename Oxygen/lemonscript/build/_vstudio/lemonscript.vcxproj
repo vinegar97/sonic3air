@@ -28,6 +28,7 @@
     <ClCompile Include="..\..\source\lemon\compiler\ParserHelper.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Preprocessor.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Token.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\TokenHelper.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\TokenProcessing.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\TypeCasting.cpp" />
     <ClCompile Include="..\..\source\lemon\pch.cpp">
@@ -43,6 +44,7 @@
     <ClCompile Include="..\..\source\lemon\program\Opcode.cpp" />
     <ClCompile Include="..\..\source\lemon\program\Program.cpp" />
     <ClCompile Include="..\..\source\lemon\program\StringRef.cpp" />
+    <ClCompile Include="..\..\source\lemon\runtime\BuiltInFunctions.cpp" />
     <ClCompile Include="..\..\source\lemon\runtime\ControlFlow.cpp" />
     <ClCompile Include="..\..\source\lemon\runtime\OpcodeProcessor.cpp" />
     <ClCompile Include="..\..\source\lemon\runtime\provider\DefaultOpcodeProvider.cpp" />
@@ -55,6 +57,7 @@
     <ClCompile Include="..\..\source\lemon\translator\SourceCodeWriter.cpp" />
     <ClCompile Include="..\..\source\lemon\translator\Translator.cpp" />
     <ClCompile Include="..\..\source\lemon\utility\FlyweightString.cpp" />
+    <ClCompile Include="..\..\source\lemon\utility\PragmaSplitter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h" />
@@ -71,6 +74,7 @@
     <ClInclude Include="..\..\source\lemon\compiler\Preprocessor.h" />
     <ClInclude Include="..\..\source\lemon\compiler\PreprocessorDefinition.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Token.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\TokenHelper.h" />
     <ClInclude Include="..\..\source\lemon\compiler\TokenProcessing.h" />
     <ClInclude Include="..\..\source\lemon\compiler\TokenTypes.h" />
     <ClInclude Include="..\..\source\lemon\compiler\TypeCasting.h" />
@@ -90,7 +94,9 @@
     <ClInclude Include="..\..\source\lemon\program\SourceFileInfo.h" />
     <ClInclude Include="..\..\source\lemon\program\StringRef.h" />
     <ClInclude Include="..\..\source\lemon\program\Variable.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\BuiltInFunctions.h" />
     <ClInclude Include="..\..\source\lemon\runtime\ControlFlow.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\FastStringStream.h" />
     <ClInclude Include="..\..\source\lemon\runtime\OpcodeExecUtils.h" />
     <ClInclude Include="..\..\source\lemon\runtime\OpcodeProcessor.h" />
     <ClInclude Include="..\..\source\lemon\runtime\provider\DefaultOpcodeProvider.h" />
@@ -105,6 +111,7 @@
     <ClInclude Include="..\..\source\lemon\translator\SourceCodeWriter.h" />
     <ClInclude Include="..\..\source\lemon\translator\Translator.h" />
     <ClInclude Include="..\..\source\lemon\utility\FlyweightString.h" />
+    <ClInclude Include="..\..\source\lemon\utility\PragmaSplitter.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="lemonscript.natvis" />

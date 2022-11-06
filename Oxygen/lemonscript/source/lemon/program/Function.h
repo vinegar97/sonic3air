@@ -53,8 +53,10 @@ namespace lemon
 		inline BitFlagSet<Flag> getFlags() const  { return mFlags; }
 		inline bool hasFlag(Flag flag) const	  { return mFlags.isSet(flag); }
 
-		inline FlyweightString getName() const { return mName; }
+		inline FlyweightString getContext() const { return mContext; }
+		inline FlyweightString getName() const    { return mName; }
 		inline uint64 getNameAndSignatureHash() const { return mNameAndSignatureHash; }
+		inline const std::vector<FlyweightString>& getAliasNames() const { return mAliasNames; }
 
 		const DataTypeDefinition* getReturnType() const  { return mReturnType; }
 		const ParameterList& getParameters() const  { return mParameters; }
@@ -73,8 +75,10 @@ namespace lemon
 		BitFlagSet<Flag> mFlags;
 
 		// Metadata
+		FlyweightString mContext;		// Name of the type if this is a method-like function
 		FlyweightString mName;
 		uint64 mNameAndSignatureHash = 0;
+		std::vector<FlyweightString> mAliasNames;
 
 		// Signature
 		const DataTypeDefinition* mReturnType = &PredefinedDataTypes::VOID;
@@ -107,6 +111,9 @@ namespace lemon
 		void addLabel(FlyweightString labelName, size_t offset);
 		const Label* findLabelByOffset(size_t offset) const;
 
+		const std::vector<uint32>& getAddressHooks() const  { return mAddressHooks; }
+
+		void addOrProcessPragma(std::string_view pragmaString, bool consumeIfProcessed);
 		inline const std::vector<std::string>& getPragmas() const  { return mPragmas; }
 
 		uint64 addToCompiledHash(uint64 hash) const;
@@ -121,6 +128,9 @@ namespace lemon
 
 		// Labels
 		std::vector<Label> mLabels;
+
+		// Address hooks
+		std::vector<uint32> mAddressHooks;
 
 		// Pragmas
 		std::vector<std::string> mPragmas;

@@ -29,8 +29,7 @@
 // -----------------------------------------------------------------------------------------------
 // [Euka] Added this change that seems needed for static Windows 64-bit builds with Visual Studio
 //  -> This prevents the linker error due to multiple "memcpy" definitions
-//  -> For some reason, it's not needed for 32-bit builds or any other platforms
-#if defined(_MSC_VER) && defined(_WIN64) && !defined(_WINDLL)
+#if defined(_MSC_VER) && !defined(_WINDLL)
     #define HAVE_LIBC
 #endif
 // -----------------------------------------------------------------------------------------------
@@ -101,6 +100,10 @@ typedef unsigned int uintptr_t;
 # define SIZEOF_VOIDP 4
 #endif
 
+#ifdef __clang__
+# define HAVE_GCC_ATOMICS 1
+#endif
+
 #define HAVE_DDRAW_H 1
 #define HAVE_DINPUT_H 1
 #define HAVE_DSOUND_H 1
@@ -111,6 +114,7 @@ typedef unsigned int uintptr_t;
 #endif
 #if defined(_WIN32_MAXVER) && _WIN32_MAXVER >= 0x0602  /* Windows 8 SDK */
 #define HAVE_D3D11_H 1
+#define HAVE_ROAPI_H 1
 #endif
 #define HAVE_MMDEVICEAPI_H 1
 #define HAVE_AUDIOCLIENT_H 1

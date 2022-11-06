@@ -12,6 +12,7 @@
 #include "lemon/program/Variable.h"
 #include "lemon/compiler/Operators.h"
 #include "lemon/compiler/Token.h"
+#include "lemon/compiler/TypeCasting.h"
 
 
 namespace lemon
@@ -22,7 +23,6 @@ namespace lemon
 	class LocalVariable;
 	class ScriptFunction;
 	class StatementToken;
-	struct GlobalCompilerConfig;
 
 	class TokenProcessing
 	{
@@ -44,7 +44,7 @@ namespace lemon
 		Context mContext;
 
 	public:
-		TokenProcessing(GlobalsLookup& globalsLookup, const GlobalCompilerConfig& config);
+		TokenProcessing(GlobalsLookup& globalsLookup, const CompileOptions& compileOptions);
 
 		void processTokens(TokenList& tokensRoot, uint32 lineNumber, const DataTypeDefinition* resultType = nullptr);
 		void processForPreprocessor(TokenList& tokensRoot, uint32 lineNumber);
@@ -54,8 +54,12 @@ namespace lemon
 	private:
 		void processDefines(TokenList& tokens);
 		void processConstants(TokenList& tokens);
-		void processParentheses(TokenList& tokens, std::vector<TokenList*>& outLinearTokenLists);
-		void processCommaSeparators(std::vector<TokenList*>& linearTokenLists);
+
+		void processParentheses(TokenList& tokens);
+		void processCommaSeparators(TokenList& tokens);
+
+		void processTokenListRecursive(TokenList& tokens);
+		void processTokenListRecursiveForPreprocessor(TokenList& tokens);
 
 		void processVariableDefinitions(TokenList& tokens);
 		void processFunctionCalls(TokenList& tokens);
@@ -70,6 +74,9 @@ namespace lemon
 		void evaluateCompileTimeConstants(TokenList& tokens);
 		bool evaluateCompileTimeConstantsRecursive(Token& inputToken, TokenPtr<StatementToken>& outTokenPtr);
 
+		void resolveAddressOfFunctions(TokenList& tokens);
+		void resolveAddressOfMemoryAccesses(TokenList& tokens);
+
 		void assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType);
 		const DataTypeDefinition* assignStatementDataType(StatementToken& token, const DataTypeDefinition* resultType);
 
@@ -79,7 +86,8 @@ namespace lemon
 
 	private:
 		GlobalsLookup& mGlobalsLookup;
-		const GlobalCompilerConfig& mConfig;
+		const CompileOptions& mCompileOptions;
+		TypeCasting mTypeCasting;
 		uint32 mLineNumber = 0;
 
 		CachedBuiltinFunction mBuiltinConstantArrayAccess;
@@ -88,7 +96,6 @@ namespace lemon
 		CachedBuiltinFunction mBuiltinStringOperatorLessOrEqual;
 		CachedBuiltinFunction mBuiltinStringOperatorGreater;
 		CachedBuiltinFunction mBuiltinStringOperatorGreaterOrEqual;
-		CachedBuiltinFunction mBuiltinStringLength;
 	};
 
 }

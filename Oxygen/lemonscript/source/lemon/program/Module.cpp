@@ -137,32 +137,83 @@ namespace lemon
 		}
 	}
 
-	void Module::dumpDefinitionsToScriptFile(const std::wstring& filename)
+	void Module::dumpDefinitionsToScriptFile(const std::wstring& filename, bool append)
 	{
 		String content;
-		content << "// This file was auto-generated from the definitions in lemon script module '" << getModuleName() << "'.\r\n";
-		content << "\r\n";
-
-		for (const Function* function : mFunctions)
+		if (!append)
 		{
-			if (function->getName().getString()[0] == '#')	// Exclude hidden built-ins (which can't be accessed by scripts directly anyways)
+			content << "// This file was auto-generated";
+		}
+		content << "\r\n\r\n\r\n";
+		content << "// === Module '" << getModuleName() << "' ===";
+
+		std::vector<const Function*> currentFunctions;
+		for (int pass = 0; pass < 2; ++pass)
+		{
+			// First pass: Regular functions -- Second pass: Methods
+			const bool outputMethods = (pass == 1);
+
+			currentFunctions.clear();
+			for (const Function* function : mFunctions)
+			{
+				const bool isMethod = !function->getContext().isEmpty();
+				if (isMethod == outputMethods)
+				{
+					if (function->getName().getString()[0] != '#')	// Exclude hidden built-ins (which can't be accessed by scripts directly anyways)
+					{
+						currentFunctions.push_back(function);
+					}
+				}
+			}
+			if (currentFunctions.empty())
 				continue;
 
+			content << "\r\n\r\n";
+			content << (outputMethods ? "// Methods (to be called on variables directly)" : "// Regular functions");
 			content << "\r\n";
-			content << "declare function " << function->getReturnType()->getName().getString() << " " << function->getName().getString() << "(";
-			for (size_t i = 0; i < function->getParameters().size(); ++i)
+
+			std::string lastPrefix = ".";		// Start with an invalid prefix so that first function will add a line break
+			for (const Function* function : currentFunctions)
 			{
-				if (i != 0)
-					content << ", ";
-				const Function::Parameter& parameter = function->getParameters()[i];
-				content << parameter.mDataType->getName().getString();
-				if (parameter.mName.isValid())
-					content << " " << parameter.mName.getString();
+				// Separate functiosn with different prefixes
+				const size_t dot = function->getName().getString().find_first_of('.');
+				std::string_view prefix = (dot == std::string_view::npos) ? std::string_view() : function->getName().getString().substr(0, dot);
+				if (prefix != lastPrefix)
+				{
+					lastPrefix = prefix;
+					content << "\r\n";
+				}
+
+				// Output signature declaration
+				content << "declare function " << function->getReturnType()->getName().getString() << " ";
+
+				size_t firstParam = 0;
+				if (outputMethods)
+				{
+					content << function->getContext().getString() << ":" << function->getName().getString() << "(";
+					firstParam = 1;
+				}
+				else
+				{
+					content << function->getName().getString() << "(";
+				}
+
+				for (size_t i = firstParam; i < function->getParameters().size(); ++i)
+				{
+					if (i > firstParam)
+						content << ", ";
+					const Function::Parameter& parameter = function->getParameters()[i];
+					content << parameter.mDataType->getName().getString();
+					if (parameter.mName.isValid())
+						content << " " << parameter.mName.getString();
+				}
+				content << ")\r\n";
 			}
-			content << ")\r\n";
 		}
 
-		content.saveFile(filename);
+		FileHandle fileHandle;
+		fileHandle.open(filename, append ? FILE_ACCESS_APPEND : FILE_ACCESS_WRITE);
+		fileHandle.write(&content[0], content.length());
 	}
 
 	const SourceFileInfo& Module::addSourceFileInfo(const std::wstring& basepath, const std::wstring& filename)
@@ -203,14 +254,15 @@ namespace lemon
 		return mFunctions[uniqueId & 0xffff];
 	}
 
-	ScriptFunction& Module::addScriptFunction(FlyweightString name, const DataTypeDefinition* returnType, const Function::ParameterList* parameters)
+	ScriptFunction& Module::addScriptFunction(FlyweightString name, const DataTypeDefinition* returnType, const Function::ParameterList& parameters, std::vector<FlyweightString>* aliasNames)
 	{
 		ScriptFunction& func = mScriptFunctionPool.createObject();
 		func.setModule(*this);
 		func.mName = name;
 		func.mReturnType = returnType;
-		if (nullptr != parameters)
-			func.mParameters = *parameters;
+		func.mParameters = parameters;
+		if (nullptr != aliasNames)
+			func.mAliasNames = *aliasNames;
 
 		addFunctionInternal(func);
 		mScriptFunctions.push_back(&func);
@@ -228,11 +280,26 @@ namespace lemon
 		return func;
 	}
 
+	NativeFunction& Module::addNativeMethod(FlyweightString context, FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, BitFlagSet<Function::Flag> flags)
+	{
+		NativeFunction& func = mNativeFunctionPool.createObject();
+		func.mContext = context;
+		func.mName = name;
+		func.setFunction(functionWrapper);
+		func.mFlags = flags;
+
+		addFunctionInternal(func);
+		return func;
+	}
+
 	void Module::addFunctionInternal(Function& func)
 	{
 		RMX_ASSERT(mFunctions.size() < 0x10000, "Too many functions in module");
 		func.mID = mFirstFunctionID + (uint32)mFunctions.size();
-		func.mNameAndSignatureHash = func.mName.getHash() + func.getSignatureHash();
+		if (func.mContext.isEmpty())
+			func.mNameAndSignatureHash = func.mName.getHash() + func.getSignatureHash();
+		else
+			func.mNameAndSignatureHash = func.mContext.getHash() + func.mName.getHash() + func.getSignatureHash();
 		mFunctions.push_back(&func);
 	}
 
@@ -345,10 +412,14 @@ namespace lemon
 		//  - 0x09 = Added source file infos + more compact way of line number serialization
 		//  - 0x0a = Added dependency hash
 		//  - 0x0b = Added app version
+		//  - 0x0c = Added address hook serialization
+		//  - 0x0d = Support for function alias names + added function flags as a small optimization
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";
-		uint16 version = 0x0b;
+		const uint16 MINIMUM_VERSION = 0x0d;
+		uint16 version = 0x0d;
+
 		if (outerSerializer.isReading())
 		{
 			const uint32 signature = *(const uint32*)outerSerializer.peek();
@@ -357,7 +428,7 @@ namespace lemon
 
 			outerSerializer.skip(4);
 			version = outerSerializer.read<uint16>();
-			if (version < 0x0b)
+			if (version < MINIMUM_VERSION)
 				return false;	// Loading older versions is not supported
 
 			const uint32 readDependencyHash = outerSerializer.read<uint32>();
@@ -443,23 +514,50 @@ namespace lemon
 			uint32 numberOfFunctions = (uint32)mFunctions.size();
 			serializer & numberOfFunctions;
 
+			enum FunctionSerializationFlags
+			{
+				FLAG_NATIVE_FUNCTION	= 0x01,
+				FLAG_HAS_ALIAS_NAMES	= 0x02,
+				FLAG_HAS_RETURN_TYPE	= 0x04,
+				FLAG_HAS_PARAMETERS		= 0x08,
+				FLAG_HAS_LABELS			= 0x10,
+				FLAG_HAS_ADDRESS_HOOKS	= 0x20,
+				FLAG_HAS_PRAGMAS		= 0x40,
+			};
+
 			uint32 lastLineNumber = 0;
+			std::vector<FlyweightString> aliasNames;
+			Function::ParameterList parameters;
 			for (uint32 i = 0; i < numberOfFunctions; ++i)
 			{
 				if (serializer.isReading())
 				{
-					const Function::Type type = (Function::Type)serializer.read<uint8>();
+					const uint8 flags = serializer.read<uint8>();
+					const Function::Type type = (flags & FLAG_NATIVE_FUNCTION) ? Function::Type::NATIVE : Function::Type::SCRIPT;
+					
 					FlyweightString name;
 					name.serialize(serializer);
 
-					const DataTypeDefinition* returnType = DataTypeSerializer::readDataType(serializer);
-					Function::ParameterList parameters;
-					const uint8 parameterCount = serializer.read<uint8>();
-					parameters.resize((size_t)parameterCount);
-					for (uint8 k = 0; k < parameterCount; ++k)
+					aliasNames.clear();
+					if (flags & FLAG_HAS_ALIAS_NAMES)
 					{
-						parameters[k].mName.serialize(serializer);
-						parameters[k].mDataType = DataTypeSerializer::readDataType(serializer);
+						aliasNames.resize((size_t)serializer.read<uint8>());
+						for (FlyweightString& aliasName : aliasNames)
+							aliasName.serialize(serializer);
+					}
+
+					const DataTypeDefinition* returnType = (flags & FLAG_HAS_RETURN_TYPE) ? DataTypeSerializer::readDataType(serializer) : &PredefinedDataTypes::VOID;
+
+					parameters.clear();
+					if (flags & FLAG_HAS_PARAMETERS)
+					{
+						const uint8 parameterCount = serializer.read<uint8>();
+						parameters.resize((size_t)parameterCount);
+						for (uint8 k = 0; k < parameterCount; ++k)
+						{
+							parameters[k].mName.serialize(serializer);
+							parameters[k].mDataType = DataTypeSerializer::readDataType(serializer);
+						}
 					}
 
 					if (type == Function::Type::NATIVE)
@@ -469,7 +567,7 @@ namespace lemon
 					else
 					{
 						// Create new script function
-						ScriptFunction& scriptFunc = addScriptFunction(name, returnType, &parameters);
+						ScriptFunction& scriptFunc = addScriptFunction(name, returnType, parameters, &aliasNames);
 
 						// Source information
 						const size_t index = (size_t)serializer.read<uint16>();
@@ -536,20 +634,36 @@ namespace lemon
 						}
 
 						// Labels
-						count = (size_t)serializer.read<uint32>();
-						for (size_t k = 0; k < count; ++k)
+						if (flags & FLAG_HAS_LABELS)
 						{
-							FlyweightString name;
-							name.serialize(serializer);
-							const uint32 offset = serializer.read<uint32>();
-							scriptFunc.addLabel(name, (size_t)offset);
+							count = (size_t)serializer.read<uint32>();
+							for (size_t k = 0; k < count; ++k)
+							{
+								FlyweightString name;
+								name.serialize(serializer);
+								const uint32 offset = serializer.read<uint32>();
+								scriptFunc.addLabel(name, (size_t)offset);
+							}
+						}
+
+						// Address hooks
+						if (flags & FLAG_HAS_ADDRESS_HOOKS)
+						{
+							count = (size_t)serializer.read<uint32>();
+							for (size_t k = 0; k < count; ++k)
+							{
+								scriptFunc.mAddressHooks.emplace_back(serializer.read<uint32>());
+							}
 						}
 
 						// Pragmas
-						count = (size_t)serializer.read<uint32>();
-						for (size_t k = 0; k < count; ++k)
+						if (flags & FLAG_HAS_PRAGMAS)
 						{
-							scriptFunc.mPragmas.emplace_back(serializer.read<std::string>());
+							count = (size_t)serializer.read<uint32>();
+							for (size_t k = 0; k < count; ++k)
+							{
+								scriptFunc.mPragmas.emplace_back(serializer.read<std::string>());
+							}
 						}
 					}
 				}
@@ -557,16 +671,43 @@ namespace lemon
 				{
 					const Function& function = *mFunctions[i];
 
-					serializer.write((uint8)function.getType());
+					uint8 flags = 0;
+					flags |= FLAG_NATIVE_FUNCTION * (function.getType() == Function::Type::NATIVE);
+					flags |= FLAG_HAS_ALIAS_NAMES * (!function.mAliasNames.empty());
+					flags |= FLAG_HAS_RETURN_TYPE * (function.mReturnType != &PredefinedDataTypes::VOID);
+					flags |= FLAG_HAS_PARAMETERS  * (!function.mParameters.empty());
+					if (function.getType() == Function::Type::SCRIPT)
+					{
+						const ScriptFunction& scriptFunc = static_cast<const ScriptFunction&>(function);
+						flags |= FLAG_HAS_LABELS		* (!scriptFunc.mLabels.empty());
+						flags |= FLAG_HAS_ADDRESS_HOOKS * (!scriptFunc.mAddressHooks.empty());
+						flags |= FLAG_HAS_PRAGMAS		* (!scriptFunc.mPragmas.empty());
+					}
+					serializer.write(flags);
+
 					function.mName.write(serializer);
 
-					DataTypeSerializer::writeDataType(serializer, function.mReturnType);
-					const uint8 parameterCount = (uint8)function.mParameters.size();
-					serializer.write(parameterCount);
-					for (uint8 k = 0; k < parameterCount; ++k)
+					if (flags & FLAG_HAS_ALIAS_NAMES)
 					{
-						function.mParameters[k].mName.write(serializer);
-						DataTypeSerializer::writeDataType(serializer, function.mParameters[k].mDataType);
+						serializer.writeAs<uint8>(function.mAliasNames.size());
+						for (const FlyweightString& aliasName : function.mAliasNames)
+							aliasName.write(serializer);
+					}
+
+					if (flags & FLAG_HAS_RETURN_TYPE)
+					{
+						DataTypeSerializer::writeDataType(serializer, function.mReturnType);
+					}
+
+					if (flags & FLAG_HAS_PARAMETERS)
+					{
+						const uint8 parameterCount = (uint8)function.mParameters.size();
+						serializer.write(parameterCount);
+						for (uint8 k = 0; k < parameterCount; ++k)
+						{
+							function.mParameters[k].mName.write(serializer);
+							DataTypeSerializer::writeDataType(serializer, function.mParameters[k].mDataType);
+						}
 					}
 
 					if (function.getType() == Function::Type::SCRIPT)
@@ -622,18 +763,34 @@ namespace lemon
 						}
 
 						// Labels
-						serializer.writeAs<uint32>(scriptFunc.mLabels.size());
-						for (const ScriptFunction::Label& label : scriptFunc.mLabels)
+						if (flags & FLAG_HAS_LABELS)
 						{
-							label.mName.write(serializer);
-							serializer.write(label.mOffset);
+							serializer.writeAs<uint32>(scriptFunc.mLabels.size());
+							for (const ScriptFunction::Label& label : scriptFunc.mLabels)
+							{
+								label.mName.write(serializer);
+								serializer.write(label.mOffset);
+							}
+						}
+
+						// Address hooks
+						if (flags & FLAG_HAS_ADDRESS_HOOKS)
+						{
+							serializer.writeAs<uint32>(scriptFunc.mAddressHooks.size());
+							for (uint32 addressHook : scriptFunc.mAddressHooks)
+							{
+								serializer.write(addressHook);
+							}
 						}
 
 						// Pragmas
-						serializer.writeAs<uint32>(scriptFunc.mPragmas.size());
-						for (const auto& pragma : scriptFunc.mPragmas)
+						if (flags & FLAG_HAS_PRAGMAS)
 						{
-							serializer.write(pragma);
+							serializer.writeAs<uint32>(scriptFunc.mPragmas.size());
+							for (const std::string& pragma : scriptFunc.mPragmas)
+							{
+								serializer.write(pragma);
+							}
 						}
 					}
 				}
