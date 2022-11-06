@@ -1682,7 +1682,7 @@ function void fn052f32()
 
 
 //# address-hook(0x052fa8) end(0x053018)
-function void fn052fa8()
+function void InitLevelScrolling.FBZ2()
 {
 	if (allocDynamicObjectStd())
 	{
@@ -1727,7 +1727,7 @@ function void fn052fa8()
 
 
 //# address-hook(0x05301c) end(0x053020)
-function void fn05301c()
+function void UpdateLevelScrolling.FBZ2()
 {
 	D0.u16 = level.scrolling_routine
 	call 0x053024 + D0.s16
