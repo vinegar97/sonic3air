@@ -238,7 +238,7 @@ function void LevelPaletteUpdate.CNZ()
 	{
 		u16[0xfffff652] = 0
 	}
-	copyMemory(0xfffffc52, 0x002d8e + D0.s16, 6)
+	copyMemory(0xfffffc52, A0 + D0.s16, 6)
 
 	A0 = 0x002ee2
 	copyMemory(0xfffff0d2, A0 + D0.s16, 6)
