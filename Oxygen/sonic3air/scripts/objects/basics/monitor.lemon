@@ -16,6 +16,7 @@ define objA1.monitor.character_address		= u16[A1 + 0x42]
 //-------------------------------------------------------//
 
 // Monitor types (stored in objA0.subtype2c and objA0.state):
+//  0x00 = Static, works like Robotnik
 //  0x01 = Extra Life
 //  0x02 = Robotnik
 //  0x03 = Rings
@@ -27,6 +28,7 @@ define objA1.monitor.character_address		= u16[A1 + 0x42]
 //  0x09 = "Super" monitor (debug only)
 //  0x0a = Already broken, too bad...
 //  0x0b = Classic Shield (Standalone only)
+//  0x10 = Flag that marks shield monitors that should be a Classic Shield when having all shield types active (Standalone only)
 
 
 #if STANDALONE

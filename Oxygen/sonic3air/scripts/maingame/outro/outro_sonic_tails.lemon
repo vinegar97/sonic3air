@@ -96,9 +96,7 @@ function void fn05d8bc()
 				else
 			#endif
 				{
-					u16[0xfffffc04] = 0x0eee
-					u16[0xfffffc06] = 0x0eee
-					u16[0xfffffc08] = 0x0eee
+					fillMemory_u16(0xfffffc04, 6, 0x0eee)
 				}
 			}
 		}
@@ -122,9 +120,7 @@ function void fn05d8bc()
 				else
 			#endif
 				{
-					u16[0xfffffc04] = 0x0eee
-					u16[0xfffffc06] = 0x0eee
-					u16[0xfffffc08] = 0x0eee
+					fillMemory_u16(0xfffffc04, 6, 0x0eee)
 				}
 			}
 		}
