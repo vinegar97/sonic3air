@@ -373,7 +373,7 @@ function void fn085760()
 
 	A3 = 0xffff0000 + A1.u16
 
-	objA0.update_address = 0x01e5e0		// Small explosion
+	objA0.update_address = addressof(SmallExplosion.BaseUpdate)
 	objA0.base_state = 0
 }
 

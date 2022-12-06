@@ -15,7 +15,7 @@
 //# address-hook(0x08fd30) end(0x08fd30)
 function void Toxomister.Init()
 {
-	Object.InitWithUpdateAddress(0x08fd36)
+	Object.InitWithUpdateAddress(addressof(Toxomister.PostInit))
 }
 
 

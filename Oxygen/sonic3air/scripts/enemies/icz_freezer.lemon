@@ -17,7 +17,7 @@
 //# address-hook(0x08a640) end(0x08a640)
 function void Freezer.Init()
 {
-	Object.InitWithUpdateAddress(0x08a644)
+	Object.InitWithUpdateAddress(addressof(Freezer.Init2))
 }
 
 //# address-hook(0x08a644) end(0x08a652)
