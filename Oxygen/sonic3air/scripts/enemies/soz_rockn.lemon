@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x08eda0) end(0x08eda0)
-function void fn08eda0()
+//# alias(fn08eda0) deprecated
+function void Rockn.Init()
 {
 	Object.InitWithUpdateAddress(0x08eda6)
 }
