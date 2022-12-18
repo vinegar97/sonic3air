@@ -45,7 +45,7 @@ function void fn083708()
 	if (level.signpost.address != 0)
 	{
 		A1 = 0xffff0000 + level.signpost.address
-		if (objA1.update_address == 0x0837b2)
+		if (objA1.update_address == addressof(SignPost.BaseUpdate))
 		{
 			u16 px = objA1.position.x.u16
 			u16 py = objA1.position.y.u16

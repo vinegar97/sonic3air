@@ -37,7 +37,7 @@ function void fn085bda()
 	level.boss_encounter = 0
 
 	// "spawnSimpleChildObjects(0x085bfa)" replaced by:
-	spawnSimpleChildObjects(0x0837b2, 1)		// Signpost
+	spawnSimpleChildObjects(addressof(SignPost.BaseUpdate), 1)		// Signpost
 
 	addPatternLoadingCue(0x085bc8)
 
