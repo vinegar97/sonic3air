@@ -195,12 +195,12 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/drawing/software/SoftwareDrawer \
 			Oxygen/oxygenengine/source/oxygen/drawing/software/SoftwareDrawerTexture \
 			Oxygen/oxygenengine/source/oxygen/drawing/software/SoftwareRasterizer \
-			Oxygen/oxygenengine/source/oxygen/download/Downloader \
 			Oxygen/oxygenengine/source/oxygen/file/FilePackage \
 			Oxygen/oxygenengine/source/oxygen/file/FileStructureTree \
 			Oxygen/oxygenengine/source/oxygen/file/PackedFileProvider \
 			Oxygen/oxygenengine/source/oxygen/file/ZipFileProvider \
 			Oxygen/oxygenengine/source/oxygen/helper/BitStream \
+			Oxygen/oxygenengine/source/oxygen/helper/Downloader \
 			Oxygen/oxygenengine/source/oxygen/helper/FileHelper \
 			Oxygen/oxygenengine/source/oxygen/helper/HighResolutionTimer \
 			Oxygen/oxygenengine/source/oxygen/helper/JsonHelper \
