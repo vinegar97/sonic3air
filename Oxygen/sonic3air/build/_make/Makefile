@@ -226,14 +226,14 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/rendering/parts/SpriteManager \
 			Oxygen/oxygenengine/source/oxygen/rendering/RenderResources \
 			Oxygen/oxygenengine/source/oxygen/rendering/software/SoftwareRenderer \
+			Oxygen/oxygenengine/source/oxygen/rendering/sprite/ComponentSprite \
+			Oxygen/oxygenengine/source/oxygen/rendering/sprite/PaletteSprite \
+			Oxygen/oxygenengine/source/oxygen/rendering/sprite/SpriteBase \
+			Oxygen/oxygenengine/source/oxygen/rendering/sprite/SpriteDump \
 			Oxygen/oxygenengine/source/oxygen/rendering/utils/BufferTexture \
-			Oxygen/oxygenengine/source/oxygen/rendering/utils/ComponentSprite \
 			Oxygen/oxygenengine/source/oxygen/rendering/utils/Kosinski \
 			Oxygen/oxygenengine/source/oxygen/rendering/utils/PaletteBitmap \
-			Oxygen/oxygenengine/source/oxygen/rendering/utils/PaletteSprite \
 			Oxygen/oxygenengine/source/oxygen/rendering/utils/RenderUtils \
-			Oxygen/oxygenengine/source/oxygen/rendering/utils/SpriteBase \
-			Oxygen/oxygenengine/source/oxygen/rendering/utils/SpriteDump \
 			Oxygen/oxygenengine/source/oxygen/resources/FontCollection \
 			Oxygen/oxygenengine/source/oxygen/resources/PrintedTextCache \
 			Oxygen/oxygenengine/source/oxygen/resources/ResourcesCache \
