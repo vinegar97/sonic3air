@@ -2,7 +2,7 @@ name: Nintendo Switch
 
 on:
   push:
-    branches: [ gha-switch ]
+    branches: [ gha-switch, gha-switch-revert ]
 
 jobs:
   build:
