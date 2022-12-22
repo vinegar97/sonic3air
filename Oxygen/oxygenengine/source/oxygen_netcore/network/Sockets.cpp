@@ -149,6 +149,7 @@ void SocketAddress::assureSockAddr() const
 	if (!mHasSockAddr)
 	{
 		memset(&mSockAddr, 0, sizeof(mSockAddr));
+	#if !defined(PLATFORM_SWITCH)
 		bool success = false;
 		{
 			// IPv6
@@ -158,6 +159,7 @@ void SocketAddress::assureSockAddr() const
 			success = (1 == inet_pton(addr.sin6_family, mIP.c_str(), &addr.sin6_addr));
 		}
 		if (!success)
+	#endif
 		{
 			// IPv4
 			sockaddr_in& addr = *reinterpret_cast<sockaddr_in*>(&mSockAddr);
