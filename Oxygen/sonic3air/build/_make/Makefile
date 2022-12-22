@@ -3,8 +3,8 @@
 .DEFAULT_GOAL := all
 
 NAME		=  sonic3air
-BUILD_STRING	= `grep BUILD_STRING ../sonic3air/version.inc | cut -d'"' -f2`
-BUILD_VARIANT	= `grep BUILD_VARIANT ../sonic3air/version.inc | cut -d'"' -f2`
+BUILD_STRING	= `grep BUILD_STRING ../../source/sonic3air/version.inc | cut -d'"' -f2`
+BUILD_VARIANT	= `grep BUILD_VARIANT ../../source/sonic3air/version.inc | cut -d'"' -f2`
 SUFFIX		=  
 PKGCONFIG	=  pkg-config
 DEBUG		?= 0
