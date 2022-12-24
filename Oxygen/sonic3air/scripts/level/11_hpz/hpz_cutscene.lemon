@@ -1322,7 +1322,7 @@ function void fn064fdc()
 	UnloadObjectA1()
 
 	u16[0xfffffaba] = 0
-	u16[0xfffff634] = 0
+	level.palettefx.timer_1 = 0
 
 	Kosinski.addToDMAQueue(0x17588a, 0xa5c0)
 	Object.TriggerUnloading()

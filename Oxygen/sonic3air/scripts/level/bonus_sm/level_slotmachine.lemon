@@ -712,7 +712,7 @@ function void fn04c026()
 		u16[(A2+=2)-2] += 2
 		u16[A2] = 0x78
 		objA0.value42 = A1.u16
-		u8[0xfffff650] = 0x01
+		level.palettefx.state = 0x01
 		if (u8[0xffffe408] == 0x18)
 		{
 			u8[0xffffe408] = 0x08
@@ -857,7 +857,7 @@ function void fn04c23e()
 	u16[A0 + 0x30] = 0
 	u16[A2] += 2
 	u16[A2+2] = 0x08
-	u8[0xfffff650] = 0
+	level.palettefx.state = 0
 }
 
 

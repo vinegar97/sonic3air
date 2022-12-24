@@ -1907,7 +1907,7 @@ function void fn05fcec()
 	else
 	{
 	#if STANDALONE
-		if (u8[0xfffff650] != 0)
+		if (level.palettefx.state != 0)
 			return
 
 		if (UpdatePaletteEffects.SuperForm.endpose() != 0)
@@ -1934,7 +1934,7 @@ function void fn05fcfc()
 //# address-hook(0x05fd16) end(0x05fd4c)
 function void fn05fd16()
 {
-	if (u8[0xfffff650] != 0)
+	if (level.palettefx.state != 0)
 	{
 		fn05ec36()
 		return

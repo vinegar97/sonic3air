@@ -15,7 +15,7 @@
 //# address-hook(0x058a46) end(0x058a9a)
 function void InitLevelTiles.SSZ_Knuckles()
 {
-	u8[0xfffff650] = 0xff
+	level.palettefx.state = 0xff
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x057c1e
@@ -175,7 +175,7 @@ function void fn058b20()
 
 	u16[0xffffeec8] = 0x01f0
 	u16[0xffffeeca] = 0x0f
-	u8[0xfffff650] = 0
+	level.palettefx.state = 0
 	u16[0xffffeec0] += 4
 }
 

@@ -41,16 +41,16 @@ define outro.scroll_speed = u32[0xfffffac8]
 function void fn05928c()
 {
 	// Palette cycling for the ocean
-	if (u8[0xfffff650] == 0)
+	if (level.palettefx.state == 0)
 	{
-		--u16[0xfffff634]
-		if (s16[0xfffff634] < 0)
+		--level.palettefx.timer_1
+		if (s16(level.palettefx.timer_1) < 0)
 		{
-			u16[0xfffff634] = 0x07
-			D0.u16 = u16[0xfffff632] + 0x06
+			level.palettefx.timer_1 = 0x07
+			D0.u16 = level.palettefx.frame_1 + 0x06
 			if (D0.u16 >= 0x30)
 				D0 = 0
-			u16[0xfffff632] = D0.u16
+			level.palettefx.frame_1 = D0.u16
 			u32[0xfffffc7a] = u32[0x0592be + D0.s16]
 			u16[0xfffffc7e] = u16[0x0592c2 + D0.s16]
 		}

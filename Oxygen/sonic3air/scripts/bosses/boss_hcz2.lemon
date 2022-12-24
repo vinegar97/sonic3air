@@ -976,7 +976,7 @@ function void fn06b832()
 	objA0.update_address = 0x06b882
 	if (objA0.subtype2c == 0)
 	{
-		u8[0xfffff650] = 0xff
+		level.palettefx.state = 0xff
 		camera.screenshake.state.hi = 0xff
 		playSound(0x57)
 		A1 = 0xffffb000

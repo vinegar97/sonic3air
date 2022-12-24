@@ -192,7 +192,7 @@ function void TitleScreen()
 	global.stage_type = 0
 	debug_mode.state = 0
 	global.rolling_demo = 0
-	u16[0xfffff634] = 0
+	level.palettefx.timer_1 = 0
 	competition_mode.active = 0
 	global.level_started = 0
 	debug_mode.enabled.u8 = 0

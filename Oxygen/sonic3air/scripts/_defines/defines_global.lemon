@@ -396,7 +396,8 @@ define global.lag_frames		= u16[0xfffff628]
 define global.frame_state		=  u8[0xfffff62a]	// Controls what the vertical interrupt does; gets reset to 0 unless a routine is explicitly set in the frame update (it usually is)
 
 define water.palette.source		= u32[0xfffff62e]	// Address with description data how and where to load secondary palette
-
+define level.palettefx.frame_1	= u16[0xfffff632]
+define level.palettefx.timer_1	= u16[0xfffff634]
 define global.random.seed		= u32[0xfffff636]
 
 define global.game.paused		= u16[0xfffff63a]	// true when game is paused (in standalone, this is never the case)
@@ -408,6 +409,12 @@ define water.height.changerate	=  u8[0xfffff64c]	// Change per frame of height t
 define water.transition_counter	=  u8[0xfffff64d]	// Counts how often Sonic switched between above and under water
 define water.fullscreen			=  u8[0xfffff64e]	// This is set to 0x01 if the whole screen is underwater
 
+define level.palettefx.state	=  u8[0xfffff650]
+define level.palettefx.frame_2	= u16[0xfffff652]
+define level.palettefx.frame_3	= u16[0xfffff654]
+define level.palettefx.frame_4	= u16[0xfffff656]
+define level.palettefx.timer_2	= u16[0xfffff658]
+define level.palettefx.timer_3	= u16[0xfffff65a]
 define super.palettefx.frame	= u16[0xfffff65c]
 define super.palettefx.timer	=  s8[0xfffff65e]	// Only for Sonic / Knuckles, as Tails has his own version (though he sometimes uses this one as well...?)
 define super.palettefx.state	=  u8[0xfffff65f]
@@ -445,6 +452,8 @@ define tails.ai_jumping			=  u8[0xfffff70f]
 define rings.update_routine		=  u8[0xfffff710]
 define global.level_started		=  s8[0xfffff711]	// Can be negative, which causes the HUD to fly in at the start
 // 0xfffff712 ... ?  -> Some kind of respawn entries for e.g. Glowing Spheres
+
+define level.palettefx.aiz_intro		=  u8[0xfffff72e]
 
 define level.water_present		=  u8[0xfffff730]
 

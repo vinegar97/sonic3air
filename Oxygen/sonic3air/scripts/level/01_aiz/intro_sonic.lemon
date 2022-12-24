@@ -306,7 +306,7 @@ function void fn067704()
 	if (u16[0xffffb000 + 0x10] < 0x13d0)
 		return
 
-	u8[0xfffff650] = 0xff
+	level.palettefx.state = 0xff
 
 	A1 = 0xffffb000
 	u8[A1 + 0x05] = 0x04
@@ -758,7 +758,7 @@ function void fn061f10()
 		return
 	}
 
-	u8[0xfffff650] = 0
+	level.palettefx.state = 0
 	player1.control_override = 0
 	fn083c06()
 	fn0851e4()

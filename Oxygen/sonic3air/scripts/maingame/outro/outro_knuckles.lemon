@@ -585,7 +585,7 @@ function void fn05f144()
 	else
 	{
 		objA0.update_address = 0x05f18a
-		u8[0xfffff650] = 0xff
+		level.palettefx.state = 0xff
 
 		if (allocDynamicObjectStd())
 		{
@@ -872,7 +872,7 @@ function void fn05f946()
 //# address-hook(0x05fba0) end(0x05fbe0)
 function void fn05fba0()
 {
-	if (u8[0xfffff650] != 0)
+	if (level.palettefx.state != 0)
 	{
 		fn05ec36()
 		return
