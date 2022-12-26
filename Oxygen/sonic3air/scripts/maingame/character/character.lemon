@@ -322,7 +322,7 @@ function void Character.UpdateNormalState.Sonic()
 	char.angle_sensor_1 = u8[0xfffff768]
 	char.angle_sensor_2 = u8[0xfffff76a]
 
-	if (u8[0xfffff7c8] != 0)
+	if (level.HCZ_water_current_flags.player1 != 0)
 	{
 		if (char.state == char.state.RUNNING)
 			char.state = char.state.former
@@ -414,7 +414,7 @@ function void Character.UpdateNormalState.Tails()
 	char.angle_sensor_1 = u8[0xfffff768]
 	char.angle_sensor_2 = u8[0xfffff76a]
 
-	if (u8[0xfffff7c9] != 0)
+	if (level.HCZ_water_current_flags.tails != 0)
 	{
 		if (char.state == char.state.RUNNING)
 			char.state = char.state.former
@@ -480,7 +480,7 @@ function void Character.UpdateNormalState.Knuckles()
 	char.angle_sensor_1 = u8[0xfffff768]
 	char.angle_sensor_2 = u8[0xfffff76a]
 
-	if (u8[0xfffff7c8] != 0)
+	if (level.HCZ_water_current_flags.player1 != 0)
 	{
 		if (char.state == char.state.RUNNING)
 			char.state = char.state.former
@@ -5911,7 +5911,7 @@ function void Character.CheckCollision()
 	}
 #endif
 
-	bool someFlag = (char.character == CHARACTER_TAILS) ? u8[0xfffff7c9] : u8[0xfffff7c8]
+	bool someFlag = (char.character == CHARACTER_TAILS) ? level.HCZ_water_current_flags.tails : level.HCZ_water_current_flags.player1
 
 	u32[0xfffff796] = (char.layer_flags1 == 0x0c) ? u32[0xfffff7b4] : u32[0xfffff7b8]
 

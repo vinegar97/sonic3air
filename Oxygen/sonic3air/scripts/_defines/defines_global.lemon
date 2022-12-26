@@ -490,6 +490,10 @@ define level.boss_encounter		=  u8[0xfffff7aa]	// Set to 1 if in boss fight or s
 define global.level_flag02		=  u8[0xfffff7c2]	// Used only in LBZ 2
 
 define global.inv_gravity		=  u8[0xfffff7c6]	// Set to 1 if inverse gravity is used (Deathegg Act 2)
+define level.HCZ_breakable_bar_flags			=  u8[0xfffff7c7]		// 3 when next to a water current, nonzero value when grabbed on to a pole in HCZ, seems related to the player's position
+define level.HCZ_water_current_flags.both		= u16[0xfffff7c8]		// Flags that determine if either player is in a water current
+define level.HCZ_water_current_flags.player1	=  u8[0xfffff7c8]		// Set to 1 when in a water current
+define level.HCZ_water_current_flags.tails		=  u8[0xfffff7c9]		// See above
 define player1.control_override	=  s8[0xfffff7ca]	// If set to 1 or 0xff, first character cannot be controlled
 define player2.control_override	=  s8[0xfffff7cb]	// If set to 1 or 0xff, second character cannot be controlled
 
