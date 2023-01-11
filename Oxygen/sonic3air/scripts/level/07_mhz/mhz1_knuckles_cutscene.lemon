@@ -338,7 +338,7 @@ function void fn062ddc()
 			if (D0.u16 > objA1.position.x.u16)
 				return
 
-			u8[A1 + 0x20] = char.state.COWERING
+			objA1.state = char.state.COWERING
 			StopObjectA1()
 		}
 		else if (s8[A1 + 0x04] >= 0)

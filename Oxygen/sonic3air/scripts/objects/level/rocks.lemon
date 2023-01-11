@@ -471,7 +471,7 @@ function void Rocks.BreakWall()
 		if (u8[A1 + 0x38] == CHARACTER_KNUCKLES && u8[A1 + 0x2f] == 0x01)
 		{
 			u8[A1 + 0x2f] = 0x02
-			u8[A1 + 0x20] = char.state.KNUX_FALLING
+			objA1.state = char.state.KNUX_FALLING
 			if (objA1.velocity.x < 0)
 				u8[A1 + 0x2a] |= 0x01
 			else

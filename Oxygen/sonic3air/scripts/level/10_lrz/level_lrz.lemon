@@ -1584,8 +1584,8 @@ function void fn059f3c()
 
 function void fn059f82()
 {
-	if (u8[A1 + 0x20] == char.state.STANDING)
-		u8[A1 + 0x20] = char.state.RUNNING
+	if (objA1.state == char.state.STANDING)
+		objA1.state = char.state.RUNNING
 
 	D0.u16 += 0x10
 	if (objA1.position.x.u16 < D0.u16)

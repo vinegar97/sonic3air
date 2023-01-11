@@ -236,7 +236,7 @@ function void fn0456f4()
 			u8[A0 + 0x2d] = D0.u8
 
 			u8[A1 + 0x2e] = 3
-			u8[A1 + 0x20] = char.state.RUNNING
+			objA1.state = char.state.RUNNING
 			u8[A1 + 0x22] = 0
 
 			if (global.zone == 0x16)
@@ -274,7 +274,7 @@ function void fn0457be()
 	if (u8[A0 + 0x2d] == 0)
 	{
 		u8[A1 + 0x2e] = 0x01
-		u8[A1 + 0x20] = char.state.ROLLING
+		objA1.state = char.state.ROLLING
 		u8[A1 + 0x2a] |= char.flag.ROLLING
 		objA0.value3e = objA1.position.y.u16
 		u32[A0 + 0x2e] = 0
@@ -315,7 +315,7 @@ function void fn04581c()
 	if (s32[A0 + 0x2e] >= 0)
 	{
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x20] = char.state.RUNNING
+		objA1.state = char.state.RUNNING
 		u8[0xffffeed6] = 0
 		objA0.update_address = 0x0455cc
 	}
@@ -545,7 +545,7 @@ function void fn045c8e()
 			objA1.velocity.x = 0
 			u16[A1 + 0x1c] = 0
 			u8[A1 + 0x2e] = 0x03
-			u8[A1 + 0x20] = char.state.RUNNING
+			objA1.state = char.state.RUNNING
 			u8[A1 + 0x22] = 0
 
 			u16[A2] = 0
@@ -659,7 +659,7 @@ function void fn05234a()
 		{
 			u8[A1 + 0x2e] = 1
 			u8[A1 + 0x2a] |= char.flag.ROLLING
-			u8[A1 + 0x20] = char.state.ROLLING
+			objA1.state = char.state.ROLLING
 		}
 		else if (u8[A2 + 0x46] < 0x18)
 		{
@@ -683,7 +683,7 @@ function void fn05234a()
 
 			u8[A1 + 0x2e] = 3
 			objA1.position.y.u16 = 0
-			u8[A1 + 0x20] = char.state.RUNNING
+			objA1.state = char.state.RUNNING
 			u8[A1 + 0x22] = 0
 
 			playSound(0x73)

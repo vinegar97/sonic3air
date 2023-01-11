@@ -556,7 +556,7 @@ function void fn08151c()
 		objA0.position.x.u16 = objA1.position.x.u16
 		objA0.position.y.u16 = objA1.position.y.u16
 		u8[A1 + 0x2e] = 1
-		u8[A1 + 0x20] = char.state.RUNNING
+		objA1.state = char.state.RUNNING
 		objA1.velocity.x = 0x0800
 		u16[A1 + 0x1c] = 0x0800
 	}

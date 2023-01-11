@@ -160,7 +160,7 @@ function void fn072c9e()
 	fn0844ce()
 
 	A1 = 0xffffb04a
-	u8[A1 + 0x20] = char.state.RUNNING
+	objA1.state = char.state.RUNNING
 	A2 = 0x073874
 	fn0844ce()
 }

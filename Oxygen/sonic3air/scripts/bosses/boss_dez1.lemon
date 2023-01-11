@@ -656,7 +656,7 @@ function void fn07e384()
 	{
 		objA0.update_address = 0x07e3ca
 		u8[A1 + 0x2e] = 0x83
-		u8[A1 + 0x20] = char.state.RUNNING
+		objA1.state = char.state.RUNNING
 		StopObjectA1()
 
 		objA1.render_flags &= ~render_flag.FLIP_X

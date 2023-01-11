@@ -188,7 +188,7 @@ function void fn063bbe()
 	player1.camera_lock = 0xff
 	player1.control_override = 0
 	u8[A1 + 0x2e] = 0x81
-	u8[A1 + 0x20] = char.state.LOOKING_UP
+	objA1.state = char.state.LOOKING_UP
 }
 
 

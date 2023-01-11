@@ -125,7 +125,7 @@ function void fn03fbc4()
 				if (u8[A1 + 0x27] == 0)
 				{
 					u8[A1 + 0x27] = 1
-					u8[A1 + 0x20] = char.state.RUNNING
+					objA1.state = char.state.RUNNING
 					u8[A1 + 0x30] = 0x7f
 					u8[A1 + 0x31] = 8
 				}

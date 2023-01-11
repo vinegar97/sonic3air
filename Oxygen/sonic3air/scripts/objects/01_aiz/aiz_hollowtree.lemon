@@ -118,7 +118,7 @@ function void fn01f7ce()
 					LetSonicClimbOnObject()
 
 					u32[A2] = 0
-					u8[A1 + 0x20] = char.state.RUNNING
+					objA1.state = char.state.RUNNING
 					u8[A1 + 0x2e] |= 0x42
 					if (A1 == 0xffffb000)
 					{

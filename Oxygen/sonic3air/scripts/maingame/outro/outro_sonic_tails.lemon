@@ -246,7 +246,7 @@ function void fn05da74()
 		objA1.mapping_offset = isMainCharacter(CHARACTER_TAILS) ? 0x148eb8 : 0x146620
 	}
 
-	u8[A1 + 0x20] = char.state.STANDING
+	objA1.state = char.state.STANDING
 	u8[A1 + 0x2e] = 0x83
 	fn05fd88()
 	fn05db2c()
@@ -945,7 +945,7 @@ function void fn05e1c2()
 	u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 	u8[A1 + 0x0a] &= ~0x80
 	u8[A1 + 0x2e] = 0x83
-	u8[A1 + 0x20] = char.state.STANDING
+	objA1.state = char.state.STANDING
 	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		A2 = 0xffffcc0a
@@ -992,7 +992,7 @@ function void fn05e288()
 
 	A1 = 0xffffb000
 	u8[A1 + 0x22] = 0x58
-	u8[A1 + 0x20] = char.state.RUNNING
+	objA1.state = char.state.RUNNING
 	UpdatePlayer1SpritePatterns()
 }
 
@@ -1163,7 +1163,7 @@ function void fn05e412()
 		{
 			objA0.base_state = 0x0c
 			u8[A1 + 0x2e] = 0x81
-			u8[A1 + 0x20] = char.state.RUNNING
+			objA1.state = char.state.RUNNING
 			u16[A1 + 0x18] = 0x0800
 			u16[A1 + 0x1c] = 0x0800
 		}

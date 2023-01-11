@@ -173,7 +173,7 @@ function void fn057dcc()
 	if (s32[A0 + 0x2e] >= 0)
 	{
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x20] = char.state.RUNNING
+		objA1.state = char.state.RUNNING
 		tails.respawn_counter = 0
 		tails.ai_routine = 0x06
 		UnloadObject()
