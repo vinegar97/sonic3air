@@ -2137,16 +2137,19 @@ function void fn04b6aa()
 	zeroMemory(0xffff3000, 0x4000)
 
 	A1 = 0xffff4020
-	A0 = 0x1e4080
+	A0 = 0x1e4080		// Layout data for the slot machine bonus
+
+	// Set player starting position
 	u16[0xffffb000 + 0x10] = u16[(A0+=2)-2]
 	u16[0xffffb000 + 0x14] = u16[(A0+=2)-2]
 
-	D1 = 0x1f
+	D1 = 0x1f		// Columns
 	while (D1.s16 >= 0)
 	{
-		D2 = 0x1f
+		D2 = 0x1f		// Rows
 		while (D2.s16 >= 0)
 		{
+			// Set block spawn position
 			u8[(A1+=1)-1] = u8[(A0+=1)-1]
 			--D2.s16
 		}
@@ -2155,15 +2158,15 @@ function void fn04b6aa()
 		--D1.s16
 	}
 
-	A1 = 0xffff7008
-	A0 = 0x04b722
-	D1 = 0x12
+	A1 = 0xffff7000 + 0x08		// Starting one block ahead to keep first type as empty space
+	A0 = 0x04b722				// Table of different block sprites for each type 
+	D1 = 0x12					// Loop once for each block type
 	while (D1.s16 >= 0)
 	{
-		u32[(A1+=4)-4] = u32[(A0+=4)-4]
+		u32[(A1+=4)-4] = u32[(A0+=4)-4]		// Mapping data
 		u16[(A1+=2)-2] = 0
-		u8[A1 - 1] = u8[A0 - 4]
-		u16[(A1+=2)-2] = u16[(A0+=2)-2]
+		u8[A1 - 1] = u8[A0 - 4]				// Initial animation frame
+		u16[(A1+=2)-2] = u16[(A0+=2)-2]		// Sprite attribute data
 		--D1.s16
 	}
 
