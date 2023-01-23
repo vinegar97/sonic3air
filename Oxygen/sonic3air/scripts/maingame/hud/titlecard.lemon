@@ -31,11 +31,13 @@ function void TitleCard.Init()
 {
 	if (global.zone_act == 0x0d01)
 	{
+		// Outro for Sonic/Tails
 		UnloadObject()
 		return
 	}
 	else if (global.zone >= 0x0e && global.zone <= 0x12)
 	{
+		// Competition mode stages
 		u8[A0 + 0x45] = 0xff
 		UnloadObject()
 		return
@@ -57,14 +59,17 @@ function void TitleCard.Init()
 	D0 = global.zone.apparent
 	if (global.zone_act == 0x1600)
 	{
+		// Lava Reef Boss
 		D0 = 9
 	}
 	else if (global.zone_act == 0x1601)
 	{
+		// Hidden Palace Zone
 		D0 = 13
 	}
 	else if (global.zone_act == 0x1700)
 	{
+		// Death Egg Boss
 		D0 = 11
 	}
 
@@ -192,8 +197,9 @@ function void TitleCard.Show()
 
 	if (u8[A0 + 0x45] == 0)
 	{
-		if (global.zone_act == 0x801)
+		if (global.zone_act == 0x0801)
 		{
+			// Sandopolis Act 2
 			if (allocDynamicObjectStd())
 			{
 				// Ghost spawner
@@ -203,7 +209,7 @@ function void TitleCard.Show()
 
 		if (global.zone >= 0x13 && global.zone != 0x16 && global.zone_act != 0x1700)
 		{
-			// Do nothing
+			// Do nothing for bonus stages and Hidden Palace emerald cave
 		}
 		else
 		{
@@ -236,10 +242,12 @@ function void fn02f77c()
 	u16 offset = global.zone
 	if (global.zone == 0x16)
 	{
+		// Lava Reef Boss, Hidden Palace Zone
 		offset = 0x0d
 	}
 	else if (global.zone_act == 0x1700)
 	{
+		// Death Egg Boss
 		offset = 0x0e
 	}
 	offset = offset * 4 + global.act * 2
@@ -351,14 +359,17 @@ function void TitleCard.TextElement.Init()
 {
 	if (global.zone_act == 0x1600)
 	{
+		// Lava Reef Boss
 		objA0.animation.sprite = 0x0d
 	}
-	else if (global.zone_act == 0x1601)   // Hidden Palace (in normal playthrough)
+	else if (global.zone_act == 0x1601)
 	{
+		// Hidden Palace Zone (in normal playthrough)
 		objA0.animation.sprite = 0x11
 	}
 	else if (global.zone_act == 0x1700)
 	{
+		// Death Egg Boss
 		objA0.animation.sprite = 0x0f
 	}
 	else
@@ -409,6 +420,7 @@ function void fn02d9a0()
 	objA0.update_address = addressof(TitleCard.TextElement.Update)
 	if (global.zone == 0x0a || global.zone == 0x0c || global.zone_act == 0x1601)
 	{
+		// Single act zones (Sky Sanctuary, Doomsday, and Hidden Palace)
 		A1 = 0xffff0000 + u16[A0 + 0x48]
 		--u16[A1 + 0x30]
 		UnloadObject()

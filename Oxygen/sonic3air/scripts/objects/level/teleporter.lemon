@@ -354,7 +354,7 @@ function void fn045866()
 		u16[A0 + 0x3a] = D0.u16
 
 		A1 = 0x04670c
-		if (global.zone == 0x0a)	// Sky Sanctuary
+		if (global.zone == 0x0a)	// Sky Sanctuary Zone
 		{
 			u32[0xfffffc58] = u32[A1 + D0.s16]
 		}

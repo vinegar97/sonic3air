@@ -629,7 +629,7 @@ function void fn00d1fa()
 		FadeOutScreenBlocking()
 		A0 = backupA0
 
-		// Do not fade out music in this case, Data Select music is meant to kept playing
+		// Do not fade out music in this case, Data Select music is meant to keep playing
 		Game.returnToMainMenu()
 		yieldExecution()
 	#endif

@@ -127,7 +127,7 @@ function void DebugMode.EvaluateInput()
 			--debug_mode.move_delay
 			if (debug_mode.move_delay == 0)
 			{
-				debug_mode.move_delay = 1	// Tha's basically no delay at all
+				debug_mode.move_delay = 1	// That's basically no delay at all
 
 				// Increase movement speed, up to 0xff
 				if (debug_mode.move_speed < 0xff)

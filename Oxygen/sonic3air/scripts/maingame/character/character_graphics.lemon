@@ -487,6 +487,7 @@ function void UpdateTailsAnimation_inner()
 			LookupAngleByVector()
 			if (global.zone == 0x15)
 			{
+				// Slot Machine bonus stage
 				D0.u8 += u8[0xffffe400]
 			}
 

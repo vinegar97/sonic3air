@@ -96,6 +96,7 @@ function void GameMode.MainGame()
 
 			if (global.zone == 0x09)
 			{
+				// Lava Reef Zone
 				fn01cacc()
 			}
 
@@ -108,8 +109,9 @@ function void GameMode.MainGame()
 			UpdateGlobalRingAnimation()
 			RenderSprites()
 
-			if (global.zone == 0x15)	// Slot Machine bonus stage
+			if (global.zone == 0x15)
 			{
+				// Slot Machine bonus stage
 				BonusSM.RenderRotatingMaze()
 				BonusSM.UpdateSlotMachine()
 			}
@@ -399,6 +401,7 @@ function void initializeMainGame()
 
 	if (global.zone_act == 0x0d01)
 	{
+		// Outro for Sonic/Tails
 		FadeScreenToWhiteBlocking()
 
 	#if STANDALONE
@@ -498,7 +501,7 @@ function void initializeMainGame()
 		else if (competition_mode.active)
 		{
 			D0 = 6
-			// Isn't requestLoadingPatterns misisng here?
+			// Isn't requestLoadingPatterns missing here?
 		}
 		else
 		{
@@ -622,8 +625,9 @@ function void initializeMainGame()
 		}
 
 		bool isAnyIntro = false
-		if (global.zone_act == 0)
+		if (global.zone_act == 0x0000)
 		{
+			// Angel Island Act 1
 			isAnyIntro = isSonicIntro()
 		}
 		if (isKnucklesIntro)
@@ -1040,11 +1044,12 @@ function void Level.InitializeWater()
 	bool levelHasWater = false
 	if (global.zone_act == 0x0000 || global.zone == 0x01 || global.zone_act == 0x0501 || global.zone_act == 0x0601)
 	{
+		// Angel Island Act 1, Hydrocity Zone, IceCap Act 2, and Launch Base Act 2 all have water
 		levelHasWater = true
 	}
-	else if (global.zone_act == 0x0001)		// Angel Island 2
+	else if (global.zone_act == 0x0001)		// Angel Island Act 2
 	{
-		levelHasWater = (global.zone_act.apparent != 0x01 || !isMainCharacter(CHARACTER_KNUCKLES))
+		levelHasWater = (global.zone_act.apparent != 0x01 || !isMainCharacter(CHARACTER_KNUCKLES))	// No water for the second part of AIZ 1 for Sonic and Tails
 	#if STANDALONE
 		if (!levelHasWater && checkpoint.number != 0)	// Checkpoint 0 is Knuckles' start
 		{
@@ -1063,13 +1068,14 @@ function void Level.InitializeWater()
 		}
 	#endif
 	}
-	else if (global.zone_act == 0x0301)		// Carnival Night 2
+	else if (global.zone_act == 0x0301)		// Carnival Night Act 2
 	{
 		levelHasWater = !isMainCharacter(CHARACTER_KNUCKLES)
 	}
 
 	if (!levelHasWater)
 	{
+		// Remove water
 		level.water_present = 0
 		water.height.current = 0x1000
 		water.height.next = 0x1000
@@ -1267,15 +1273,16 @@ function void SetupCharacterAtStartPosition()
 	}
 	else
 	{
-		A1 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x1e3cd8 : 0x1e3c18
+		A1 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x1e3cd8 : 0x1e3c18		// Get starting positions from respective tables
 		A1 += global.zone * 8 + global.act * 4
-		D1 = u16[A1]
-		D0 = u16[A1+2]
-		u16[0xffffb000 + 0x10] = D1.u16
-		u16[0xffffb000 + 0x14] = D0.u16
+		D1 = u16[A1]		// Get x-position
+		D0 = u16[A1+2]		// Get y-position
+		u16[0xffffb000 + 0x10] = D1.u16		// Set Player 1 x-position
+		u16[0xffffb000 + 0x14] = D0.u16		// Set Player 1 y-position
 
 		if (global.zone_act == 0x0000)
 		{
+			// Angel Island Act 1
 			if (isSonicIntro())
 			{
 				D1.u16 = 0
@@ -1312,6 +1319,7 @@ function void SetupCharacterAtStartPosition()
 		}
 		else if (global.zone_act == 0x0300)
 		{
+			// Carnival Night Act 1
 			if (isMainCharacter(CHARACTER_KNUCKLES))
 			{
 			#if STANDALONE
@@ -1331,6 +1339,7 @@ function void SetupCharacterAtStartPosition()
 		}
 		else if (global.zone_act == 0x0500)
 		{
+			// IceCap Act 1
 			if (isMainCharacter(CHARACTER_TAILS))
 			{
 				u16[0xffffb000 + 0x10] = 0x3780
@@ -1373,9 +1382,10 @@ function void SetupCharacterAtStartPosition()
 	#if STANDALONE
 		else if (global.zone_act == 0x0601)
 		{
+			// Launch Base Act 2
 			if (isMainCharacter(CHARACTER_KNUCKLES) && getNumPlayers() == 2)
 			{
-				// Move Knuckles a bit to the right in LBZ 2 to make space for Tails
+				// Move Knuckles (and camera) a bit to the right to make space for Tails
 				u16[0xffffb000 + 0x10] += 0x10
 				D1.u16 += 0x10
 			}
@@ -1383,8 +1393,10 @@ function void SetupCharacterAtStartPosition()
 	#endif
 		else if (global.zone_act == 0x0700)
 		{
+			// Mushroom Hill Act 1
 			if (!isMainCharacter(CHARACTER_KNUCKLES) && global.lock_on_state == 0)
 			{
+				// Place camera above spawn point to accommodate for Knuckles falling in intro
 				move_area.left  = 0x00c0
 				move_area.left.target = 0x00c0
 				move_area.left.player2 = 0x00c0
@@ -1393,13 +1405,17 @@ function void SetupCharacterAtStartPosition()
 		}
 		else if (global.zone_act == 0x0900)
 		{
+			// Lava Reef Act 1
 			if (isMainCharacter(CHARACTER_KNUCKLES))
 			{
+				// Move camera ahead to accommodate for the Knuckles' walk-in intro
 				D1.u16 += 0xb0
 			}
 		}
 		else if (global.zone_act == 0x0b00 || global.zone_act == 0x1601)
 		{
+			// Death Egg Act 1, Hidden Palace
+			// Move camera ahead to accommodate for the walk-in intro
 			D1.u16 += 0xb0 + getScreenExtend()
 		}
 	#if STANDALONE
@@ -1414,7 +1430,7 @@ function void SetupCharacterAtStartPosition()
 		}
 		else if (global.zone == 0x15)
 		{
-			// Slot Machine
+			// Slot Machine bonus stage
 			D1.u16 -= getScreenExtend()
 		}
 	#endif
@@ -1629,15 +1645,18 @@ function void fn028c80()
 {
 	if (global.zone_act == 0x0100)
 	{
+		// Hydrocity act 1
 		fn0279d4()
 	}
 	else if (global.zone_act == 0x0101)
 	{
+		// Hydrocity act 2
 		u8[0xfffff7f1] = 0x20
 		u8[0xfffff7f3] = 0x40
 	}
 	else if (global.zone == 0x03)
 	{
+		// Carnival Night Zone
 		u8[0xfffff7f1] = 0x40
 		u8[0xfffff7f2] = 0
 		u8[0xfffff7f4] = 0
@@ -1649,34 +1668,41 @@ function void fn028c80()
 	}
 	else if (global.zone_act == 0x0600)
 	{
+		// Launch Base act 1
 		u8[0xfffff7f3] = 0x20
 	}
 	else if (global.zone_act == 0x0601)
 	{
+		// Launch Base act 2
 		fn02807a()
 		u8[0xfffff7f1] = 0x10
 	}
 	else if (global.zone == 0x07)
 	{
+		// Mushroom Hill
 		u8[0xfffff7f1] = 0x20
 		u8[0xfffff7f3] = 0x40
 	}
 	else if (global.zone == 0x08)
 	{
+		// Sandopolis Zone
 		u8[0xfffff7f1] = 0xff
 	}
 	else if (global.zone_act == 0x0900)
 	{
+		// Lava Reef act 1
 		u8[0xfffff7f1] = 0xff
 		u8[0xfffff7f3] = 0xff
 	}
 	else if (global.zone_act == 0x1000)
 	{
+		// Desert Palace
 		u8[0xfffff7f1] = 0x40
 		u8[0xfffff7f3] = 0x40
 	}
 	else if (global.zone == 0x14)
 	{
+		// Glowing Spheres bonus stage 
 		Kosinski.decompress(0x156c08, 0xffff1000)
 		Kosinski.decompress(0x1574e8, 0xffff7000)
 
@@ -1696,6 +1722,7 @@ function void fn028c80()
 	}
 	else if (global.zone_act == 0x1600)
 	{
+		// Lava Reef Boss
 		u8[0xfffff7f1] = 0xff
 		u8[0xfffff7f3] = 0xff
 	}

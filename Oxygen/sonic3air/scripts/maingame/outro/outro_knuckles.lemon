@@ -479,24 +479,49 @@ function void fn05ef68()
 	objA0.countdown_value = 0x01ff
 	super.palettefx.state = 0
 
-	D0.u16 = (global.characters & 0x03) - 2
-	D1 = 0
+	// Choose the right sequence of logos and eyecatch, based on certain criteria
+	D0.u16 = (global.characters & 0x03) - 2		// Sonic: -2 and -1, Tails: 0, Knuckles: 1
+	D1 = 0	// Range of post-ending routines, starts with Sonic
 	if (D0.s16 >= 0)
 	{
-		D1.u16 += (D0.u16 == 0) ? 0x30 : 0x60
+		// Tails or Knuckles
+		D1.u16 += (D0.u16 == 0) ? 0x30 : 0x60	// Choose the right range for each character
 	}
 	if (global.lock_on_state == 0)
 	{
-		D1.u16 += 0x18
+		// Lock-on active
+		D1.u16 += 0x18		// latter half of range is for Sonic 3 & Knuckles, earlier half is just Sonic & Knuckles without lock-on (disc 2)
 	}
 	if (outro.ending_type >= 0)
 	{
-		D1.u16 += (outro.ending_type == 0) ? 0x08 : 0x10
+		// Good or best ending
+		D1.u16 += (outro.ending_type == 0) ? 0x08 : 0x10		// Finally, choose the right table entry for each kind of ending
 	}
 
-	A1 = 0x05efb6 + D1.s16
-	A2 = u32[(A1+=4)-4]
-	objA0.countdown_callback = u32[(A1+=4)-4]
+
+	// Targets:
+	//   offset "D1.u16"		End pose logos "A2"			Post-credits eyecatch "objA0.countdown_callback"
+	//  - 0x00:					0x05f046					0x05f0e2											// Sonic's bad ending, without lock-on
+	//  - 0x08:					0x05f046					0x05f106											// Sonic's good ending, without lock-on
+	//  - 0x10:					0x05f046					0x05f106											// Sonic's best ending, without lock-on
+	//  - 0x18:					0x05f05c					0x05f0e2											// Sonic's bad ending, with lock-on
+	//  - 0x20:					0x05f05c					0x05f106											// Sonic's good ending, with lock-on
+	//  - 0x28:					0x05f05c					0x05f116											// Sonic's best ending, with lock-on
+	//  - 0x30:					0x05f05c					0x05f0e2											// Tails' bad ending, without lock-on
+	//  - 0x38:					0x05f05c					0x05f106											// Tails' good ending, without lock-on
+	//  - 0x40:					0x05f05c					0x05f116											// Tails' best ending, without lock-on
+	//  - 0x48:					0x05f05c					0x05f0e2											// Tails' bad ending, with lock-on
+	//  - 0x50:					0x05f05c					0x05f106											// Tails' good ending, with lock-on
+	//  - 0x58:					0x05f05c					0x05f116											// Tails' best ending, with lock-on
+	//  - 0x60:					0x05f090					0x05f126											// Knuckles' bad ending, without lock-on
+	//  - 0x68:					0x05f072					0x05f0da											// Knuckles' good ending, without lock-on
+	//  - 0x70:					0x05f072					0x05f0da											// Knuckles' best ending, without lock-on
+	//  - 0x78:					0x05f0c4					0x05f126											// Knuckles' bad ending, with lock-on
+	//  - 0x80:					0x05f0a6					0x05f0da											// Knuckles' good ending, with lock-on
+	//  - 0x88:					0x05f0a6					0x05f116											// Knuckles' best ending, with lock-on
+	A1 = 0x05efb6 + D1.s16		// get entry of appropriate post credits routines from table
+	A2 = u32[(A1+=4)-4]		// Assigns logo routine to execute
+	objA0.countdown_callback = u32[(A1+=4)-4]		// Stores eyecatch routine for later
 	call A2
 }
 
