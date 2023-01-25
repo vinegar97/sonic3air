@@ -160,8 +160,8 @@ function void Character.Initialization.shared(u8 character)
 
 	setSpeedCapProperties(A4, false)
 
-	u8[A0 + 0x30] = 0
-	u8[A0 + 0x31] = 4
+	char.rotation.x.count = 0
+	char.rotation.x.speed = 4
 	char.drown_countdown = 30
 
 	if (character == CHARACTER_TAILS)
@@ -3324,26 +3324,26 @@ function void Character.UpdateRotationInAir()
 	{
 		u8 oldRotation = char.rotation.x
 		bool incRotation = 0
-		if (char.groundspeed >= 0 || u8[A0 + 0x2d] & 0x80)
+		if (char.groundspeed >= 0 || char.flags2d & 0x80)
 		{
-			char.rotation.x += u8[A0 + 0x31]
+			char.rotation.x += char.rotation.x.speed
 			incRotation = (char.rotation.x < oldRotation)
 		}
 		else
 		{
-			char.rotation.x -= u8[A0 + 0x31]
+			char.rotation.x -= char.rotation.x.speed
 			incRotation = (char.rotation.x > oldRotation)
 		}
 
 		if (incRotation)
 		{
-			if (u8[A0 + 0x30] > 0)
+			if (char.rotation.x.count > 0)
 			{
-				--u8[A0 + 0x30]
+				--char.rotation.x.count
 			}
 			else
 			{
-				u8[A0 + 0x30] = 0
+				char.rotation.x.count = 0
 				char.rotation.x = 0
 			}
 		}
@@ -4321,24 +4321,28 @@ function void PressedLeftWhileUprightOnGround()
 	D0.u16 = char.groundspeed
 	if (D0.s16 > 0)
 	{
+		// Pressed left while running right, thus braking
 		D0.u16 -= D4.u16
 		if (D0.s16 < 0)
 			D0.s16 = -0x80
 		char.groundspeed = D0.u16
 
-		// Check for braking (only when rotated upright)
+		// Check for braking state (only when rotated upright and going fast enough)
 		D0.u8 = (char.rotation + 0x20) & 0xc0
 		if (D0.u8 == 0 && D0.s16 >= 0x400)
 		{
-			if ((u8[A0 + 0x2d] & 0x80) == 0)
+			// 'char.flags2d & 0x80' prevents braking animation when set
+			if ((char.flags2d & 0x80) == 0)
 			{
 				playSound(SFX_BRAKE)
 				char.state = char.state.BRAKING
 				char.flags &= ~char.flag.FACING_LEFT
+
+				// Start braking dust animation if drown countdown is not active
 				if (char.drown_countdown >= 12)
 				{
-					u8[A6 + 0x05] = 0x06
-					u8[A6 + 0x22] = 0x15
+					u8[A6 + 0x05] = 0x06		// Base update for braking dust
+					u8[A6 + 0x22] = 0x15		// First frame of dust animation
 				}
 			}
 		}
@@ -4373,24 +4377,28 @@ function void PressedRightWhileUprightOnGround()
 	D0.u16 = char.groundspeed
 	if (D0.s16 < 0)
 	{
+		// Pressed right while running left, thus braking
 		D0.u16 += D4.u16
 		if (D0.s16 >= 0)
 			D0.s16 = 0x80
 		char.groundspeed = D0.u16
 
-		// Check for braking (only when rotated upright)
+		// Check for braking state (only when rotated upright and going fast enough)
 		D0.u8 = (char.rotation + 0x20) & 0xc0
 		if (D0.u8 == 0 && D0.s16 <= -0x400)
 		{
-			if ((u8[A0 + 0x2d] & 0x80) == 0)
+			// 'char.flags2d & 0x80' prevents braking animation when set
+			if ((char.flags2d & 0x80) == 0)
 			{
 				playSound(SFX_BRAKE)
 				char.state = char.state.BRAKING
 				char.flags |= char.flag.FACING_LEFT
+
+				// Start braking dust animation if drown countdown is not active
 				if (char.drown_countdown >= 12)
 				{
-					u8[A6 + 0x05] = 0x06
-					u8[A6 + 0x22] = 0x15
+					u8[A6 + 0x05] = 0x06		// Base update for braking dust
+					u8[A6 + 0x22] = 0x15		// First frame of dust animation
 				}
 			}
 		}
@@ -6176,8 +6184,8 @@ function void Character.LandingOnGroundResetState()
 	char.jumping = 0
 	score.bonus_counter = 0		// No more increasing bonuses after hitting the ground
 	char.rotation.x = 0
-	u8[A0 + 0x2d] = 0
-	u8[A0 + 0x30] = 0
+	char.flags2d = 0
+	char.rotation.x.count = 0
 	char.look_up_down_timer = 0
 
 	// Check for double jump state
