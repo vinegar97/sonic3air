@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -39,6 +39,7 @@ namespace option
 		MUSIC_VOLUME,
 		SOUND_VOLUME,
 		SOUNDTRACK,
+		SOUNDTRACK_DOWNLOAD,
 		SOUND_TEST,
 		TITLE_THEME,
 		EXTRA_LIFE_JINGLE,
@@ -120,6 +121,7 @@ namespace option
 		RANDOM_SPECIALSTAGES,
 		SPECIAL_STAGE_REPEAT,
 		REGION,
+		FIX_GLITCHES,
 
 		_CHECK_FOR_UPDATE,
 		RELEASE_CHANNEL,

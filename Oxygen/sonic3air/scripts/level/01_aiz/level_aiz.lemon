@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2022 by Eukaryot
+	Copyright (C) 2017-2023 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -1205,12 +1205,14 @@ function void fn01c550()
 
 #if STANDALONE
 	// Handling for Knuckles' new path
-	if (objA0.position.x.u16 < 0x1a00)
+	u16 playerPosX = u16[0xffffb000 + 0x10]
+	u16 playerPosY = u16[0xffffb000 + 0x14]
+	if (playerPosX >= 0x1680 && playerPosX < 0x1a00)	// Including a fix #contributed by Thorn
 	{
-		if (objA0.position.y.u16 < 0x0180)
+		if (playerPosY < 0x0180)
 		{
 			move_area.left = 0x1680
-			move_area.bottom.target = (objA0.position.x.u16 < 0x1960) ? 0x0090 : 0x0390
+			move_area.bottom.target = (playerPosX < 0x1960) ? 0x0090 : 0x0390
 			move_area.bottom.current = move_area.bottom.target
 		}
 		else

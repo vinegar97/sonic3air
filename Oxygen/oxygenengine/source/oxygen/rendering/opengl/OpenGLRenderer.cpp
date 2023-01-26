@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -296,12 +296,12 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 
 			if (mLastRenderedGeometryType != Geometry::Type::PLANE || mLastUsedPlaneShader != &shader)
 			{
-				shader.refresh(mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
+				shader.refresh(mGameResolution, mResources);
 				mLastRenderedGeometryType = Geometry::Type::PLANE;
 				mLastUsedPlaneShader = &shader;
 			}
 
-			shader.draw(pg, mRenderParts, mResources);
+			shader.draw(pg, mRenderParts.getPaletteManager().mSplitPositionY, mRenderParts, mResources);
 			break;
 		}
 

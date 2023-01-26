@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -18,10 +18,17 @@ namespace lemon
 	class OpcodeExecUtils
 	{
 	public:
-		template<typename T> FORCE_INLINE static T safeDivide(T a, T b) { return (b == 0) ? 0 : (a / b); }
+		template<typename T> FORCE_INLINE static T safeDivide(T a, T b)		 { return (b == 0) ? 0 : (a / b); }
+		template<typename T> FORCE_INLINE static T safeModulo(T a, T b)		 { return (b == 0) ? 0 : (a % b); }
+
 		template<typename T> FORCE_INLINE static T readMemory(ControlFlow& controlFlow, uint64 address) {}
 		template<typename T> FORCE_INLINE static void writeMemory(ControlFlow& controlFlow, uint64 address, T value) {}
 	};
+
+	template<> FORCE_INLINE float  OpcodeExecUtils::safeDivide(float a, float b)   { return a / b; }
+	template<> FORCE_INLINE double OpcodeExecUtils::safeDivide(double a, double b) { return a / b; }
+	template<> FORCE_INLINE float  OpcodeExecUtils::safeModulo(float a, float b)   { return std::fmod(a, b); }
+	template<> FORCE_INLINE double OpcodeExecUtils::safeModulo(double a, double b) { return std::fmod(a, b); }
 
 	template<> FORCE_INLINE int8   OpcodeExecUtils::readMemory<int8>  (ControlFlow& controlFlow, uint64 address) { return controlFlow.getMemoryAccessHandler().read8 (address); }
 	template<> FORCE_INLINE int16  OpcodeExecUtils::readMemory<int16> (ControlFlow& controlFlow, uint64 address) { return controlFlow.getMemoryAccessHandler().read16(address); }

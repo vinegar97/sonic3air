@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -231,7 +231,7 @@ void SoftwareRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 		const PatternManager& patternManager = mRenderParts.getPatternManager();
 		const uint32* palettes[2] = { paletteManager.getPalette(0), paletteManager.getPalette(1) };
 		const PatternManager::CacheItem* patternCache = patternManager.getPatternCache();
-		const uint16 numPatternsPerLine = bitmapSize.x / 8;
+		const uint16 numPatternsPerLine = (uint16)(bitmapSize.x / 8);
 		const bool highlightPrioPatterns = (FTX::keyState(SDLK_LSHIFT) != 0);
 
 		for (int y = 0; y < bitmapSize.y; ++y)

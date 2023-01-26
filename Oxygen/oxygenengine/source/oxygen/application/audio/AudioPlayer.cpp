@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -84,6 +84,7 @@ void AudioPlayer::startup()
 
 void AudioPlayer::shutdown()
 {
+	stopAllSounds(true);
 	mAudioSourceManager.clear();
 }
 
@@ -805,7 +806,7 @@ void AudioPlayer::applyAudioModifierSingle(SoundIterator& iterator, std::string_
 		uint8 tempoSpeedup = 0;
 		if (relativeSpeed > 1.01f)
 		{
-			tempoSpeedup = 2 * roundToInt(1.0f / (relativeSpeed - 1.0f));
+			tempoSpeedup = (uint8)(2 * roundToInt(1.0f / (relativeSpeed - 1.0f)));
 		}
 
 		EmulationAudioSource& emulationAudioSource = static_cast<EmulationAudioSource&>(*playingSound.mAudioSource);

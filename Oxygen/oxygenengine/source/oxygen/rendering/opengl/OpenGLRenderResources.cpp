@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -68,7 +68,7 @@ void OpenGLRenderResources::initialize()
 		const PlaneManager& planeManager = mRenderParts.getPlaneManager();
 		for (int index = 0; index < 4; ++index)
 		{
-			mPlanePatternsTexture[index].create(BufferTexture::PixelFormat::UINT_16, 0x1000, 1, planeManager.getPlanePatternsBuffer(index));
+			mPlanePatternsTexture[index].create(BufferTexture::PixelFormat::UINT_16, 0x1000, 1, planeManager.getPlanePatternsBuffer((uint8)index));
 		}
 
 		for (int index = 0; index < 4; ++index)
@@ -227,7 +227,7 @@ void OpenGLRenderResources::refresh()
 			if (!planeManager.isPlaneUsed(index))
 				continue;
 
-			const uint16* buffer = planeManager.getPlanePatternsBuffer(index);
+			const uint16* buffer = planeManager.getPlanePatternsBuffer((uint8)index);
 			const bool hasChanged = (memcmp(mPlanePatternsData[index], buffer, numPatterns * 2) != 0);
 			if (!hasChanged)
 				continue;

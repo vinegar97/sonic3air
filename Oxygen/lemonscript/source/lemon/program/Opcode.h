@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -23,8 +23,6 @@ namespace lemon
 			MOVE_STACK,
 			MOVE_VAR_STACK,
 			PUSH_CONSTANT,
-			DUPLICATE,		// Not created any more, could be removed sooner or later
-			EXCHANGE,		// Not created any more, could be removed sooner or later
 			GET_VARIABLE_VALUE,
 			SET_VARIABLE_VALUE,
 			READ_MEMORY,

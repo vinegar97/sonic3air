@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2022 by Eukaryot
+	Copyright (C) 2017-2023 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -21,6 +21,9 @@ constant u8 FastMusicFlag.SUPER_THEME	= 0x02
 global u8 fastMusicFlags
 global u8 alternatingRingSoundState
 
+
+
+#if STANDALONE
 
 // This function is here only for script mods that want to change the sound key, e.g. to play a custom music track / sound effect
 function u64 Standalone.getModdedSoundKey(u64 soundKey, u8 sfxId, u8 soundRegType)
@@ -43,85 +46,85 @@ function void Standalone.playRumbleEffectForAudio(u8 sfxId)
 	// Rumble effects for certain sounds
 	if (sfxId == SFX_RING || sfxId == SFX_RING_ALT)
 	{
-		Input.setControllerRumble(0, 0, 0x3000, 200)
+		Input.setControllerRumble(-1, 0.0f, 0.2f, 200)
 	}
 	else if (sfxId == SFX_COLLAPSE)
 	{
-		Input.setControllerRumble(0, 0x8000, 0x8000, 300)
+		Input.setControllerRumble(-1, 0.5f, 0.5f, 300)
 	}
 	else if (sfxId == SFX_POP)
 	{
 		// Badnik or monitor hit
-		Input.setControllerRumble(0, 0x4000, 0x8000, 200)
+		Input.setControllerRumble(-1, 0.25f, 0.5f, 200)
 	}
 	else if (sfxId == SFX_FIRESHIELDDASH)
 	{
-		Input.setControllerRumble(0, 0x4000, 0x6000, 200)
+		Input.setControllerRumble(-1, 0.25f, 0x6000, 200)
 	}
 	else if (sfxId == SFX_BUBBLEBOUNCE)
 	{
-		Input.setControllerRumble(0, 0, 0x4000, 200)
+		Input.setControllerRumble(-1, 0.0f, 0.25f, 200)
 	}
 	else if (sfxId == SFX_LIGHTNINGJUMP)
 	{
-		Input.setControllerRumble(0, 0, 0x8000, 250)
+		Input.setControllerRumble(-1, 0.0f, 0.5f, 250)
 	}
 	else if (sfxId == SFX_SPILLRINGS)
 	{
-		Input.setControllerRumble(0, 0x8000, 0x8000, 300)
+		Input.setControllerRumble(-1, 0.5f, 0.5f, 300)
 	}
 	else if (sfxId == SFX_HITSPIKES)
 	{
-		Input.setControllerRumble(0, 0x8000, 0x8000, 300)
+		Input.setControllerRumble(-1, 0.5f, 0.5f, 300)
 	}
 	else if (sfxId == SFX_SPRING)
 	{
-		Input.setControllerRumble(0, 0, 0x8000, 150)
+		Input.setControllerRumble(-1, 0.0f, 0.5f, 150)
 	}
 	else if (sfxId == 0x35)
 	{
 		// Lose shield
-		Input.setControllerRumble(0, 0x8000, 0x8000, 300)
+		Input.setControllerRumble(-1, 0.5f, 0.5f, 300)
 	}
 	else if (sfxId == 0x65)
 	{
 		// Collect blue sphere or bonus stage bubble
-		Input.setControllerRumble(0, 0, 0x2000, 200)
+		Input.setControllerRumble(-1, 0.0f, 0.1f, 200)
 	}
 	else if (sfxId == 0x6e)
 	{
 		// Boss hit
-		Input.setControllerRumble(0, 0x8000, 0x8000, 300)
+		Input.setControllerRumble(-1, 0.5f, 0.5f, 300)
 	}
 	else if (sfxId == 0x6f)
 	{
 		// Earthquake rumble
-		Input.setControllerRumble(0, 0x4000, 0x4000, 200)
+		Input.setControllerRumble(-1, 0.25f, 0.25f, 200)
 	}
 	else if (sfxId == 0x77)
 	{
 		// Balloon pop
-		Input.setControllerRumble(0, 0, 0x4000, 200)
+		Input.setControllerRumble(-1, 0.0f, 0.25f, 200)
 	}
 	else if (sfxId == 0x81)
 	{
 		// LBZ booster tube (and CNZ cannon)
-		Input.setControllerRumble(0, 0x4000, 0, 300)
+		Input.setControllerRumble(-1, 0.25f, 0.0f, 300)
 	}
 	else if (sfxId == 0xaa)
 	{
 		// Bumper
-		Input.setControllerRumble(0, 0x2000, 0x2000, 200)
+		Input.setControllerRumble(-1, 0.1f, 0.1f, 200)
 	}
 	else if (sfxId == 0xb4)
 	{
 		// Boss explosion
-		Input.setControllerRumble(0, 0x8000, 0x8000, 300)
+		Input.setControllerRumble(-1, 0.5f, 0.5f, 300)
 	}
 	else if (sfxId == 0xcd)
 	{
 		// Death Egg rising
-		Input.setControllerRumble(0, 0x2000, 0x2000, 500)
+		Input.setControllerRumble(-1, 0.1f, 0.1f, 500)
 	}
 }
 
@@ -131,7 +134,7 @@ function void Standalone.playAudio(u8 sfxId)
 	// Handle music control IDs
 	if (sfxId == MUSIC_CTRL_FADEOUT)
 	{
-		Audio.fadeOutChannel(0, 0x200)	// Fade out over 2 seconds
+		Audio.fadeOutChannel(0, 2.0f)	// Fade out over 2 seconds
 		return
 	}
 	else if (sfxId == MUSIC_CTRL_STOP)
@@ -440,7 +443,7 @@ function void Standalone.playAudio(u8 sfxId)
 		{
 			// Do not restart music if already playing
 			//  -> But make sure it gets played at full volume (in case it's fading out)
-			Audio.fadeInChannel(0, 0x40)
+			Audio.fadeInChannel(0, 0.25f)
 			return
 		}
 	}
@@ -469,7 +472,7 @@ function void Standalone.setFastMusicFlag(u8 flag, bool enable)
 		//  -> In the Oxygen engine, this is implemented as an audio modifier for channel 0
 		if (shouldBeFastMusicMode)
 		{
-			Audio.enableAudioModifier(0, 0, "_fast", 0x14000)
+			Audio.enableAudioModifier(0, 0, "_fast", 1.25f)
 		}
 		else
 		{
@@ -478,9 +481,9 @@ function void Standalone.setFastMusicFlag(u8 flag, bool enable)
 	}
 }
 
-function void Standalone.setFastMusicFlagWithSpeedup(u8 flag, u32 relativeSpeed)
+function void Standalone.setFastMusicFlagWithSpeedup(u8 flag, float relativeSpeed)
 {
-	if (relativeSpeed <= 0x10000)
+	if (relativeSpeed <= 1.0f)
 	{
 		Standalone.setFastMusicFlag(flag, false)
 	}
@@ -490,3 +493,5 @@ function void Standalone.setFastMusicFlagWithSpeedup(u8 flag, u32 relativeSpeed)
 		Audio.enableAudioModifier(0, 0, "_fast", relativeSpeed)
 	}
 }
+
+#endif

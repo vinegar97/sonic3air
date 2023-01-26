@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2022 by Eukaryot
+	Copyright (C) 2017-2023 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -129,7 +129,7 @@ function void fn02e410()
 			{
 				playSound(SFX_CLICK)
 			#if STANDALONE
-				Input.setControllerRumble(0, 0, 0x2000, 100)
+				Input.setControllerRumble(-1, 0.0f, 0.1f, 100)
 			#endif
 			}
 		}

@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2022 by Eukaryot
+	Copyright (C) 2017-2023 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -236,7 +236,7 @@ function void LevelPaletteUpdate.CNZ()
 	{
 		level.palettefx.frame_2 = 0
 	}
-	copyMemory(0xfffffc52, 0x002d8e + D0.s16, 6)
+	copyMemory(0xfffffc52, A0 + D0.s16, 6)
 
 
 	A0 = 0x002ee2
@@ -651,12 +651,7 @@ function void LevelPaletteUpdate.DEZ2()
 
 		A0 = 0x003474 + D0.s16
 		A1 = 0xfffffc50
-		debugLog(stringformat("A1 = 0x%x", A1))
-		/* u32[(A1+=4)-4] = u32[(A0+=4)-4] */
-		/* u32[(A1+=4)-4] = u32[(A0+=4)-4] */
-		/* u16[(A1+=2)-2] = u16[(A0+=2)-2] */
 		copyMemory((A1+=10)-10, (A0+=10)-10, 10)
-		debugLog(stringformat("A1 = 0x%x", A1))
 	}
 }
 

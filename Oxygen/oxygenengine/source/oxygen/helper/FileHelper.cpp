@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -161,8 +161,7 @@ bool FileHelper::loadShader(Shader& shader, const std::wstring& filename, const 
 	}
 	else
 	{
-		RMX_LOG_INFO("Error(s) loading shader '" << WString(filename).toStdString() << "':");
-		RMX_LOG_INFO(shader.getCompileLog().toStdString());
+		RMX_ERROR("Shader loading failed for '" << WString(filename).toStdString() << "':\n" << shader.getCompileLog().toStdString(), );
 	}
 	return true;
 }

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license: see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -21,8 +21,6 @@ namespace lemon
 			case Type::MOVE_STACK:			return "MOVE_STACK";
 			case Type::MOVE_VAR_STACK:		return "MOVE_VAR_STACK";
 			case Type::PUSH_CONSTANT:		return "PUSH_CONSTANT";
-			case Type::DUPLICATE:			return "DUPLICATE";
-			case Type::EXCHANGE:			return "EXCHANGE";
 			case Type::GET_VARIABLE_VALUE:	return "GET_VARIABLE_VALUE";
 			case Type::SET_VARIABLE_VALUE:	return "SET_VARIABLE_VALUE";
 			case Type::READ_MEMORY:			return "READ_MEMORY";

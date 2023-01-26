@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,6 +10,7 @@
 
 #include "lemon/runtime/Runtime.h"
 #include "lemon/runtime/RuntimeOpcode.h"
+#include "lemon/utility/AnyBaseValue.h"
 
 
 namespace lemon
@@ -51,15 +52,13 @@ namespace lemon
 		template<typename T>
 		FORCE_INLINE T readLocalVariable(size_t index) const
 		{
-			//return *(T*)&mControlFlow->mCurrentLocalVariables[index];
-			return (T)mControlFlow->mCurrentLocalVariables[index];
+			return BaseTypeConversion::convert<int64, T>(mControlFlow->mCurrentLocalVariables[index]);
 		}
 
 		template<typename T>
 		FORCE_INLINE void writeLocalVariable(size_t index, T value) const
 		{
-			//*(T*)&mControlFlow->mCurrentLocalVariables[index] = value;	// TODO: Try this instead
-			mControlFlow->mCurrentLocalVariables[index] = (T)value;
+			mControlFlow->mCurrentLocalVariables[index] = BaseTypeConversion::convert<T, int64>(value);
 		}
 	};
 }

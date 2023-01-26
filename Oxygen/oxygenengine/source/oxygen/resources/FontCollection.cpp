@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -72,9 +72,9 @@ void FontCollection::registerManagedFont(Font& font, const std::string& key)
 		collectedFont->mManagedFonts.push_back(&font);
 
 		// Update the font source in all font instances (note that it might also be a null pointer)
-		for (Font* font : collectedFont->mManagedFonts)
+		for (Font* managedFont : collectedFont->mManagedFonts)
 		{
-			font->injectFontSource(collectedFont->mFontSource);
+			managedFont->injectFontSource(collectedFont->mFontSource);
 		}
 	}
 }
@@ -124,7 +124,7 @@ void FontCollection::updateLoadedFonts()
 		}
 
 		// Nothing to do if the last definition (= the highest priority one) is already loaded
-		if (collectedFont.mDefinitions.size() == collectedFont.mLoadedDefinitionIndex + 1)
+		if (collectedFont.mDefinitions.size() == (size_t)collectedFont.mLoadedDefinitionIndex + 1)
 			continue;
 
 		// Font source needs to be reloaded

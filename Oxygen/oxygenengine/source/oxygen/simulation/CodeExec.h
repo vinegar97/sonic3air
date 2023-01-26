@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -21,6 +21,9 @@ namespace lemon
 
 class CodeExec final : public DebugNotificationInterface
 {
+friend struct RuntimeExecuteConnector;
+friend struct RuntimeExecuteConnectorDev;
+
 public:
 	enum class ExecutionState
 	{
@@ -41,12 +44,11 @@ public:
 
 	struct Location
 	{
-		CodeExec* mCodeExec = nullptr;
 		const lemon::ScriptFunction* mFunction = nullptr;
 		size_t mProgramCounter = 0;
 		mutable std::string mResolvedString;
 
-		const std::string& toString() const;
+		const std::string& toString(CodeExec& codeExec) const;
 		bool operator==(const Location& other) const;
 	};
 
@@ -160,10 +162,8 @@ private:
 	bool hasValidState() const;
 	void runScript(bool executeSingleFunction, CallFrameTracking* callFrameTracking);
 
-	bool executeRuntimeSteps(size_t& stepsExecuted);
-	bool executeRuntimeStepsDev(size_t& stepsExecuted);
-
-	void getLastStepLocation(Location& outLocation);
+	bool executeRuntimeSteps(size_t& stepsExecuted, size_t minimumCallStackSize);
+	bool executeRuntimeStepsDev(size_t& stepsExecuted, size_t minimumCallStackSize);
 
 	bool tryCallAddressHook(uint32 address);
 	bool tryCallAddressHookDev(uint32 address);

@@ -35,6 +35,7 @@
     <ClCompile Include="..\..\source\oxygen\application\input\InputConfig.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputRecorder.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\input\RumbleEffectQueue.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\mainview\GameView.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\GameSetupScreen.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\MenuItems.cpp" />
@@ -51,8 +52,8 @@
     <ClCompile Include="..\..\source\oxygen\application\overlays\SaveStateMenu.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\overlays\TouchControlsOverlay.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\video\VideoOut.cpp" />
-    <ClCompile Include="..\..\source\oxygen\base\CrashHandler.cpp" />
-    <ClCompile Include="..\..\source\oxygen\base\PlatformFunctions.cpp" />
+    <ClCompile Include="..\..\source\oxygen\download\Downloader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\download\DownloadManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\DrawCollection.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\DrawCommand.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\Drawer.cpp" />
@@ -71,7 +72,6 @@
     <ClCompile Include="..\..\source\oxygen\file\FileStructureTree.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\PackedFileProvider.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\ZipFileProvider.cpp" />
-    <ClCompile Include="..\..\source\oxygen\helper\Downloader.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\HighResolutionTimer.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Profiling.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Transform2D.cpp" />
@@ -84,10 +84,13 @@
     <ClCompile Include="..\..\source\oxygen\helper\Logging.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Utils.cpp" />
     <ClCompile Include="..\..\source\oxygen\platform\AndroidJavaInterface.cpp" />
+    <ClCompile Include="..\..\source\oxygen\platform\CrashHandler.cpp" />
+    <ClCompile Include="..\..\source\oxygen\platform\PlatformFunctions.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\Geometry.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderer.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderResources.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\DebugDrawPlaneShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\OpenGLShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderComponentSpriteShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPaletteSpriteShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPlaneShader.cpp" />
@@ -147,6 +150,7 @@
     <ClInclude Include="..\..\source\oxygen\application\input\InputConfig.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputManager.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputRecorder.h" />
+    <ClInclude Include="..\..\source\oxygen\application\input\RumbleEffectQueue.h" />
     <ClInclude Include="..\..\source\oxygen\application\mainview\GameView.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\GameSetupScreen.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\MenuItems.h" />
@@ -163,8 +167,8 @@
     <ClInclude Include="..\..\source\oxygen\application\overlays\SaveStateMenu.h" />
     <ClInclude Include="..\..\source\oxygen\application\overlays\TouchControlsOverlay.h" />
     <ClInclude Include="..\..\source\oxygen\application\video\VideoOut.h" />
-    <ClInclude Include="..\..\source\oxygen\base\CrashHandler.h" />
-    <ClInclude Include="..\..\source\oxygen\base\PlatformFunctions.h" />
+    <ClInclude Include="..\..\source\oxygen\download\Downloader.h" />
+    <ClInclude Include="..\..\source\oxygen\download\DownloadManager.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\DrawCollection.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\DrawCommand.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\Drawer.h" />
@@ -184,7 +188,6 @@
     <ClInclude Include="..\..\source\oxygen\file\FileStructureTree.h" />
     <ClInclude Include="..\..\source\oxygen\file\PackedFileProvider.h" />
     <ClInclude Include="..\..\source\oxygen\file\ZipFileProvider.h" />
-    <ClInclude Include="..\..\source\oxygen\helper\Downloader.h" />
     <ClInclude Include="..\..\source\oxygen\helper\DrawerHelper.h" />
     <ClInclude Include="..\..\source\oxygen\helper\HighResolutionTimer.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Profiling.h" />
@@ -196,10 +199,13 @@
     <ClInclude Include="..\..\source\oxygen\helper\Logging.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Utils.h" />
     <ClInclude Include="..\..\source\oxygen\platform\AndroidJavaInterface.h" />
+    <ClInclude Include="..\..\source\oxygen\platform\CrashHandler.h" />
+    <ClInclude Include="..\..\source\oxygen\platform\PlatformFunctions.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\Geometry.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderer.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderResources.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\DebugDrawPlaneShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\OpenGLShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderComponentSpriteShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPaletteSpriteShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPlaneShader.h" />

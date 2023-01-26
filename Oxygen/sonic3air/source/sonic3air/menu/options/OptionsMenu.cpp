@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -24,8 +24,8 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/video/VideoOut.h"
-#include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/Utils.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/Simulation.h"
 
 
@@ -51,9 +51,13 @@ namespace
 		}
 	};
 
+	// Hide certain options depending on:
+	//  - whether the options menu is opened from the pause menu (second parameter)
+	//  - and/or depending on secrets (third parameter)
 	static const std::vector<ConditionalOption> CONDITIONAL_OPTIONS =
 	{
 		ConditionalOption(option::SOUNDTRACK,				 true),
+		ConditionalOption(option::SOUNDTRACK_DOWNLOAD,		 true),
 		ConditionalOption(option::SOUND_TEST,				 true),
 		ConditionalOption(option::TITLE_THEME,				 true),
 		ConditionalOption(option::OUTRO_MUSIC,				 true),
@@ -172,6 +176,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::UNDERWATER_AUDIO,			SharedDatabase::Setting::SETTING_UNDERWATER_AUDIO);
 		setupOptionEntry(option::REGION,					SharedDatabase::Setting::SETTING_REGION_CODE);
 		setupOptionEntry(option::TIMEATTACK_GHOSTS,			SharedDatabase::Setting::SETTING_TIME_ATTACK_GHOSTS);
+		setupOptionEntry(option::FIX_GLITCHES,				SharedDatabase::Setting::SETTING_FIX_GLITCHES);
 		setupOptionEntry(option::DROP_DASH,					SharedDatabase::Setting::SETTING_DROPDASH);
 		setupOptionEntry(option::SUPER_PEELOUT,				SharedDatabase::Setting::SETTING_SUPER_PEELOUT);
 		setupOptionEntry(option::DEBUG_MODE,				SharedDatabase::Setting::SETTING_DEBUG_MODE);
@@ -338,9 +343,12 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 		entries.addEntry<TitleMenuEntry>().initEntry("Soundtrack");
 
-		entries.addEntry<OptionsMenuEntry>().initEntry("Soundtrack Type:", option::SOUNDTRACK)
+		entries.addEntry<SoundtrackMenuEntry>().initEntry("Soundtrack Type:", option::SOUNDTRACK)
 			.addOption("Emulated", 0)
 			.addOption("Remastered", 1);
+
+		mSoundtrackDownloadMenuEntry = &entries.addEntry<SoundtrackDownloadMenuEntry>();
+		mSoundtrackDownloadMenuEntry->initEntry("", option::SOUNDTRACK_DOWNLOAD);
 
 		entries.addEntry<OptionsMenuEntry>().initEntry("Sound Test:", option::SOUND_TEST);	// Will be filled with content in "initialize()"
 
@@ -754,6 +762,14 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		entries.addEntry<OptionsMenuEntry>().initEntry("Region Code:", option::REGION)
 			.addOption("Western (\"Tails\")", 0x80)
 			.addOption("Japan (\"Miles\")", 0x00);
+
+
+		entries.addEntry<TitleMenuEntry>().initEntry("Speedrunning");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Glitch Fixes:", option::FIX_GLITCHES)
+			.addOption("No glitch fixes", 0)
+			.addOption("Only basic fixes", 1)
+			.addOption("All (recommended)", 2);
 	}
 
 	for (int i = 1; i < Tab::Id::_NUM; ++i)		// Exclude "Mods" tab
@@ -909,6 +925,8 @@ void OptionsMenu::initialize()
 		mTabMenuEntries[0].mSelectedIndex = mActiveTab;
 	}
 
+	mSoundtrackDownloadMenuEntry->setVisible(mSoundtrackDownloadMenuEntry->shouldBeShown());
+
 	// Fill sound test
 	{
 		mSoundTestAudioDefinitions.clear();
@@ -1025,7 +1043,7 @@ void OptionsMenu::update(float timeElapsed)
 						{
 							// Change soundtrack and restart music
 							config.mActiveSoundtrack = selectedEntry.selected().mValue;
-							if (AudioOut::instance().getAudioCollection().getNumSourcesByPackageType(AudioCollection::Package::REMASTERED) != 0)
+							if (AudioOut::instance().hasLoadedRemasteredSoundtrack())
 							{
 								AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
 								AudioOut::instance().onSoundtrackPreferencesChanged();
@@ -1038,6 +1056,7 @@ void OptionsMenu::update(float timeElapsed)
 									playSoundtest(*mPlayingSoundTest);
 								}
 							}
+							mSoundtrackDownloadMenuEntry->setVisible(mSoundtrackDownloadMenuEntry->shouldBeShown());
 							break;
 						}
 
@@ -1115,7 +1134,7 @@ void OptionsMenu::update(float timeElapsed)
 			else if (buttonEffect == ButtonEffect::ACCEPT && mActiveMenu != &mTabMenuEntries)
 			{
 				Tab& tab = mTabs[mActiveTab];
-				const GameMenuEntry& selectedEntry = tab.mMenuEntries.selected();
+				GameMenuEntry& selectedEntry = tab.mMenuEntries.selected();
 				switch (selectedEntry.mData)
 				{
 					case option::SOUND_TEST:
@@ -1150,6 +1169,28 @@ void OptionsMenu::update(float timeElapsed)
 						else
 						{
 							updateCheck.startUpdateCheck();
+						}
+						break;
+					}
+
+					case option::SOUNDTRACK_DOWNLOAD:
+					{
+						mSoundtrackDownloadMenuEntry->triggerButton();
+						mSoundtrackDownloadMenuEntry->setVisible(mSoundtrackDownloadMenuEntry->shouldBeShown());
+
+						// Restart music if remastered soundtrack was just loaded
+						if (AudioOut::instance().hasLoadedRemasteredSoundtrack())
+						{
+							AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
+							AudioOut::instance().onSoundtrackPreferencesChanged();
+							if (nullptr == mPlayingSoundTest)
+							{
+								AudioOut::instance().restartMenuMusic();
+							}
+							else
+							{
+								playSoundtest(*mPlayingSoundTest);
+							}
 						}
 						break;
 					}
@@ -1407,8 +1448,9 @@ void OptionsMenu::setupOptionsMenu(bool enteredFromIngame)
 
 	for (const ConditionalOption& option : CONDITIONAL_OPTIONS)
 	{
-		const bool visible = option.shouldBeVisible(enteredFromIngame);
-		mOptionEntries[option.mOptionId].mGameMenuEntry->setVisible(visible);
+		OptionsMenuEntry& optionsMenuEntry = *static_cast<OptionsMenuEntry*>(mOptionEntries[option.mOptionId].mGameMenuEntry);
+		const bool visible = option.shouldBeVisible(enteredFromIngame) && optionsMenuEntry.shouldBeShown();
+		optionsMenuEntry.setVisible(visible);
 	}
 
 #if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WEB)

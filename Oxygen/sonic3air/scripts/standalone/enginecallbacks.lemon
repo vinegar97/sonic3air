@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2022 by Eukaryot
+	Copyright (C) 2017-2023 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -36,12 +36,14 @@ function void Init()
 
 	// Initialization of global variables
 	{
+	#if STANDALONE
 		globalComponentTintColorR = 0xff
 		globalComponentTintColorG = 0xff
 		globalComponentTintColorB = 0xff
 		globalComponentAddedColorR = 0
 		globalComponentAddedColorG = 0
 		globalComponentAddedColorB = 0
+	#endif
 
 		enableCustomPlaneReset = true
 	}
@@ -193,7 +195,7 @@ function void restartAtCheckpoint()
 function void restartTimeAttack()
 {
 	// Fade out music and screen
-	Audio.fadeOutChannel(0, 0x100)
+	Audio.fadeOutChannel(0, 1.0f)
 	FadeOutScreenBlocking()
 
 	// Signal restart

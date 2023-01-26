@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -44,8 +44,8 @@ namespace
 		bmp.create(16, 16);
 		for (int colorIndex = 0; colorIndex < 0x100; ++colorIndex)
 		{
-			palette[colorIndex] = paletteManager.getPaletteEntry(paletteIndex, colorIndex);
-			bmp.getData()[colorIndex] = colorIndex;
+			palette[colorIndex] = paletteManager.getPaletteEntry(paletteIndex, (uint16)colorIndex);
+			bmp.getData()[colorIndex] = (uint8)colorIndex;
 		}
 		if (!bmp.saveBMP(fileContent, palette))
 			return false;
@@ -536,8 +536,8 @@ void GameView::update(float timeElapsed)
 					LogDisplay::instance().updateScriptLogValue("~index", rmx::hexString(index, 4));
 					if (mDebugOutput < 2)
 					{
-						const uint16 address = planeManager.getPatternVRAMAddress(mDebugOutput, index);
-						const uint16 pattern = planeManager.getPatternAtIndex(mDebugOutput, index);
+						const uint16 address = planeManager.getPatternVRAMAddress(mDebugOutput, (uint16)index);
+						const uint16 pattern = planeManager.getPatternAtIndex(mDebugOutput, (uint16)index);
 						LogDisplay::instance().updateScriptLogValue("~addr", rmx::hexString(address, 4));
 						LogDisplay::instance().updateScriptLogValue("~ptrn", rmx::hexString(pattern, 4));
 					}
@@ -653,7 +653,7 @@ void GameView::render()
 			{
 				const int px = baseX + 1 + (k & 0x0f) * 5;
 				const int height = (k < 0x40) ? 4 : 2;
-				Color color = paletteManager.getPaletteEntry(paletteIndex, k);
+				Color color = paletteManager.getPaletteEntry(paletteIndex, (uint16)k);
 				color.a = 1.0f;
 				drawer.drawRect(Recti(px, py, 4, height), color);
 

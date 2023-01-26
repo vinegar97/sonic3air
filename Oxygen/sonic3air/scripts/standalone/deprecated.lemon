@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2022 by Eukaryot
+	Copyright (C) 2017-2023 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -93,6 +93,11 @@ function void Renderer.drawCustomSpriteTinted(u64 key, s16 px, s16 py, u8 atex, 
 function void Renderer.drawCustomSpriteTransformed(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue, u32 tintColor, s32 transform11, s32 transform12, s32 transform21, s32 transform22)
 {
 	Renderer.drawSpriteTransformed(key, px, py, u16(atex), flags, renderQueue, tintColor, transform11, transform12, transform21, transform22)
+}
+
+function void Standalone.setFastMusicFlagWithSpeedup(u8 flag, u32 relativeSpeed)
+{
+	Standalone.setFastMusicFlagWithSpeedup(flag, float(relativeSpeed) / 65536.0f)
 }
 
 

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -32,8 +32,8 @@ namespace lemon
 
 	private:
 		void eraseFromLine(std::string_view& line, std::string*& modifiedLine, size_t offset, size_t count);
-		bool evaluateConditionString(const char* characters, size_t len, Parser& parser);
-		void processDefinition(const char* characters, size_t len, Parser& parser);
+		bool evaluateConditionString(std::string_view input, Parser& parser);
+		void processDefinition(std::string_view input, Parser& parser);
 		int64 evaluateConstantExpression(const ParserTokenList& parserTokens) const;
 		int64 evaluateConstantToken(const StatementToken& token) const;
 

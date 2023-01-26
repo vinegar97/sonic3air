@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -78,28 +78,28 @@ namespace lemon
 	friend class OpcodeExecUtils;
 	friend class OpcodeExec;
 	friend class OptimizedOpcodeExec;
-	friend class NativizedCode;
 	friend class RuntimeFunction;
 	friend struct RuntimeOpcodeContext;
 
 	public:
 		struct ExecuteResult
 		{
-			enum Result
+			enum class Result
 			{
-				CONTINUE,
-				CALL,
-				RETURN,
-				EXTERNAL_CALL,
-				EXTERNAL_JUMP,
+				OKAY,
 				HALT
 			};
 
-			Result mResult = Result::HALT;
+			Result mResult = Result::OKAY;
 			size_t mStepsExecuted = 0;
+		};
 
-			uint64 mCallTarget = 0;							// For result CALL, EXTERNAL_CALL and EXTERNAL_JUMP
-			const RuntimeOpcode* mRuntimeOpcode = nullptr;	// For result CALL only
+		struct ExecuteConnector : public ExecuteResult
+		{
+			virtual bool handleCall(const Function* func, uint64 callTarget) = 0;
+			virtual bool handleReturn() = 0;
+			virtual bool handleExternalCall(uint64 address) = 0;
+			virtual bool handleExternalJump(uint64 address) = 0;
 		};
 
 	public:
@@ -140,16 +140,16 @@ namespace lemon
 		inline const ControlFlow& getMainControlFlow() const  { return *mControlFlows[0]; }
 		inline const ControlFlow& getSelectedControlFlow() const  { return *mSelectedControlFlow; }
 
-		void callFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex = 0);
+		void callRuntimeFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex = 0);
 		void callFunction(const Function& function, size_t baseCallIndex = 0);
 		bool callFunctionAtLabel(const Function& function, FlyweightString labelName);
 		bool callFunctionByName(FlyweightString functionName, FlyweightString labelName = FlyweightString());
 		bool returnFromFunction();
 
-		void executeSteps(Runtime::ExecuteResult& result, size_t stepsLimit = 1000);
-		const Function* handleResultCall(const ExecuteResult& result);
+		void executeSteps(ExecuteConnector& result, size_t stepsLimit, size_t minimumCallStackSize);
+		const Function* handleResultCall(const RuntimeOpcode& runtimeOpcode);
 
-		void getLastStepLocation(ControlFlow::Location& outLocation) const;
+		inline void triggerStopSignal()  { mReceivedStopSignal = true; }
 
 		bool serializeState(VectorBinarySerializer& serializer, std::string* outError = nullptr);
 
@@ -174,6 +174,8 @@ namespace lemon
 		// TODO: Add functions to create / destroy control flows, otherwise we're stuck with just the main control flow
 		std::vector<ControlFlow*> mControlFlows;		// Contains at least one control flow at all times = the main control flow at index 0
 		ControlFlow* mSelectedControlFlow = nullptr;	// The currently selected control flow used by methods like "executeSteps" and "callFunction"; this must always be a valid pointer
+
+		bool mReceivedStopSignal = false;
 	};
 
 }

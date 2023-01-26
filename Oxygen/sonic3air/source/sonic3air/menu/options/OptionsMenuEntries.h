@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -68,10 +68,13 @@ public:
 
 	virtual void renderEntry(RenderContext& renderContext_) override;
 
+	virtual void triggerButton() {}
+	virtual bool shouldBeShown() { return true; }	// Note that this is only one of multiple conditions for whether the options entry is shown
+
 protected:
 	void renderInternal(RenderContext& renderContext_, const Color& normalColor, const Color& selectedColor);
 
-private:
+protected:
 	bool mUseSmallFont = false;
 };
 
@@ -96,4 +99,20 @@ public:
 
 private:
 	bool mTextUpdateLink = false;
+};
+
+
+class SoundtrackMenuEntry : public OptionsMenuEntry
+{
+public:
+	void renderEntry(RenderContext& renderContext) override;
+};
+
+
+class SoundtrackDownloadMenuEntry : public OptionsMenuEntry
+{
+public:
+	void renderEntry(RenderContext& renderContext) override;
+	void triggerButton() override;
+	bool shouldBeShown() override;
 };

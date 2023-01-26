@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -28,9 +28,9 @@
 #include "oxygen/application/overlays/SaveStateMenu.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/video/VideoOut.h"
-#include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/helper/Profiling.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/Simulation.h"
 
@@ -104,7 +104,7 @@ void Application::initialize()
 
 	// Font
 	mLogDisplayFont.setSize(15.0f);
-	mLogDisplayFont.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 1.0f), 1.0f));
+	mLogDisplayFont.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2i(1, 1), 1.0f));
 
 	RMX_LOG_INFO("Application initialization complete");
 }
@@ -239,6 +239,7 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 						// Not available for normal users, as this would crash the application if OpenGL is not supported
 						if (EngineMain::getDelegate().useDeveloperFeatures())
 						{
+							updateWindowDisplayIndex();
 							const Configuration::RenderMethod newRenderMethod = (Configuration::instance().mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? Configuration::RenderMethod::OPENGL_SOFT :
 																				(Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? Configuration::RenderMethod::OPENGL_FULL : Configuration::RenderMethod::SOFTWARE;
 							EngineMain::instance().switchToRenderMethod(newRenderMethod);
@@ -532,7 +533,6 @@ void Application::render()
 
 	if (mPausedByFocusLoss)
 	{
-		Font& font = EngineMain::getDelegate().getDebugFont(10);
 		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 0.8f));
 
 		// TODO: The sprites are from S3AIR, but used in OxygenApp as well
@@ -623,13 +623,6 @@ void Application::childClosed(GuiBase& child)
 	}
 	mRemoveChild = &child;
 }
-
-/*
-bool Application::isFullscreen() const
-{
-	return (SDL_GetWindowFlags(FTX::Video->getMainWindow()) & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0;
-}
-*/
 
 void Application::setWindowMode(WindowMode windowMode, bool force)
 {

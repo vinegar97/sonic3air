@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -25,8 +25,8 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/mainview/GameView.h"
-#include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/FileHelper.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/rendering/utils/RenderUtils.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/Simulation.h"

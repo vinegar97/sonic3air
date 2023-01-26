@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -57,6 +57,9 @@ public:
 	AudioCollection& getAudioCollection()  { return mAudioCollection; }
 	AudioPlayer& getAudioPlayer()		   { return mAudioPlayer; }
 
+	void reloadRemasteredSoundtrack();
+	bool hasLoadedRemasteredSoundtrack() const  { return mLoadedRemasteredSoundtrack; }
+
 	inline float getGlobalVolume() const   { return mGlobalVolume; }
 	void setGlobalVolume(float volume);
 
@@ -81,5 +84,6 @@ protected:
 protected:
 	AudioCollection mAudioCollection;
 	AudioPlayer mAudioPlayer;
+	bool mLoadedRemasteredSoundtrack = false;
 	float mGlobalVolume = 1.0f;
 };

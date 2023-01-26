@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -42,7 +42,7 @@ struct CommandForwarder::Internal
 		buffer[command.length()] = 0;
 
 		DWORD bytesSent = 0;
-		const bool result = WriteFile(pipeHandle, buffer, strlen(buffer)+1, &bytesSent, nullptr);
+		const bool result = WriteFile(pipeHandle, buffer, (DWORD)(strlen(buffer)+1), &bytesSent, nullptr);
 		RMX_CHECK(result && command.length() + 1 == bytesSent, "Error sending command: " << GetLastError(), );
 
 		CloseHandle(pipeHandle);

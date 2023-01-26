@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -40,7 +40,7 @@ namespace lemon
 		template<typename R, typename T>
 		R absolute(T a)
 		{
-			return std::abs(a);
+			return (R)std::abs(a);
 		}
 
 		uint32 sqrt_u32(uint32 a)
@@ -67,6 +67,36 @@ namespace lemon
 		{
 			return (int32)roundToInt(std::cos((float)x / (float)0x10000) * (float)0x10000);
 		}
+
+		template<typename T> T Math_PI()  { return PI_DOUBLE; }
+		template<> float Math_PI()		  { return PI_FLOAT; }
+
+		template<typename T> T Math_sqrt(T value)				{ return std::sqrt(value); }
+		template<typename T> T Math_pow(T base, T exponent)		{ return std::pow(base, exponent); }
+		template<typename T> T Math_exp(T value)				{ return std::exp(value); }
+		template<typename T> T Math_log(T value)				{ return std::log(value); }
+
+		template<typename T> T Math_sin(T value) 				{ return std::sin(value); }
+		template<typename T> T Math_cos(T value)				{ return std::cos(value); }
+		template<typename T> T Math_tan(T value)				{ return std::tan(value); }
+		template<typename T> T Math_asin(T value)				{ return std::asin(value); }
+		template<typename T> T Math_acos(T value)				{ return std::acos(value); }
+		template<typename T> T Math_atan(T value)				{ return std::atan(value); }
+		template<typename T> T Math_atan2(T y, T x)				{ return std::atan2(y, x); }
+
+		template<typename T> T Math_degreesToRadians(T degrees)	{ return degrees * (Math_PI<T>() / (T)180); }
+		template<typename T> T Math_radiansToDegrees(T radians)	{ return radians * ((T)180 / Math_PI<T>()); }
+
+		template<typename T> T Math_floor(T value)				{ return std::floor(value); }
+		template<typename T> int64 Math_floorToInt(T value)		{ return (int64)std::floor(value); }
+		template<typename T> T Math_ceil(T value)				{ return std::ceil(value); }
+		template<typename T> int64 Math_ceilToInt(T value)		{ return (int64)std::ceil(value); }
+		template<typename T> T Math_round(T value)				{ return std::round(value); }
+		template<typename T> int64 Math_roundToInt(T value)		{ return (int64)std::round(value); }
+
+		template<typename T> bool Math_isNumber(T value)		{ return std::isnormal(value) || (value == (T)0); }
+		template<typename T> bool Math_isNaN(T value)			{ return std::isnan(value); }
+		template<typename T> bool Math_isInfinite(T value)		{ return std::isinf(value); }
 
 		StringRef stringformat(StringRef format, int argv, uint64* args)
 		{
@@ -238,6 +268,12 @@ namespace lemon
 			return (uint32)str.getString().length();
 		}
 
+		bool string_isEmpty(StringRef str)
+		{
+			RMX_CHECK(str.isValid(), "Unable to resolve string", return 0);
+			return str.getString().empty();
+		}
+
 		uint8 string_getCharacter(StringRef string, uint32 index)
 		{
 			if (!string.isValid())
@@ -258,6 +294,36 @@ namespace lemon
 			return StringRef(runtime->addString(part));
 		}
 
+		bool string_startsWith(StringRef string, StringRef substring)
+		{
+			if (!string.isValid() || !substring.isValid())
+				return false;
+			return rmx::startsWith(string.getString(), substring.getString());
+		}
+
+		bool string_endsWith(StringRef string, StringRef substring)
+		{
+			if (!string.isValid() || !substring.isValid())
+				return false;
+			return rmx::endsWith(string.getString(), substring.getString());
+		}
+
+		int16 string_find(StringRef string, StringRef substring)
+		{
+			if (!string.isValid() || !substring.isValid())
+				return false;
+			const size_t position = string.getString().find(substring.getString());
+			return (position == std::string_view::npos) ? -1 : (int16)position;
+		}
+
+		StringRef getStringFromCharacter(uint8 character)
+		{
+			Runtime* runtime = Runtime::getActiveRuntime();
+			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			const char str[2] = { (char)character, '\0' };
+			return StringRef(runtime->addString(str));
+		}
+
 		StringRef getStringFromHash(uint64 hash)
 		{
 			Runtime* runtime = Runtime::getActiveRuntime();
@@ -273,6 +339,11 @@ namespace lemon
 		// Register built-in functions
 		BuiltInFunctions::registerBuiltInFunctions(module);
 
+		// Constants
+		module.addConstant("PI_FLOAT", &PredefinedDataTypes::FLOAT, AnyBaseValue(PI_FLOAT));
+		module.addConstant("PI_DOUBLE", &PredefinedDataTypes::DOUBLE, AnyBaseValue(PI_DOUBLE));
+
+		// Functions
 		const BitFlagSet<Function::Flag> defaultFlags(Function::Flag::ALLOW_INLINE_EXECUTION);
 		const BitFlagSet<Function::Flag> compileTimeConstant(Function::Flag::ALLOW_INLINE_EXECUTION, Function::Flag::COMPILE_TIME_CONSTANT);
 
@@ -282,6 +353,10 @@ namespace lemon
 		module.addNativeFunction("min", lemon::wrap(&functions::minimum<uint16>), compileTimeConstant);
 		module.addNativeFunction("min", lemon::wrap(&functions::minimum<int32>), compileTimeConstant);
 		module.addNativeFunction("min", lemon::wrap(&functions::minimum<uint32>), compileTimeConstant);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<int64>), compileTimeConstant);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<uint64>), compileTimeConstant);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<float>), compileTimeConstant);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<double>), compileTimeConstant);
 
 		module.addNativeFunction("max", lemon::wrap(&functions::maximum<int8>), compileTimeConstant);
 		module.addNativeFunction("max", lemon::wrap(&functions::maximum<uint8>), compileTimeConstant);
@@ -289,6 +364,10 @@ namespace lemon
 		module.addNativeFunction("max", lemon::wrap(&functions::maximum<uint16>), compileTimeConstant);
 		module.addNativeFunction("max", lemon::wrap(&functions::maximum<int32>), compileTimeConstant);
 		module.addNativeFunction("max", lemon::wrap(&functions::maximum<uint32>), compileTimeConstant);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<int64>), compileTimeConstant);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<uint64>), compileTimeConstant);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<float>), compileTimeConstant);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<double>), compileTimeConstant);
 
 		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<int8>), compileTimeConstant);
 		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<uint8>), compileTimeConstant);
@@ -296,10 +375,17 @@ namespace lemon
 		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<uint16>), compileTimeConstant);
 		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<int32>), compileTimeConstant);
 		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<uint32>), compileTimeConstant);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<int64>), compileTimeConstant);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<uint64>), compileTimeConstant);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<float>), compileTimeConstant);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<double>), compileTimeConstant);
 
 		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<uint8, int8>), compileTimeConstant);
 		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<uint16, int16>), compileTimeConstant);
 		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<uint32, int32>), compileTimeConstant);
+		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<uint64, int64>), compileTimeConstant);
+		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<float, float>), compileTimeConstant);
+		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<double, double>), compileTimeConstant);
 
 		module.addNativeFunction("sqrt", lemon::wrap(&functions::sqrt_u32), compileTimeConstant);
 
@@ -307,6 +393,58 @@ namespace lemon
 		module.addNativeFunction("sin_s32", lemon::wrap(&functions::sin_s32), compileTimeConstant);
 		module.addNativeFunction("cos_s16", lemon::wrap(&functions::cos_s16), compileTimeConstant);
 		module.addNativeFunction("cos_s32", lemon::wrap(&functions::cos_s32), compileTimeConstant);
+
+		// Math
+		{
+			module.addNativeFunction("Math.sqrt",  lemon::wrap(&functions::Math_sqrt<float>),   compileTimeConstant);
+			module.addNativeFunction("Math.sqrt",  lemon::wrap(&functions::Math_sqrt<double>),  compileTimeConstant);
+			module.addNativeFunction("Math.pow",   lemon::wrap(&functions::Math_pow<float>),    compileTimeConstant);
+			module.addNativeFunction("Math.pow",   lemon::wrap(&functions::Math_pow<double>),   compileTimeConstant);
+			module.addNativeFunction("Math.exp",   lemon::wrap(&functions::Math_exp<float>),    compileTimeConstant);
+			module.addNativeFunction("Math.exp",   lemon::wrap(&functions::Math_exp<double>),   compileTimeConstant);
+			module.addNativeFunction("Math.log",   lemon::wrap(&functions::Math_log<float>),    compileTimeConstant);
+			module.addNativeFunction("Math.log",   lemon::wrap(&functions::Math_log<double>),   compileTimeConstant);
+
+			module.addNativeFunction("Math.sin",   lemon::wrap(&functions::Math_sin<float>),    compileTimeConstant);
+			module.addNativeFunction("Math.sin",   lemon::wrap(&functions::Math_sin<double>),   compileTimeConstant);
+			module.addNativeFunction("Math.cos",   lemon::wrap(&functions::Math_cos<float>),    compileTimeConstant);
+			module.addNativeFunction("Math.cos",   lemon::wrap(&functions::Math_cos<double>),   compileTimeConstant);
+			module.addNativeFunction("Math.tan",   lemon::wrap(&functions::Math_tan<float>),    compileTimeConstant);
+			module.addNativeFunction("Math.tan",   lemon::wrap(&functions::Math_tan<double>),   compileTimeConstant);
+			module.addNativeFunction("Math.asin",  lemon::wrap(&functions::Math_asin<float>),   compileTimeConstant);
+			module.addNativeFunction("Math.asin",  lemon::wrap(&functions::Math_asin<double>),  compileTimeConstant);
+			module.addNativeFunction("Math.acos",  lemon::wrap(&functions::Math_acos<float>),   compileTimeConstant);
+			module.addNativeFunction("Math.acos",  lemon::wrap(&functions::Math_acos<double>),  compileTimeConstant);
+			module.addNativeFunction("Math.atan",  lemon::wrap(&functions::Math_atan<float>),   compileTimeConstant);
+			module.addNativeFunction("Math.atan",  lemon::wrap(&functions::Math_atan<double>),  compileTimeConstant);
+			module.addNativeFunction("Math.atan2", lemon::wrap(&functions::Math_atan2<float>),  compileTimeConstant);
+			module.addNativeFunction("Math.atan2", lemon::wrap(&functions::Math_atan2<double>), compileTimeConstant);
+
+			module.addNativeFunction("Math.degreesToRadians", lemon::wrap(&functions::Math_degreesToRadians<float>),  compileTimeConstant);
+			module.addNativeFunction("Math.degreesToRadians", lemon::wrap(&functions::Math_degreesToRadians<double>), compileTimeConstant);
+			module.addNativeFunction("Math.radiansToDegrees", lemon::wrap(&functions::Math_radiansToDegrees<float>),  compileTimeConstant);
+			module.addNativeFunction("Math.radiansToDegrees", lemon::wrap(&functions::Math_radiansToDegrees<double>), compileTimeConstant);
+
+			module.addNativeFunction("Math.floor",		lemon::wrap(&functions::Math_floor<float>),		  compileTimeConstant);
+			module.addNativeFunction("Math.floor",		lemon::wrap(&functions::Math_floor<double>),	  compileTimeConstant);
+			module.addNativeFunction("Math.floorToInt",	lemon::wrap(&functions::Math_floorToInt<float>),  compileTimeConstant);
+			module.addNativeFunction("Math.floorToInt",	lemon::wrap(&functions::Math_floorToInt<double>), compileTimeConstant);
+			module.addNativeFunction("Math.ceil",		lemon::wrap(&functions::Math_ceil<float>),		  compileTimeConstant);
+			module.addNativeFunction("Math.ceil",		lemon::wrap(&functions::Math_ceil<double>),		  compileTimeConstant);
+			module.addNativeFunction("Math.ceilToInt",	lemon::wrap(&functions::Math_ceilToInt<float>),   compileTimeConstant);
+			module.addNativeFunction("Math.ceilToInt",	lemon::wrap(&functions::Math_ceilToInt<double>),  compileTimeConstant);
+			module.addNativeFunction("Math.round",		lemon::wrap(&functions::Math_round<float>),		  compileTimeConstant);
+			module.addNativeFunction("Math.round",		lemon::wrap(&functions::Math_round<double>),	  compileTimeConstant);
+			module.addNativeFunction("Math.roundToInt",	lemon::wrap(&functions::Math_roundToInt<float>),  compileTimeConstant);
+			module.addNativeFunction("Math.roundToInt",	lemon::wrap(&functions::Math_roundToInt<double>), compileTimeConstant);
+
+			module.addNativeFunction("Math.isNumber",	lemon::wrap(&functions::Math_isNumber<float>),	  compileTimeConstant);
+			module.addNativeFunction("Math.isNumber",	lemon::wrap(&functions::Math_isNumber<double>),   compileTimeConstant);
+			module.addNativeFunction("Math.isNaN",		lemon::wrap(&functions::Math_isNaN<float>),		  compileTimeConstant);
+			module.addNativeFunction("Math.isNaN",		lemon::wrap(&functions::Math_isNaN<double>),	  compileTimeConstant);
+			module.addNativeFunction("Math.isInfinite",	lemon::wrap(&functions::Math_isInfinite<float>),  compileTimeConstant);
+			module.addNativeFunction("Math.isInfinite",	lemon::wrap(&functions::Math_isInfinite<double>), compileTimeConstant);
+		}
 
 		module.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat1), defaultFlags)
 			.setParameterInfo(0, "format")
@@ -382,6 +520,8 @@ namespace lemon
 
 		module.addNativeMethod("string", "length", lemon::wrap(&functions::string_length), defaultFlags);
 
+		module.addNativeMethod("string", "isEmpty", lemon::wrap(&functions::string_isEmpty), defaultFlags);
+
 		module.addNativeMethod("string", "getCharacter", lemon::wrap(&functions::string_getCharacter), defaultFlags)
 			.setParameterInfo(0, "str")
 			.setParameterInfo(1, "index");
@@ -390,6 +530,18 @@ namespace lemon
 			.setParameterInfo(0, "str")
 			.setParameterInfo(1, "index")
 			.setParameterInfo(2, "length");
+
+		module.addNativeMethod("string", "startsWith", lemon::wrap(&functions::string_startsWith), defaultFlags)
+			.setParameterInfo(0, "substring");
+
+		module.addNativeMethod("string", "endsWith", lemon::wrap(&functions::string_endsWith), defaultFlags)
+			.setParameterInfo(0, "substring");
+
+		module.addNativeMethod("string", "find", lemon::wrap(&functions::string_find), defaultFlags)
+			.setParameterInfo(0, "substring");
+
+		module.addNativeFunction("getStringFromCharacter", lemon::wrap(&functions::getStringFromCharacter), defaultFlags)
+			.setParameterInfo(0, "character");
 
 		module.addNativeFunction("getStringFromHash", lemon::wrap(&functions::getStringFromHash), defaultFlags)
 			.setParameterInfo(0, "hash");

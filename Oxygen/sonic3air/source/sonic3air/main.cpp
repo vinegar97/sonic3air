@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -11,7 +11,7 @@
 #include "sonic3air/helper/ArgumentsReader.h"
 #include "sonic3air/helper/PackageBuilder.h"
 
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 
 // HJW: I know it's sloppy to put this here... it'll get moved afterwards
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 	// Make sure we're in the correct working directory
 	PlatformFunctions::changeWorkingDirectory(arguments.mExecutableCallPath);
 
-#if !defined(ENDUSER) && !defined(PLATFORM_ANDROID)
+#if !defined(PLATFORM_ANDROID)
 	if (arguments.mPack)
 	{
 		PackageBuilder::performPacking();

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -28,7 +28,7 @@ namespace lemon
 	{
 		for (Constant* constant : module.mPreprocessorDefinitions)
 		{
-			mPreprocessorDefinitions.setDefinition(constant->getName(), constant->getValue());
+			mPreprocessorDefinitions.setDefinition(constant->getName(), constant->getValue().get<int64>());
 			registerConstant(*constant);	// Also add as a normal constant to be able to access them outside of preprocessor directives as well
 		}
 		for (Function* function : module.mFunctions)

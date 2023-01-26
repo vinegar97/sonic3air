@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2022 by Eukaryot
+	Copyright (C) 2017-2023 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -36,15 +36,6 @@ function void fn063cfc()
 	copyMemory(A2, A1, 0x4a)
 
 	UnloadObject()
-
-#if STANDALONE
-	// Change the level chunks a little bit, so the prophecy picture is only there once
-	u8[0xffff81e5] = 0x48
-	u8[0xffff8218] = 0x42
-	u8[0xffff8219] = 0x49
-	u8[0xffff824d] = 0x4a
-	u8[0xffff824e] = 0x4c
-#endif
 }
 
 

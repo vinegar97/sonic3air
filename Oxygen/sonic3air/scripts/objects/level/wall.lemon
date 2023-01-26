@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2022 by Eukaryot
+	Copyright (C) 2017-2023 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -235,7 +235,7 @@ function void fn021568()
 		fn02165a()
 
 	#if STANDALONE
-		if (Game.getSetting(SETTING_FIX_GLITCHES))
+		if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
 		{
 			// Prevent slope glitch here for player 1
 			if ((u8[0xffffb000 + 0x2a] & char.flag.ON_OBJECT) && u16[0xffffb000 + 0x42] == A0.u16)

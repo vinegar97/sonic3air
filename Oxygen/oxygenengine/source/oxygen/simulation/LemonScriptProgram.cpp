@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -424,7 +424,7 @@ void LemonScriptProgram::evaluateDefines()
 			if (tokens.size() == 4 &&
 				tokens[2].getType() == lemon::Token::Type::CONSTANT)
 			{
-				const uint32 address = (uint32)tokens[2].as<lemon::ConstantToken>().mValue;
+				const uint32 address = (uint32)tokens[2].as<lemon::ConstantToken>().mValue.get<uint64>();
 				const lemon::DataTypeDefinition& dataType = *tokens[0].as<lemon::VarTypeToken>().mDataType;
 				if (dataType.getClass() == lemon::DataTypeDefinition::Class::INTEGER)
 				{

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -23,18 +23,18 @@ namespace lemon
 	void ControlFlow::reset()
 	{
 		mCallStack.clear();
-		for (size_t k = 0; k < 0x80; ++k)
+		for (size_t k = 0; k < VALUE_STACK_MAX_SIZE; ++k)
 		{
 			mValueStackBuffer[k] = 0;
 		}
-		mValueStackStart = &mValueStackBuffer[4];
-		mValueStackPtr   = &mValueStackBuffer[4];
-		for (size_t k = 0; k < 0x400; ++k)
+		mValueStackStart = &mValueStackBuffer[VALUE_STACK_FIRST_INDEX];
+		mValueStackPtr   = &mValueStackBuffer[VALUE_STACK_FIRST_INDEX];
+
+		for (size_t k = 0; k < VAR_STACK_LIMIT; ++k)
 		{
 			mLocalVariablesBuffer[k] = 0;
 		}
 		mLocalVariablesSize = 0;
-		mLastStepState = State();
 	}
 
 	void ControlFlow::getCallStack(std::vector<Location>& outLocations) const
@@ -58,15 +58,16 @@ namespace lemon
 
 	void ControlFlow::getLastStepLocation(Location& outLocation) const
 	{
-		if (nullptr == mLastStepState.mRuntimeFunction)
+		if (!mCallStack.empty())
 		{
-			outLocation.mFunction = nullptr;
-			outLocation.mProgramCounter = 0;
+			const State& state = mCallStack.back();
+			outLocation.mFunction = state.mRuntimeFunction->mFunction;
+			outLocation.mProgramCounter = state.mRuntimeFunction->translateFromRuntimeProgramCounter(state.mProgramCounter);
 		}
 		else
 		{
-			outLocation.mFunction = mLastStepState.mRuntimeFunction->mFunction;
-			outLocation.mProgramCounter = mLastStepState.mRuntimeFunction->translateFromRuntimeProgramCounter(mLastStepState.mProgramCounter);
+			outLocation.mFunction = nullptr;
+			outLocation.mProgramCounter = 0;
 		}
 	}
 

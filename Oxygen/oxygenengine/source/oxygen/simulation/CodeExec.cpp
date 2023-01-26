@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -16,7 +16,7 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/GameProfile.h"
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 #include <lemon/program/Function.h>
 #include <lemon/runtime/Runtime.h>
@@ -80,8 +80,90 @@ namespace
 }
 
 
+struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
+{
+	CodeExec& mCodeExec;
 
-const std::string& CodeExec::Location::toString() const
+	inline explicit RuntimeExecuteConnector(CodeExec& codeExec) : mCodeExec(codeExec) {}
+
+	bool handleCall(const lemon::Function* func, uint64 callTarget) override
+	{
+		if (nullptr == func)
+		{
+			mCodeExec.showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(callTarget, 16) + ").");
+			return false;
+		}
+		return true;
+	}
+
+	bool handleReturn() override
+	{
+		if (mCodeExec.mHasCallFramesToAdd)
+		{
+			mCodeExec.applyCallFramesToAdd();
+		}
+		return true;
+	}
+
+	bool handleExternalCall(uint64 address) override
+	{
+		// Check for address hook at the target address
+		//  -> If it fails, we will just continue after the call
+		mCodeExec.tryCallAddressHook((uint32)address);
+		return true;
+	}
+
+	bool handleExternalJump(uint64 address) override
+	{
+		handleReturn();
+		return handleExternalCall(address);
+	}
+};
+
+
+struct RuntimeExecuteConnectorDev : public RuntimeExecuteConnector
+{
+	inline explicit RuntimeExecuteConnectorDev(CodeExec& codeExec) : RuntimeExecuteConnector(codeExec) {}
+
+	bool handleCall(const lemon::Function* func, uint64 callTarget) override
+	{
+		if (nullptr == func)
+		{
+			mCodeExec.showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(callTarget, 16) + ").");
+			return false;
+		}
+		if (func->getType() == lemon::Function::Type::SCRIPT)
+		{
+			CodeExec::CallFrame& callFrame = mCodeExec.mActiveCallFrameTracking->pushCallFrame(CodeExec::CallFrame::Type::SCRIPT_DIRECT);
+			callFrame.mFunction = func;
+		}
+		return true;
+	}
+
+	bool handleReturn() override
+	{
+		mCodeExec.popCallFrame();
+		return true;
+	}
+
+	bool handleExternalCall(uint64 address) override
+	{
+		// Check for address hook at the target address
+		//  -> If it fails, we will just continue after the call
+		mCodeExec.tryCallAddressHookDev((uint32)address);
+		return true;
+	}
+
+	bool handleExternalJump(uint64 address) override
+	{
+		handleReturn();
+		return handleExternalCall(address);
+	}
+};
+
+
+
+const std::string& CodeExec::Location::toString(CodeExec& codeExec) const
 {
 	if (mResolvedString.empty())
 	{
@@ -93,7 +175,7 @@ const std::string& CodeExec::Location::toString() const
 		{
 			std::string scriptFilename;
 			uint32 lineNumber;
-			mCodeExec->getLemonScriptProgram().resolveLocation(*mFunction, (uint32)mProgramCounter, scriptFilename, lineNumber);
+			codeExec.getLemonScriptProgram().resolveLocation(*mFunction, (uint32)mProgramCounter, scriptFilename, lineNumber);
 			mResolvedString = std::string(mFunction->getName().getString()) + ", line " + std::to_string(lineNumber);
 		}
 	}
@@ -338,7 +420,7 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 			uint32 stackPointer = mEmulatorInterface.getRegister(EmulatorInterface::Register::A7);
 			RMX_CHECK((stackPointer & 0x00ff0000) == 0x00ff0000, "Stack pointer in register A7 is not pointing to a RAM address", );
 			stackPointer |= 0xffff0000;
-			RMX_CHECK(stackPointer >= GameProfile::instance().mAsmStackRange.first && stackPointer <= GameProfile::instance().mAsmStackRange.second, "Stack pointer in register A7 is not iside the ASM stack range", );
+			RMX_CHECK(stackPointer >= GameProfile::instance().mAsmStackRange.first && stackPointer <= GameProfile::instance().mAsmStackRange.second, "Stack pointer in register A7 is not inside the ASM stack range", );
 			while (stackPointer < GameProfile::instance().mAsmStackRange.second)
 			{
 				callstack.push_back(mEmulatorInterface.readMemory32(stackPointer));
@@ -455,6 +537,7 @@ bool CodeExec::performFrameUpdate()
 void CodeExec::yieldExecution()
 {
 	mCurrentlyRunningScript = false;
+	mLemonScriptRuntime.getInternalLemonRuntime().triggerStopSignal();
 }
 
 bool CodeExec::executeScriptFunction(const std::string& functionName, bool showErrorOnFail, const lemon::Environment* environment)
@@ -634,7 +717,7 @@ void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFram
 
 	mActiveInstance = this;
 	mCurrentlyRunningScript = true;
-	const size_t abortOnCallStackSize = std::max<size_t>(mLemonScriptRuntime.getCallStackSize(), 1) - 1;	// Only used if executeSingleFunction == true
+	const size_t abortOnCallStackSize = executeSingleFunction ? (std::max<size_t>(mLemonScriptRuntime.getCallStackSize(), 1) - 1) : 0;
 	mActiveCallFrameTracking = mIsDeveloperMode ? callFrameTracking : nullptr;
 
 	size_t stepsCounter = 0;
@@ -647,7 +730,7 @@ void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFram
 		size_t stepsExecutedThisCall;
 		try
 		{
-			const bool success = (nullptr != mActiveCallFrameTracking) ? executeRuntimeStepsDev(stepsExecutedThisCall) : executeRuntimeSteps(stepsExecutedThisCall);
+			const bool success = (nullptr != mActiveCallFrameTracking) ? executeRuntimeStepsDev(stepsExecutedThisCall, abortOnCallStackSize) : executeRuntimeSteps(stepsExecutedThisCall, abortOnCallStackSize);
 			if (!success)
 			{
 				if (executeSingleFunction)
@@ -725,76 +808,28 @@ void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFram
 	mActiveInstance = nullptr;
 }
 
-bool CodeExec::executeRuntimeSteps(size_t& stepsExecuted)
+bool CodeExec::executeRuntimeSteps(size_t& stepsExecuted, size_t minimumCallStackSize)
 {
 	lemon::Runtime& runtime = mLemonScriptRuntime.getInternalLemonRuntime();
-	lemon::Runtime::ExecuteResult result;
-	runtime.executeSteps(result, 5000);
+	RuntimeExecuteConnector connector(*this);
+	runtime.executeSteps(connector, 5000, minimumCallStackSize);
 
-	switch (result.mResult)
-	{
-		case lemon::Runtime::ExecuteResult::CALL:
-		{
-			const lemon::Function* func = runtime.handleResultCall(result);
-			if (nullptr == func)
-			{
-				showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(result.mCallTarget, 16) + ").");
-			}
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::RETURN:
-		{
-			if (mHasCallFramesToAdd)
-			{
-				applyCallFramesToAdd();
-			}
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::EXTERNAL_JUMP:
-		{
-			// Note that lemon script internal runtime already performed a return in this case
-			if (mHasCallFramesToAdd)
-			{
-				applyCallFramesToAdd();
-			}
-
-			// Fallthrough
-		}
-
-		case lemon::Runtime::ExecuteResult::EXTERNAL_CALL:
-		{
-			// Check for address hook at the target address
-			//  -> If it fails, we will just continue after the call
-			tryCallAddressHook((uint32)result.mCallTarget);
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::HALT:
-		{
-			return false;
-		}
-
-		default: break;
-	}
-
-	stepsExecuted = result.mStepsExecuted;
-	return true;
+	stepsExecuted = connector.mStepsExecuted;
+	return (connector.mResult != lemon::Runtime::ExecuteResult::Result::HALT);
 }
 
-bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted)
+bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted, size_t minimumCallStackSize)
 {
 	// Same as "executeRuntimeSteps", but with additional developer mode stuff, incl. tracking of call frames
 	if (mActiveCallFrameTracking->mCallFrames.empty())
 		return false;
 
 	lemon::Runtime& runtime = mLemonScriptRuntime.getInternalLemonRuntime();
-	lemon::Runtime::ExecuteResult result;
-	runtime.executeSteps(result, 5000);
+	RuntimeExecuteConnectorDev connector(*this);
+	runtime.executeSteps(connector, 5000, minimumCallStackSize);
 
 	{
-		mActiveCallFrameTracking->mCallFrames.back().mSteps += result.mStepsExecuted;
+		mActiveCallFrameTracking->mCallFrames.back().mSteps += connector.mStepsExecuted;
 
 		// Correct written values for all watches that triggered in this update
 		if (!mWatchHitsThisUpdate.empty())
@@ -809,63 +844,8 @@ bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted)
 		}
 	}
 
-	switch (result.mResult)
-	{
-		case lemon::Runtime::ExecuteResult::CALL:
-		{
-			const lemon::Function* func = runtime.handleResultCall(result);
-			if (nullptr == func)
-			{
-				showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(result.mCallTarget, 16) + ").");
-				break;
-			}
-
-			if (func->getType() == lemon::Function::Type::SCRIPT)
-			{
-				CallFrame& callFrame = mActiveCallFrameTracking->pushCallFrame(CallFrame::Type::SCRIPT_DIRECT);
-				callFrame.mFunction = mLemonScriptRuntime.getCurrentFunction();
-			}
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::RETURN:
-		{
-			popCallFrame();
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::EXTERNAL_JUMP:
-		{
-			// Note that lemon script internal runtime already performed a return in this case
-			popCallFrame();
-
-			// Fallthrough
-		}
-
-		case lemon::Runtime::ExecuteResult::EXTERNAL_CALL:
-		{
-			// Check for address hook at the target address
-			//  -> If it fails, we will just continue after the call
-			tryCallAddressHookDev((uint32)result.mCallTarget);
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::HALT:
-		{
-			return false;
-		}
-
-		default: break;
-	}
-
-	stepsExecuted = result.mStepsExecuted;
-	return true;
-}
-
-void CodeExec::getLastStepLocation(Location& outLocation)
-{
-	outLocation.mCodeExec = this;
-	mLemonScriptRuntime.getLastStepLocation(outLocation.mFunction, outLocation.mProgramCounter);
+	stepsExecuted = connector.mStepsExecuted;
+	return (connector.mResult != lemon::Runtime::ExecuteResult::Result::HALT);
 }
 
 bool CodeExec::tryCallAddressHook(uint32 address)
@@ -946,8 +926,8 @@ uint32 CodeExec::getCurrentWatchValue(uint32 address, uint16 bytes) const
 		case 1:  return mEmulatorInterface.readMemory8 (address);
 		case 2:  return mEmulatorInterface.readMemory16(address);
 		case 4:  return mEmulatorInterface.readMemory32(address);
+		default: return 0;
 	}
-	return 0;
 }
 
 void CodeExec::deleteWatch(Watch& watch)
@@ -977,7 +957,7 @@ void CodeExec::onWatchTriggered(size_t watchIndex, uint32 address, uint16 bytes)
 		return;
 
 	Location location;
-	getLastStepLocation(location);
+	mLemonScriptRuntime.getLastStepLocation(location.mFunction, location.mProgramCounter);
 
 	Watch& watch = *mWatches[watchIndex];
 	{
@@ -1005,7 +985,7 @@ void CodeExec::onVRAMWrite(uint16 address, uint16 bytes)
 		return;
 
 	Location location;
-	getLastStepLocation(location);
+	mLemonScriptRuntime.getLastStepLocation(location.mFunction, location.mProgramCounter);
 
 	// Check if this can be merged with the VRAM write just before
 	if (!mVRAMWrites.empty())

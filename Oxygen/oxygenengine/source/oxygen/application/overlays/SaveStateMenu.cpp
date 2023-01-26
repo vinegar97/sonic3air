@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -21,7 +21,7 @@
 SaveStateMenu::SaveStateMenu()
 {
 	mFont.setSize(18.0f);
-	mFont.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2f(2.0f, 2.0f), 0.5f));
+	mFont.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2i(2, 2), 0.5f));
 }
 
 SaveStateMenu::~SaveStateMenu()

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -217,7 +217,7 @@ bool LemonScriptRuntime::callAddressHook(uint32 address)
 	const lemon::RuntimeFunction** runtimeFunctionPtr = mInternal.mAddressHookLookup.find(address);
 	if (nullptr != runtimeFunctionPtr)
 	{
-		mInternal.mRuntime.callFunction(**runtimeFunctionPtr);
+		mInternal.mRuntime.callRuntimeFunction(**runtimeFunctionPtr);
 	}
 	else
 	{
@@ -232,7 +232,7 @@ bool LemonScriptRuntime::callAddressHook(uint32 address)
 		if (nullptr != runtimeFunction)
 		{
 			mInternal.mAddressHookLookup.add(address, runtimeFunction);
-			mInternal.mRuntime.callFunction(*runtimeFunction);
+			mInternal.mRuntime.callRuntimeFunction(*runtimeFunction);
 		}
 		else
 		{
@@ -329,7 +329,7 @@ void LemonScriptRuntime::setGlobalVariableValue_int64(lemon::FlyweightString var
 void LemonScriptRuntime::getLastStepLocation(const lemon::ScriptFunction*& outFunction, size_t& outProgramCounter) const
 {
 	lemon::ControlFlow::Location location;
-	mInternal.mRuntime.getLastStepLocation(location);
+	mInternal.mRuntime.getSelectedControlFlow().getLastStepLocation(location);
 	outFunction = location.mFunction;
 	outProgramCounter = location.mProgramCounter;
 }
@@ -350,7 +350,7 @@ std::string LemonScriptRuntime::buildScriptLocationString(const lemon::ControlFl
 	const std::wstring& fileName = location.mFunction->mSourceFileInfo->mFilename;
 	const uint32 lineNumber = getLineNumberInFile(*location.mFunction, location.mProgramCounter);
 	const std::string& moduleName = location.mFunction->getModule().getModuleName();
-	return "function '" + functionName + "' at line " + std::to_string(lineNumber) + " of file '" + WString(fileName).toStdString() + "' in module '" + moduleName + "'";	return std::string();
+	return "function '" + functionName + "' at line " + std::to_string(lineNumber) + " of file '" + WString(fileName).toStdString() + "' in module '" + moduleName + "'";
 }
 
 uint32 LemonScriptRuntime::getLineNumberInFile(const lemon::ScriptFunction& function, size_t programCounter)

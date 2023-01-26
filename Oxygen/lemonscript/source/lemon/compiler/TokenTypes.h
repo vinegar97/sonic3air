@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -12,6 +12,7 @@
 #include "lemon/compiler/Operators.h"
 #include "lemon/compiler/Token.h"
 #include "lemon/program/GlobalsLookup.h"
+#include "lemon/utility/AnyBaseValue.h"
 #include "lemon/utility/FlyweightString.h"
 
 
@@ -91,7 +92,7 @@ namespace lemon
 		inline ConstantToken() : StatementToken(TYPE) {}
 
 	public:
-		int64 mValue = 0;
+		AnyBaseValue mValue { 0 };
 	};
 
 

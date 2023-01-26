@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -16,14 +16,16 @@
 
 void DebugDrawPlaneShader::initialize()
 {
-	const std::string additionalDefines = BufferTexture::supportsBufferTextures() ? "USE_BUFFER_TEXTURES" : "";
-	FileHelper::loadShader(mShader, L"data/shader/debugdraw_plane.shader", "Standard", additionalDefines);
+	if (BufferTexture::supportsBufferTextures())	// Buffer texture support is required for this shader
+	{
+		FileHelper::loadShader(mShader, L"data/shader/debugdraw_plane.shader", "Standard", "USE_BUFFER_TEXTURES");
 
-	mLocPlayfieldSize	= mShader.getUniformLocation("PlayfieldSize");
-	mLocIndexTex		= mShader.getUniformLocation("IndexTexture");
-	mLocPatternCacheTex	= mShader.getUniformLocation("PatternCacheTexture");
-	mLocPaletteTex		= mShader.getUniformLocation("PaletteTexture");
-	mLocHighlightPrio	= mShader.getUniformLocation("HighlightPrio");
+		mLocPlayfieldSize	= mShader.getUniformLocation("PlayfieldSize");
+		mLocIndexTex		= mShader.getUniformLocation("IndexTexture");
+		mLocPatternCacheTex	= mShader.getUniformLocation("PatternCacheTexture");
+		mLocPaletteTex		= mShader.getUniformLocation("PaletteTexture");
+		mLocHighlightPrio	= mShader.getUniformLocation("HighlightPrio");
+	}
 }
 
 void DebugDrawPlaneShader::draw(int planeIndex, RenderParts& renderParts, const OpenGLRenderResources& resources)

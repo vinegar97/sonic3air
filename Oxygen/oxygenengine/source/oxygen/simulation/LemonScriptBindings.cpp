@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -32,6 +32,8 @@
 #include <lemon/runtime/Runtime.h>
 
 #include <rmxmedia.h>
+
+#include <iomanip>
 
 
 namespace
@@ -116,7 +118,7 @@ namespace
 	{
 		uint8* destPointer = EmulatorInterface::instance().getMemoryPointer(destAddress, true, bytes);
 		uint8* sourcePointer = EmulatorInterface::instance().getMemoryPointer(sourceAddress, false, bytes);
-		memcpy(destPointer, sourcePointer, bytes);
+		memmove(destPointer, sourcePointer, bytes);
 	}
 
 	void zeroMemory(uint32 startAddress, uint32 bytes)
@@ -346,11 +348,97 @@ namespace
 		debugLogInternal(valueString);
 	}
 
-	void debugLog(lemon::StringRef text)
+	template<typename T>
+	void debugLogIntSigned(T value)
 	{
-		if (text.isValid())
+		if (value < 0)
 		{
-			debugLogInternal(text.getString());
+			debugLogInternal('-' + rmx::hexString(-value, sizeof(T) * 2));
+		}
+		else
+		{
+			debugLogInternal(rmx::hexString(value, sizeof(T) * 2));
+		}
+	}
+
+	template<typename T>
+	void debugLogIntUnsigned(T value)
+	{
+		debugLogInternal(rmx::hexString(value, sizeof(T) * 2));
+	}
+
+	void debugLog(lemon::AnyTypeWrapper param)
+	{
+		switch (param.mType->getClass())
+		{
+			case lemon::DataTypeDefinition::Class::INTEGER:
+			{
+				if (param.mType == &lemon::PredefinedDataTypes::INT_8)
+				{
+					debugLogIntSigned(param.mValue.get<int8>());
+				}
+				else if (param.mType == &lemon::PredefinedDataTypes::UINT_8)
+				{
+					debugLogIntUnsigned(param.mValue.get<uint8>());
+				}
+				else if (param.mType == &lemon::PredefinedDataTypes::INT_16)
+				{
+					debugLogIntSigned(param.mValue.get<int16>());
+				}
+				else if (param.mType == &lemon::PredefinedDataTypes::UINT_16)
+				{
+					debugLogIntUnsigned(param.mValue.get<uint16>());
+				}
+				else if (param.mType == &lemon::PredefinedDataTypes::INT_32)
+				{
+					debugLogIntSigned(param.mValue.get<int32>());
+				}
+				else if (param.mType == &lemon::PredefinedDataTypes::UINT_32)
+				{
+					debugLogIntUnsigned(param.mValue.get<uint32>());
+				}
+				else if (param.mType == &lemon::PredefinedDataTypes::INT_64)
+				{
+					debugLogIntSigned(param.mValue.get<int64>());
+				}
+				else
+				{
+					debugLogIntUnsigned(param.mValue.get<uint64>());
+				}
+				break;
+			}
+
+			case lemon::DataTypeDefinition::Class::FLOAT:
+			{
+				std::stringstream str;
+				if (param.mType->getBytes() == 4)
+				{
+					str << std::setprecision(std::numeric_limits<float>::digits10) << param.mValue.get<float>() << "f";
+				}
+				else
+				{
+					str << std::setprecision(std::numeric_limits<double>::digits10) << param.mValue.get<double>();
+				}
+				debugLogInternal(str.str());
+				break;
+			}
+
+			case lemon::DataTypeDefinition::Class::STRING:
+			{
+				lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
+				if (nullptr != runtime)
+				{
+					const lemon::FlyweightString* str = runtime->resolveStringByKey(param.mValue.get<uint64>());
+					if (nullptr != str)
+					{
+						debugLogInternal(str->getString());
+					}
+				}
+				break;
+			}
+
+			default:
+				break;
 		}
 	}
 
@@ -417,16 +505,39 @@ namespace
 		return (getButtonState((int)index) && !getButtonState(index, true)) ? 1 : 0;
 	}
 
-	void Input_setTouchInputMode(uint8 index)
+	void Input_setTouchInputMode(uint8 mode)
 	{
-		return InputManager::instance().setTouchInputMode((InputManager::TouchInputMode)index);
+		return InputManager::instance().setTouchInputMode((InputManager::TouchInputMode)mode);
 	}
 
-	void Input_setControllerRumble(uint8 playerIndex, uint16 lowFrequencyRumble, uint16 highFrequencyRumble, uint32 milliseconds)
+	void Input_resetControllerRumble(int8 playerIndex)
+	{
+		if (playerIndex < 0)
+		{
+			// All players
+			InputManager::instance().resetControllerRumbleForPlayer(0);
+			InputManager::instance().resetControllerRumbleForPlayer(1);
+		}
+		else if (playerIndex < 2)
+		{
+			InputManager::instance().resetControllerRumbleForPlayer(playerIndex);
+		}
+	}
+
+	void Input_setControllerRumble(int8 playerIndex, float lowFrequencyRumble, float highFrequencyRumble, uint16 milliseconds)
 	{
 		// Limit length to 30 seconds
-		milliseconds = std::min<uint32>(milliseconds, 30000);
-		InputManager::instance().setControllerRumbleForPlayer(playerIndex, (float)lowFrequencyRumble / 65535.0f, (float)highFrequencyRumble / 65535.0f, milliseconds);
+		milliseconds = std::min<uint16>(milliseconds, 30000);
+		if (playerIndex < 0)
+		{
+			// All players
+			InputManager::instance().setControllerRumbleForPlayer(0, lowFrequencyRumble, highFrequencyRumble, milliseconds);
+			InputManager::instance().setControllerRumbleForPlayer(1, lowFrequencyRumble, highFrequencyRumble, milliseconds);
+		}
+		else if (playerIndex < 2)
+		{
+			InputManager::instance().setControllerRumbleForPlayer(playerIndex, lowFrequencyRumble, highFrequencyRumble, milliseconds);
+		}
 	}
 
 	void Input_setControllerLEDs(uint8 playerIndex, uint32 color)
@@ -842,17 +953,34 @@ namespace
 		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color(1.0f, 1.0f, 1.0f, (float)alpha / 255.0f), (float)angle / 128.0f * PI_FLOAT);
 	}
 
-	void Renderer_drawSpriteTinted(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint32 tintColor, int32 scale)
+	void Renderer_drawSpriteTinted(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue, float angle, uint32 tintColor, float scale)
+	{
+		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), angle, scale);
+	}
+
+	void Renderer_drawSpriteTinted2(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint32 tintColor, int32 scale)
 	{
 		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), (float)angle / 128.0f * PI_FLOAT, (float)scale / 65536.0f);
 	}
 
-	void Renderer_drawSpriteTinted2(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint32 tintColor, int32 scaleX, int32 scaleY)
+	void Renderer_drawSpriteTinted3(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue, float angle, uint32 tintColor, float scaleX, float scaleY)
+	{
+		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), angle, Vec2f(scaleX, scaleY));
+	}
+
+	void Renderer_drawSpriteTinted4(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint32 tintColor, int32 scaleX, int32 scaleY)
 	{
 		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), (float)angle / 128.0f * PI_FLOAT, Vec2f((float)scaleX, (float)scaleY) / 65536.0f);
 	}
 
-	void Renderer_drawSpriteTransformed(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue, uint32 tintColor, int32 transform11, int32 transform12, int32 transform21, int32 transform22)
+	void Renderer_drawSpriteTransformed(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue, uint32 tintColor, float transform11, float transform12, float transform21, float transform22)
+	{
+		Transform2D transformation;
+		transformation.setByMatrix(transform11, transform12, transform21, transform22);
+		RenderParts::instance().getSpriteManager().drawCustomSpriteWithTransform(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), transformation);
+	}
+
+	void Renderer_drawSpriteTransformed2(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue, uint32 tintColor, int32 transform11, int32 transform12, int32 transform21, int32 transform22)
 	{
 		Transform2D transformation;
 		transformation.setByMatrix((float)transform11 / 65536.0f, (float)transform12 / 65536.0f, (float)transform21 / 65536.0f, (float)transform22 / 65536.0f);
@@ -949,9 +1077,9 @@ namespace
 					if (containsByPredicate(textString, [](char ch) { return (ch >= 'A' && ch <= 'Z'); } ))
 					{
 						// Convert to lowercase and try again
-						String str = textString;
-						str.lowerCase();
-						sfxId = rmx::getMurmur2_64(str);
+						String tempStr = textString;
+						tempStr.lowerCase();
+						sfxId = rmx::getMurmur2_64(tempStr);
 						EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
 					}
 				}
@@ -969,12 +1097,22 @@ namespace
 		EngineMain::instance().getAudioOut().stopChannel(channel);
 	}
 
-	void Audio_fadeInChannel(uint8 channel, uint16 length)
+	void Audio_fadeInChannel(uint8 channel, float seconds)
+	{
+		EngineMain::instance().getAudioOut().fadeInChannel(channel, seconds);
+	}
+
+	void Audio_fadeInChannel2(uint8 channel, uint16 length)
 	{
 		EngineMain::instance().getAudioOut().fadeInChannel(channel, (float)length / 256.0f);
 	}
 
-	void Audio_fadeOutChannel(uint8 channel, uint16 length)
+	void Audio_fadeOutChannel(uint8 channel, float seconds)
+	{
+		EngineMain::instance().getAudioOut().fadeOutChannel(channel, seconds);
+	}
+
+	void Audio_fadeOutChannel2(uint8 channel, uint16 length)
 	{
 		EngineMain::instance().getAudioOut().fadeOutChannel(channel, (float)length / 256.0f);
 	}
@@ -984,7 +1122,15 @@ namespace
 		EngineMain::instance().getAudioOut().playOverride(sfxId, contextId, channelId, overriddenChannelId);
 	}
 
-	void Audio_enableAudioModifier(uint8 channel, uint8 context, lemon::StringRef postfix, uint32 relativeSpeed)
+	void Audio_enableAudioModifier(uint8 channel, uint8 context, lemon::StringRef postfix, float relativeSpeed)
+	{
+		if (postfix.isValid())
+		{
+			EngineMain::instance().getAudioOut().enableAudioModifier(channel, context, postfix.getString(), relativeSpeed);
+		}
+	}
+
+	void Audio_enableAudioModifier2(uint8 channel, uint8 context, lemon::StringRef postfix, uint32 relativeSpeed)
 	{
 		if (postfix.isValid())
 		{
@@ -1428,7 +1574,10 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(0, "index");
 
 		module.addNativeFunction("Input.setTouchInputMode", lemon::wrap(&Input_setTouchInputMode), defaultFlags)
-			.setParameterInfo(0, "index");
+			.setParameterInfo(0, "mode");
+
+		module.addNativeFunction("Input.resetControllerRumble", lemon::wrap(&Input_resetControllerRumble), defaultFlags)
+			.setParameterInfo(0, "playerIndex");
 
 		module.addNativeFunction("Input.setControllerRumble", lemon::wrap(&Input_setControllerRumble), defaultFlags)
 			.setParameterInfo(0, "playerIndex")
@@ -1702,10 +1851,46 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(5, "renderQueue")
 			.setParameterInfo(6, "angle")
 			.setParameterInfo(7, "tintColor")
+			.setParameterInfo(8, "scale");
+
+		module.addNativeFunction("Renderer.drawSpriteTinted", lemon::wrap(&Renderer_drawSpriteTinted3), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "px")
+			.setParameterInfo(2, "py")
+			.setParameterInfo(3, "atex")
+			.setParameterInfo(4, "flags")
+			.setParameterInfo(5, "renderQueue")
+			.setParameterInfo(6, "angle")
+			.setParameterInfo(7, "tintColor")
+			.setParameterInfo(8, "scaleX")
+			.setParameterInfo(9, "scaleY");
+
+		module.addNativeFunction("Renderer.drawSpriteTinted", lemon::wrap(&Renderer_drawSpriteTinted4), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "px")
+			.setParameterInfo(2, "py")
+			.setParameterInfo(3, "atex")
+			.setParameterInfo(4, "flags")
+			.setParameterInfo(5, "renderQueue")
+			.setParameterInfo(6, "angle")
+			.setParameterInfo(7, "tintColor")
 			.setParameterInfo(8, "scaleX")
 			.setParameterInfo(9, "scaleY");
 
 		module.addNativeFunction("Renderer.drawSpriteTransformed", lemon::wrap(&Renderer_drawSpriteTransformed), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "px")
+			.setParameterInfo(2, "py")
+			.setParameterInfo(3, "atex")
+			.setParameterInfo(4, "flags")
+			.setParameterInfo(5, "renderQueue")
+			.setParameterInfo(6, "tintColor")
+			.setParameterInfo(7, "transform11")
+			.setParameterInfo(8, "transform12")
+			.setParameterInfo(9, "transform21")
+			.setParameterInfo(10, "transform22");
+
+		module.addNativeFunction("Renderer.drawSpriteTransformed", lemon::wrap(&Renderer_drawSpriteTransformed2), defaultFlags)
 			.setParameterInfo(0, "key")
 			.setParameterInfo(1, "px")
 			.setParameterInfo(2, "py")
@@ -1825,9 +2010,17 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		module.addNativeFunction("Audio.fadeInChannel", lemon::wrap(&Audio_fadeInChannel), defaultFlags)
 			.setParameterInfo(0, "channel")
+			.setParameterInfo(1, "seconds");
+
+		module.addNativeFunction("Audio.fadeInChannel", lemon::wrap(&Audio_fadeInChannel2), defaultFlags)
+			.setParameterInfo(0, "channel")
 			.setParameterInfo(1, "length");
 
 		module.addNativeFunction("Audio.fadeOutChannel", lemon::wrap(&Audio_fadeOutChannel), defaultFlags)
+			.setParameterInfo(0, "channel")
+			.setParameterInfo(1, "seconds");
+
+		module.addNativeFunction("Audio.fadeOutChannel", lemon::wrap(&Audio_fadeOutChannel2), defaultFlags)
 			.setParameterInfo(0, "channel")
 			.setParameterInfo(1, "length");
 
@@ -1838,6 +2031,12 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(3, "overriddenChannelId");
 
 		module.addNativeFunction("Audio.enableAudioModifier", lemon::wrap(&Audio_enableAudioModifier), defaultFlags)
+			.setParameterInfo(0, "channel")
+			.setParameterInfo(1, "context")
+			.setParameterInfo(2, "postfix")
+			.setParameterInfo(3, "relativeSpeed");
+
+		module.addNativeFunction("Audio.enableAudioModifier", lemon::wrap(&Audio_enableAudioModifier2), defaultFlags)
 			.setParameterInfo(0, "channel")
 			.setParameterInfo(1, "context")
 			.setParameterInfo(2, "postfix")
@@ -1869,7 +2068,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		}
 
 		module.addNativeFunction("debugLog", lemon::wrap(&debugLog), defaultFlags)
-			.setParameterInfo(0, "text");
+			.setParameterInfo(0, "value");
 
 		module.addNativeFunction("debugLogColors", lemon::wrap(&debugLogColors), defaultFlags)
 			.setParameterInfo(0, "name")

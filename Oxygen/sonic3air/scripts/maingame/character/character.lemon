@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2022 by Eukaryot
+	Copyright (C) 2017-2023 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -878,6 +878,9 @@ function void UpdateTailsFlight_innerB()
 			if (((level.framecounter.low + 8) & 0x0f) == 0)
 			{
 				playSound((char.state == char.state.TAILS_FLYTIRED) ? 0xbb : 0xba)
+			#if STANDALONE
+				Input.setControllerRumbleByAddress(A0, 0.0f, 0.1f, 150)
+			#endif
 			}
 		}
 	}
@@ -1328,12 +1331,15 @@ function void UpdateKnucklesGlideCollision()
 							Character.ClearEnemiesOnScreen()
 							playSound(0x49)
 						#if STANDALONE
-							Input.setControllerRumble(0, 0x8000, 0xffff, 200)
+							Input.setControllerRumbleByAddress(A0, 0.5f, 1.0f, 200)
 						#endif
 						}
 						else
 						{
 							playSound(SFX_GRAB)
+						#if STANDALONE
+							Input.setControllerRumbleByAddress(A0, 0.5f, 0.0f, 200)
+						#endif
 						}
 
 						char.groundspeed = 0
@@ -1475,6 +1481,9 @@ function void UpdateKnucklesGlideCollision()
 				{
 					playSound(0x7e)
 				}
+			#if STANDALONE
+				Input.setControllerRumbleByAddress(A0, 0.2f, 0.2f, 100)
+			#endif
 			}
 			else
 			{
@@ -2766,7 +2775,7 @@ function void Character.updateJumpMoves()
 							Audio.playAudio("dropdash_charge", AudioContext.CONTEXT_SOUND)
 						}
 					}
-					Input.setControllerRumble(0, 0, 0x4000, 100)
+					Input.setControllerRumbleByAddress(A0, 0.0f, 0.25f, 100)
 				}
 				else if (sonic.dropdash_counter > 0)
 				{
@@ -3941,7 +3950,9 @@ function bool Character.UpdateSpindash()
 				char.spindash_charge = min(char.spindash_charge + 0x200, 0x800)
 				playSound(SFX_SPINDASH_CHARGE)
 			}
-			Input.setControllerRumble(0, 0, 0x3000, 100)
+		#if STANDALONE
+			Input.setControllerRumbleByAddress(A0, 0.0f, 0.2f, 100)
+		#endif
 		}
 		else
 		{
@@ -4011,7 +4022,9 @@ function void releaseSpindash()
 	u8[A6 + 0x20] = 0
 
 	playSound(SFX_SPINDASH_RELEASE)
-	Input.setControllerRumble(0, 0, 0xffff, 150)
+#if STANDALONE
+	Input.setControllerRumbleByAddress(A0, 0.0f, 1.0f, 150)
+#endif
 }
 
 
@@ -4104,10 +4117,12 @@ function void releaseDropDash()
 	}
 
 	Audio.playAudio("dropdash_release", AudioContext.CONTEXT_SOUND)
+#if STANDALONE
 	if (super.active)
-		Input.setControllerRumble(0, 0x8000, 0xffff, 200)
+		Input.setControllerRumbleByAddress(A0, 0.5f, 1.0f, 200)
 	else
-		Input.setControllerRumble(0, 0, 0xffff, 150)
+		Input.setControllerRumbleByAddress(A0, 0.0f, 1.0f, 150)
+#endif
 }
 
 
@@ -4149,7 +4164,9 @@ function bool Character.updateSuperPeelout()
 			if (abs(char.groundspeed) >= 0x0a00)
 				sonic.fastrunanim.timer = 30
 
-			Input.setControllerRumble(0, 0, 0x4000, 100)
+		#if STANDALONE
+			Input.setControllerRumbleByAddress(A0, 0.0f, 0.25f, 100)
+		#endif
 		}
 		else
 		{
@@ -4195,7 +4212,7 @@ function void releaseSuperPeelout()
 	}
 
 	Audio.playAudio("peelout_release", AudioContext.CONTEXT_SOUND)
-	Input.setControllerRumble(0, 0, 0xffff, 150)
+	Input.setControllerRumbleByAddress(A0, 0.0f, 1.0f, 150)
 }
 #endif
 

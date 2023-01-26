@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2022 by Eukaryot
+	Copyright (C) 2017-2023 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -1689,7 +1689,7 @@ function void fn009b62()
 			{
 				playMusic(0x66)
 			#if STANDALONE
-				Input.setControllerRumble(0, 0x6000, 0xffff, 400)
+				Input.setControllerRumble(-1, 0.4f, 1.0f, 400)
 			#endif
 			}
 			bluespheres.lifted_height += (bluespheres.lifted_height >= 0x7d) ? 4 : (bluespheres.lifted_height >= 0x3e) ? 3 : 2

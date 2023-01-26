@@ -1,3 +1,11 @@
+/*
+*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
+*	Copyright (C) 2017-2023 by Eukaryot
+*
+*	Published under the GNU GPLv3 open source software license, see license.txt
+*	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
 #define RMX_LIB
 
 #include "lemon/compiler/Compiler.h"
@@ -70,15 +78,41 @@ void logValueStr(int64 key)
 	std::cout << storedString->getString() << std::endl;
 }
 
-void debugLog(uint64 stringHash)
+void debugLog(AnyTypeWrapper param)
 {
-	Runtime* runtime = Runtime::getActiveRuntime();
-	RMX_CHECK(nullptr != runtime, "No lemon script runtime active", return);
+	if (param.mType == &PredefinedDataTypes::UINT_8)
+	{
+		std::cout << rmx::hexString(param.mValue.get<uint8>(), 2) << std::endl;
+	}
+	else if (param.mType == &PredefinedDataTypes::UINT_64)
+	{
+		std::cout << rmx::hexString(param.mValue.get<uint64>(), 8) << std::endl;
+	}
+	else if (param.mType == &PredefinedDataTypes::FLOAT)
+	{
+		std::cout << param.mValue.get<float>() << std::endl;
+	}
+	else if (param.mType == &PredefinedDataTypes::DOUBLE)
+	{
+		std::cout << param.mValue.get<double>() << std::endl;
+	}
+	else if (param.mType == &PredefinedDataTypes::STRING)
+	{
+		Runtime* runtime = Runtime::getActiveRuntime();
+		RMX_CHECK(nullptr != runtime, "No lemon script runtime active", return);
+		const FlyweightString* storedString = runtime->resolveStringByKey(param.mValue.get<uint64>());
+		RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
+		std::cout << storedString->getString() << std::endl;
+	}
+	else
+	{
+		std::cout << "Oops, type support not implemented yet" << std::endl;
+	}
+}
 
-	const FlyweightString* storedString = runtime->resolveStringByKey((uint64)stringHash);
-	RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
-
-	std::cout << storedString->getString() << std::endl;
+void logFloat(float value)
+{
+	std::cout << value << std::endl;
 }
 
 uint32 valueD0 = 0;
@@ -182,6 +216,44 @@ void doNothing()	// This function serves only as a point where to place breakpoi
 }
 
 
+struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
+{
+	Runtime& mRuntime;
+	bool mStopped = false;
+
+	inline RuntimeExecuteConnector(Runtime& runtime) : mRuntime(runtime) {}
+
+	bool handleCall(const lemon::Function* func, uint64 callTarget) override
+	{
+		if (nullptr == func)
+		{
+			throw std::runtime_error("Call failed, probably due to an invalid function");
+		}
+		return true;
+	}
+
+	bool handleReturn() override
+	{
+		if (mRuntime.getMainControlFlow().getCallStack().count == 0)
+		{
+			mStopped = true;
+			return false;
+		}
+		return true;
+	}
+
+	bool handleExternalCall(uint64 address) override
+	{
+		return true;
+	}
+
+	bool handleExternalJump(uint64 address) override
+	{
+		return true;
+	}
+};
+
+
 int main(int argc, char** argv)
 {
 	INIT_RMX;
@@ -201,6 +273,7 @@ int main(int argc, char** argv)
 	var2.mSetter = logValueStr;
 
 	module.addNativeFunction("debugLog", lemon::wrap(&debugLog));
+	module.addNativeFunction("logFloat", lemon::wrap(&logFloat));
 	module.addNativeFunction("maximum", wrap(&testFunctionA), Function::Flag::COMPILE_TIME_CONSTANT);
 	module.addNativeFunction("maximum", wrap(&testFunctionB), Function::Flag::COMPILE_TIME_CONSTANT);
 
@@ -215,9 +288,9 @@ int main(int argc, char** argv)
 
 	{
 		std::cout << "=== Compilation ===\r\n";
-		lemon::Compiler::CompileOptions options;
+		lemon::CompileOptions options;
 		Compiler compiler(module, globalsLookup, options);
-		const bool compileSuccess = compiler.loadScript(L"script01.lemon");
+		const bool compileSuccess = compiler.loadScript(L"script/mainscript.lemon");
 		if (!compileSuccess)
 		{
 			for (const Compiler::ErrorMessage& error : compiler.getErrors())
@@ -279,41 +352,14 @@ int main(int argc, char** argv)
 		runtime.setMemoryAccessHandler(&memoryAccess);
 		runtime.callFunction(*func);
 
-		Runtime::ExecuteResult result;
-		bool running = true;
-		while (running)
+		RuntimeExecuteConnector connector(runtime);
+		while (!connector.mStopped)
 		{
-			runtime.executeSteps(result, 10);
-			switch (result.mResult)
+			runtime.executeSteps(connector, 10, 0);
+
+			if (connector.mResult == Runtime::ExecuteResult::Result::HALT)
 			{
-				case Runtime::ExecuteResult::CALL:
-				{
-					if (nullptr == runtime.handleResultCall(result))
-					{
-						throw std::runtime_error("Call failed, probably due to an invalid function");
-					}
-					break;
-				}
-
-				case Runtime::ExecuteResult::RETURN:
-				{
-					if (runtime.getMainControlFlow().getCallStack().count == 0)
-						running = false;
-					break;
-				}
-
-				case Runtime::ExecuteResult::EXTERNAL_CALL:
-				case Runtime::ExecuteResult::EXTERNAL_JUMP:
-				{
-					doNothing();
-					break;
-				}
-
-				case Runtime::ExecuteResult::HALT:
-				{
-					running = false;
-					break;
-				}
+				connector.mStopped = true;
 			}
 		}
 

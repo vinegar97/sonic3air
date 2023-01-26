@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2022 by Eukaryot
+	Copyright (C) 2017-2023 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -68,7 +68,7 @@ function void Character.TailsAI.Update()
 	//  - 0x013d4a	-> tails.ai_routine = 0x06	-> Normal state, controlled by player or AI
 	//  - 0x013f40	-> tails.ai_routine = 0x08	-> Automatically spindashing up slopes
 	//  - 0x013fc0	-> tails.ai_routine = 0x0a	-> Inactive (e.g. in AIZ Intro with Sonic & Tails, but not with Sonic alone)
-	//  - 0x013fc2	-> tails.ai_routine = 0x0c	-> Flying Sonic in automatically, Initialization 
+	//  - 0x013fc2	-> tails.ai_routine = 0x0c	-> Flying Sonic in automatically, Initialization
 	//  - 0x013ffa	-> tails.ai_routine = 0x0e	-> Flying Sonic in automatically (e.g. CNZ 1 start with Sonic & Tails)
 	//  - 0x01408a	-> tails.ai_routine = 0x10	-> Flying away to disappear      (e.g. CNZ 1 start with Sonic alone)
 	//  - 0x0140c6	-> tails.ai_routine = 0x12	-> Direct control in MGZ 2 boss, waiting (direct control by first player, used in MGZ 2 boss with Sonic)
@@ -273,8 +273,9 @@ function void Character.TailsAI.Init()
 		else if (global.zone_act == 0x0500 || global.zone_act == 0x0a00)	// ICZ 1 or SSZ (S/T)
 		{
 		#if STANDALONE
-			if (isMainCharacter(CHARACTER_KNUCKLES))
+			if (isMainCharacter(CHARACTER_KNUCKLES) && global.zone_act == 0x0500)
 			{
+				// For Knuckles & Tails in ICZ 1, make Tails fly in after a short time
 				tails.respawn_counter = 0
 				tails.ai_routine = 0x02
 				char.control_flags = 0x81
@@ -287,7 +288,6 @@ function void Character.TailsAI.Init()
 		#endif
 
 			// Disable Tails
-			// TODO: At least in SSZ, we should spawn Tails as well right from the start (he will reappear after a death anyway)
 			RespawnTails()
 			tails.ai_routine = 0x0a
 			char.control_flags = 0x83

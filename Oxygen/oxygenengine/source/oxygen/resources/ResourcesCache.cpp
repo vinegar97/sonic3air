@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,10 +10,10 @@
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/modding/ModManager.h"
-#include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/Logging.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 
 bool ResourcesCache::loadRom()

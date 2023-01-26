@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -33,7 +33,7 @@ public:
 		{
 			INVALID								= 0,
 
-			SETTING_FIX_GLITCHES				= 0x00000101,
+			SETTING_FIX_GLITCHES				= 0x00000102,
 			SETTING_NO_CONTROL_LOCK				= 0x00000201,
 			SETTING_TAILS_ASSIST_MODE			= 0x00000401,
 			SETTING_CANCEL_FLIGHT				= 0x00000501,

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -133,6 +133,12 @@ bool ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 			mScriptOptimizationLevel = -1;
 		}
 
+		if (mGameVersionInSettings < "22.12.17.0")
+		{
+			// Reset the SETTING_FIX_GLITCHES, after the default value changed
+			settingsMap.at(SharedDatabase::Setting::SETTING_FIX_GLITCHES).mCurrentValue = 2;
+		}
+
 		// Make corrections where needed
 		if (!settingsMap.empty())	// This is going to be empty when the macOS UI calls loadConfiguration externally, causing crash
 		{
@@ -213,6 +219,7 @@ void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 	{
 		JsonHelper devModeHelper(devModeJson);
 		devModeHelper.tryReadBool("EnforceDebugMode", mDevModeImpl.mEnforceDebugMode);
+		devModeHelper.tryReadBool("SkipExitConfirmation", mDevModeImpl.SkipExitConfirmation);
 	}
 
 	// Game server

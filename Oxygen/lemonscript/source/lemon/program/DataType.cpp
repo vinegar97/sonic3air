@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -32,6 +32,12 @@ namespace lemon
 		}
 	}
 
+	uint32 FloatDataType::getDataTypeHash() const
+	{
+		static const constexpr uint32 baseHash = ((uint32)Class::FLOAT) << 24;
+		return baseHash + (uint32)getBytes();
+	}
+
 
 	size_t DataTypeHelper::getSizeOfBaseType(BaseType baseType)
 	{
@@ -46,6 +52,8 @@ namespace lemon
 			case BaseType::INT_32:		return 4;
 			case BaseType::INT_64:		return 8;
 			case BaseType::INT_CONST:	return 8;
+			case BaseType::FLOAT:		return 4;
+			case BaseType::DOUBLE:		return 8;
 			default:					return 0;
 		}
 	}
@@ -63,21 +71,33 @@ namespace lemon
 			case BaseType::INT_32:		return &PredefinedDataTypes::INT_32;
 			case BaseType::INT_64:		return &PredefinedDataTypes::INT_64;
 			case BaseType::INT_CONST:	return &PredefinedDataTypes::CONST_INT;
+			case BaseType::FLOAT:		return &PredefinedDataTypes::FLOAT;
+			case BaseType::DOUBLE:		return &PredefinedDataTypes::DOUBLE;
 			default:					return nullptr;
 		}
 	}
 
+	bool DataTypeHelper::isPureIntegerBaseCast(BaseCastType baseCastType)
+	{
+		const uint8 value = (uint8)baseCastType;
+		return (value > 0 && value < 0x20);
+	}
 
-	const DataTypeDefinition* DataTypeSerializer::readDataType(VectorBinarySerializer& serializer)
+
+	const DataTypeDefinition* DataTypeSerializer::getDataTypeFromSerializedId(uint8 dataTypeId)
 	{
 		// TODO: We definitely need a more sophisticated serialization to support more data types
-		const BaseType baseType = (BaseType)serializer.read<uint8>();
-		if ((uint8)baseType == 0x40)	// Some dumb placeholder magic number for string
+		if (dataTypeId == 0x41)			// Some dumb placeholder magic number for any
+		{
+			return &PredefinedDataTypes::ANY;
+		}
+		else if (dataTypeId == 0x40)	// Some dumb placeholder magic number for string
 		{
 			return &PredefinedDataTypes::STRING;
 		}
 		else
 		{
+			const BaseType baseType = (BaseType)dataTypeId;
 			switch (baseType)
 			{
 				case BaseType::VOID:		return &PredefinedDataTypes::VOID;
@@ -89,32 +109,48 @@ namespace lemon
 				case BaseType::INT_16:		return &PredefinedDataTypes::INT_16;
 				case BaseType::INT_32:		return &PredefinedDataTypes::INT_32;
 				case BaseType::INT_64:		return &PredefinedDataTypes::INT_64;
-					//case BaseType::BOOL:
+				//case BaseType::BOOL:
 				case BaseType::INT_CONST:	return &PredefinedDataTypes::CONST_INT;
+				case BaseType::FLOAT:		return &PredefinedDataTypes::FLOAT;
+				case BaseType::DOUBLE:		return &PredefinedDataTypes::DOUBLE;
+				default:					return &PredefinedDataTypes::VOID;
 			}
-			return &PredefinedDataTypes::VOID;
 		}
 	}
 
-	void DataTypeSerializer::writeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition* const dataTypeDefinition)
+	uint8 DataTypeSerializer::getSerializedIdForDataType(const DataTypeDefinition* const dataTypeDefinition)
 	{
 		// TODO: We definitely need a more sophisticated serialization to support more data types
 		if (nullptr == dataTypeDefinition)
 		{
-			serializer.write<uint8>(0);
+			return 0;
+		}
+		else if (dataTypeDefinition == &PredefinedDataTypes::ANY)
+		{
+			return 0x41;	// The same dumb magic number as above
 		}
 		else if (dataTypeDefinition == &PredefinedDataTypes::STRING)
 		{
-			serializer.write<uint8>(0x40);	// The same dumb magic number as above
+			return 0x40;	// The same dumb magic number as above
 		}
 		else if (dataTypeDefinition->getClass() == DataTypeDefinition::Class::INTEGER && dataTypeDefinition->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::BOOLEAN)
 		{
-			serializer.writeAs<uint8>(BaseType::BOOL);
+			return (uint8)BaseType::BOOL;
 		}
 		else
 		{
-			serializer.writeAs<uint8>(dataTypeDefinition->getBaseType());
+			return (uint8)dataTypeDefinition->getBaseType();
 		}
+	}
+
+	const DataTypeDefinition* DataTypeSerializer::readDataType(VectorBinarySerializer& serializer)
+	{
+		return getDataTypeFromSerializedId(serializer.read<uint8>());
+	}
+
+	void DataTypeSerializer::writeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition* const dataTypeDefinition)
+	{
+		serializer.write<uint8>(getSerializedIdForDataType(dataTypeDefinition));
 	}
 
 	void DataTypeSerializer::serializeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition*& dataTypeDefinition)

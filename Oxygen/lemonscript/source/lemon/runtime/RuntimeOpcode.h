@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -34,10 +34,9 @@ namespace lemon
 	public:
 		enum Flags
 		{
-			FLAG_CALL_INLINE_RESOLVED		= 0x10,		// For CALL opcodes only: Call target is already resolved and is a user function meant to be inline executed
 			FLAG_CALL_IS_BASE_CALL			= 0x20,		// For CALL opcodes only: It is a base call
 			FLAG_CALL_TARGET_RESOLVED		= 0x40,		// For CALL opcodes only: Call target is already resolved and can be found in the parameter (as pointer)
-			FLAG_CALL_TARGET_RUNTIME_FUNC	= 0x80		// For CALL opcodes only: Resolved call target is a RuntimeFunction, not a Function
+			FLAG_CALL_TARGET_RUNTIME_FUNC	= 0x80		// For CALL opcodes only: Call target is resolved and is a RuntimeFunction, not a Function
 		};
 
 		ExecFunc mExecFunc;

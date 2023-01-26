@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -16,10 +16,11 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
-#include "oxygen/base/CrashHandler.h"
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/download/DownloadManager.h"
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/software/SoftwareDrawer.h"
+#include "oxygen/platform/CrashHandler.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/resources/FontCollection.h"
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/file/PackedFileProvider.h"
@@ -50,6 +51,7 @@ struct EngineMain::Internal
 	PersistentData	mPersistentData;
 	VideoOut		mVideoOut;
 	ControlsIn		mControlsIn;
+	DownloadManager mDownloadManager;
 
 #if defined(PLATFORM_ANDROID)
 	AndroidJavaInterface mAndroidJavaInterface;
@@ -126,6 +128,20 @@ void EngineMain::onActiveModsChanged()
 
 	// Scripts need to be reloaded
 	Application::instance().getSimulation().reloadScriptsAfterModsChange();
+}
+
+bool EngineMain::reloadFilePackage(std::wstring_view packageName, bool forceReload)
+{
+	GameProfile& gameProfile = GameProfile::instance();
+	for (size_t index = 0; index < gameProfile.mDataPackages.size(); ++index)
+	{
+		const GameProfile::DataPackage& dataPackage = gameProfile.mDataPackages[index];
+		if (dataPackage.mFilename == packageName)
+		{
+			return loadFilePackageByIndex(index, forceReload);
+		}
+	}
+	return false;
 }
 
 uint32 EngineMain::getPlatformFlags() const
@@ -370,6 +386,7 @@ void EngineMain::shutdown()
 	RMX_LOG_INFO("System shutdown");
 	FTX::Audio->exit();
 	FTX::System->exit();
+	FTX::JobManager->~JobManager();
 
 	mInternal.mModManager.copyModSettingsToConfig();
 	Configuration::instance().saveSettings();
@@ -456,37 +473,76 @@ bool EngineMain::initFileSystem()
 	}
 
 	// Add package providers
-	GameProfile& gameProfile = GameProfile::instance();
-	int priority = 0x20;
-	for (const GameProfile::DataPackage& dataPackage : gameProfile.mDataPackages)
-	{
-		const std::wstring basePath = config.mGameDataPath + L"/";
-		PackedFileProvider* provider = new PackedFileProvider(basePath + dataPackage.mFilename);
-		if (provider->isLoaded())
-		{
-			// Mount to "data" in any case, otherwise OxygenApp won't work when the game data path is somewhere different
-			FTX::FileSystem->addManagedFileProvider(*provider);
-			FTX::FileSystem->addMountPoint(*provider, L"data/", L"data/", priority);
-		}
-		else
-		{
-			// Oops, could not load package file
-			delete provider;
+	return loadFilePackages(false);
+}
 
+bool EngineMain::loadFilePackages(bool forceReload)
+{
+	Configuration& config = Configuration::instance();
+	GameProfile& gameProfile = GameProfile::instance();
+	mPackedFileProviders.resize(gameProfile.mDataPackages.size(), nullptr);
+
+	for (size_t index = 0; index < gameProfile.mDataPackages.size(); ++index)
+	{
+		const bool success = loadFilePackageByIndex(index, forceReload);
+		if (!success)
+		{
 			// Is this a required package after all?
+			const GameProfile::DataPackage& dataPackage = gameProfile.mDataPackages[index];
 			if (dataPackage.mRequired)
 			{
-				// We still accept missing packages if data is present in unpacked form
+				// We still accept missing packages if any data is present in unpacked form
 				//  -> Just checking the "icon.png" to know whether that's the case
 				static const bool hasUnpackedData = FTX::FileSystem->exists(config.mGameDataPath + L"/images/icon.png");
-				RMX_CHECK(hasUnpackedData, "Could not find or open package '" << *WString(basePath + dataPackage.mFilename).toString() << "', application will close now again.", return false);
+				RMX_CHECK(hasUnpackedData, "Could not find or open package '" << *WString(dataPackage.mFilename).toString() << "', application will close now again.", return false);
 			}
 		}
-
-		++priority;
 	}
 
 	return true;
+}
+
+bool EngineMain::loadFilePackageByIndex(size_t index, bool forceReload)
+{
+	// Already loaded?
+	if (nullptr != mPackedFileProviders[index])
+	{
+		if (forceReload)
+		{
+			FTX::FileSystem->destroyManagedFileProvider(*mPackedFileProviders[index]);
+			mPackedFileProviders[index] = nullptr;
+		}
+		else
+		{
+			// Just ignore that one, it's already loaded
+			return true;
+		}
+	}
+
+	const GameProfile::DataPackage& dataPackage = GameProfile::instance().mDataPackages[index];
+	Configuration& config = Configuration::instance();
+
+	// First try loading from game installation
+	const std::wstring gameDataBasePath = config.mGameDataPath + L"/";
+	PackedFileProvider* provider = PackedFileProvider::createPackedFileProvider(gameDataBasePath + dataPackage.mFilename);
+	if (nullptr == provider)
+	{
+		// Then try loading from save data (e.g. downloaded packages)
+		const std::wstring saveDataBasePath = config.mAppDataPath + L"/data/";
+		provider = PackedFileProvider::createPackedFileProvider(saveDataBasePath + dataPackage.mFilename);
+	}
+
+	if (nullptr != provider)
+	{
+		// Mount to "data" in any case, otherwise OxygenApp won't work when the game data path is somewhere different
+		FTX::FileSystem->addManagedFileProvider(*provider);
+		FTX::FileSystem->addMountPoint(*provider, L"data/", L"data/", 0x20 + (int)index);
+		mPackedFileProviders[index] = provider;
+		return true;
+	}
+
+	// Failed
+	return false;
 }
 
 bool EngineMain::createWindow()

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -73,7 +73,25 @@ struct PackedFileProvider::Internal
 
 
 
-PackedFileProvider::PackedFileProvider(const std::wstring& packageFilename) :
+PackedFileProvider* PackedFileProvider::createPackedFileProvider(std::wstring_view packageFilename)
+{
+	if (!FTX::FileSystem->exists(packageFilename))
+		return nullptr;
+
+	PackedFileProvider* provider = new PackedFileProvider(packageFilename);
+	if (provider->isLoaded())
+	{
+		return provider;
+	}
+	else
+	{
+		// Oops, could not load package file
+		delete provider;
+		return nullptr;
+	}
+}
+
+PackedFileProvider::PackedFileProvider(std::wstring_view packageFilename) :
 	mInternal(*new Internal())
 {
 	// Load the package if there is one

@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2022 by Eukaryot
+	Copyright (C) 2017-2023 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -386,7 +386,7 @@ function void fn056dca()
 	}
 
 #if STANDALONE
-	if (Game.getSetting(SETTING_FIX_GLITCHES))
+	if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
 	{
 		// Additional hard-coded check to make sure that level.display_routine is 0 when reaching the boss area
 		//  -> This prevents the glitch that act 2 won't properly load after the boss fight

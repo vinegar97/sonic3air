@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2022 by Eukaryot
+	Copyright (C) 2017-2023 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -129,7 +129,7 @@ function bool BossSOZ1.slideAsRock()
 		{
 			// Spawn dust effects
 			// "spawnIdenticalChildObjects(0x07740a)" replaced by:
-			spawnChildObjects(0x07706c, 0, 4, 6)
+			spawnChildObjects(0x07706c, 0, 5, 6)
 		}
 	}
 

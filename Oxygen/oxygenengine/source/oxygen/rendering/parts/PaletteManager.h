@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -44,7 +44,7 @@ public:
 	void setGlobalComponentTint(const Vec4f& tintColor, const Vec4f& addedColor);
 
 public:
-	uint8 mSplitPositionY = 0xff;
+	int mSplitPositionY = 0xffff;	// Use some large value as default that is definitely larger than any responable screen height
 
 private:
 	struct PackedPaletteColor

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -39,7 +39,7 @@ void AudioOut::startup()
 	AudioOutBase::startup();
 
 	// Switch soundtrack selection if remastered soundtrack is not available
-	if (mAudioCollection.getNumSourcesByPackageType(AudioCollection::Package::REMASTERED) == 0)
+	if (!mLoadedRemasteredSoundtrack)
 	{
 		ConfigurationImpl::instance().mActiveSoundtrack = 0;
 	}

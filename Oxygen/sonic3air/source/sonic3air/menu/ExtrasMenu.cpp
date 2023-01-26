@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -29,13 +29,14 @@ namespace
 
 	bool showExtrasMenuTabContent(int tabIndex)
 	{
-	#if defined(ENDUSER)
 		if (tabIndex == 2)
 		{
-			// Achievements are hidden if dev mode or debug mode is active
-			return (Game::instance().getSetting(SharedDatabase::Setting::SETTING_DEBUG_MODE, true) == 0 && !EngineMain::getDelegate().useDeveloperFeatures());
+			// Achievements are hidden if debug mode is active (but not for dev mode)
+			if (!EngineMain::getDelegate().useDeveloperFeatures())
+			{
+				return (Game::instance().getSetting(SharedDatabase::Setting::SETTING_DEBUG_MODE, true) == 0);
+			}
 		}
-	#endif
 		return true;
 	}
 }

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -53,7 +53,7 @@ UpdateCheck::UpdateCheck()
 	// Test version (Windows only)
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x22081300;
+		definition.mVersionNumber = 0x22121500;
 		definition.mReleaseChannel = ReleaseChannel::TEST;
 		definition.addPlatform(Platform::WINDOWS);
 		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";

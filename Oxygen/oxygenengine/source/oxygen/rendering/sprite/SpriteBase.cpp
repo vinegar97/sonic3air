@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2022 by Eukaryot
+*	Copyright (C) 2017-2023 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -19,9 +19,9 @@ namespace spritebaseinternal
 		const int alpha = srcPtr[3];
 		const int oneMinusAlpha = 0x100 - alpha;
 
-		dstPtr[0] = ((int)srcPtr[0] * alpha + (int)dstPtr[0] * oneMinusAlpha) >> 8;
-		dstPtr[1] = ((int)srcPtr[1] * alpha + (int)dstPtr[1] * oneMinusAlpha) >> 8;
-		dstPtr[2] = ((int)srcPtr[2] * alpha + (int)dstPtr[2] * oneMinusAlpha) >> 8;
+		dstPtr[0] = (uint8)(((int)srcPtr[0] * alpha + (int)dstPtr[0] * oneMinusAlpha) >> 8);
+		dstPtr[1] = (uint8)(((int)srcPtr[1] * alpha + (int)dstPtr[1] * oneMinusAlpha) >> 8);
+		dstPtr[2] = (uint8)(((int)srcPtr[2] * alpha + (int)dstPtr[2] * oneMinusAlpha) >> 8);
 		return dst | 0xff000000;
 	}
 
@@ -187,10 +187,10 @@ namespace spritebaseinternal
 		{
 			Vec2f min(1e10f, 1e10f);
 			Vec2f max(-1e10f, -1e10f);
-			const Vec2i corners[4] = { Vec2i(0, 0), Vec2i(sourceBitmap.getWidth() - 1, 0), Vec2i(0, sourceBitmap.getHeight() - 1), Vec2i(sourceBitmap.getWidth() - 1, sourceBitmap.getHeight() - 1) };
+			const Vec2i corners[4] = { Vec2i(0, 0), Vec2i(sourceBitmap.getWidth(), 0), Vec2i(0, sourceBitmap.getHeight()), Vec2i(sourceBitmap.getWidth(), sourceBitmap.getHeight()) };
 			for (int i = 0; i < 4; ++i)
 			{
-				const Vec2f localCorner((float)(corners[i].x + offset.x + 0.5f), (float)(corners[i].y + offset.y + 0.5f));
+				const Vec2f localCorner((float)(corners[i].x + offset.x), (float)(corners[i].y + offset.y));
 				const float screenCornerX = destPosition.x + localCorner.x * blitOptions.mTransform[0] + localCorner.y * blitOptions.mTransform[1];
 				const float screenCornerY = destPosition.y + localCorner.x * blitOptions.mTransform[2] + localCorner.y * blitOptions.mTransform[3];
 				min.x = std::min(screenCornerX, min.x);
