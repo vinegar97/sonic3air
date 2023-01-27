@@ -283,7 +283,7 @@ function void MonitorIntact.Init()
 		{
 			objA0.animation.sprite = 0x0b
 		#if STANDALONE
-			objA0.update_address = 0x01d61a		// Needed for render hook, simply calls "DrawOrUnloadObject"
+			objA0.update_address = addressof(MonitorIntact.Render)		// Needed for render hook, simply calls "DrawOrUnloadObject"
 		#else
 			objA0.update_address = addressof(DrawOrUnloadObject)
 		#endif
@@ -353,7 +353,7 @@ function void fn01d61e()
 	// Broken monitor
 	if (objA0.animation.sprite == 0x0b)
 	{
-		objA0.update_address = 0x01d61a
+		objA0.update_address = addressof(MonitorIntact.Render)
 	}
 
 	Object.animationUpdate(0x01db3a)
