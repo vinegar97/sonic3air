@@ -855,6 +855,7 @@ function void UpdateTailsFlight_innerB()
 		// Flying
 		if (competition_mode.active)
 		{
+			// Not really clear why this is here, competition mode Tails doesn't seem to even use this function
 			char.state = char.state.TAILS_FLYDOWN
 		}
 		else
@@ -4744,10 +4745,12 @@ function void Character.UpdateControlOnGroundShared()
 			u8 angle = (D0.u8 + 0x20) & 0xc0
 			if (angle == 0)
 			{
+				// Upright
 				char.velocity.y += D1.s16
 			}
 			else if (angle == 0x40)
 			{
+				// Left wall
 				char.velocity.x -= D1.s16
 				char.groundspeed = 0
 				if (char.flags & char.flag.FACING_LEFT)
@@ -4757,10 +4760,12 @@ function void Character.UpdateControlOnGroundShared()
 			}
 			else if (angle == 0x80)
 			{
+				// Upside down
 				char.velocity.y -= D1.s16
 			}
 			else
 			{
+				// Right wall
 				char.velocity.x += D1.s16
 				char.groundspeed = 0
 				if ((char.flags & char.flag.FACING_LEFT) == 0)
@@ -5086,17 +5091,14 @@ function void Character.OnCollisionWithDynamicObject()
 	{
 		// Collision is an enemy, i.e. is harmful, but can be attacked
 		bool attacking = false
-		if (char.bonus_effect & char.bonus.INVINCIBLE)
-		{
-			attacking = true
-		}
-		else if (char.state == char.state.ROLLING || char.state == char.state.SPINDASH)
+		if (char.bonus_effect & char.bonus.INVINCIBLE || char.state == char.state.ROLLING || char.state == char.state.SPINDASH)
 		{
 			attacking = true
 		}
 	#if STANDALONE
 		else if (Game.getSetting(SETTING_DROPDASH) && char.character == CHARACTER_SONIC && char.state == char.state.SONIC_DROPDASH)
 		{
+			// Count Sonic's drop dash as a rolling state
 			attacking = true
 		}
 	#endif
@@ -5106,14 +5108,17 @@ function void Character.OnCollisionWithDynamicObject()
 			bool isThreat = false
 			if (char.character == CHARACTER_KNUCKLES)
 			{
+				// Check for Knuckles' gliding and ground slide states
 				isThreat = (char.double_jump_state != 1 && char.double_jump_state != 3)
 			}
 			else if (char.character == CHARACTER_SONIC || char.double_jump_state == 0 || (char.flags & char.flag.UNDERWATER))
 			{
+				// No real special conditions for Sonic besides the drop dash
 				isThreat = true
 			}
 			else
 			{
+				// Check for if the enemy is above Tails while flying
 				s16 dx = char.position.x.u16 - objA1.position.x.u16
 				s16 dy = char.position.y.u16 - objA1.position.y.u16
 				D0.u8 = lookupAngleByVector(dx, dy) - 0x20

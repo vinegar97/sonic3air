@@ -655,9 +655,9 @@ function void fn05f26c()
 	}
 
 	// "spawnChildObjects(0x0601f0)" replaced by:
-	spawnChildObject(0x05f31c, 0x00, 0, 0)
-	spawnChildObject(0x05f3aa, 0x02, 0, 0)
-	spawnChildObject(0x05f410, 0x04, 0, 0)
+	spawnChildObject(0x05f31c, 0x00, 0, 0)		// Sonic in best ending final screen
+	spawnChildObject(0x05f3aa, 0x02, 0, 0)		// Tails in best ending final screen
+	spawnChildObject(0x05f410, 0x04, 0, 0)		// Knuckles in best ending final screen
 }
 
 

@@ -299,7 +299,7 @@ function u8 BlueSpheres.getNextOpenStageIndex()
 		if (emeraldCount < 7)
 		{
 			D1 = 5
-			D2 = hasSuperEmerald ? 2 : 0
+			D2 = hasSuperEmerald ? 2 : 0		// Use the correct emerald collection state based on the special stage set
 
 			while (u8[0xffffffb2 + D0.u16] != D2.u8)
 			{

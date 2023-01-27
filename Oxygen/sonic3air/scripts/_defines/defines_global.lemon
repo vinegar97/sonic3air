@@ -497,7 +497,7 @@ define level.HCZ_water_current_flags.tails		=  u8[0xfffff7c9]		// See above
 define player1.control_override	=  s8[0xfffff7ca]	// If set to 1 or 0xff, first character cannot be controlled
 define player2.control_override	=  s8[0xfffff7cb]	// If set to 1 or 0xff, second character cannot be controlled
 
-define score.bonus_counter		= u16[0xfffff7d0]	// Needed for increases bonusses when destroying multiple enemies in a row
+define score.bonus_counter		= u16[0xfffff7d0]	// Needed for increases bonuses when destroying multiple enemies in a row
 define results.time_bonus		= u16[0xfffff7d2]	// Time bonus value in level results; also used for Perfect bonus in special stage results
 define results.ring_bonus		= u16[0xfffff7d4]	// Ring bonus value in level and special stage results
 
