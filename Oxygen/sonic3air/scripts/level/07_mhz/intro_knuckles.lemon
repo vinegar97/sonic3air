@@ -303,7 +303,7 @@ function void fn06364e()
 
 #if !STANDALONE
 	// This should already have been set to exactly this value...
-	D0.u16 = 0x0700
+	D0.u16 = 0x0700		// Mushroom Hill Act 1
 	global.zone_act = D0.u16
 	global.zone_act.apparent = D0.u16
 #endif

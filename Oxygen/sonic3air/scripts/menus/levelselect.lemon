@@ -298,7 +298,7 @@ function bool LevelSelect.innerUpdate()
 				{
 					if (global.zone_act != 0x0400 && global.zone_act < 0x0700)
 					{
-						global.zone_act = 0x0700
+						global.zone_act = 0x0700		// Mushroom Hill Act 1
 						global.zone_act.apparent = 0x0700
 						checkpoint.zone_act = 0x0700
 						checkpoint.zone_act.apparent = 0x0700

@@ -273,7 +273,7 @@ function void fn061892()
 function void fn0618ac()
 {
 	global.stage_type = 2
-	global.zone_act = 0x1701
+	global.zone_act = 0x1701		// Hidden Palace emerald cave
 	global.zone_act.apparent = 0x1701
 	checkpoint.number = 0
 	level.restart.u8 = 1

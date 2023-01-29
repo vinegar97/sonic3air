@@ -1296,7 +1296,7 @@ function void fn01c664()
 		move_area.bottom.target = 0x0590
 		camera.update_routine += 2
 
-		if (global.zone_act.apparent == 1)
+		if (global.zone_act.apparent == 0x0001)
 		{
 		#if STANDALONE
 			move_area.left = 0x1040
@@ -1506,7 +1506,7 @@ function void fn01c78c()
 		move_area.bottom.target = 0x0590
 		camera.update_routine += 2
 
-		if (global.zone_act.apparent == 1)
+		if (global.zone_act.apparent == 0x0001)
 		{
 			move_area.left = 0x1040
 			camera.update_routine += 2

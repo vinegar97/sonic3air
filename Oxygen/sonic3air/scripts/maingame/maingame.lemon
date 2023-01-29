@@ -1049,7 +1049,7 @@ function void Level.InitializeWater()
 	}
 	else if (global.zone_act == 0x0001)		// Angel Island Act 2
 	{
-		levelHasWater = (global.zone_act.apparent != 0x01 || !isMainCharacter(CHARACTER_KNUCKLES))	// No water for the second part of AIZ 1 for Sonic and Tails
+		levelHasWater = (global.zone_act.apparent != 0x0001 || !isMainCharacter(CHARACTER_KNUCKLES))	// No water for the second part of AIZ 1 for Sonic and Tails
 	#if STANDALONE
 		if (!levelHasWater && checkpoint.number != 0)	// Checkpoint 0 is Knuckles' start
 		{
