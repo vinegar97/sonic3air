@@ -53,7 +53,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		if (gameMode != 0x0c && gameMode != 0x08)
 		{
 			// Check if fading out to special stage, which is only relevant when entering a super emerald stage from the HPZ emerald cave
-			if (gameMode != 0x34 || drawCharacterVariant == 2 || (char.mapping_offset != 0x146620 && char.mapping_offset != 0x148eb8 && char.mapping_offset != 0x14a8d6))
+			if (gameMode != 0x34 || drawCharacterVariant == 2 || (objA0.update_address != 0x010a94 && objA0.update_address != 0x01365c && objA0.update_address != 0x016444))
 				drawCharacterVariant = 0xff
 		}
 		if ((debug_mode.state & 0xff) == 1)		// Not when in object placement mode
