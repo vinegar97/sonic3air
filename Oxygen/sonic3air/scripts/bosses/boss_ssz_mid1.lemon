@@ -67,7 +67,7 @@ function void fn07a20e()
 
 	requestLoadingPatterns(0x7b)
 
-	Kosinski.addToDMAQueue(0x17edb4, 0x8d00)
+	Kosinski.addToDMAQueue(0x17edb4, 0x8d00)		// Green Hill Zone wrecking ball boss sprites
 
 	copyMemory(0xfffffca0, 0xfffffc20, 0x20)
 

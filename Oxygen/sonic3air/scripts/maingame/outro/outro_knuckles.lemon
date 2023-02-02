@@ -74,7 +74,7 @@ function void fn05e70e()
 		// "spawnChildObjects(0x0601b2)" replaced by:
 		spawnChildObject(0x05ebc6, 0x00, 4, -16)
 
-		Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)
+		Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)	// Master Emerald sprite
 
 		if (outro.ending_type != 0)
 		{
@@ -95,9 +95,9 @@ function void fn05e70e()
 	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
 #endif
 
-	Kosinski.addToDMAQueue(0x163b9a, 0x6200)
-	Kosinski.addToDMAQueue(0x163418, 0x3c60)
-	Kosinski.addToDMAQueue(0x162914, 0x4dc0)
+	Kosinski.addToDMAQueue(0x163b9a, 0x6200)	// Knuckles end pose sprites
+	Kosinski.addToDMAQueue(0x163418, 0x3c60)	// Tornado
+	Kosinski.addToDMAQueue(0x162914, 0x4dc0)	// Smaller ending sprites + Sonic pilot head + chain
 
 #if STANDALONE
 	Game.startSkippableCutscene()
@@ -747,7 +747,7 @@ function void fn05f74e()
 	copyMemory((A2+=8)-8, (A1+=8)-8, 8)
 	u16[A2] = 0
 
-	Kosinski.addToDMAQueue(0x17f738, 0x8380)
+	Kosinski.addToDMAQueue(0x17f738, 0x8380)		// Mecha Sonic effects sprites
 }
 
 
@@ -880,7 +880,7 @@ function void fn05f8c6()
 		u16[A1 + 0x32] = 0xfc80
 	}
 
-	Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)
+	Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)	// Master Emerald sprite
 }
 
 

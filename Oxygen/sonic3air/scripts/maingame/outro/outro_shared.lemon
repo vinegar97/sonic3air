@@ -870,7 +870,7 @@ function void fn05f94c()
 #endif
 	copyMemory(A2, A1, 0x10)
 
-	Kosinski.addToDMAQueue(0x165826, 0x76c0)
+	Kosinski.addToDMAQueue(0x165826, 0x76c0)		// Clouds
 }
 
 

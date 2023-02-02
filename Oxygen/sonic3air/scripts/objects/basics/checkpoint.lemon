@@ -296,7 +296,7 @@ function void fn02d3c8()
 		// Gumball machine
 		A1 = 0x187bec
 	}
-	Kosinski.addToDMAQueue(A1, 0xbd80)
+	Kosinski.addToDMAQueue(A1, 0xbd80)		// Checkpoint stars sprites
 }
 
 

@@ -85,8 +85,8 @@ function void fn075220()
 		u8[A1 + 0x2c] = MUSIC_MINIBOSS_2
 	}
 
-	Kosinski.addToDMAQueue(0x1680ca, 0x75a0)
-	Kosinski.addToDMAQueue(0x16908c, 0x93e0)
+	Kosinski.addToDMAQueue(0x1680ca, 0x75a0)		// Boss sprites
+	Kosinski.addToDMAQueue(0x16908c, 0x93e0)		// Rolling chopped tree log sprites
 
 	addPatternLoadingCue(0x075f48)
 

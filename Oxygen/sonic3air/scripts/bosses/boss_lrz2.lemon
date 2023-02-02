@@ -18,8 +18,8 @@ function void fn079786()
 	u16[0xfffffaa4] = A0.u16
 	objA0.update_address = 0x0797c6
 
-	Kosinski.addToDMAQueue(0x1715f2, 0x7980)
-	Kosinski.addToDMAQueue(0x1714c0, 0x90e0)
+	Kosinski.addToDMAQueue(0x1715f2, 0x7980)		// Boss sprites
+	Kosinski.addToDMAQueue(0x1714c0, 0x90e0)		// Debris sprites
 
 	addPatternLoadingCue(0x083d64)
 

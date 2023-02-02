@@ -89,7 +89,7 @@ function void fn07b2dc()
 		objA0.position.y.u16 = camera.position.y.u16 + 0xa0
 	}
 
-	Kosinski.addToDMAQueue(0x17f738, 0x8380)
+	Kosinski.addToDMAQueue(0x17f738, 0x8380)		// Mecha Sonic effects sprites
 
 	addPatternLoadingCue(0x083d64)
 

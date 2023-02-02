@@ -103,7 +103,7 @@ function void fn078592()
 	objA0.base_state = 0x04
 	objA0.countdown_value = 0x2f
 
-	Kosinski.addToDMAQueue(0x16fcda, 0x7f60)
+	Kosinski.addToDMAQueue(0x16fcda, 0x7f60)		// Boss sprites
 
 	addPatternLoadingCue(0x083d64)
 }

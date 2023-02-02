@@ -43,9 +43,9 @@ function void TitleCard.Init()
 		return
 	}
 
-	Kosinski.addToDMAQueue(0x0d6f28, 0xa000)
+	Kosinski.addToDMAQueue(0x0d6f28, 0xa000)		// Common title card sprites
 
-	A1 = (global.lock_on_state == 0) ? 0x15c3a2 : 0x15c2e0
+	A1 = (global.lock_on_state == 0) ? 0x15c3a2 : 0x15c2e0		// "Sonic 3 & Knuckles"/"Sonic & Knuckles" red banner title
 	Kosinski.addToDMAQueue(A1, 0xa200)
 
 	A1 = 0x0d6e46
@@ -53,7 +53,7 @@ function void TitleCard.Init()
 	{
 		A1 = 0x0d6d84
 	}
-	Kosinski.addToDMAQueue(A1, 0xa7a0)
+	Kosinski.addToDMAQueue(A1, 0xa7a0)		// Act number sprite
 
 	A1 = 0x02da16
 	D0 = global.zone.apparent
@@ -74,7 +74,7 @@ function void TitleCard.Init()
 	}
 
 	A1 = u32[A1 + D0.u16 * 4]
-	Kosinski.addToDMAQueue(A1, 0xa9a0)
+	Kosinski.addToDMAQueue(A1, 0xa9a0)		// Zone name
 
 	objA0.countdown_value = 0x5a
 	objA0.value32 = 0

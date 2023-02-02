@@ -608,7 +608,7 @@ function void fn0522a0()
 		player1.control_override = 0xff
 		control.player1 = 0
 
-		Kosinski.addToDMAQueue(0x159cae, 0xa000)
+		Kosinski.addToDMAQueue(0x159cae, 0xa000)		// Zone warp teleporter sprites
 
 		A1 = 0xfffffc22
 		objA1.update_address = 0x0eee0ec0

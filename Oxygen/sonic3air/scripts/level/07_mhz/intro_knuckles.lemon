@@ -491,7 +491,7 @@ function void fn063790()
 	spawnChildObject(0x0638dc, 0x00, 0, -20)
 
 	addPatternLoadingCue(0x083d64)
-	Kosinski.addToDMAQueue(0x165000, 0xa5c0)
+	Kosinski.addToDMAQueue(0x165000, 0xa5c0)		// Bomb sprites
 }
 
 
@@ -664,7 +664,7 @@ function void fn0639c8()
 	spawnChildObject(0x0916a8, 0x00, -12, 28)
 	spawnChildObject(0x0916ee, 0x02, -28, -4)
 
-	Kosinski.addToDMAQueue(0x17b17e, 0xa000)
+	Kosinski.addToDMAQueue(0x17b17e, 0xa000)		// Egg Robo badnik sprites
 }
 
 

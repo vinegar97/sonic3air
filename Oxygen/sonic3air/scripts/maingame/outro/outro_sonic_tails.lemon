@@ -146,9 +146,9 @@ function void fn05d8bc()
 
 	copyMemory(0xfffffcc0, 0x0a97bc, 0x20)
 
-	Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)
-	Kosinski.addToDMAQueue(0x163418, 0x3c60)
-	Kosinski.addToDMAQueue(0x162914, 0x4dc0)
+	Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)	// Master Emerald sprite
+	Kosinski.addToDMAQueue(0x163418, 0x3c60)	// Tornado
+	Kosinski.addToDMAQueue(0x162914, 0x4dc0)	// Smaller ending sprites + Sonic pilot head + chain
 
 #if STANDALONE
 	Game.startSkippableCutscene()
@@ -312,7 +312,7 @@ function void fn05db76()
 		D2 = 0x01
 		fn05fe1e()
 
-		Kosinski.addToDMAQueue(0x160aaa, 0x5fe0)
+		Kosinski.addToDMAQueue(0x160aaa, 0x5fe0)		// Waterfalls and splashes as the island lifts
 	}
 	fn060000()
 }
@@ -792,7 +792,7 @@ function void fn05dfee()
 		u8[A1 + 0x2c] = 0xff
 	}
 
-	Kosinski.addToDMAQueue(0x162914, 0x4dc0)
+	Kosinski.addToDMAQueue(0x162914, 0x4dc0)	// Smaller ending sprites + Sonic pilot head + chain
 }
 
 
@@ -971,9 +971,9 @@ function void fn05e1c2()
 		spawnSimpleChildObjects(0x05e612, 2)	// The dolphins
 	}
 
-	Kosinski.addToDMAQueue(0x163418, 0x3c60)
-	Kosinski.addToDMAQueue(0x162914, 0x4dc0)
-	Kosinski.addToDMAQueue(0x160d8c, 0x5fe0)
+	Kosinski.addToDMAQueue(0x163418, 0x3c60)	// Tornado
+	Kosinski.addToDMAQueue(0x162914, 0x4dc0)	// Smaller ending sprites + Sonic pilot head + chain
+	Kosinski.addToDMAQueue(0x160d8c, 0x5fe0)	// Dolphin and seagull sprites
 }
 
 
@@ -1036,7 +1036,7 @@ function void fn05e2c2()
 	}
 #endif
 	A1 = u32[0x05e328 + D0.u16]
-	Kosinski.addToDMAQueue(A1, 0x68e0)
+	Kosinski.addToDMAQueue(A1, 0x68e0)		// End pose sprite for Sonic/Tails
 }
 
 
@@ -1681,7 +1681,7 @@ function void fn05f566()
 
 	fn05fda4()
 
-	Kosinski.addToDMAQueue(0x163246, 0x6000)
+	Kosinski.addToDMAQueue(0x163246, 0x6000)		// Robotnik standing, hand on hips
 }
 
 
@@ -1736,7 +1736,7 @@ function void fn05f5de()
 		u8[A1 + 0x2c] = 0x8a
 	}
 
-	Kosinski.addToDMAQueue(0x16118e, 0x6000)
+	Kosinski.addToDMAQueue(0x16118e, 0x6000)		// Egg Robo post credits sprites
 }
 
 

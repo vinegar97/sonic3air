@@ -28,7 +28,7 @@ function void fn07f06c()
 	u8[0xfffffab8] = 0
 
 	requestLoadingPatterns(0x76)
-	Kosinski.addToDMAQueue(0x181002, 0x7140)
+	Kosinski.addToDMAQueue(0x181002, 0x7140)		// Boss sprites
 	loadPaletteLine1(0x07fd08)
 
 	// "spawnChildObjects(0x07fc8c)" replaced by:

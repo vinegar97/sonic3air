@@ -159,7 +159,7 @@ function void fn064472()
 		objA1.update_address = 0x084ad2
 	}
 
-	Kosinski.addToDMAQueue(0x1607d8, 0x94e0)
+	Kosinski.addToDMAQueue(0x1607d8, 0x94e0)	// Egg Mobile grabber claw sprites
 
 	addPatternLoadingCue(0x064516)
 }
@@ -1324,7 +1324,7 @@ function void fn064fdc()
 	u16[0xfffffaba] = 0
 	level.palettefx.timer_1 = 0
 
-	Kosinski.addToDMAQueue(0x17588a, 0xa5c0)
+	Kosinski.addToDMAQueue(0x17588a, 0xa5c0)		// Teleporter
 	Object.TriggerUnloading()
 }
 

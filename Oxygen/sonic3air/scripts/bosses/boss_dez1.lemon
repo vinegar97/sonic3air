@@ -52,7 +52,7 @@ function void fn07ddb4()
 	spawnSimpleChildObjects(0x07e80e, 8)
 
 	requestLoadingPatterns(0x7b)
-	Kosinski.addToDMAQueue(0x1805a0, 0x8000)
+	Kosinski.addToDMAQueue(0x1805a0, 0x8000)		// Boss sprites
 
 	loadPaletteLine1(0x07effc)
 }

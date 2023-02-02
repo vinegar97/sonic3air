@@ -84,8 +84,8 @@ function void UpdateLevelScrolling.EC()
 //# address-hook(0x090964) end(0x090a70)
 function void fn090964()
 {
-	Kosinski.addToDMAQueue(0x1759ac, 0x9580)
-	Kosinski.addToDMAQueue(0x17588a, 0x9100)
+	Kosinski.addToDMAQueue(0x1759ac, 0x9580)		// Chaos Emeralds
+	Kosinski.addToDMAQueue(0x17588a, 0x9100)		// Teleporter
 
 	A1 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x0a8a3c : 0x066912
 	copyMemory(0xfffffca0, A1, 0x20)

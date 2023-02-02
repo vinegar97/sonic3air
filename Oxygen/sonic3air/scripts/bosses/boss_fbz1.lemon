@@ -54,7 +54,7 @@ function void fn06eea8()
 
 	addPatternLoadingCue(0x083d64)
 
-	Kosinski.addToDMAQueue(0x1652b4, 0xa5c0)
+	Kosinski.addToDMAQueue(0x1652b4, 0xa5c0)		// Boss sprites
 
 	loadPaletteLine1(0x06fac0)
 

@@ -721,7 +721,7 @@ function void fn059194()
 //# address-hook(0x05b42a) end(0x05b470)
 function void fn05b42a()
 {
-	Kosinski.addToDMAQueue(0x0de362, 0x7de0)
+	Kosinski.addToDMAQueue(0x0de362, 0x7de0) 		// "& Knuckles" subtitle
 
 	D0.u16 = (global.characters & 0x03) - 2
 	D1 = 0
@@ -764,7 +764,7 @@ function void fn05b4de()
 //# address-hook(0x05b4e8) end(0x05b4f2)
 function void fn05b4e8()
 {
-	Kosinski.addToDMAQueue(0x16461e, 0x82a0)
+	Kosinski.addToDMAQueue(0x16461e, 0x82a0)		// "Sonic 3" Logo sprite
 }
 
 
@@ -825,7 +825,7 @@ function void fn07ca3a()
 	// "spawnChildObjects(0x0681b4)" replaced by:
 	spawnChildObject(0x068062, 0x00, 30, 0)
 
-	Kosinski.addToDMAQueue(0x1607d8, 0x94e0)
+	Kosinski.addToDMAQueue(0x1607d8, 0x94e0)	// Egg Mobile grabber claw sprites
 
 	DrawObject()
 }

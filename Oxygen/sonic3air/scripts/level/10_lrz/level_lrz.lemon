@@ -681,7 +681,7 @@ function void fn057156()
 
 	if (objA0.countdown_value == 0)
 	{
-		Kosinski.addToDMAQueue(0x15a112, 0x73e0)
+		Kosinski.addToDMAQueue(0x15a112, 0x73e0)		// Death Egg as part of the backgornd
 		objA0.flags2e = 0xff
 	}
 

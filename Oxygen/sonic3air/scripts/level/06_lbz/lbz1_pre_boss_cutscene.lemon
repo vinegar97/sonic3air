@@ -70,7 +70,7 @@ function void fn08cb9e()
 
 	requestLoadingPatterns(0x60)
 
-	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)
+	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)		// Miniboss containment box
 
 	// "spawnChildObjects(0x06817c)" replaced by:
 	spawnChildObject(0x067c38, 0x00, 0, -28)
@@ -160,7 +160,7 @@ function void fn08cc84()
 		return
 
 	objA0.base_state = 0x0a
-	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)
+	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)		// Miniboss containment box
 	screenmover_target.right = 0x3ea0
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
@@ -215,7 +215,7 @@ function void fn08cce8()
 	objA0.velocity.x = 0x0200
 	objA0.velocity.y = 0x0200
 
-	Kosinski.addToDMAQueue(0x375358, 0x9ac0)
+	Kosinski.addToDMAQueue(0x375358, 0x9ac0)		// Boss sprites
 
 	// "spawnChildObjects(0x0681b4)" replaced by:
 	spawnChildObject(0x068062, 0x00, 30, 0)
@@ -295,9 +295,9 @@ function void fn08cdb8()
 //# address-hook(0x08d0ea) end(0x08d110)
 function void fn08d0ea()
 {
-	Kosinski.addToDMAQueue(0x375358, 0x9ac0)
+	Kosinski.addToDMAQueue(0x375358, 0x9ac0)		// Boss sprites
 
-	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)
+	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)		// Miniboss containment box
 
 	addPatternLoadingCue(0x083d64)
 }

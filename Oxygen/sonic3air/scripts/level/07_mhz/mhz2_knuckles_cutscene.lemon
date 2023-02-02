@@ -238,7 +238,7 @@ function void fn0632ca()
 		objA0.respawn_entry = u16[A1 + 0x48]
 	}
 
-	Kosinski.addToDMAQueue(0x16a072, 0xa500)
+	Kosinski.addToDMAQueue(0x16a072, 0xa500)		// Knuckles lever
 }
 
 

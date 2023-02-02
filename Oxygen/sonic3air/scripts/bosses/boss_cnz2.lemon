@@ -352,7 +352,7 @@ function void fn06e778()
 #endif
 	{
 		objA0.update_address = 0x06e7b6
-		Kosinski.addToDMAQueue(0x0db406, 0xb400)
+		Kosinski.addToDMAQueue(0x0db406, 0xb400)		// Explosion smoke sprites
 
 		if (allocDynamicObjectStd())
 		{

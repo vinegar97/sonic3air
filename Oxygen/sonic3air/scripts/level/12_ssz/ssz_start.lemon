@@ -291,7 +291,7 @@ function void fn06575e()
 	objA0.animation.sprite = 0x56
 	objA0.hitbox_extends.y = 0x33
 
-	Kosinski.addToDMAQueue(0x17dbc2, 0xa000)
+	Kosinski.addToDMAQueue(0x17dbc2, 0xa000)	// The Death Egg rising from the clouds in the intro
 }
 
 

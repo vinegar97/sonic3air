@@ -349,7 +349,7 @@ function void fn081554()
 		objA1.update_address = 0x082722
 	}
 
-	Kosinski.addToDMAQueue(0x18322a, 0x5b60)
+	Kosinski.addToDMAQueue(0x18322a, 0x5b60)		// Boss sprites, missiles and rocks, etc.
 
 #if STANDALONE
 	// Start with 50 rings now already, that looks better and prevents an unnecessary music tempo change

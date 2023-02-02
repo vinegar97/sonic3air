@@ -149,7 +149,7 @@ function void fn063b40()
 		objA1.update_address = 0x063c3e
 	}
 
-	Kosinski.addToDMAQueue(0x172214, 0xa000)
+	Kosinski.addToDMAQueue(0x172214, 0xa000)	// Rolling boulder sprites
 }
 
 

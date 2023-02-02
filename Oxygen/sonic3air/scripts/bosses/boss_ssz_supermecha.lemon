@@ -34,7 +34,7 @@ function void fn07b996()
 	// "spawnChildObjects(0x07d492)" replaced by:
 	spawnChildObject(0x07c886, 0x00, -4, 12)
 
-	Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)
+	Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)	// Master Emerald sprite
 }
 
 

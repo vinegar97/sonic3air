@@ -43,7 +43,7 @@ function void fn07fd9e()
 	u16[0xfffffaa4] = A0.u16
 	u32[0xfffffa84] = 0
 
-	Kosinski.addToDMAQueue(0x181d44, 0x71e0)
+	Kosinski.addToDMAQueue(0x181d44, 0x71e0)		// Boss sprites
 
 	if (allocDynamicObjectStd())
 	{

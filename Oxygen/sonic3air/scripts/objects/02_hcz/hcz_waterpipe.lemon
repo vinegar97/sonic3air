@@ -23,7 +23,7 @@ function void fn02fef6()
 		return
 	}
 
-	Kosinski.addToDMAQueue(0x390c02, 0xa000)
+	Kosinski.addToDMAQueue(0x390c02, 0xa000)		// Water geyser horizontal
 
 	objA0.update_address = 0x02ff2a
 	fn02ff2a()
@@ -289,7 +289,7 @@ function void fn030294()
 	u16 dy = u16[0xffffb000 + 0x14] - objA0.position.y.u16 + 0x40
 	if (dx < 0x60 && dy < 0x10)
 	{
-		Kosinski.addToDMAQueue(0x391394, 0xa000)
+		Kosinski.addToDMAQueue(0x391394, 0xa000)		// Water geyser vertical sprites
 		objA0.animation.sprite = 1
 		u8[0xffffb000 + 0x2e] = 0x81
 		u8[0xffffb04a + 0x2e] = 0x81

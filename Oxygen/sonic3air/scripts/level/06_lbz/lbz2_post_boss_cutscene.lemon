@@ -96,7 +96,7 @@ function void fn072bbc()
 		objA1.update_address = 0x0863c0
 	}
 
-	Kosinski.addToDMAQueue(0x37921c, 0x95c0)
+	Kosinski.addToDMAQueue(0x37921c, 0x95c0)		// Death Egg falling in the distance
 }
 
 

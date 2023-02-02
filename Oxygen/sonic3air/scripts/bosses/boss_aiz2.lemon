@@ -54,7 +54,7 @@ function void fn0691c8()
 
 	requestLoadingPatterns(0x6b)
 
-	Kosinski.addToDMAQueue(0x365260, 0x3000)
+	Kosinski.addToDMAQueue(0x365260, 0x3000)		// Boss sprites
 
 	loadPaletteLine1(0x069e80)
 }

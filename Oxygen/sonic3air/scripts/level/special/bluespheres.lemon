@@ -2472,7 +2472,7 @@ function void fn02df64()
 
 	addPatternLoadingCue(0x02e310)
 
-	Kosinski.addToDMAQueue(0x0d6a62, 0xb700)		// Common results graphics shared
+	Kosinski.addToDMAQueue(0x0d6a62, 0xb700)		// Common results graphics
 
 	// Choose text: "Super" or "Hyper"
 	if (isMainCharacter(CHARACTER_SONIC))

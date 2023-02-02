@@ -919,7 +919,7 @@ function void fn06b76e()
 //# address-hook(0x06b7bc) end(0x06b7ea)
 function void fn06b7bc()
 {
-	Kosinski.addToDMAQueue(0x391394, 0x6d60)
+	Kosinski.addToDMAQueue(0x391394, 0x6d60)		// Rising water geyser sprites
 
 	objA0.update_address = 0x06b7d2
 	objA0.update_address = 0x06b7ec

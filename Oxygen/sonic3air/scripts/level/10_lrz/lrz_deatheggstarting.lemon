@@ -52,7 +52,7 @@ function void fn079416()
 		u16[A1 + 0x3a] = 0x03
 	}
 
-	Kosinski.addToDMAQueue(0x17093c, 0x8480)
+	Kosinski.addToDMAQueue(0x17093c, 0x8480)	// Robotnik in pod, missiles and more
 
 	addPatternLoadingCue(0x083d64)
 }
