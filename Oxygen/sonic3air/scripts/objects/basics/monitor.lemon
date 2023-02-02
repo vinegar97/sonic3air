@@ -681,7 +681,7 @@ function void ItemEffect.UpdateDefaultInternal()
 #if STANDALONE
 	if (objA0.state == 0x0b)	// Classic Shield
 	{
-		ItemEffect.applyShield(0, addressof(InstaShield.Init), 0x3a)
+		ItemEffect.applyShield(0, addressof(InstaShield.Init), SFX_CLASSICSHIELD)
 	}
 	else
 #endif
