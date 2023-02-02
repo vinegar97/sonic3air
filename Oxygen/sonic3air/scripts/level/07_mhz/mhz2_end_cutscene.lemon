@@ -336,7 +336,7 @@ function void fn076456()
 	if (objA0.countdown_value >= 0)
 		return
 
-	TriggerNextZone(0x0400)
+	TriggerNextZone(0x0400)		// Flying Battery Zone
 	UnloadObject()
 
 #if STANDALONE

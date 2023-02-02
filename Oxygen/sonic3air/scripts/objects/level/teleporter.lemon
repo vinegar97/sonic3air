@@ -384,7 +384,7 @@ function void fn045b94()
 		sram.block_interrupts.u8 = 0xff
 		SaveGameOnLevelFinished()
 
-		TriggerNextZone(0x0a01)
+		TriggerNextZone(0x0a01)		// Knuckles' Sky Sanctuary act
 	}
 	else
 	{
@@ -579,7 +579,7 @@ function void fn045c8e()
 			sram.block_interrupts.u8 = 0xff
 			SaveGameOnLevelFinished()
 
-			TriggerNextZone(0x0a00)
+			TriggerNextZone(0x0a00)		// Sonic/Tails Sky Sanctuary act
 		}
 	}
 }
@@ -704,7 +704,7 @@ function void fn0523ca()
 	if (camera.position.y.u16 < 0x0780)
 	{
 		playMusic(MUSIC_CTRL_FADEOUT)
-		TriggerNextZone(0x0500)
+		TriggerNextZone(0x0500)		// IceCap Act 1
 	}
 }
 

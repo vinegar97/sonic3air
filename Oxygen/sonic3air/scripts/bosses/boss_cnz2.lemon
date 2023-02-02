@@ -420,7 +420,7 @@ function void fn06e80c()
 		return
 #endif
 
-	TriggerNextZone(0x0500)
+	TriggerNextZone(0x0500)		// IceCap Zone
 	fn0852ae()
 }
 

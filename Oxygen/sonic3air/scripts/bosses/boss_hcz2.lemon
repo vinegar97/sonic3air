@@ -1042,7 +1042,7 @@ function void fn06b8c8()
 		return
 	}
 
-	TriggerNextZone(0x0200)
+	TriggerNextZone(0x0200)		// Marble Garden Zone
 	UnloadObject()
 }
 

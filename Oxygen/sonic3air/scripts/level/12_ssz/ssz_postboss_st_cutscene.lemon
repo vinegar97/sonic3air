@@ -342,7 +342,7 @@ function void fn05806e()
 			if (u16[A2 + 0x04] == 0)
 			{
 				playMusic(MUSIC_CTRL_FADEOUT)
-				TriggerNextZone(0x0b00)
+				TriggerNextZone(0x0b00)		// Death Egg Zone
 			}
 		}
 	}

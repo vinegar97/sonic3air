@@ -320,7 +320,7 @@ function void fn07092a()
 		return
 	}
 
-	TriggerNextZone(0x0800)
+	TriggerNextZone(0x0800)		// Sandopolis Zone
 	UnloadObject()
 
 #if STANDALONE
