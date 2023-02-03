@@ -105,6 +105,7 @@ function void fn0511c8()
 {
 	if (kosinski.waiting_modules == 0)
 	{
+		// Go to Marble Garden Act 2
 		global.zone_act = 0x0201
 		camera.update_routine = 0
 		dynobjects.routine = 0

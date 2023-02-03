@@ -167,6 +167,7 @@ function void fn050c4c()
 {
 	if (kosinski.waiting_modules == 0)
 	{
+		// Go to Hydrocity Act 2
 		global.zone_act = 0x0101
 		camera.update_routine = 0
 		dynobjects.routine = 0

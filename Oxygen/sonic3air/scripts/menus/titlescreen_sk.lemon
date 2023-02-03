@@ -241,7 +241,7 @@ function void TitleScreen_SK()
 	#endif
 
 		levelselect.characters = titlescreen.selection * 2 + 1
-		D0.u16 = 0x0700
+		D0.u16 = 0x0700		// Mushroom Hill Act 1
 		global.zone_act = D0.u16
 		global.zone_act.apparent = D0.u16
 		checkpoint.zone_act = D0.u16

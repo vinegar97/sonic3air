@@ -870,6 +870,7 @@ function void fn05427c()
 {
 	if (kosinski.waiting_modules == 0)
 	{
+		// Go to Launch Base Act 2
 		global.zone_act = 0x0601
 		camera.update_routine = 0
 		dynobjects.routine = 0

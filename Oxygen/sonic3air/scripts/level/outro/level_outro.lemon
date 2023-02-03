@@ -270,6 +270,7 @@ function void fn05ac70()
 	push(A0)
 	push(D7)
 
+	// Go to AIZ scene in best ending
 	global.zone_act = 0
 	checkpoint.number = 0x01
 	fn01c362()
@@ -450,6 +451,7 @@ function void fn05ae0a()
 	push(A0)
 	push(D7)
 
+	// Got to the credits scene
 	fn01c362()
 	fn0076a6()
 

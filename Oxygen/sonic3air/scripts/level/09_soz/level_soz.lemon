@@ -324,6 +324,7 @@ function void fn055c84()
 	if (kosinski.waiting_modules != 0)
 		return
 
+	// Go to Sandopolis Act 2
 #if STANDALONE
 	Game.endSkippableCutscene()
 #endif

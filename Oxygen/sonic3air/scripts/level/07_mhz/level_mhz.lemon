@@ -146,6 +146,7 @@ function void UpdateLevelScrolling.MHZ1()
 {
 	if (u16[0xffffeec6] != 0)
 	{
+		// Go to Mushroom Hill Act 2
 		u16[0xffffeec6] = 0
 
 		push(A3)

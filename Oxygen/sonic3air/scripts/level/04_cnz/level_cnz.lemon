@@ -382,6 +382,7 @@ function void fn051e60()
 {
 	if (u16[0xffffeec6] != 0)
 	{
+		// Go to Carnival Night Act 2
 		u16[0xffffeec6] = 0
 
 		push(A3)

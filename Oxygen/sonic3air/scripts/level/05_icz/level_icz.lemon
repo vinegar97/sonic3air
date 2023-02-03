@@ -630,6 +630,7 @@ function void ICZ1.TransitionToOutdoorArea()
 {
 	if (kosinski.queue_size == 0)
 	{
+		// Go to IceCap Act 2
 		global.zone_act = 0x0501
 		camera.update_routine = 0
 		dynobjects.routine = 0

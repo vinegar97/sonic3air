@@ -253,6 +253,7 @@ function void fn056caa()
 {
 	if (kosinski.waiting_modules == 0)
 	{
+		// Go to Lava Reef Act 2
 		global.zone_act = 0x0901
 		camera.update_routine = 0
 		dynobjects.routine = 0
