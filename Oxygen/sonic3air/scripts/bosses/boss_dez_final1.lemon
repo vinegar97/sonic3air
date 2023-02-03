@@ -197,6 +197,7 @@ function void fn07fef6()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn the Master Emerald
 			objA1.update_address = 0x0806da
 			u16[A1 + 0x46] = A0.u16
 		}
@@ -437,16 +438,16 @@ function void fn080562()
 
 
 
-// A different object
+// The Master Emerald in the mouth of the giant Egg Robo
 
 //# address-hook(0x0806da) end(0x08072e)
 function void fn0806da()
 {
 	setupObjectAttributesFull(0x0812d4)
 
-	A1 = 0xffffffb2
-	D0 = 0x03
-	D1 = 0x06
+	A1 = 0xffffffb2		// Start of emerald collection states
+	D0 = 0x03			// Super Emerald collected state
+	D1 = 6				// Number of emeralds
 	while (D1.s16 >= 0)
 	{
 		if (D0.u8 != u8[(A1+=1)-1])

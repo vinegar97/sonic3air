@@ -750,9 +750,7 @@ function void DataSelect.sharedNewGameStartup()
 	global.next_bluespheres = 0
 	u16[0xfffffe17] = 0			// Possibly not needed at all
 	u16[0xffffffb0] = 0
-	u32[0xffffffb2] = 0
-	u16[0xffffffb6] = 0
-	u8[0xffffffb8] = 0
+	zeroMemory(0xffffffb2, 7)		// Clear emerald collection states
 	level.giantrings_clear = 0
 	global.traded_emeralds = 0
 
@@ -833,7 +831,7 @@ function void fn00d39e()
 	objA0.value3b = u8[A1] & 0x03
 
 	D0.u16 = u16[A1 + 0x06]
-	A2 = 0xffffffb2
+	A2 = 0xffffffb2		// Start of emerald collection states
 	fn00da1e()
 
 	u8[A0 + 0x3c] = D1.u8
@@ -1064,7 +1062,7 @@ function bool fn00d458()
 		global.next_bluespheres = (u8[A1 + 0x02] & 0x0f)
 
 		D0 = u16[A1 + 0x06]
-		A2 = 0xffffffb2
+		A2 = 0xffffffb2		// Start of emerald collection states
 		fn00da1e()
 		global.chaos_emeralds = D1.u8
 		global.super_emeralds = D2.u8

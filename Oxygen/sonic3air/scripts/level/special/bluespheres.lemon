@@ -1751,7 +1751,7 @@ function void fn009b62()
 					if (u8[A2] < 7)
 					{
 						++u8[A2]
-						A1 = 0xffffffb2
+						A1 = 0xffffffb2		// Start of emerald collection states
 						D0 = global.next_bluespheres
 						u8[A1 + D0.s16] |= 0x01
 					}
