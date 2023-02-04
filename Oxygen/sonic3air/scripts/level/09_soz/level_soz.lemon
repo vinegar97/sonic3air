@@ -301,7 +301,7 @@ function void fn055c26()
 
 				Kosinski.addToDMAQueue(0x1ad81e, 0x62a0)
 
-				requestLoadingPatterns(0x2c)
+				requestLoadingPatterns(0x2c)		// SOZ2 object sprites
 
 				D7 = pop()
 				A0 = pop()

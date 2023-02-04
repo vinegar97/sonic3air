@@ -34,7 +34,7 @@ function void fn06aeb6()
 	objA0.update_address = 0x06aefe
 	objA0.countdown_callback = 0x06af04
 
-	requestLoadingPatterns(0x6c)
+	requestLoadingPatterns(0x6c)		// Boss sprites
 
 	u16[0xfffffc1e] = 0
 
@@ -117,7 +117,7 @@ function void fn06af80()
 	objA0.countdown_value = 0x3f
 	objA0.countdown_callback = 0x06afc8
 
-	addPatternLoadingCue(0x083d6c)
+	addPatternLoadingCue(0x083d6c)		// Small explosion sprites
 	fn0685e2()
 }
 

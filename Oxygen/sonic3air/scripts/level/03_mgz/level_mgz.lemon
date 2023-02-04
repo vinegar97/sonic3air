@@ -81,7 +81,7 @@ function void fn051160()
 
 		Kosinski.addToDMAQueue(0x3ca132, 0x4a40)
 
-		requestLoadingPatterns(0x14)
+		requestLoadingPatterns(0x14)		// MGZ2 object sprites
 
 		D7 = pop()
 		A0 = pop()

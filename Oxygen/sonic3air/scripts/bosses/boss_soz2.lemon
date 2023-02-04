@@ -43,7 +43,7 @@ function void fn07767c()
 
 	Kosinski.addToDMAQueue(0x16e1b0, 0x7480)		// Boss sprites
 
-	requestLoadingPatterns(0x6d)
+	requestLoadingPatterns(0x6d) // Robotnik's ship, boss explosions, and capsule sprites
 	loadPaletteLine1(0x0784a0)
 	copyMemory(0xfffffc60, 0x0784c0, 0x20)
 

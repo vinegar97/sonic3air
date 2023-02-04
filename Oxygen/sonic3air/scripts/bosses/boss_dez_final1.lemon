@@ -158,7 +158,7 @@ function void fn07fe96()
 			objA1.update_address = 0x08642e
 		}
 
-		addPatternLoadingCue(0x083d64)
+		addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 
 		if (allocDynamicObjectStd())
 		{

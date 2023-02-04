@@ -493,28 +493,30 @@ function void initializeMainGame()
 
 		if (isSonicIntro())
 		{
-			D0 = 1
-			FillPatternLoadingCues()
-
+			fillPatternLoadingCues(0x01)
 			requestLoadingPatterns(0x0a)
 		}
 		else if (competition_mode.active)
 		{
 			D0 = 6
-			// Isn't requestLoadingPatterns missing here?
+			// It looks like RequestLoadingPatterns() is missing here, but each zone already loads the common sprites, so it would be redundant
 		}
 		else
 		{
-			if (isMainCharacter(CHARACTER_SONIC))		// Sonic
+			// Load both HUD and common object sprites for main game stages
+			if (isMainCharacter(CHARACTER_SONIC))
 			{
+				// Sonic
 				requestLoadingPatterns(0x01)
 			}
-			else if (isMainCharacter(CHARACTER_TAILS))	// Tails - or Miles
+			else if (isMainCharacter(CHARACTER_TAILS))
 			{
+				// Tails - or Miles
 				requestLoadingPatterns((global.region_code & 0x80) ? 0x07 : 0x52)
 			}
-			else 										// Must be Knuckles then
+			else
 			{
+				// Must be Knuckles then
 				requestLoadingPatterns(0x05)
 			}
 		}

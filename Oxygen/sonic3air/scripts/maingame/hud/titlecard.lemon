@@ -142,7 +142,7 @@ function void TitleCard.Wait()
 
 		if (u8[A0 + 0x3e] != 0 && global.zone == 0x06)
 		{
-			requestLoadingPatterns(0x25)
+			requestLoadingPatterns(0x25)		// LBZ2 object sprites
 		}
 
 		objA0.base_state += 2
@@ -224,7 +224,7 @@ function void TitleCard.Show()
 			}
 			else if (global.zone != 0x0c && global.zone_act != 0x1700)
 			{
-				addPatternLoadingCue(0x08399a)
+				addPatternLoadingCue(0x08399a)		// Spike and Springs
 				fn02f77c()
 				StartLoadingPatternsForZone()
 			}
@@ -296,7 +296,7 @@ function void fn02f77c()
 //# address-hook(0x085fde) end(0x085ff8)
 function void StartLoadingPatternsForZone()
 {
-	addPatternLoadingCue(0x083d6c)
+	addPatternLoadingCue(0x083d6c)		// Small explosion sprites
 
 	// Targets:
 	//  - 0x08602e	-> global.zone = 0x00	-> AIZ
@@ -314,6 +314,7 @@ function void StartLoadingPatternsForZone()
 	//  - 0x0860d6	-> global.zone = 0x0c	-> DDZ
 	//  - 0x0860e4	-> global.zone = 0x0d	-> Outro S/T
 	//  - 0x0860e4	-> global.zone = 0x16	-> LRZ Boss
+	//  - All succeeding entries use 0x0860e4
 	u32 address = tableLookupAddress(0x085ffe, global.zone * 2)
 	addPatternLoadingCue(address)
 }

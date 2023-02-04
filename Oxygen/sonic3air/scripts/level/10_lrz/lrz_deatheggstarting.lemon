@@ -54,7 +54,7 @@ function void fn079416()
 
 	Kosinski.addToDMAQueue(0x17093c, 0x8480)	// Robotnik in pod, missiles and more
 
-	addPatternLoadingCue(0x083d64)
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 }
 
 

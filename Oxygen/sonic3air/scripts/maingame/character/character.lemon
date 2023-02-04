@@ -6771,8 +6771,7 @@ function void Character.CheckDiedStateEnd()
 				playMusic(MUSIC_GAMEOVER)
 
 				// Load patterns for time/game over
-				D0 = 3
-				FillPatternLoadingCues()
+				fillPatternLoadingCues(0x03)
 			}
 		}
 	}

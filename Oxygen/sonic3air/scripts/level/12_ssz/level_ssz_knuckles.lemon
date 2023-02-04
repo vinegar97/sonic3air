@@ -746,7 +746,7 @@ function void fn05b42a()
 //# address-hook(0x05b4d4) end(0x05b4d8)
 function void fn05b4d4()
 {
-	addPatternLoadingCue(0x05b504)
+	addPatternLoadingCue(0x05b504)		// Characters and logo sprites in post-credits eyecatch
 
 	fn05b4de()
 }
@@ -755,7 +755,7 @@ function void fn05b4d4()
 //# address-hook(0x05b4de) end(0x05b4e2)
 function void fn05b4de()
 {
-	addPatternLoadingCue(0x05b50c)
+	addPatternLoadingCue(0x05b50c)		// Knuckles ending pose sprites
 
 	fn05b4e8()
 }
@@ -773,7 +773,7 @@ function void fn05b4f8()
 {
 	fn05b4e8()
 
-	addPatternLoadingCue(0x05b504)
+	addPatternLoadingCue(0x05b504)		// Characters and logo sprites in post-credits eyecatch
 }
 
 
@@ -786,7 +786,7 @@ function void fn07ca1c()
 	objA0.update_address = 0x07ca3a
 	move_area.right = move_area.left + getScreenExtend() * 2
 
-	addPatternLoadingCue(0x07ca32)
+	addPatternLoadingCue(0x07ca32)		// Robotnik's ship
 }
 
 

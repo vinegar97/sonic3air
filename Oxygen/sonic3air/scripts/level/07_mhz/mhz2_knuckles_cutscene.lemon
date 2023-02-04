@@ -422,7 +422,7 @@ function void fn062422()
 	// Copies palette colors 0x10 .. 0x1f from secondary (underwater) to primary palette
 	copyMemory(0xfffffc20, 0xfffffca0, 0x20)
 
-	addPatternLoadingCue(0x083d48)
+	addPatternLoadingCue(0x083d48)		// Monitor, small explosion, and critter sprites
 
 	if (allocDynamicObjectStd())
 	{

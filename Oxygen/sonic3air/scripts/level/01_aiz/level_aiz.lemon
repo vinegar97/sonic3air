@@ -398,7 +398,7 @@ function void fn04fc46()
 		Kosinski.addToDMAQueue(0x3b15d2, 0x0000)
 		Kosinski.addToDMAQueue(0x3b3784, 0x3f80)
 
-		addPatternLoadingCue(0x08399a)
+		addPatternLoadingCue(0x08399a)		// Spike and Springs
 
 		D7 = pop()
 		A0 = pop()
@@ -929,7 +929,7 @@ function void fn05011e()
 		push(A0)
 		push(D7)
 
-		requestLoadingPatterns(0x0c)
+		requestLoadingPatterns(0x0c)		// AIZ2 object sprites
 		fn02f77c()
 
 		D7 = pop()
@@ -1108,7 +1108,7 @@ function void fn01c46e()
 		{
 			if (checkpoint.number == 0 && isMainCharacter(CHARACTER_SONIC))
 			{
-				requestLoadingPatterns(0x0b)
+				requestLoadingPatterns(0x0b)		// AIZ1 object sprites
 			}
 
 			Level.loadPaletteData(0x2a)
@@ -1168,7 +1168,7 @@ function void fn01c4d0()
 		Checkpoint.SaveCurrentState()
 
 		checkpoint.time = 0
-		requestLoadingPatterns(0x08)
+		requestLoadingPatterns(0x08)		// Monitor sprites
 		camera.update_routine += 2
 	}
 }
@@ -1199,7 +1199,7 @@ function void fn01c550()
 	{
 		u16[0xfffffc5e] = isMainCharacter(CHARACTER_KNUCKLES) ? u16[0x04faea] : 0x0c02
 		move_area.left = 0x2d80
-		requestLoadingPatterns(0x5a)
+		requestLoadingPatterns(0x5a)		// Boss sprites
 		camera.update_routine += 2
 	}
 
@@ -1233,7 +1233,7 @@ function void fn01c5c6()
 	if (camera.position.x.u16 >= 0x2e00 && kosinski.waiting_modules == 0)
 	{
 		Kosinski.addToDMAQueue(0x3af5d0, 0xa000)
-		requestLoadingPatterns(0x0c)
+		requestLoadingPatterns(0x0c)		// AIZ2 object sprites
 		camera.update_routine += 2
 	}
 }

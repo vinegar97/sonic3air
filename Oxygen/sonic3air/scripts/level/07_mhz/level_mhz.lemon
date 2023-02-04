@@ -154,7 +154,7 @@ function void UpdateLevelScrolling.MHZ1()
 		push(A0)
 		push(D7)
 
-		requestLoadingPatterns(0x28)
+		requestLoadingPatterns(0x28)		// MHZ2 object sprites
 
 		global.zone_act = 0x0701
 		camera.update_routine = 0

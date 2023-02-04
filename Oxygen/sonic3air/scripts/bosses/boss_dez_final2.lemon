@@ -567,7 +567,7 @@ function bool fn080f3a()
 		u8[A1 + 0x2c] = 0x16
 	}
 
-	addPatternLoadingCue(0x080f9e)
+	addPatternLoadingCue(0x080f9e)		// Robotnik's ship
 	return true
 }
 

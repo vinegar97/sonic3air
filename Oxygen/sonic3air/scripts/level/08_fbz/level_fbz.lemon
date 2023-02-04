@@ -834,7 +834,7 @@ function void fn052972()
 		push(A0)
 		push(D7)
 
-		requestLoadingPatterns(0x1c)
+		requestLoadingPatterns(0x1c)		// FBZ2 object sprites
 
 		global.zone_act = 0x0401
 		camera.update_routine = 0

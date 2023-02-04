@@ -303,7 +303,7 @@ function void fn065d6e()
 	objA0.update_address = 0x065d8c
 	objA0.position.y.u16 += 4
 
-	addPatternLoadingCue(0x065bfc)
+	addPatternLoadingCue(0x065bfc)		// Button sprites
 }
 
 

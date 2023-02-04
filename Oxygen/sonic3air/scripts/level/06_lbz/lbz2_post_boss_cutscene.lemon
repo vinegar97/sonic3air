@@ -71,7 +71,7 @@ function void fn072b96()
 	PlayMusicAfterLevelResults()
 	objA0.countdown_value = 0x1f
 
-	addPatternLoadingCue(0x083d64)
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 }
 
 

@@ -2470,7 +2470,7 @@ function void fn02df64()
 	global.fade_timer = 0
 	bluespheres.backup.zone_act = global.zone_act
 
-	addPatternLoadingCue(0x02e310)
+	addPatternLoadingCue(0x02e310)		// Ring sprites + HUD text for bonus tally
 
 	Kosinski.addToDMAQueue(0x0d6a62, 0xb700)		// Common results graphics
 
@@ -2577,7 +2577,7 @@ function void fn02df64()
 		Kosinski.addToDMAQueue(0x1bee58, 0x0000)
 		Kosinski.addToDMAQueue(0x1c3f2c, D4.u16)
 
-		requestLoadingPatterns(0x48)
+		requestLoadingPatterns(0x48)		// HPZ object sprites
 
 		global.zone_act = 0x1701		// Hidden Palace emerald cave
 		camera.position.x.u16 = 0x15a0 - getScreenExtend()

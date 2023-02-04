@@ -136,6 +136,7 @@ function void fn050bce()
 
 		Kosinski.addToDMAQueue(0x3bfa6c, 0x2360)
 
+		// Load HCZ2 object sprites
 		requestLoadingPatterns(0x10)
 		requestLoadingPatterns(0x11)
 

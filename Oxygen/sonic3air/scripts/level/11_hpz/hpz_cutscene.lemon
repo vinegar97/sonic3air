@@ -161,7 +161,7 @@ function void fn064472()
 
 	Kosinski.addToDMAQueue(0x1607d8, 0x94e0)	// Egg Mobile grabber claw sprites
 
-	addPatternLoadingCue(0x064516)
+	addPatternLoadingCue(0x064516)		// Robotnik's ship
 }
 
 

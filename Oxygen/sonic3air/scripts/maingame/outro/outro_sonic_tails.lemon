@@ -1022,7 +1022,7 @@ function void fn05e2c2()
 #if STANDALONE
 	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
-		// This is similar to `addPatternLoadingCue(0x05b504)`, but isn't called directly here because the target in VRAM we need is different
+		// This is similar to `addPatternLoadingCue(0x05b50c)`, but isn't called directly here because the target in VRAM we need is different
 		// Search for next free place in table
 		A2 = 0xfffff680
 		while (u32[A2] != 0)

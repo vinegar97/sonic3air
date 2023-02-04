@@ -51,7 +51,7 @@ function void fn07ddb4()
 	// "spawnSimpleChildObjects(0x07ef96)" replaced by:
 	spawnSimpleChildObjects(0x07e80e, 8)
 
-	requestLoadingPatterns(0x7b)
+	requestLoadingPatterns(0x7b)		// Robotnik's ship and boss explosion sprites
 	Kosinski.addToDMAQueue(0x1805a0, 0x8000)		// Boss sprites
 
 	loadPaletteLine1(0x07effc)

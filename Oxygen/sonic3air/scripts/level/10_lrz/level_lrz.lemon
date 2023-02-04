@@ -151,7 +151,7 @@ function void fn056bd2()
 
 		Kosinski.addToDMAQueue(0x1b97d6, 0x1200)
 
-		requestLoadingPatterns(0x30)
+		requestLoadingPatterns(0x30)		// LRZ2 object sprites
 
 		D7 = backupD7
 		A0 = backupA0

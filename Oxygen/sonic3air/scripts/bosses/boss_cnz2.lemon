@@ -29,7 +29,7 @@ function void fn06e488()
 	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 
-	requestLoadingPatterns(0x6e)
+	requestLoadingPatterns(0x6e)		// Boss sprites
 	loadPaletteLine1(0x06ee48)
 }
 

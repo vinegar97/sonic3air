@@ -36,7 +36,7 @@ function void fn065bd4()
 	objA0.update_address = 0x065c04
 	objA0.position.y.u16 += 4
 
-	addPatternLoadingCue(0x065bfc)
+	addPatternLoadingCue(0x065bfc)		// Knuckles' button sprites
 }
 
 

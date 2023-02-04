@@ -100,7 +100,7 @@ function void fn05b1a2()
 	u16[0xfffffc02] = 0x0eee
 	u16[0xfffffc22] = 0x00ee
 
-	addPatternLoadingCue(0x05b1ec)
+	addPatternLoadingCue(0x05b1ec)		// Credits text font
 }
 
 

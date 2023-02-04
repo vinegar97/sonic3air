@@ -449,7 +449,7 @@ function void fn08167c()
 		u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
 	}
 
-	addPatternLoadingCue(0x083d64)
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 }
 
 

@@ -115,7 +115,7 @@ function void fn06c354()
 
 	Kosinski.addToDMAQueue(0x36d572, 0x8bc0)		// Falling debris sprites
 
-	requestLoadingPatterns(0x6d)
+	requestLoadingPatterns(0x6d)		// Robotnik's ship, boss explosions, and capsule sprites
 	loadPaletteLine1(0x06d97c)
 
 	// "spawnChildObjects(0x06819c)" replaced by:

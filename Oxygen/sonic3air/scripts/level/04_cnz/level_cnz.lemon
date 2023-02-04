@@ -390,6 +390,7 @@ function void fn051e60()
 		push(A0)
 		push(D7)
 
+		// Load CNZ2 object sprites
 		requestLoadingPatterns(0x18)
 		requestLoadingPatterns(0x19)
 
@@ -643,7 +644,7 @@ function void fn05215a()
 						u32 backupA2 = A2
 						u32 backupA3 = A3
 
-						addPatternLoadingCue(0x083d74)
+						addPatternLoadingCue(0x083d74)		// Capsule Sprites
 
 						D7 = backupD7
 						A0 = backupA0

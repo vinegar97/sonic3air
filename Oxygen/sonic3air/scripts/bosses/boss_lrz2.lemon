@@ -21,7 +21,7 @@ function void fn079786()
 	Kosinski.addToDMAQueue(0x1715f2, 0x7980)		// Boss sprites
 	Kosinski.addToDMAQueue(0x1714c0, 0x90e0)		// Debris sprites
 
-	addPatternLoadingCue(0x083d64)
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 
 	loadPaletteLine1(0x07a1ee)
 }
@@ -253,7 +253,7 @@ function void fn079988()
 		objA1.update_address = 0x07a100
 	}
 
-	addPatternLoadingCue(0x083d74)
+	addPatternLoadingCue(0x083d74)		// Capsule Sprites
 
 #if STANDALONE
 	// Fade out

@@ -105,7 +105,7 @@ function void fn078592()
 
 	Kosinski.addToDMAQueue(0x16fcda, 0x7f60)		// Boss sprites
 
-	addPatternLoadingCue(0x083d64)
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 }
 
 
