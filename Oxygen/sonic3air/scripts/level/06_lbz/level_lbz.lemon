@@ -890,7 +890,7 @@ function void fn05427c()
 		Level.InitializeWater()
 		VDP.Config.enableHInt(true)
 
-		Level.loadPaletteData(0x17)
+		Level.loadPaletteData(0x17)		// LBZ 2 level palette
 
 		D7 = backupD7
 		A0 = backupA0

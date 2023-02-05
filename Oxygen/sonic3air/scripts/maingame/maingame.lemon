@@ -570,7 +570,7 @@ function void initializeMainGame()
 	u16[0xfffffb00] = 0
 	u32[0xfffffbfc] = 0xfffffb00
 
-	Level.loadPaletteData(isMainCharacter(CHARACTER_KNUCKLES) ? 5 : 3)
+	Level.loadPaletteData(isMainCharacter(CHARACTER_KNUCKLES) ? 0x05 : 0x03)	// Character palette
 	Level.InitializeWater()
 
 	zeroMemory(0xfffff0a0, 0x60)
@@ -673,7 +673,7 @@ function void initializeMainGame()
 	#endif
 	}
 
-	Level.loadNonfadingPaletteData(0x03)
+	Level.loadNonfadingPaletteData(0x03)	// Sonic's character palette
 
 	fn01bc60()
 
@@ -847,10 +847,11 @@ function void SetGlobalCharacters()
 
 
 //# address-hook(0x003dbe) end(0x003dd8)
-function void fn003dbe()
+//# alias(fn003dbe) deprecated
+function void Level.loadNonfadingPaletteData()
 {
 	// Copies to somewhere inside the palette at 0xfffffc80 = primary palette without fading applied
-	copyPaletteDataFromTable(D0.u16, 0xfc80)
+	Level.loadNonfadingPaletteData(D0.u16)
 }
 
 function void Level.loadNonfadingPaletteData(u8 index)
@@ -863,7 +864,7 @@ function void Level.loadNonfadingPaletteData(u8 index)
 function void Level.LoadPaletteData()
 {
 	// Copies to somewhere inside the palette at 0xfffffc00 = primary palette with fading applied
-	copyPaletteDataFromTable(D0.u16, 0xfc00)
+	Level.loadPaletteData(D0.u16)
 }
 
 function void Level.loadPaletteData(u8 index)
@@ -873,18 +874,30 @@ function void Level.loadPaletteData(u8 index)
 
 
 //# address-hook(0x003df2) end(0x003e0c)
-function void fn003df2()
+//# alias(fn003df2) deprecated
+function void Level.loadSecondaryPaletteData()
 {
 	// Copies to somewhere inside the palette at 0xfffff080 = secondary palette with fading applied
-	copyPaletteDataFromTable(D0.u16, 0xf080)
+	Level.loadSecondaryPaletteData(D0.u16)
+}
+
+function void Level.loadSecondaryPaletteData(u8 index)
+{
+	copyPaletteDataFromTable(index, 0xf080)
 }
 
 
 //# address-hook(0x003e0e) end(0x003e28)
-function void fn003e0e()
+//# alias(fn003e0e) deprecated
+function void Level.loadNonfadingSecondaryPaletteData()
 {
 	// Copies to somewhere inside the palette at 0xfffff000 = secondary palette without fading applied
-	copyPaletteDataFromTable(D0.u16, 0xf000)
+	Level.loadNonfadingSecondaryPaletteData(D0.u16)
+}
+
+function void Level.loadNonfadingSecondaryPaletteData(u8 index)
+{
+	copyPaletteDataFromTable(index, 0xf000)
 }
 
 
@@ -1165,10 +1178,10 @@ function void Level.InitializeWater.Part2()
 		}
 
 		D1.u16 = D0.u16
-		fn003df2()
+		Level.loadSecondaryPaletteData()
 
 		D0.u16 = D1.u16
-		fn003e0e()
+		Level.loadNonfadingSecondaryPaletteData()
 
 		if (checkpoint.number != 0)
 		{

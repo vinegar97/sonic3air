@@ -137,7 +137,7 @@ function void LevelSelect.init()
 	A2 = 0x0081b0
 	LevelTilesAnim.Default()
 
-	Level.loadNonfadingPaletteData(0x04)
+	Level.loadNonfadingPaletteData(0x04)		// Level Select
 
 	copyMemory(0xfffffcc0, 0xfffffc40, 0x20)
 	zeroMemory(0xfffffc40, 0x20)

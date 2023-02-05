@@ -486,7 +486,7 @@ function void fn04fd62()
 		fn01c362()
 		fn0076a6()
 		Level.InitializeWater()
-		Level.loadPaletteData(0x0b)
+		Level.loadPaletteData(0x0b)		// AIZ 2 level palette
 
 		D7 = pop()
 		A0 = pop()
@@ -1111,7 +1111,7 @@ function void fn01c46e()
 				requestLoadingPatterns(0x0b)		// AIZ1 object sprites
 			}
 
-			Level.loadPaletteData(0x2a)
+			Level.loadPaletteData(0x2a)		// AIZ 1 level palette
 
 			if (isMainCharacter(CHARACTER_KNUCKLES))
 			{
@@ -1440,7 +1440,7 @@ function void fn01c6f6()
 			Kosinski.addToDMAQueue(0x3b48c6, 0x3f80)
 			Kosinski.addToDMAQueue(0x399cc4, 0xa000)
 
-			Level.loadPaletteData(0x30)
+			Level.loadPaletteData(0x30)		// AIZ 2 bombing scene palette
 
 			u8[0xffffeec6] = 0xff
 			camera.update_routine += 2
@@ -1567,7 +1567,7 @@ function void fn01c81e()
 		Kosinski.addToDecompressionQueue(0x3b1372, 0xffff9ab8)
 		Kosinski.addToDMAQueue(0x3b48c6, 0x3f80)
 
-		Level.loadPaletteData(0x30)
+		Level.loadPaletteData(0x30)		// AIZ 2 bombing scene palette
 
 		move_area.left = 0x3b80
 		move_area.bottom.target = 0x05da

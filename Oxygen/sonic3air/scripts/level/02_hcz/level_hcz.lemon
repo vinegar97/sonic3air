@@ -194,7 +194,7 @@ function void fn050c4c()
 		water.height.next = D0.u16
 		water.height.target = D0.u16
 
-		Level.loadPaletteData(0x0d)
+		Level.loadPaletteData(0x0d)		// HCZ 2 level palette
 
 		D7 = backupD7
 		A0 = backupA0

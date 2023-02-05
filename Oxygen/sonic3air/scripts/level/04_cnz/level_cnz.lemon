@@ -411,7 +411,7 @@ function void fn051e60()
 			VDP.Config.enableHInt(true)
 		}
 
-		Level.loadPaletteData(0x11)
+		Level.loadPaletteData(0x11)		// CNZ 2 level palette
 
 		D7 = pop()
 		A0 = pop()

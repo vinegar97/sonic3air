@@ -122,7 +122,7 @@ function void fn0511c8()
 		fn01c362()
 		fn0076a6()
 
-		Level.loadPaletteData(0x0f)
+		Level.loadPaletteData(0x0f)		// MGZ 2 level palette
 
 		D7 = pop()
 		A0 = pop()

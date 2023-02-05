@@ -345,6 +345,7 @@ function void fn055c84()
 	fn01c362()
 	fn0076a6()
 
+	// Load character and level palettes
 	Level.loadNonfadingPaletteData(isMainCharacter(CHARACTER_KNUCKLES) ? 0x05 : 0x03)
 	Level.loadNonfadingPaletteData(0x1b)
 	Level.loadPaletteData(0x1b)
@@ -1406,7 +1407,7 @@ function void fn0565de()
 
 	Kosinski.addToDMAQueue(0x1ad81e, 0x62a0)
 
-	Level.loadPaletteData(0x1b)
+	Level.loadPaletteData(0x1b)		// SOZ 2 level palette
 
 	D7 = pop()
 	A0 = pop()

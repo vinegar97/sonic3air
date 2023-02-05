@@ -278,6 +278,7 @@ function void fn05ac70()
 	global.zone_act = 0x0d01
 	checkpoint.number = 0
 
+	// Load character and level palettes
 	Level.loadNonfadingPaletteData(0x03)
 	Level.loadNonfadingPaletteData(0x2a)
 	copyMemory(0xfffffca0, 0x0a97bc, 0x20)
@@ -455,7 +456,7 @@ function void fn05ae0a()
 	fn01c362()
 	fn0076a6()
 
-	Level.loadNonfadingPaletteData(0x03)
+	Level.loadNonfadingPaletteData(0x03)		// Sonic's character palette
 
 	copyMemory(0xfffffca0, 0x0a97fc, 0x60)
 	fn05b11c()

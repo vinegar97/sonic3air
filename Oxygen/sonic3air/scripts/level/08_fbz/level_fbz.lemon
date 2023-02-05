@@ -847,7 +847,7 @@ function void fn052972()
 		fn01c362()
 		fn0076a6()
 
-		Level.loadPaletteData(0x13)
+		Level.loadPaletteData(0x13)		// FBZ 2 level palette
 
 		D7 = pop()
 		A0 = pop()
