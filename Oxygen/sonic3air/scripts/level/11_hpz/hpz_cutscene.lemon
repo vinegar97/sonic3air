@@ -858,7 +858,7 @@ function void fn064b22()
 		objA1.update_address = 0x084a76
 	}
 
-	A1 = 0x06671f
+	A1 = 0x06671f				// Cutscene Knuckles tired panting animation data
 	fn084580()
 
 #if STANDALONE
@@ -925,7 +925,7 @@ function void fn064bc6()
 	objA0.animation.sprite = 0
 	objA0.render_flags &= ~render_flag.FLIP_X
 
-	A1 = 0x06671f
+	A1 = 0x06671f				// Cutscene Knuckles tired panting animation data
 	fn084580()
 }
 

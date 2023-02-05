@@ -601,7 +601,7 @@ function void fn0626d6()
 	// Knuckles starts throwing the bomb
 
 	objA0.base_state = 0x06
-	u32[A0 + 0x30] = 0x0666c3
+	u32[A0 + 0x30] = 0x0666c3		// Cutscene Knuckles bomb throw animation data
 	objA0.countdown_callback = 0x0626f4
 }
 
@@ -672,7 +672,7 @@ function void fn06273e()
 function void fn062760()
 {
 	objA0.base_state = 0x0e
-	u32[A0 + 0x30] = 0x06669f
+	u32[A0 + 0x30] = 0x06669f		// Cutscene Knuckles walking animation data
 	objA0.animation.timer = 0
 	objA0.animation.frame = 0
 }

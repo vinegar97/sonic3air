@@ -1138,30 +1138,37 @@ function void Standalone.renderCutsceneKnuckles(u8 variant, s16 px, s16 py, u16 
 	{
 		if (variant == 1)
 		{
+			// Sonic 3 (disc 1) zones use a shared resource for its Knuckles cutscene sprites
 			key = Standalone.renderWithStandardPacking(px, py, 0x06666a, 0x80, renderQueue)
 		}
 		else if (variant == 2)
 		{
+			// HPZ emerald theft scene
 			key = Standalone.renderWithStandardPacking(px, py, 0x066682, 0x80, renderQueue)
 		}
 		else if (variant == 3)
 		{
+			// Tired panting and shooing in HPZ/SSZ
 			key = Standalone.renderWithStandardPacking(px, py, 0x06668a, 0x80, renderQueue)
 		}
 		else if (variant == 4)
 		{
+			// Pushing the lever in MHZ 2
 			key = Standalone.renderWithStandardPacking(px, py, 0x066672, 0x80, renderQueue)
 		}
 		else if (variant == 5)
 		{
+			// Laying down in intro
 			key = Standalone.renderWithStandardPacking(px, py, 0x06667a, 0x80, renderQueue)
 		}
 		else if (variant == 6)
 		{
+			// Outro
 			key = Standalone.renderWithKosinskiCompression(px, py, 0x163b9a, 0x80, renderQueue)
 		}
 		else if (variant == 7)
 		{
+			// Looking left and right in MHZ 1
 			key = Standalone.renderWithKosinskiCompression(px, py, 0x1695c0, 0x80, renderQueue)
 		}
 

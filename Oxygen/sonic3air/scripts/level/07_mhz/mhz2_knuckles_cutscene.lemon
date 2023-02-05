@@ -162,7 +162,7 @@ function void fn063220()
 		fn065eb4()
 	}
 
-	A1 = 0x0666f6
+	A1 = 0x0666f6		// Cutscene Knuckles lever pushing animation data
 	fn0845a0()
 	if (!_equal())
 	{

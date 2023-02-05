@@ -456,7 +456,7 @@ function void fn0658f2()
 	u8[0xffffeeda] = 0xff
 	playSound(SFX_CLICK)
 
-	A1 = 0x06671f
+	A1 = 0x06671f				// Cutscene Knuckles tired panting animation data
 	fn084580()
 
 #if STANDALONE
@@ -778,7 +778,7 @@ function void fn065fde()
 	u8[0x065fde] = 0x93
 #endif
 
-	A1 = 0x06672a
+	A1 = 0x06672a		// Cutscene Knuckles tired shooing animation data
 	fn084580()
 }
 
