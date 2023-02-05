@@ -1554,14 +1554,15 @@ function void SetupCharacterAtLastCheckpoint()
 //# address-hook(0x007812) end(0x007890)
 function void fn007812()
 {
-	A4 = MainGame.getLevelDataPointer()
-	A1 = u32[A4] & 0x00ffffff
+	// Decompress 8x8 level tiles into VRAM
+	A4 = MainGame.getLevelDataPointer()		// Pointer to level art data
+	A1 = u32[A4] & 0x00ffffff		// Ignoring upper byte, which is the pattern request ID for object art
 	u32 firstSource = A1
 	D4.u16 = u16[A1]
 	Kosinski.addToDMAQueue(A1, 0x0000)
 
-	A1 = u32[A4+4] & 0x00ffffff
-	if (A1 != firstSource)
+	A1 = u32[A4+4] & 0x00ffffff		// Pointer to second set of tiles
+	if (A1 != firstSource)	// Checking if the two pointers aren't duplicates of eachother
 	{
 		Kosinski.addToDMAQueue(A1, D4.u16)
 	}
@@ -1583,18 +1584,20 @@ function void fn007812()
 //# address-hook(0x01c2b0) end(0x01c360)
 function void fn01c2b0()
 {
-	A2 = MainGame.getLevelDataPointer()
+	// Decompress 16x16 level blocks into its area in RAM
+	A2 = MainGame.getLevelDataPointer()		// Pointer to level art data
 
-	D0 = u32[A2+8] & 0x00ffffff
+	D0 = u32[A2+8] & 0x00ffffff		// Ignoring upper byte, which is the palette entry ID for level
 	D7 = D0
 	Kosinski.decompress(D0, 0xffff9000)
 
-	D0 = u32[A2+12] & 0x00ffffff
-	if (D7 != D0)
+	D0 = u32[A2+12] & 0x00ffffff		// Pointer to second set of blocks
+	if (D7 != D0)               	// Checking if the two pointers aren't duplicates of eachother
 	{
 		Kosinski.decompress(D0, A1)
 	}
 
+	// Decompress 128x128 level chunks into its area in RAM
 	D0 = u32[A2+16] & 0x00ffffff
 	D7 = D0
 	Kosinski.decompress(D0, 0xffff0000)
@@ -1718,8 +1721,8 @@ function void fn028c80()
 	else if (global.zone == 0x14)
 	{
 		// Glowing Spheres bonus stage 
-		Kosinski.decompress(0x156c08, 0xffff1000)
-		Kosinski.decompress(0x1574e8, 0xffff7000)
+		Kosinski.decompress(0x156c08, 0xffff1000)		// Animated background art, loaded into a designated area in RAMm before going into VRAM
+		Kosinski.decompress(0x1574e8, 0xffff7000)		// See above
 
 		A1 = 0xffff6000
 		A2 = 0xffff7000
@@ -1733,7 +1736,7 @@ function void fn028c80()
 			--D0.s16
 		}
 
-		Kosinski.decompress(0x1578f8, 0xffff7800)
+		Kosinski.decompress(0x1578f8, 0xffff7800)		// Compressed palette for the background. yeah this stage is weird
 	}
 	else if (global.zone_act == 0x1600)
 	{

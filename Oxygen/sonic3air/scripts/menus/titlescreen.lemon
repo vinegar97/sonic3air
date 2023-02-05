@@ -91,7 +91,7 @@ function void fn00440c()
 	{
 		if (D7.u16 > 7)
 		{
-			Kosinski.decompress(D0 & 0x00ffffff, 0xffff0000)
+			Kosinski.decompress(D0 & 0x00ffffff, 0xffff0000)		// Title screen + intro frames
 			D3.u16 = A1.u16 >> 1
 		}
 
@@ -215,6 +215,7 @@ function void TitleScreen()
 		return
 	}
 
+	// S3 title screen intro first frame
 	Kosinski.decompress(0x350d26, 0xffff0000)	// After this, A1 points to where uncompressed data ends
 	updateSpritePattern(0xffff0000, TitleScreen.Intro_Background.targetInVRAM, A1.u16 >> 1)
 

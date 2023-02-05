@@ -44,13 +44,12 @@ function void TitleCard.Init()
 	}
 
 	Kosinski.addToDMAQueue(0x0d6f28, 0xa000)		// Common title card sprites
-
-	A1 = (global.lock_on_state == 0) ? 0x15c3a2 : 0x15c2e0		// "Sonic 3 & Knuckles"/"Sonic & Knuckles" red banner title
-	Kosinski.addToDMAQueue(A1, 0xa200)
+	Kosinski.addToDMAQueue((global.lock_on_state == 0) ? 0x15c3a2 : 0x15c2e0, 0xa200)		// "Sonic 3 & Knuckles"/"Sonic & Knuckles" red banner title
 
 	A1 = 0x0d6e46
-	if (global.zone_act != 0x1600 && global.zone_act != 0x1700 && global.act.apparent == 0)
+	if (global.zone_act != 0x1600 && global.zone_act != 0x1700 && global.act.apparent == 0)		// Excluding LRZ boss and DEZ boss acts
 	{
+		// Use act 1 title card number
 		A1 = 0x0d6d84
 	}
 	Kosinski.addToDMAQueue(A1, 0xa7a0)		// Act number sprite

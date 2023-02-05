@@ -361,12 +361,13 @@ function void DataSelect.setup()
 	copyMemory(0xfffffce0, 0xfffffc60, 0x20)
 	zeroMemory(0xfffffc60, 0x20)
 
-	Kosinski.decompress(0x20c7e0, 0xffff0000)
+	Kosinski.decompress(0x20c7e0, 0xffff0000)	// Save file S3 zone preview images
 
 	copyMemory(0xffff2300, 0xffff2bc0, 0x1180)
 
+	// Save file SK zone preview images
 	Kosinski.decompress(0x15cd62, 0xffff3480)	// After this, A1 points to where uncompressed data ends
-	Kosinski.decompress(0x15edb2, A1)
+	Kosinski.decompress(0x15edb2, A1)			// Save file Knuckles and Tails previews
 
 	A0 = A1 - 0x08c0
 	copyMemory(A1, A0, 0x540)
