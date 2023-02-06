@@ -516,12 +516,22 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				return true
 			}
 
-			//// CNZ Balloon
-			//if (objA0.update_address == 0x031754)		// TODO: This still does not work (except for the red balloon, but not even its cord)
-			//{
-			//	Standalone.renderWithKosinskiCompression(px, py, 0x37060e, 0xff, renderQueue, 0xae80)
-			//	return true
-			//}
+			// CNZ Balloon
+			if (objA0.update_address == 0x031754 && objA0.subtype2c == 0x04)
+			{
+				// This only works for the red balloon; its cord and other colors use a copy of the art that's Nemesis-compressed
+				Standalone.renderWithKosinskiCompression(px, py, 0x37060e, 0xff, renderQueue, 0xae80)		// Draw the balloon sprite
+
+				// Directly drawing the cord sprites
+				if (objA0.animation.sprite == 0x14)
+					Renderer.drawVdpSprite(px-4, py+16, 0x03, 0x035c, renderQueue)
+				if (objA0.animation.sprite == 0x15)
+					Renderer.drawVdpSprite(px-4, py+16, 0x03, 0x0360, renderQueue)
+				if (objA0.animation.sprite == 0x16)
+					Renderer.drawVdpSprite(px-4, py+16, 0x03, (sprite_attribute.FLIP_X | 0x035c), renderQueue)
+
+				return true        // skip hardware drawing the original balloon
+			}
 
 			// Elemental Shields + Insta-Shield
 			if (objA0.update_address == 0x01952a || objA0.update_address == 0x019602 || objA0.update_address == 0x019732 || objA0.update_address == 0x019922)
