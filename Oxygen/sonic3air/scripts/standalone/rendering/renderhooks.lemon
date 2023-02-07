@@ -122,6 +122,16 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			return true
 		}
 
+		// Dynamic ring
+		if (objA0.update_address == 0x01a88c && objA0.base_state == 0x00)
+		{
+			// Use smoother ring rotation
+			u16 animFrame = ((objA0.animation.sprite * 4 + 3 - objA0.animation.timer) / 2) % 8
+			u64 key = stringformat("ring_0%d", animFrame)
+			Renderer.drawCustomSprite(key, px, py, 0x00, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue, 0, 255)
+			return true
+		}
+
 		// Monitor
 		if (objA0.update_address >= 0x01d566 && objA0.update_address <= 0x01d61e)
 		{
