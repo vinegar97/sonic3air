@@ -1411,7 +1411,7 @@ function void SetupCharacterAtStartPosition()
 			// Mushroom Hill Act 1
 			if (!isMainCharacter(CHARACTER_KNUCKLES) && global.lock_on_state == 0)
 			{
-				// Place camera above spawn point to accommodate for Knuckles falling in intro
+				// Move camera back to an earlier spawn point for Sonic/Tails with lock-on
 				move_area.left  = 0x00c0
 				move_area.left.target = 0x00c0
 				move_area.left.player2 = 0x00c0
