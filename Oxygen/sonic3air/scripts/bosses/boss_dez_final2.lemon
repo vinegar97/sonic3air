@@ -89,6 +89,7 @@ function void fn080102()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn Egg Mobile with glass dome
 		objA1.update_address = 0x080160
 	}
 
@@ -554,14 +555,14 @@ function bool fn080f3a()
 	objA0.flags38 &= ~0x20
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x16
 	}
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x16

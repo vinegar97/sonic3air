@@ -81,7 +81,7 @@ function void fn07b2dc()
 		objA0.flags38 |= 0x04
 
 		// "spawnSimpleChildObjects(0x07d47a)" replaced by:
-		spawnSimpleChildObjects(0x07c902, 2)
+		spawnSimpleChildObjects(0x07c902, 2)		// Dash dust
 
 		BossMecha1.setBossArea()
 
@@ -106,7 +106,7 @@ function void fn07b2dc()
 	}
 
 	// "spawnSimpleChildObjects(0x07d474)" replaced by:
-	spawnSimpleChildObjects(0x07c9ba, 1)
+	spawnSimpleChildObjects(0x07c9ba, 1)		// Damaging spike hitbox
 
 	AllocDynamicObjectStd()
 }
@@ -298,7 +298,7 @@ function void fn07b544()
 	objA0.flags38 |= 0x04
 
 	// "spawnSimpleChildObjects(0x07d486)" replaced by:
-	spawnSimpleChildObjects(0x07c8fe, 2)
+	spawnSimpleChildObjects(0x07c8fe, 2)		// Dash dust
 }
 
 
@@ -457,7 +457,7 @@ function void fn07b6ee()
 			playSound(0x96)
 
 			// "spawnSimpleChildObjects(0x07d480)" replaced by:
-			spawnSimpleChildObjects(0x07c902, 1)
+			spawnSimpleChildObjects(0x07c902, 1)		// Dash dust
 			if (_equal())
 			{
 				u8[A1 + 0x2c] = 0x08
@@ -625,7 +625,7 @@ function void fn07b888()
 	fn07c678()
 
 	// "spawnSimpleChildObjects(0x07d48c)" replaced by:
-	spawnSimpleChildObjects(0x07c948, 1)
+	spawnSimpleChildObjects(0x07c948, 1)		// Electric sparks
 
 	playSound(0x96)
 
@@ -729,7 +729,7 @@ function void fn07c902()
 //# address-hook(0x07c91c) end(0x07c942)
 function void fn07c91c()
 {
-	A1 = 0x07d65f
+	A1 = 0x07d65f		// Mecha Sonic dash dust animation data
 	fn0845a0()
 	MoveAndFlipWithParent()
 
@@ -933,6 +933,8 @@ function void fn07d312()
 	D0.u8 = boss.remaining_hits
 	if (D0.u8 == 0)
 	{
+		// Boss beaten
+
 		// Targets:
 		//  - 0x07d35a
 		//  - 0x07d39e
@@ -969,7 +971,7 @@ function void fn07d35a()
 	objA0.countdown_value = 0x7f
 
 	// "spawnChildObjects(0x083fee)" replaced by:
-	spawnChildObject(0x083d84, 0x00, 0, 0)
+	spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x04

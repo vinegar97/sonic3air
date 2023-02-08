@@ -282,7 +282,7 @@ function void fn065730()
 //# address-hook(0x06575e) end(0x06578e)
 function void fn06575e()
 {
-	A1 = 0x0667c1
+	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
 	fn084512()
 	if ((u8[0xfffffab8] & 0x01) == 0)
 		return
@@ -387,7 +387,7 @@ function void fn06584c()
 	objA0.velocity.x = 0x200
 	objA0.velocity.y = -0x300
 
-	A1 = 0x0667c1
+	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
 	fn084580()
 }
 
@@ -410,7 +410,7 @@ function void fn065876()
 	objA0.velocity.y = 0
 	objA0.render_flags &= ~render_flag.FLIP_X
 
-	A1 = 0x066824
+	A1 = 0x066824		// Cutscene Knuckles walking animation data
 	fn084580()
 }
 
@@ -428,7 +428,7 @@ function void fn0658ba()
 	objA0.velocity.x = 0x0480
 	objA0.velocity.y = -0x600
 
-	A1 = 0x0667c1
+	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
 	fn084580()
 }
 

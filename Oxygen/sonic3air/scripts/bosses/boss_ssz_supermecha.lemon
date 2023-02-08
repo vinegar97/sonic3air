@@ -32,7 +32,7 @@ function void fn07b996()
 	playMusic(MUSIC_DDZ)
 
 	// "spawnChildObjects(0x07d492)" replaced by:
-	spawnChildObject(0x07c886, 0x00, -4, 12)
+	spawnChildObject(0x07c886, 0x00, -4, 12)	// Mecha Sonic's eye
 
 	Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)	// Master Emerald sprite
 }
@@ -66,6 +66,7 @@ function void fn07ba00()
 	objA0.countdown_value = 0x3b
 	objA0.flags38 |= 0x04
 
+	// Spawn dash dust
 	if (objA0.render_flags & render_flag.FLIP_X)
 	{
 		// "spawnSimpleChildObjects(0x07d47a)" replaced by:
@@ -208,7 +209,7 @@ function void fn07bb7c()
 	fn07c678()
 
 	// "spawnSimpleChildObjects(0x07d48c)" replaced by:
-	spawnSimpleChildObjects(0x07c948, 1)
+	spawnSimpleChildObjects(0x07c948, 1)		// Electric sparks
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x08
@@ -296,7 +297,7 @@ function void fn07bc32()
 		objA0.countdown_callback = 0x07bc70
 
 		// "spawnSimpleChildObjects(0x07d4ca)" replaced by:
-		spawnSimpleChildObjects(0x07ce90, 16)
+		spawnSimpleChildObjects(0x07ce90, 16)		// Mecha Sonic giblets
 	}
 }
 
@@ -601,7 +602,7 @@ function void fn07bed2()
 	objA0.flags38 |= 0x40
 
 	// "spawnChildObjects(0x07d49a)" replaced by:
-	spawnChildObject(0x07c78e, 0x00, 20, -4)
+	spawnChildObject(0x07c78e, 0x00, 20, -4)		// Exhaust flame + spark effect of Super Mecha
 }
 
 
@@ -755,7 +756,7 @@ function void fn07c06e()
 		objA0.flags38 |= 0x40
 
 		// "spawnChildObjects(0x07d49a)" replaced by:
-		spawnChildObject(0x07c78e, 0x00, 20, -4)
+		spawnChildObject(0x07c78e, 0x00, 20, -4)		// Exhaust flame + spark effect of Super Mecha
 	}
 	else
 	{
@@ -1020,7 +1021,7 @@ function void fn07c39e()
 	objA0.countdown_value = 0x2f
 
 	// "spawnChildObjects(0x07d4ae)" replaced by:
-	spawnChildObject(0x07c744, 0x00, -7, -8)
+	spawnChildObject(0x07c744, 0x00, -7, -8)		// Energy ball projectile
 
 	--objA0.value39
 	if (s8(objA0.value39) >= 0)
@@ -1352,7 +1353,7 @@ function void fn07c6f0()
 	playSound(0x98)
 
 	// "spawnSimpleChildObjects(0x07d4a8)" replaced by:
-	spawnSimpleChildObjects(0x07c726, 8)
+	spawnSimpleChildObjects(0x07c726, 8)		// Ring projectiles
 }
 
 
@@ -1364,7 +1365,7 @@ function void fn07c718()
 }
 
 
-// Orb projectile
+// Ring projectile
 
 //# address-hook(0x07c726) end(0x07c734)
 function void fn07c726()
@@ -1427,7 +1428,7 @@ function void fn07c77a()
 
 
 
-// Exhaust spark effect of Super Mecha
+// Exhaust flame + spark effect of Super Mecha
 
 //# address-hook(0x07c78e) end(0x07c796)
 function void fn07c78e()
@@ -1455,7 +1456,7 @@ function void fn07c79c()
 		return
 
 	// "spawnSimpleChildObjects(0x07d4a2)" replaced by:
-	spawnSimpleChildObjects(0x07c7d4, 1)
+	spawnSimpleChildObjects(0x07c7d4, 1)		// Exhaust sparks
 
 	DrawObject()
 }
@@ -1676,7 +1677,7 @@ function void fn07cf14()
 		objA0.position.y.u16 = camera.position.y.u16 + 0xd0
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x0c
@@ -1690,7 +1691,7 @@ function void fn07cf14()
 		objA0.velocity.x = (D0.u8 == 0) ? -2 : 2
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x1e

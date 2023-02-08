@@ -59,8 +59,8 @@ function void fn063d1a()
 
 	if (allocDynamicObjectStd())
 	{
-		objA1.update_address = 0x085ca4
-		u32[A1 + 0x34] = 0x063dd4
+		objA1.update_address = addressof(CheckForBossStart)
+		objA1.countdown_callback = 0x063dd4
 		u16[A1 + 0x2e] = 0x78
 		u8[A1 + 0x27] = u8[A0 + 0x27]
 
@@ -81,7 +81,7 @@ function void fn063d1a()
 	objA0.render_flags = (render_flag.WORLD | render_flag.FLIP_X)
 	objA0.animation.sprite = 0xd8
 	boss.remaining_hits = 8
-	u32[A0 + 0x30] = 0x066771
+	u32[A0 + 0x30] = 0x066771		// Boss Knuckles fighting pose animation data
 	u16[A0 + 0x44] = 0
 
 	copyMemory(0xfffffca0, 0xfffffc20, 0x20)
@@ -237,7 +237,7 @@ function void fn063ebe()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 
-	A1 = 0x066771
+	A1 = 0x066771		// Boss Knuckles fighting pose animation data
 	fn084580()
 }
 
@@ -275,7 +275,7 @@ function void fn063f20()
 	objA0.animation.sprite = 0xda
 	objA0.countdown_value = 119
 
-	A1 = 0x0667ad
+	A1 = 0x0667ad		// Boss Knuckles punching animation data
 	fn084580()
 }
 
@@ -331,7 +331,7 @@ function void fn063f7a()
 	objA1.velocity.y = -objA1.velocity.y
 	s16[A1 + 0x1c] = -s16[A1 + 0x1c]
 
-	A1 = 0x0667b4
+	A1 = 0x0667b4		// Boss Knuckles "crouch guard" animation data
 	fn084580()
 }
 
@@ -384,7 +384,7 @@ function void fn06401c()
 #endif
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
+	A1 = 0x0667c1		// Boss Knuckles jumping animation data
 	fn084580()
 }
 
@@ -417,7 +417,7 @@ function void fn064066()
 	objA0.velocity.y = 0
 	objA0.countdown_callback = 0x06401c
 
-	A1 = 0x0667cc
+	A1 = 0x0667cc		// Boss Knuckles crouching animation data
 	fn084580()
 }
 
@@ -488,7 +488,7 @@ function void fn064132()
 	objA0.render_flags ^= render_flag.FLIP_X
 	objA0.velocity.x = 0
 
-	A1 = 0x0667d4
+	A1 = 0x0667d4		// Boss Knuckles glide drop animation data
 	fn084580()
 }
 
@@ -513,7 +513,7 @@ function void fn064164()
 	objA0.velocity.y = 0
 	objA0.countdown_callback = 0x063ebe
 
-	A1 = 0x0667e0
+	A1 = 0x0667e0		// Boss Knuckles land to get up animation data
 	fn084580()
 }
 
@@ -539,7 +539,7 @@ function void fn064184()
 		objA0.flags38 &= ~0x01
 
 		// "spawnSimpleChildObjects(0x0665fc)" replaced by:
-		spawnSimpleChildObjects(0x064c24, 1)
+		spawnSimpleChildObjects(0x064c24, 1)		// Spin dash dust
 	}
 
 	A3 = 0x064056
@@ -558,7 +558,7 @@ function void fn0641c4()
 	objA0.velocity.y = 0
 	objA0.countdown_value = 0x3b
 
-	A1 = 0x0667f5
+	A1 = 0x0667f5		// Boss Knuckles crouching animation data
 	fn084580()
 }
 
@@ -605,7 +605,7 @@ function void fn064222()
 	u16[A0 + 0x40] = D1.u16
 	objA0.position.y.u16 += 4
 
-	A1 = 0x0667c1
+	A1 = 0x0667c1		// Boss Knuckles rolling animation data
 	fn084580()
 }
 
@@ -668,7 +668,7 @@ function void fn06429e()
 		objA0.mapping_offset = 0x14a8d6
 		objA0.animation.sprite = 0x8d
 
-		A1 = 0x0667bc
+		A1 = 0x0667bc		// Boss Knuckles hurt animation data
 		fn084580()
 	}
 }
@@ -725,7 +725,7 @@ function void fn064356()
 	objA0.countdown_callback = 0x0643a4
 	playSound(0x90)
 
-	A1 = 0x06680a
+	A1 = 0x06680a		// Cutscene Knuckles unconscious animation data
 	fn084580()
 
 	Kosinski.addToDMAQueue(0x174a86, 0xa000)	// Swirling stars around Knuckles' head while dizzy

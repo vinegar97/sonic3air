@@ -379,7 +379,7 @@ function void fn08f3f6()
 	objA0.subtype2c = 0x03
 
 	// "spawnChildObjects(0x08f646)" replaced by:
-	spawnChildObject(0x08f438, 0x00, 0, -36)
+	spawnChildObject(0x08f438, 0x00, 0, -36)			// Capsule unlock button
 
 	bool isCapsuleOpen = (checkpoint.number != 0 || isMainCharacter(CHARACTER_KNUCKLES) || !isGhostSpawnEnabled())
 	if (isCapsuleOpen)

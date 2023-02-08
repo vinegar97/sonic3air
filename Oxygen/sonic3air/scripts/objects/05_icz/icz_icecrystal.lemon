@@ -67,7 +67,7 @@ function void fn08b4ec()
 	}
 
 	// "spawnSimpleChildObjects(0x08b54a)" replaced by:
-	spawnSimpleChildObjects(0x08b230, 12)
+	spawnSimpleChildObjects(0x08b230, 12)			// Broken ice
 
 	Object.TriggerUnloading()
 	playSound(0x80)

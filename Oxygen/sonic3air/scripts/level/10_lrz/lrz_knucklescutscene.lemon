@@ -66,7 +66,7 @@ function void fn063aca()
 //# address-hook(0x063ae8) end(0x063aec)
 function void fn063ae8()
 {
-	A1 = 0x066891
+	A1 = 0x066891		// Cutscene Knuckles boulder push animation data
 	fn08468c()
 }
 
@@ -78,7 +78,7 @@ function void fn063af2()
 	u8[0xfffffab8] |= 0x04
 	objA0.countdown_callback = 0x063b1a
 
-	A1 = 0x0668a7
+	A1 = 0x0668a7		// Cutscene Knuckles standing animation data
 	fn084580()
 }
 
@@ -86,7 +86,7 @@ function void fn063af2()
 //# address-hook(0x063b10) end(0x063b14)
 function void fn063b10()
 {
-	A1 = 0x0668a7
+	A1 = 0x0668a7		// Cutscene Knuckles boulder push animation data
 	fn08468c()
 }
 

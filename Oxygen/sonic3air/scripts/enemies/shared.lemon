@@ -51,7 +51,7 @@ function void Enemy.UnloadDelayed()
 //# address-hook(0x085102) end(0x08513a)
 function void fn085102()
 {
-	// Called after destruction
+	// Scattered boss giblets, Called after destruction
 
 	UpdateMovementSimple()
 

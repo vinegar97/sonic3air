@@ -220,6 +220,8 @@ function void fn08963e()
 }
 
 
+// Used when jumping out of a capsule
+
 //# address-hook(0x089650) end(0x08965e)
 function void fn089650()
 {

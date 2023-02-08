@@ -303,7 +303,7 @@ function void fn0791fe()
 	objA0.position.y.u16 += 0x18
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 
 	if (objA0.subtype2c != 0)
 	{

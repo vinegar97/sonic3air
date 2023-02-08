@@ -331,6 +331,7 @@ function void fn0787e0()
 		objA1.update_address = 0x078aa8
 	}
 
+	// Spawn boss giblets
 	// "spawnChildObjects(0x078d9e)" replaced by:
 	spawnChildObject(0x078a70, 0x00, 0, -12)
 	spawnChildObject(0x078a70, 0x02, -25, -12)
@@ -737,7 +738,7 @@ function void fn078b86()
 	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	// "spawnChildObjects(0x083fee)" replaced by:
-	spawnChildObject(0x083d84, 0x00, 0, 0)
+	spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 6
@@ -794,6 +795,7 @@ function void fn078c14()
 	D0.u8 = boss.remaining_hits
 	if (D0.u8 == 0)
 	{
+		// Boss beaten
 		fn078c60()
 		return
 	}
@@ -826,7 +828,7 @@ function void fn078c60()
 	objA0.countdown_callback = 0x0787e0
 
 	// "spawnChildObjects(0x083fee)" replaced by:
-	spawnChildObject(0x083d84, 0x00, 0, 0)
+	spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 
 	fn08594e()
 	AddScoreForBossEnemy()
@@ -864,6 +866,7 @@ function void fn078cf4()
 	D0.u8 = boss.remaining_hits
 	if (D0.u8 == 0)
 	{
+		// Boss beaten
 		A1 = 0xffff0000 + u16[A0 + 0x44]
 		D0.u16 = (objA0.render_flags & render_flag.FLIP_X) ? 7 : 6
 		u8[A1 + 0x38] |= (1 << D0.u8)
@@ -881,7 +884,7 @@ function void fn078cf4()
 		playSound(0x6e)
 
 		// "spawnSimpleChildObjects(0x078d98)" replaced by:
-		spawnSimpleChildObjects(0x078a28, 1)
+		spawnSimpleChildObjects(0x078a28, 1)		// Damage flashing sprite
 	}
 
 	--objA0.state

@@ -99,7 +99,7 @@ function void fn064422()
 function void fn064450()
 {
 	objA0.base_state = 0x22
-	A1 = 0x066824
+	A1 = 0x066824		// Cutscene Knuckles walking animation data
 	fn084580()
 }
 
@@ -123,7 +123,7 @@ function void fn064472()
 	objA0.mapping_offset = 0x066f36
 	objA0.animation.sprite = 0x0a
 
-	A1 = 0x06687b
+	A1 = 0x06687b		// Cutscene Knuckles shaking fist animation data
 	fn084580()
 
 	u8[A0 + 0x0a] |= 0x80
@@ -138,6 +138,7 @@ function void fn064472()
 	}
 	if (allocDynamicObjectStd())
 	{
+		// Spawn Egg Mobile
 		objA1.update_address = 0x064e88
 	}
 	if (allocDynamicObjectStd())
@@ -192,7 +193,7 @@ function void fn06453c()
 	objA0.velocity.y = -0x600
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
+	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
 	fn084580()
 }
 
@@ -238,7 +239,7 @@ function void fn0645b0()
 	objA0.velocity.y = -0x500
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
+	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
 	fn084580()
 }
 
@@ -268,7 +269,7 @@ function void fn0645e0()
 	objA0.animation.sprite = 0x0a
 	objA0.countdown_value = 0x7f
 
-	A1 = 0x066880
+	A1 = 0x066880		// Cutscene Knuckles shouting animation data
 	fn084580()
 }
 
@@ -296,7 +297,7 @@ function void fn06463c()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 
-	A1 = 0x06682f
+	A1 = 0x06682f		// Cutscene Knuckles walking animation data
 	fn084580()
 }
 
@@ -318,7 +319,7 @@ function void fn064670()
 	objA0.base_state = 0x30
 	u16[A0 + 0x44] = 0x02
 	objA0.mapping_offset = 0x066f36
-	objA0.animation.sprite = 0x0d
+	objA0.animation.sprite = 0x0d		// Cutscene Knuckles preparing jump frame
 	objA0.countdown_value = 0x1d
 }
 
@@ -351,7 +352,7 @@ function void fn0646b8()
 	objA0.velocity.y = -0x500
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
+	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
 	fn084580()
 }
 
@@ -380,7 +381,7 @@ function void fn06471a()
 	objA0.velocity.y = -0x200
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
+	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
 	fn084580()
 }
 
@@ -413,7 +414,7 @@ function void fn06478e()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 
-	A1 = 0x06682f
+	A1 = 0x06682f		// Cutscene Knuckles walking animation data
 	fn084580()
 }
 
@@ -441,7 +442,7 @@ function void fn0647ec()
 	objA0.velocity.y = -0x600
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
+	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
 	fn084580()
 }
 
@@ -549,7 +550,7 @@ function void fn0648b8()
 	objA0.velocity.y = 0
 	objA0.countdown_callback = 0x0648ea
 
-	A1 = 0x0667e7
+	A1 = 0x0667e7		// Cutscene Knuckles falling off animation data
 	fn084580()
 }
 
@@ -603,7 +604,7 @@ function void fn0648fa()
 	for (u8 i = 0; i < 2; ++i)
 	{
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x14
@@ -670,7 +671,7 @@ function void fn06498a()
 	objA0.velocity.y = 0
 	objA0.countdown_callback = 0x0649b4
 
-	A1 = 0x06680a
+	A1 = 0x06680a		// Cutscene Knuckles unconscious animation data
 	fn084580()
 }
 
@@ -688,7 +689,7 @@ function void fn0649b4()
 	objA0.base_state = 0x4a
 	objA0.countdown_callback = 0x0649de
 
-	A1 = 0x06684f
+	A1 = 0x06684f		// Cutscene Knuckles head shaking animation data
 	fn084580()
 
 	// "spawnSimpleChildObjects(0x066644)" replaced by:
@@ -738,7 +739,7 @@ function void fn064a1c()
 	objA0.render_flags |= render_flag.FLIP_X
 	objA0.velocity.x = 0
 
-	A1 = 0x06682f
+	A1 = 0x06682f		// Cutscene Knuckles walking animation data
 	fn084580()
 }
 
@@ -765,7 +766,7 @@ function void fn064a3c()
 	objA0.animation.sprite = 0x0e
 	objA0.countdown_callback = 0x064a8e
 
-	A1 = 0x0668af
+	A1 = 0x0668af		// Cutscene Knuckles pointing back animation data
 	fn084580()
 }
 
@@ -795,7 +796,7 @@ function void fn064a8e()
 	objA0.mapping_offset = 0x14a8d6
 	objA0.animation.sprite = 0x56
 
-	A1 = 0x066885
+	A1 = 0x066885		// Cutscene Knuckles door barging animation data
 	fn084580()
 }
 
@@ -824,7 +825,7 @@ function void fn064ae2()
 	objA0.animation.sprite = 0x07
 	objA0.velocity.x = 0
 
-	A1 = 0x06682f
+	A1 = 0x06682f		// Cutscene Knuckles walking animation data
 	fn084580()
 }
 
@@ -895,7 +896,7 @@ function void fn064b80()
 
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
+	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
 	fn084580()
 }
 
@@ -949,7 +950,7 @@ function void fn064c00()
 	objA0.mapping_offset = 0x14a8d6
 	objA0.animation.sprite = 0x9a
 
-	A1 = 0x0667c1
+	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
 	fn084580()
 }
 
@@ -1179,6 +1180,8 @@ function void fn064e86()
 }
 
 
+// The Egg Mobile
+
 //# address-hook(0x064e88) end(0x064ebe)
 function void fn064e88()
 {
@@ -1191,10 +1194,10 @@ function void fn064e88()
 	objA0.position.y.u16 = 0x02d0
 
 	// "spawnChildObjects(0x068184)" replaced by:
-	spawnChildObject(0x067cd2, 0x00, 0, -28)
+	spawnChildObject(0x067cd2, 0x00, 0, -28)		// Robotnik head
 
 	// "spawnChildObjects(0x066608)" replaced by:
-	spawnChildObject(0x06502e, 0x00, 0, 35)
+	spawnChildObject(0x06502e, 0x00, 0, 35)			// Egg Mobile crane hook
 
 	fn064ec4()
 }
@@ -1233,7 +1236,7 @@ function void fn064f04()
 	fn0685e2()
 
 	// "spawnChildObjects(0x0681b4)" replaced by:
-	spawnChildObject(0x068062, 0x00, 30, 0)
+	spawnChildObject(0x068062, 0x00, 30, 0)		// Egg Mobile exhaust flame
 }
 
 
@@ -1253,10 +1256,10 @@ function void fn064f20()
 		objA0.flags38 |= 0x10
 		objA0.velocity.x = 0
 		objA0.collision_attributes = collision.size.24x24
-		u8[A0 + 0x29] = 0xff
+		boss.remaining_hits = 0xff
 
 		// "spawnIdenticalChildObjects(0x066624)" replaced by:
-		spawnChildObjects(0x06531e, 8, -4, 2)
+		spawnChildObjects(0x06531e, 8, -4, 2)		// Egg Mobile electrifying tentacles
 	}
 
 	fn066348()
@@ -1295,7 +1298,7 @@ function void fn064fa0()
 		objA0.flags38 &= ~0x10
 
 		// "spawnChildObjects(0x0681b4)" replaced by:
-		spawnChildObject(0x068062, 0x00, 30, 0)
+		spawnChildObject(0x068062, 0x00, 30, 0)		// Egg Mobile exhaust flame
 	}
 
 	fn066372()
@@ -1420,7 +1423,7 @@ function void fn066372()
 
 
 
-// Robotnik (some function above seem to be part of his capsule)
+// Egg Mobile hook (some function above seem to be part of Robotnik's capsule)
 
 //# address-hook(0x06502e) end(0x065042)
 function void fn06502e()
@@ -1689,6 +1692,8 @@ function void fn0652fe()
 	u8[A0 + 0x0a] |= 0x80
 }
 
+
+// Egg Mobile electrifying tentacles
 
 //# address-hook(0x06531e) end(0x065342)
 function void fn06531e()

@@ -58,7 +58,7 @@ function void fn08d2b6()
 				spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 				// "spawnChildObjects(0x0681b4)" replaced by:
-				spawnChildObject(0x068062, 0x00, 30, 0)
+				spawnChildObject(0x068062, 0x00, 30, 0)		// Egg Mobile exhaust flame
 
 				fn08d53e()
 

@@ -155,13 +155,13 @@ function void fn063526()
 			}
 		}
 
-		Object.animationProgress(0x0668c3)
+		Object.animationProgress(0x0668c3)		// Cutscene Knuckles chilling animation
 	}
 	else
 	{
 		objA0.base_state = 0x04
 		objA0.animation.sprite = 0x04
-		A1 = 0x0668c7
+		A1 = 0x0668c7		// Cutscene Knuckles getting up animation data
 		fn084580()
 	}
 }
@@ -178,7 +178,7 @@ function void fn063562()
 
 	objA0.base_state = 0x06
 	objA0.value42 = 0x02
-	objA0.animation.sprite = 0x8d
+	objA0.animation.sprite = 0x8d		// Cutscene Knuckles hurt animation
 	objA0.velocity.x = -0x100
 	objA0.velocity.y = -0x100
 
@@ -220,7 +220,7 @@ function void fn0635c8()
 	objA0.base_state = 0x0a
 	objA0.countdown_callback = 0x0635fc
 
-	A1 = 0x0668d0
+	A1 = 0x0668d0		// Cutscene Knuckles unconscious, getting up, shaking head to shaking fist animation
 	fn084580()
 }
 
@@ -241,7 +241,7 @@ function void fn0635fc()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 
-	A1 = 0x06682f
+	A1 = 0x06682f		// Cutscene Knuckles walking animation data
 	fn084580()
 
 #if STANDALONE

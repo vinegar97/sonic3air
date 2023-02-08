@@ -217,10 +217,10 @@ function void fn07f220()
 	spawnSimpleChildObjects(0x07f7f6, 2)
 
 	// "spawnSimpleChildObjects(0x07fcc8)" replaced by:
-	spawnSimpleChildObjects(0x07f7ce, 6)
+	spawnSimpleChildObjects(0x07f7ce, 6)		// Boss giblets
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 
 	playMusic(MUSIC_CTRL_FADEOUT)
 }
@@ -238,7 +238,7 @@ function void fn07f266()
 		objA0.position.y.u16 = 0x0328
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	}
 }
 
@@ -499,7 +499,7 @@ function void fn07f4b8()
 function void fn07f4c0()
 {
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x06
@@ -940,7 +940,7 @@ function void fn07f79c()
 		objA0.animation.sprite = 0x15
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x06
@@ -1357,7 +1357,7 @@ function void fn07fb92()
 			objA0.countdown_callback = 0x07f210
 
 			// "spawnSimpleChildObjects(0x083fee)" replaced by:
-			spawnSimpleChildObjects(0x083d84, 1)
+			spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 
 			if (allocDynamicObjectStd())
 			{

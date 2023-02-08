@@ -16,6 +16,7 @@
 function void GiantRing.Init()
 {
 #if STANDALONE
+	// No Giant Rings in Time Attack, as they serve no purpose there
 	if (Game.isTimeAttack())
 	{
 		UnloadObject()

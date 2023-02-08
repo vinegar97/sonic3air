@@ -169,6 +169,7 @@ function void fn062ca4()
 	bool useCutscene = (!isMainCharacter(CHARACTER_KNUCKLES) && checkpoint.number == 0 && global.lock_on_state == 0)
 
 #if STANDALONE
+	// Skip Knuckles in Time Attack
 	if (Game.isTimeAttack())
 	{
 		useCutscene = false
