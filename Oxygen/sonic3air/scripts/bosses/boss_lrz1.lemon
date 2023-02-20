@@ -148,8 +148,7 @@ function void fn078606()
 	objA0.velocity.y = -0x400
 	playSound(0x95)
 
-	A1 = 0x078de2
-	fn084580()
+	Object.ResetAnimationProgress(0x078de2)
 }
 
 
@@ -216,8 +215,7 @@ function void fn0786bc()
 	objA0.collision_attributes = (collision.flag.THREAT | collision.size.40x32)
 	objA0.countdown_callback = 0x0786ea
 
-	A1 = 0x078df1
-	fn084580()
+	Object.ResetAnimationProgress(0x078df1)
 }
 
 
@@ -272,8 +270,7 @@ function void fn07873a()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0x0400
 
-	A1 = 0x078df8
-	fn084580()
+	Object.ResetAnimationProgress(0x078df8)
 	fn08594e()
 }
 

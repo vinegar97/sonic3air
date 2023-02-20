@@ -99,8 +99,7 @@ function void fn064422()
 function void fn064450()
 {
 	objA0.base_state = 0x22
-	A1 = 0x066824		// Cutscene Knuckles walking animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x066824)		// Cutscene Knuckles walking animation data
 }
 
 
@@ -123,8 +122,7 @@ function void fn064472()
 	objA0.mapping_offset = 0x066f36
 	objA0.animation.sprite = 0x0a
 
-	A1 = 0x06687b		// Cutscene Knuckles shaking fist animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06687b)		// Cutscene Knuckles shaking fist animation data
 
 	u8[A0 + 0x0a] |= 0x80
 	objA0.position.x.u16 = 0x1620
@@ -193,8 +191,7 @@ function void fn06453c()
 	objA0.velocity.y = -0x600
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 
@@ -239,8 +236,7 @@ function void fn0645b0()
 	objA0.velocity.y = -0x500
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 
@@ -269,8 +265,7 @@ function void fn0645e0()
 	objA0.animation.sprite = 0x0a
 	objA0.countdown_value = 0x7f
 
-	A1 = 0x066880		// Cutscene Knuckles shouting animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x066880)		// Cutscene Knuckles shouting animation data
 }
 
 
@@ -297,8 +292,7 @@ function void fn06463c()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 
-	A1 = 0x06682f		// Cutscene Knuckles walking animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06682f)		// Cutscene Knuckles walking animation data
 }
 
 
@@ -352,8 +346,7 @@ function void fn0646b8()
 	objA0.velocity.y = -0x500
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 
@@ -381,8 +374,7 @@ function void fn06471a()
 	objA0.velocity.y = -0x200
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 
@@ -414,8 +406,7 @@ function void fn06478e()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 
-	A1 = 0x06682f		// Cutscene Knuckles walking animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06682f)		// Cutscene Knuckles walking animation data
 }
 
 
@@ -442,8 +433,7 @@ function void fn0647ec()
 	objA0.velocity.y = -0x600
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 
@@ -550,8 +540,7 @@ function void fn0648b8()
 	objA0.velocity.y = 0
 	objA0.countdown_callback = 0x0648ea
 
-	A1 = 0x0667e7		// Cutscene Knuckles falling off animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667e7)		// Cutscene Knuckles falling off animation data
 }
 
 
@@ -671,8 +660,7 @@ function void fn06498a()
 	objA0.velocity.y = 0
 	objA0.countdown_callback = 0x0649b4
 
-	A1 = 0x06680a		// Cutscene Knuckles unconscious animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06680a)		// Cutscene Knuckles unconscious animation data
 }
 
 
@@ -689,8 +677,7 @@ function void fn0649b4()
 	objA0.base_state = 0x4a
 	objA0.countdown_callback = 0x0649de
 
-	A1 = 0x06684f		// Cutscene Knuckles head shaking animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06684f)		// Cutscene Knuckles head shaking animation data
 
 	// "spawnSimpleChildObjects(0x066644)" replaced by:
 	spawnSimpleChildObjects(0x06563a, 1)
@@ -739,8 +726,7 @@ function void fn064a1c()
 	objA0.render_flags |= render_flag.FLIP_X
 	objA0.velocity.x = 0
 
-	A1 = 0x06682f		// Cutscene Knuckles walking animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06682f)		// Cutscene Knuckles walking animation data
 }
 
 
@@ -766,8 +752,7 @@ function void fn064a3c()
 	objA0.animation.sprite = 0x0e
 	objA0.countdown_callback = 0x064a8e
 
-	A1 = 0x0668af		// Cutscene Knuckles pointing back animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0668af)		// Cutscene Knuckles pointing back animation data
 }
 
 
@@ -796,8 +781,7 @@ function void fn064a8e()
 	objA0.mapping_offset = 0x14a8d6
 	objA0.animation.sprite = 0x56
 
-	A1 = 0x066885		// Cutscene Knuckles door barging animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x066885)		// Cutscene Knuckles door barging animation data
 }
 
 
@@ -825,8 +809,7 @@ function void fn064ae2()
 	objA0.animation.sprite = 0x07
 	objA0.velocity.x = 0
 
-	A1 = 0x06682f		// Cutscene Knuckles walking animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06682f)		// Cutscene Knuckles walking animation data
 }
 
 
@@ -859,8 +842,7 @@ function void fn064b22()
 		objA1.update_address = 0x084a76
 	}
 
-	A1 = 0x06671f				// Cutscene Knuckles tired panting animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06671f)		// Cutscene Knuckles tired panting animation data
 
 #if STANDALONE
 	Game.endSkippableCutscene()
@@ -896,8 +878,7 @@ function void fn064b80()
 
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 
@@ -926,8 +907,7 @@ function void fn064bc6()
 	objA0.animation.sprite = 0
 	objA0.render_flags &= ~render_flag.FLIP_X
 
-	A1 = 0x06671f				// Cutscene Knuckles tired panting animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06671f)		// Cutscene Knuckles tired panting animation data
 }
 
 
@@ -950,8 +930,7 @@ function void fn064c00()
 	objA0.mapping_offset = 0x14a8d6
 	objA0.animation.sprite = 0x9a
 
-	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 

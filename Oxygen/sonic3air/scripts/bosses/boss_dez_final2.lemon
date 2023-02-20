@@ -300,8 +300,7 @@ function void fn080810()
 	objA0.value42 += 0x34
 	u16[A0 + 0x44] += 0x04
 
-	A1 = 0x081397
-	fn084580()
+	Object.ResetAnimationProgress(0x081397)
 
 	objA0.countdown_callback = 0x080888
 	objA0.render_flags &= ~render_flag.VISIBLE

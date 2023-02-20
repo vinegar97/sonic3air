@@ -142,8 +142,7 @@ function void fn05e832()
 		objA0.countdown_value = 0xb3
 		if (outro.ending_type >= 0)
 		{
-			A1 = 0x060244
-			fn084580()
+			Object.ResetAnimationProgress(0x060244)
 		}
 	}
 }
@@ -187,8 +186,7 @@ function void fn05e890()
 	objA0.velocity.x = -0x200
 	fn06001e()
 
-	A1 = 0x060253
-	fn084580()
+	Object.ResetAnimationProgress(0x060253)
 
 	// "spawnChildObjects(0x0601d8)" replaced by:
 	spawnChildObject(0x05ec3c, 0x00, -10, 12)
@@ -782,8 +780,7 @@ function void fn05f802()
 	objA0.animation.sprite = 0x0e
 	objA0.countdown_callback = 0x05f832
 
-	A1 = 0x07d5ef
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5ef)
 }
 
 
@@ -799,8 +796,7 @@ function void fn05f832()
 {
 	objA0.base_state = 0x08
 	objA0.countdown_callback = 0x05f84c
-	A1 = 0x07d5f6
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5f6)
 }
 
 
@@ -824,8 +820,7 @@ function void fn05f85a()
 	objA0.countdown_callback = 0x05f89a
 	playSound(0x96)
 
-	A1 = 0x07d5ab
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5ab)
 }
 
 

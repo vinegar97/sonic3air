@@ -831,11 +831,18 @@ function void fn084576()
 
 
 //# address-hook(0x084580) end(0x08458c)
-function void fn084580()		// "Set_Raw_Animation" in skdisasm
+//# alias(fn084580) deprecated
+function void Object.ResetAnimationProgress()		// "Set_Raw_Animation" in skdisasm
 {
 	u32[A0 + 0x30] = A1
 	objA0.animation.frame = 0
 	objA0.animation.timer = 0
+}
+
+function void Object.ResetAnimationProgress(u32 address)
+{
+	A1 = address
+	Object.ResetAnimationProgress()
 }
 
 
@@ -1109,6 +1116,8 @@ function void Object.AnimationProgress.CheckEnd_DistinctTimer()		// "Animate_Raw
 	D1 = u8[(A2+=1)-1]
 	if (D1.u8 == 0xff)
 	{
+		// Reached end of animation
+
 		D1.s8 = -s8[(A2+=1)-1]
 		// Calls one of the following:
 		//	- 0x0846cc
@@ -1190,6 +1199,7 @@ function void fn0846f2()
 
 
 //# address-hook(0x084700) end(0x084700)
+//# alias(fn084700) deprecated
 function void Object.AnimationProgressByLocalA1.SpeedUp()		// "Animate_RawGetFaster" in skdisasm
 {
 	Object.AnimationProgress.SpeedUp(u32[A0 + 0x30])
@@ -1197,12 +1207,20 @@ function void Object.AnimationProgressByLocalA1.SpeedUp()		// "Animate_RawGetFas
 
 
 //# address-hook(0x084704) end(0x08477e)
+//# alias(fn084704) deprecated
 function void Object.AnimationProgress.SpeedUp()		// "Animate_RawNoSSTGetFaster" in skdisasm
 {
+	// Plays animation with a starting timer set in u8[A1], and increases that timer value up to a limit defined in u8[A1 + 1]
+
+	// _setZeroFlagByValue(0)	-> No change
+	// _setZeroFlagByValue(1)	-> Change to next frame
+	// _setZeroFlagByValue(-1)	-> Reached end of animation, loop
+
 	if ((objA0.flags38 & 0x20) == 0)
 	{
+		// Animation just started
 		objA0.flags38 |= 0x20
-		objA0.flags2e = u8[A1]
+		objA0.flags2e = u8[A1]		// Initial timer value
 		objA0.value2f = 0
 	}
 
@@ -1211,29 +1229,34 @@ function void Object.AnimationProgress.SpeedUp()		// "Animate_RawNoSSTGetFaster"
 	{
 		D2.u8 = objA0.flags2e
 		D0 = objA0.animation.frame + 1
-		D1.u8 = u8[A1 + D0.s16 + 2]
+		D1.u8 = u8[A1 + D0.s16 + 2]		// Advance to next frame
 		if (D1.s8 < 0)
 		{
+			// Reached end of animation
 			D0 = 0
-			D1.u8 = u8[A1 + 2]
+			D1.u8 = u8[A1 + 2]		// Loop animation from the start
 			if (D2.u8 == 0)
 			{
 				objA0.animation.frame = D0.u8
 				objA0.animation.sprite = D1.u8
 				objA0.animation.timer = D2.u8
-				++objA0.value2f
+
+				++objA0.value2f		// Increment with each loop
 				if (objA0.value2f >= u8[A1 + 1])
 				{
+					// Reached fastest animation speed
 					objA0.flags38 &= ~0x20
 					objA0.value2f = 0
+
 					A2 = objA0.countdown_callback
 					call A2
 				}
-				D2 = 0xffffffff
+				D2 = -1
 				_setZeroFlagByValue(D2)
 				return
 			}
 
+			// Decrease timer restart value for faster animation
 			--D2.u8
 			objA0.flags2e = D2.u8
 		}
@@ -1258,6 +1281,7 @@ function void Object.AnimationProgress.SpeedUp(u32 address)
 
 
 //# address-hook(0x084780) end(0x084780)
+//# alias(fn084780) deprecated
 function void Object.AnimationProgressByLocalA1.SlowDown()		// "Animate_RawGetSlower" in skdisasm
 {
 	Object.AnimationProgress.SlowDown(u32[A0 + 0x30])
@@ -1265,10 +1289,14 @@ function void Object.AnimationProgressByLocalA1.SlowDown()		// "Animate_RawGetSl
 
 
 //# address-hook(0x084784) end(0x0847e4)
+//# alias(fn084784) deprecated
 function void Object.AnimationProgress.SlowDown()		// "Animate_RawNoSSTGetSlower" in skdisasm
 {
+	// Plays animation with a starting timer of 0, and increases that timer value up to a limit defined in u8[A1]
+
 	if ((objA0.flags38 & 0x20) == 0)
 	{
+		// Animation just started
 		objA0.countdown_value = 0
 	}
 	objA0.flags38 |= 0x20
@@ -1279,12 +1307,13 @@ function void Object.AnimationProgress.SlowDown()		// "Animate_RawNoSSTGetSlower
 
 	D2.u8 = objA0.flags2e
 	D0 = objA0.animation.frame + 1
-	D1.u8 = u8[A1 + D0.s16 + 0x01]
+	D1.u8 = u8[A1 + D0.s16 + 1]		// Advance to next frame
 	if (D1.s8 < 0)
 	{
+		// Reached end of animation
 		D0 = 0
-		D1.u8 = u8[A1 + 0x01]
-		++D2.u8
+		D1.u8 = u8[A1 + 1]		// Loop animation from the start
+		++D2.u8			// Increase timer restart value for slower animation
 	}
 
 	objA0.animation.frame = D0.u8
@@ -1292,13 +1321,14 @@ function void Object.AnimationProgress.SlowDown()		// "Animate_RawNoSSTGetSlower
 	objA0.animation.timer = D2.u8
 	if (D2.u8 < u8[A1])
 	{
-		objA0.flags2e = D2.u8
+		// Reached slowest animation speed
+		objA0.flags2e = D2.u8		// Set new timer value
 		return
 	}
 
-	D0.u8 = objA0.value2f + 1
+	D0.u8 = objA0.value2f + 1		// Increment with each loop
 	objA0.value2f = D0.u8
-	if (D0.u8 < u8[A1 + 0x01])
+	if (D0.u8 < u8[A1 + 1])		// Seems like this is using the first animation frame as a loop count limit?
 		return
 
 	objA0.flags38 &= ~0x20

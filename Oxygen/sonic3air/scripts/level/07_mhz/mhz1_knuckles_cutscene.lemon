@@ -110,8 +110,7 @@ function void fn062bf4()
 	objA0.velocity.y = -0x400
 	objA0.countdown_callback = 0x062c5a
 
-	A1 = 0x0666af		// Cutscene Knuckles jumping animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0666af)		// Cutscene Knuckles jumping animation data
 	fn062c42()
 }
 
@@ -143,8 +142,7 @@ function void fn062c76()
 	objA0.velocity.x = 0x200
 	objA0.velocity.y = 0
 
-	A1 = 0x06669f		// Cutscene Knuckles walking animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06669f)		// Cutscene Knuckles walking animation data
 }
 
 

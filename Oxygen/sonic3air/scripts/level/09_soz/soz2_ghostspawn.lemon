@@ -127,8 +127,7 @@ function void fn08f11e()
 			objA0.update_address = 0x08f37a
 			objA0.countdown_callback = 0x08f16a
 
-			A1 = 0x08f6bf
-			fn084580()
+			Object.ResetAnimationProgress(0x08f6bf)
 
 			playSound(0x8a)
 		}
@@ -254,7 +253,7 @@ function void fn08f26e()
 			A1 = u32[0x08f2b2 + D0.s16]
 			objA0.animation.sprite = u8[A1]
 
-			fn084580()
+			Object.ResetAnimationProgress()
 		}
 	}
 }

@@ -237,8 +237,7 @@ function void fn063ebe()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 
-	A1 = 0x066771		// Boss Knuckles fighting pose animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x066771)		// Boss Knuckles fighting pose animation data
 }
 
 
@@ -275,8 +274,7 @@ function void fn063f20()
 	objA0.animation.sprite = 0xda
 	objA0.countdown_value = 119
 
-	A1 = 0x0667ad		// Boss Knuckles punching animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667ad)		// Boss Knuckles punching animation data
 }
 
 
@@ -331,8 +329,7 @@ function void fn063f7a()
 	objA1.velocity.y = -objA1.velocity.y
 	s16[A1 + 0x1c] = -s16[A1 + 0x1c]
 
-	A1 = 0x0667b4		// Boss Knuckles "crouch guard" animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667b4)		// Boss Knuckles "crouch guard" animation data
 }
 
 
@@ -384,8 +381,7 @@ function void fn06401c()
 #endif
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1		// Boss Knuckles jumping animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Boss Knuckles jumping animation data
 }
 
 
@@ -417,8 +413,7 @@ function void fn064066()
 	objA0.velocity.y = 0
 	objA0.countdown_callback = 0x06401c
 
-	A1 = 0x0667cc		// Boss Knuckles crouching animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667cc)		// Boss Knuckles crouching animation data
 }
 
 
@@ -488,8 +483,7 @@ function void fn064132()
 	objA0.render_flags ^= render_flag.FLIP_X
 	objA0.velocity.x = 0
 
-	A1 = 0x0667d4		// Boss Knuckles glide drop animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667d4)		// Boss Knuckles glide drop animation data
 }
 
 
@@ -513,8 +507,7 @@ function void fn064164()
 	objA0.velocity.y = 0
 	objA0.countdown_callback = 0x063ebe
 
-	A1 = 0x0667e0		// Boss Knuckles land to get up animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667e0)		// Boss Knuckles land to get up animation data
 }
 
 
@@ -558,8 +551,7 @@ function void fn0641c4()
 	objA0.velocity.y = 0
 	objA0.countdown_value = 0x3b
 
-	A1 = 0x0667f5		// Boss Knuckles crouching animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667f5)		// Boss Knuckles crouching animation data
 }
 
 
@@ -605,8 +597,7 @@ function void fn064222()
 	u16[A0 + 0x40] = D1.u16
 	objA0.position.y.u16 += 4
 
-	A1 = 0x0667c1		// Boss Knuckles rolling animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Boss Knuckles rolling animation data
 }
 
 
@@ -668,8 +659,7 @@ function void fn06429e()
 		objA0.mapping_offset = 0x14a8d6
 		objA0.animation.sprite = 0x8d
 
-		A1 = 0x0667bc		// Boss Knuckles hurt animation data
-		fn084580()
+		Object.ResetAnimationProgress(0x0667bc)		// Boss Knuckles hurt animation data
 	}
 }
 
@@ -725,8 +715,7 @@ function void fn064356()
 	objA0.countdown_callback = 0x0643a4
 	playSound(0x90)
 
-	A1 = 0x06680a		// Cutscene Knuckles unconscious animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06680a)		// Cutscene Knuckles unconscious animation data
 
 	Kosinski.addToDMAQueue(0x174a86, 0xa000)	// Swirling stars around Knuckles' head while dizzy
 }

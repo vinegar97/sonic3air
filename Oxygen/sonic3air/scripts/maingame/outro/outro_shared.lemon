@@ -700,8 +700,7 @@ function void fn05f376()
 	if (u8[0xfffffab8] & 0x04)
 	{
 		objA0.update_address = 0x05f39e
-		A1 = 0x060260
-		fn084580()
+		Object.ResetAnimationProgress(0x060260)
 	}
 	DrawObject()
 }

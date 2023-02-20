@@ -44,8 +44,7 @@ function void fn07b9d2()
 	if ((objA0.flags38 & 0x40) == 0)
 	{
 		objA0.base_state = 0x0c
-		A1 = 0x07d5ef
-		fn084580()
+		Object.ResetAnimationProgress(0x07d5ef)
 		objA0.animation.sprite = 0x0e
 		objA0.countdown_callback = 0x07ba00
 	}
@@ -126,8 +125,7 @@ function void fn07ba90()
 
 	objA0.base_state = 0x12
 	objA0.countdown_callback = 0x07bad0
-	A1 = 0x07d5f6
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5f6)
 }
 
 
@@ -149,8 +147,7 @@ function void fn07bad0()
 	objA0.hitbox_extends.y = 0x4b
 	objA0.countdown_callback = 0x07bb20
 
-	A1 = (objA0.render_flags & render_flag.FLIP_X) ? 0x07d60a : 0x07d61a
-	fn084580()
+	Object.ResetAnimationProgress((objA0.render_flags & render_flag.FLIP_X) ? 0x07d60a : 0x07d61a)
 }
 
 
@@ -192,8 +189,7 @@ function void fn07bb20()
 	objA0.base_state = 0x16
 	objA0.countdown_callback = 0x07bbc6
 
-	A1 = 0x07d5ab
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5ab)
 
 	fn07bb7c()
 }
@@ -480,8 +476,7 @@ function void fn07bdd8()
 	objA0.base_state = 0x02
 	objA0.flags38 |= 0x40
 	objA0.countdown_callback = 0x07bdf6
-	A1 = 0x07d5ff
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5ff)
 }
 
 
@@ -507,8 +502,7 @@ function void fn07be0e()
 	objA0.position.y.u16 = D0.u16
 	objA0.base_state = 0x06
 	objA0.countdown_callback = 0x07be4e
-	A1 = 0x07d645
-	fn084580()
+	Object.ResetAnimationProgress(0x07d645)
 }
 
 
@@ -597,8 +591,7 @@ function void fn07bed2()
 	objA0.velocity.y = 0
 	u16[A0 + 0x40] = (objA0.render_flags & render_flag.FLIP_X) ? 0x80 : -0x80
 
-	A1 = 0x07d652
-	fn084580()
+	Object.ResetAnimationProgress(0x07d652)
 	objA0.flags38 |= 0x40
 
 	// "spawnChildObjects(0x07d49a)" replaced by:
@@ -645,8 +638,7 @@ function void fn07bf5a()
 
 	objA0.base_state = 0x0e
 	s16[A0 + 0x40] = -s16[A0 + 0x40]
-	A1 = 0x07d626
-	fn084580()
+	Object.ResetAnimationProgress(0x07d626)
 }
 
 
@@ -733,8 +725,7 @@ function void fn07c06e()
 		D5 = 3
 		fn0861d0()
 
-		A1 = 0x07d52a
-		fn084580()
+		Object.ResetAnimationProgress(0x07d52a)
 		return
 	}
 
@@ -751,8 +742,7 @@ function void fn07c06e()
 
 		playSound(0xa0)
 
-		A1 = 0x07d652
-		fn084580()
+		Object.ResetAnimationProgress(0x07d652)
 		objA0.flags38 |= 0x40
 
 		// "spawnChildObjects(0x07d49a)" replaced by:
@@ -764,8 +754,7 @@ function void fn07c06e()
 		objA0.velocity.x = 0
 		objA0.velocity.y = 0
 
-		A1 = 0x07d57c
-		fn084580()
+		Object.ResetAnimationProgress(0x07d57c)
 	}
 }
 
@@ -836,8 +825,7 @@ function void fn07c18c()
 	else
 		objA0.render_flags &= ~render_flag.FLIP_X
 
-	A1 = 0x07d538
-	fn084580()
+	Object.ResetAnimationProgress(0x07d538)
 }
 
 
@@ -910,8 +898,7 @@ function void fn07c274()
 	objA0.countdown_callback = 0x07c2be
 	playSound(0x96)
 
-	A1 = 0x07d556
-	fn084580()
+	Object.ResetAnimationProgress(0x07d556)
 }
 
 
@@ -933,8 +920,7 @@ function void fn07c2be()
 	objA0.flags38 &= ~0x40
 	objA0.countdown_callback = 0x07c2e8
 
-	A1 = 0x07d561
-	fn084580()
+	Object.ResetAnimationProgress(0x07d561)
 }
 
 
@@ -953,8 +939,7 @@ function void fn07c2e8()
 	objA0.velocity.x = 0
 	objA0.velocity.y = -0x600
 
-	A1 = 0x07d56c
-	fn084580()
+	Object.ResetAnimationProgress(0x07d56c)
 }
 
 
@@ -1045,8 +1030,7 @@ function void fn07c3ca()
 	A1 = 0x07db66
 	fn07c678()
 
-	A1 = 0x07d508
-	fn084580()
+	Object.ResetAnimationProgress(0x07d508)
 }
 
 
@@ -1067,8 +1051,7 @@ function void fn07c410()
 	objA0.countdown_callback = 0x07c436
 	playSound(0x96)
 
-	A1 = 0x07d510
-	fn084580()
+	Object.ResetAnimationProgress(0x07d510)
 }
 
 
@@ -1159,8 +1142,7 @@ function void fn07c4e0()
 
 	playSound(0x96)
 
-	A1 = 0x07d5c1
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5c1)
 }
 
 
@@ -1212,8 +1194,7 @@ function void fn07c578()
 
 	playSound(0x96)
 
-	A1 = 0x07d5b6
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5b6)
 	fn07bb7c()
 }
 
@@ -1230,8 +1211,7 @@ function void fn07c59a()
 	{
 		objA0.base_state = 0x46
 		objA0.countdown_callback = 0x07c718
-		A1 = 0x07d587
-		fn084580()
+		Object.ResetAnimationProgress(0x07d587)
 	}
 	else
 	{
@@ -1256,8 +1236,7 @@ function void fn07c59a()
 			objA0.base_state = 0x3e
 			objA0.countdown_callback = 0x07c646
 
-			A1 = 0x07d636
-			fn084580()
+			Object.ResetAnimationProgress(0x07d636)
 		}
 		else
 		{

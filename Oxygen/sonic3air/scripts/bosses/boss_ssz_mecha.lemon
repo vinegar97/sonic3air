@@ -343,8 +343,7 @@ function void fn07b5c2()
 function void fn07b5e8()
 {
 	objA0.hitbox_extends.y = 0x0f
-	A1 = 0x07d54a
-	fn084580()
+	Object.ResetAnimationProgress(0x07d54a)
 
 	objA0.velocity.x = (getScreenWidth() - 64) * 2
 	if ((objA0.render_flags & render_flag.FLIP_X) == 0)
@@ -618,8 +617,7 @@ function void fn07b888()
 {
 	objA0.hitbox_extends.y = 0x23
 
-	A1 = 0x07d5e4
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5e4)
 
 	A1 = 0x07d842
 	fn07c678()
