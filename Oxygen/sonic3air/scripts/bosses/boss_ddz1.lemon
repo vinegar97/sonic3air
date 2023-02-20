@@ -551,8 +551,7 @@ function void fn0826e2()
 		objA0.position.x.u16 += u16[0xfffffa90]
 	}
 
-	A1 = 0x083fcc
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x083fcc)
 
 	objA0.velocity.x += u16[A0 + 0x3a]
 	objA0.velocity.y += u16[A0 + 0x3c]

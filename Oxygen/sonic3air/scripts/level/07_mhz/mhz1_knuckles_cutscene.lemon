@@ -523,8 +523,7 @@ function void fn062fb4()
 //# address-hook(0x062fca) end(0x062fd4)
 function void fn062fca()
 {
-	A1 = 0x0666e1		// Cutscene Knuckles peeking animation data
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x0666e1)		// Cutscene Knuckles peeking animation
 	DrawObject()
 }
 

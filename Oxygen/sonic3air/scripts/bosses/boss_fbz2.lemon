@@ -646,7 +646,7 @@ function void fn070bb0()
 	playSoundRepeatedly(0x4f)
 	fn085a5a()
 	MoveWithParent()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Enemy.DrawDynamicObject()
 }
 

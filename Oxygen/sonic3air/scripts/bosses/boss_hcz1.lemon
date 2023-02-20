@@ -756,8 +756,7 @@ function void fn06a57c()
 //# address-hook(0x06a5b2) end(0x06a5b6)
 function void fn06a5b2()
 {
-	A1 = 0x06adec
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x06adec)
 }
 
 
@@ -790,7 +789,7 @@ function void fn06a5d8()
 		objA0.countdown_callback = 0x06a622
 
 		fn06a986()
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 	}
 }
 
@@ -798,8 +797,7 @@ function void fn06a5d8()
 //# address-hook(0x06a618) end(0x06a61c)
 function void fn06a618()
 {
-	A1 = 0x06ae16
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x06ae16)
 }
 
 

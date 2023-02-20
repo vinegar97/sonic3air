@@ -833,7 +833,7 @@ function void fn064ae2()
 //# address-hook(0x064b10) end(0x064b20)
 function void fn064b10()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (u8[0xfffffab8] & 0x40)
 	{
 		fn064b80()
@@ -910,7 +910,7 @@ function void fn064bb8()
 	}
 	else
 	{
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 	}
 }
 

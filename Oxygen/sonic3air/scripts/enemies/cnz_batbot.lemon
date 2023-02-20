@@ -112,9 +112,7 @@ function void fn08940c()
 //# address-hook(0x089426) end(0x08942a)
 function void fn089426()
 {
-	// Play lightbulb flashing animation
-	A1 = 0x089480
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x089480)		// Lightbulb flashing animation
 }
 
 

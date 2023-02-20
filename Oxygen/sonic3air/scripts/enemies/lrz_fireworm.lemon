@@ -159,7 +159,7 @@ function void fn08f862()
 	if (_equal())
 	{
 		UpdateMovementStraightSimple()
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		return
 	}
 

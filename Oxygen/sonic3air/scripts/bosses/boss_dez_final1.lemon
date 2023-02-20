@@ -680,8 +680,7 @@ function void fn080c48()
 //# address-hook(0x080c58) end(0x080c5c)
 function void fn080c58()
 {
-	A1 = 0x08133e
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x08133e)
 }
 
 
@@ -712,8 +711,7 @@ function void fn080c8a()
 //# address-hook(0x080ca6) end(0x080caa)
 function void fn080ca6()
 {
-	A1 = 0x081349
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x081349)
 }
 
 

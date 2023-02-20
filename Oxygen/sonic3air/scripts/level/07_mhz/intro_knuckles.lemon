@@ -172,7 +172,7 @@ function void fn063562()
 {
 	if ((u8[0xfffffab8] & 0x02) == 0)
 	{
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		return
 	}
 
@@ -228,7 +228,7 @@ function void fn0635c8()
 //# address-hook(0x0635f6) end(0x0635f6)
 function void fn0635f6()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 

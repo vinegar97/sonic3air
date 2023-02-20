@@ -470,8 +470,7 @@ function void fn079b7e()
 function void fn079b96()
 {
 	MoveWithParent()
-	A1 = 0x07a1c7
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x07a1c7)
 	DrawObject()
 }
 
@@ -491,8 +490,7 @@ function void fn079bac()
 //# address-hook(0x079bca) end(0x079be0)
 function void fn079bca()
 {
-	A1 = 0x07a1d8
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x07a1d8)
 	objA0.velocity.y -= 0x10
 	UpdateMovementStraightSimple()
 	DrawObject()

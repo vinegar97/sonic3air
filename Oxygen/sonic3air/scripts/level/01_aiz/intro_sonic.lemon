@@ -461,7 +461,7 @@ function void AIZIntro.WaveEffect.Update()
 	{
 		D0.u16 = u16[A1 + 0x40]
 		objA0.position.x.u16 -= D0.u16
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		DrawObject()
 	}
 	else

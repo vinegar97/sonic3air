@@ -265,8 +265,7 @@ function void fn0807ee()
 {
 	fn080ffa()
 
-	A1 = 0x08135a
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x08135a)
 	fn081024()
 	fn084920()
 }
@@ -315,7 +314,7 @@ function void fn080810()
 //# address-hook(0x08086c) end(0x080884)
 function void fn08086c()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (!_equal())
 	{
 		D0 = 0
@@ -386,8 +385,7 @@ function void fn0808ae()
 //# address-hook(0x0808fa) end(0x08093a)
 function void fn0808fa()
 {
-	A1 = 0x08138e
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x08138e)
 	objA0.velocity.x -= 0x40
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]

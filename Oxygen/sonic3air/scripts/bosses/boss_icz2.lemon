@@ -519,7 +519,7 @@ function void fn07203c()
 function void fn07205e()
 {
 	MoveWithParent()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (objA0.animation.frame >= 4 && objA0.animation.frame <= 8)
 	{
 		A1 = 0x07208a
@@ -534,7 +534,7 @@ function void fn07205e()
 function void fn072092()
 {
 	MoveAndFlipWithParent()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (objA0.animation.frame >= 4 && objA0.animation.frame <= 8)
 	{
 		A1 = 0x0720be

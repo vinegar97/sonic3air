@@ -733,7 +733,7 @@ function void fn07f66c()
 	if ((u8[A1 + 0x38] & 0x04) == 0)
 	{
 		MoveWithParent()
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		fn084934()
 		return
 	}
@@ -756,7 +756,7 @@ function void fn07f690()
 			++u8[A0 + 0x43]
 		}
 		MoveWithParent()
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		fn084920()
 		return
 	}
@@ -774,7 +774,7 @@ function void fn07f6ba()
 	if (objA0.countdown_value >= 0)
 	{
 		MoveWithParent()
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		fn084920()
 		return
 	}
@@ -794,7 +794,7 @@ function void fn07f6d2()
 	}
 
 	MoveWithParent()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x08)
@@ -871,7 +871,7 @@ function void fn07f74c()
 //# address-hook(0x070068) end(0x070094)
 function void fn070068()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
 	{

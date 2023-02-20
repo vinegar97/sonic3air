@@ -167,7 +167,7 @@ function void fn08f1ac()
 	fn08f538()
 	playSound(0x92)
 
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (D2.u16 != 0)
 	{
 		if (u8[0xfffff7c3] == 5)	// That's the final light state
@@ -192,7 +192,7 @@ function void fn08f1f4()
 //# address-hook(0x08f1fe) end(0x08f224)
 function void fn08f1fe()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	fn0847e6()
 	UpdateMovementStraightSimple()
 	fn08f4f0()
@@ -208,7 +208,7 @@ function void fn08f1fe()
 //# address-hook(0x08f226) end(0x08f264)
 function void fn08f226()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	fn0847e6()
 	if (D3.u16 == 0)
 	{
@@ -241,7 +241,7 @@ function void fn08f26e()
 	fn0847e6()
 	UpdateMovementStraightSimple()
 	fn08f4f0()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (!_equal())
 	{
 		if (objA0.animation.frame == 2)
@@ -266,7 +266,7 @@ function void fn08f2be()
 	fn0847e6()
 	UpdateMovementStraightSimple()
 	fn08f4f0()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (D2.u16 != 0)
 	{
 		objA0.base_state = 0x04
@@ -280,7 +280,7 @@ function void fn08f2be()
 //# address-hook(0x08f2e0) end(0x08f320)
 function void fn08f2e0()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	fn0847e6()
 	UpdateMovementStraightSimple()
 
@@ -307,7 +307,7 @@ function void fn08f2e0()
 //# address-hook(0x08f322) end(0x08f36c)
 function void fn08f322()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	--objA0.countdown_value
 	if (objA0.countdown_value >= 0)
 		return
@@ -325,7 +325,7 @@ function void fn08f322()
 //# address-hook(0x08f36e) end(0x08f374)
 function void fn08f36e()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementStraightSimple()
 }
 
@@ -333,7 +333,7 @@ function void fn08f36e()
 //# address-hook(0x08f37a) end(0x08f38a)
 function void fn08f37a()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.loadSpritePatterns(0x08f67a)
 	DrawObject()
 }

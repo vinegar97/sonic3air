@@ -16,7 +16,7 @@
 function void fn07b984()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 }
 
@@ -55,7 +55,7 @@ function void fn07b9d2()
 //# address-hook(0x07b9fa) end(0x07b9fa)
 function void fn07b9fa()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -136,7 +136,7 @@ function void fn07babe()
 {
 	objA0.velocity.x -= 0x30
 	UpdateMovementStraightSimple()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -223,7 +223,7 @@ function void fn07bbac()
 	playSoundRepeatedly(0xa4)
 	fn08598a()
 	u8[0xfffffab8] ^= 0x40
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -471,7 +471,7 @@ function void fn07bdbe()
 	playSoundRepeatedly(0xa4)
 	fn08598a()
 	u8[0xfffffab8] ^= 0x40
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 //# address-hook(0x07bdd8) end(0x07bdf0)
@@ -516,7 +516,7 @@ function void fn07be0e()
 function void fn07be42()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -610,7 +610,7 @@ function void fn07bed2()
 function void fn07bf28()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	D0.u16 = objA0.velocity.x + u16[A0 + 0x40]
 	objA0.velocity.x = D0.u16
@@ -774,7 +774,7 @@ function void fn07c06e()
 function void fn07c11c()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 }
 
@@ -792,7 +792,7 @@ function void fn07c12e()
 function void fn07c144()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementStraightSimple()
 	Object.TriggerOnGroundHit()
 }
@@ -821,7 +821,7 @@ function void fn07c17a()
 function void fn07c18c()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementStraightSimple()
 	D0.u16 = level.bossarea.top
 	if (D0.u16 < objA0.position.y.u16)
@@ -845,7 +845,7 @@ function void fn07c18c()
 function void fn07c1d8()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -862,7 +862,7 @@ function void fn07c1e4()
 function void fn07c1f2()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	objA0.velocity.x += u16[A0 + 0x40]
 	objA0.velocity.y += 0x80
@@ -891,7 +891,7 @@ function void fn07c232()
 function void fn07c250()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	objA0.velocity.y = objA0.velocity.y - 0x80
 	UpdateMovementStraightSimple()
@@ -919,7 +919,7 @@ function void fn07c274()
 function void fn07c2a4()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	objA0.velocity.x += u16[A0 + 0x40]
 	UpdateMovementStraightSimple()
@@ -942,7 +942,7 @@ function void fn07c2be()
 function void fn07c2dc()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -1054,7 +1054,7 @@ function void fn07c3ca()
 function void fn07c3f8()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementSimple()
 	Object.TriggerOnGroundHit()
 }
@@ -1075,7 +1075,7 @@ function void fn07c410()
 //# address-hook(0x07c430) end(0x07c430)
 function void fn07c430()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -1093,7 +1093,7 @@ function void fn07c436()
 //# address-hook(0x07c458) end(0x07c464)
 function void fn07c458()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	MoveWithGravity20()
 	Object.TriggerOnGroundHit()
 }
@@ -1121,7 +1121,7 @@ function void fn07c46a()
 //# address-hook(0x07c49e) end(0x07c4de)
 function void fn07c49e()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementStraightSimple()
 
 	D0.u16 = level.bossarea.right
@@ -1147,7 +1147,7 @@ function void fn07c49e()
 //# address-hook(0x07c4e0) end(0x07c516)
 function void fn07c4e0()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	MoveWithGravity20()
 	CheckGroundCollision()
 	if (D1.s16 < 0)
@@ -1167,7 +1167,7 @@ function void fn07c4e0()
 //# address-hook(0x07c51c) end(0x07c51c)
 function void fn07c51c()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -1195,7 +1195,7 @@ function void fn07c522()
 //# address-hook(0x07c55e) end(0x07c572)
 function void fn07c55e()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	MoveWithGravity20()
 	if (objA0.velocity.y >= 0)
 	{
@@ -1344,7 +1344,7 @@ function void fn07c684()
 function void fn07c6f0()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (_equal())
 		return
 	if (objA0.animation.frame != 8)
@@ -1482,8 +1482,7 @@ function void fn07c7d4()
 //# address-hook(0x07c80a) end(0x07c812)
 function void fn07c80a()
 {
-	A1 = 0x07d683
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x07d683)
 	DrawObject()
 }
 
@@ -1566,7 +1565,7 @@ function void fn07c886()
 //# address-hook(0x07c8ba) end(0x07c8be)
 function void fn07c8ba()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	DrawObject()
 }
 

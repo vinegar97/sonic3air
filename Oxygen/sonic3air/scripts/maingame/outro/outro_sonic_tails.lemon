@@ -620,8 +620,7 @@ function void fn05dca6()
 
 	if (objA0.position.x.u16 >= 0x0140 + getScreenExtend())
 	{
-		A1 = 0x060253
-		fn0845a0()
+		Object.AnimationProgress.DistinctTimer(0x060253)
 	}
 
 	if (objA0.position.x.u16 <= 0x0220 + getScreenExtend() * 2)
@@ -1809,8 +1808,7 @@ function void fn05f6c4()
 //# address-hook(0x05f6da) end(0x05f6e4)
 function void fn05f6da()
 {
-	A1 = 0x0602a7
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x0602a7)
 	DrawObject()
 }
 

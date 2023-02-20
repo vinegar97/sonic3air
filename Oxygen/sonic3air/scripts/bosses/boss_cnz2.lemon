@@ -533,7 +533,7 @@ function void fn06e8fe()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x08)
 	{
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		return
 	}
 
@@ -626,7 +626,7 @@ function void fn06e9e2()
 	{
 		D0.u8 = u8[A0 + 0x40]
 		u8[A0 + 0x3c] += D0.u8
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		Object.CountdownAndTrigger()
 	}
 	else
@@ -657,7 +657,7 @@ function void fn06ea26()
 	{
 		D0.u8 = u8[A0 + 0x40]
 		u8[A0 + 0x3c] += D0.u8
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 	}
 	else
 	{
@@ -674,7 +674,7 @@ function void fn06ea5c()
 {
 	D0.u8 = u8[A0 + 0x40]
 	u8[A0 + 0x3c] += D0.u8
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 }
 
@@ -698,7 +698,7 @@ function void fn06ea70()
 //# address-hook(0x06ea92) end(0x06eab0)
 function void fn06ea92()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	++u8[A0 + 0x3c]
 	if (u8[A0 + 0x3c] == objA0.value3a)
 	{
@@ -713,7 +713,7 @@ function void fn06eab2()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x08)
 	{
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		return
 	}
 

@@ -156,7 +156,7 @@ function void fn078606()
 //# address-hook(0x078628) end(0x078660)
 function void fn078628()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	fn07867c()
 	UpdateMovementStraightSimple()
 
@@ -225,7 +225,7 @@ function void fn0786bc()
 function void fn0786da()
 {
 	objA0.position.y.u16 += 4
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	AddAsDynamicObject()
 }
 
@@ -281,7 +281,7 @@ function void fn07873a()
 //# address-hook(0x078768) end(0x0787ac)
 function void fn078768()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (objA0.animation.frame < 6)
 	{
 		fn078c14()

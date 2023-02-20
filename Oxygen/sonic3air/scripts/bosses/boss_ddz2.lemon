@@ -325,8 +325,7 @@ function void fn081dcc()
 	D0 = u32[A0 + 0x30]
 	if (D0 != 0)
 	{
-		A1 = D0
-		fn0845a0()
+		Object.AnimationProgress.DistinctTimer(D0)
 	}
 	fn082c86()
 
@@ -457,8 +456,7 @@ function void fn08259a()
 		objA0.sprite_priority = 0x0100
 	}
 
-	A1 = 0x0832c3
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x0832c3)
 
 	MoveWithParent()
 	fn084920()

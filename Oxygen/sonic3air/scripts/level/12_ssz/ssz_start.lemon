@@ -349,7 +349,7 @@ function void fn0657fe()
 	playSoundRepeatedly(0xd3)
 	if ((u8[0xfffffab8] & 0x02) == 0)
 	{
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 	}
 	else
 	{
@@ -469,7 +469,7 @@ function void fn0658f2()
 function void fn06594a()
 {
 	fn065fde()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	s16 dx = camera.position.x.u16 - 0x80
 	u16 dy = objA0.position.y.u16 - camera.position.y.u16 + 0x80
@@ -629,7 +629,7 @@ function void fn065ab6()
 //# address-hook(0x065ad4) end(0x065af4)
 function void fn065ad4()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	--objA0.countdown_value
 	if (objA0.countdown_value >= 0)
@@ -647,7 +647,7 @@ function void fn065af6()
 	--objA0.countdown_value
 	if (objA0.countdown_value >= 0)
 	{
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		return
 	}
 	else
@@ -713,8 +713,7 @@ function void fn065b42()
 function void fn065b5a()
 {
 	MoveWithParent()
-	A1 = 0x066760
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x066760)
 	DrawObject()
 }
 

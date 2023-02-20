@@ -216,7 +216,7 @@ function void fn0856b2()
 //# address-hook(0x0856c4) end(0x0856c8)
 function void fn0856c4()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Enemy.DrawDynamicObject()
 }
 
@@ -685,8 +685,7 @@ function void fn083f9e()
 	D0.u16 = u16[0xffffeebc]
 	objA0.position.x.u16 -= D0.u16
 
-	A1 = 0x083fcc
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x083fcc)
 	DrawObject()
 }
 

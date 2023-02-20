@@ -155,7 +155,7 @@ function void fn06db0e()
 //# address-hook(0x06db1a) end(0x06db1a)
 function void fn06db1a()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -191,7 +191,7 @@ function void fn06db44()
 //# address-hook(0x06db6c) end(0x06db6c)
 function void fn06db6c()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -579,7 +579,7 @@ function void fn06df34()
 function void fn06df4a()
 {
 	MoveWithParent()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 	fn084934()
 }
@@ -603,7 +603,7 @@ function void fn06df94()
 	if (u8[A1 + 0x38] & 0x40)
 	{
 		MoveWithParent()
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		fn084934()
 	}
 	else

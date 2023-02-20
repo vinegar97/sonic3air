@@ -148,8 +148,7 @@ function void fn069c94()
 //# address-hook(0x0692e2) end(0x069300)
 function void fn0692e2()
 {
-	A1 = 0x069d98
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x069d98)
 	objA0.flags38 &= ~0x40
 	if (objA0.animation.sprite == 0x2b)
 	{
@@ -161,8 +160,7 @@ function void fn0692e2()
 //# address-hook(0x06932c) end(0x069336)
 function void fn06932c()
 {
-	A1 = 0x069db3
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x069db3)
 	fn069be2()
 }
 
@@ -556,8 +554,7 @@ function void fn0696b4()
 function void fn0696ca()
 {
 	objA0.flags38 &= ~0x40
-	A1 = 0x069dbe
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x069dbe)
 }
 
 
@@ -1090,7 +1087,7 @@ function void fn06995a()
 //# address-hook(0x06998a) end(0x069990)
 function void fn06998a()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	DrawObject()
 }
 
@@ -1107,8 +1104,7 @@ function void fn069996()
 //# address-hook(0x0699b0) end(0x0699ba)
 function void fn0699b0()
 {
-	A1 = 0x069e41
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x069e41)
 	DrawObject()
 }
 

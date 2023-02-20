@@ -501,7 +501,7 @@ function void fn068dd8()
 //# address-hook(0x068dee) end(0x068df4)
 function void fn068dee()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Enemy.DrawDynamicObject()
 }
 
@@ -795,7 +795,7 @@ function void fn06878c()
 //# address-hook(0x06879c) end(0x06879c)
 function void fn06879c()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -977,7 +977,7 @@ function void fn068928()
 //# address-hook(0x068956) end(0x06895c)
 function void fn068956()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Enemy.DrawDynamicObject()
 }
 
@@ -1028,7 +1028,7 @@ function void fn0689ac()
 //# address-hook(0x0689f8) end(0x068a16)
 function void fn0689f8()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (D2.s16 > 0)
 	{
 		D0.u16 = u16[0x068a18 + D0.s16]

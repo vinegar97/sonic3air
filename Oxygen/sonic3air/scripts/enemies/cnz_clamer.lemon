@@ -68,9 +68,7 @@ function void fn088fec()
 			}
 		}
 
-		// Play shell clacking animation
-		A1 = 0x089170
-		fn0845a0()
+		Object.AnimationProgress.DistinctTimer(0x089170)		// Shell clacking animation
 	}
 	else
 	{
@@ -102,9 +100,7 @@ function void fn089056()
 //# address-hook(0x089064) end(0x089088)
 function void fn089064()
 {
-	// Play shooting animation
-	A1 = 0x089185
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x089185)		// Shooting animation
 
 	if (D2.u16 != 0 && objA0.animation.sprite == 8 && objA0.render_flags & render_flag.VISIBLE)
 	{

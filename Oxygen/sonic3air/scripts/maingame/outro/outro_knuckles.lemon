@@ -112,7 +112,7 @@ function void fn05e70e()
 function void fn05e80a()
 {
 	playSoundRepeatedly(0xce)
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	--objA0.countdown_value
 	if (objA0.countdown_value < 0)
@@ -133,7 +133,7 @@ function void fn05e80a()
 //# address-hook(0x05e832) end(0x05e868)
 function void fn05e832()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	MoveWithGravity20()
 	if (objA0.velocity.y >= 0)
 	{
@@ -154,7 +154,7 @@ function void fn05e86a()
 {
 	fn0847e6()
 	UpdateMovementStraightSimple()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	--objA0.countdown_value
 	if (objA0.countdown_value < 0)
@@ -170,7 +170,7 @@ function void fn05e890()
 {
 	fn0847e6()
 	UpdateMovementStraightSimple()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	D0.u16 = camera.position.x.u16 + 0x0200
 	if (D0.u16 > objA0.position.x.u16)
@@ -211,7 +211,7 @@ function void fn05e916()
 	D3.u16 = camera.position.x.u16 + 0x60
 	if (D3.u16 >= objA0.position.x.u16)
 	{
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 	}
 	D3.u16 -= 0xa0
 	if (D3.u16 < objA0.position.x.u16)
@@ -790,7 +790,7 @@ function void fn05f802()
 //# address-hook(0x05f82c) end(0x05f82c)
 function void fn05f82c()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 

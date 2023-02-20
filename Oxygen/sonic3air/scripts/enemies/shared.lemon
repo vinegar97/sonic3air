@@ -837,16 +837,19 @@ function void StopObjectA1()
 
 
 //# address-hook(0x08459c) end(0x0845d6)
-function void fn08459c()		// "Animate_RawMultiDelay" in skdisasm
+//# alias(fn08459c) deprecated
+function void Object.AnimationProgressByLocalA1.DistinctTimer()		// "Animate_RawMultiDelay" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(u32[A0 + 0x30])
 }
 
 
 //# address-hook(0x0845a0)
-function void fn0845a0()		// "Animate_RawNoSSTMultiDelay" in skdisasm
+//# alias(fn0845a0) deprecated
+function void Object.AnimationProgress.DistinctTimer()		// "Animate_RawNoSSTMultiDelay" in skdisasm
 {
+	// Gives each animation frame its own timer value
+
 	// D2 = 0	-> Animation running, no frame change
 	// D2 = 1	-> Animation running, change to next frame
 	// D2 = -1	-> Animation stopped
@@ -872,10 +875,16 @@ function void fn0845a0()		// "Animate_RawNoSSTMultiDelay" in skdisasm
 	{
 		// Advance to next frame
 		objA0.animation.sprite = D1.u8
-		objA0.animation.timer = u8[A1 + D0.s16 + 1]
+		objA0.animation.timer = u8[A1 + D0.s16 + 1]		// Set unique timer value for new frame
 		D2 = 1
 		_setZeroFlagByValue(1)
 	}
+}
+
+function void Object.AnimationProgress.DistinctTimer(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.DistinctTimer()
 }
 
 

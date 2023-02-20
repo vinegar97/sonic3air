@@ -494,7 +494,7 @@ function void fn0626b2()
 //# address-hook(0x0626ee) end(0x0626ee)
 function void fn0626ee()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
