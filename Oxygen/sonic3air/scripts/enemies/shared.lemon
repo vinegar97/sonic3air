@@ -953,16 +953,19 @@ function void fn084600()
 
 
 //# address-hook(0x08460e) end(0x08460e)
-function void fn08460e()		// "Animate_RawMultiDelayFlipX" in skdisasm
+//# alias(fn08460e) deprecated
+function void Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()		// "Animate_RawMultiDelayFlipX" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
-	fn084612()
+	Object.AnimationProgress.DistinctTimer_CheckFlipX(u32[A0 + 0x30])
 }
 
 
 //# address-hook(0x084612) end(0x084648)
-function void fn084612()		// "Animate_RawNoSSTMultiDelayFlipX" in skdisasm
+//# alias(fn084612) deprecated
+function void Object.AnimationProgress.DistinctTimer_CheckFlipX()		// "Animate_RawNoSSTMultiDelayFlipX" in skdisasm
 {
+	// Gives each animation frame its own timer value, flips sprite horizontally if flag 0x40 is set
+
 	// D2 = 0	-> Animation running, no frame change
 	// D2 = 1	-> Animation running, change to next frame
 	// D2 = -1	-> Animation stopped
@@ -987,7 +990,7 @@ function void fn084612()		// "Animate_RawNoSSTMultiDelayFlipX" in skdisasm
 
 			// Advance to next frame
 			objA0.animation.sprite = D1.u8
-			objA0.animation.timer = u8[A1 + D0.s16 + 0x01]
+			objA0.animation.timer = u8[A1 + D0.s16 + 0x01]		// Set unique timer value for new frame
 			D2 = 1
 		}
 	}
@@ -997,18 +1000,27 @@ function void fn084612()		// "Animate_RawNoSSTMultiDelayFlipX" in skdisasm
 	}
 }
 
+function void Object.AnimationProgress.DistinctTimer_CheckFlipX(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.DistinctTimer_CheckFlipX()
+}
+
 
 //# address-hook(0x08464a) end(0x08464a)
-function void fn08464a()		// "Animate_RawMultiDelayFlipY" in skdisasm
+//# alias(fn08464a) deprecated
+function void Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipY()		// "Animate_RawMultiDelayFlipY" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
-	fn08464e()
+	Object.AnimationProgress.DistinctTimer_CheckFlipY(u32[A0 + 0x30])
 }
 
 
 //# address-hook(0x08464e) end(0x084686)
-function void fn08464e()		// "Animate_RawNoSSTMultiDelayFlipY" in skdisasm
+//# alias(fn08464e) deprecated
+function void Object.AnimationProgress.DistinctTimer_CheckFlipY()		// "Animate_RawNoSSTMultiDelayFlipY" in skdisasm
 {
+	// Gives each animation frame its own timer value, flips sprite vertically if flag 0x40 is set
+
 	// D2 = 0	-> Animation running, no frame change
 	// D2 = 1	-> Animation running, change to next frame
 	// D2 = -1	-> Animation stopped
@@ -1033,7 +1045,7 @@ function void fn08464e()		// "Animate_RawNoSSTMultiDelayFlipY" in skdisasm
 
 			// Advance to next frame
 			objA0.animation.sprite = D1.u8
-			objA0.animation.timer = u8[A1 + D0.s16 + 0x01]
+			objA0.animation.timer = u8[A1 + D0.s16 + 0x01]		// Set unique timer value for new frame
 
 			D2 = 1
 			return
@@ -1041,6 +1053,12 @@ function void fn08464e()		// "Animate_RawNoSSTMultiDelayFlipY" in skdisasm
 	}
 
 	D2 = 0
+}
+
+function void Object.AnimationProgress.DistinctTimer_CheckFlipY(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.DistinctTimer_CheckFlipY()
 }
 
 
@@ -1055,6 +1073,9 @@ function void fn084688()		// "Animate_Raw2MultiDelay" in skdisasm
 //# address-hook(0x08468c) end(0x0846ca)
 function void fn08468c()		// "Animate_Raw2NoSSTMultiDelay" in skdisasm
 {
+	// Gives each animation frame its own timer value
+	// Seems mainly used for Cutscene/Boss Knuckles when using "real" Knuckles sprites
+
 	// D2 = 0	-> No change
 	// D2 = 1	-> Change to next frame
 	// D2 = -1	-> Reached end of animation, decide next step
@@ -1088,7 +1109,7 @@ function void fn08468c()		// "Animate_Raw2NoSSTMultiDelay" in skdisasm
 	{
 		// Advance to next frame
 		objA0.animation.sprite = D1.u8
-		objA0.animation.timer = u8[A1 + D0.s16 + 1]
+		objA0.animation.timer = u8[A1 + D0.s16 + 1]		// Set unique timer value for new frame
 		D2 = 1
 		_setZeroFlagByValue(1)
 	}

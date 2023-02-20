@@ -423,7 +423,7 @@ function void fn076d28()
 function void fn076d7c()
 {
 	--objA0.countdown_value
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 	if (D2.s16 > 0)
 	{
 		D0.u8 = objA0.animation.sprite

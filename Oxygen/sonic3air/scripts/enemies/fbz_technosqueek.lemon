@@ -80,7 +80,7 @@ function void fn089842()
 //# address-hook(0x0898dc) end(0x089924)
 function void fn0898dc()
 {
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 	if (D2.u16 != 0 && objA0.animation.frame == 6)
 	{
 		objA0.flags38 |= 0x02
@@ -140,7 +140,7 @@ function void fn089940()
 //# address-hook(0x08995c) end(0x08999c)
 function void fn08995c()
 {
-	fn08464a()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipY()
 	if (D2.u16 != 0 && objA0.animation.frame == 6)
 	{
 		objA0.flags38 |= 0x02

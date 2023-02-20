@@ -157,7 +157,7 @@ function void fn07bad0()
 //# address-hook(0x07bb06) end(0x07bb1a)
 function void fn07bb06()
 {
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 	MoveWithGravity20()
 	if (objA0.velocity.y >= 0)
 	{
@@ -654,7 +654,7 @@ function void fn07bf5a()
 function void fn07bfa0()
 {
 	fn08598a()
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 
 	objA0.velocity.x += u16[A0 + 0x40]
 	UpdateMovementStraightSimple()
@@ -962,7 +962,7 @@ function void fn07c2e8()
 function void fn07c302()
 {
 	fn08598a()
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 	MoveWithGravity20()
 
 	D0.u16 = level.bossarea.top
@@ -978,7 +978,7 @@ function void fn07c302()
 function void fn07c328()
 {
 	fn08598a()
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 
 	moveWithGravity(0x10)
 	if (u16[A0 + 0x1a] < 0x0100)
@@ -1283,7 +1283,7 @@ function void fn07c59a()
 function void fn07c630()
 {
 	fn08598a()
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 	fn0847e6()
 	UpdateMovementStraightSimple()
 }

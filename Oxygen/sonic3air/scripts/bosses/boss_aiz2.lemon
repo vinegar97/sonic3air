@@ -1000,8 +1000,7 @@ function void fn0699c0()
 //# address-hook(0x0699ea) end(0x0699fe)
 function void fn0699ea()
 {
-	A1 = 0x069e4a
-	fn084612()
+	Object.AnimationProgress.DistinctTimer_CheckFlipX(0x069e4a)
 	if (objA0.animation.sprite != 0x2b)
 	{
 		DrawObject()
@@ -1013,8 +1012,7 @@ function void fn0699ea()
 function void fn069a1a()
 {
 	UpdateMovementStraightSimple()
-	A1 = 0x069e65
-	fn084612()
+	Object.AnimationProgress.DistinctTimer_CheckFlipX(0x069e65)
 	if (objA0.animation.sprite != 0x2b)
 	{
 		DrawObject()
