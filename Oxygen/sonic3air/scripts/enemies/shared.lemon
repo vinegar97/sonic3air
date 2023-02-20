@@ -721,16 +721,20 @@ function void fn084258()
 
 
 //# address-hook(0x08450e) end(0x08450e)
-function void fn08450e()		// "Animate_RawCheckResult" in skdisasm
+//# alias(fn08450e) deprecated
+function void Object.AnimationProgressByLocalA1.CheckEnd()		// "Animate_RawCheckResult" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
-	fn084512()
+	Object.AnimationProgress.CheckEnd(u32[A0 + 0x30])
 }
 
 
 //# address-hook(0x084512) end(0x084550)
-function void fn084512()		// "Animate_RawNoSSTCheckResult" in skdisasm
+//# alias(fn084512) deprecated
+function void Object.AnimationProgress.CheckEnd()		// "Animate_RawNoSSTCheckResult" in skdisasm
 {
+	// Marks end of animation specifically with 0xff
+	// Seems mainly used for Cutscene/Boss Knuckles when using "real" Knuckles sprites
+
 	// D2 = 0	-> No change
 	// D2 = 1	-> Change to next frame
 	// D2 = -1	-> Reached end of animation, decide next step
@@ -748,6 +752,8 @@ function void fn084512()		// "Animate_RawNoSSTCheckResult" in skdisasm
 	D1 = u8[(A2+=1)-1]
 	if (D1.u8 == 0xff)
 	{
+		// Reached end of animation
+
 		D1.s8 = -s8[(A2+=1)-1]
 		// Calls one of the following:
 		//	- 0x084552
@@ -764,6 +770,12 @@ function void fn084512()		// "Animate_RawNoSSTCheckResult" in skdisasm
 		objA0.animation.sprite = D1.u8
 		D2 = 1
 	}
+}
+
+function void Object.AnimationProgress.CheckEnd(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.CheckEnd()
 }
 
 

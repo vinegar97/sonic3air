@@ -263,7 +263,7 @@ function void fn063620()
 		objA0.velocity.x += 0x0c
 	}
 	UpdateMovementStraightSimple()
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 
 	u16 pointToReach = camera.position.x.u16 + 0x0180
 #if STANDALONE

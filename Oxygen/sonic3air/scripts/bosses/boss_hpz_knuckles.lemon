@@ -245,7 +245,7 @@ function void fn063ebe()
 //# address-hook(0x063eda) end(0x063f0c)
 function void fn063eda()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	CheckDistanceToPlayers()
 	fn066094()
 
@@ -368,7 +368,7 @@ function void fn063ff8()
 //# address-hook(0x064016) end(0x064016)
 function void fn064016()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 }
 
 
@@ -392,7 +392,7 @@ function void fn06401c()
 //# address-hook(0x06403a) end(0x064052)
 function void fn06403a()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 	if (objA0.velocity.y >= 0)
 	{
@@ -496,7 +496,7 @@ function void fn064132()
 //# address-hook(0x06414c) end(0x064160)
 function void fn06414c()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	CheckDistanceToPlayers()
 	fn066094()
 
@@ -526,7 +526,7 @@ function void fn064184()
 		playSound(SFX_ROLL)
 	}
 
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	--objA0.countdown_value
 	if (objA0.countdown_value < 0)
 	{
@@ -566,7 +566,7 @@ function void fn0641c4()
 //# address-hook(0x0641ec) end(0x06421e)
 function void fn0641ec()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	fn06615a()
 
 	if (objA0.velocity.x == 0)
@@ -613,7 +613,7 @@ function void fn064222()
 //# address-hook(0x064258) end(0x06429a)
 function void fn064258()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	fn06615a()
 	UpdateMovementSimple()
 

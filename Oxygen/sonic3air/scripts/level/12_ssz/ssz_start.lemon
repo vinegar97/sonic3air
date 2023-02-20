@@ -282,8 +282,7 @@ function void fn065730()
 //# address-hook(0x06575e) end(0x06578e)
 function void fn06575e()
 {
-	A1 = 0x0667c1		// Cutscene Knuckles jumping animation data
-	fn084512()
+	Object.AnimationProgress.CheckEnd(0x0667c1)		// Cutscene Knuckles jumping animation
 	if ((u8[0xfffffab8] & 0x01) == 0)
 		return
 
@@ -395,7 +394,7 @@ function void fn06584c()
 //# address-hook(0x065876) end(0x0658b4)
 function void fn065876()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 	if (objA0.velocity.y < 0)
 		return
@@ -418,7 +417,7 @@ function void fn065876()
 //# address-hook(0x0658ba) end(0x0658ec)
 function void fn0658ba()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementStraightSimple()
 	if (objA0.position.x.u16 < 0x02a8)
 		return
@@ -436,7 +435,7 @@ function void fn0658ba()
 //# address-hook(0x0658f2) end(0x065944)
 function void fn0658f2()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 	if (objA0.velocity.y < 0)
 		return

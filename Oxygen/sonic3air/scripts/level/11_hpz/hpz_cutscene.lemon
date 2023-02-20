@@ -78,7 +78,7 @@ function void fn0643f2()
 function void fn064422()
 {
 	// Knuckles running to the right after he lost the fight
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 
 	D0.u16 = objA0.velocity.x + 0x10
 	if (D0.u16 < 0x0400)
@@ -107,7 +107,7 @@ function void fn064450()
 //# address-hook(0x064460) end(0x064470)
 function void fn064460()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	if (u8[0xfffffab8] & 0x01)
 	{
 		fn06453c()
@@ -169,7 +169,7 @@ function void fn064472()
 //# address-hook(0x06451e) end(0x06453a)
 function void fn06451e()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 	if (objA0.velocity.y >= 0)
 	{
@@ -222,7 +222,7 @@ function void fn06457c()
 //# address-hook(0x064594) end(0x0645ae)
 function void fn064594()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 	if (objA0.velocity.y >= 0 && objA0.position.y.u16 >= 0x0339)
 	{
@@ -254,7 +254,7 @@ function void fn0645d4()
 	}
 	else
 	{
-		fn08450e()
+		Object.AnimationProgressByLocalA1.CheckEnd()
 	}
 }
 
@@ -277,7 +277,7 @@ function void fn0645e0()
 //# address-hook(0x064610) end(0x06463a)
 function void fn064610()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	objA0.velocity.x = min(objA0.velocity.x + 0x0c, 0x300)
 	UpdateMovementStraightSimple()
 	if (objA0.position.x.u16 >= 0x1660)
@@ -327,7 +327,7 @@ function void fn064670()
 //# address-hook(0x064692) end(0x0646ae)
 function void fn064692()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 
 	A1 = 0xffff0000 + u16[0xfffffaae]
@@ -360,7 +360,7 @@ function void fn0646b8()
 //# address-hook(0x0646f6) end(0x064710)
 function void fn0646f6()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 	if (objA0.velocity.y >= 0 && objA0.position.y.u16 >= 0x03ab)
 	{
@@ -389,7 +389,7 @@ function void fn06471a()
 //# address-hook(0x064758) end(0x06478c)
 function void fn064758()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	objA0.velocity.x = min(objA0.velocity.x + 0x0c, 0x300)
 	UpdateMovementStraightSimple()
 
@@ -422,7 +422,7 @@ function void fn06478e()
 //# address-hook(0x0647c6) end(0x0647e2)
 function void fn0647c6()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 
 	A1 = 0xffff0000 + u16[0xfffffaba]
@@ -722,7 +722,7 @@ function void fn0649de()
 //# address-hook(0x064a00) end(0x064a1a)
 function void fn064a00()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	objA0.velocity.x -= 0x0c
 	UpdateMovementStraightSimple()
 	if (objA0.position.x.u16 <= 0x1810)
@@ -804,7 +804,7 @@ function void fn064a8e()
 //# address-hook(0x064ac0) end(0x064ae0)
 function void fn064ac0()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	objA0.velocity.x -= 0x0c
 	UpdateMovementStraightSimple()
 	D0.u16 = camera.position.x.u16 - 0x40
@@ -871,7 +871,7 @@ function void fn064b22()
 //# address-hook(0x064b6a) end(0x064b7e)
 function void fn064b6a()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 	if (objA0.position.x.u16 <= 0x15c0)
 	{
@@ -938,7 +938,7 @@ function void fn064bfa()
 	// Correct Knuckles facing right while rolling in teleporter
 	objA0.render_flags |= render_flag.FLIP_X
 #endif
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 }
 
 

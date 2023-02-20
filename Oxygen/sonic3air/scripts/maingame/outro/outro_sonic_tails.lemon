@@ -860,8 +860,7 @@ function void fn05e0f8()
 //# address-hook(0x05e142) end(0x05e16e)
 function void fn05e142()
 {
-	A1 = 0x066824		// Cutscene Knuckles walking animation data
-	fn084512()
+	Object.AnimationProgress.CheckEnd(0x066824)		// Cutscene Knuckles walking animation
 
 	UpdateMovementStraightSimple()
 	if (objA0.position.x.u16 < 0x0120 + getScreenExtend())
