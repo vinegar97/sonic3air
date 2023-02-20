@@ -205,7 +205,7 @@ function void fn063e14()
 //# address-hook(0x063e7c) end(0x063eba)
 function void fn063e7c()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 	if (D2.s16 < 0 && u8[0xfffffab8] & 0x01)
 	{
 		D0.u8 = objA0.value39 + 1
@@ -292,7 +292,7 @@ function void fn063f3c()
 		UpdateMovementStraightSimple()
 	}
 
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 	if (!_negative())
 	{
 		A3 = 0x063f6a
@@ -466,7 +466,7 @@ function void fn0640dc()
 //# address-hook(0x064102) end(0x06411e)
 function void fn064102()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 	UpdateMovementSimple()
 	CheckGroundCollision()
 	if (D1.s16 < 0)
@@ -713,7 +713,7 @@ function void fn064310()
 //# address-hook(0x064350) end(0x064350)
 function void fn064350()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 }
 
 

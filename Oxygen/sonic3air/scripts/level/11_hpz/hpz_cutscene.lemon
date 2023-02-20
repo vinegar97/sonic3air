@@ -536,7 +536,7 @@ function void fn06489e()
 //# address-hook(0x0648b2) end(0x0648b2)
 function void fn0648b2()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 }
 
 
@@ -658,7 +658,7 @@ function void fn064964()
 //# address-hook(0x064984) end(0x064984)
 function void fn064984()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 }
 
 
@@ -679,7 +679,7 @@ function void fn06498a()
 //# address-hook(0x0649ae) end(0x0649ae)
 function void fn0649ae()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 }
 
 
@@ -752,7 +752,7 @@ function void fn064a36()
 		objA0.animation.timer = min(objA0.animation.timer, 60)
 	#endif
 
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 }
 
 
@@ -774,7 +774,7 @@ function void fn064a3c()
 //# address-hook(0x064a6e) end(0x064a8c)
 function void fn064a6e()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 	if (!_equal())
 	{
 		if (objA0.animation.frame == 6)

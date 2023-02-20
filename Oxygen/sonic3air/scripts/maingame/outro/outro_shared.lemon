@@ -790,8 +790,7 @@ function void fn05f410()
 //# address-hook(0x05f46a) end(0x05f47a)
 function void fn05f46a()
 {
-	A1 = 0x066771		// Knuckles fighting pose animation data
-	fn08468c()
+	Object.AnimationProgress.CheckEnd_DistinctTimer(0x066771)		// Knuckles fighting pose animation
 	fn05fea8()
 	DrawObject()
 }

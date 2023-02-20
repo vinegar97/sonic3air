@@ -1075,17 +1075,18 @@ function void Object.AnimationProgress.DistinctTimer_CheckFlipY(u32 address)
 
 
 //# address-hook(0x084688) end(0x084688)
-function void fn084688()		// "Animate_Raw2MultiDelay" in skdisasm
+//# alias(fn084688) deprecated
+function void Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()		// "Animate_Raw2MultiDelay" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
-	fn08468c()
+	Object.AnimationProgress.CheckEnd_DistinctTimer(u32[A0 + 0x30])
 }
 
 
 //# address-hook(0x08468c) end(0x0846ca)
-function void fn08468c()		// "Animate_Raw2NoSSTMultiDelay" in skdisasm
+//# alias(fn08468c) deprecated
+function void Object.AnimationProgress.CheckEnd_DistinctTimer()		// "Animate_Raw2NoSSTMultiDelay" in skdisasm
 {
-	// Gives each animation frame its own timer value
+	// Gives each animation frame its own timer value, marks end of animation specifically with 0xff
 	// Seems mainly used for Cutscene/Boss Knuckles when using "real" Knuckles sprites
 
 	// D2 = 0	-> No change
@@ -1125,6 +1126,12 @@ function void fn08468c()		// "Animate_Raw2NoSSTMultiDelay" in skdisasm
 		D2 = 1
 		_setZeroFlagByValue(1)
 	}
+}
+
+function void Object.AnimationProgress.CheckEnd_DistinctTimer(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.CheckEnd_DistinctTimer()
 }
 
 

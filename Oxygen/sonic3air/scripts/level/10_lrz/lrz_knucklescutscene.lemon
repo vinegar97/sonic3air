@@ -66,8 +66,7 @@ function void fn063aca()
 //# address-hook(0x063ae8) end(0x063aec)
 function void fn063ae8()
 {
-	A1 = 0x066891		// Cutscene Knuckles boulder push animation data
-	fn08468c()
+	Object.AnimationProgress.CheckEnd_DistinctTimer(0x066891)		// Cutscene Knuckles boulder push animation
 }
 
 
@@ -86,8 +85,7 @@ function void fn063af2()
 //# address-hook(0x063b10) end(0x063b14)
 function void fn063b10()
 {
-	A1 = 0x0668a7		// Cutscene Knuckles boulder push animation data
-	fn08468c()
+	Object.AnimationProgress.CheckEnd_DistinctTimer(0x0668a7)		// Cutscene Knuckles boulder push animation
 }
 
 
