@@ -16,7 +16,6 @@ class OptionsMenu;
 struct OptionsMenuRenderContext : public GameMenuEntry::RenderContext
 {
 	OptionsMenu* mOptionsMenu = nullptr;
-	bool mIsSelected = false;
 	float mTabAlpha = 1.0f;
 	bool mIsModsTab = false;
 };
@@ -55,9 +54,12 @@ public:
 
 public:
 	LabelMenuEntry();
-	LabelMenuEntry& initEntry(const std::string& text);
+	LabelMenuEntry& initEntry(const std::string& text, const Color& color);
 
 	void renderEntry(RenderContext& renderContext_) override;
+
+protected:
+	Color mColor = Color::WHITE;
 };
 
 

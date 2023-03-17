@@ -30,7 +30,7 @@
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/PersistentData.h"
 #include "oxygen/simulation/Simulation.h"
-#if defined (PLATFORM_ANDROID)
+#if defined(PLATFORM_ANDROID)
 	#include "oxygen/platform/AndroidJavaInterface.h"
 #endif
 
@@ -400,7 +400,7 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 	config.initialization();
 
 	RMX_LOG_INFO("Loading configuration");
-#if defined(PLATFORM_MAC) || defined(PLATFORM_IOS)
+#if (defined(PLATFORM_MAC) || defined(PLATFORM_IOS)) && defined(ENDUSER)
 	config.loadConfiguration(config.mGameDataPath + L"/config.json");
 #else
 	config.loadConfiguration(L"config.json");
@@ -687,11 +687,8 @@ bool EngineMain::createWindow()
 	}
 
 	// Create drawer depending on render method
-	if (config.mRenderMethod == Configuration::RenderMethod::SOFTWARE)
-	{
-		mDrawer.createDrawer<SoftwareDrawer>();
-	}
-	else
+#ifdef RMX_WITH_OPENGL_SUPPORT
+	if (config.mRenderMethod >= Configuration::RenderMethod::OPENGL_SOFT)
 	{
 		if (!mDrawer.createDrawer<OpenGLDrawer>())
 		{
@@ -700,6 +697,11 @@ bool EngineMain::createWindow()
 			config.mRenderMethod = Configuration::RenderMethod::SOFTWARE;
 			mDrawer.createDrawer<SoftwareDrawer>();
 		}
+	}
+	else
+#endif
+	{
+		mDrawer.createDrawer<SoftwareDrawer>();
 	}
 
 	// Tell FTX video manager that everything is okay

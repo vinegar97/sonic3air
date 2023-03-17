@@ -158,6 +158,32 @@ bool GhostSync::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 {
 	switch (evaluation.mPacketType)
 	{
+		case network::ChannelErrorPacket::PACKET_TYPE:
+		{
+			network::ChannelErrorPacket packet;
+			if (!evaluation.readPacket(packet))
+				return false;
+
+			switch (packet.mErrorCode)
+			{
+				case network::ChannelErrorPacket::ErrorCode::UNKNOWN_CHANNEL:
+				case network::ChannelErrorPacket::ErrorCode::CHANNEL_NOT_JOINED:
+				{
+					// Re-join the channel if needed
+					const uint32 channelHash = packet.mParameter;
+					if (mState == State::JOINED_CHANNEL && channelHash == mJoinedChannelHash)
+					{
+						mState = State::READY_TO_JOIN;
+					}
+					break;
+				}
+
+				default:
+					break;
+			}
+			return true;
+		}
+
 		case network::ChannelMessagePacket::PACKET_TYPE:
 		{
 			network::ChannelMessagePacket packet;
@@ -347,7 +373,10 @@ void GhostSync::updateGhostPlayers()
 
 		const float moveDirAngle = (float)ghostData.mMoveDirection / 128.0f * PI_FLOAT;
 		const bool enableOffscreen = ConfigurationImpl::instance().mGameServer.mGhostSync.mShowOffscreenGhosts;
-		s3air::drawPlayerSprite(emulatorInterface, ghostData.mCharacter, Vec2i(px, py), moveDirAngle, ghostData.mSprite, ghostData.mFlags & 0x0f, ghostData.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &ghostData.mFrameCounter, enableOffscreen, playerData.mPlayerID);
+		uint8 renderFlags = ghostData.mFlags & 0x03;
+		if (ghostData.mFlags & GhostData::FLAG_PRIORITY)
+			renderFlags |= 0x40;
+		s3air::drawPlayerSprite(emulatorInterface, ghostData.mCharacter, Vec2i(px, py), moveDirAngle, ghostData.mSprite, renderFlags, ghostData.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &ghostData.mFrameCounter, enableOffscreen, playerData.mPlayerID);
 	}
 
 	for (uint32 id : playersToRemove)

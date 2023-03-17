@@ -8,8 +8,9 @@
 
 #pragma once
 
-#include "oxygen/simulation/LemonScriptRuntime.h"
 #include "oxygen/simulation/DebuggingInterfaces.h"
+#include "oxygen/simulation/LemonScriptRuntime.h"
+#include "oxygen/simulation/RuntimeEnvironment.h"
 
 class EmulatorInterface;
 namespace lemon
@@ -67,6 +68,7 @@ public:
 		Type mType;
 		const lemon::Function* mFunction = nullptr;
 		uint32 mAddress = 0xffffffff;
+		int mParentIndex = -1;
 		int mDepth = 0;
 		size_t mSteps = 0;
 		bool mAnyChildFailed = false;
@@ -96,7 +98,7 @@ public:
 			uint32 mAddress = 0;
 			uint16 mBytes = 0;
 			Location mLocation;
-			std::vector<uint64> mCallStack;
+			int mCallFrameIndex = -1;
 		};
 
 		std::vector<Hit*> mHits;
@@ -112,7 +114,7 @@ public:
 		uint16 mAddress = 0;
 		uint16 mSize = 0;
 		Location mLocation;
-		std::vector<uint64> mCallStack;
+		int mCallFrameIndex = -1;
 	};
 
 public:
@@ -137,7 +139,7 @@ public:
 	bool performFrameUpdate();
 	void yieldExecution();
 
-	bool executeScriptFunction(const std::string& functionName, bool showErrorOnFail, const lemon::Environment* environment = nullptr);
+	bool executeScriptFunction(const std::string& functionName, bool showErrorOnFail);
 
 	inline EmulatorInterface& getEmulatorInterface()	{ return mEmulatorInterface; }
 	inline LemonScriptRuntime& getLemonScriptRuntime()	{ return mLemonScriptRuntime; }
@@ -147,6 +149,7 @@ public:
 
 	void processCallFrames();
 	inline const std::vector<CallFrame>& getCallFrames() const  { return mMainCallFrameTracking.mCallFrames; }
+	void getCallStackFromCallFrameIndex(std::vector<uint64>& outCallStack, int callFrameIndex);
 
 	inline const std::vector<uint32>& getUnknownAddresses() const  { return mUnknownAddressesInOrder; }
 
@@ -189,8 +192,9 @@ private:
 	LemonScriptProgram& mLemonScriptProgram;	// Move instance to Simulation?
 	EmulatorInterface&  mEmulatorInterface;
 	LemonScriptRuntime& mLemonScriptRuntime;
-	bool mIsDeveloperMode = false;
+	RuntimeEnvironment mRuntimeEnvironment;
 
+	bool mIsDeveloperMode = false;
 	ExecutionState mExecutionState = ExecutionState::INACTIVE;
 	bool mCurrentlyRunningScript = false;
 	size_t mAccumulatedStepsOfCurrentFrame = 0;

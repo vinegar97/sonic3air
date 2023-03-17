@@ -10,6 +10,7 @@
 #include "sonic3air/menu/ModsMenu.h"
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/MenuBackground.h"
+#include "sonic3air/menu/entries/GeneralMenuEntries.h"
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/Game.h"
 
@@ -212,6 +213,12 @@ void ModsMenu::initialize()
 			entries.clear();
 			entries.reserve(activeMods.size());
 
+			// TEST!
+			//entries.addEntry<InputFieldMenuEntry>().initEntry(L"ABC");
+			//entries.addEntry<InputFieldMenuEntry>().initEntry(L"DEF");
+			//entries.addEntry<InputFieldMenuEntry>().initEntry(L"GHIJKL");
+			//entries.addEntry<InputFieldMenuEntry>().initEntry(L"MNOP");
+
 			// Add active mods
 			//  -> In reverse order, as highest priority are the last (not first!) mods in the active list
 			for (auto it = activeMods.rbegin(); it != activeMods.rend(); ++it)
@@ -268,6 +275,16 @@ void ModsMenu::deinitialize()
 
 void ModsMenu::keyboard(const rmx::KeyboardEvent& ev)
 {
+	GameMenuEntry* entry = getSelectedGameMenuEntry();
+	if (nullptr != entry)
+		entry->keyboard(ev);
+}
+
+void ModsMenu::textinput(const rmx::TextInputEvent& ev)
+{
+	GameMenuEntry* entry = getSelectedGameMenuEntry();
+	if (nullptr != entry)
+		entry->textinput(ev);
 }
 
 void ModsMenu::update(float timeElapsed)
@@ -440,7 +457,7 @@ void ModsMenu::update(float timeElapsed)
 	}
 
 	// Info overlay animation
-	moveFloatTowards(mInfoOverlay.mVisibility, mInfoOverlay.mShouldBeVisible ? 1.0f : 0.0f, timeElapsed * 6.0f);
+	moveFloatTowards(mInfoOverlay.mVisibility, mInfoOverlay.mShouldBeVisible ? 1.0f : 0.0f, timeElapsed * 8.0f);
 	if (mInfoOverlay.mVisibility > 0.0f)
 	{
 		GameMenuEntries& menuEntries = mTabs[mActiveTab].mMenuEntries;
@@ -460,7 +477,7 @@ void ModsMenu::update(float timeElapsed)
 			ModEntry& modEntry = mModEntries[menuEntries.selected().mData];
 			if (mInfoOverlay.mShownMod != modEntry.mMod)
 			{
-				global::mFont4.wordWrapText(mInfoOverlay.mDescriptionLines, 300, modEntry.mMod->mDescription);
+				global::mOxyfontTinySimple.wordWrapText(mInfoOverlay.mDescriptionLines, 290, modEntry.mMod->mDescription);
 				mInfoOverlay.mShownMod = modEntry.mMod;
 			}
 		}
@@ -523,22 +540,25 @@ void ModsMenu::render()
 	GuiBase::render();
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
+	GameMenuEntry::RenderContext renderContext;
+	renderContext.mDrawer = &drawer;
+
 	const int globalOffsetX = -roundToInt(saturate(1.0f - mVisibility) * 300.0f);
 
 	if (!mHasAnyMods)
 	{
 		Recti rect(globalOffsetX + 32, 16, 300, 18);
-		drawer.printText(global::mFont7, rect, "No mods installed!", 1, Color(0.6f, 0.8f, 1.0f, mVisibility));
+		drawer.printText(global::mSonicFontB, rect, "No mods installed!", 1, Color(0.6f, 0.8f, 1.0f, mVisibility));
 		rect.y += 22;
 
 		Color color(0.8f, 0.9f, 1.0f, mVisibility);
-		drawer.printText(global::mFont5, rect, "Have a look at the game manual PDF for instructions", 1, color);
+		drawer.printText(global::mOxyfontSmall, rect, "Have a look at the game manual PDF for instructions", 1, color);
 		rect.y += 14;
-		drawer.printText(global::mFont5, rect, "on how to install mods.", 1, color);
+		drawer.printText(global::mOxyfontSmall, rect, "on how to install mods.", 1, color);
 		rect.y += 18;
-		drawer.printText(global::mFont5, rect, "Note that you will have to restart Sonic 3 A.I.R.", 1, color);
+		drawer.printText(global::mOxyfontSmall, rect, "Note that you will have to restart Sonic 3 A.I.R.", 1, color);
 		rect.y += 14;
-		drawer.printText(global::mFont5, rect, "to make it scan for new mods.", 1, color);
+		drawer.printText(global::mOxyfontSmall, rect, "to make it scan for new mods.", 1, color);
 		rect.y += 32;
 		rect.x += 16;
 
@@ -550,7 +570,7 @@ void ModsMenu::render()
 			color = isSelected ? Color::YELLOW : Color::WHITE;
 			color.a *= mVisibility;
 
-			drawer.printText(global::mFont10, rect, entry.mText, 1, color);
+			drawer.printText(global::mOxyfontRegular, rect, entry.mText, 1, color);
 			rect.y += 22;
 		}
 		return;
@@ -573,7 +593,7 @@ void ModsMenu::render()
 	for (size_t tabIndex = minTabIndex; tabIndex <= maxTabIndex; ++tabIndex)
 	{
 		Tab& tab = mTabs[tabIndex];
-		const GameMenuEntries& menuEntries = tab.mMenuEntries;
+		GameMenuEntries& menuEntries = tab.mMenuEntries;
 		const int startY = 10 - tab.mScrolling.getScrollOffsetYInt();
 
 		Recti rect((tabIndex == 0) ? 0 : rightTabStart, startY, 300, 18);
@@ -600,14 +620,14 @@ void ModsMenu::render()
 				text = "* " + text + " *";
 				visualRect.x -= 12;
 			}
-			drawer.printText(global::mFont7, visualRect, text, 1, Color(0.6f, 0.8f, 1.0f, alpha));
+			drawer.printText(global::mSonicFontB, visualRect, text, 1, Color(0.6f, 0.8f, 1.0f, alpha));
 			rect.y += rect.height + 7;
 		}
 
 		const bool showPriorityHints = (tabIndex == 0 && mActiveTab == 0 && inMovementMode && menuEntries.size() >= 2);
 		if (showPriorityHints)
 		{
-			drawer.printText(global::mFont3Pure, rect + Vec2i(-12, -12), "HIGH PRIORITY", 1, Color(0.4f, 0.5f, 0.6f, alpha * 0.25f));
+			drawer.printText(global::mSmallfont, rect + Vec2i(-12, -12), "HIGH PRIORITY", 1, Color(0.4f, 0.5f, 0.6f, alpha * 0.25f));
 		}
 
 		if (menuEntries.empty())
@@ -615,84 +635,95 @@ void ModsMenu::render()
 			Recti visualRect = rect;
 			visualRect.x -= roundToInt(saturate(1.0f - mVisibility) * 300.0f);
 			Color color = (tabIndex == mActiveTab) ? Color(1.0f, 1.0f, 1.0f, alpha) : Color(0.7f, 0.7f, 0.7f, alpha);
-			drawer.printText(global::mFont5, visualRect + Vec2i(24, 0), (tabIndex == 0) ? "- None -" : "- None -", 1, color);
+			drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(24, 0), (tabIndex == 0) ? "- None -" : "- None -", 1, color);
 		}
 
 		for (size_t index = 0; index < menuEntries.size(); ++index)
 		{
-			const auto& entry = menuEntries[index];
-			const ModEntry* modEntry = (entry.mData < 0xfff0) ? &mModEntries[entry.mData] : nullptr;
+			GameMenuEntry& entry = menuEntries[index];
 			const bool isSelected = ((int)index == menuEntries.mSelectedEntryIndex && tabIndex == mActiveTab);
+			renderContext.mIsSelected = isSelected;
 
-			Color color = (tabIndex == mActiveTab) ? (isSelected ? (inMovementMode ? Color(0.25f, 0.75f, 1.0f) : Color::YELLOW) : Color::WHITE) : Color(0.7f, 0.7f, 0.7f);
-			color.a *= alpha;
-
-			const float lineOffset = (mState < State::SHOW) ? (224.0f - (float)rect.y - startY) : 0.0f;
-
-			Recti visualRect = rect;
-			visualRect.x -= roundToInt(saturate(1.0f - mVisibility - lineOffset / 500.0f) * 300.0f);
-			visualRect.x += roundToInt(entry.mAnimation.mOffset.x * 200.0f);
-			visualRect.y += roundToInt(entry.mAnimation.mOffset.y * rect.height);
-
-			if (nullptr != modEntry)
+			if (entry.getMenuEntryType() == 0)
 			{
-				if (isSelected && inMovementMode)
+				const ModEntry* modEntry = (entry.mData < 0xfff0) ? &mModEntries[entry.mData] : nullptr;
+
+				Color color = (tabIndex == mActiveTab) ? (isSelected ? (inMovementMode ? Color(0.25f, 0.75f, 1.0f) : Color::YELLOW) : Color::WHITE) : Color(0.7f, 0.7f, 0.7f);
+				color.a *= alpha;
+
+				const float lineOffset = (mState < State::SHOW) ? (224.0f - (float)rect.y - startY) : 0.0f;
+
+				Recti visualRect = rect;
+				visualRect.x -= roundToInt(saturate(1.0f - mVisibility - lineOffset / 500.0f) * 300.0f);
+				visualRect.x += roundToInt(entry.mAnimation.mOffset.x * 200.0f);
+				visualRect.y += roundToInt(entry.mAnimation.mOffset.y * rect.height);
+
+				if (nullptr != modEntry)
 				{
-					// Draw background
-					Recti bgRect = visualRect;
-					bgRect.addPos(-20, -5);
-					drawer.drawRect(bgRect, Color(0.25f, 0.75f, 1.0f, 0.5f * alpha));
+					if (isSelected && inMovementMode)
+					{
+						// Draw background
+						Recti bgRect = visualRect;
+						bgRect.addPos(-20, -5);
+						drawer.drawRect(bgRect, Color(0.25f, 0.75f, 1.0f, 0.5f * alpha));
+					}
+
+					DrawerTexture& texture = (tabIndex == 0) ? modEntry->mModResources->mSmallIcon : modEntry->mModResources->mSmallIconGray;
+					if (texture.isValid())
+					{
+						const Recti iconRect(visualRect.x, visualRect.y - 4, 16, 16);
+						drawer.drawRect(iconRect, texture, Color(1.0f, 1.0f, 1.0f, alpha));
+					}
+
+					drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(24, 0), modEntry->mMod->mDisplayName, 1, color);
+
+					if (isSelected && inMovementMode)
+					{
+						// Draw arrows
+						if (tabIndex == 0)
+						{
+							if (menuEntries.size() >= 2)
+								drawer.printText(global::mOxyfontSmall, visualRect - Vec2i(12, 1), L"\u21f3", 1, color);
+							drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(225, 0), L"\u25ba", 1, color);
+						}
+						else
+						{
+							drawer.printText(global::mOxyfontSmall, visualRect - Vec2i(10, 0), L"\u25c4", 1, color);
+						}
+					}
+				}
+				else
+				{
+					drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(24, 0), entry.mText, 1, color);
 				}
 
-				DrawerTexture& texture = (tabIndex == 0) ? modEntry->mModResources->mSmallIcon : modEntry->mModResources->mSmallIconGray;
-				if (texture.isValid())
+				if (inMovementMode && tabIndex != mActiveTab && (int)index == menuEntries.mSelectedEntryIndex)
 				{
-					const Recti iconRect(visualRect.x, visualRect.y - 4, 16, 16);
-					drawer.drawRect(iconRect, texture, Color(1.0f, 1.0f, 1.0f, alpha));
+					// Draw a line to show where the mod would be inserted
+					drawer.drawRect(Recti(visualRect.x + 20, visualRect.y - 6, 100, 1), Color(0.25f, 0.75f, 1.0f));
+					drawer.drawRect(Recti(visualRect.x + 21, visualRect.y - 5, 100, 1), Color(0.2f, 0.2f, 0.2f, 0.9f));
 				}
 
-				drawer.printText(global::mFont5, visualRect + Vec2i(24, 0), modEntry->mMod->mDisplayName, 1, color);
+				const int currentAbsoluteY1 = (index == 0) ? 0 : (rect.y - startY);
+				rect.y += rect.height;
 
-				if (isSelected && inMovementMode)
+				if (isSelected)
 				{
-					// Draw arrows
-					if (tabIndex == 0)
-					{
-						if (menuEntries.size() >= 2)
-							drawer.printText(global::mFont5, visualRect - Vec2i(12, 1), L"\u21f3", 1, color);
-						drawer.printText(global::mFont5, visualRect + Vec2i(225, 0), L"\u25ba", 1, color);
-					}
-					else
-					{
-						drawer.printText(global::mFont5, visualRect - Vec2i(10, 0), L"\u25c4", 1, color);
-					}
+					const int currentAbsoluteY2 = rect.y - startY;
+					tab.mScrolling.setCurrentSelection(currentAbsoluteY1 - 20, currentAbsoluteY2 + 25);
 				}
 			}
 			else
 			{
-				drawer.printText(global::mFont5, visualRect + Vec2i(24, 0), entry.mText, 1, color);
-			}
-
-			if (inMovementMode && tabIndex != mActiveTab && (int)index == menuEntries.mSelectedEntryIndex)
-			{
-				// Draw a line to show where the mod would be inserted
-				drawer.drawRect(Recti(visualRect.x + 20, visualRect.y - 6, 100, 1), Color(0.25f, 0.75f, 1.0f));
-				drawer.drawRect(Recti(visualRect.x + 21, visualRect.y - 5, 100, 1), Color(0.2f, 0.2f, 0.2f, 0.9f));
-			}
-
-			const int currentAbsoluteY1 = (index == 0) ? 0 : (rect.y - startY);
-			rect.y += rect.height;
-
-			if (isSelected)
-			{
-				const int currentAbsoluteY2 = rect.y - startY;
-				tab.mScrolling.setCurrentSelection(currentAbsoluteY1 - 20, currentAbsoluteY2 + 25);
+				renderContext.mCurrentPosition.set(rect.x, rect.y);
+				entry.performRenderEntry(renderContext);
+				rect.y = renderContext.mCurrentPosition.y;
 			}
 		}
 
 		if (showPriorityHints)
 		{
-			drawer.printText(global::mFont3Pure, rect + Vec2i(-12, -3), "LOW PRIORITY", 1, Color(0.4f, 0.5f, 0.6f, alpha * 0.25f));
+			drawer.printText(global::mSmallfont, rect + Vec2i(-12, -3), "LOW PRIORITY", 1, Color(0.4f, 0.5f, 0.6f, alpha * 0.25f));
 		}
 
 		drawer.popScissor();
@@ -706,8 +737,8 @@ void ModsMenu::render()
 		drawer.popScissor();
 
 		Recti rect(globalOffsetX, infoOverlayPosition, 400, 224 - infoOverlayPosition);
-		drawer.drawRect(rect, Color(1.0f, 1.0f, 1.0f, mVisibility * 0.5f));
-		drawer.drawRect(Recti(rect.x, rect.y - 1, rect.width, 1), Color(0.0f, 0.0f, 0.0f, mVisibility * 0.5f));
+		drawer.drawRect(rect, Color(0.0f, 0.0f, 0.0f, mVisibility * 0.9f));
+		drawer.drawRect(Recti(rect.x, rect.y - 1, rect.width, 1), Color(1.0f, 1.0f, 1.0f, mVisibility));
 
 		if (mTabs[mActiveTab].mMenuEntries.hasSelected())
 		{
@@ -734,20 +765,20 @@ void ModsMenu::render()
 				{
 					WString path(L"mods/" + modEntry->mMod->mLocalDirectory);
 					path.upperCase();
-					drawer.printText(global::mFont3Pure, rect + Vec2i(3, -9), path, 3, colorDark);
+					drawer.printText(global::mSmallfont, rect + Vec2i(3, -10), path, 3, colorDark);
 				}
 				{
-					drawer.printText(global::mFont10, rect, modEntry->mMod->mDisplayName, 1, colorY2);
+					drawer.printText(global::mOxyfontRegular, rect, modEntry->mMod->mDisplayName, 1, colorY2);
 					rect.y += 19;
 				}
 				if (!modEntry->mMod->mAuthor.empty())
 				{
-					drawer.printText(global::mFont5, rect + Vec2i(8, 0), "by " + modEntry->mMod->mAuthor, 1, colorY);
+					drawer.printText(global::mOxyfontSmallNoOutline, rect + Vec2i(8, 0), "by " + modEntry->mMod->mAuthor, 1, colorY);
 					rect.y += 15;
 				}
 				if (!modEntry->mMod->mModVersion.empty())
 				{
-					drawer.printText(global::mFont5, rect + Vec2i(8, 0), "Version " + modEntry->mMod->mModVersion, 1, colorY);
+					drawer.printText(global::mOxyfontSmallNoOutline, rect + Vec2i(8, 0), "Version " + modEntry->mMod->mModVersion, 1, colorY);
 					rect.y += 15;
 				}
 				rect.y += 4;
@@ -755,14 +786,14 @@ void ModsMenu::render()
 				{
 					for (const std::wstring& line : mInfoOverlay.mDescriptionLines)
 					{
-						drawer.printText(global::mFont4, rect, line, 1, colorW);
-						rect.y += 12;
+						drawer.printText(global::mOxyfontTinySimple, rect, line, 1, colorW);
+						rect.y += 11;
 					}
 					rect.y += 6;
 				}
 				if (!modEntry->mMod->mURL.empty())
 				{
-					drawer.printText(global::mFont4, rect, "More info:   " + modEntry->mMod->mURL, 1, colorW);
+					drawer.printText(global::mOxyfontTinySimple, rect, "More info:   " + modEntry->mMod->mURL, 1, colorW);
 					rect.y += 16;
 				}
 			}
@@ -774,7 +805,7 @@ void ModsMenu::render()
 	{
 		Recti rect(100, 94, 200, 35);
 		DrawerHelper::drawBorderedRect(drawer, rect, 1, Color(1.0f, 1.0f, 1.0f, 0.95f), Color(0.2f, 0.2f, 0.2f, 0.9f));
-		drawer.printText(global::mFont10, rect, "Applying changes...", 5);
+		drawer.printText(global::mOxyfontRegular, rect, "Applying changes...", 5);
 	}
 
 	drawer.performRendering();
@@ -798,12 +829,16 @@ bool ModsMenu::applyModChanges(bool dryRun)
 	std::vector<Mod*> activeMods;
 	activeMods.reserve(menuEntries.size());
 
-	for (auto it = menuEntries.rbegin(); it != menuEntries.rend(); ++it)
+	for (size_t index = 0; index < menuEntries.size(); ++index)
 	{
-		const ModEntry& modEntry = mModEntries[(*it)->mData];
-		if (modEntry.mMakeActive)
+		const GameMenuEntry& entry = *menuEntries[index];
+		if (entry.getMenuEntryType() == 0)
 		{
-			activeMods.push_back(modEntry.mMod);
+			const ModEntry& modEntry = mModEntries[entry.mData];
+			if (modEntry.mMakeActive)
+			{
+				activeMods.push_back(modEntry.mMod);
+			}
 		}
 	}
 
@@ -833,4 +868,17 @@ void ModsMenu::goBack()
 		GameApp::instance().onExitMods();
 		mState = State::FADE_TO_MENU;
 	}
+}
+
+GameMenuEntry* ModsMenu::getSelectedGameMenuEntry()
+{
+	for (size_t tabIndex = 0; tabIndex <= 1; ++tabIndex)
+	{
+		GameMenuEntries& menuEntries = mTabs[tabIndex].mMenuEntries;
+		if (menuEntries.mSelectedEntryIndex >= 0 && menuEntries.mSelectedEntryIndex < (int)menuEntries.size())
+		{
+			return &menuEntries[menuEntries.mSelectedEntryIndex];
+		}
+	}
+	return nullptr;
 }

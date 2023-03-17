@@ -8,14 +8,10 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/rendering/sprite/ComponentSprite.h"
+#include "oxygen/drawing/software/Blitter.h"
 
 
 void ComponentSprite::clear()
 {
 	mBitmap.clear(0);
-}
-
-void ComponentSprite::blitInto(Bitmap& output, const Vec2i& position, const BlitOptions& blitOptions) const
-{
-	SpriteBase::blitInto(output, mBitmap, position, blitOptions);
 }

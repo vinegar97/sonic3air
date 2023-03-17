@@ -70,39 +70,51 @@ void Drawer::setWindowRenderTarget(const Recti& rect)
 	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetWindowRenderTargetDrawCommands.createObject(rect));
 }
 
-void Drawer::setBlendMode(DrawerBlendMode blendMode)
+void Drawer::setBlendMode(BlendMode blendMode)
 {
 	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetBlendModeDrawCommands.createObject(blendMode));
 }
 
-void Drawer::setSamplingMode(DrawerSamplingMode samplingMode)
+void Drawer::setSamplingMode(SamplingMode samplingMode)
 {
 	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetSamplingModeDrawCommands.createObject(samplingMode));
 }
 
-void Drawer::setWrapMode(DrawerWrapMode wrapMode)
+void Drawer::setWrapMode(TextureWrapMode wrapMode)
 {
 	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetWrapModeDrawCommands.createObject(wrapMode));
 }
 
 void Drawer::drawRect(const Rectf& rect, const Color& color)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, color));
+	if (!rect.isEmpty())
+	{
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, color));
+	}
 }
 
 void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture));
+	if (!rect.isEmpty())
+	{
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture));
+	}
 }
 
 void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture, const Color& tintColor)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture, tintColor));
+	if (!rect.isEmpty())
+	{
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture, tintColor));
+	}
 }
 
 void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture, const Vec2f& uv0, const Vec2f& uv1, const Color& tintColor)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture, uv0, uv1, tintColor));
+	if (!rect.isEmpty())
+	{
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture, uv0, uv1, tintColor));
+	}
 }
 
 void Drawer::drawUpscaledRect(const Rectf& rect, DrawerTexture& texture)
@@ -113,6 +125,14 @@ void Drawer::drawUpscaledRect(const Rectf& rect, DrawerTexture& texture)
 void Drawer::drawSprite(Vec2i position, uint64 spriteKey, const Color& tintColor, Vec2f scale)
 {
 	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSpriteDrawCommands.createObject(position, spriteKey, tintColor, scale));
+}
+
+void Drawer::drawSpriteRect(const Recti& rect, uint64 spriteKey, const Color& tintColor)
+{
+	if (!rect.isEmpty())
+	{
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSpriteRectDrawCommands.createObject(rect, spriteKey, tintColor));
+	}
 }
 
 void Drawer::drawMesh(const std::vector<DrawerMeshVertex>& triangles, DrawerTexture& texture)
@@ -144,7 +164,7 @@ void Drawer::printText(Font& font, const Recti& rect, const String& text, int al
 		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, rect, text, alignment, color));
 }
 
-void Drawer::printText(Font& font, const Recti& rect, const String& text, const rmx::Painter::PrintOptions& printOptions)
+void Drawer::printText(Font& font, const Recti& rect, const String& text, const DrawerPrintOptions& printOptions)
 {
 	if (!text.empty())
 		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, rect, text, printOptions));
@@ -156,7 +176,7 @@ void Drawer::printText(Font& font, const Recti& rect, const WString& text, int a
 		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, rect, text, alignment, color));
 }
 
-void Drawer::printText(Font& font, const Recti& rect, const WString& text, const rmx::Painter::PrintOptions& printOptions)
+void Drawer::printText(Font& font, const Recti& rect, const WString& text, const DrawerPrintOptions& printOptions)
 {
 	if (!text.empty())
 		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, rect, text, printOptions));

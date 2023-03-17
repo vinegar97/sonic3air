@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/rendering/opengl/shaders/RenderPlaneShader.h"
 #include "oxygen/rendering/opengl/OpenGLRenderResources.h"
 #include "oxygen/rendering/Geometry.h"
@@ -167,7 +170,7 @@ void RenderPlaneShader::draw(const PlaneGeometry& geometry, int waterSurfaceHeig
 		const int paletteVariant = i;
 		if (mLastPaletteVariant != paletteVariant || !mInitialized)
 		{
-			const float paletteOffset = (float)(paletteVariant + 0.5f) / 2.0f;
+			const float paletteOffset = (float)paletteVariant / 2.0f;
 			glUniform1f(mLocPaletteOffset, paletteOffset);
 			mLastPaletteVariant = paletteVariant;
 		}
@@ -175,3 +178,5 @@ void RenderPlaneShader::draw(const PlaneGeometry& geometry, int waterSurfaceHeig
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 }
+
+#endif

@@ -66,7 +66,7 @@ bool EngineDelegate::onEnginePreStartup()
 	// Sanity check if the game is even extracted
 	{
 		// One of these two files must exist
-	#if defined(PLATFORM_MAC) || defined(PLATFORM_IOS)
+	#if (defined(PLATFORM_MAC) || defined(PLATFORM_IOS)) && defined(ENDUSER)
 		Configuration& config = Configuration::instance();
 		const bool check = FTX::FileSystem->exists(config.mGameDataPath + L"/gamedata.bin");
 	#else
@@ -114,9 +114,9 @@ bool EngineDelegate::setupCustomGameProfile()
 	return true;
 }
 
-void EngineDelegate::startupGame()
+void EngineDelegate::startupGame(EmulatorInterface& emulatorInterface)
 {
-	mGame.startup();
+	mGame.startup(emulatorInterface);
 	mCommandForwarder.startup();
 }
 
@@ -213,7 +213,7 @@ void EngineDelegate::onGameRecordingHeaderSave(std::vector<uint8>& buffer)
 
 Font& EngineDelegate::getDebugFont(int size)
 {
-	return (size >= 10) ? global::mFont10 : global::mFont3;
+	return (size >= 10) ? global::mOxyfontRegular : global::mSmallfontOutlined;
 }
 
 void EngineDelegate::fillDebugVisualization(Bitmap& bitmap, int& mode)

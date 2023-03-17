@@ -37,16 +37,18 @@ namespace
 
 	bool dumpPaletteAsBMP(int paletteIndex)
 	{
-		PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
-		std::vector<uint8> fileContent;
+		const PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
 		Color palette[0x100] = { Color::TRANSPARENT };
+		paletteManager.getPalette(paletteIndex).dumpColors(palette, 0x100);
+
 		PaletteBitmap bmp;
 		bmp.create(16, 16);
 		for (int colorIndex = 0; colorIndex < 0x100; ++colorIndex)
 		{
-			palette[colorIndex] = paletteManager.getPaletteEntry(paletteIndex, (uint16)colorIndex);
 			bmp.getData()[colorIndex] = (uint8)colorIndex;
 		}
+
+		std::vector<uint8> fileContent;
 		if (!bmp.saveBMP(fileContent, palette))
 			return false;
 		return FTX::FileSystem->saveFile("palette_dump.bmp", fileContent);
@@ -56,14 +58,14 @@ namespace
 #if 0
 	bool dumpPaletteAsPAL(int paletteIndex)
 	{
-		PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
+		const PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
 		String str;
 		str << "JASC-PAL\r\n";
 		str << "0100\r\n";
 		str << "256\r\n";
 		for (int colorIndex = 0; colorIndex < 64; ++colorIndex)
 		{
-			const Color color = paletteManager.getPaletteEntry(paletteIndex, colorIndex);
+			const Color color = paletteManager.getPalette(paletteIndex).getColor(colorIndex);
 			str << roundToInt(color.r * 255.0f) << ' ' << roundToInt(color.g * 255.0f) << ' ' << roundToInt(color.b * 255.0f) << "\r\n";
 		}
 		for (int colorIndex = 64; colorIndex < 256; ++colorIndex)
@@ -296,10 +298,12 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 
 						case SDLK_F10:
 						{
+							HighResolutionTimer timer;
+							timer.start();
 							RenderResources::instance().loadSpriteCache();
 							ResourcesCache::instance().loadAllResources();
 							FontCollection::instance().reloadAll();
-							setLogDisplay("Reloaded resources");
+							setLogDisplay(String(0, "Reloaded resources in %0.2f sec", timer.getSecondsSinceStart()));
 							break;
 						}
 					}
@@ -590,14 +594,14 @@ void GameView::render()
 	if (mDebugOutput >= 0)
 	{
 		// Draw a dark background over the full screen
-		drawer.setBlendMode(DrawerBlendMode::NONE);
+		drawer.setBlendMode(BlendMode::OPAQUE);
 		drawer.drawRect(FTX::screenRect(), Color(0.15f, 0.15f, 0.15f));
 		drawer.performRendering();
 
 		videoOut.renderDebugDraw(mDebugOutput, mRect);
 
 		// Enable alpha again for the UI
-		drawer.setBlendMode(DrawerBlendMode::ALPHA);
+		drawer.setBlendMode(BlendMode::ALPHA);
 		drawer.performRendering();
 
 		// No "GuiBase::render()" call here, as this would e.g. draw menus on top (and in wrong resolutions)
@@ -606,7 +610,7 @@ void GameView::render()
 
 	// Here goes the real rendering
 	drawer.setRenderTarget(mFinalGameTexture, gameScreenRect);
-	drawer.setBlendMode(DrawerBlendMode::NONE);
+	drawer.setBlendMode(BlendMode::OPAQUE);
 
 	// Simple mirror mode implementation: Just mirror the whole screen
 	if (Configuration::instance().mMirrorMode)
@@ -620,7 +624,7 @@ void GameView::render()
 	}
 
 	// Enable alpha for the UI
-	drawer.setBlendMode(DrawerBlendMode::ALPHA);
+	drawer.setBlendMode(BlendMode::ALPHA);
 
 	// Debug visualizations
 	if (mDebugVisualizationsEnabled)
@@ -653,7 +657,7 @@ void GameView::render()
 			{
 				const int px = baseX + 1 + (k & 0x0f) * 5;
 				const int height = (k < 0x40) ? 4 : 2;
-				Color color = paletteManager.getPaletteEntry(paletteIndex, (uint16)k);
+				Color color = paletteManager.getPalette(paletteIndex).getColor(k);
 				color.a = 1.0f;
 				drawer.drawRect(Recti(px, py, 4, height), color);
 
@@ -682,10 +686,12 @@ void GameView::render()
 			}
 		}
 
+	#ifdef RMX_WITH_OPENGL_SUPPORT
 		if (drawer.getType() == Drawer::Type::OPENGL)
 		{
 			FTX::Painter->setColor(Color::WHITE);	// Prevent possible broken display in UI (e.g. in S3AIR's menus)
 		}
+	#endif
 	}
 	drawer.performRendering();
 
@@ -711,7 +717,7 @@ void GameView::render()
 
 	// Draw the combined image
 	drawer.setWindowRenderTarget(FTX::screenRect());
-	drawer.setBlendMode(DrawerBlendMode::NONE);
+	drawer.setBlendMode(BlendMode::OPAQUE);
 	drawer.drawUpscaledRect(mGameViewport, mFinalGameTexture);
 
 	if (!FTX::Video->getVideoConfig().mAutoClearScreen)
@@ -732,7 +738,7 @@ void GameView::render()
 
 	// Enable alpha again
 	// TODO: Better do the fading inside the game viewport (instead of the full window) for performance reasons -- or apply to "drawUpscaledRect"
-	drawer.setBlendMode(DrawerBlendMode::ALPHA);
+	drawer.setBlendMode(BlendMode::ALPHA);
 	if (mFadeValue < 1.0f)
 	{
 		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 1.0f - mFadeValue));

@@ -161,8 +161,7 @@ const std::vector<const ResourcesCache::RawData*>& ResourcesCache::getRawData(ui
 
 const ResourcesCache::Palette* ResourcesCache::getPalette(uint64 key, uint8 line) const
 {
-	const auto it = mPalettes.find(key + line);
-	return (it == mPalettes.end()) ? nullptr : &it->second;
+	return mapFind(mPalettes, key + line);
 }
 
 void ResourcesCache::applyRomInjections(uint8* rom, uint32 romSize) const
@@ -212,19 +211,28 @@ bool ResourcesCache::loadRomFile(const std::wstring& filename, const GameProfile
 bool ResourcesCache::loadRomMemory(const std::vector<uint8>& content)
 {
 	const uint64 headerChecksum = getHeaderChecksum(content);
-	for (const GameProfile::RomInfo& romInfo : GameProfile::instance().mRomInfos)
+	if (GameProfile::instance().mRomInfos.empty())
 	{
-		// If ROM info defines a required header checksum, make sure it fits (this is meant to be an early-out before doing the potentially expensive code below)
-		if (romInfo.mHeaderChecksum != 0 && romInfo.mHeaderChecksum != headerChecksum)
-			continue;
-
 		mRom = content;
-		if (applyRomModifications(romInfo))
+		if (checkRomContent())
+			return true;
+	}
+	else
+	{
+		for (const GameProfile::RomInfo& romInfo : GameProfile::instance().mRomInfos)
 		{
-			if (checkRomContent())
+			// If ROM info defines a required header checksum, make sure it fits (this is meant to be an early-out before doing the potentially expensive code below)
+			if (romInfo.mHeaderChecksum != 0 && romInfo.mHeaderChecksum != headerChecksum)
+				continue;
+
+			mRom = content;
+			if (applyRomModifications(romInfo))
 			{
-				mLoadedRomInfo = &romInfo;
-				return true;
+				if (checkRomContent())
+				{
+					mLoadedRomInfo = &romInfo;
+					return true;
+				}
 			}
 		}
 	}

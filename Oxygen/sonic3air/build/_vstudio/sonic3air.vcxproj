@@ -44,12 +44,14 @@
     <ClCompile Include="..\..\source\sonic3air\helper\BlueSpheresRendering.cpp" />
     <ClCompile Include="..\..\source\sonic3air\helper\CommandForwarder.cpp" />
     <ClCompile Include="..\..\source\sonic3air\helper\DiscordIntegration.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\helper\DrawingUtils.cpp" />
     <ClCompile Include="..\..\source\sonic3air\helper\GameUtils.cpp" />
     <ClCompile Include="..\..\source\sonic3air\helper\PackageBuilder.cpp" />
     <ClCompile Include="..\..\source\sonic3air\main.cpp">
       <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\entries\GeneralMenuEntries.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\ExtrasMenu.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\ActSelectMenu.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\GameApp.cpp" />
@@ -92,9 +94,11 @@
     <ClInclude Include="..\..\source\sonic3air\helper\BlueSpheresRendering.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\CommandForwarder.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\DiscordIntegration.h" />
+    <ClInclude Include="..\..\source\sonic3air\helper\DrawingUtils.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\GameUtils.h" />
     <ClInclude Include="..\..\source\sonic3air\helper\PackageBuilder.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\entries\GeneralMenuEntries.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\ExtrasMenu.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\ActSelectMenu.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\GameApp.h" />

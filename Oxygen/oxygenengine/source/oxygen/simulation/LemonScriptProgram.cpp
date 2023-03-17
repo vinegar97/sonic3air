@@ -48,22 +48,12 @@ struct LemonScriptProgram::Internal
 LemonScriptProgram::LemonScriptProgram() :
 	mInternal(*new Internal())
 {
-	mInternal.mLemonCoreModule.clear();
-	mInternal.mOxygenCoreModule.clear();
-
 	// Register game-specific nativized code
 	EngineMain::getDelegate().registerNativizedCode(mInternal.mProgram);
-}
 
-LemonScriptProgram::~LemonScriptProgram()
-{
-	delete &mInternal;
-}
-
-void LemonScriptProgram::startup()
-{
 	Configuration& config = Configuration::instance();
-	mInternal.mGlobalsLookupCoreOnly = lemon::GlobalsLookup();
+	mInternal.mLemonCoreModule.clear();
+	mInternal.mOxygenCoreModule.clear();
 
 	// Setup lemon core module -- containing lemonscript standard library
 	{
@@ -80,8 +70,6 @@ void LemonScriptProgram::startup()
 	}
 
 	// Setup oxygen core module -- with Oxygen Engine specific bindings
-	//  -> TODO: This has some dependency of the runtime, as the register variables directly access the emulator interface instance;
-	//           and this in turn is the reason why there's a need for this separate startup function at all...
 	{
 		lemon::Module& module = mInternal.mOxygenCoreModule;
 		module.startCompiling(mInternal.mGlobalsLookupCoreOnly);
@@ -95,6 +83,11 @@ void LemonScriptProgram::startup()
 		mInternal.mLemonCoreModule.dumpDefinitionsToScriptFile(config.mDumpCppDefinitionsOutput);
 		mInternal.mOxygenCoreModule.dumpDefinitionsToScriptFile(config.mDumpCppDefinitionsOutput, true);
 	}
+}
+
+LemonScriptProgram::~LemonScriptProgram()
+{
+	delete &mInternal;
 }
 
 LemonScriptBindings& LemonScriptProgram::getLemonScriptBindings()
@@ -212,7 +205,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 				if (FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer))
 				{
 					VectorBinarySerializer serializer(true, buffer);
-					scriptsLoaded = mInternal.mScriptModule.serialize(serializer, coreModuleDependencyHash, loadOptions.mAppVersion);
+					scriptsLoaded = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
 					RMX_CHECK(scriptsLoaded, "Failed to deserialize scripts, possibly because the compiled script file '" << WString(config.mCompiledScriptSavePath).toStdString() << "' is using an older format", );
 				}
 			}
@@ -235,7 +228,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 						// Save compiled scripts
 						buffer.clear();
 						VectorBinarySerializer serializer(false, buffer);
-						const bool success = mInternal.mScriptModule.serialize(serializer, coreModuleDependencyHash, loadOptions.mAppVersion);
+						const bool success = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
 						RMX_CHECK(success, "Failed to serialize scripts", );
 						FTX::FileSystem->saveFile(config.mCompiledScriptSavePath, buffer);	// In order to use these scripts, they have to be manually moved to the "data" folder
 					}
@@ -249,7 +242,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 			if (FTX::FileSystem->readFile(L"data/scripts.bin", buffer))
 			{
 				VectorBinarySerializer serializer(true, buffer);
-				scriptsLoaded = mInternal.mScriptModule.serialize(serializer, coreModuleDependencyHash, loadOptions.mAppVersion);
+				scriptsLoaded = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
 				RMX_CHECK(scriptsLoaded, "Failed to load 'scripts.bin'", );
 			}
 		}

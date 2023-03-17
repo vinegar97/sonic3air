@@ -11,6 +11,10 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
+#include "rmxmedia/opengl/SpriteAtlas.h"
+
 class Font;
 
 
@@ -22,10 +26,18 @@ public:
 		Vec2f mPosition;
 		Vec2f mTexcoords;
 	};
+
 	struct VertexGroup
 	{
 		Texture* mTexture = nullptr;
+		size_t mStartIndex = 0;
+		size_t mNumVertices = 0;
+	};
+
+	struct VertexGroups
+	{
 		std::vector<Vertex> mVertices;
+		std::vector<VertexGroup> mVertexGroups;
 	};
 
 public:
@@ -34,7 +46,7 @@ public:
 	inline const FontKey& getFontKey() const  { return mFont.getKey(); }
 
 	void print(const std::vector<Font::TypeInfo>& infos);
-	void buildVertexGroups(std::vector<VertexGroup>& outVertexGroups, const std::vector<Font::TypeInfo>& infos);
+	void buildVertexGroups(VertexGroups& outVertexGroups, const std::vector<Font::TypeInfo>& infos);
 
 private:
 	struct SpriteHandleInfo
@@ -56,3 +68,5 @@ private:
 	SpriteAtlas mAtlas;
 	std::map<uint32, SpriteHandleInfo> mHandleMap;
 };
+
+#endif

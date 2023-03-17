@@ -121,7 +121,9 @@ namespace s3air
 
 			if (!SpriteCache::instance().hasSprite(key))
 			{
-				key = SharedDatabase::setupCharacterSprite(characterIndex, animationSprite, false);
+				key = SharedDatabase::setupCharacterSprite(emulatorInterface, characterIndex, animationSprite, false);
+				if (!SpriteCache::instance().hasSprite(key))
+					key = 0;
 			}
 		}
 		SpriteManager& spriteManager = VideoOut::instance().getRenderParts().getSpriteManager();
@@ -150,7 +152,9 @@ namespace s3air
 			uint64 key = rmx::getMurmur2_64(String(0, "character_tails_tails_0x%02x", tailsAnimSprite));
 			if (!SpriteCache::instance().hasSprite(key))
 			{
-				key = SharedDatabase::setupTailsTailsSprite(tailsAnimSprite);
+				key = SharedDatabase::setupTailsTailsSprite(emulatorInterface, tailsAnimSprite);
+				if (!SpriteCache::instance().hasSprite(key))
+					key = 0;
 			}
 
 			if (key != 0)
@@ -164,11 +168,14 @@ namespace s3air
 		}
 
 		// Main sprite
-		spriteManager.setSpriteTagWithPosition(spriteTagBaseValue, renderPos);
-		if (showAtBorder)
-			spriteManager.drawCustomSprite(key, renderPos, atex, flags | 0x40, 0xe000, color, 0.0f, 0.4f);
-		else
-			spriteManager.drawCustomSprite(key, renderPos, atex, flags, 0x9eff, color);
+		if (key != 0)
+		{
+			spriteManager.setSpriteTagWithPosition(spriteTagBaseValue, renderPos);
+			if (showAtBorder)
+				spriteManager.drawCustomSprite(key, renderPos, atex, flags | 0x40, 0xe000, color, 0.0f, 0.4f);
+			else
+				spriteManager.drawCustomSprite(key, renderPos, atex, flags, 0x9eff, color);
+		}
 	}
 
 	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, const Vec2i& velocity, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, const uint16* globalFrameNumber, bool enableOffscreen, uint64 spriteTagBaseValue)

@@ -53,9 +53,9 @@ public:
 
 	void setRenderTarget(DrawerTexture& texture, const Recti& rect);
 	void setWindowRenderTarget(const Recti& rect);
-	void setBlendMode(DrawerBlendMode blendMode);
-	void setSamplingMode(DrawerSamplingMode samplingMode);
-	void setWrapMode(DrawerWrapMode wrapMode);
+	void setBlendMode(BlendMode blendMode);
+	void setSamplingMode(SamplingMode samplingMode);
+	void setWrapMode(TextureWrapMode wrapMode);
 
 	void drawRect(const Rectf& rect, const Color& color);
 	void drawRect(const Rectf& rect, DrawerTexture& texture);
@@ -63,14 +63,15 @@ public:
 	void drawRect(const Rectf& rect, DrawerTexture& texture, const Vec2f& uv0, const Vec2f& uv1, const Color& tintColor);
 	void drawUpscaledRect(const Rectf& rect, DrawerTexture& texture);
 	void drawSprite(Vec2i position, uint64 spriteKey, const Color& tintColor = Color::WHITE, Vec2f scale = Vec2f(1.0f, 1.0f));
+	void drawSpriteRect(const Recti& rect, uint64 spriteKey, const Color& tintColor = Color::WHITE);
 	void drawMesh(const std::vector<DrawerMeshVertex>& triangles, DrawerTexture& texture);
 	void drawMesh(const std::vector<DrawerMeshVertex_P2_C4>& triangles);
 	void drawQuad(const DrawerMeshVertex* quad, DrawerTexture& texture);
 
 	void printText(Font& font, const Recti& rect, const String& text, int alignment = 1, Color color = Color::WHITE);
-	void printText(Font& font, const Recti& rect, const String& text, const rmx::Painter::PrintOptions& printOptions);
+	void printText(Font& font, const Recti& rect, const String& text, const DrawerPrintOptions& printOptions);
 	void printText(Font& font, const Recti& rect, const WString& text, int alignment = 1, Color color = Color::WHITE);
-	void printText(Font& font, const Recti& rect, const WString& text, const rmx::Painter::PrintOptions& printOptions);
+	void printText(Font& font, const Recti& rect, const WString& text, const DrawerPrintOptions& printOptions);
 
 	void pushScissor(const Recti& rect);
 	void popScissor();

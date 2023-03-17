@@ -8,18 +8,12 @@
 
 #pragma once
 
-#include "oxygen/simulation/DebuggingInterfaces.h"
-
-namespace lemon
-{
-	class Module;
-	class Runtime;
-}
+#include <string>
 
 
-class LemonScriptBindings
+class CrashHandler
 {
 public:
-	void registerBindings(lemon::Module& module);
-	void setDebugNotificationInterface(DebugNotificationInterface* bebugNotificationInterface);
+	static void initializeCrashHandler();
+	static void setApplicationInfo(const std::string& applicationInfo);
 };

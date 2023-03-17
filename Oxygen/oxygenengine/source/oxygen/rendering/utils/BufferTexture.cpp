@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/rendering/utils/BufferTexture.h"
 
 
@@ -77,6 +80,11 @@ void BufferTexture::create(PixelFormat pixelFormat, int width, int height, const
 #endif
 }
 
+void BufferTexture::create(PixelFormat pixelFormat, Vec2i size, const void* data)
+{
+	create(pixelFormat, size.x, size.y, data);
+}
+
 void BufferTexture::bindBuffer() const
 {
 #if defined(SUPPORTS_BUFFER_TEXTURES)
@@ -118,3 +126,5 @@ void BufferTexture::bufferData(const void* data, int width, int height)
 	glBindTexture(GL_TEXTURE_2D, 0);
 #endif
 }
+
+#endif

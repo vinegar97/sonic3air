@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
 
 
@@ -15,8 +18,8 @@ void OpenGLDrawerTexture::updateFromBitmap(const Bitmap& bitmap)
 	mTexture.loadBitmap(bitmap);
 
 	// Need to update these, as "loadBitmap" changed the OpenGL texture parameters
-	mSamplingMode = DrawerSamplingMode::POINT;
-	mWrapMode = DrawerWrapMode::CLAMP;
+	mSamplingMode = SamplingMode::POINT;
+	mWrapMode = TextureWrapMode::CLAMP;
 }
 
 void OpenGLDrawerTexture::setupAsRenderTarget(const Vec2i& size, DrawerTexture& owner)
@@ -65,3 +68,5 @@ GLuint OpenGLDrawerTexture::getFrameBufferHandle()
 {
 	return mFrameBuffer.getHandle();
 }
+
+#endif

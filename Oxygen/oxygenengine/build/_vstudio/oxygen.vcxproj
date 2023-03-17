@@ -74,6 +74,7 @@
     <ClCompile Include="..\..\source\oxygen\file\ZipFileProvider.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\HighResolutionTimer.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Profiling.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\TextInputHandler.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Transform2D.cpp" />
     <ClCompile Include="..\..\source\oxygen\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -106,7 +107,6 @@
     <ClCompile Include="..\..\source\oxygen\rendering\software\SoftwareRenderer.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\sprite\ComponentSprite.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\sprite\PaletteSprite.cpp" />
-    <ClCompile Include="..\..\source\oxygen\rendering\sprite\SpriteBase.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\sprite\SpriteDump.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\BufferTexture.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\Kosinski.cpp" />
@@ -117,10 +117,11 @@
     <ClCompile Include="..\..\source\oxygen\resources\ResourcesCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\SpriteCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\bindings\LemonScriptBindings.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\bindings\RendererBindings.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\CodeExec.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\EmulatorInterface.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\GameRecorder.cpp" />
-    <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptBindings.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptProgram.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptRuntime.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\LogDisplay.cpp" />
@@ -180,6 +181,7 @@
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLTexture.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\Upscaler.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\software\BlitterHelper.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\Blitter.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareDrawer.h" />
@@ -191,6 +193,7 @@
     <ClInclude Include="..\..\source\oxygen\helper\DrawerHelper.h" />
     <ClInclude Include="..\..\source\oxygen\helper\HighResolutionTimer.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Profiling.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\TextInputHandler.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Transform2D.h" />
     <ClInclude Include="..\..\source\oxygen\pch.h" />
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h" />
@@ -220,6 +223,7 @@
     <ClInclude Include="..\..\source\oxygen\rendering\parts\SpacesManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\SpriteManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\Renderer.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\RenderingDefinitions.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\RenderResources.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\software\SoftwareRenderer.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\sprite\ComponentSprite.h" />
@@ -235,15 +239,17 @@
     <ClInclude Include="..\..\source\oxygen\resources\ResourcesCache.h" />
     <ClInclude Include="..\..\source\oxygen\resources\SpriteCache.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\bindings\LemonScriptBindings.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\bindings\RendererBindings.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\CodeExec.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\DebuggingInterfaces.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\EmulatorInterface.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\GameRecorder.h" />
-    <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptBindings.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptProgram.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptRuntime.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\LogDisplay.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\PersistentData.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\RuntimeEnvironment.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\SaveStateSerializer.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\Simulation.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\sound\blip_buf.h" />

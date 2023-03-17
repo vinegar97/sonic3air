@@ -62,6 +62,47 @@ void moveOutOfBinDir(const std::string& path)
 }
 
 
+struct ObjectHandleWrapper
+{
+	uint32 mContent;
+
+	static inline const CustomDataType* mObjectHandleDataType = nullptr;
+};
+
+ObjectHandleWrapper makeObjectHandle(uint32 value)
+{
+	return ObjectHandleWrapper { value };
+}
+
+ObjectHandleWrapper increaseObjectHandle(ObjectHandleWrapper value)
+{
+	return ObjectHandleWrapper { value.mContent + 1 };
+}
+
+namespace lemon
+{
+	namespace traits
+	{
+		template<> const DataTypeDefinition* getDataType<ObjectHandleWrapper>()  { return ObjectHandleWrapper::mObjectHandleDataType; }
+	}
+
+	namespace internal
+	{
+		template<>
+		void pushStackGeneric<ObjectHandleWrapper>(ObjectHandleWrapper value, const NativeFunction::Context context)
+		{
+			context.mControlFlow.pushValueStack(value.mContent);
+		};
+
+		template<>
+		ObjectHandleWrapper popStackGeneric(const NativeFunction::Context context)
+		{
+			return ObjectHandleWrapper { context.mControlFlow.popValueStack<uint32>() };
+		}
+	}
+}
+
+
 void logValue(int64 value)
 {
 	std::cout << rmx::hexString(value, 8) << std::endl;
@@ -104,6 +145,10 @@ void debugLog(AnyTypeWrapper param)
 		RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
 		std::cout << storedString->getString() << std::endl;
 	}
+	else if (param.mType == ObjectHandleWrapper::mObjectHandleDataType)
+	{
+		std::cout << "[ObjectHandle: " << param.mValue.get<uint32>() << "]" << std::endl;
+	}
 	else
 	{
 		std::cout << "Oops, type support not implemented yet" << std::endl;
@@ -126,6 +171,11 @@ uint32 getterD0()
 void setterD0(int64 value)
 {
 	valueD0 = (uint32)value;
+}
+
+int64* accessA0()
+{
+	return (int64*)&valueA0;
 }
 
 int8 testFunctionA(int8 a, int8 b)
@@ -262,11 +312,13 @@ int main(int argc, char** argv)
 	moveOutOfBinDir(argv[0]);
 
 	Module module("test_module");
+	GlobalsLookup globalsLookup;
+	module.startCompiling(globalsLookup);
+
 	UserDefinedVariable& varD0 = module.addUserDefinedVariable("D0", &PredefinedDataTypes::UINT_32);
 	varD0.mGetter = getterD0;
 	varD0.mSetter = setterD0;
-	lemon::ExternalVariable& varA0 = module.addExternalVariable("A0", &lemon::PredefinedDataTypes::UINT_32);
-	varA0.mPointer = &valueA0;
+	lemon::ExternalVariable& varA0 = module.addExternalVariable("A0", &lemon::PredefinedDataTypes::UINT_32, std::bind(accessA0));
 	UserDefinedVariable& var = module.addUserDefinedVariable("Log", &PredefinedDataTypes::INT_64);
 	var.mSetter = logValue;
 	UserDefinedVariable& var2 = module.addUserDefinedVariable("LogStr", &PredefinedDataTypes::INT_64);
@@ -281,9 +333,13 @@ int main(int argc, char** argv)
 	module.addNativeFunction("sayHello", wrap(instance, &SomeClass::sayHello));
 	module.addNativeFunction("incTen", wrap(instance, &SomeClass::incTen));
 
+	ObjectHandleWrapper::mObjectHandleDataType = module.addDataType("ObjectHandle", BaseType::UINT_32);
+	module.addNativeFunction("makeObjectHandle", wrap(&makeObjectHandle));
+	module.addNativeFunction("increaseObjectHandle", wrap(&increaseObjectHandle));
+	module.addNativeMethod("ObjectHandle", "increase", wrap(&increaseObjectHandle));
+
 	StandardLibrary::registerBindings(module);
 
-	GlobalsLookup globalsLookup;
 	globalsLookup.addDefinitionsFromModule(module);
 
 	{

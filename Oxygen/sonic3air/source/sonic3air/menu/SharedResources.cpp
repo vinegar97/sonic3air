@@ -20,13 +20,17 @@
 
 namespace global
 {
-	Font mFont3Pure;
-	Font mFont3;
-	Font mFont4;
-	Font mFont5;
-	Font mFont7;
-	Font mFont10;
-	Font mFont18;
+	Font mSmallfont;
+	Font mSmallfontOutlined;
+	Font mOxyfontNarrowSimple;
+	Font mOxyfontNarrow;
+	Font mOxyfontTinySimple;
+	Font mOxyfontTiny;
+	Font mOxyfontSmallNoOutline;
+	Font mOxyfontSmall;
+	Font mOxyfontRegular;
+	Font mSonicFontB;
+	Font mSonicFontC;
 
 	DrawerTexture mMainMenuBackgroundSeparator;
 	DrawerTexture mDataSelectBackground;
@@ -52,6 +56,7 @@ namespace global
 		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor  = std::make_shared<ShadowFontProcessor>(Vec2i(1, 1), 0.5f, 0.8f);
 		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor2 = std::make_shared<ShadowFontProcessor>(Vec2i(1, 1), 0.5f, 1.0f);
 		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor3 = std::make_shared<ShadowFontProcessor>(Vec2i(1, 1), 0.5f, 0.6f);
+		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor4 = std::make_shared<ShadowFontProcessor>(Vec2i(1, 1), 0.0f, 1.0f);
 
 		std::shared_ptr<OutlineFontProcessor> outlineFontProcessor = std::make_shared<OutlineFontProcessor>();
 		std::shared_ptr<OutlineFontProcessor> outlineFontProcessorTransparent = std::make_shared<OutlineFontProcessor>(Color(0.0f, 0.0f, 0.0f, 0.5f));
@@ -60,35 +65,50 @@ namespace global
 
 		FontCollection& fontCollection = FontCollection::instance();
 
-		fontCollection.registerManagedFont(mFont3Pure, "smallfont");
+		fontCollection.registerManagedFont(mSmallfont, "smallfont");
 
-		fontCollection.registerManagedFont(mFont3, "smallfont");
-		mFont3.addFontProcessor(outlineFontProcessorTransparent);
+		fontCollection.registerManagedFont(mSmallfontOutlined, "smallfont");
+		mSmallfontOutlined.addFontProcessor(outlineFontProcessorTransparent);
 
-		fontCollection.registerManagedFont(mFont4, "oxyfont_tiny");
-		mFont4.addFontProcessor(outlineFontProcessor);
-		mFont4.addFontProcessor(gradientFontProcessor);
-		mFont4.addFontProcessor(shadowFontProcessor3);
+		fontCollection.registerManagedFont(mOxyfontNarrowSimple, "oxyfont_tiny_narrow");
+		mOxyfontNarrowSimple.addFontProcessor(shadowFontProcessor4);
 
-		fontCollection.registerManagedFont(mFont5, "oxyfont_small");
-		mFont5.addFontProcessor(outlineFontProcessor);
-		mFont5.addFontProcessor(gradientFontProcessor);
-		mFont5.addFontProcessor(shadowFontProcessor);
+		fontCollection.registerManagedFont(mOxyfontNarrow, "oxyfont_tiny_narrow");
+		mOxyfontNarrow.addFontProcessor(outlineFontProcessor);
+		mOxyfontNarrow.addFontProcessor(gradientFontProcessor);
+		mOxyfontNarrow.addFontProcessor(shadowFontProcessor3);
 
-		fontCollection.registerManagedFont(mFont7, "sonic3_fontB");
-		mFont7.addFontProcessor(outlineFontProcessor);
-		mFont7.addFontProcessor(gradientFontProcessor);
-		mFont7.addFontProcessor(shadowFontProcessor);
+		fontCollection.registerManagedFont(mOxyfontTinySimple, "oxyfont_tiny");
+		mOxyfontTinySimple.addFontProcessor(shadowFontProcessor4);
 
-		fontCollection.registerManagedFont(mFont10, "oxyfont_regular");
-		mFont10.addFontProcessor(outlineFontProcessor);
-		mFont10.addFontProcessor(gradientFontProcessor);
-		mFont10.addFontProcessor(shadowFontProcessor);
+		fontCollection.registerManagedFont(mOxyfontTiny, "oxyfont_tiny");
+		mOxyfontTiny.addFontProcessor(outlineFontProcessor);
+		mOxyfontTiny.addFontProcessor(gradientFontProcessor);
+		mOxyfontTiny.addFontProcessor(shadowFontProcessor3);
 
-		fontCollection.registerManagedFont(mFont18, "sonic3_fontC");
-		mFont18.addFontProcessor(outlineFontProcessor);
-		mFont18.addFontProcessor(gradientFontProcessor);
-		mFont18.addFontProcessor(shadowFontProcessor2);
+		fontCollection.registerManagedFont(mOxyfontSmallNoOutline, "oxyfont_small");
+		mOxyfontSmallNoOutline.addFontProcessor(gradientFontProcessor);
+		mOxyfontSmallNoOutline.addFontProcessor(shadowFontProcessor4);
+
+		fontCollection.registerManagedFont(mOxyfontSmall, "oxyfont_small");
+		mOxyfontSmall.addFontProcessor(outlineFontProcessor);
+		mOxyfontSmall.addFontProcessor(gradientFontProcessor);
+		mOxyfontSmall.addFontProcessor(shadowFontProcessor);
+
+		fontCollection.registerManagedFont(mOxyfontRegular, "oxyfont_regular");
+		mOxyfontRegular.addFontProcessor(outlineFontProcessor);
+		mOxyfontRegular.addFontProcessor(gradientFontProcessor);
+		mOxyfontRegular.addFontProcessor(shadowFontProcessor);
+
+		fontCollection.registerManagedFont(mSonicFontB, "sonic3_fontB");
+		mSonicFontB.addFontProcessor(outlineFontProcessor);
+		mSonicFontB.addFontProcessor(gradientFontProcessor);
+		mSonicFontB.addFontProcessor(shadowFontProcessor);
+
+		fontCollection.registerManagedFont(mSonicFontC, "sonic3_fontC");
+		mSonicFontC.addFontProcessor(outlineFontProcessor);
+		mSonicFontC.addFontProcessor(gradientFontProcessor);
+		mSonicFontC.addFontProcessor(shadowFontProcessor2);
 
 		FileHelper::loadTexture(mMainMenuBackgroundSeparator, L"data/images/menu/mainmenu_bg_separator.png");
 		FileHelper::loadTexture(mDataSelectBackground, L"data/images/menu/dataselect_bg.png");

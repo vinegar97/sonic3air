@@ -135,36 +135,19 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 		if (formatVersion >= 3)
 		{
 			if (serializer.isReading())
-			{
 				emulatorInterface.clearSharedMemory();
-				const uint64 usageFlags = serializer.read<uint64>();
-				for (int bit = 0; bit < 64; ++bit)
-				{
-					if ((usageFlags >> bit) == 0)
-						break;
+			serializer.serialize(emulatorInterface.getRuntimeMemory().mSharedMemoryUsage);
 
-					if ((usageFlags >> bit) & 1)
-					{
-						const size_t address = 0x4000 * bit;
-						uint8* ptr = emulatorInterface.getMemoryPointer(0x800000 + (uint32)address, true, 0x4000);
-						serializer.read(ptr, 0x4000);
-					}
-				}
-			}
-			else
+			uint64 usageFlags = emulatorInterface.getRuntimeMemory().mSharedMemoryUsage;
+			for (int bit = 0; bit < 64; ++bit)
 			{
-				const uint64 usageFlags = emulatorInterface.getSharedMemoryUsage();
-				serializer.write(usageFlags);
-				for (int bit = 0; bit < 64; ++bit)
-				{
-					if ((usageFlags >> bit) == 0)
-						break;
+				if ((usageFlags >> bit) == 0)
+					break;
 
-					if ((usageFlags >> bit) & 1)
-					{
-						const size_t address = 0x4000 * bit;
-						serializer.serialize(emulatorInterface.getSharedMemory() + address, 0x4000);
-					}
+				if ((usageFlags >> bit) & 1)
+				{
+					const size_t address = 0x4000 * bit;
+					serializer.serialize(&emulatorInterface.getSharedMemory()[address], 0x4000);
 				}
 			}
 		}
@@ -197,7 +180,7 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 			{
 				for (int i = 0; i < 0x40; ++i)
 				{
-					buffer[i] = paletteManager.getPaletteEntryPacked(0, i, true);
+					buffer[i] = paletteManager.getPalette(0).getEntryPacked(i, true);
 				}
 				serializer.serialize(buffer, 0x80);
 			}

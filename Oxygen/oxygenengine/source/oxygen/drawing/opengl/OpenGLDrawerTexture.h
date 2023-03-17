@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include <rmxmedia.h>
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/drawing/DrawerTexture.h"
 #include "oxygen/drawing/DrawCommand.h"
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
@@ -28,10 +29,12 @@ public:
 	GLuint getFrameBufferHandle();
 
 public:
-	DrawerSamplingMode mSamplingMode = DrawerSamplingMode::POINT;
-	DrawerWrapMode mWrapMode = DrawerWrapMode::CLAMP;
+	SamplingMode mSamplingMode = SamplingMode::POINT;
+	TextureWrapMode mWrapMode = TextureWrapMode::CLAMP;
 
 private:
 	OpenGLTexture mTexture;
 	Framebuffer mFrameBuffer;	// Only used if this is a render target
 };
+
+#endif

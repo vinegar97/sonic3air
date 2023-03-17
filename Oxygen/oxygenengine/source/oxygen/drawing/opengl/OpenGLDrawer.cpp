@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
@@ -70,17 +73,17 @@ namespace opengldrawer
 
 		const char* titleString = (type == GL_DEBUG_TYPE_ERROR) ? "OpenGL Error" : "OpenGL Message";
 		const char* severityString = (severity == GL_DEBUG_SEVERITY_HIGH)		  ? "High" :
-									 (severity == GL_DEBUG_SEVERITY_MEDIUM)		  ? "Medium" :
-									 (severity == GL_DEBUG_SEVERITY_LOW)		  ? "Low" :
-									 (severity == GL_DEBUG_SEVERITY_NOTIFICATION) ? "Notification" : "<unknown>";
+										(severity == GL_DEBUG_SEVERITY_MEDIUM)		  ? "Medium" :
+										(severity == GL_DEBUG_SEVERITY_LOW)		  ? "Low" :
+										(severity == GL_DEBUG_SEVERITY_NOTIFICATION) ? "Notification" : "<unknown>";
 		const char* typeString = (type == GL_DEBUG_TYPE_ERROR)				 ? "Error" :
-								 (type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR) ? "Deprecated Behavior" :
-								 (type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)	 ? "Undefined Behavior" :
-								 (type == GL_DEBUG_TYPE_PORTABILITY)		 ? "Portability" :
-								 (type == GL_DEBUG_TYPE_PERFORMANCE)		 ? "Performance" :
-								 (type == GL_DEBUG_TYPE_MARKER)				 ? "Marker" :
-								 (type == GL_DEBUG_TYPE_PUSH_GROUP)			 ? "Push Group" :
-								 (type == GL_DEBUG_TYPE_POP_GROUP)			 ? "Pop Group" : "<other>";
+									(type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR) ? "Deprecated Behavior" :
+									(type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)	 ? "Undefined Behavior" :
+									(type == GL_DEBUG_TYPE_PORTABILITY)		 ? "Portability" :
+									(type == GL_DEBUG_TYPE_PERFORMANCE)		 ? "Performance" :
+									(type == GL_DEBUG_TYPE_MARKER)				 ? "Marker" :
+									(type == GL_DEBUG_TYPE_PUSH_GROUP)			 ? "Push Group" :
+									(type == GL_DEBUG_TYPE_POP_GROUP)			 ? "Pop Group" : "<other>";
 
 		RMX_ERROR(titleString << " (severity = " << severityString << ", type = " << typeString << "):\n" << message, );
 	}
@@ -121,7 +124,7 @@ namespace opengldrawer
 
 			// Setup OpenGL defaults
 			RMX_LOG_INFO("Setting OpenGL defaults...");
-			setBlendMode(DrawerBlendMode::NONE);
+			setBlendMode(BlendMode::OPAQUE);
 
 			// Startup OpenGL drawer resources, including quad VAO and some basic shaders
 			RMX_LOG_INFO("OpenGL drawer resources startup");
@@ -168,21 +171,37 @@ namespace opengldrawer
 			return !mInvalidScissorRegion;
 		}
 
-		void setBlendMode(DrawerBlendMode blendMode)
+		void setBlendMode(BlendMode blendMode)
 		{
 			mCurrentBlendMode = blendMode;
 			switch (blendMode)
 			{
-				case DrawerBlendMode::NONE:
+				case BlendMode::OPAQUE:
 				{
 					glDisable(GL_BLEND);
 					glBlendFunc(GL_ONE, GL_ZERO);
 					break;
 				}
-				case DrawerBlendMode::ALPHA:
+
+				case BlendMode::ALPHA:
+				case BlendMode::ONE_BIT:
 				{
 					glEnable(GL_BLEND);
 					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+					break;
+				}
+
+				case BlendMode::ADDITIVE:
+				{
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_ONE, GL_ONE);
+					break;
+				}
+
+				case BlendMode::MULTIPLICATIVE:
+				{
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_DST_COLOR, GL_ZERO);
 					break;
 				}
 			}
@@ -192,13 +211,13 @@ namespace opengldrawer
 		{
 			switch (mCurrentSamplingMode)
 			{
-				case DrawerSamplingMode::POINT:
+				case SamplingMode::POINT:
 				{
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 					break;
 				}
-				case DrawerSamplingMode::BILINEAR:
+				case SamplingMode::BILINEAR:
 				{
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -211,13 +230,13 @@ namespace opengldrawer
 		{
 			switch (mCurrentWrapMode)
 			{
-				case DrawerWrapMode::CLAMP:
+				case TextureWrapMode::CLAMP:
 				{
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 					break;
 				}
-				case DrawerWrapMode::REPEAT:
+				case TextureWrapMode::REPEAT:
 				{
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -264,7 +283,7 @@ namespace opengldrawer
 
 				if (uv0.x == 0.0f && uv0.y == 0.0f && uv1.x == 1.0f && uv1.y == 1.0f)
 				{
-					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, mCurrentBlendMode == DrawerBlendMode::ALPHA);
+					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, mCurrentBlendMode == BlendMode::ALPHA);
 					shader.bind();
 					shader.setParam("Transform", rectParam);
 					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
@@ -275,7 +294,7 @@ namespace opengldrawer
 				}
 				else
 				{
-					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, mCurrentBlendMode == DrawerBlendMode::ALPHA);
+					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, mCurrentBlendMode == BlendMode::ALPHA);
 					shader.bind();
 					shader.setParam("Transform", rectParam);
 					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
@@ -308,7 +327,7 @@ namespace opengldrawer
 			}
 		}
 
-		void printText(Font& font, const StringReader& text, const Recti& rect, const rmx::Painter::PrintOptions& printOptions)
+		void printText(Font& font, const StringReader& text, const Recti& rect, const DrawerPrintOptions& printOptions)
 		{
 			OpenGLFontOutput& fontOutput = getOpenGLFontOutput(font);
 			const Vec2f pos = font.alignText(rect, text, printOptions.mAlignment);
@@ -317,24 +336,23 @@ namespace opengldrawer
 			typeinfos.clear();
 			font.getTypeInfos(typeinfos, pos, text, printOptions.mSpacing);
 
-			static std::vector<OpenGLFontOutput::VertexGroup> vertexGroups;
-			vertexGroups.clear();
+			static OpenGLFontOutput::VertexGroups vertexGroups;
 			fontOutput.buildVertexGroups(vertexGroups, typeinfos);
 
 			Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(true, true);
 			shader.bind();
 			shader.setParam("Transform", getPixelToViewSpaceTransform());
 
-			for (const OpenGLFontOutput::VertexGroup& vertexGroup : vertexGroups)
+			for (const OpenGLFontOutput::VertexGroup& vertexGroup : vertexGroups.mVertexGroups)
 			{
 				shader.setTexture("Texture", *vertexGroup.mTexture);
 				shader.setParam("TintColor", printOptions.mTintColor);
 
 				static std::vector<float> vertexData;
-				vertexData.resize(vertexGroup.mVertices.size() * 4);
-				for (size_t i = 0; i < vertexGroup.mVertices.size(); ++i)
+				vertexData.resize(vertexGroup.mNumVertices * 4);
+				for (size_t i = 0; i < vertexGroup.mNumVertices; ++i)
 				{
-					const OpenGLFontOutput::Vertex& src = vertexGroup.mVertices[i];
+					const OpenGLFontOutput::Vertex& src = vertexGroups.mVertices[vertexGroup.mStartIndex + i];
 					float* dst = &vertexData[i * 4];
 					dst[0] = src.mPosition.x;
 					dst[1] = src.mPosition.y;
@@ -343,7 +361,7 @@ namespace opengldrawer
 				}
 
 				mMeshVAO.setup(opengl::VertexArrayObject::Format::P2_T2);
-				mMeshVAO.updateVertexData(&vertexData[0], vertexGroup.mVertices.size());
+				mMeshVAO.updateVertexData(&vertexData[0], vertexGroup.mNumVertices);
 				mMeshVAO.draw(GL_TRIANGLES);
 			}
 		}
@@ -357,9 +375,9 @@ namespace opengldrawer
 		Recti mCurrentViewport;
 		Vec4f mPixelToViewSpaceTransform;	// Transformation from pixel-based coordinates view space, in the form: (x, y) = offset; (z, w) = scale
 
-		DrawerBlendMode mCurrentBlendMode = DrawerBlendMode::NONE;
-		DrawerSamplingMode mCurrentSamplingMode = DrawerSamplingMode::POINT;
-		DrawerWrapMode mCurrentWrapMode = DrawerWrapMode::CLAMP;
+		BlendMode mCurrentBlendMode = BlendMode::OPAQUE;
+		SamplingMode mCurrentSamplingMode = SamplingMode::POINT;
+		TextureWrapMode mCurrentWrapMode = TextureWrapMode::CLAMP;
 
 		std::vector<Recti> mScissorStack;
 		bool mInvalidScissorRegion = false;
@@ -510,6 +528,28 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 				mInternal.applySamplingMode();
 
 				mInternal.drawRect(targetRect, texture->getHandle(), sc.mTintColor);
+				break;
+			}
+
+			case DrawCommand::Type::SPRITE_RECT:
+			{
+				SpriteRectDrawCommand& sc = drawCommand->as<SpriteRectDrawCommand>();
+				const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(sc.mSpriteKey);
+				if (nullptr == item)
+					break;
+				if (!item->mUsesComponentSprite)
+					break;
+
+				OpenGLTexture* texture = mInternal.mSpriteTextureManager.getComponentSpriteTexture(*item);
+				if (nullptr == texture)
+					break;
+
+				// TODO: Cache sampling mode for the texture?
+				//  -> That requires the sprite texture manager to store (more high level) OpenGLDrawerTexture instead of OpenGLTexture instances
+				glBindTexture(GL_TEXTURE_2D, texture->getHandle());
+				mInternal.applySamplingMode();
+
+				mInternal.drawRect(sc.mRect, texture->getHandle(), sc.mTintColor);
 				break;
 			}
 
@@ -666,3 +706,5 @@ void OpenGLDrawer::presentScreen()
 {
 	SDL_GL_SwapWindow(mInternal.mOutputWindow);
 }
+
+#endif

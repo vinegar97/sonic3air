@@ -275,7 +275,6 @@ function void UpdateGamePause()
 	}
 
 #if GAMEAPP
-	// In game app, global.game.paused will never be true -- instead, the whole script execution will get paused
 
 	// Start button pressed?
 	if (control.pad1.pressed & CONTROL_START)
@@ -295,6 +294,7 @@ function void UpdateGamePause()
 		}
 		else
 		{
+			global.game.paused = true
 			bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb000 + 0x05] <= 0x04) && !competition_mode.active
 			Game.onGamePause(canRestart)
 
@@ -302,6 +302,7 @@ function void UpdateGamePause()
 			waitForNextFrame()
 
 			Standalone.onResumeAfterPause()
+			global.game.paused = false
 
 			// Fix for brief glitch in Blue Spheres special stage
 			if (global.game_mode == 0x34)
@@ -634,12 +635,19 @@ function void initializeMainGame()
 		}
 		if (isKnucklesIntro)
 		{
-			// This loads the critters graphics, though it does not seem to make a difference if this is done or not...
+			// This loads the critters graphics
 		#if !STANDALONE
 			set_status_register(0x2700)
-		#endif
+
+			// Use AIZ critters and not the MHZ critters in Knuckles' intro, #contributed by iCloudius
+			//  -> Also requires a ROM manipulation, search for the comment above to find that one
 			Nemesis.loadDataToVRAM(0x1935a8, 0xb000)
 			Nemesis.loadDataToVRAM(0x193308, 0xb240)
+		#else
+			Nemesis.loadDataToVRAM(0x193308, 0xb000)
+			Nemesis.loadDataToVRAM(0x1931d6, 0xb240)
+		#endif
+
 			isAnyIntro = true
 		}
 

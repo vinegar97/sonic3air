@@ -60,7 +60,7 @@ namespace lemon
 		inline const std::vector<Variable*>& getGlobalVariables() const  { return mGlobalVariables; }
 		GlobalVariable& addGlobalVariable(FlyweightString name, const DataTypeDefinition* dataType);
 		UserDefinedVariable& addUserDefinedVariable(FlyweightString name, const DataTypeDefinition* dataType);
-		ExternalVariable& addExternalVariable(FlyweightString name, const DataTypeDefinition* dataType);
+		ExternalVariable& addExternalVariable(FlyweightString name, const DataTypeDefinition* dataType, std::function<int64*()>&& accessor);
 
 		// Constants
 		Constant& addConstant(FlyweightString name, const DataTypeDefinition* dataType, AnyBaseValue value);
@@ -76,9 +76,13 @@ namespace lemon
 		const std::vector<FlyweightString>& getStringLiterals() const  { return mStringLiterals; }
 		void addStringLiteral(FlyweightString str);
 
+		// Data types
+		const std::vector<const CustomDataType*>& getDataTypes() const  { return mDataTypes; }
+		const CustomDataType* addDataType(const char* name, BaseType baseType);
+
 		// Serialization
 		uint32 buildDependencyHash() const;
-		bool serialize(VectorBinarySerializer& serializer, uint32 dependencyHash, uint32 appVersion);
+		bool serialize(VectorBinarySerializer& serializer, const GlobalsLookup& globalsLookup, uint32 dependencyHash, uint32 appVersion);
 
 		inline uint64 getCompiledCodeHash() const     { return mCompiledCodeHash; }
 		inline void setCompiledCodeHash(uint64 hash)  { mCompiledCodeHash = hash; }
@@ -124,6 +128,10 @@ namespace lemon
 
 		// String literals
 		std::vector<FlyweightString> mStringLiterals;
+
+		// Data types
+		uint16 mFirstDataTypeID = 0;
+		std::vector<const CustomDataType*> mDataTypes;
 
 		// Misc
 		uint64 mCompiledCodeHash = 0;

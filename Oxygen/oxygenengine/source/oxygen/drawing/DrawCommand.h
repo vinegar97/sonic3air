@@ -9,28 +9,11 @@
 #pragma once
 
 #include <rmxbase.h>
+#include "oxygen/rendering/RenderingDefinitions.h"
 
 class DrawerTexture;
 class DrawCommandFactory;
 
-
-enum class DrawerBlendMode
-{
-	NONE,
-	ALPHA
-};
-
-enum class DrawerSamplingMode
-{
-	POINT,
-	BILINEAR
-};
-
-enum class DrawerWrapMode
-{
-	CLAMP,
-	REPEAT
-};
 
 struct DrawerMeshVertex		// TODO: Rename to "DrawerMeshVertex_P2_T2" to be more specific here
 {
@@ -42,6 +25,13 @@ struct DrawerMeshVertex_P2_C4
 {
 	Vec2f mPosition;
 	Color mColor;
+};
+
+struct DrawerPrintOptions
+{
+	int   mAlignment = 1;
+	int   mSpacing = 0;
+	Color mTintColor = Color::WHITE;
 };
 
 
@@ -56,6 +46,7 @@ public:
 		RECT,
 		UPSCALED_RECT,
 		SPRITE,
+		SPRITE_RECT,
 		MESH,
 		MESH_VERTEX_COLOR,
 		SET_BLEND_MODE,
@@ -158,6 +149,20 @@ public:
 };
 
 
+class SpriteRectDrawCommand final : public DrawCommand
+{
+	friend class ObjectPoolBase<SpriteRectDrawCommand>;
+
+protected:
+	SpriteRectDrawCommand(const Recti& rect, uint64 spriteKey, const Color& tintColor) : DrawCommand(Type::SPRITE_RECT), mRect(rect), mSpriteKey(spriteKey), mTintColor(tintColor) {}
+
+public:
+	Recti mRect;
+	uint64 mSpriteKey;
+	Color mTintColor;
+};
+
+
 class MeshDrawCommand final : public DrawCommand
 {
 friend class ObjectPoolBase<MeshDrawCommand>;
@@ -190,10 +195,10 @@ class SetBlendModeDrawCommand final : public DrawCommand
 friend class ObjectPoolBase<SetBlendModeDrawCommand>;
 
 protected:
-	SetBlendModeDrawCommand(DrawerBlendMode blendMode) : DrawCommand(Type::SET_BLEND_MODE), mBlendMode(blendMode) {}
+	SetBlendModeDrawCommand(BlendMode blendMode) : DrawCommand(Type::SET_BLEND_MODE), mBlendMode(blendMode) {}
 
 public:
-	DrawerBlendMode mBlendMode;
+	BlendMode mBlendMode;
 };
 
 
@@ -202,10 +207,10 @@ class SetSamplingModeDrawCommand final : public DrawCommand
 	friend class ObjectPoolBase<SetSamplingModeDrawCommand>;
 
 protected:
-	SetSamplingModeDrawCommand(DrawerSamplingMode samplingMode) : DrawCommand(Type::SET_SAMPLING_MODE), mSamplingMode(samplingMode) {}
+	SetSamplingModeDrawCommand(SamplingMode samplingMode) : DrawCommand(Type::SET_SAMPLING_MODE), mSamplingMode(samplingMode) {}
 
 public:
-	DrawerSamplingMode mSamplingMode;
+	SamplingMode mSamplingMode;
 };
 
 
@@ -214,10 +219,10 @@ class SetWrapModeDrawCommand final : public DrawCommand
 	friend class ObjectPoolBase<SetWrapModeDrawCommand>;
 
 protected:
-	SetWrapModeDrawCommand(DrawerWrapMode wrapMode) : DrawCommand(Type::SET_WRAP_MODE), mWrapMode(wrapMode) {}
+	SetWrapModeDrawCommand(TextureWrapMode wrapMode) : DrawCommand(Type::SET_WRAP_MODE), mWrapMode(wrapMode) {}
 
 public:
-	DrawerWrapMode mWrapMode;
+	TextureWrapMode mWrapMode;
 };
 
 
@@ -233,7 +238,7 @@ protected:
 		mPrintOptions.mTintColor = color;
 	}
 
-	PrintTextDrawCommand(Font& font, const Recti& rect, const String& text, const rmx::Painter::PrintOptions& printOptions) :
+	PrintTextDrawCommand(Font& font, const Recti& rect, const String& text, const DrawerPrintOptions& printOptions) :
 		DrawCommand(Type::PRINT_TEXT), mFont(&font), mRect(rect), mText(text), mPrintOptions(printOptions)
 	{}
 
@@ -241,7 +246,7 @@ public:
 	Font* mFont = nullptr;
 	Recti mRect;
 	String mText;
-	rmx::Painter::PrintOptions mPrintOptions;
+	DrawerPrintOptions mPrintOptions;
 };
 
 
@@ -257,7 +262,7 @@ protected:
 		mPrintOptions.mTintColor = color;
 	}
 
-	PrintTextWDrawCommand(Font& font, const Recti& rect, const WString& text, const rmx::Painter::PrintOptions& printOptions) :
+	PrintTextWDrawCommand(Font& font, const Recti& rect, const WString& text, const DrawerPrintOptions& printOptions) :
 		DrawCommand(Type::PRINT_TEXT_W), mFont(&font), mRect(rect), mText(text), mPrintOptions(printOptions)
 	{}
 
@@ -265,7 +270,7 @@ public:
 	Font* mFont = nullptr;
 	Recti mRect;
 	WString mText;
-	rmx::Painter::PrintOptions mPrintOptions;
+	DrawerPrintOptions mPrintOptions;
 };
 
 
@@ -298,6 +303,7 @@ public:
 	ObjectPool<RectDrawCommand>					 mRectDrawCommands;
 	ObjectPool<UpscaledRectDrawCommand>			 mUpscaledRectDrawCommands;
 	ObjectPool<SpriteDrawCommand>				 mSpriteDrawCommands;
+	ObjectPool<SpriteRectDrawCommand>			 mSpriteRectDrawCommands;
 	ObjectPool<MeshDrawCommand>					 mMeshDrawCommands;
 	ObjectPool<MeshVertexColorDrawCommand>		 mMeshVertexColorDrawCommands;
 	ObjectPool<SetBlendModeDrawCommand>			 mSetBlendModeDrawCommands;
@@ -319,6 +325,7 @@ public:
 			case DrawCommand::Type::RECT:						mRectDrawCommands.destroyObject(drawCommand.as<RectDrawCommand>());  break;
 			case DrawCommand::Type::UPSCALED_RECT:				mUpscaledRectDrawCommands.destroyObject(drawCommand.as<UpscaledRectDrawCommand>());  break;
 			case DrawCommand::Type::SPRITE:						mSpriteDrawCommands.destroyObject(drawCommand.as<SpriteDrawCommand>());  break;
+			case DrawCommand::Type::SPRITE_RECT:				mSpriteRectDrawCommands.destroyObject(drawCommand.as<SpriteRectDrawCommand>());  break;
 			case DrawCommand::Type::MESH:						mMeshDrawCommands.destroyObject(drawCommand.as<MeshDrawCommand>());  break;
 			case DrawCommand::Type::MESH_VERTEX_COLOR:			mMeshVertexColorDrawCommands.destroyObject(drawCommand.as<MeshVertexColorDrawCommand>());  break;
 			case DrawCommand::Type::SET_BLEND_MODE:				mSetBlendModeDrawCommands.destroyObject(drawCommand.as<SetBlendModeDrawCommand>());  break;
