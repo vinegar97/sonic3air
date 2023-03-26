@@ -78,6 +78,7 @@ bin/
 /Oxygen/oxygenengine/crashdump.dmp
 /Oxygen/oxygenengine/palette_dump.bmp
 /Oxygen/oxygenengine/screenshot.bmp
+/Oxygen/oxygenengine/savedata
 /Oxygen/sonic3air/Sonic3AIR
 /Oxygen/sonic3air/source/_cmake/build/*
 /Oxygen/sonic3air/___internal/analysis/*
@@ -85,6 +86,7 @@ bin/
 /Oxygen/sonic3air/build/_vstudio/lib/Release-Enduser_x86
 /Oxygen/sonic3air/build/_vstudio/lib/Release-Enduser_x64
 /Oxygen/sonic3air/_master_image_template/data
+/Oxygen/sonic3air/savedata
 /Oxygen/sonic3air/saves/scripts.bin
 /Oxygen/sonic3air/saves/rec
 /Oxygen/sonic3air/enginedata.bin
