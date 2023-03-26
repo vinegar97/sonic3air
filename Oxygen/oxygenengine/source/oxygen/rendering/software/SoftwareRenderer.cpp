@@ -707,11 +707,11 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 				blitterOptions.mTransform = hasTransform ? *spriteBase.mTransformation.mMatrix : nullptr;
 				blitterOptions.mInvTransform = hasTransform ? *spriteBase.mTransformation.mInverse : nullptr;
 				blitterOptions.mSamplingMode = SamplingMode::POINT;
-				blitterOptions.mBlendMode = spriteBase.mFullyOpaque ? BlendMode::OPAQUE : BlendMode::ALPHA;
+				blitterOptions.mBlendMode = spriteBase.mBlendMode;
 				blitterOptions.mTintColor = (tintColor != Color::WHITE) ? &tintColor : nullptr;
 				blitterOptions.mAddedColor = (addedColor != Color::TRANSPARENT) ? &addedColor : nullptr;
 				blitterOptions.mDepthBuffer = (mEmptyDepthBuffer && !spriteBase.mPriorityFlag) ? nullptr : &depthBufferView;
-				blitterOptions.mDepthValue = (spriteBase.mPriorityFlag) ? 0x80 : 0;
+				blitterOptions.mDepthTestValue = (spriteBase.mPriorityFlag) ? 0x80 : 0;
 			}
 
 			if (isPaletteSprite)

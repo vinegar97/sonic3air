@@ -36,7 +36,7 @@ void InputFieldMenuEntry::renderEntry(RenderContext& renderContext)
 {
 	const Recti textRect(renderContext.mCurrentPosition, Vec2i(200, 11));
 	Font& font = global::mOxyfontSmall;
-	const int cursorOffset = font.getWidth(mTextInputHandler.getText(), 0, mTextInputHandler.getCursorPosition());
+	const int cursorOffset = font.getWidth(mTextInputHandler.getText(), 0, (int)mTextInputHandler.getCursorPosition());
 
 	if (renderContext.mIsSelected)
 	{
@@ -47,16 +47,27 @@ void InputFieldMenuEntry::renderEntry(RenderContext& renderContext)
 			renderContext.mDrawer->drawRect(Recti(textRect.x + cursorOffset, textRect.y - 2, 3, textRect.height), Color::BLACK);
 			renderContext.mDrawer->drawRect(Recti(textRect.x + cursorOffset + 1, textRect.y - 1, 1, textRect.height - 2), Color::WHITE);
 		}
+
+		if (mTextInputHandler.getMarkedRangeStart().has_value())
+		{
+			const int endOffset = font.getWidth(mTextInputHandler.getText(), 0, (int)*mTextInputHandler.getMarkedRangeStart());
+			Recti rect(textRect.x + cursorOffset, textRect.y - 2, endOffset - cursorOffset, textRect.height);
+			if (rect.width < 0)
+			{
+				rect.width = -rect.width + 1;
+				rect.x -= rect.width;
+			}
+			else
+			{
+				rect.x += 3;
+				rect.width += 1;
+			}
+			renderContext.mDrawer->drawRect(rect, Color(1.0f, 1.0f, 0.0f, 0.6f));
+		}
 	}
 	else
 	{
 		renderContext.mDrawer->printText(font, textRect, mTextInputHandler.getText());
-	}
-
-	if (mTextInputHandler.getMarkedRangeStart().has_value())
-	{
-		const int endOffset = font.getWidth(mTextInputHandler.getText(), 0, *mTextInputHandler.getMarkedRangeStart());
-		renderContext.mDrawer->drawRect(Recti(textRect.x + cursorOffset, textRect.y - 2, endOffset - cursorOffset, textRect.height), Color(1.0f, 1.0f, 0.0f, 0.5f));
 	}
 
 	renderContext.mCurrentPosition.y += 14;

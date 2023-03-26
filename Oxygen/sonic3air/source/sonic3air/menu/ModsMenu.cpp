@@ -213,12 +213,6 @@ void ModsMenu::initialize()
 			entries.clear();
 			entries.reserve(activeMods.size());
 
-			// TEST!
-			//entries.addEntry<InputFieldMenuEntry>().initEntry(L"ABC");
-			//entries.addEntry<InputFieldMenuEntry>().initEntry(L"DEF");
-			//entries.addEntry<InputFieldMenuEntry>().initEntry(L"GHIJKL");
-			//entries.addEntry<InputFieldMenuEntry>().initEntry(L"MNOP");
-
 			// Add active mods
 			//  -> In reverse order, as highest priority are the last (not first!) mods in the active list
 			for (auto it = activeMods.rbegin(); it != activeMods.rend(); ++it)
@@ -829,7 +823,7 @@ bool ModsMenu::applyModChanges(bool dryRun)
 	std::vector<Mod*> activeMods;
 	activeMods.reserve(menuEntries.size());
 
-	for (size_t index = 0; index < menuEntries.size(); ++index)
+	for (int index = (int)menuEntries.size()-1; index >= 0; --index)
 	{
 		const GameMenuEntry& entry = *menuEntries[index];
 		if (entry.getMenuEntryType() == 0)

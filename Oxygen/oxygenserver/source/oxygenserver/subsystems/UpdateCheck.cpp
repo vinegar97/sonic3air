@@ -10,6 +10,8 @@
 #include "oxygenserver/subsystems/UpdateCheck.h"
 #include "oxygenserver/server/ServerNetConnection.h"
 
+#include "oxygen_netcore/network/LagStopwatch.h"
+#include "oxygen_netcore/network/ServerClientBase.h"
 #include "oxygen_netcore/serverclient/Packets.h"
 
 
@@ -53,7 +55,7 @@ UpdateCheck::UpdateCheck()
 	// Test version (Windows only)
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x23011500;
+		definition.mVersionNumber = 0x23032501;
 		definition.mReleaseChannel = ReleaseChannel::TEST;
 		definition.addPlatform(Platform::WINDOWS);
 		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
@@ -82,6 +84,8 @@ UpdateCheck::ReleaseChannel UpdateCheck::getReleaseChannelFromString(const std::
 
 bool UpdateCheck::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 {
+	LAG_STOPWATCH("UpdateCheck::onReceivedRequestQuery", 1000);
+
 	switch (evaluation.mPacketType)
 	{
 		case network::AppUpdateCheckRequest::Query::PACKET_TYPE:
