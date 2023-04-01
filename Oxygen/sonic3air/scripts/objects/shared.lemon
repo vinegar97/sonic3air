@@ -391,13 +391,14 @@ function bool fn01dcb6_internal(u32 characterAddress, u8 bitnum)
 
 	if (objA0.flags2a & bit)
 	{
-		D2.u16 = D1.u16 * 2
-		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+		D2.u16 = D1.u16 * 2		// Width
+		if ((objA1.flags2a & char.flag.IN_AIR) == 0)
 		{
-			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+			// Still on the object
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
 			if (D0.s16 >= 0 && D0.u16 < D2.u16)
 			{
-				// Character is standing on the object
+				// Correct height
 				D2.u16 = D4.u16
 				UpdateSonicPositionOnMovingObject()
 				D4 = 0
@@ -405,7 +406,7 @@ function bool fn01dcb6_internal(u32 characterAddress, u8 bitnum)
 			}
 		}
 
-		// Character fell off the object
+		// Not on the object any more (either in air, or outside the object's width)
 		objA1.flags2a &= ~char.flag.ON_OBJECT
 		objA1.flags2a |= char.flag.IN_AIR
 		objA0.flags2a &= ~bit
