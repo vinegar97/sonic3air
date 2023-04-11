@@ -6142,7 +6142,7 @@ function void Character.CheckCollision()
 			}
 		}
 	}
-	else 	// (D0.u8 == 0xc0)
+	else	// (D0.u8 == 0xc0)
 	{
 		Character.CheckRightWallCollision()
 		if (D1.s16 < 0)
