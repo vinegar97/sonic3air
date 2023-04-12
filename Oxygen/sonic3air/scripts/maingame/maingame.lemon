@@ -1217,18 +1217,10 @@ function void fn0076a6()
 	A1 = 0x098100 + global.zone * 8 + global.act * 4
 	D0 = u32[A1]
 	u32[0xfffff7b4] = D0
-	if (D0 >= 0x260000)
-	{
-		D0 += 0x600
-		u32[0xfffff7b8] = D0
-		u32[0xfffff796] = u32[0xfffff7b4]
-	}
-	else
-	{
-		++D0
-		u32[0xfffff7b8] = D0
-		u32[0xfffff796] = u32[0xfffff7b4]
-	}
+
+	D0 += (D0 >= 0x260000) ? 0x600 : 1
+	u32[0xfffff7b8] = D0
+	u32[0xfffff796] = u32[0xfffff7b4]
 }
 
 
