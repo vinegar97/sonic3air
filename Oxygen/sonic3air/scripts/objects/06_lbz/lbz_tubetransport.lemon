@@ -128,7 +128,7 @@ function void fn029dec()
 	if (objA1.render_flags & render_flag.VISIBLE)
 	{
 		D0 = u8[A1 + 0x22]
-		D0.u16 = objA1.position.x.u16 + s8[0x029e1c + D0.s16]
+		D0.u16 = objA1.position.x.u16 + s8[0x029e1c + D0.u16]
 		objA0.position.x.u16 = D0.u16
 	}
 	DrawOrUnloadObject()
@@ -268,11 +268,12 @@ function void fn029f34()
 			u8[A4+1] = 0
 			u8[0xffffee39] = 0
 		}
-		return
 	}
-
-	u32[A1 + 0x10] += s32(objA1.velocity.x) << 8
-	u32[A1 + 0x14] += s32(objA1.velocity.y) << 8
+	else
+	{
+		objA1.position.x += s32(objA1.velocity.x) << 8
+		objA1.position.y += s32(objA1.velocity.y) << 8
+	}
 }
 
 
@@ -488,9 +489,9 @@ function void fn02a106()
 	#endif
 		{
 			D0 = objA0.value26
-			u8[A1 + 0x22] = u8[0x02a218 + D0.s16]
+			u8[A1 + 0x22] = u8[0x02a218 + D0.u16]
 			objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
-			D0.u8 = u8[0x02a224 + D0.s16]
+			D0.u8 = u8[0x02a224 + D0.u16]
 			objA1.render_flags |= D0.u8
 			D0 = u8[A1 + 0x22]
 
@@ -505,85 +506,4 @@ function void fn02a106()
 //# address-hook(0x02a230) end(0x02a230)
 function void fn02a230()
 {
-}
-
-
-
-// More general code? (Also used by two FBZ platform objects)
-
-//# address-hook(0x01de20) end(0x01deca)
-function void fn01de20()
-{
-	u32 backupD1 = D1
-	u32 backupD2 = D2
-	u32 backupD3 = D3
-	u32 backupD4 = D4
-
-	A1 = 0xffffb000
-	D6 = 3		// object.flag.P1_ON_OBJECT
-	fn01de36()
-
-	D1 = backupD1
-	D2 = backupD2
-	D3 = backupD3
-	D4 = backupD4
-
-	A1 = 0xffffb04a
-	++D6.u8		// object.flag.P2_ON_OBJECT
-	fn01de36()
-}
-
-
-function void fn01de36()
-{
-	u8 bit = (1 << D6.u8)
-
-	if (objA0.flags2a & bit)
-	{
-		if ((objA1.flags2a & char.flag.IN_AIR) == 0)
-		{
-			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
-			if (D0.s16 >= 0 && D0.u16 < D1.u16 * 2)
-			{
-				D0.u16 = objA0.position.y.u16 - D2.u16 + D3.u16
-				D1 = u8[A1 + 0x1e]
-				D0.u16 -= D1.u16
-				objA1.position.y.u16 = D0.u16
-				objA1.position.x.u16 -= (D4.u16 - objA0.position.x.u16)
-				D4 = 0
-				return
-			}
-		}
-
-		objA1.flags2a &= ~char.flag.ON_OBJECT
-		objA1.flags2a |= char.flag.IN_AIR
-
-		objA0.flags2a &= ~bit
-		D4 = 0
-	}
-	else
-	{
-		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
-		if (D0.s16 >= 0 && D0.u16 <= D1.u16 * 2)
-		{
-			D5.u16 = objA0.position.y.u16 + D3.u16
-			D2.u16 += s8[A1 + 0x1e]
-			D3.u16 = objA1.position.y.u16 - D5.u16 + D2.u16 + 4
-			if (D3.s16 >= 0 && D3.u16 < D2.u16 * 2)
-			{
-				fn01dffe()
-				return
-			}
-
-		#if STANDALONE
-			// When moving fast vertically above, limit velocity to prevent phasing through (and maybe even getting killed because of that)
-			if (objA1.velocity.y > 0xc00 && D3.s16 >= -0x20 && D3.s16 < D2.s16 * 2)
-			{
-				objA1.velocity.y = 0xc00
-			}
-		#endif
-		}
-
-		fn01e0a2()
-	}
 }

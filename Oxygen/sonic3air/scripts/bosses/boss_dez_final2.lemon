@@ -506,7 +506,7 @@ function void fn080a60()
 		objA0.render_flags |= render_flag.FLIP_X
 	}
 	D0.u16 <<= 2
-	u32[A0 + 0x30] = u32[0x080a8c + D0.s16]
+	u32[A0 + 0x30] = u32[0x080a8c + D0.u16]
 }
 
 
@@ -518,7 +518,7 @@ function void fn080a98()
 	{
 		objA0.animation.frame += 4
 		D0 = objA0.animation.frame
-		A1 = u32[A0 + 0x30] + D0.s16
+		A1 = u32[A0 + 0x30] + D0.u16
 		D1.u8 = u8[(A1+=1)-1]
 		if (D1.s8 < 0)
 		{

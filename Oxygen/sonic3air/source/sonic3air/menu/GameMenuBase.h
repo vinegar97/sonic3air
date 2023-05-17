@@ -140,8 +140,12 @@ public:
 		return *entry;
 	}
 
-	void insert(const GameMenuEntry& toCopy, size_t index);
+	void insertCopy(const GameMenuEntry& toCopy, size_t index);
+	void insertByReference(GameMenuEntry& entry, size_t index);
+	void destroy(size_t index);
 	void erase(size_t index);
+
+	void swapEntries(size_t indexA, size_t indexB);
 
 	inline bool empty() const	{ return mEntries.empty(); }
 	inline size_t size() const	{ return mEntries.size(); }

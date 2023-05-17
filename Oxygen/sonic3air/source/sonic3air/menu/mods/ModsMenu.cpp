@@ -7,10 +7,11 @@
 */
 
 #include "sonic3air/pch.h"
-#include "sonic3air/menu/ModsMenu.h"
+#include "sonic3air/menu/mods/ModsMenu.h"
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/MenuBackground.h"
 #include "sonic3air/menu/entries/GeneralMenuEntries.h"
+#include "sonic3air/menu/mods/ModsMenuEntries.h"
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/helper/DrawingUtils.h"
 #include "sonic3air/Game.h"
@@ -102,8 +103,25 @@ void ModsMenu::initialize()
 	ModManager& modManager = ModManager::instance();
 	const bool anyChange = modManager.rescanMods();
 
-	const std::vector<Mod*>& allMods = modManager.getAllMods();
+	std::vector<Mod*> allMods = modManager.getAllMods();
+	std::sort(allMods.begin(), allMods.end(), [](const Mod* a, const Mod* b) { return (a->mDisplayName < b->mDisplayName); } );
 	const std::vector<Mod*>& activeMods = modManager.getActiveMods();
+
+#if 0
+	// Check mod dependencies
+	for (Mod* mod : allMods)
+	{
+		for (const Mod::OtherMod& otherMod : mod->mOtherMods)
+		{
+			const uint64 idHash = rmx::getMurmur2_64(otherMod.mModID);
+			Mod* foundMod = modManager.findModByIDHash(idHash);
+			if (nullptr == foundMod && otherMod.mIsRequired)
+			{
+				// TODO: Add an error "Requires mod XYZ"
+			}
+		}
+	}
+#endif
 
 	// Rebuild list of mods
 	if (anyChange || (mModEntries.empty() && !allMods.empty()))
@@ -214,7 +232,7 @@ void ModsMenu::initialize()
 				{
 					if (mModEntries[index].mMod == mod)
 					{
-						entries.addEntry(mod->mDisplayName, (uint32)index);
+						entries.addEntry<ModMenuEntry>().initEntry(*mod, *mModEntries[index].mModResources, (uint32)index);
 						break;
 					}
 				}
@@ -232,7 +250,7 @@ void ModsMenu::initialize()
 				const ModEntry& modEntry = mModEntries[index];
 				if (!modEntry.mMakeActive)
 				{
-					entries.addEntry(modEntry.mMod->mDisplayName, (uint32)index);
+					entries.addEntry<ModMenuEntry>().initEntry(*modEntry.mMod, *mModEntries[index].mModResources, (uint32)index);
 				}
 			}
 		}
@@ -250,6 +268,8 @@ void ModsMenu::initialize()
 
 		mActiveTab = 0;
 	}
+
+	refreshAllDependencies();
 
 	mInfoOverlay.mShouldBeVisible = false;
 	mInfoOverlay.mVisibility = 0.0f;
@@ -321,15 +341,18 @@ void ModsMenu::update(float timeElapsed)
 					const int diff = menuEntries.mSelectedEntryIndex - previousSelectedEntryIndex;
 					if (diff == -1 || diff == 1)
 					{
-						GameMenuEntry& menuEntryA = menuEntries[previousSelectedEntryIndex];
-						GameMenuEntry& menuEntryB = menuEntries[menuEntries.mSelectedEntryIndex];
+						const size_t indexA = previousSelectedEntryIndex;
+						const size_t indexB = menuEntries.mSelectedEntryIndex;
 
 						// Exchange entry with previous one, effectively moving that one
-						std::swap(menuEntryA, menuEntryB);
+						menuEntries.swapEntries(indexA, indexB);
+
+						refreshDependencies(static_cast<ModMenuEntry&>(menuEntries[indexA]), indexA);
+						refreshDependencies(static_cast<ModMenuEntry&>(menuEntries[indexB]), indexB);
 
 						// For animation
-						menuEntryA.mAnimation.mOffset.y = (float)diff;
-						menuEntryB.mAnimation.mOffset.y = -(float)diff;
+						menuEntries[indexA].mAnimation.mOffset.y = (float)diff;
+						menuEntries[indexB].mAnimation.mOffset.y = -(float)diff;
 					}
 					else
 					{
@@ -392,15 +415,23 @@ void ModsMenu::update(float timeElapsed)
 					}
 
 					modEntry.mMakeActive = makeActive;
-					entry.mAnimation.mOffset.x = makeActive ? 1.0f : -1.0f;
 
-					newTab.mMenuEntries.insert(entry, newTab.mMenuEntries.mSelectedEntryIndex);
+					newTab.mMenuEntries.insertByReference(entry, newTab.mMenuEntries.mSelectedEntryIndex);
+					menuEntries.erase(menuEntries.mSelectedEntryIndex);
+
+					if (!makeActive)
+					{
+						clearDependencies(static_cast<ModMenuEntry&>(entry));
+					}
+
+					// For animation
+					entry.mAnimation.mOffset.x = makeActive ? 1.0f : -1.0f;
 					for (size_t k = newTab.mMenuEntries.mSelectedEntryIndex + 1; k < newTab.mMenuEntries.size(); ++k)
 						newTab.mMenuEntries[k].mAnimation.mOffset.y = -1.0f;
-
-					menuEntries.erase(menuEntries.mSelectedEntryIndex);
 					for (size_t k = menuEntries.mSelectedEntryIndex; k < menuEntries.size(); ++k)
 						menuEntries[k].mAnimation.mOffset.y = 1.0f;
+
+					refreshAllDependencies();
 				}
 
 				playMenuSound(0x5b);
@@ -532,15 +563,8 @@ void ModsMenu::render()
 	GuiBase::render();
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
-	GameMenuEntry::RenderContext renderContext;
+	ModsMenuRenderContext renderContext;
 	renderContext.mDrawer = &drawer;
-
-	struct SpeechBalloon
-	{
-		std::string_view mText;
-		Vec2i mBasePosition;
-	};
-	SpeechBalloon speechBalloon;
 
 	const int globalOffsetX = -roundToInt(saturate(1.0f - mVisibility) * 300.0f);
 
@@ -643,7 +667,7 @@ void ModsMenu::render()
 			const bool isSelected = ((int)index == menuEntries.mSelectedEntryIndex && tabIndex == mActiveTab);
 			renderContext.mIsSelected = isSelected;
 
-			if (entry.getMenuEntryType() == 0)
+			if (entry.getMenuEntryType() == ModMenuEntry::MENU_ENTRY_TYPE)
 			{
 				const ModEntry* modEntry = (entry.mData < 0xfff0) ? &mModEntries[entry.mData] : nullptr;
 
@@ -657,54 +681,17 @@ void ModsMenu::render()
 				visualRect.x += roundToInt(entry.mAnimation.mOffset.x * 200.0f);
 				visualRect.y += roundToInt(entry.mAnimation.mOffset.y * rect.height);
 
+				renderContext.mVisualRect = visualRect;
+				renderContext.mBaseColor = color;
+				renderContext.mIsSelected = isSelected;
+				renderContext.mIsActiveModsTab = (tabIndex == 0);
+				renderContext.mInMovementMode = inMovementMode;
+				renderContext.mNumModsInTab = menuEntries.size();
+
 				if (nullptr != modEntry)
 				{
-					if (isSelected && inMovementMode)
-					{
-						// Draw background
-						Recti bgRect = visualRect;
-						bgRect.addPos(-20, -5);
-						drawer.drawRect(bgRect, Color(0.25f, 0.75f, 1.0f, 0.5f * alpha));
-					}
-
-					DrawerTexture& texture = (tabIndex == 0) ? modEntry->mModResources->mSmallIcon : modEntry->mModResources->mSmallIconGray;
-					if (texture.isValid())
-					{
-						const Recti iconRect(visualRect.x, visualRect.y - 4, 16, 16);
-						drawer.drawRect(iconRect, texture, Color(1.0f, 1.0f, 1.0f, alpha));
-					}
-
-					Color textColor = color;
-					if (modEntry->mMod->mState == Mod::State::FAILED)
-					{
-						textColor.set(1.0f, isSelected ? 0.5f : 0.0f, 0.0f, color.a);
-
-						static const uint64 spriteKey = rmx::getMurmur2_64("small_warning_icon_red");
-						drawer.drawSprite(Vec2i(visualRect.x + 212, visualRect.y + 4), spriteKey, Color(1.0f, 1.0f, 1.0f, alpha));
-
-						if (isSelected)
-						{
-							speechBalloon.mText = modEntry->mMod->mFailedMessage;
-							speechBalloon.mBasePosition.set(visualRect.x + 212, visualRect.y + 4);
-						}
-					}
-
-					drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(24, 0), modEntry->mMod->mDisplayName, 1, textColor);
-
-					if (isSelected && inMovementMode)
-					{
-						// Draw arrows
-						if (tabIndex == 0)
-						{
-							if (menuEntries.size() >= 2)
-								drawer.printText(global::mOxyfontSmall, visualRect - Vec2i(12, 1), L"\u21f3", 1, color);
-							drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(225, 0), L"\u25ba", 1, color);
-						}
-						else
-						{
-							drawer.printText(global::mOxyfontSmall, visualRect - Vec2i(10, 0), L"\u25c4", 1, color);
-						}
-					}
+					// Render this game menu entry
+					entry.performRenderEntry(renderContext);
 				}
 				else
 				{
@@ -814,10 +801,10 @@ void ModsMenu::render()
 		}
 	}
 
-	if (!speechBalloon.mText.empty() && mVisibility == 1.0f)
+	if (!renderContext.mSpeechBalloon.mText.empty() && mVisibility == 1.0f)
 	{
-		const Recti attachmentRect(speechBalloon.mBasePosition.x, speechBalloon.mBasePosition.y, 0, 13);
-		DrawingUtils::drawSpeechBalloon(drawer, global::mOxyfontTinySimple, speechBalloon.mText, attachmentRect, Recti(15, 10, 370, 204), Color(1.0f, 1.0f, 1.0f, 0.9f));
+		const Recti attachmentRect(renderContext.mSpeechBalloon.mBasePosition.x, renderContext.mSpeechBalloon.mBasePosition.y, 0, 13);
+		DrawingUtils::drawSpeechBalloon(drawer, global::mOxyfontTinySimple, renderContext.mSpeechBalloon.mText, attachmentRect, Recti(15, 10, 370, 204), Color(1.0f, 1.0f, 1.0f, 0.9f));
 	}
 
 	// "Applying changes" box
@@ -829,6 +816,87 @@ void ModsMenu::render()
 	}
 
 	drawer.performRendering();
+}
+
+void ModsMenu::refreshAllDependencies()
+{
+	for (size_t i = 0; i < mTabs[0].mMenuEntries.size(); ++i)
+	{
+		GameMenuEntry& gameMenuEntry = *mTabs[0].mMenuEntries.getEntries()[i];
+		if (gameMenuEntry.getMenuEntryType() == ModMenuEntry::MENU_ENTRY_TYPE)
+		{
+			refreshDependencies(static_cast<ModMenuEntry&>(gameMenuEntry), i);
+		}
+	}
+}
+
+void ModsMenu::clearDependencies(ModMenuEntry& modMenuEntry)
+{
+	modMenuEntry.mRemarks.clear();
+	modMenuEntry.refreshAfterRemarksChange();
+}
+
+void ModsMenu::refreshDependencies(ModMenuEntry& modMenuEntry, size_t modIndex)
+{
+	modMenuEntry.mRemarks.clear();
+
+	ModManager& modManager = ModManager::instance();
+	for (const Mod::OtherModInfo& otherModInfo : modMenuEntry.getMod().mOtherModInfos)
+	{
+		const Mod* otherMod = modManager.findModByIDHash(otherModInfo.mModIDHash);
+		ModEntry* foundOtherMod = nullptr;
+		size_t foundIndex = ~0;
+		if (nullptr != otherMod)
+		{
+			// Search other mod entry
+			for (size_t i = 0; i < mTabs[0].mMenuEntries.size(); ++i)
+			{
+				GameMenuEntry& gameMenuEntry = *mTabs[0].mMenuEntries.getEntries()[i];
+				if (gameMenuEntry.getMenuEntryType() == ModMenuEntry::MENU_ENTRY_TYPE)
+				{
+					ModMenuEntry& otherModMenuEntry = static_cast<ModMenuEntry&>(gameMenuEntry);
+					if (&otherModMenuEntry.getMod() == otherMod)
+					{
+						foundIndex = i;
+						break;
+					}
+				}
+			}
+		}
+
+		const bool otherShouldBeHigherPrio = (otherModInfo.mRelativePriority > 0);
+		if (foundIndex != ~0)
+		{
+			// Check relative priority
+			const bool otherIsHigherPrio = (foundIndex < modIndex);
+			if (otherIsHigherPrio != otherShouldBeHigherPrio)
+			{
+				// Show warning
+				ModMenuEntry::Remark& remark = vectorAdd(modMenuEntry.mRemarks);
+				remark.mIsError = otherModInfo.mIsRequired;
+				remark.mText = std::string("This mod needs to be placed ") + (otherShouldBeHigherPrio ? "below" : "above") + " \"" + otherMod->mDisplayName + "\"";
+			}
+		}
+		else
+		{
+			if (otherModInfo.mIsRequired)
+			{
+				// Show error
+				ModMenuEntry::Remark& remark = vectorAdd(modMenuEntry.mRemarks);
+				remark.mIsError = true;
+				if (nullptr != otherMod)
+				{
+					remark.mText = std::string("This mod requires \"") + otherMod->mDisplayName + "\" to be activated as well, and placed " + (otherShouldBeHigherPrio ? "above" : "below") + " this one";
+				}
+				else
+				{
+					remark.mText = std::string("This mod requires \"") + otherModInfo.mDisplayName + "\" in order to work (you might need to search for that mod online)";
+				}
+			}
+		}
+	}
+
+	modMenuEntry.refreshAfterRemarksChange();
 }
 
 int ModsMenu::getInfoOverlayHeight() const
@@ -852,7 +920,7 @@ bool ModsMenu::applyModChanges(bool dryRun)
 	for (int index = (int)menuEntries.size()-1; index >= 0; --index)
 	{
 		const GameMenuEntry& entry = *menuEntries[index];
-		if (entry.getMenuEntryType() == 0)
+		if (entry.getMenuEntryType() == ModMenuEntry::MENU_ENTRY_TYPE)
 		{
 			const ModEntry& modEntry = mModEntries[entry.mData];
 			if (modEntry.mMakeActive)
