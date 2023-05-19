@@ -32,6 +32,10 @@ namespace
 		BUTTON_Y		= 0x17,
 		BUTTON_START	= 0x18,
 		BUTTON_BACK		= 0x19,
+
+		BUTTON_L		= 0x1a,
+		BUTTON_R		= 0x1b,
+
 		_BACK			= 0xff
 	};
 
@@ -76,7 +80,7 @@ void ControllerSetupMenu::initialize()
 	mMenuEntries.addEntry("Assign all buttons", ::ASSIGN_ALL);
 
 	const constexpr size_t NUM_BUTTONS = (size_t)InputConfig::DeviceDefinition::Button::_NUM;
-	const char* buttonNames[NUM_BUTTONS] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back" };
+	const char* buttonNames[NUM_BUTTONS] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back", "L", "R" };
 	for (size_t i = 0; i < NUM_BUTTONS; ++i)
 	{
 		mMenuEntries.addEntry(buttonNames[i], ::BUTTON_UP + (uint32)i);

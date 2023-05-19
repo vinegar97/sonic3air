@@ -110,6 +110,9 @@ void DynamicSprites::updateSpriteRedirects()
 	static const uint64 INPUT_ICON_BUTTON_START = rmx::getMurmur2_64("@input_icon_button_start");
 	static const uint64 INPUT_ICON_BUTTON_BACK  = rmx::getMurmur2_64("@input_icon_button_back");
 
+	static const uint64 INPUT_ICON_BUTTON_L     = rmx::getMurmur2_64("@input_icon_button_L");
+	static const uint64 INPUT_ICON_BUTTON_R     = rmx::getMurmur2_64("@input_icon_button_R");
+
 	switch (mLastInputType)
 	{
 		case InputManager::InputType::KEYBOARD:
@@ -124,6 +127,9 @@ void DynamicSprites::updateSpriteRedirects()
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  getKeyboardIconSpriteKey(keys.Down));
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, getKeyboardIconSpriteKey(keys.Start));
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  getKeyboardIconSpriteKey(keys.Back));
+
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_L,     getKeyboardIconSpriteKey(keys.L));
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_R,     getKeyboardIconSpriteKey(keys.R));
 			break;
 		}
 
@@ -167,6 +173,9 @@ void DynamicSprites::updateSpriteRedirects()
 			static const uint64 INPUT_ICON_XBOX_START = rmx::getMurmur2_64("input_icon_xbox_start");
 			static const uint64 INPUT_ICON_XBOX_BACK  = rmx::getMurmur2_64("input_icon_xbox_back");
 
+			static const uint64 INPUT_ICON_XBOX_L = rmx::getMurmur2_64("input_icon_xbox_L");
+			static const uint64 INPUT_ICON_XBOX_R  = rmx::getMurmur2_64("input_icon_xbox_R");
+
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     INPUT_ICON_XBOX_A);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     INPUT_ICON_XBOX_B);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     INPUT_ICON_XBOX_X);
@@ -177,6 +186,9 @@ void DynamicSprites::updateSpriteRedirects()
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  INPUT_ICON_XBOX_DOWN);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, INPUT_ICON_XBOX_START);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  INPUT_ICON_XBOX_BACK);
+
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_L,     INPUT_ICON_XBOX_L);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_R,     INPUT_ICON_XBOX_R);
 			break;
 		}
 	}
