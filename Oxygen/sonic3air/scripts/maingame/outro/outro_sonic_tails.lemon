@@ -866,7 +866,7 @@ function void fn05e142()
 	if (objA0.position.x.u16 < 0x0120 + getScreenExtend())
 	{
 		objA0.base_state = 0x04
-		objA0.animation.sprite = 0x55
+		objA0.animation.sprite = 0x55		// Knuckles looking ahead sprite
 		objA0.countdown_value = 119
 	}
 }
@@ -989,7 +989,7 @@ function void fn05e288()
 	objA0.countdown_value = 0x1f
 
 	A1 = 0xffffb000
-	u8[A1 + 0x22] = 0x58
+	u8[A1 + 0x22] = 0x58		// Set player character's looking forward sprite
 	objA1.state = char.state.RUNNING
 	UpdatePlayer1SpritePatterns()
 }

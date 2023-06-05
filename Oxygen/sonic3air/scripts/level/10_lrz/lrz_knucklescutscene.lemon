@@ -302,17 +302,17 @@ function void fn065efe()
 	A1 = 0xffffb000
 	D2 = 0
 	D3 = 0x3c
-	D4 = 0xffffff8d
+	D4 = 0xffffff8d		// Sonic's hurt sprite
 #if STANDALONE
 	if (isMainCharacter(CHARACTER_TAILS))	// Choose the right animation for Tails
-		D4 = 0xffffff8a
+		D4 = 0xffffff8a		// Tails' hurt sprite
 #endif
 	fn065f84()
 
 	A1 = 0xffffb04a
 	D2 = 1
 	D3 = 0x3d
-	D4 = 0xffffff8a
+	D4 = 0xffffff8a		// Tails' hurt sprite
 	fn065f84()
 
 	A1 = 0xffffb000
