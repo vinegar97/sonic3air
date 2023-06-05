@@ -6283,7 +6283,7 @@ function void Character.LandingOnGroundResetState()
 	}
 
 	// Check for Knuckles gliding/falling/standup state
-	if (char.character == CHARACTER_KNUCKLES && char.state >= 0x20)
+	if (char.character == CHARACTER_KNUCKLES && char.state >= char.state.KNUX_FLYCLIMB)
 	{
 		char.state = char.state.RUNNING
 	}

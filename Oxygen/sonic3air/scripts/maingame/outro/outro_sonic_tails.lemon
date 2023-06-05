@@ -1842,7 +1842,7 @@ function void fn05f6fc()
 //# address-hook(0x05fc8e) end(0x05fc98)
 function void fn05fc8e()
 {
-	u8[0xffffb000 + 0x20] = 0
+	u8[0xffffb000 + 0x20] = char.state.RUNNING
 	super.palettefx.frame = 36
 	super.active = 1
 	fn05fc9e()
