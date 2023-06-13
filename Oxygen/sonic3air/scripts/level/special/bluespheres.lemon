@@ -159,7 +159,7 @@ function void SpecialStage()
 	bluespheres.stage_exit_animation = 0
 	VDP.Config.setRenderingModeConfiguration(true)		// Enable shadow/highlight palette mode
 
-	global.demo_countdown = 1800
+	global.demo_countdown = 1800	// 30 seconds
 	fn0075d2()
 
 #if STANDALONE
