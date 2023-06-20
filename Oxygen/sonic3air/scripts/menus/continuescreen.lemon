@@ -258,7 +258,7 @@ function void fn05c2e0()
 		return
 	}
 
-	global.game_mode = 0x0c
+	global.game_mode = 0x0c			// Main Game
 	lives_counter = 3
 	unused.lives_counter.player2 = 3
 	ring_counter = 0
