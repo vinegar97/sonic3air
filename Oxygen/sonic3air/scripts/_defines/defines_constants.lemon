@@ -45,10 +45,12 @@ constant u8 CONTROL_START	= 0x80
 constant u8 CONTROL_DPAD	= 0x0f	// Any of the four directions
 constant u8 CONTROL_ABC		= 0x70	// Any of the three buttons
 
+// These values are mainly produced by "Input.getController*"
 constant u16 CONTROL_Z		= 0x0100
 constant u16 CONTROL_Y		= 0x0200
 constant u16 CONTROL_X		= 0x0400
 constant u16 CONTROL_MODE	= 0x0800
+
 constant u16 CONTROL_XYZ	= 0x0700	// Any of the three top buttons
 constant u16 CONTROL_ABCXYZ	= 0x0770	// Any of the six buttons
 constant u16 CONTROL_STARTMODE	= 0x0880
