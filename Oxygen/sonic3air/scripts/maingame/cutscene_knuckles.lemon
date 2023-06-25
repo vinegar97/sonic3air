@@ -164,6 +164,34 @@ function void fn065dd6()
 // Buttons that Knuckles loves to jump on                //
 //-------------------------------------------------------//
 
+//# address-hook(0x065bd4) end(0x065bf6)
+function void fn065bd4()
+{
+	// This is used in AIZ 2, HCZ 2, and CNZ 2
+
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		UnloadObject()
+		return
+	}
+
+#if STANDALONE
+	// Also unload for other characters in Time Attack, which skips Knuckles cutscenes anyway
+	if (Game.isTimeAttack())
+	{
+		UnloadObject()
+		return
+	}
+#endif
+
+	setupObjectAttributesFull(0x066402)
+	objA0.update_address = 0x065c04
+	objA0.position.y.u16 += 4
+
+	addPatternLoadingCue(0x065bfc)		// Knuckles' button sprites
+}
+
+
 //# address-hook(0x065c04) end(0x065c3a)
 function void fn065c04()
 {
