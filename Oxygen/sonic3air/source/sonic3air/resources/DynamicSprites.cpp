@@ -146,6 +146,9 @@ void DynamicSprites::updateSpriteRedirects()
 			static const uint64 INPUT_ICON_TOUCH_START = rmx::getMurmur2_64("input_icon_touch_start");
 			static const uint64 INPUT_ICON_TOUCH_BACK  = rmx::getMurmur2_64("input_icon_touch_back");
 
+			static const uint64 INPUT_ICON_TOUCH_L     = rmx::getMurmur2_64("@input_icon_touch_L");
+			static const uint64 INPUT_ICON_TOUCH_R     = rmx::getMurmur2_64("@input_icon_touch_R");
+
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     INPUT_ICON_TOUCH_A);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     INPUT_ICON_TOUCH_B);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     INPUT_ICON_TOUCH_X);
@@ -156,6 +159,9 @@ void DynamicSprites::updateSpriteRedirects()
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  INPUT_ICON_TOUCH_DOWN);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, INPUT_ICON_TOUCH_START);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  INPUT_ICON_TOUCH_BACK);
+
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_L,     INPUT_ICON_TOUCH_L);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_R,     INPUT_ICON_TOUCH_R);
 			break;
 		}
 
