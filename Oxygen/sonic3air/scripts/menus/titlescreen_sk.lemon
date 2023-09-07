@@ -70,7 +70,7 @@ function void TitleScreen_SK()
 	}
 	copyMemory(0xfffffca0, 0x0055a8, 0x20)
 
-	global.demo_countdown = (global.region_code & 0x40) ? 150 : 180		// 2 seconds 30 frames/3 seconds
+	global.demo_countdown = (global.region_code & 0x40) ? 150 : 180		// 2.5 seconds / 3 seconds
 
 	VDP.Config.setActiveDisplay(true)
 
@@ -116,7 +116,7 @@ function void TitleScreen_SK()
 	playMusic(MUSIC_TITLESCREEN)
 
 	lives_counter = 3
-	global.demo_countdown = (global.region_code & 0x40) ? 900 : 1080		// 15 seconds/30 seconds
+	global.demo_countdown = (global.region_code & 0x40) ? 900 : 1080		// 15 seconds / 18 seconds
 
 	while (true)
 	{
@@ -369,6 +369,10 @@ function void fn005628()
 //# address-hook(0x00565a) end(0x0056e2)
 function void fn00565a()
 {
+#if STANDALONE
+	// Fix for Sonic's position in widescreen, #contributed by TheMushrunt
+	objA0.position.x.u16 = 0xe8 + getScreenExtend()
+#endif
 	if (objA0.position.y.u16 != 0xf0)
 		++objA0.position.y.u16
 
@@ -880,7 +884,7 @@ function void fn005b42()
 	u16[A2+4] = D4.u16
 	u16[A2+6] = D3.u16
 	u16[A2+8] = D2.u16
-	u8[A2+10] = D5.u8
+	u8[A2+11] = D5.u8
 
 	DrawObject()
 }

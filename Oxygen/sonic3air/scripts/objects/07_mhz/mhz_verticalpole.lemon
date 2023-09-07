@@ -249,7 +249,7 @@ function void fn03f246()
 				objA1.position.x.u16 = objA0.position.x.u16 + D2.u16
 				u8[A1 + 0x20] = 0
 				u8[A1 + 0x2e] = 0x03
-				u8[A1 + 0x22] = 0x62		// Set Player characters' pole posing sprite. unfortunately, due to an error, it only shows up for one frame
+				u8[A1 + 0x22] = 0x62		// Set Player characters' pole posing sprite; unfortunately, due to an error, it only shows up for one frame
 
 				u8[A2 + 0x04] = 0x08
 				u8[A2] = 0x01

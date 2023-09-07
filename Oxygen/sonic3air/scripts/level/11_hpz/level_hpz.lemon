@@ -329,7 +329,7 @@ function void UpdateBackground.HPZ()
 function void fn0656a8()
 {
 	D0.u16 = u16[A0 + 0x3a]		// Previous palette state
-	D1 = (camera.position.x.u16 >= 0x0460) ? 4 : 0		// assign offset for chosen palette entry
+	D1 = (camera.position.x.u16 >= 0x0460) ? 4 : 0		// Assign offset for chosen palette entry
 	u16[A0 + 0x3a] = D1.u16		// New palette state
 	if (D1.u16 != D0.u16)
 	{

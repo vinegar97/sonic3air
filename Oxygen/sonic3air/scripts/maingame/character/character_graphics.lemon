@@ -358,7 +358,7 @@ function void updateSonicAnimationRunning()
 			D0.u8 = u8[A1 + 1]
 		}
 
-		char.animation.sprite = D0.u8 + D3.u8		// change sprites based on rotations
+		char.animation.sprite = D0.u8 + D3.u8		// Change sprites based on rotations
 		--char.animation.timer
 		if (s8(char.animation.timer) < 0)
 		{

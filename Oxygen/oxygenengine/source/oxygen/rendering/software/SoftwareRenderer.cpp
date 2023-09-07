@@ -8,12 +8,14 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/rendering/software/SoftwareRenderer.h"
+#include "oxygen/rendering/software/SoftwareBlur.h"
 #include "oxygen/rendering/Geometry.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/drawing/Drawer.h"
 #include "oxygen/drawing/DrawerTexture.h"
+#include "oxygen/drawing/software/BlitterHelper.h"
 
 
 namespace detail
@@ -319,31 +321,9 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 			const EffectBlurGeometry& ebg = static_cast<const EffectBlurGeometry&>(geometry);
 			Bitmap& gameScreenBitmap = mGameScreenTexture.accessBitmap();
 
-			// Blur x-direction
 			if (ebg.mBlurValue >= 1)
 			{
-				for (int y = 0; y < gameScreenBitmap.getHeight(); ++y)
-				{
-					uint32* data = gameScreenBitmap.getPixelPointer(0, y);
-					for (int x = gameScreenBitmap.getWidth() - 1; x >= 1; --x)
-					{
-						data[x] = (data[x] & 0xff000000) + (((data[x] & 0xfefefe) + (data[x-1] & 0xfefefe)) >> 1);
-					}
-				}
-			}
-
-			// Blur y-direction
-			if (ebg.mBlurValue >= 3)
-			{
-				const int stride = gameScreenBitmap.getWidth();
-				for (int y = 0; y < gameScreenBitmap.getHeight()-1; ++y)
-				{
-					uint32* data = gameScreenBitmap.getPixelPointer(0, y);
-					for (int x = 0; x < gameScreenBitmap.getWidth(); ++x)
-					{
-						data[x] = (data[x] & 0xff000000) + (((data[x] & 0xfefefe) + (data[x+stride] & 0xfefefe)) >> 1);
-					}
-				}
+				SoftwareBlur::blurBitmap(gameScreenBitmap, ebg.mBlurValue);
 			}
 			break;
 		}
@@ -660,14 +640,8 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 							color.g = saturate(sprite.mAddedColor.g + color.g * sprite.mTintColor.g);
 							color.b = saturate(sprite.mAddedColor.b + color.b * sprite.mTintColor.b);
 							color.a = saturate(sprite.mAddedColor.a + color.a * sprite.mTintColor.a);
-
-							if (color.a < 1.0f)
-							{
-								color = color.blendOver(Color::fromABGR32(dst));
-								color.a = 1.0f;
-							}
-
-							dst = color.getABGR32();
+							uint32 src = color.getABGR32();
+							BlitterHelper::blendPixelAlpha((uint8*)&dst, (uint8*)&src);
 						}
 						else
 						{
@@ -691,9 +665,9 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 
 			// Build blitter options
 			Blitter::Options blitterOptions;
+			Color tintColor = spriteBase.mTintColor;
+			Color addedColor = spriteBase.mAddedColor;
 			{
-				Color tintColor = spriteBase.mTintColor;
-				Color addedColor = spriteBase.mAddedColor;
 				if (spriteBase.mUseGlobalComponentTint && !isPaletteSprite)
 				{
 					tintColor.r *= paletteManager.getGlobalComponentTintColor().r;
