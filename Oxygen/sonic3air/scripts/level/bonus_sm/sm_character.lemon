@@ -72,8 +72,8 @@ function void fn04b99e()
 function void fn04b9ce()
 {
 	objA0.base_state += 2
-	objA0.hitbox_extends.x = 0x07
-	objA0.hitbox_extends.y = 0x0e
+	objA0.hitbox_extends.x = char.hitbox.x.ROLLING
+	objA0.hitbox_extends.y = char.hitbox.y.ROLLING
 
 	D0.u16 = min(getMainCharacter(), 2)
 	objA0.flags38 = D0.u8
