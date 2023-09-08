@@ -700,8 +700,7 @@ function void fn0748ae()
 
 	objA0.update_address = 0x0748f4
 	objA0.flags2a |= 0x40
-	objA0.flags38 |= 0x10
-	objA0.flags38 |= 0x20
+	objA0.flags38 |= (0x10 | 0x20)
 	level.boss_encounter = 0
 	objA0.render_flags &= ~render_flag.VISIBLE
 }

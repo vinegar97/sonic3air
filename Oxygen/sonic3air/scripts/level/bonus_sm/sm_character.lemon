@@ -560,23 +560,31 @@ function void fn04be3a()
 	{
 		D1 = u32[A0 + 0x32] - 0xffff3001
 		D2.u16 = D1.u16
+
 		D1.u16 &= 0x7f
 		D1 = u32(D1.u16) * 0x18
 		D1.u16 -= 0x14
+
 		D2.u16 >>= 7
+
 		D2.u16 &= 0x7f
 		D2 = u32(D2.u16) * 0x18
 		D2.u16 -= 0x44
+
 		D1.u16 -= objA0.position.x.u16
 		D2.u16 -= objA0.position.y.u16
+
 		LookupAngleByVector()
 		LookupSinCos()
+
 		D1.s32 = s32(D1.s16) * -0x0700
 		D1.s32 >>= 8
 		objA0.velocity.x = D1.u16
+
 		D0.s32 = s32(D0.s16) * -0x0700
 		D0.s32 >>= 8
 		objA0.velocity.y = D0.u16
+
 		objA0.flags2a |= char.flag.IN_AIR
 
 		fn04b57c()

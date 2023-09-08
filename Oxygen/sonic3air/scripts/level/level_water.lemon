@@ -572,7 +572,7 @@ function void UpdateWaterSurfaceLevel.AIZ2()
 				camera.screenshake.state = 0xffff
 				if (allocDynamicObjectStd())
 				{
-					objA1.update_address = 0x006e6e
+					objA1.update_address = addressof(Object.ScreenShakeTimeout)
 					u8[A1 + 0x24] = 0xb4
 				}
 			}

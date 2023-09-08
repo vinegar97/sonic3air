@@ -130,14 +130,18 @@ function void fn039208()
 {
 	D0.u8 = u8[A1 + 0x26]
 	LookupSinCos()
+
 	D1.s32 = s32(D1.s16) * objA1.groundspeed
 	D1.s32 >>= 8
 	objA1.velocity.x = D1.u16
+
 	D0.s32 = s32(D0.s16) * objA1.groundspeed
 	D0.s32 >>= 8
 	objA1.velocity.y = D0.u16
+
 	D0.u8 = u8[A1 + 0x26]
 	LookupSinCos()
+
 	D0.s32 = s32(D0.s16) * 0x50
 	D0.s32 >>= 8
 	if (objA1.groundspeed >= 0)
