@@ -32,7 +32,7 @@ function void GiantRing.Init()
 	}
 	else
 	{
-		Object.InitWithUpdateAddress(0x061682)
+		Object.InitWithUpdateAddress(addressof(GiantRing.BaseUpdate))
 	}
 }
 
@@ -78,7 +78,7 @@ function void fn06169a()
 
 	u32[A0 + 0x30] = 0x0619c2
 
-	bool isSuperEmeraldStage = (objA0.subtype2c & 0x80) || GiantRing.isSuperEmeraldStage()
+	bool isSuperEmeraldStage = (objA0.subtype2c & 0x80) || GiantRing.isSuperEmeraldStage()		// First condition is for the first giant ring in Mushroom Hill that always leads to Hidden Palace
 	if (isSuperEmeraldStage)
 	{
 		objA0.flags38 |= 0x40
