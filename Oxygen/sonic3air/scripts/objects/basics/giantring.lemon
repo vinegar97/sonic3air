@@ -83,8 +83,8 @@ function void fn06169a()
 	{
 		objA0.flags38 |= 0x40
 		copyMemory(0xfffffade, 0x061c28, 8)
-		copyMemory(0xfffffae6, 0x061ca4, 8)
-		u16[0xfffffaee] = 0
+		copyMemory(0xfffffade+8, 0x061ca4, 8)
+		u16[0xfffffade+16] = 0
 	}
 
 	fn0616e6()
