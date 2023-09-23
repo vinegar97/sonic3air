@@ -1143,7 +1143,8 @@ function void fn074c8c()
 
 #if STANDALONE
 	// Remove spindash cloud
-	u8[0xffffcc54 + 0x20] = 0
+	u32 dustAddress = isMainCharacter(CHARACTER_TAILS) ? 0xffffcc9e : 0xffffcc54
+	u8[dustAddress + 0x20] = 0
 #endif
 
 	fn074ccc()

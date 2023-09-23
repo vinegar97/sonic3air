@@ -1415,8 +1415,8 @@ function void UpdateKnucklesGlideCollision()
 				char.animation.frame = 0
 				if (char.drown_countdown >= 12)
 				{
-					u8[A6 + 0x05] = 6
-					u8[A6 + 0x22] = 0x15
+					u8[A6 + 0x05] = 0x06		// Base update for braking dust
+					u8[A6 + 0x22] = 0x15		// First frame of dust animation
 				}
 			}
 		}
