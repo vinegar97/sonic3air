@@ -40,7 +40,7 @@ function void CollapsingCliff.Init()
 	objA0.flags38 = 0x07
 	objA0.animation.sprite = objA0.subtype2c
 	objA0.flags2a |= 0x80
-	objA0.update_address = 0x020594
+	objA0.update_address = addressof(CollapsingCliff.Update)
 	CollapsingCliff.Update()
 }
 

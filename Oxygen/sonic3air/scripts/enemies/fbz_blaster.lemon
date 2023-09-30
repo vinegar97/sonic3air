@@ -15,12 +15,13 @@
 //# address-hook(0x08948e) end(0x0894a2)
 function void Blaster.Init()
 {
-	Object.InitWithUpdateAddress(0x089494)
+	Object.InitWithUpdateAddress(addressof(Blaster.BaseUpdate))
 }
 
 
 //# address-hook(0x089494) end(0x0894a2)
-function void fn089494()
+//# alias(fn089494) deprecated
+function void Blaster.BaseUpdate()
 {
 	// Targets:
 	//  - 0x0894b6	-> objA0.base_state = 0x00
