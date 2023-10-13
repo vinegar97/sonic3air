@@ -1329,7 +1329,7 @@ function void Object.AlternativeAnimationUpdate()
 	--objA0.animation.timer
 	if (objA0.animation.timer == 0xff)
 	{
-		A1.u16 += u16[A1 + objA0.state * 2]
+		A1.u16 = tableLookupAddress(A1, objA0.state * 2)
 		D1 = objA0.animation.frame * 2
 
 		D0.u8 = u8[A1 + D1.u16]
