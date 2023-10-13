@@ -64,8 +64,7 @@ function void fn08c34e()
 {
 	if (objA0.flags38 & 0x04)
 	{
-		objA0.flags38 &= ~0x04
-		objA0.flags38 &= 0xfc
+		objA0.flags38 &= ~(0x04 | 0x03)
 
 		objA0.flags38 ^= 0x08
 		D0 = (objA0.flags38 & 0x08) ? 0 : 1

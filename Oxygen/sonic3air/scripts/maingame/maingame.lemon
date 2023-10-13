@@ -1816,7 +1816,7 @@ function void fn0067ee()
 		if (isSonicIntro())
 		{
 			// Trigger intro
-			u32[0xffffb172] = 0x067472
+			u32[0xffffb172] = 0x067472		// Intro cutscene controller
 			global.level_started = 0
 		}
 	#if STANDALONE
@@ -1832,10 +1832,7 @@ function void fn0067ee()
 		objA1.state = char.state.FALLING_PANIC
 		if (isMainCharacter(CHARACTER_KNUCKLES))
 		{
-			// objA1.state = char.state.KNUX_FALLING
-			// objA1.state.former = char.state.KNUX_FALLING
-			objA1.state.both = 0x2121
-
+			objA1.state.both = 0x2121	// char.state.KNUX_FALLING, char.state.KNUX_FALLING
 			objA1.animation.frame = 1
 			objA1.animation.timer = 0	// This is A0 instead of A1 in original, thanks to Clownacy (https://forums.sonicretro.org/index.php?showtopic=30778&view=findpost&p=893997)
 		}

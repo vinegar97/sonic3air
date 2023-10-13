@@ -64,7 +64,7 @@ function void fn01e626()
 	objA0.animation.timer = 3
 	objA0.animation.sprite = 0
 
-	objA0.update_address = 0x01e66e
+	objA0.update_address = addressof(SmallExplosion.Update)
 	SmallExplosion.Update()
 }
 

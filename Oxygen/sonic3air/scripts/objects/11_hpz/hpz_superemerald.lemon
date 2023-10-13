@@ -175,7 +175,7 @@ function void fn0908de()
 
 			A1 = 0xffffb000
 			u8[A1 + 0x2e] = 0x81
-			u16[A1 + 0x20] = 0x0500		// char.state.STANDING, char.state.RUNNING
+			objA1.state.both = 0x0500		// char.state.STANDING, char.state.RUNNING
 		}
 	}
 

@@ -835,7 +835,7 @@ function void fn04b130()
 
 			D0.u8 = u8[A3 + 0x2a] & char.flag.FACING_LEFT
 			objA1.render_flags |= D0.u8
-			u8[A1 + 0x2a] &= 0xfc
+			u8[A1 + 0x2a] &= ~0x03
 			u8[A1 + 0x2a] |= D0.u8
 			u8[A2] = 0x01
 

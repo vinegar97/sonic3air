@@ -155,7 +155,7 @@ function void fn031226()
 		u8[A1 + 0x27] = 0
 		objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 		objA1.flags2a &= ~char.flag.CONTROL_LOCK
-		u8[A1 + 0x2e] &= 0xfc
+		u8[A1 + 0x2e] &= ~0x03
 		u8[A1 + 0x40] = 0x01
 		return
 	}

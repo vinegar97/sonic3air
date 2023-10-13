@@ -230,9 +230,8 @@ function void fn049090()
 
 		objA1.render_flags &= ~render_flag.FLIP_X
 		u8[A1 + 0x2a] &= ~0x01
-		u8[A1 + 0x2e] |= 0x40
-		u8[A1 + 0x2e] |= 0x02
-		u16[A1 + 0x20] = char.state.RUNNING2
+		u8[A1 + 0x2e] |= (0x40 | 0x02)
+		objA1.state.both = char.state.RUNNING2
 		u8[A1 + 0x27] = 0		// Set x-rotation of character
 		u8[A2 + 0x02] = 0
 	}
@@ -382,7 +381,7 @@ function void fn0492d4()
 				objA1.groundspeed = 0
 				u16[A1 + 0x26] = 0
 				objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
-				u16[A1 + 0x20] = char.state.RUNNING2
+				objA1.state.both = char.state.RUNNING2
 				u8[A1 + 0x2e] = 0x83
 
 				u8[A2] = 1

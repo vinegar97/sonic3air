@@ -175,7 +175,7 @@ function void fn03a314()
 			u8[A1 + 0x2a] &= ~char.flag.ROLLING
 			u8[A1 + 0x1e] = u8[A1 + 0x44]
 			u8[A1 + 0x1f] = u8[A1 + 0x45]
-			u16[A1 + 0x20] = char.state.RUNNING2
+			objA1.state.both = char.state.RUNNING2
 			u8[A1 + 0x2e] = 0
 			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 			objA0.flags2a &= ~bit
@@ -188,7 +188,7 @@ function void fn03a314()
 		u8[A1 + 0x2a] &= ~char.flag.ROLLING
 		u8[A1 + 0x1e] = u8[A1 + 0x44]
 		u8[A1 + 0x1f] = u8[A1 + 0x45]
-		u16[A1 + 0x20] = char.state.RUNNING2
+		objA1.state.both = char.state.RUNNING2
 		u8[A1 + 0x2e] = 0
 		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		objA0.flags2a &= ~(u8(1) << D6.u8)

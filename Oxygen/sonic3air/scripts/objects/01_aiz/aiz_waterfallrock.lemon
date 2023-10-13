@@ -42,7 +42,7 @@ function void AIZWaterfallRock.Init()
 		objA0.animation.sprite = 5
 	}
 
-	objA0.update_address = 0x02a2d6
+	objA0.update_address = addressof(AIZWaterfallRock.Update)
 	AIZWaterfallRock.Update()
 }
 

@@ -148,7 +148,7 @@ function void fn04a4b4()
 //# address-hook(0x04a4f0) end(0x04a4f0)
 function void fn04a4f0()
 {
-	u8[A1 + 0x2e] &= 0xfc
+	u8[A1 + 0x2e] &= ~0x03
 	fn04a4f6()
 }
 

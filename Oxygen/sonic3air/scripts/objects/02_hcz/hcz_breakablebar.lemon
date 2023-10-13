@@ -114,7 +114,7 @@ function void fn01edec()
 		u8[A2] = 0
 		u8[A2 + 0x02] = 0x3c
 		level.HCZ_breakable_bar_flags &= ~(1 << D2.u8)
-		u8[A1 + 0x2e] &= 0xfe
+		u8[A1 + 0x2e] &= ~0x01
 		if ((objA0.subtype2c & 0x40) == 0)
 		{
 			objA0.value3a = 0x01
@@ -173,11 +173,11 @@ function void fn01eeec()
 {
 	if (u8[A0 + 0x32] != 0)
 	{
-		u8[0xffffb000 + 0x2e] &= 0xfe
+		u8[0xffffb000 + 0x2e] &= ~0x01
 	}
 	if (u8[A0 + 0x33] != 0)
 	{
-		u8[0xffffb04a + 0x2e] &= 0xfe
+		u8[0xffffb04a + 0x2e] &= ~0x01
 	}
 
 	level.HCZ_breakable_bar_flags = 0
@@ -289,7 +289,7 @@ function void fn01efa0()
 		u8[A2] = 0
 		u8[A2 + 0x02] = 0x3c
 		level.HCZ_breakable_bar_flags &= ~(1 << D2.u8)
-		u8[A1 + 0x2e] &= 0xfe
+		u8[A1 + 0x2e] &= ~0x01
 		if ((objA0.subtype2c & 0x40) == 0)
 		{
 			objA0.value3a = 0x01
@@ -351,11 +351,11 @@ function void fn01f09a()
 {
 	if (u8[A0 + 0x32] != 0)
 	{
-		u8[0xffffb000 + 0x2e] &= 0xfe
+		u8[0xffffb000 + 0x2e] &= ~0x01
 	}
 	if (u8[A0 + 0x33] != 0)
 	{
-		u8[0xffffb04a + 0x2e] &= 0xfe
+		u8[0xffffb04a + 0x2e] &= ~0x01
 	}
 
 	level.HCZ_breakable_bar_flags = 0

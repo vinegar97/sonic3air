@@ -1210,10 +1210,7 @@ function void stopCharacterWinPose(u32 address)
 //# address-hook(0x085b8e) end(0x085ba6)
 function void StopCharacterWinPose()
 {
-	// objA1.state = char.state.STANDING
-	// objA1.state.former = char.state.STANDING
-	objA1.state.both = 0x0505
-
+	objA1.state.both = 0x0505		// char.state.STANDING, char.state.STANDING
 	objA1.animation.frame = 0
 	objA1.animation.timer = 0
 	objA1.flags2a &= ~char.flag.IN_AIR
@@ -1274,11 +1271,13 @@ function void Object.AnimationUpdate()
 		{
 			if (D0.u8 == 0xff)
 			{
+				// Loop animation from the start
 				objA0.animation.frame = 0
 				D0.u8 = u8[A1 + 1]
 			}
 			else if (D0.u8 == 0xfe)
 			{
+				// Loop animation from specific frame
 				D0.u8 = u8[A1 + objA0.animation.frame + 2]
 				objA0.animation.frame -= D0.u8
 				D0.u8 = u8[A1 + objA0.animation.frame + 1]
@@ -1287,6 +1286,7 @@ function void Object.AnimationUpdate()
 			{
 				if (D0.u8 == 0xfd)
 				{
+					// Change to another animation
 					objA0.state = u8[A1 + objA0.animation.frame + 2]
 				}
 				else if (D0.u8 == 0xfc)
@@ -1303,6 +1303,7 @@ function void Object.AnimationUpdate()
 			}
 		}
 
+		// Advance to next frame
 		objA0.animation.sprite = D0.u8
 		objA0.render_flags = (objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (objA0.flags2a & 0x03)
 		++objA0.animation.frame
@@ -1337,12 +1338,14 @@ function void Object.AlternativeAnimationUpdate()
 		{
 			if (D0.u8 == 0xff)
 			{
+				// Loop animation from the start
 				D1 = 0
 				objA0.animation.frame = 0
 				D0.u8 = u8[A1]
 			}
 			else if (D0.u8 == 0xfe)
 			{
+				// Loop animation from specific frame
 				D0.u8 = u8[A1 + D1.u16 + 1]
 				objA0.animation.frame -= D0.u8
 				D1.u8 -= D0.u8 * 2
@@ -1352,6 +1355,7 @@ function void Object.AlternativeAnimationUpdate()
 			{
 				if (D0.u8 == 0xfd)
 				{
+					// Change to another animation
 					objA0.state = u8[A1 + D1.u16 + 1]
 				}
 				else if (D0.u8 == 0xfc)
@@ -1364,6 +1368,7 @@ function void Object.AlternativeAnimationUpdate()
 			}
 		}
 
+		// Advance to next frame
 		objA0.animation.timer = u8[A1 + D1.u16 + 1]
 		objA0.animation.sprite = D0.u8
 		objA0.render_flags = (objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (objA0.flags2a & 0x03)
@@ -1597,7 +1602,7 @@ function void fn01e0a2()
 		#if STANDALONE
 			// Also add exceptions for...
 			//  -> The win pose: This prevents characters from showing their walking animation when standing next to an object like the capsule during the level results
-			//  -> Super/Hyper transformation: Without this, transformating next to a monitor switched to the run animation, and can even cause a softlock if imediately cancelling the transformation
+			//  -> Super/Hyper transformation: Without this, transforming next to a monitor switched to the run animation, and can even cause a softlock if immediately cancelling the transformation
 			if (u8[A1 + 0x20] != char.state.WIN_POSE && u8[A1 + 0x20] != char.state.TRANSFORMING)
 		#endif
 			{
@@ -2283,12 +2288,12 @@ function void Object.AnimationProgress.CheckFlipY(u32 address)
 //# address-hook(0x0844ce) end(0x08450c)
 function void fn0844ce()
 {
-	--u8[A1 + 0x24]
-	if (s8[A1 + 0x24] < 0)
+	--objA1.animation.timer
+	if (s8(objA1.animation.timer) < 0)
 	{
-		u8[A1 + 0x24] = u8[A2]
-		D0 = u8[A1 + 0x23] + 2
-		u8[A1 + 0x23] = D0.u8
+		objA1.animation.timer = u8[A2]
+		D0 = objA1.animation.frame + 2
+		objA1.animation.frame = D0.u8
 		D1.u8 = u8[A2 + D0.u16 + 1]
 		if (D1.u8 == 0)
 		{
@@ -2298,7 +2303,7 @@ function void fn0844ce()
 			return
 		}
 
-		u8[A1 + 0x22] = D1.u8
+		objA1.animation.sprite = D1.u8
 		objA1.render_flags &= ~render_flag.FLIP_X
 		if (u8[A2 + D0.u16 + 2] != 0)
 		{

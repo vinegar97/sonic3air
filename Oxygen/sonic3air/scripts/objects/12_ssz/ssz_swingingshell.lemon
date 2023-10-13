@@ -249,7 +249,7 @@ function void fn046324()
 			if (s8[A0 + 0x2c] < 0)
 			{
 				D0.u16 = objA0.flags2a & 0x01
-				u8[A1 + 0x2a] &= 0xfe
+				u8[A1 + 0x2a] &= ~0x01
 				u8[A1 + 0x2a] |= D0.u8
 			}
 		}
