@@ -90,7 +90,7 @@ function void fn044338()
 
 		fn04450a()
 
-		D0 = u8[A1 + 0x22]
+		D0 = objA1.animation.sprite
 		u32 backupA2 = A2
 		SetCharacterSpritePatterns()
 		A2 = backupA2
@@ -197,7 +197,7 @@ function void fn044434()
 
 			fn04450a()
 
-			D0 = u8[A1 + 0x22]
+			D0 = objA1.animation.sprite
 			u32 backupA2 = A2
 			SetCharacterSpritePatterns()
 			A2 = backupA2

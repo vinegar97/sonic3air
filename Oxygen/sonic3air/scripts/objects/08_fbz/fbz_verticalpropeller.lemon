@@ -101,7 +101,7 @@ function void fn03bfa0()
 //# address-hook(0x03bffe) end(0x03c00e)
 function void fn03bffe()
 {
-	D0 = u8[A1 + 0x22]
+	D0 = objA1.animation.sprite
 	u32 backupA2 = A2
 	SetCharacterSpritePatterns()
 	A2 = backupA2

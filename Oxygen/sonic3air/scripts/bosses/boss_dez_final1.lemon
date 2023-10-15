@@ -753,7 +753,7 @@ function void fn080ce2()
 function void fn080cf8()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	objA0.animation.sprite = u8[A1 + 0x22]
+	objA0.animation.sprite = objA1.animation.sprite
 	if ((u8[A1 + 0x38] & 0x02) == 0)
 	{
 		MoveWithParent()
@@ -774,7 +774,7 @@ function void fn080cf8()
 function void fn080d30()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	objA0.animation.sprite = u8[A1 + 0x22]
+	objA0.animation.sprite = objA1.animation.sprite
 	if (u8[A1 + 0x38] & 0x02)
 	{
 		MoveWithParent()
@@ -896,7 +896,7 @@ function void fn081140()
 function void fn08117a()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	D0.u8 = u8[A1 + 0x22]
+	D0.u8 = objA1.animation.sprite
 	if ((objA0.state & 0x01) == 0)
 	{
 		D0.u8 += 0x13

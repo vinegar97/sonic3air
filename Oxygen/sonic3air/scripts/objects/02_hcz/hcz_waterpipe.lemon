@@ -387,7 +387,7 @@ function void fn030338()
 			objA1.box_size.y = 0x18
 			objA1.velocity.x = u16[(A3+=2)-2]
 			objA1.velocity.y = u16[(A3+=2)-2]
-			u8[A1 + 0x22] = D1.u8
+			objA1.animation.sprite = D1.u8
 
 			--D1.s16
 		}

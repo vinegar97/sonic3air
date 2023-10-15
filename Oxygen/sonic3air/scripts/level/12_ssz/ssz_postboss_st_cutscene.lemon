@@ -316,7 +316,7 @@ function void fn05806e()
 		// Set player characters' spiral run sprites
 		A2 = 0x0587a8
 		D0.u8 = u8[A2 + D2.u16]
-		u8[A1 + 0x22] = D0.u8
+		objA1.animation.sprite = D0.u8
 		SetCharacterSpritePatterns()
 	}
 	else if (s16[A2 + 0x04] < 0)

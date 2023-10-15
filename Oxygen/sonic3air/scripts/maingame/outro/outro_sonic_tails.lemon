@@ -576,7 +576,7 @@ function void fn05dc2c()
 	objA0.countdown_value = 119
 
 	A1 = 0xffffb000
-	u8[A1 + 0x22] = 0
+	objA1.animation.sprite = 0
 #if STANDALONE
 	objA0.velocity.x = 0x0100 + (getScreenExtend() * 0x80 / 40)
 #else
@@ -989,7 +989,7 @@ function void fn05e288()
 	objA0.countdown_value = 0x1f
 
 	A1 = 0xffffb000
-	u8[A1 + 0x22] = 0x58		// Set player character's looking forward sprite
+	objA1.animation.sprite = 0x58		// Set player character's looking forward sprite
 	objA1.state = char.state.RUNNING
 	UpdatePlayer1SpritePatterns()
 }
@@ -1116,7 +1116,7 @@ function void fn05e3c0()
 
 	A1 = 0xffffb000
 	u8[A1 + 0x2e] = 0x83
-	u8[A1 + 0x22] = 0
+	objA1.animation.sprite = 0
 	DrawObject()
 }
 
@@ -1201,7 +1201,7 @@ function void fn05e474()
 
 	A1 = 0xffffb000
 	u8[A1 + 0x2e] = 0x83
-	u8[A1 + 0x22] = 0
+	objA1.animation.sprite = 0
 
 	if (allocDynamicObjectStd())
 	{

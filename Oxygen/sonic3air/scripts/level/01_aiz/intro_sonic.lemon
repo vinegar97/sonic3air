@@ -68,7 +68,7 @@ function void fn0674ac()
 	char.animation.sprite.backup = 0xff
 
 	A1 = 0xffffb000
-	u8[A1 + 0x22] = 0		// char.animation.sprite
+	objA1.animation.sprite = 0		// char.animation.sprite
 	u8[A1 + 0x2e] = 0x53	// char.control_flags
 
 #if STANDALONE

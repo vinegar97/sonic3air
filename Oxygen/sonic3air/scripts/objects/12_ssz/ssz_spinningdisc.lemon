@@ -349,6 +349,6 @@ function void fn0460a6()
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	objA1.render_flags |= D0.u8
 	D0.u8 = u8[A2]
-	u8[A1 + 0x22] = D0.u8
+	objA1.animation.sprite = D0.u8
 	SetCharacterSpritePatterns()
 }

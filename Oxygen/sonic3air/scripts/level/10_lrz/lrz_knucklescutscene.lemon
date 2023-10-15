@@ -378,7 +378,7 @@ function void fn065f84()
 		player1.camera_lock = 0
 		hud.dirty.timer = 0
 		objA1.state = char.state.RUNNING
-		u8[A1 + 0x22] = D4.u8
+		objA1.animation.sprite = D4.u8
 		u8[A1 + 0x23] = 0
 		u8[A1 + 0x24] = 0
 		u8[A1 + 0x2e] = 0x83
