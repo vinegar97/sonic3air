@@ -357,7 +357,7 @@ function void fn08d94a()
 				objA0.countdown_callback = 0x08d846
 				playSound(0xae)
 				u8[A2 + 0x2a] |= char.flag.IN_AIR
-				u8[A2 + 0x2e] = 0x01
+				u8[A2 + 0x2e] = control_flag.DISABLE_UPDATE
 				u8[A2 + 0x20] = char.state.GOT_HURT
 				u8[A2 + 0x3d] = 0
 			}

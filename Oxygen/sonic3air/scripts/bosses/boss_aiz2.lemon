@@ -461,7 +461,7 @@ function void fn0695ce()
 		return
 
 	objA0.update_address = 0x069616
-	u8[A1 + 0x2e] = 0x83
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	objA1.animation.sprite = 0xcb		// Set Knuckles dropping sprite
 	UpdatePlayer1SpritePatterns()
 

@@ -447,7 +447,7 @@ function void fn02a106()
 		}
 
 		u8[A2] += 2
-		u8[A1 + 0x2e] = 0x83
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 		u8[A1 + 0x20] = 0
 		u8[A1 + 0x40] = 0
 		objA1.velocity.x = 0

@@ -96,7 +96,7 @@ function void fn03a270()
 					u8[A1 + 0x2a] |= char.flag.IN_AIR
 					LetSonicClimbOnObject()
 
-					u8[A1 + 0x2e] = 0x42
+					u8[A1 + 0x2e] = (control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION)
 					fn03a314()
 				}
 			}

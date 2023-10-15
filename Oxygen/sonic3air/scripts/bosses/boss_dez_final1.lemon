@@ -78,7 +78,7 @@ function void fn07fd9e()
 //# address-hook(0x07fe06) end(0x07fe2a)
 function void fn07fe06()
 {
-	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	objA1.state = char.state.RUNNING
 	objA1.velocity.x = 0x600
 	objA1.groundspeed = 0x600

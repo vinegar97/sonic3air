@@ -1426,7 +1426,7 @@ function void fn01df90()
 //# address-hook(0x01dffe)
 function void fn01dffe()
 {
-	if (u8[A1 + 0x2e] & 0x80)	// Check "char.control_flags" against the no-collision flag
+	if (u8[A1 + 0x2e] & control_flag.DISABLE_INTERACTION)	// Check "char.control_flags" against the no-collision flag
 	{
 		fn01e0a2()
 	}
@@ -1664,7 +1664,7 @@ function void fn01e1f4()
 function void updateSonicPositionOnMovingObjectInternal(s8 sign)
 {
 	// First check is against collision interaction flag in "char.control_flags"
-	if ((u8[A1 + 0x2e] & 0x80) == 0 && u8[A1 + 0x05] < 6 && debug_mode.state == 0)
+	if ((u8[A1 + 0x2e] & control_flag.DISABLE_INTERACTION) == 0 && u8[A1 + 0x05] < 6 && debug_mode.state == 0)
 	{
 		objA1.position.x.u16 += objA0.position.x.u16 - D2.u16
 		objA1.position.y.u16 = D0.u16 + u8[A1 + 0x1e] * sign

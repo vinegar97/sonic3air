@@ -201,7 +201,7 @@ function void fn03a8b8()
 			objA1.position.y.u16 = objA0.position.y.u16 + 0x9c
 			objA1.state = char.state.HANGING
 			objA1.flags2a |= char.flag.ON_OBJECT
-			u8[A1 + 0x2e] = 0x01
+			u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
 			u16[A1 + 0x42] = A0.u16
 
 			u8[A2] = 0x01
@@ -466,7 +466,7 @@ function void fn03ac86()
 			objA1.state = char.state.HANGING
 			objA1.animation.sprite = 0x91		// Set player character's hanging sprite
 			u8[A1 + 0x2a] |= char.flag.ON_OBJECT
-			u8[A1 + 0x2e] = 0x03
+			u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 			u16[A1 + 0x42] = A0.u16
 
 			u8[A2] = 0x01

@@ -47,7 +47,7 @@ function void fn08d2b6()
 				u8[A1 + 0x0a] |= 0x80
 				objA1.state = char.state.STANDING
 				objA1.flags2a &= ~char.flag.FACING_LEFT
-				u8[A1 + 0x2e] = 0x83
+				u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 
 				playSound(0xd0)
 

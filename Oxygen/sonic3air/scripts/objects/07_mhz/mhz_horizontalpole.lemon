@@ -49,7 +49,7 @@ function void HorizontalPole.Update()
 	// Handle second character if he's still attached to the pole
 	if (objA0.update_address == 0 && player2attached)
 	{
-		u8[0xffffb04a + 0x2e] &= ~0x03
+		u8[0xffffb04a + 0x2e] &= ~(control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	}
 #else
 	DrawOrUnloadObject()
@@ -122,7 +122,7 @@ function void fn03ed6e()
 				{
 					u8[A2] = 0
 					u8[A2 + 0x02] = 0x08
-					u8[A1 + 0x2e] &= ~0x03
+					u8[A1 + 0x2e] &= ~(control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 					u8[A1 + 0x40] = 0
 					u8[A1 + 0x3d] = 0
 					u8[A1 + 0x05] = 0x02
@@ -153,7 +153,7 @@ function void fn03ed6e()
 		u8[A2] = 0
 		u8[A2 + 2] = (objA1.flags2a & char.flag.UNDERWATER) ? 0x3c : 0x1e
 
-		u8[A1 + 0x2e] &= ~0x03
+		u8[A1 + 0x2e] &= ~(control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 		u8[A1 + 0x40] = 0x01
 		objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 		objA1.hitbox_extends.x = char.hitbox.x.ROLLING
@@ -190,7 +190,7 @@ function void fn03ed6e()
 						objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 						objA1.position.y.u16 = objA0.position.y.u16 + 0x14
 						u8[A1 + 0x20] = 0
-						u8[A1 + 0x2e] = 0x03
+						u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 						objA1.animation.sprite = 0x94		// Player characters' bar hanging sprites
 						u8[A2 + 0x04] = 0
 						u8[A2 + 0x06] = 0

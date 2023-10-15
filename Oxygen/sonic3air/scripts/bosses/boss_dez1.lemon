@@ -659,7 +659,7 @@ function void fn07e384()
 	if (objA1.position.y.u16 >= 0x0360 && (u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 	{
 		objA0.update_address = 0x07e3ca
-		u8[A1 + 0x2e] = 0x83
+		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 		objA1.state = char.state.RUNNING
 		StopObjectA1()
 

@@ -921,7 +921,7 @@ function void ItemEffect.ApplySuperTransformation()
 	#endif
 	}
 
-	u8[0xffffb000 + 0x2e] = 0x81
+	u8[0xffffb000 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	u8[0xffffb000 + 0x35] = 0
 	u8[A1 + 0x2b] |= char.bonus.INVINCIBLE
 

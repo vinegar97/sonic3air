@@ -489,7 +489,7 @@ function void fn022af8()
 			objA1.position.y.u16 = objA0.position.y.u16 + 0x14
 			objA1.state = char.state.HANGING
 			u8[A1 + 0x3d] = 0
-			u8[A1 + 0x2e] = 0x03
+			u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 			objA1.render_flags &= ~render_flag.FLIP_Y
 		}
 	}

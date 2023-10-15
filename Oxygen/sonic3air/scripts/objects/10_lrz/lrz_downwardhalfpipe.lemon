@@ -71,7 +71,7 @@ function void fn042574()
 						u8[A1 + 0x2a] |= 0x01
 						objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 						objA1.render_flags |= render_flag.FLIP_X
-						u8[A1 + 0x2e] = 0x43
+						u8[A1 + 0x2e] = (control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 					}
 				}
 				else
@@ -86,7 +86,7 @@ function void fn042574()
 
 						u8[A1 + 0x2a] &= ~0x01
 						objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
-						u8[A1 + 0x2e] = 0x43
+						u8[A1 + 0x2e] = (control_flag.DISABLE_WALLS | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 					}
 				}
 			}

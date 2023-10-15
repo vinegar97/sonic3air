@@ -307,7 +307,7 @@ function void fn08a9e0()
 			u16[A4 + 0x1c] = 0
 			u8[A4 + 0x20] = char.state.GOT_HURT
 			u8[A4 + 0x2a] |= 0x02
-			u8[A4 + 0x2e] = 0x81
+			u8[A4 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 			u8[A4 + 0x3d] = 0
 
 			D4 = D0
