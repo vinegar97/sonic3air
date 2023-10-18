@@ -52,7 +52,11 @@ namespace lemon
 		inline Node& operator*() const	{ return mBlockNode.mNodes[mCurrentIndex]; }
 		inline Node* operator->() const	{ return &mBlockNode.mNodes[mCurrentIndex]; }
 		inline bool valid() const		{ return (mCurrentIndex < mBlockNode.mNodes.size()); }
+		inline Node* get() const		{ return (mCurrentIndex < mBlockNode.mNodes.size()) ? &mBlockNode.mNodes[mCurrentIndex] : nullptr; }
 		inline Node* peek() const		{ return (mCurrentIndex + 1 < mBlockNode.mNodes.size()) ? &mBlockNode.mNodes[mCurrentIndex + 1] : nullptr; }
+
+		template<typename T> inline T* getSpecific() const   { Node* node = get();  return (nullptr != node && node->isA<T>()) ? static_cast<T*>(node) : nullptr; }
+		template<typename T> inline T* peekSpecific() const  { Node* node = peek(); return (nullptr != node && node->isA<T>()) ? static_cast<T*>(node) : nullptr; }
 
 		inline void eraseCurrent()
 		{
@@ -110,7 +114,7 @@ namespace lemon
 
 			// Check for block begin and end
 			bool isUndefined = true;
-			if (parserTokens[0].getType() == ParserToken::Type::KEYWORD)
+			if (parserTokens[0].isA<KeywordParserToken>())
 			{
 				const Keyword keyword = parserTokens[0].as<KeywordParserToken>().mKeyword;
 				switch (keyword)
@@ -146,7 +150,7 @@ namespace lemon
 			}
 
 			// Check for pragma
-			if (parserTokens[0].getType() == ParserToken::Type::PRAGMA)
+			if (parserTokens[0].isA<PragmaParserToken>())
 			{
 				std::string& content = parserTokens[0].as<PragmaParserToken>().mContent;
 				if (!processGlobalPragma(content))
@@ -245,16 +249,16 @@ namespace lemon
 		for (NodesIterator nodesIterator(rootNode); nodesIterator.valid(); ++nodesIterator)
 		{
 			Node& node = *nodesIterator;
-			if (node.getType() == Node::Type::PRAGMA)
+			if (node.isA<PragmaNode>())
 			{
 				currentPragmas.push_back(&node.as<PragmaNode>());
 			}
-			else if (node.getType() == Node::Type::UNDEFINED)
+			else if (node.isA<UndefinedNode>())
 			{
 				TokenList& tokens = node.as<UndefinedNode>().mTokenList;
 
 				// Check for keywords
-				if (tokens[0].getType() == Token::Type::KEYWORD)
+				if (tokens[0].isA<KeywordToken>())
 				{
 					switch (tokens[0].as<KeywordToken>().mKeyword)
 					{
@@ -263,7 +267,7 @@ namespace lemon
 							// Next node must be a block node
 							const size_t nodeIndex = nodesIterator.mCurrentIndex;
 							CHECK_ERROR(nodeIndex+1 < nodes.size(), "Function definition as last node is not allowed", node.getLineNumber());
-							CHECK_ERROR(nodes[nodeIndex+1].getType() == Node::Type::BLOCK, "Expected block node after function header", node.getLineNumber());
+							CHECK_ERROR(nodes[nodeIndex+1].isA<BlockNode>(), "Expected block node after function header", node.getLineNumber());
 
 							// Process tokens
 							ScriptFunction& function = processFunctionHeader(node, tokens);
@@ -294,11 +298,11 @@ namespace lemon
 						case Keyword::GLOBAL:
 						{
 							size_t offset = 1;
-							CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::VARTYPE, "Expected a typename after 'global' keyword", node.getLineNumber());
+							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<VarTypeToken>(), "Expected a typename after 'global' keyword", node.getLineNumber());
 							const DataTypeDefinition* dataType = tokens[offset].as<VarTypeToken>().mDataType;
 							++offset;
 
-							CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected an identifier in global variable definition", node.getLineNumber());
+							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier in global variable definition", node.getLineNumber());
 							const FlyweightString identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
@@ -308,7 +312,7 @@ namespace lemon
 
 							if (offset+2 <= tokens.size() && isOperator(tokens[offset], Operator::ASSIGN))
 							{
-								CHECK_ERROR(offset+2 == tokens.size() && tokens[offset+1].getType() == Token::Type::CONSTANT, "Expected a constant value for initializing the global variable", node.getLineNumber());
+								CHECK_ERROR(offset+2 == tokens.size() && tokens[offset+1].isA<ConstantToken>(), "Expected a constant value for initializing the global variable", node.getLineNumber());
 								variable.mInitialValue = tokens[offset+1].as<ConstantToken>().mValue.get<int64>();
 							}
 							break;
@@ -326,13 +330,13 @@ namespace lemon
 							const DataTypeDefinition* dataType = nullptr;	// Not specified
 
 							// Typename is optional
-							if (offset < tokens.size() && tokens[offset].getType() == Token::Type::VARTYPE)
+							if (offset < tokens.size() && tokens[offset].isA<VarTypeToken>())
 							{
 								dataType = tokens[offset].as<VarTypeToken>().mDataType;
 								++offset;
 							}
 
-							CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected an identifier for define", node.getLineNumber());
+							CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier for define", node.getLineNumber());
 							const FlyweightString identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
@@ -345,7 +349,7 @@ namespace lemon
 							// Find out the data type if not specified yet
 							if (nullptr == dataType)
 							{
-								if (tokens[offset].getType() == Token::Type::VARTYPE)
+								if (tokens[offset].isA<VarTypeToken>())
 								{
 									dataType = tokens[offset].as<VarTypeToken>().mDataType;
 								}
@@ -398,11 +402,11 @@ namespace lemon
 		const uint32 lineNumber = node.getLineNumber();
 
 		size_t offset = 1;
-		CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::VARTYPE, "Expected a typename after 'function' keyword", lineNumber);
+		CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<VarTypeToken>(), "Expected a typename after 'function' keyword", lineNumber);
 		const DataTypeDefinition* returnType = tokens[offset].as<VarTypeToken>().mDataType;
 
 		++offset;
-		CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected an identifier in function definition", lineNumber);
+		CHECK_ERROR(offset < tokens.size() && tokens[offset].isA<IdentifierToken>(), "Expected an identifier in function definition", lineNumber);
 		const FlyweightString functionName = tokens[offset].as<IdentifierToken>().mName;
 
 		++offset;
@@ -412,7 +416,7 @@ namespace lemon
 		CHECK_ERROR(offset < tokens.size(), "Unexpected end of function definition", lineNumber);
 
 		std::vector<Function::Parameter> parameters;
-		if (tokens[offset].getType() == Token::Type::OPERATOR)
+		if (tokens[offset].isA<OperatorToken>())
 		{
 			CHECK_ERROR(tokens[offset].as<OperatorToken>().mOperator == Operator::PARENTHESIS_RIGHT, "Expected closing parentheses or parameter definition", lineNumber);
 		}
@@ -425,15 +429,15 @@ namespace lemon
 				CHECK_ERROR(offset + 2 < tokens.size(), "Expected function parameter definition", lineNumber);
 				parameters.emplace_back();
 
-				CHECK_ERROR(tokens[offset].getType() == Token::Type::VARTYPE, "Expected type in function parameter definition", lineNumber);
+				CHECK_ERROR(tokens[offset].isA<VarTypeToken>(), "Expected type in function parameter definition", lineNumber);
 				parameters.back().mDataType = tokens[offset].as<VarTypeToken>().mDataType;
 
 				++offset;
-				CHECK_ERROR(tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected identifier in function parameter definition", lineNumber);
+				CHECK_ERROR(tokens[offset].isA<IdentifierToken>(), "Expected identifier in function parameter definition", lineNumber);
 				parameters.back().mName = tokens[offset].as<IdentifierToken>().mName;
 
 				++offset;
-				CHECK_ERROR(tokens[offset].getType() == Token::Type::OPERATOR, "Expected comma or closing parentheses after function parameter definition", lineNumber);
+				CHECK_ERROR(tokens[offset].isA<OperatorToken>(), "Expected comma or closing parentheses after function parameter definition", lineNumber);
 				const Operator op = tokens[offset].as<OperatorToken>().mOperator;
 				if (op == Operator::PARENTHESIS_RIGHT)
 				{
@@ -527,7 +531,7 @@ namespace lemon
 		const uint32 lineNumber = undefinedNode.getLineNumber();
 		TokenList& tokens = undefinedNode.mTokenList;
 
-		if (tokens[0].getType() == Token::Type::KEYWORD)
+		if (tokens[0].isA<KeywordToken>())
 		{
 			// Check for keywords
 			const Keyword keyword = tokens[0].as<KeywordToken>().mKeyword;
@@ -562,6 +566,28 @@ namespace lemon
 					// Process tokens
 					processTokens(tokens, function, scopeContext, lineNumber, mCompileOptions.mExternalAddressType);
 
+					// Special case: Indirect jump
+					if (keyword == Keyword::JUMP && tokens.size() == 1 && tokens[0].isA<CommaSeparatedListToken>())
+					{
+						const CommaSeparatedListToken& cslt = tokens[0].as<CommaSeparatedListToken>();
+						if (cslt.mContent.size() >= 2 && cslt.mContent[0].size() == 2 && cslt.mContent[0][1].isStatement())
+						{
+							JumpIndirectNode& node = NodeFactory::create<JumpIndirectNode>();
+							node.mIndexToken = cslt.mContent[0][1].as<StatementToken>();
+
+							size_t index = 1;
+							while (index < cslt.mContent.size())
+							{
+								CHECK_ERROR(cslt.mContent[index].size() == 1, "Invalid syntax for indirect 'jump'", lineNumber);
+								CHECK_ERROR(cslt.mContent[index][0].isA<LabelToken>(), "Invalid syntax for indirect 'jump'", lineNumber);
+								vectorAdd(node.mLabelTokens) = cslt.mContent[index][0].as<LabelToken>();
+								++index;
+							}
+							node.setLineNumber(lineNumber);
+							return &node;
+						}
+					}
+
 					CHECK_ERROR(tokens.size() == 2, "'call' and 'jump' need an additional token after them", lineNumber);
 					if (tokens[1].isStatement())
 					{
@@ -573,7 +599,7 @@ namespace lemon
 						tokens.erase(1);
 						return &node;
 					}
-					else if (tokens[1].getType() == Token::Type::LABEL)
+					else if (tokens[1].isA<LabelToken>())
 					{
 						CHECK_ERROR(keyword == Keyword::JUMP, "Label is not allowed after 'call' keyword", lineNumber);
 
@@ -606,60 +632,7 @@ namespace lemon
 
 				case Keyword::IF:
 				{
-					if (mCompileOptions.mScriptFeatureLevel >= 2)
-						CHECK_ERROR(tokens.size() >= 2 && isOperator(tokens[1], Operator::PARENTHESIS_LEFT), "Expected parentheses after 'if' keyword", lineNumber);
-
-					// Process tokens
-					processTokens(tokens, function, scopeContext, lineNumber);
-
-					CHECK_ERROR(tokens.size() == 2, "Expected single statement after 'if' keyword", lineNumber);
-					CHECK_ERROR(tokens[1].isStatement(), "Expected statement after 'if' keyword", lineNumber);
-
-					IfStatementNode& node = NodeFactory::create<IfStatementNode>();
-					node.mConditionToken = tokens[1].as<StatementToken>();
-					node.setLineNumber(lineNumber);
-					tokens.erase(1);
-
-					// Go on with the next node, which must be either a block or a statement
-					{
-						Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
-						CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'if' line", node.getLineNumber());
-						newNode->setLineNumber(node.getLineNumber());
-						node.mContentIf = newNode;
-						nodesIterator.eraseCurrent();
-					}
-
-					// Also check for 'else'
-					{
-						Node* nextNode = nodesIterator.peek();
-						if (nullptr != nextNode && nextNode->getType() == Node::Type::UNDEFINED)
-						{
-							UndefinedNode& nextNodeUndefined = nextNode->as<UndefinedNode>();
-							if (nextNodeUndefined.mTokenList.size() >= 1 && isKeyword(nextNodeUndefined.mTokenList[0], Keyword::ELSE))
-							{
-								// Special case: 'else if' (or anything where there's a statement directly after the 'else')
-								if (nextNodeUndefined.mTokenList.size() >= 2)
-								{
-									// Remove the 'else' here and treat the rest as a normal statement, as if it was on the next line
-									nextNodeUndefined.mTokenList.erase(0);
-								}
-								else
-								{
-									// Normal handling for 'else'
-									++nodesIterator;
-									nodesIterator.eraseCurrent();
-								}
-
-								Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
-								CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'else' line", node.getLineNumber());
-								newNode->setLineNumber(node.getLineNumber());
-								node.mContentElse = newNode;
-								nodesIterator.eraseCurrent();
-							}
-						}
-					}
-
-					return &node;
+					return processIfBlock(tokens, function, scopeContext, nodesIterator, lineNumber);
 				}
 
 				case Keyword::ELSE:
@@ -771,7 +744,7 @@ namespace lemon
 					break;
 			}
 		}
-		else if (tokens[0].getType() == Token::Type::LABEL)
+		else if (tokens[0].isA<LabelToken>())
 		{
 			// Process label definition
 			CHECK_ERROR(tokens.size() == 2, "Expected only colon after label", lineNumber);
@@ -862,9 +835,9 @@ namespace lemon
 		{
 			CHECK_ERROR(tokens.size() >= 7, "Syntax error in constant array definition", lineNumber);
 			CHECK_ERROR(isOperator(tokens[2], Operator::COMPARE_LESS), "Expected a type in <> in constant array definition", lineNumber);
-			CHECK_ERROR(tokens[3].getType() == Token::Type::VARTYPE, "Expected a type in <> in constant array definition", lineNumber);
+			CHECK_ERROR(tokens[3].isA<VarTypeToken>(), "Expected a type in <> in constant array definition", lineNumber);
 			CHECK_ERROR(isOperator(tokens[4], Operator::COMPARE_GREATER), "Expected a type in <> in constant array definition", lineNumber);
-			CHECK_ERROR(tokens[5].getType() == Token::Type::IDENTIFIER, "Expected identifier in constant array definition", lineNumber);
+			CHECK_ERROR(tokens[5].isA<IdentifierToken>(), "Expected identifier in constant array definition", lineNumber);
 			CHECK_ERROR(isOperator(tokens[6], Operator::ASSIGN), "Expected assignment at the end of constant array definition", lineNumber);
 
 			static std::vector<uint64> values;
@@ -890,7 +863,7 @@ namespace lemon
 					}
 					else
 					{
-						CHECK_ERROR(token.getType() == Token::Type::CONSTANT, "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
+						CHECK_ERROR(token.isA<ConstantToken>(), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
 						values.push_back(token.as<ConstantToken>().mValue.get<uint64>());
 						expectingComma = true;
 					}
@@ -900,14 +873,14 @@ namespace lemon
 			{
 				Node* nextNode = nodesIterator.peek();
 				CHECK_ERROR(nullptr != nextNode, "Constant array definition as last node is not allowed", lineNumber);
-				CHECK_ERROR(nextNode->getType() == Node::Type::BLOCK, "Expected block node after constant array header", lineNumber);
+				CHECK_ERROR(nextNode->isA<BlockNode>(), "Expected block node after constant array header", lineNumber);
 
 				// Go through the block node and collect the values
 				BlockNode& content = nextNode->as<BlockNode>();
 				bool expectingComma = false;
 				for (size_t n = 0; n < content.mNodes.size(); ++n)
 				{
-					CHECK_ERROR(content.mNodes[n].getType() == Node::Type::UNDEFINED, "Syntax error inside constant array list of values", content.mNodes[n].getLineNumber());
+					CHECK_ERROR(content.mNodes[n].isA<UndefinedNode>(), "Syntax error inside constant array list of values", content.mNodes[n].getLineNumber());
 					UndefinedNode& listNode = content.mNodes[n].as<UndefinedNode>();
 					for (size_t i = 0; i < listNode.mTokenList.size(); ++i)
 					{
@@ -919,7 +892,7 @@ namespace lemon
 						}
 						else
 						{
-							CHECK_ERROR(token.getType() == Token::Type::CONSTANT, "Expected a comma-separated list of constants inside constant array list of values", listNode.getLineNumber());
+							CHECK_ERROR(token.isA<ConstantToken>(), "Expected a comma-separated list of constants inside constant array list of values", listNode.getLineNumber());
 							values.push_back(token.as<ConstantToken>().mValue.get<uint64>());
 							expectingComma = true;
 						}
@@ -948,12 +921,12 @@ namespace lemon
 		}
 		else
 		{
-			CHECK_ERROR(tokens[1].getType() == Token::Type::VARTYPE, "Expected a type in constant definition", lineNumber);
-			CHECK_ERROR(tokens[2].getType() == Token::Type::IDENTIFIER, "Expected an identifier for constant definition", lineNumber);
+			CHECK_ERROR(tokens[1].isA<VarTypeToken>(), "Expected a type in constant definition", lineNumber);
+			CHECK_ERROR(tokens[2].isA<IdentifierToken>(), "Expected an identifier for constant definition", lineNumber);
 			CHECK_ERROR(isOperator(tokens[3], Operator::ASSIGN), "Missing assignment in constant definition", lineNumber);
 
 			// TODO: Support all statements that result in a compile-time constant
-			CHECK_ERROR(tokens[4].getType() == Token::Type::CONSTANT, "", lineNumber);
+			CHECK_ERROR(tokens[4].isA<ConstantToken>(), "", lineNumber);
 
 			const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
 			const FlyweightString identifier = tokens[2].as<IdentifierToken>().mName;
@@ -972,6 +945,116 @@ namespace lemon
 				constant.mValue = constantValue;
 			}
 		}
+	}
+
+	Node* CompilerFrontend::processIfBlock(TokenList& tokens_, ScriptFunction& function, ScopeContext& scopeContext, NodesIterator& nodesIterator, uint32 lineNumber)
+	{
+		IfStatementNode* firstIfStatementNode = nullptr;
+		IfStatementNode* previousIfStatementNode = nullptr;
+		TokenList* currentTokens = &tokens_;
+
+		// Loop used in case we have multiple if-else-if, to avoid too deep recursion
+		while (true)
+		{
+			// Assuming here that the first token was already checked and is an 'if' keyword
+			TokenList& tokens = *currentTokens;
+			if (mCompileOptions.mScriptFeatureLevel >= 2)
+				CHECK_ERROR(tokens.size() >= 2 && isOperator(tokens[1], Operator::PARENTHESIS_LEFT), "Expected parentheses after 'if' keyword", lineNumber);
+
+			// Process tokens
+			processTokens(tokens, function, scopeContext, lineNumber);
+
+			CHECK_ERROR(tokens.size() == 2, "Expected single statement after 'if' keyword", lineNumber);
+			CHECK_ERROR(tokens[1].isStatement(), "Expected statement after 'if' keyword", lineNumber);
+
+			// Create node and move the condition statement into it
+			IfStatementNode& isn = NodeFactory::create<IfStatementNode>();
+			isn.mConditionToken = tokens[1].as<StatementToken>();
+			isn.setLineNumber(lineNumber);
+			tokens.erase(1);
+
+			// Is this the first loop iteration or already somewhere further down?
+			if (nullptr == previousIfStatementNode)
+			{
+				// Set the return value
+				firstIfStatementNode = &isn;
+			}
+			else
+			{
+				// Register in the previous node as 'else' content
+				previousIfStatementNode->mContentElse = &isn;
+			}
+
+			// Go on with the next node, which must be either a block or a statement
+			{
+				Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
+				CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'if' line", lineNumber);
+				newNode->setLineNumber(lineNumber);
+				isn.mContentIf = newNode;
+				nodesIterator.eraseCurrent();
+			}
+
+			// Also check for 'else'
+			UndefinedNode* peekedNode = nodesIterator.peekSpecific<UndefinedNode>();
+			if (nullptr != peekedNode && !peekedNode->mTokenList.empty() && isKeyword(peekedNode->mTokenList[0], Keyword::ELSE))
+			{
+				++nodesIterator;
+
+				// Special case: 'else if' (or anything where there's a statement directly after the 'else')
+				if (peekedNode->mTokenList.size() >= 2)
+				{
+					// Remove the 'else' here and treat the rest as a normal statement, as if it was on the next line
+					peekedNode->mTokenList.erase(0);
+				}
+				else
+				{
+					// Remove the 'else', it does not contain anything other than the 'else ' itself
+					nodesIterator.eraseCurrent();
+					++nodesIterator;
+				}
+
+				Node* newNode = nullptr;
+				Node* nextNode = nodesIterator.get();
+				if (nullptr != nextNode)
+				{
+					if (nextNode->isA<BlockNode>())
+					{
+						// Handle block
+						newNode = nextNode;
+						processUndefinedNodesInBlock(nextNode->as<BlockNode>(), function, scopeContext);
+					}
+					else if (nextNode->isA<UndefinedNode>())
+					{
+						UndefinedNode& nextNodeUndefined = nextNode->as<UndefinedNode>();
+						if (isKeyword(nextNodeUndefined.mTokenList[0], Keyword::IF))
+						{
+							nodesIterator.eraseCurrent();	// This seems to make no difference?
+
+							// Loop once more
+							currentTokens = &nextNodeUndefined.mTokenList;
+							lineNumber = nextNodeUndefined.getLineNumber();
+							previousIfStatementNode = &isn;
+							continue;
+						}
+						else
+						{
+							newNode = processUndefinedNode(nextNodeUndefined, function, scopeContext, nodesIterator);
+							newNode->setLineNumber(nextNodeUndefined.getLineNumber());
+						}
+					}
+				}
+
+				CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'else' line", peekedNode->getLineNumber());
+				newNode->setLineNumber(peekedNode->getLineNumber());
+				isn.mContentElse = newNode;
+				nodesIterator.eraseCurrent();
+			}
+
+			// Done, break the loop
+			break;
+		}
+
+		return firstIfStatementNode;
 	}
 
 	bool CompilerFrontend::processGlobalPragma(const std::string& content)

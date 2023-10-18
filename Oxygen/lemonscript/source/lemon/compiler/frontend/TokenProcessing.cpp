@@ -124,10 +124,22 @@ namespace lemon
 	{
 		fillCachedBuiltInFunctionMultiple(mBuiltinConstantArrayAccess,			globalsLookup, BuiltInFunctions::CONSTANT_ARRAY_ACCESS);
 		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlus,				globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS);
+		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlusInt64,		globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64);
+		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlusInt64Inv,		globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64_INV);
 		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorLess,				globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS);
 		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorLessOrEqual,		globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS_OR_EQUAL);
 		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorGreater,			globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER);
 		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorGreaterOrEqual,	globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER_OR_EQUAL);
+
+		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlus,           &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING);
+		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusInt64,      &PredefinedDataTypes::STRING, &PredefinedDataTypes::INT_64, &PredefinedDataTypes::STRING);
+		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusInt64Inv,   &PredefinedDataTypes::INT_64, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING);
+		mBinaryOperationLookup[(size_t)Operator::ASSIGN_PLUS]             .emplace_back(&mBuiltinStringOperatorPlus,           &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, Operator::BINARY_PLUS);
+		mBinaryOperationLookup[(size_t)Operator::ASSIGN_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusInt64,      &PredefinedDataTypes::STRING, &PredefinedDataTypes::INT_64, &PredefinedDataTypes::STRING, Operator::BINARY_PLUS);
+		mBinaryOperationLookup[(size_t)Operator::COMPARE_LESS]            .emplace_back(&mBuiltinStringOperatorLess,           &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
+		mBinaryOperationLookup[(size_t)Operator::COMPARE_LESS_OR_EQUAL]   .emplace_back(&mBuiltinStringOperatorLessOrEqual,    &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
+		mBinaryOperationLookup[(size_t)Operator::COMPARE_GREATER]         .emplace_back(&mBuiltinStringOperatorGreater,        &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
+		mBinaryOperationLookup[(size_t)Operator::COMPARE_GREATER_OR_EQUAL].emplace_back(&mBuiltinStringOperatorGreaterOrEqual, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
 	}
 
 	void TokenProcessing::processTokens(TokenList& tokensRoot, uint32 lineNumber, const DataTypeDefinition* resultType)
@@ -172,7 +184,7 @@ namespace lemon
 		bool anyResolved = false;
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::IDENTIFIER)
+			if (tokens[i].isA<IdentifierToken>())
 			{
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
 				if (nullptr == identifierToken.mResolved)
@@ -307,7 +319,7 @@ namespace lemon
 		bool anyDefineResolved = false;
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::IDENTIFIER)
+			if (tokens[i].isA<IdentifierToken>())
 			{
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
 				if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::DEFINE)
@@ -336,7 +348,7 @@ namespace lemon
 	{
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::IDENTIFIER)
+			if (tokens[i].isA<IdentifierToken>())
 			{
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
 				const Constant* constant = nullptr;
@@ -371,7 +383,7 @@ namespace lemon
 		parenthesisStack.clear();
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::OPERATOR)
+			if (tokens[i].isA<OperatorToken>())
 			{
 				const OperatorToken& opToken = tokens[i].as<OperatorToken>();
 				if (opToken.mOperator == Operator::PARENTHESIS_LEFT ||
@@ -419,7 +431,7 @@ namespace lemon
 		// Recursively go through the whole parenthesis hierarchy
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::PARENTHESIS)
+			if (tokens[i].isA<ParenthesisToken>())
 			{
 				// Call recursively for this parenthesis
 				processCommaSeparators(tokens[i].as<ParenthesisToken>().mContent);
@@ -521,7 +533,7 @@ namespace lemon
 		// Go through the child token lists
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::PARENTHESIS)
+			if (tokens[i].isA<ParenthesisToken>())
 			{
 				// Call recursively for this parenthesis' contents
 				processTokenListRecursiveForPreprocessor(tokens[i].as<ParenthesisToken>().mContent);
@@ -546,7 +558,7 @@ namespace lemon
 					if (keyword == Keyword::FUNCTION)
 					{
 						// Next token must be an identifier
-						CHECK_ERROR(i+1 < tokens.size() && tokens[i+1].getType() == Token::Type::IDENTIFIER, "Function keyword must be followed by an identifier", mLineNumber);
+						CHECK_ERROR(i+1 < tokens.size() && tokens[i+1].isA<IdentifierToken>(), "Function keyword must be followed by an identifier", mLineNumber);
 
 						// TODO: We could register the function name here already, so it is known later on...
 
@@ -563,7 +575,7 @@ namespace lemon
 
 					// Next token must be an identifier
 					Token& nextToken = tokens[i+1];
-					if (nextToken.getType() == Token::Type::IDENTIFIER)
+					if (nextToken.isA<IdentifierToken>())
 					{
 						CHECK_ERROR(varType->getClass() != DataTypeDefinition::Class::VOID, "void variables not allowed", mLineNumber);
 
@@ -599,7 +611,7 @@ namespace lemon
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::IDENTIFIER && isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS))
+			if (tokens[i].isA<IdentifierToken>() && isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS))
 			{
 				TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
@@ -685,7 +697,7 @@ namespace lemon
 				// Build list of parameters
 				if (!content.empty())
 				{
-					if (content[0].getType() == Token::Type::COMMA_SEPARATED)
+					if (content[0].isA<CommaSeparatedListToken>())
 					{
 						const std::vector<TokenList>& tokenLists = content[0].as<CommaSeparatedListToken>().mContent;
 						functionToken.mParameters.reserve(tokenLists.size());
@@ -801,7 +813,7 @@ namespace lemon
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::VARTYPE && isParenthesis(tokens[i+1], ParenthesisType::BRACKET))
+			if (tokens[i].isA<VarTypeToken>() && isParenthesis(tokens[i+1], ParenthesisType::BRACKET))
 			{
 				TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
 				CHECK_ERROR(content.size() == 1, "Expected exactly one token inside brackets", mLineNumber);
@@ -824,7 +836,7 @@ namespace lemon
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::IDENTIFIER && isParenthesis(tokens[i+1], ParenthesisType::BRACKET))
+			if (tokens[i].isA<IdentifierToken>() && isParenthesis(tokens[i+1], ParenthesisType::BRACKET))
 			{
 				// Check the identifier
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
@@ -882,7 +894,7 @@ namespace lemon
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::VARTYPE && isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS))
+			if (tokens[i].isA<VarTypeToken>() && isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS))
 			{
 				const DataTypeDefinition* targetType = tokens[i].as<VarTypeToken>().mDataType;
 
@@ -899,7 +911,7 @@ namespace lemon
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
 			Token& token = tokens[i];
-			if (token.getType() == Token::Type::IDENTIFIER)
+			if (token.isA<IdentifierToken>())
 			{
 				// Check the identifier
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
@@ -927,7 +939,7 @@ namespace lemon
 		// Left to right associative
 		for (int i = 0; i < (int)tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::OPERATOR)
+			if (tokens[i].isA<OperatorToken>())
 			{
 				const Operator op = tokens[i].as<OperatorToken>().mOperator;
 				switch (op)
@@ -960,7 +972,7 @@ namespace lemon
 		// Right to left associative: Go through in reverse order
 		for (int i = (int)tokens.size() - 1; i >= 0; --i)
 		{
-			if (tokens[i].getType() == Token::Type::OPERATOR)
+			if (tokens[i].isA<OperatorToken>())
 			{
 				const Operator op = tokens[i].as<OperatorToken>().mOperator;
 				switch (op)
@@ -975,7 +987,7 @@ namespace lemon
 						if (op == Operator::BINARY_MINUS && i > 0)
 						{
 							Token& leftToken = tokens[i-1];
-							if (leftToken.getType() != Token::Type::OPERATOR)
+							if (!leftToken.isA<OperatorToken>())
 								continue;
 						}
 
@@ -1025,7 +1037,7 @@ namespace lemon
 			size_t bestPosition = 0;
 			for (size_t i = 0; i < tokens.size(); ++i)
 			{
-				if (tokens[i].getType() == Token::Type::OPERATOR)
+				if (tokens[i].isA<OperatorToken>())
 				{
 					const Operator op = tokens[i].as<OperatorToken>().mOperator;
 					CHECK_ERROR((i > 0 && i < tokens.size()-1) && (op != Operator::SEMICOLON_SEPARATOR), getOperatorNotAllowedErrorMessage(op), mLineNumber);
@@ -1096,7 +1108,7 @@ namespace lemon
 				UnaryOperationToken& uot = inputToken.as<UnaryOperationToken>();
 				evaluateCompileTimeConstantsRecursive(*uot.mArgument, uot.mArgument);
 
-				if (uot.mArgument->getType() == ConstantToken::TYPE)
+				if (uot.mArgument->isA<ConstantToken>())
 				{
 					int64 resultValue;
 					if (tryReplaceConstantsUnary(uot.mArgument->as<ConstantToken>(), uot.mOperator, resultValue))
@@ -1117,7 +1129,7 @@ namespace lemon
 				evaluateCompileTimeConstantsRecursive(*bot.mLeft, bot.mLeft);
 				evaluateCompileTimeConstantsRecursive(*bot.mRight, bot.mRight);
 
-				if (bot.mLeft->getType() == ConstantToken::TYPE && bot.mRight->getType() == ConstantToken::TYPE)
+				if (bot.mLeft->isA<ConstantToken>() && bot.mRight->isA<ConstantToken>())
 				{
 					int64 resultValue;
 					if (tryReplaceConstantsBinary(bot.mLeft->as<ConstantToken>(), bot.mRight->as<ConstantToken>(), bot.mOperator, resultValue))
@@ -1139,7 +1151,7 @@ namespace lemon
 				for (TokenPtr<StatementToken>& parameterTokenPtr : ft.mParameters)
 				{
 					evaluateCompileTimeConstantsRecursive(*parameterTokenPtr, parameterTokenPtr);
-					if (parameterTokenPtr->getType() != Token::Type::CONSTANT)
+					if (!parameterTokenPtr->isA<ConstantToken>())
 						allConstant = false;
 				}
 
@@ -1187,7 +1199,7 @@ namespace lemon
 			{
 				CHECK_ERROR(isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS), "addressof must be followed by parentheses", mLineNumber);
 				const TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
-				if (content.size() == 1 && content[0].getType() == Token::Type::IDENTIFIER)
+				if (content.size() == 1 && content[0].isA<IdentifierToken>())
 				{
 					IdentifierToken& identifierToken = content[0].as<IdentifierToken>();
 					const std::vector<Function*>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
@@ -1232,7 +1244,7 @@ namespace lemon
 				const TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
 				CHECK_ERROR(content.size() == 1, "Expected a single token in parentheses after addressof", mLineNumber);
 
-				if (content[0].getType() == Token::Type::MEMORY_ACCESS)
+				if (content[0].isA<MemoryAccessToken>())
 				{
 					// Replace addressof and the parenthesis with the actual address
 					TokenPtr<StatementToken> addressToken = content[0].as<MemoryAccessToken>().mAddress;
@@ -1246,6 +1258,62 @@ namespace lemon
 				}
 			}
 		}
+	}
+
+	TokenProcessing::BinaryOperationResult TokenProcessing::getBestOperatorSignature(Operator op, const DataTypeDefinition* leftDataType, const DataTypeDefinition* rightDataType)
+	{
+		BinaryOperationResult result;
+
+		// Special handling for certain operations with strings
+		if (mCompileOptions.mScriptFeatureLevel >= 2)
+		{
+			const BinaryOperationLookup* bestLookup = nullptr;
+			uint16 bestPriority = 0xff00;
+			for (const BinaryOperationLookup& lookup : mBinaryOperationLookup[(size_t)op])
+			{
+				// This is pretty much the same as "TypeCasting::getBestOperatorSignature", except for the "exactMatchLeftRequired" part
+				const uint16 priority = mTypeCasting.getPriorityOfSignature(lookup.mSignature, leftDataType, rightDataType);
+				if (priority < bestPriority)
+				{
+					bestLookup = &lookup;
+					bestPriority = priority;
+				}
+			}
+
+			if (nullptr != bestLookup)
+			{
+				result.mEnforcedFunction = (nullptr == bestLookup->mCachedBuiltinFunction || bestLookup->mCachedBuiltinFunction->mFunctions.empty()) ? nullptr : bestLookup->mCachedBuiltinFunction->mFunctions[0];
+				result.mSignature = &bestLookup->mSignature;
+				result.mSplitToOperator = bestLookup->mSplitToOperator;
+				return result;
+			}
+		}
+
+		// Choose best fitting signature
+		{
+			const std::vector<TypeCasting::BinaryOperatorSignature>& signatures = TypeCasting::getBinarySignaturesForOperator(op);
+			const bool exactMatchLeftRequired = (OperatorHelper::getOperatorType(op) == OperatorHelper::OperatorType::ASSIGNMENT);
+			const std::optional<size_t> bestIndex = mTypeCasting.getBestOperatorSignature(signatures, exactMatchLeftRequired, leftDataType, rightDataType);
+			if (bestIndex.has_value())
+			{
+				result.mSignature = &signatures[*bestIndex];
+				// If needed later, store the index in the token - this indirectly gives access to the chosen signature again
+			}
+			else
+			{
+				// Special handling for assignment of the same type
+				if (leftDataType == rightDataType && op == Operator::ASSIGN)
+				{
+					static TypeCasting::BinaryOperatorSignature directSignature(leftDataType, rightDataType, leftDataType);
+					result.mSignature = &directSignature;
+				}
+				else
+				{
+					CHECK_ERROR(false, "Cannot apply binary operator " << OperatorHelper::getOperatorCharacters(op) << " between types '" << leftDataType->getName() << "' and '" << rightDataType->getName() << "'", mLineNumber);
+				}
+			}
+		}
+		return result;
 	}
 
 	void TokenProcessing::assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType)
@@ -1326,82 +1394,41 @@ namespace lemon
 				const DataTypeDefinition* leftDataType = assignStatementDataType(*bot.mLeft, expectedType);
 				const DataTypeDefinition* rightDataType = assignStatementDataType(*bot.mRight, (opType == OperatorHelper::OperatorType::ASSIGNMENT) ? leftDataType : expectedType);
 
-				if (mCompileOptions.mScriptFeatureLevel >= 2)
+				const BinaryOperationResult result = getBestOperatorSignature(bot.mOperator, leftDataType, rightDataType);
+				if (nullptr == result.mEnforcedFunction)
 				{
-					// Special handling for certain operations with two strings
-					if (leftDataType == &PredefinedDataTypes::STRING && rightDataType == &PredefinedDataTypes::STRING)
-					{
-						CachedBuiltinFunction* cachedBuiltinFunction = nullptr;
-						switch (bot.mOperator)
-						{
-							case Operator::BINARY_PLUS:				 cachedBuiltinFunction = &mBuiltinStringOperatorPlus;  break;
-							case Operator::COMPARE_LESS:			 cachedBuiltinFunction = &mBuiltinStringOperatorLess;  break;
-							case Operator::COMPARE_LESS_OR_EQUAL:	 cachedBuiltinFunction = &mBuiltinStringOperatorLessOrEqual;  break;
-							case Operator::COMPARE_GREATER:			 cachedBuiltinFunction = &mBuiltinStringOperatorGreater;  break;
-							case Operator::COMPARE_GREATER_OR_EQUAL: cachedBuiltinFunction = &mBuiltinStringOperatorGreaterOrEqual;  break;
-							default: break;
-						}
+					// Default behavior: Use the found signature
+					bot.mDataType = result.mSignature->mResult;
 
-						if (nullptr != cachedBuiltinFunction)
-						{
-							bot.mFunction = cachedBuiltinFunction->mFunctions[0];
-							token.mDataType = &PredefinedDataTypes::STRING;
-							break;
-						}
-						else
-						{
-							if (bot.mOperator == Operator::ASSIGN_PLUS)
-							{
-								// Convert "A += B" to "A = A + B" for strings
-								TokenPtr<StatementToken> newRightSide;
-								BinaryOperationToken& newRightBot = newRightSide.create<BinaryOperationToken>();
-								newRightBot.mOperator = Operator::BINARY_PLUS;
-								newRightBot.mLeft = bot.mLeft;
-								newRightBot.mRight = bot.mRight;
-								newRightBot.mFunction = mBuiltinStringOperatorPlus.mFunctions[0];
-								newRightBot.mDataType = &PredefinedDataTypes::STRING;
-								bot.mOperator = Operator::ASSIGN;
-								bot.mRight = newRightSide;
-								bot.mDataType = &PredefinedDataTypes::STRING;
-								break;
-							}
-						}
+					if (opType != OperatorHelper::OperatorType::TRINARY)
+					{
+						// Add implicit casts where needed
+						insertCastTokenIfNecessary(bot.mLeft, result.mSignature->mLeft);
+						insertCastTokenIfNecessary(bot.mRight, result.mSignature->mRight);
 					}
 				}
-
-				// Choose best fitting signature
-				const TypeCasting::BinaryOperatorSignature* signature = nullptr;
+				else
 				{
-					const std::vector<TypeCasting::BinaryOperatorSignature>& signatures = TypeCasting::getBinarySignaturesForOperator(bot.mOperator);
-					const bool exactMatchLeftRequired = (OperatorHelper::getOperatorType(bot.mOperator) == OperatorHelper::OperatorType::ASSIGNMENT);
-					const std::optional<size_t> bestIndex = mTypeCasting.getBestOperatorSignature(signatures, exactMatchLeftRequired, leftDataType, rightDataType);
-					if (bestIndex.has_value())
+					if (result.mSplitToOperator == Operator::_INVALID)
 					{
-						signature = &signatures[*bestIndex];
-						// If needed later, store the index in the token - this indirectly gives access to the chosen signature again
+						// Use the enforced function
+						bot.mFunction = result.mEnforcedFunction;
+						bot.mDataType = result.mSignature->mResult;
 					}
 					else
 					{
-						// Special handling for assignment of the same type
-						if (leftDataType == rightDataType && bot.mOperator == Operator::ASSIGN)
-						{
-							static TypeCasting::BinaryOperatorSignature directSignature(leftDataType, rightDataType, leftDataType);
-							signature = &directSignature;
-						}
-						else
-						{
-							CHECK_ERROR(false, "Cannot apply binary operator " << OperatorHelper::getOperatorCharacters(bot.mOperator) << " between types '" << leftDataType->getName() << "' and '" << rightDataType->getName() << "'", mLineNumber);
-						}
+						// Split an operator like "A += B" into "A = A + B"
+						TokenPtr<StatementToken> newRightSide;
+						BinaryOperationToken& newRightBot = newRightSide.create<BinaryOperationToken>();
+						newRightBot.mOperator = result.mSplitToOperator;
+						newRightBot.mLeft = bot.mLeft;
+						newRightBot.mRight = bot.mRight;
+						newRightBot.mFunction = result.mEnforcedFunction;
+						newRightBot.mDataType = result.mSignature->mResult;
+						bot.mOperator = Operator::ASSIGN;
+						bot.mRight = newRightSide;
+						bot.mDataType = result.mSignature->mResult;
 					}
-				}
-
-				token.mDataType = signature->mResult;
-
-				if (opType != OperatorHelper::OperatorType::TRINARY)
-				{
-					// Add implicit casts where needed
-					insertCastTokenIfNecessary(bot.mLeft, signature->mLeft);
-					insertCastTokenIfNecessary(bot.mRight, signature->mRight);
 				}
 				break;
 			}

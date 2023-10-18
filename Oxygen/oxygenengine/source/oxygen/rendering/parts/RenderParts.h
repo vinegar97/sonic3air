@@ -40,12 +40,6 @@ public:
 	inline bool getActiveDisplay() const	   { return mActiveDisplay; }
 	inline void setActiveDisplay(bool enable)  { mActiveDisplay = enable; }
 
-	inline bool getEnforceClearScreen() const		{ return mEnforceClearScreen; }
-	inline void setEnforceClearScreen(bool enable)	{ mEnforceClearScreen = enable; }
-
-	inline bool getFullEmulation() const  { return mFullEmulation; }
-	void setFullEmulation(bool enable);
-
 	void addViewport(const Recti& rect, uint16 renderQueue);
 	inline const std::vector<Viewport>& getViewports() const  { return mViewports; }
 
@@ -70,8 +64,6 @@ private:
 	SpriteManager		 mSpriteManager;
 
 	bool mActiveDisplay = true;
-	bool mEnforceClearScreen = false;
-	bool mFullEmulation = false;
 
 	std::vector<Viewport> mViewports;
 };

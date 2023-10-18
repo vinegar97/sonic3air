@@ -45,18 +45,7 @@ void ScrollOffsetsManager::refresh(const RefreshParameters& refreshParameters)
 		{
 			uint16* buffer = mSets[index].mScrollOffsetsH;
 			bool* overwriteFlags = mSets[index].mExplicitOverwriteH;
-			if (index == 1 && mAbstractionModeForPlaneA)
-			{
-				const uint16 cameraX = EmulatorInterface::instance().readMemory16(0xffffee78);
-				for (int k = 0; k < 0x100; ++k)
-				{
-					if (!overwriteFlags[k])
-					{
-						buffer[k] = cameraX & SCROLL_OFFSET_VALUE_BITMASK;
-					}
-				}
-			}
-			else if (index < 2)
+			if (index < 2)
 			{
 				const uint16* src = (uint16*)&EmulatorInterface::instance().getVRam()[mHorizontalScrollTableBase + (1 - index) * 2];
 				for (int k = 0; k < 0x100; ++k)
@@ -270,4 +259,38 @@ const uint16* ScrollOffsetsManager::getScrollOffsetsV(int setIndex) const
 void ScrollOffsetsManager::setVerticalScrollOffsetBias(int16 bias)
 {
 	mVerticalScrollOffsetBias = bias;
+}
+
+void ScrollOffsetsManager::serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion)
+{
+	serializer.serializeAs<uint8>(mVerticalScrolling);
+	serializer.serialize(mHorizontalScrollMask);
+
+	if (formatVersion >= 2)
+	{
+		serializer.serialize(mHorizontalScrollTableBase);
+	}
+
+	if (formatVersion >= 4)
+	{
+		for (int k = 0; k < 4; ++k)
+		{
+			ScrollOffsetSet& set = mSets[k];
+			for (int i = 0; i < 0x100; ++i)
+			{
+				serializer.serialize(set.mScrollOffsetsH[i]);
+				serializer.serialize(set.mExplicitOverwriteH[i]);
+			}
+			for (int i = 0; i < 0x20; ++i)
+			{
+				serializer.serialize(set.mScrollOffsetsV[i]);
+				serializer.serialize(set.mExplicitOverwriteV[i]);
+			}
+			serializer.serialize(set.mHorizontalScrollNoRepeat);
+		}
+
+		serializer.serializeAs<int16>(mScrollOffsetW.x);
+		serializer.serializeAs<int16>(mScrollOffsetW.y);
+		serializer.serialize(mVerticalScrollOffsetBias);
+	}
 }

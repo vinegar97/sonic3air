@@ -102,6 +102,21 @@ namespace lemon
 			virtual bool handleExternalJump(uint64 address) = 0;
 		};
 
+		struct FunctionCallParameters
+		{
+			struct Parameter
+			{
+				const lemon::DataTypeDefinition* mDataType = nullptr;
+				uint64 mStorage = 0;
+
+				inline Parameter() {}
+				inline Parameter(const lemon::DataTypeDefinition& dataType, uint64 storage) : mDataType(&dataType), mStorage(storage) {}
+			};
+
+			const lemon::DataTypeDefinition* mReturnType = nullptr;
+			std::vector<Parameter> mParams;
+		};
+
 	public:
 		inline static ControlFlow* getActiveControlFlow()	{ return mActiveControlFlow; }
 		inline static Runtime* getActiveRuntime()			{ return (nullptr == mActiveControlFlow) ? nullptr : &mActiveControlFlow->getRuntime(); }
@@ -143,11 +158,13 @@ namespace lemon
 
 		inline const ControlFlow& getMainControlFlow() const  { return *mControlFlows[0]; }
 		inline const ControlFlow& getSelectedControlFlow() const  { return *mSelectedControlFlow; }
+		inline ControlFlow& getSelectedControlFlowMutable()  { return *mSelectedControlFlow; }
 
 		void callRuntimeFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex = 0);
 		void callFunction(const Function& function, size_t baseCallIndex = 0);
 		bool callFunctionAtLabel(const Function& function, FlyweightString labelName);
 		bool callFunctionByName(FlyweightString functionName, FlyweightString labelName = FlyweightString());
+		bool callFunctionWithParameters(FlyweightString functionName, const FunctionCallParameters& params);
 		bool returnFromFunction();
 
 		void executeSteps(ExecuteConnector& result, size_t stepsLimit, size_t minimumCallStackSize);
@@ -156,6 +173,9 @@ namespace lemon
 		inline void triggerStopSignal()  { mReceivedStopSignal = true; }
 
 		bool serializeState(VectorBinarySerializer& serializer, std::string* outError = nullptr);
+
+	private:
+		void setupGlobalVariables();
 
 	private:
 		inline static ControlFlow* mActiveControlFlow = nullptr;
@@ -171,7 +191,8 @@ namespace lemon
 		std::unordered_map<uint64, std::vector<RuntimeFunction*>> mRuntimeFunctionsBySignature;   // Key is the hashed function name + signature hash
 		rmx::OneTimeAllocPool mRuntimeOpcodesPool;
 
-		std::vector<int64> mGlobalVariables;
+		// Static memory contains all global variables
+		std::vector<uint8> mStaticMemory;
 
 		StringLookup mStrings;
 

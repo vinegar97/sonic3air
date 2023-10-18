@@ -91,6 +91,7 @@ define char.hitbox_extends.y	=  u8[A0 + 0x1e]
 	constant u8 char.hitbox.y.UPRIGHT		= 19
 	constant u8 char.hitbox.y.UPRIGHT_TAILS	= 15
 	constant u8 char.hitbox.y.ROLLING		= 14			// But not when ducking
+
 define char.hitbox_extends.x	=  u8[A0 + 0x1f]
 	constant u8 char.hitbox.x.UPRIGHT		= 9
 	constant u8 char.hitbox.x.ROLLING		= 7

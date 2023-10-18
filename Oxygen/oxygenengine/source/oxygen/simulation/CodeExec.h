@@ -80,6 +80,14 @@ public:
 		size_t processCallFramesRecursive(size_t index);
 	};
 
+	struct FunctionExecData
+	{
+		lemon::Runtime::FunctionCallParameters mParams;
+		uint64 mReturnValueStorage = 0;
+
+		inline void addParam(const lemon::DataTypeDefinition& dataType, uint64 storageValue)  { mParams.mParams.emplace_back(dataType, storageValue); }
+	};
+
 public:
 	static inline CodeExec* getActiveInstance() { return mActiveInstance; }
 
@@ -102,7 +110,7 @@ public:
 	bool performFrameUpdate();
 	void yieldExecution();
 
-	bool executeScriptFunction(const std::string& functionName, bool showErrorOnFail);
+	bool executeScriptFunction(const std::string& functionName, bool showErrorOnFail, FunctionExecData* execData = nullptr);
 
 	inline EmulatorInterface& getEmulatorInterface()	{ return mEmulatorInterface; }
 	inline LemonScriptRuntime& getLemonScriptRuntime()	{ return mLemonScriptRuntime; }

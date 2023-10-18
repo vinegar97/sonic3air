@@ -21,11 +21,12 @@ namespace lemon
 	{
 		bool isComparison(const Token& token)
 		{
-			if (token.getType() != Token::Type::BINARY_OPERATION)
-				return false;
-
-			const Operator op = token.as<BinaryOperationToken>().mOperator;
-			return (op >= Operator::COMPARE_EQUAL && op <= Operator::COMPARE_GREATER_OR_EQUAL);
+			if (token.isA<BinaryOperationToken>())
+			{
+				const Operator op = token.as<BinaryOperationToken>().mOperator;
+				return (op >= Operator::COMPARE_EQUAL && op <= Operator::COMPARE_GREATER_OR_EQUAL);
+			}
+			return false;
 		}
 
 		bool isCommutative(Operator op)
@@ -121,6 +122,19 @@ namespace lemon
 		// Build opcodes for the block
 		NodeContext context;
 		buildOpcodesFromNodes(blockNode, context);
+
+		// Process all jumps to labels
+		for (const auto& [key, collectedLabel] : mCollectedLabels)
+		{
+			for (size_t jumpLocation : collectedLabel.mJumpLocations)
+			{
+				RMX_ASSERT(mOpcodes[jumpLocation].mType == Opcode::Type::JUMP, "Expected JUMP opcode");
+				size_t offset = 0;
+				if (!mFunction.getLabel(collectedLabel.mLabelName, offset))
+					RMX_ASSERT(false, "Jump target label not found: " << collectedLabel.mLabelName.getString());
+				mOpcodes[jumpLocation].mParameter = (uint64)offset;
+			}
+		}
 
 		// Make sure it ends with a return in any case
 		if (mOpcodes.empty() || mOpcodes.back().mType != Opcode::Type::RETURN)
@@ -221,8 +235,30 @@ namespace lemon
 		}
 	}
 
+	Opcode& FunctionCompiler::addJumpToLabel(Opcode::Type type, const LabelToken& labelToken)
+	{
+		CollectedLabel* collectedLabel = mapFind(mCollectedLabels, labelToken.mName.getHash());
+		CHECK_ERROR(nullptr != collectedLabel, "Jump target label not found: " << labelToken.mName.getString(), mLineNumber);
+		collectedLabel->mJumpLocations.push_back((uint32)mOpcodes.size());
+
+		return addOpcode(type);	// Target position will be set afterwards
+	}
+
 	void FunctionCompiler::buildOpcodesFromNodes(const BlockNode& blockNode, NodeContext& context)
 	{
+		// First collect all the labels
+		for (size_t i = 0; i < blockNode.mNodes.size(); ++i)
+		{
+			const Node& node = blockNode.mNodes[i];
+			if (node.isA<LabelNode>())
+			{
+				const FlyweightString& labelName = node.as<LabelNode>().mLabel;
+				CollectedLabel& collectedLabel = mCollectedLabels[labelName.getHash()];
+				CHECK_ERROR(!collectedLabel.mLabelName.isValid(), "Label is defined more than once: " << labelName.getString(), node.getLineNumber());
+				collectedLabel.mLabelName = labelName;
+			}
+		}
+
 		// Cycle through all nodes
 		for (size_t i = 0; i < blockNode.mNodes.size(); ++i)
 		{
@@ -265,11 +301,22 @@ namespace lemon
 				const JumpNode& jumpNode = node.as<JumpNode>();
 				CHECK_ERROR(jumpNode.mLabelToken.valid(), "Jump node must have a label", node.getLineNumber());
 
-				size_t offset = 0xffffffff;
-				if (!mFunction.getLabel(jumpNode.mLabelToken->mName, offset))
-					CHECK_ERROR(false, "Jump target label not found: " << jumpNode.mLabelToken->mName.getString(), node.getLineNumber());
+				addJumpToLabel(Opcode::Type::JUMP, *jumpNode.mLabelToken);
+				break;
+			}
 
-				addOpcode(Opcode::Type::JUMP, offset);
+			case Node::Type::JUMP_INDIRECT:
+			{
+				const JumpIndirectNode& jumpNode = node.as<JumpIndirectNode>();
+				CHECK_ERROR(!jumpNode.mLabelTokens.empty(), "Indirect jump node must have at least one label", node.getLineNumber());
+
+				compileTokenTreeToOpcodes(*jumpNode.mIndexToken);
+
+				for (const TokenPtr<LabelToken>& labelToken : jumpNode.mLabelTokens)
+				{
+					addJumpToLabel(Opcode::Type::JUMP_SWITCH, *labelToken);
+				}
+				addOpcode(Opcode::Type::MOVE_VAR_STACK, -1);	// Consume top of stack if none of the jumps did
 				break;
 			}
 
@@ -326,27 +373,47 @@ namespace lemon
 
 			case Node::Type::IF_STATEMENT:
 			{
-				const IfStatementNode& isn = node.as<IfStatementNode>();
-
-				// First evaluate the condition
-				compileTokenTreeToOpcodes(*isn.mConditionToken);
-
-				OpcodeBuilder builder(*this);
-				builder.beginIf();
+				std::vector<OpcodeBuilder> openOpcodeBuilders;
+				const IfStatementNode* currentIfNode = &node.as<IfStatementNode>();
+				while (true)
 				{
-					// Compile if-block content
-					buildOpcodesForNode(*isn.mContentIf, context);
+					const IfStatementNode& isn = *currentIfNode;
+
+					// First evaluate the condition
+					compileTokenTreeToOpcodes(*isn.mConditionToken);
+
+					OpcodeBuilder& builder = openOpcodeBuilders.emplace_back(*this);
+					builder.beginIf();
+					{
+						// Compile if-block content
+						buildOpcodesForNode(*isn.mContentIf, context);
+					}
+
+					// Optional here is an else-statement
+					if (isn.mContentElse.valid())
+					{
+						builder.beginElse();
+
+						mLineNumber = node.getLineNumber();
+						if (isn.mContentElse->isA<IfStatementNode>())
+						{
+							// Start another cycle in the loop
+							currentIfNode = &isn.mContentElse->as<IfStatementNode>();
+							continue;
+						}
+						else
+						{
+							// Compile else-block content
+							buildOpcodesForNode(*isn.mContentElse, context);
+						}
+					}
+					break;
 				}
 
-				// Optional here is an else-statement
-				if (isn.mContentElse.valid())
+				for (auto it = openOpcodeBuilders.rbegin(); it != openOpcodeBuilders.rend(); ++it)
 				{
-					builder.beginElse();
-
-					// Compile else-block content
-					buildOpcodesForNode(*isn.mContentElse, context);
+					it->endIf();
 				}
-				builder.endIf();
 				break;
 			}
 
@@ -605,7 +672,7 @@ namespace lemon
 					case Operator::QUESTIONMARK:
 					{
 						// Trinary operation handling
-						CHECK_ERROR(bot.mRight->getType() == Token::Type::BINARY_OPERATION, "Expected : after ? operator, but no binary operation found at all", mLineNumber);
+						CHECK_ERROR(bot.mRight->isA<BinaryOperationToken>(), "Expected : after ? operator, but no binary operation found at all", mLineNumber);
 						const BinaryOperationToken& colonToken = *bot.mRight.as<BinaryOperationToken>();
 						CHECK_ERROR(colonToken.mOperator == Operator::COLON, "Expected : after ? operator, but found wrong binary operation there", mLineNumber);
 
@@ -720,7 +787,7 @@ namespace lemon
 	{
 		// Special handling for memory access on left side
 		//  -> Memory address calculation must only be done once, especially if it has side effects (e.g. "u8[A0++] += 8")
-		if (bot.mLeft->getType() == Token::Type::MEMORY_ACCESS)
+		if (bot.mLeft->isA<MemoryAccessToken>())
 		{
 			// Compile memory read
 			const MemoryAccessToken& mat = bot.mLeft->as<MemoryAccessToken>();
@@ -765,7 +832,7 @@ namespace lemon
 		// Move constant to the right for easier optimization later on
 		StatementToken* leftToken = bot.mLeft.get();
 		StatementToken* rightToken = bot.mRight.get();
-		if (leftToken->getType() == Token::Type::CONSTANT && rightToken->getType() != Token::Type::CONSTANT && isCommutative(bot.mOperator))
+		if (leftToken->isA<ConstantToken>() && !rightToken->isA<ConstantToken>() && isCommutative(bot.mOperator))
 		{
 			rightToken = bot.mLeft.get();
 			leftToken = bot.mRight.get();

@@ -114,19 +114,6 @@ void PlaneManager::refresh()
 				break;
 			}
 
-			case PLANE_A:
-			{
-				if (mAbstractionModeForPlaneA)
-				{
-					const uint32 cameraX = EmulatorInterface::instance().readMemory16(0xffffee78);
-					const uint32 cameraY = EmulatorInterface::instance().readMemory16(0xffffee7c);
-
-					fillBufferByAbstraction(buffer, Vec2i(cameraX, cameraY), Vec2i(mPlayfieldSize.x * 8, mPlayfieldSize.y * 8));
-					break;
-				}
-				// Fallthrough to the default case
-			}
-
 			default:
 			{
 				const uint16* src = getPlaneContent(index);
@@ -284,4 +271,48 @@ void PlaneManager::setupCustomPlane(const Recti& rect, uint8 sourcePlane, uint8 
 	plane.mSourcePlane = sourcePlane;
 	plane.mScrollOffsets = scrollOffsets;
 	plane.mRenderQueue = renderQueue;
+}
+
+void PlaneManager::serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion)
+{
+	serializer.serialize(mNameTableBaseA);
+	serializer.serialize(mNameTableBaseB);
+
+	if (serializer.isReading())
+	{
+		Vec2i playfieldSize;
+		playfieldSize.x = serializer.read<uint16>();
+		playfieldSize.y = serializer.read<uint16>();
+		setPlayfieldSizeInPixels(playfieldSize);
+	}
+	else
+	{
+		const Vec2i playfieldSize = getPlayfieldSizeInPixels();
+		serializer.write<uint16>(playfieldSize.x);
+		serializer.write<uint16>(playfieldSize.y);
+	}
+
+	if (formatVersion >= 4)
+	{
+		serializer.serialize(mNameTableBaseW);
+		serializer.serializeAs<uint8>(mUsingPlaneW);
+		serializer.serialize(mPlaneAWSplit);
+
+		for (int k = 0; k < 4; ++k)
+		{
+			serializer.serialize(mDisabledDefaultPlane[k]);
+		}
+
+		serializer.serializeArraySize(mCustomPlanes, 64);
+		for (CustomPlane& customPlane : mCustomPlanes)
+		{
+			serializer.serializeAs<int16>(customPlane.mRect.x);
+			serializer.serializeAs<int16>(customPlane.mRect.y);
+			serializer.serializeAs<int16>(customPlane.mRect.width);
+			serializer.serializeAs<int16>(customPlane.mRect.height);
+			serializer.serialize(customPlane.mSourcePlane);
+			serializer.serialize(customPlane.mScrollOffsets);
+			serializer.serialize(customPlane.mRenderQueue);
+		}
+	}
 }

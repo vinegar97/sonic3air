@@ -291,7 +291,7 @@ function void TitleScreen()
 	D0 = 1
 	fn00440c()
 
-	global.demo_countdown = (global.region_code & 0x40) ? 750 : 900		// 12.5 seconds/15 seconds 
+	global.demo_countdown = (global.region_code & 0x40) ? 750 : 900		// 12.5 seconds / 15 seconds 
 #if STANDALONE
 	// Slightly increase the wait time until demo starts
 	global.demo_countdown += 20
@@ -1013,7 +1013,7 @@ function void fn004be4()
 	if (u8[A0 + 0x30] == 0)
 	{
 		++objA0.position.x.u16
-		if (objA0.position.x.u16 == 0x0240)
+		if (objA0.position.x.u16 == 0x0240 + getScreenExtend())		// Fixes the Tornado moving downward early, #contributed by TheMushrunt
 		{
 			u8[A0 + 0x30] = 1
 			objA0.flags2a |= 0x01
