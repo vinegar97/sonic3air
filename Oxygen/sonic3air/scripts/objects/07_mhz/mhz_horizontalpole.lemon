@@ -22,7 +22,7 @@ function void HorizontalPole.Init()
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x04
 
-	objA0.update_address = 0x03ed46
+	objA0.update_address = addressof(HorizontalPole.Update)
 	HorizontalPole.Update()
 }
 

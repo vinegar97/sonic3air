@@ -73,7 +73,7 @@ function void MovingPlatform.Init()
 	}
 
 	objA0.subtype2c = (objA0.subtype2c & 0x0f) * 2
-	objA0.update_address = 0x0255f4
+	objA0.update_address = addressof(MovingPlatform.Update)
 	MovingPlatform.Update()
 }
 

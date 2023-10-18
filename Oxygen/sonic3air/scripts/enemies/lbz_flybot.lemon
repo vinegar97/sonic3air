@@ -207,7 +207,7 @@ function void FlyBotAlert.Init()
 	objA0.sprite_priority = 0x0280
 	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 
-	objA0.update_address = 0x02946a
+	objA0.update_address = addressof(FlyBotAlert.Update)
 	FlyBotAlert.Update()
 }
 

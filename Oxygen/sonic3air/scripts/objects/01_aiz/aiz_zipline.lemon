@@ -696,7 +696,7 @@ function void AIZZipLineEndPole.Init()
 	objA0.box_size.x = 0x20
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0324)
-	objA0.update_address = 0x01e7dc
+	objA0.update_address = addressof(AIZZipLineEndPole.Update)
 	AIZZipLineEndPole.Update()
 }
 

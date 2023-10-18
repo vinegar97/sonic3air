@@ -23,7 +23,7 @@ function void VerticalPole.Init()
 	objA0.box_size.y = 0x20
 	objA0.flags2a |= 0x80
 
-	objA0.update_address = 0x03f08c
+	objA0.update_address = addressof(VerticalPole.Update)
 	VerticalPole.Update()
 }
 

@@ -440,7 +440,7 @@ function void fn067888()
 //# address-hook(0x0678a0) end(0x0678d2)
 function void AIZIntro.WaveEffect.Init()
 {
-	objA0.update_address = 0x0678da
+	objA0.update_address = addressof(AIZIntro.WaveEffect.Update)
 	objA0.mapping_offset = 0x22119a
 	objA0.sprite_attributes = 0x03d1
 	objA0.sprite_priority = 0x0100
