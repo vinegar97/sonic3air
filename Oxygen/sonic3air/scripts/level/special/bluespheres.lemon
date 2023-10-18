@@ -1409,7 +1409,7 @@ function void fn00972e()
 		++bluespheres.rings_collected
 		bluespheres.rings_flags |= 0x80
 
-		u8 soundId = 0x33
+		u8 soundId = SFX_RING
 		if (bluespheres.minigame_mode == 0)
 		{
 			if (bluespheres.rings_collected >= 50 && (bluespheres.rings_flags & 0x01) == 0)
@@ -1447,11 +1447,11 @@ function void fn00972e()
 					if (!Game.getSetting(SETTING_INFINITE_LIVES))
 					{
 						lives_counter = min(lives_counter + 1, 99)
-						soundId = 0x2a 	// Changed from ring loss sound to proper 1-up jingle, #contributed by mrgrassman14
+						soundId = MUSIC_EXTRALIFE 	// Changed from ring loss sound to proper 1-up jingle, #contributed by mrgrassman14
 					}
 				#else
 					++lives_counter
-					soundId = 0xb9
+					soundId = SFX_SPILLRINGS
 				#endif
 				}
 			}
