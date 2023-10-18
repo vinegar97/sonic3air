@@ -211,7 +211,7 @@ define char.flags2d				=  u8[A0 + 0x2d]			// Another set of flags to manage the 
 define char.control_flags		=  u8[A0 + 0x2e]
 	constant u8 control_flag.DISABLE_UPDATE		= 0x01		// Can't be controlled directly, but maybe by an object (used e.g. when hanging or when hit by mole mushroom)
 	constant u8 control_flag.DISABLE_ANIMATION	= 0x02		// No automatic animation update, allowing it to be controlled by other objects
-	constant u8 control_flag.DISABLE_WALLS		= 0x40		// Prevent detection of walls while moving. set in Sonic's AIZ intro and other places
+	constant u8 control_flag.DISABLE_WALLS		= 0x40		// Prevent detection of walls while moving; set in Sonic's AIZ intro and other places
 	constant u8 control_flag.DISABLE_INTERACTION= 0x80		// No interactions with other objects (e.g. during Super transformation, in LBZ 2 mid-boss cutscene, for AI Tails flying in, etc.); 0x20 seems to do this as well?
 
 define char.double_jump_state	=  u8[A0 + 0x2f]			// Usually 0, except shield power was used (used in different ways for Tails and Knuckles)
