@@ -70,7 +70,7 @@ function void TitleScreen_SK()
 	}
 	copyMemory(0xfffffca0, 0x0055a8, 0x20)
 
-	global.demo_countdown = (global.region_code & 0x40) ? 150 : 180		// 2.5 seconds/3 seconds
+	global.demo_countdown = (global.region_code & 0x40) ? 150 : 180		// 2.5 seconds / 3 seconds
 
 	VDP.Config.setActiveDisplay(true)
 
@@ -116,7 +116,7 @@ function void TitleScreen_SK()
 	playMusic(MUSIC_TITLESCREEN)
 
 	lives_counter = 3
-	global.demo_countdown = (global.region_code & 0x40) ? 900 : 1080		// 15 seconds/18 seconds
+	global.demo_countdown = (global.region_code & 0x40) ? 900 : 1080		// 15 seconds / 18 seconds
 
 	while (true)
 	{
