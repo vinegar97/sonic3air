@@ -63,7 +63,7 @@ function void fn0691c8()
 //# address-hook(0x069228) end(0x06923c)
 function void fn069228()
 {
-	objA0.update_address = 0x06923e
+	objA0.update_address = addressof(Boss.AIZ2.BaseUpdate)
 	playMusic(MUSIC_MAINBOSS)
 	level.default_music.u8 = MUSIC_MAINBOSS
 }

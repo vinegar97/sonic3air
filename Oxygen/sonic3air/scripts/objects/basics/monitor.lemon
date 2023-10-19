@@ -532,7 +532,7 @@ function void MonitorIntact.Opening()
 	if (allocDynamicObjectAfterA0())
 	{
 		// Effect icon from the monitor
-		objA1.update_address = 0x01d7ba
+		objA1.update_address = addressof(ItemEffect.BaseUpdate)
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		objA1.render_flags = objA0.render_flags

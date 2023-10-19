@@ -36,7 +36,7 @@ function void fn08b2a4()
 	}
 	else
 	{
-		objA0.update_address = 0x08b2ee
+		objA0.update_address = addressof(FallingIcicle.Update)
 		objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x16)
 	}
 }

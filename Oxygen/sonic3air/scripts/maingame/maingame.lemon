@@ -715,7 +715,7 @@ function void initializeMainGame()
 	}
 	else if (global.zone == 0x07)
 	{
-		u32[0xffffb128] = 0x03da00		// MHZ leaves effect
+		u32[0xffffb128] = addressof(MHZLeavesEffect.Update)		// MHZ leaves effect
 	}
 
 	if (checkpoint.number == 0)

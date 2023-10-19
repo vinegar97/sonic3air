@@ -76,7 +76,7 @@ function void fn08a67e()
 	}
 	else
 	{
-		objA0.update_address = 0x08a656
+		objA0.update_address = addressof(Freezer.Update)
 		objA0.flags38 &= ~0x02
 		playSound(0xe4)
 	}
