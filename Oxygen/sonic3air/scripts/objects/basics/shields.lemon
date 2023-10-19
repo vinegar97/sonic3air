@@ -420,7 +420,7 @@ function void Invincibility.Init()
 
 	objA0.update_address = addressof(Invincibility.Update)
 	u8[A0 + 0x34] = 4
-	fn018868()
+	Invincibility.Update()
 }
 
 
