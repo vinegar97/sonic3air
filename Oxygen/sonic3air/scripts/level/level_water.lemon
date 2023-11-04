@@ -661,6 +661,14 @@ function void UpdateWaterSurfaceLevel.Empty()
 }
 
 
+//# address-hook(0x006ecc) end(0x006ed2)
+function void UpdateWaterSurfaceLevel.LBZ1()
+{
+	A1 = 0x006ed4
+	fn006f2c()
+}
+
+
 //# address-hook(0x006ee8) end(0x006f10)
 function void UpdateWaterSurfaceLevel.LBZ2()
 {
