@@ -723,6 +723,16 @@ function void UpdateWaterSurfaceLevel.Empty2()
 }
 
 
+//# address-hook(0x006f1c) end(0x006f2a)
+function void UpdateWaterSurfaceLevel.Outro()
+{
+	if (camera.position.x.u16 >= 0x1de0)
+	{
+		water.height.target = 0x0510
+	}
+}
+
+
 //# address-hook(0x006f2c) end(0x006f48)
 function void fn006f2c()
 {
