@@ -464,7 +464,7 @@ function void fn0220c2()
 
 	if (s8[A2] > 0)
 	{
-		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 4)
+		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < base_state.HURT)
 		{
 			// Check if jump button pressed
 			D1.u8 = D0.u8 & CONTROL_ABC
@@ -658,7 +658,7 @@ function void fn0222f4()
 	if (dx < 0x20 && dy < 0x18)
 #endif
 	{
-		if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+		if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x05] < base_state.HURT && debug_mode.state == 0)
 		{
 		#if STANDALONE
 			// Ignore for Tails while he's carrying the main player

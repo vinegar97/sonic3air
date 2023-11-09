@@ -21,7 +21,7 @@ function void UpdateWater()
 		return
 	}
 
-	if (u8[0xffffee30] == 0 && u8[0xffffb000 + 0x05] < 0x06)
+	if (u8[0xffffee30] == 0 && u8[0xffffb000 + 0x05] < base_state.DIED)
 	{
 		fn006f4a()
 		UpdateWaterSurfaceLevel()
@@ -430,7 +430,7 @@ function void fn006f90()
 		D1.u16 = objA1.position.y.u16
 		if (D0.u16 >= u16[A2] && D0.u16 < u16[A2 + 4] && D1.u16 >= u16[A2 + 2] && D1.u16 < u16[A2 + 6])
 		{
-			if (u8[A1 + 0x05] >= 4)
+			if (u8[A1 + 0x05] >= base_state.HURT)
 			{
 				u8[A3] = 0
 				return

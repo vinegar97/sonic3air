@@ -2042,7 +2042,7 @@ function void fn086334()
 function void fn08635e()
 {
 	objA1.velocity.y = D0.u16
-	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x05] = base_state.NORMAL
 	objA1.state = char.state.STRAIGHTJUMP
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.ON_OBJECT
