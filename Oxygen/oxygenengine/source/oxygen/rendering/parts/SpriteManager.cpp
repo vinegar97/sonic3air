@@ -14,112 +14,28 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 
 
-void SpriteManager::SpriteInfo::serialize(VectorBinarySerializer& serializer, uint8 formatVersion)
-{
-	serializer.serializeAs<int16>(mPosition.x);
-	serializer.serializeAs<int16>(mPosition.y);
-	serializer.serializeAs<uint8>(mPriorityFlag);
-	serializer.serialize(mRenderQueue);
-	mTintColor.serialize(serializer);
-	mAddedColor.serialize(serializer);
-	serializer.serializeAs<uint8>(mUseGlobalComponentTint);
-	serializer.serializeAs<uint8>(mBlendMode);
-	serializer.serializeAs<uint8>(mCoordinatesSpace);
-	serializer.serializeAs<uint8>(mLogicalSpace);
-}
-
-void SpriteManager::VdpSpriteInfo::serialize(VectorBinarySerializer& serializer, uint8 formatVersion)
-{
-	SpriteInfo::serialize(serializer, formatVersion);
-
-	serializer.serializeAs<uint8>(mSize.x);
-	serializer.serializeAs<uint8>(mSize.y);
-	serializer.serialize(mFirstPattern);
-}
-
-void SpriteManager::CustomSpriteInfoBase::serialize(VectorBinarySerializer& serializer, uint8 formatVersion)
-{
-	SpriteInfo::serialize(serializer, formatVersion);
-
-	serializer.serialize(mKey);
-	if (serializer.isReading())
-	{
-		mCacheItem = SpriteCache::instance().getSprite(mKey);
-	}
-
-	serializer.serializeAs<uint16>(mSize.x);
-	serializer.serializeAs<uint16>(mSize.y);
-	serializer.serializeAs<int16>(mPivotOffset.x);
-	serializer.serializeAs<int16>(mPivotOffset.y);
-	serializer.serialize(mTransformation.mMatrix.x);
-	serializer.serialize(mTransformation.mMatrix.y);
-	serializer.serialize(mTransformation.mMatrix.z);
-	serializer.serialize(mTransformation.mMatrix.w);
-	serializer.serialize(mTransformation.mInverse.x);
-	serializer.serialize(mTransformation.mInverse.y);
-	serializer.serialize(mTransformation.mInverse.z);
-	serializer.serialize(mTransformation.mInverse.w);
-	serializer.serializeAs<uint8>(mUseUpscaledSprite);
-}
-
-void SpriteManager::PaletteSpriteInfo::serialize(VectorBinarySerializer& serializer, uint8 formatVersion)
-{
-	CustomSpriteInfoBase::serialize(serializer, formatVersion);
-
-	serializer.serialize(mAtex);
-}
-
-void SpriteManager::SpriteMaskInfo::serialize(VectorBinarySerializer& serializer, uint8 formatVersion)
-{
-	serializer.serializeAs<uint16>(mSize.x);
-	serializer.serializeAs<uint16>(mSize.y);
-	serializer.serialize(mDepth);
-}
-
-
-void SpriteManager::SpriteSets::clear()
-{
-	mVdpSprites.clear();
-	mPaletteSprites.clear();
-	mComponentSprites.clear();
-	mSpriteMasks.clear();
-}
-
-void SpriteManager::SpriteSets::swap(SpriteSets& other)
-{
-	other.mVdpSprites.swap(mVdpSprites);
-	other.mPaletteSprites.swap(mPaletteSprites);
-	other.mComponentSprites.swap(mComponentSprites);
-	other.mSpriteMasks.swap(mSpriteMasks);
-}
-
-
 SpriteManager::SpriteManager(PatternManager& patternManager, SpacesManager& spacesManager) :
 	mPatternManager(patternManager),
 	mSpacesManager(spacesManager)
 {
-	reset();
+	clear();
 }
 
-void SpriteManager::reset()
+void SpriteManager::clear()
 {
-	mResetSprites = true;
-
-	mCurrSpriteSets.clear();
-	mNextSpriteSets.clear();
-	mSprites.clear();
+	mResetRenderItems = false;
+	clearAllContexts();
+	clearItemSet(mAddedItems);
 }
 
-void SpriteManager::resetSprites()
+void SpriteManager::clearLifetimeContext(RenderItem::LifetimeContext lifetimeContext)
 {
-	mResetSprites = true;
-
-	mCurrSpriteSets.clear();
-	mSprites.clear();
+	clearItemSet(mContexts[(int)lifetimeContext]);
 }
 
 void SpriteManager::preFrameUpdate()
 {
+	mCurrentContext = RenderItem::LifetimeContext::DEFAULT;
 	mLogicalSpriteSpace = Space::SCREEN;
 	mSpriteTag = 0;
 	mTaggedSpritesLastFrame.swap(mTaggedSpritesThisFrame);
@@ -129,115 +45,82 @@ void SpriteManager::preFrameUpdate()
 void SpriteManager::postFrameUpdate()
 {
 	// Process sprite handles
-	for (const auto& [key, data] : mSpritesHandles)
+	processSpriteHandles();
+
+	// Process render items
 	{
-		CustomSpriteInfoBase* spritePtr = addSpriteByKey(data.mKey);
-		if (nullptr == spritePtr)
-			continue;
-
-		CustomSpriteInfoBase& sprite = *spritePtr;
-		sprite.mPosition = data.mPosition;
-		sprite.mRenderQueue = data.mRenderQueue;
-		sprite.mPriorityFlag = data.mPriorityFlag;
-		sprite.mTintColor = data.mTintColor;
-		sprite.mAddedColor = data.mAddedColor;
-		sprite.mUseGlobalComponentTint = data.mUseGlobalComponentTint;
-		sprite.mBlendMode = data.mBlendMode;
-		sprite.mCoordinatesSpace = data.mCoordinatesSpace;
-		sprite.mUseUpscaledSprite = data.mUseUpscaledSprite;
-
-		if (data.mRotation != 0.0f || data.mScale != Vec2f(1.0f, 1.0f))
+		if (mResetRenderItems)
 		{
-			sprite.mTransformation.setRotationAndScale(data.mRotation, data.mScale);
+			clearAllContexts();
+		}
+
+		// Apply added render items
+		grabAddedSprites();
+
+		clearLifetimeContext(RenderItem::LifetimeContext::OUTSIDE_FRAME);
+		mCurrentContext = RenderItem::LifetimeContext::OUTSIDE_FRAME;
+
+		if (mResetRenderItems)
+		{
+			if (EngineMain::getDelegate().useDeveloperFeatures())
+			{
+				mLegacyVdpSpriteMode = FTX::keyState('u') && (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT));
+
+				// In legacy mode, we collect current sprites from VRAM, instead of the usual methods via script calls like "Renderer.drawVdpSprite"
+				if (mLegacyVdpSpriteMode)
+				{
+					collectLegacySprites();
+				}
+			}
+
+			// Process coordinates of all sprites
+			const Vec2i worldSpaceOffset = mSpacesManager.getWorldSpaceOffset();
+
+			for (int contextIndex = 0; contextIndex < RenderItem::NUM_CONTEXTS; ++contextIndex)
+			{
+				for (RenderItem* renderItem : mContexts[contextIndex].mItems)
+				{
+					if (renderItem->mCoordinatesSpace == SpriteManager::Space::WORLD)
+					{
+						renderItem->mPosition -= worldSpaceOffset;
+					}
+				}
+			}
+
+			mResetRenderItems = false;
 		}
 		else
 		{
-			sprite.mTransformation = data.mTransformation;
-		}
-
-		if (data.mFlipX)
-		{
-			sprite.mTransformation.flipX();
-		}
-		if (data.mFlipY)
-		{
-			sprite.mTransformation.flipY();
-		}
-
-		if (sprite.getType() == SpriteInfo::Type::PALETTE)
-		{
-			static_cast<PaletteSpriteInfo&>(sprite).mAtex = data.mAtex;
-		}
-
-		if (data.mSpriteTag != 0)
-		{
-			const auto it = mTaggedSpritesLastFrame.find(data.mSpriteTag);
-			if (it != mTaggedSpritesLastFrame.end())
+			// When maintaining sprites, make sure to reset sprite interpolation
+			for (int contextIndex = 0; contextIndex < RenderItem::NUM_CONTEXTS; ++contextIndex)
 			{
-				sprite.mHasLastPosition = true;
-				sprite.mLastPositionChange = data.mTaggedSpritePosition - it->second.mPosition;
+				for (RenderItem* renderItem : mContexts[contextIndex].mItems)
+				{
+					if (renderItem->isSprite())
+					{
+						renderitems::SpriteInfo& sprite = static_cast<renderitems::SpriteInfo&>(*renderItem);
+						sprite.mLastPositionChange.clear();
+					}
+				}
 			}
-
-			TaggedSpriteData& taggedSpriteData = mTaggedSpritesThisFrame[data.mSpriteTag];
-			taggedSpriteData.mPosition = data.mTaggedSpritePosition;
-		}
-	}
-	mSpritesHandles.clear();
-
-	if (mResetSprites)
-	{
-		// Move over from "next" to "current" sprite sets
-		mCurrSpriteSets.swap(mNextSpriteSets);
-		mNextSpriteSets.clear();
-
-		mResetSprites = false;
-
-		if (EngineMain::getDelegate().useDeveloperFeatures())
-		{
-			mLegacyVdpSpriteMode = FTX::keyState('u') && (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT));
-
-			// In legacy mode, we collect current sprites from VRAM, instead of the usual methods via script calls like "Renderer.drawVdpSprite"
-			if (mLegacyVdpSpriteMode)
-			{
-				collectLegacySprites();
-			}
-		}
-
-		buildSortedSprites();
-
-		// Process coordinates of all sprites
-		const Vec2i worldSpaceOffset = mSpacesManager.getWorldSpaceOffset();
-		for (SpriteInfo* sprite : mSprites)
-		{
-			if (sprite->mCoordinatesSpace == SpriteManager::Space::WORLD)
-			{
-				sprite->mPosition -= worldSpaceOffset;
-			}
-		}
-	}
-	else
-	{
-		// When maintaining sprites, make sure to reset sprite interpolation
-		for (SpriteInfo* sprite : mSprites)
-		{
-			sprite->mLastPositionChange.clear();
 		}
 	}
 }
 
-void SpriteManager::refresh()
+void SpriteManager::postRefreshDebugging()
 {
+	grabAddedSprites();
 }
 
 void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, const Color& tintColor, const Color& addedColor)
 {
-	if (mNextSpriteSets.mVdpSprites.size() >= 0x400)
+	if (mAddedItems.mItems.size() >= 0x400)
 	{
-		RMX_ERROR("Reached the upper limit of " << mNextSpriteSets.mVdpSprites.size() << " VDP sprites, further sprites will be ignored", );
+		RMX_ERROR("Reached the upper limit of " << mAddedItems.mItems.size() << " items to render, further ones will be ignored", );
 		return;
 	}
 
-	VdpSpriteInfo& sprite = vectorAdd(mNextSpriteSets.mVdpSprites);
+	renderitems::VdpSpriteInfo& sprite = mPoolOfRenderItems.mVdpSprites.createObject();
 	sprite.mPosition = position;
 	sprite.mSize.x = 1 + ((encodedSize >> 2) & 3);
 	sprite.mSize.y = 1 + (encodedSize & 3);
@@ -248,6 +131,7 @@ void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint
 	sprite.mAddedColor = addedColor;
 	sprite.mCoordinatesSpace = Space::SCREEN;
 	sprite.mLogicalSpace = mLogicalSpriteSpace;
+	mAddedItems.mItems.push_back(&sprite);
 
 	if (EngineMain::getDelegate().useDeveloperFeatures())
 	{
@@ -298,14 +182,14 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 	//  - 0x40 = Priority flag
 	//  - 0x80 = Use global tint
 
-	CustomSpriteInfoBase* spritePtr = addSpriteByKey(key);
+	renderitems::CustomSpriteInfoBase* spritePtr = addSpriteByKey(key);
 	if (nullptr == spritePtr)
 		return;
 
-	CustomSpriteInfoBase& sprite = *spritePtr;
-	if (sprite.getType() == SpriteInfo::Type::PALETTE)
+	renderitems::CustomSpriteInfoBase& sprite = *spritePtr;
+	if (sprite.getType() == RenderItem::Type::PALETTE_SPRITE)
 	{
-		static_cast<PaletteSpriteInfo&>(sprite).mAtex = atex;
+		static_cast<renderitems::PaletteSpriteInfo&>(sprite).mAtex = atex;
 	}
 
 	sprite.mPosition = position;
@@ -350,19 +234,64 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 
 void SpriteManager::addSpriteMask(const Vec2i& position, const Vec2i& size, uint16 renderQueue, bool priorityFlag, Space space)
 {
-	if (mNextSpriteSets.mSpriteMasks.size() >= 0x40)
+	// TODO: Originally, the number of sprite masks was 0x40
+	if (mAddedItems.mItems.size() >= 0x400)
 	{
-		RMX_ERROR("Reached the upper limit of " << mNextSpriteSets.mSpriteMasks.size() << " sprite masks, further sprites will be ignored", );
+		RMX_ERROR("Reached the upper limit of " << mAddedItems.mItems.size() << " items to render, further ones will be ignored", );
 		return;
 	}
 
-	SpriteMaskInfo& sprite = vectorAdd(mNextSpriteSets.mSpriteMasks);
+	renderitems::SpriteMaskInfo& sprite = mPoolOfRenderItems.mSpriteMasks.createObject();
 	sprite.mPosition = position;
 	sprite.mSize = size;
 	sprite.mRenderQueue = renderQueue;
 	sprite.mDepth = priorityFlag ? 0.6f : 0.1f;
 	sprite.mCoordinatesSpace = space;
 	sprite.mLogicalSpace = mLogicalSpriteSpace;
+	mAddedItems.mItems.push_back(&sprite);
+}
+
+void SpriteManager::addRectangle(const Recti& rect, const Color& color, uint16 renderQueue, Space space, bool useGlobalComponentTint)
+{
+	if (mAddedItems.mItems.size() >= 0x400)
+	{
+		RMX_ERROR("Reached the upper limit of " << mAddedItems.mItems.size() << " items to render, further ones will be ignored", );
+		return;
+	}
+
+	renderitems::Rectangle& newRect = mPoolOfRenderItems.mRectangles.createObject();
+	newRect.mPosition = rect.getPos();
+	newRect.mSize = rect.getSize();
+	newRect.mColor = color;
+	newRect.mRenderQueue = renderQueue;
+	newRect.mCoordinatesSpace = space;
+	newRect.mLifetimeContext = mCurrentContext;
+	newRect.mUseGlobalComponentTint = useGlobalComponentTint;
+	mAddedItems.mItems.push_back(&newRect);
+}
+
+void SpriteManager::addText(std::string_view fontKeyString, uint64 fontKeyHash, const Vec2i& position, std::string_view textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space, bool useGlobalComponentTint)
+{
+	if (mAddedItems.mItems.size() >= 0x400)
+	{
+		RMX_ERROR("Reached the upper limit of " << mAddedItems.mItems.size() << " items to render, further ones will be ignored", );
+		return;
+	}
+
+	renderitems::Text& newText = mPoolOfRenderItems.mTexts.createObject();
+	newText.mFontKeyString = fontKeyString;
+	newText.mFontKeyHash = fontKeyHash;
+	newText.mPosition = position;
+	newText.mTextHash = textHash;
+	newText.mTextString = textString;
+	newText.mColor = color;
+	newText.mAlignment = alignment;
+	newText.mSpacing = spacing;
+	newText.mRenderQueue = renderQueue;
+	newText.mCoordinatesSpace = space;
+	newText.mLifetimeContext = mCurrentContext;
+	newText.mUseGlobalComponentTint = useGlobalComponentTint;
+	mAddedItems.mItems.push_back(&newText);
 }
 
 uint32 SpriteManager::addSpriteHandle(uint64 key, const Vec2i& position, uint16 renderQueue)
@@ -414,79 +343,99 @@ void SpriteManager::setSpriteTagWithPosition(uint64 spriteTag, const Vec2i& posi
 	mTaggedSpritePosition = position;
 }
 
+void SpriteManager::clearItemSet(ItemSet& itemSet)
+{
+	for (RenderItem* renderItem : itemSet.mItems)
+	{
+		mPoolOfRenderItems.destroy(*renderItem);
+	}
+	itemSet.mItems.clear();
+}
+
+void SpriteManager::clearAllContexts()
+{
+	for (int contextIndex = 0; contextIndex < RenderItem::NUM_CONTEXTS; ++contextIndex)
+	{
+		clearItemSet(mContexts[contextIndex]);
+	}
+}
+
 void SpriteManager::serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion)
 {
+	if (serializer.isReading())
+	{
+		clear();
+	}
+
 	if (formatVersion >= 4)
 	{
-		serializer.serializeArraySize(mCurrSpriteSets.mVdpSprites);
-		for (VdpSpriteInfo& sprite : mCurrSpriteSets.mVdpSprites)
+		for (int contextIndex = 0; contextIndex < RenderItem::NUM_CONTEXTS; ++contextIndex)
 		{
-			sprite.serialize(serializer, formatVersion);
-		}
-
-		serializer.serializeArraySize(mCurrSpriteSets.mPaletteSprites);
-		for (PaletteSpriteInfo& sprite : mCurrSpriteSets.mPaletteSprites)
-		{
-			sprite.serialize(serializer, formatVersion);
-		}
-
-		serializer.serializeArraySize(mCurrSpriteSets.mComponentSprites);
-		for (ComponentSpriteInfo& sprite : mCurrSpriteSets.mComponentSprites)
-		{
-			sprite.serialize(serializer, formatVersion);
-		}
-
-		serializer.serializeArraySize(mCurrSpriteSets.mSpriteMasks);
-		for (SpriteMaskInfo& sprite : mCurrSpriteSets.mSpriteMasks)
-		{
-			sprite.serialize(serializer, formatVersion);
-		}
-
-		if (serializer.isReading())
-		{
-			buildSortedSprites();
+			std::vector<RenderItem*>& renderItems = mContexts[contextIndex].mItems;
+			serializer.serializeArraySize(renderItems);
+			if (serializer.isReading())
+			{
+				for (RenderItem*& renderItem : renderItems)
+				{
+					const RenderItem::Type type = (RenderItem::Type)serializer.read<uint8>();
+					renderItem = &mPoolOfRenderItems.create(type);
+					renderItem->serialize(serializer, formatVersion);
+				}
+			}
+			else
+			{
+				for (RenderItem* renderItem : renderItems)
+				{
+					serializer.writeAs<uint8>(renderItem->getType());
+					renderItem->serialize(serializer, formatVersion);
+				}
+			}
 		}
 	}
 }
 
-SpriteManager::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key)
+SpriteManager::ItemSet& SpriteManager::getItemsByContext(RenderItem::LifetimeContext lifetimeContext)
+{
+	RMX_ASSERT((int)lifetimeContext < RenderItem::NUM_CONTEXTS, "Invalid lifetime context " << (int)lifetimeContext);
+	return mContexts[(int)lifetimeContext];
+}
+
+renderitems::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key)
 {
 	const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(key);
 	if (nullptr != item)
 	{
-		if (item->mUsesComponentSprite)
+		if (mAddedItems.mItems.size() < 0x400)
 		{
-			if (mNextSpriteSets.mComponentSprites.size() < 0x400)
+			if (item->mUsesComponentSprite)
 			{
-				ComponentSpriteInfo& sprite = vectorAdd(mNextSpriteSets.mComponentSprites);
+				renderitems::ComponentSpriteInfo& sprite = mPoolOfRenderItems.mComponentSprites.createObject();
 				sprite.mKey = key;
 				sprite.mCacheItem = item;
 				sprite.mPivotOffset = item->mSprite->mOffset;
 				sprite.mSize = static_cast<ComponentSprite*>(item->mSprite)->getBitmap().getSize();
 				sprite.mLogicalSpace = mLogicalSpriteSpace;
+				mAddedItems.mItems.push_back(&sprite);
 				return &sprite;
 			}
-			RMX_ERROR("Reached the upper limit of " << mNextSpriteSets.mComponentSprites.size() << " component sprites, further sprites will be ignored", );
-		}
-		else
-		{
-			if (mNextSpriteSets.mPaletteSprites.size() < 0x400)
+			else
 			{
-				PaletteSpriteInfo& sprite = vectorAdd(mNextSpriteSets.mPaletteSprites);
+				renderitems::PaletteSpriteInfo& sprite = mPoolOfRenderItems.mPaletteSprites.createObject();
 				sprite.mKey = key;
 				sprite.mCacheItem = item;
 				sprite.mPivotOffset = item->mSprite->mOffset;
 				sprite.mSize = static_cast<PaletteSprite*>(sprite.mCacheItem->mSprite)->getBitmap().getSize();
 				sprite.mLogicalSpace = mLogicalSpriteSpace;
+				mAddedItems.mItems.push_back(&sprite);
 				return &sprite;
 			}
-			RMX_ERROR("Reached the upper limit of " << mNextSpriteSets.mPaletteSprites.size() << " palette sprites, further sprites will be ignored", );
 		}
+		RMX_ERROR("Reached the upper limit of " << mAddedItems.mItems.size() << " items to render, further ones will be ignored", );
 	}
 	return nullptr;
 }
 
-void SpriteManager::checkSpriteTag(SpriteInfo& sprite)
+void SpriteManager::checkSpriteTag(renderitems::SpriteInfo& sprite)
 {
 	if (mSpriteTag != 0)
 	{
@@ -502,17 +451,84 @@ void SpriteManager::checkSpriteTag(SpriteInfo& sprite)
 	}
 }
 
+void SpriteManager::processSpriteHandles()
+{
+	for (const auto& [key, data] : mSpritesHandles)
+	{
+		renderitems::CustomSpriteInfoBase* spritePtr = addSpriteByKey(data.mKey);
+		if (nullptr == spritePtr)
+			continue;
+
+		renderitems::CustomSpriteInfoBase& sprite = *spritePtr;
+		sprite.mPosition = data.mPosition;
+		sprite.mRenderQueue = data.mRenderQueue;
+		sprite.mPriorityFlag = data.mPriorityFlag;
+		sprite.mTintColor = data.mTintColor;
+		sprite.mAddedColor = data.mAddedColor;
+		sprite.mUseGlobalComponentTint = data.mUseGlobalComponentTint;
+		sprite.mBlendMode = data.mBlendMode;
+		sprite.mCoordinatesSpace = data.mCoordinatesSpace;
+		sprite.mUseUpscaledSprite = data.mUseUpscaledSprite;
+
+		if (data.mRotation != 0.0f || data.mScale != Vec2f(1.0f, 1.0f))
+		{
+			sprite.mTransformation.setRotationAndScale(data.mRotation, data.mScale);
+		}
+		else
+		{
+			sprite.mTransformation = data.mTransformation;
+		}
+
+		if (data.mFlipX)
+		{
+			sprite.mTransformation.flipX();
+		}
+		if (data.mFlipY)
+		{
+			sprite.mTransformation.flipY();
+		}
+
+		if (sprite.getType() == RenderItem::Type::PALETTE_SPRITE)
+		{
+			static_cast<renderitems::PaletteSpriteInfo&>(sprite).mAtex = data.mAtex;
+		}
+
+		if (data.mSpriteTag != 0)
+		{
+			const auto it = mTaggedSpritesLastFrame.find(data.mSpriteTag);
+			if (it != mTaggedSpritesLastFrame.end())
+			{
+				sprite.mHasLastPosition = true;
+				sprite.mLastPositionChange = data.mTaggedSpritePosition - it->second.mPosition;
+			}
+
+			TaggedSpriteData& taggedSpriteData = mTaggedSpritesThisFrame[data.mSpriteTag];
+			taggedSpriteData.mPosition = data.mTaggedSpritePosition;
+		}
+	}
+	mSpritesHandles.clear();
+}
+
+void SpriteManager::grabAddedSprites()
+{
+	// Add render items from "next" to "current", in reverse order
+	for (auto it = mAddedItems.mItems.rbegin(); it != mAddedItems.mItems.rend(); ++it)
+	{
+		getItemsByContext((*it)->mLifetimeContext).mItems.push_back(*it);
+	}
+	mAddedItems.mItems.clear();		// Intentionally not using anything like "clearLifetimeContext" here, as it would invalidate the copied instances
+}
+
 void SpriteManager::collectLegacySprites()
 {
 	// Collect sprites to render
-	mCurrSpriteSets.mVdpSprites.clear();
-
+	int numSpritesAdded = 0;
 	for (int link = 0;;)
 	{
 		const uint16* data = (uint16*)&EmulatorInterface::instance().getVRam()[mSpriteAttributeTableBase + link * 2];
 
-		VdpSpriteInfo& sprite = vectorAdd(mCurrSpriteSets.mVdpSprites);
-		sprite.mRenderQueue = 0x2000;
+		renderitems::VdpSpriteInfo& sprite = mPoolOfRenderItems.mVdpSprites.createObject();
+		sprite.mRenderQueue = 0x2100 - numSpritesAdded;
 		sprite.mPriorityFlag = (data[2] & 0x8000) != 0;
 
 		// Note that for accurate emulation, this would be 0x1ff instead of 0x3ff
@@ -525,6 +541,9 @@ void SpriteManager::collectLegacySprites()
 		sprite.mSize.y = 1 + ((data[1] >> 8) & 3);
 
 		sprite.mFirstPattern = data[2];
+
+		mContexts[(int)RenderItem::LifetimeContext::DEFAULT].mItems.push_back(&sprite);
+		++numSpritesAdded;
 
 		// Update "last used atex" of patterns in cache (actually that's only needed for debug output)
 		{
@@ -539,38 +558,7 @@ void SpriteManager::collectLegacySprites()
 		link = (data[1] & 0x7f) << 2;
 		if ((link == 0) || (link >= 320))
 			break;
-		if (mCurrSpriteSets.mVdpSprites.size() >= 0x100)	// Sanity check
+		if (numSpritesAdded >= 0x100)	// Sanity check
 			break;
 	}
-}
-
-void SpriteManager::buildSortedSprites()
-{
-	// Mix all types of sprites together in one sorted vector
-	mSprites.clear();
-	for (VdpSpriteInfo& sprite : mCurrSpriteSets.mVdpSprites)
-	{
-		mSprites.push_back(&sprite);
-	}
-	for (PaletteSpriteInfo& sprite : mCurrSpriteSets.mPaletteSprites)
-	{
-		mSprites.push_back(&sprite);
-	}
-	for (ComponentSpriteInfo& sprite : mCurrSpriteSets.mComponentSprites)
-	{
-		mSprites.push_back(&sprite);
-	}
-	for (SpriteMaskInfo& sprite : mCurrSpriteSets.mSpriteMasks)
-	{
-		mSprites.push_back(&sprite);
-	}
-
-	// Sorting only cares about render queue, not priority!
-	//  -> Because that's how the VDP works as well
-	std::stable_sort(mSprites.begin(), mSprites.end(),
-		[](const SpriteInfo* a, const SpriteInfo* b) { return a->mRenderQueue > b->mRenderQueue; });
-
-	// Reverse order, so that the sprites "in front" are rendered last
-	//  -> Note that it makes a difference if this was removed and the sorting order changed, namely for sprites sharing the same render queue
-	std::reverse(mSprites.begin(), mSprites.end());
 }

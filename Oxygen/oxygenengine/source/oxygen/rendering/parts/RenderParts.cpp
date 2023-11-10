@@ -35,7 +35,7 @@ void RenderParts::reset()
 	mViewports.clear();
 
 	mPlaneManager.reset();
-	mSpriteManager.reset();
+	mSpriteManager.clear();
 	mScrollOffsetsManager.reset();
 }
 
@@ -43,7 +43,6 @@ void RenderParts::preFrameUpdate()
 {
 	// TODO: It could make sense to require an explicit script call for these as well, see "Renderer.resetCustomPlaneConfigurations()"
 	mViewports.clear();
-	mOverlayManager.preFrameUpdate();
 	mPaletteManager.preFrameUpdate();
 	mSpriteManager.preFrameUpdate();
 	mScrollOffsetsManager.preFrameUpdate();
@@ -51,7 +50,6 @@ void RenderParts::preFrameUpdate()
 
 void RenderParts::postFrameUpdate()
 {
-	mOverlayManager.postFrameUpdate();
 	mSpriteManager.postFrameUpdate();
 	mScrollOffsetsManager.postFrameUpdate();
 }
@@ -64,7 +62,6 @@ void RenderParts::refresh(const RefreshParameters& refreshParameters)
 		mPlaneManager.refresh();
 		mScrollOffsetsManager.refresh(refreshParameters);
 	}
-	mSpriteManager.refresh();
 }
 
 void RenderParts::dumpPatternsContent()
