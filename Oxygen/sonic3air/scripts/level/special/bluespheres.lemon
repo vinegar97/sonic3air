@@ -572,19 +572,18 @@ function void fn008c5e()
 
 
 //# address-hook(0x008d5c) end(0x008d76)
-function void fn008d5c()
+//# alias(fn008d5c) deprecated
+function void BlueSpheres.AllocDynamicObjectAfterA0()
 {
-	A1 = A0
-	D0.u16 = (0xcf82 - A0.u16) >> 6
-	D0.u16 = u8[0x008d78 + D0.s16]
-	while (D0.s16 >= 0)
-	{
-		A1 += 0x4a
-		--D0.s16
-		if (u32[A1] == 0)
-			break
-	}
-	_setZeroFlagByValue(0)	// Is this correct?
+	BlueSpheres.allocDynamicObjectAfterA0()
+}
+
+
+function bool BlueSpheres.allocDynamicObjectAfterA0()
+{
+	u32 offset = (0xffffcfcc - 0x4a - A0) >> 6
+	D0.u16 = u8[0x008d78 + offset]
+	return allocDynamicObject(A0, D0.u16)
 }
 
 
@@ -619,12 +618,12 @@ function void fn008e2a()
 //# address-hook(0x008e40) end(0x008e56)
 function void fn008e40()
 {
-	fn008d5c()
-	if (_equal())
+	if (BlueSpheres.allocDynamicObjectAfterA0())
 	{
+		// Spawn another instance of the object for the other half of the text
 		objA1.update_address = 0x008e5c
-		u8[A1 + 0x2a] |= 0x01
-		u8[A1 + 0x22] = 0x01
+		objA1.flags2a |= 0x01
+		objA1.animation.sprite = 0x01
 	}
 	fn008e5c()
 }
@@ -746,10 +745,9 @@ function void fn008faa()
 		objA0.mapping_offset = 0x2908ba
 		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (SpecialStage.Tails.targetInVRAM >> 5))
 
-		fn008d5c()
-		if (_equal())
+		if (BlueSpheres.allocDynamicObjectAfterA0())
 		{
-			// Spawn tails object
+			// Spawn Tails' tails object
 			objA1.update_address = 0x009444
 			u16[A1 + 0x3e] = A0.u16
 		}
@@ -924,10 +922,9 @@ function void fn009212()
 
 	fn0093e2()
 
-	fn008d5c()
-	if (_equal())
+	if (BlueSpheres.allocDynamicObjectAfterA0())
 	{
-		// Spawn tails object
+		// Spawn Tails' tails object
 		objA1.update_address = 0x009444
 		u16[A1 + 0x3e] = A0.u16
 	}
