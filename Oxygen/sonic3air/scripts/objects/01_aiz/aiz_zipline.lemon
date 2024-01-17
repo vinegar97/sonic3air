@@ -532,7 +532,7 @@ function void fn0221ec()
 		return
 	}
 
-	fn02219e()
+	fn02219e()		// Check for cheat
 	objA1.position.x.u16 = objA0.position.x.u16
 	objA1.position.y.u16 = objA0.position.y.u16 + 0x14
 
@@ -564,6 +564,7 @@ function void fn022224()
 //# address-hook(0x02219e) end(0x0221e0)
 function void fn02219e()
 {
+	// Check for Level Select cheat
 	if (A1 != 0xffffb000 || D0.u8 == 0)
 		return
 
@@ -571,7 +572,7 @@ function void fn02219e()
 	if (D0.u8 == u8[0x0221e2 + D1.u16])
 	{
 		++u8[A0 + 0x25]
-		D1.u8 = u8[0x0221e3 + D1.u16]
+		D1.u8 = u8[0x0221e2 + D1.u16 + 1]
 		if (D1.u8 != 0)
 			return
 
@@ -584,6 +585,7 @@ function void fn02219e()
 
 		D1.u16 = D0.u16
 		playSound(SFX_RING)
+
 		D0.u16 = D1.u16
 	}
 	u8[A0 + 0x25] = 0
