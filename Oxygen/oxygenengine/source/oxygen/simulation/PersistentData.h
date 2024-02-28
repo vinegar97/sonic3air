@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -19,7 +19,7 @@ public:
 	bool saveToFile();
 
 	const std::vector<uint8>& getData(uint64 keyHash) const;
-	void setData(const std::string& key, const std::vector<uint8>& data);
+	void setData(std::string_view key, const std::vector<uint8>& data);
 
 private:
 	bool serialize(VectorBinarySerializer& serializer);

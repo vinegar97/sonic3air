@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -38,6 +38,7 @@ public:
 		uint32 mDefaultValue = 0;
 		uint32 mCurrentValue = 0;
 	};
+
 	struct SettingCategory
 	{
 		std::string mDisplayName;
@@ -45,8 +46,25 @@ public:
 		std::vector<Setting> mSettings;
 	};
 
+	struct UsedFeature
+	{
+		std::string mFeatureName;
+		uint64 mFeatureNameHash = 0;
+	};
+
+	struct OtherModInfo
+	{
+		std::string mModID;
+		uint64 mModIDHash = 0;
+		std::string mDisplayName;
+		std::string mMinimumVersion;
+		bool mIsRequired = false;
+		int mRelativePriority = 0;
+	};
+
 public:
-	std::string mName;					// Internal name, which is also the directory name
+	std::string mUniqueID;				// Unique mod ID
+	std::string mDirectoryName;			// Directory name (an alternative internal name for the sake of compatibility)
 	std::wstring mLocalDirectory;		// Local path inside mods directory, excluding the trailing slash, e.g. "my-sample-mod" or "modfolder/my-sample-mod"
 	std::wstring mFullPath;				// Complete path, now including the trailing slash, e.g. "<savedatadir>/mods/modfolder/my-sample-mod/"
 	uint64 mLocalDirectoryHash = 0;
@@ -64,8 +82,17 @@ public:
 	// Settings
 	std::vector<SettingCategory> mSettingCategories;
 
+	// Features
+	std::unordered_map<uint64, UsedFeature> mUsedFeatures;	// Using feature name string hash as key
+
+	// Relationships with other mods
+	std::vector<OtherModInfo> mOtherModInfos;
+
 public:
 	void loadFromJson(const Json::Value& json);
+
+	const UsedFeature* getUsedFeature(std::string_view featureName) const;
+	const UsedFeature* getUsedFeature(uint64 featureNameHash) const;
 
 private:
 	bool mDirty = false;			// Only temporarily used by ModManager

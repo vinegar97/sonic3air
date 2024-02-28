@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,12 +9,46 @@
 #include "lemon/pch.h"
 #include "lemon/program/Function.h"
 #include "lemon/program/Module.h"
-#include "lemon/runtime/Runtime.h"
 #include "lemon/compiler/Utility.h"
+#include "lemon/runtime/Runtime.h"
+#include "lemon/utility/PragmaSplitter.h"
+#include "lemon/utility/QuickDataHasher.h"
 
 
 namespace lemon
 {
+	namespace detail
+	{
+		uint32 getVoidSignatureHash()
+		{
+			uint32 value = PredefinedDataTypes::VOID.getDataTypeHash();
+			return rmx::getFNV1a_32((const uint8*)&value, sizeof(uint32));
+		}
+	}
+
+
+	void Function::SignatureBuilder::clear(const DataTypeDefinition& returnType)
+	{
+		mData.clear();
+		mData.push_back(returnType.getDataTypeHash());
+	}
+
+	void Function::SignatureBuilder::addParameterType(const DataTypeDefinition& dataType)
+	{
+		mData.push_back(dataType.getDataTypeHash());
+	}
+
+	uint32 Function::SignatureBuilder::getSignatureHash()
+	{
+		uint32 hash = rmx::getFNV1a_32((const uint8*)&mData[0], mData.size() * sizeof(uint32));
+		while (hash == 0)		// That should be a really rare case anyway
+		{
+			mData.push_back(0xcd000000);		// Just add anything to get away from hash 0
+			hash = rmx::getFNV1a_32((const uint8*)&mData[0], mData.size() * sizeof(uint32));
+		}
+		return hash;
+	}
+
 
 	void Function::setParametersByTypes(const std::vector<const DataTypeDefinition*>& parameterTypes)
 	{
@@ -22,19 +56,14 @@ namespace lemon
 		mParameters.resize(parameterTypes.size());
 		for (size_t i = 0; i < parameterTypes.size(); ++i)
 		{
-			mParameters[i].mType = parameterTypes[i];
+			mParameters[i].mDataType = parameterTypes[i];
 		}
 		mSignatureHash = 0;
 	}
 
 	uint32 Function::getVoidSignatureHash()
 	{
-		static uint32 signatureHash = 0;
-		if (signatureHash == 0)
-		{
-			uint8 value = (uint8)BaseType::VOID;
-			signatureHash = rmx::getCRC32(&value, 1);
-		}
+		static const uint32 signatureHash = detail::getVoidSignatureHash();
 		return signatureHash;
 	}
 
@@ -42,20 +71,11 @@ namespace lemon
 	{
 		if (mSignatureHash == 0)
 		{
-			static std::vector<uint8> data;
-			data.clear();
-			data.push_back((uint8)DataTypeHelper::getBaseType(mReturnType));
+			static SignatureBuilder builder;
+			builder.clear(*mReturnType);
 			for (const Parameter& parameter : mParameters)
-			{
-				data.push_back((uint8)DataTypeHelper::getBaseType(parameter.mType));
-			}
-
-			mSignatureHash = rmx::getCRC32(&data[0], (uint32)data.size());
-			while (mSignatureHash == 0)		// That should be a really rare case anyway
-			{
-				data.push_back(0xcd);		// Just add anything to get away from hash 0
-				mSignatureHash = rmx::getCRC32(&data[0], (uint32)data.size());
-			}
+				builder.addParameterType(*parameter.mDataType);
+			mSignatureHash = builder.getSignatureHash();
 		}
 		return mSignatureHash;
 	}
@@ -63,80 +83,143 @@ namespace lemon
 
 	ScriptFunction::~ScriptFunction()
 	{
-		for (LocalVariable* variable : mLocalVariablesById)
+		for (LocalVariable* variable : mLocalVariablesByID)
 		{
 			mModule->destroyLocalVariable(*variable);
 		}
 	}
 
-	LocalVariable* ScriptFunction::getLocalVariableByIdentifier(const std::string& identifier) const
+	LocalVariable* ScriptFunction::getLocalVariableByIdentifier(uint64 nameHash) const
 	{
-		const auto it = mLocalVariablesByIdentifier.find(identifier);
+		const auto it = mLocalVariablesByIdentifier.find(nameHash);
 		return (it == mLocalVariablesByIdentifier.end()) ? nullptr : it->second;
 	}
 
-	LocalVariable& ScriptFunction::getLocalVariableById(uint32 id) const
+	LocalVariable& ScriptFunction::getLocalVariableByID(uint32 id) const
 	{
-		return *mLocalVariablesById[id];
+		return *mLocalVariablesByID[id];
 	}
 
-	LocalVariable& ScriptFunction::addLocalVariable(const std::string& identifier, const DataTypeDefinition* dataType, uint32 lineNumber)
+	LocalVariable& ScriptFunction::addLocalVariable(FlyweightString name, const DataTypeDefinition* dataType, uint32 lineNumber)
 	{
 		// Check if it already exists!
-		if (mLocalVariablesByIdentifier.count(identifier))
+		if (mLocalVariablesByIdentifier.count(name.getHash()))
 		{
 			CHECK_ERROR(false, "Variable already exists", lineNumber);
 		}
 
 		LocalVariable& variable = mModule->createLocalVariable();
-		variable.mName = identifier;
+		variable.mName = name;
 		variable.mDataType = dataType;
 
-		mLocalVariablesByIdentifier.emplace(identifier, &variable);
+		mLocalVariablesByIdentifier.emplace(name.getHash(), &variable);
 
-		variable.mId = (uint32)mLocalVariablesById.size();
-		mLocalVariablesById.emplace_back(&variable);
+		variable.mID = (uint32)mLocalVariablesByID.size();
+		mLocalVariablesByID.emplace_back(&variable);
 
 		return variable;
 	}
 
-	bool ScriptFunction::getLabel(const std::string& labelName, size_t& outOffset) const
+	bool ScriptFunction::getLabel(FlyweightString labelName, size_t& outOffset) const
 	{
-		const auto it = mLabels.find(labelName);
-		if (it == mLabels.end())
-			return false;
-
-		outOffset = it->second;
-		return true;
-	}
-
-	void ScriptFunction::addLabel(const std::string& labelName, size_t offset)
-	{
-		mLabels[labelName] = (uint32)offset;
-	}
-
-	const std::string* ScriptFunction::findLabelByOffset(size_t offset) const
-	{
-		// Note that this won't handle multipe labels at the same position too well
-		for (const auto& pair : mLabels)
+		for (const Label& label : mLabels)
 		{
-			if (pair.second == offset)
+			if (label.mName == labelName)
 			{
-				return &pair.first;
+				outOffset = (size_t)label.mOffset;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void ScriptFunction::addLabel(FlyweightString labelName, size_t offset)
+	{
+		Label& label = vectorAdd(mLabels);
+		label.mName = labelName;
+		label.mOffset = (uint32)offset;
+	}
+
+	const ScriptFunction::Label* ScriptFunction::findLabelByOffset(size_t offset) const
+	{
+		// Note that this won't handle multiple labels at the same position too well
+		for (const Label& label : mLabels)
+		{
+			if (label.mOffset == offset)
+			{
+				return &label;
 			}
 		}
 		return nullptr;
 	}
 
+	void ScriptFunction::addOrProcessPragma(std::string_view pragmaString, bool consumeIfProcessed)
+	{
+		PragmaSplitter pragmaSplitter(pragmaString);
+		if (!pragmaSplitter.mEntries.empty())
+		{
+			bool hadAddressHook = false;
+			for (const lemon::PragmaSplitter::Entry& entry : pragmaSplitter.mEntries)
+			{
+				if (entry.mArgument == "alias")
+				{
+					mAliasNames.push_back(entry.mValue);
+				}
+				else if (entry.mArgument == "address-hook")
+				{
+					// Create address hook
+					RMX_CHECK(!entry.mValue.empty(), "Address hook must have a value", continue);
+					const uint32 address = (uint32)rmx::parseInteger(entry.mValue);
+					mAddressHooks.push_back(address);
+					hadAddressHook = true;
+				}
+				else if (entry.mArgument == "translated")
+				{
+					// You can use "translated" to denote that some code was already put into script, but should not be an actual address hook
+					hadAddressHook = true;
+				}
+			}
 
-	void UserDefinedFunction::setFunction(const FunctionWrapper& functionWrapper)
+			// If there was an address hook, there's no need to store this pragma
+			if (consumeIfProcessed && hadAddressHook)
+				return;
+		}
+
+		// Store this pragma as string
+		mPragmas.emplace_back(pragmaString);
+	}
+
+	uint64 ScriptFunction::addToCompiledHash(uint64 hash) const
+	{
+		QuickDataHasher dataHasher(hash);
+		for (const Opcode& opcode : mOpcodes)
+		{
+			dataHasher.prepareNextData(10);
+			dataHasher.addData((uint8)opcode.mType);
+			dataHasher.addData((uint8)opcode.mDataType);
+			if (opcode.mParameter != 0)
+				dataHasher.addData((uint64)opcode.mParameter);
+		}
+		return dataHasher.getHash();
+	}
+
+
+	void NativeFunction::setFunction(const FunctionWrapper& functionWrapper)
 	{
 		mFunctionWrapper = &functionWrapper;
 		mReturnType = functionWrapper.getReturnType();
 		setParametersByTypes(functionWrapper.getParameterTypes());
 	}
 
-	void UserDefinedFunction::execute(const Context context) const
+	NativeFunction& NativeFunction::setParameterInfo(size_t index, const std::string& identifier)
+	{
+		RMX_ASSERT(index < mParameters.size(), "Invalid parameter index " << index);
+		RMX_ASSERT(!mParameters[index].mName.isValid(), "Parameter identifier is already set for index " << index);
+		mParameters[index].mName.set(identifier);
+		return *this;
+	}
+
+	void NativeFunction::execute(const Context context) const
 	{
 		RuntimeDetailHandler* runtimeDetailHandler = context.mControlFlow.getRuntime().getRuntimeDetailHandler();
 		if (nullptr != runtimeDetailHandler)

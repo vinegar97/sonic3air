@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,6 +10,7 @@
 #include "oxygen/simulation/SaveStateSerializer.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
+#include "oxygen/application/video/VideoOut.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/rendering/parts/PaletteManager.h"
 
@@ -19,7 +20,9 @@ namespace
 	// Version history
 	//  - 2 and lower: See serialization code for changes
 	//  - 3: Using shared memory access flags
-	static const constexpr uint8 STANDALONE_SAVESTATE_FORMATVERSION = 3;
+	//  - 4: Added more rendering data (scroll offsets, sprites, etc.)
+	//  - 5: Added data for ROM based sprites
+	static const constexpr uint8 OXYGEN_SAVESTATE_FORMATVERSION = 5;
 }
 
 
@@ -63,7 +66,7 @@ bool SaveStateSerializer::saveState(std::vector<uint8>& output)
 {
 	// Save state
 	VectorBinarySerializer serializer(false, output);
-	StateType stateType = StateType::STANDALONE;	// This is actually ignored
+	StateType stateType = StateType::OXYGEN;	// This is actually ignored
 	return serializeState(serializer, stateType);
 }
 
@@ -92,13 +95,13 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 			stateType = StateType::GENSX;
 			readGensxState(serializer);
 		}
-		else if (memcmp(signature, "AIR Standalone", 15) == 0)
+		else if (memcmp(signature, "AIR Standalone", 15) == 0)	// Deprecated since end of 2019
 		{
-			stateType = StateType::STANDALONE;
+			stateType = StateType::OXYGEN;
 		}
 		else if (memcmp(signature, "Oxygen_State__", 15) == 0)
 		{
-			stateType = StateType::STANDALONE;
+			stateType = StateType::OXYGEN;
 		}
 		else
 		{
@@ -107,15 +110,15 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 	}
 	else
 	{
-		stateType = StateType::STANDALONE;
+		stateType = StateType::OXYGEN;
 
 		memcpy(signature, "Oxygen_State__", 15);
-		signature[15] = STANDALONE_SAVESTATE_FORMATVERSION;
+		signature[15] = OXYGEN_SAVESTATE_FORMATVERSION;
 
 		serializer.serialize(signature, 16);
 	}
 
-	if (stateType == StateType::STANDALONE)
+	if (stateType == StateType::OXYGEN)
 	{
 		const uint8 formatVersion = signature[15];
 
@@ -128,41 +131,26 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 		// RAM and VRAM
 		serializer.serialize(emulatorInterface.getRam(), 0x10000);
 		serializer.serialize(emulatorInterface.getVRam(), 0x10000);
+		if (serializer.isReading())
+			emulatorInterface.getVRamChangeBits().setAllBits();
 
 		// Shared memory
 		if (formatVersion >= 3)
 		{
 			if (serializer.isReading())
-			{
 				emulatorInterface.clearSharedMemory();
-				const uint64 usageFlags = serializer.read<uint64>();
-				for (int bit = 0; bit < 64; ++bit)
-				{
-					if ((usageFlags >> bit) == 0)
-						break;
+			serializer.serialize(emulatorInterface.getRuntimeMemory().mSharedMemoryUsage);
 
-					if ((usageFlags >> bit) & 1)
-					{
-						const size_t address = 0x4000 * bit;
-						uint8* ptr = emulatorInterface.getMemoryPointer(0x800000 + (uint32)address, true, 0x4000);
-						serializer.read(ptr, 0x4000);
-					}
-				}
-			}
-			else
+			uint64 usageFlags = emulatorInterface.getRuntimeMemory().mSharedMemoryUsage;
+			for (int bit = 0; bit < 64; ++bit)
 			{
-				const uint64 usageFlags = emulatorInterface.getSharedMemoryUsage();
-				serializer.write(usageFlags);
-				for (int bit = 0; bit < 64; ++bit)
-				{
-					if ((usageFlags >> bit) == 0)
-						break;
+				if ((usageFlags >> bit) == 0)
+					break;
 
-					if ((usageFlags >> bit) & 1)
-					{
-						const size_t address = 0x4000 * bit;
-						serializer.serialize(emulatorInterface.getSharedMemory() + address, 0x4000);
-					}
+				if ((usageFlags >> bit) & 1)
+				{
+					const size_t address = 0x4000 * bit;
+					serializer.serialize(&emulatorInterface.getSharedMemory()[address], 0x4000);
 				}
 			}
 		}
@@ -179,69 +167,17 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 		}
 
 		// CRAM, actually part of palette manager's data
-		{
-			PaletteManager& paletteManager = mRenderParts.getPaletteManager();
-			uint16 buffer[0x40];
-			if (serializer.isReading())
-			{
-				serializer.serialize(buffer, 0x80);
-				for (int i = 0; i < 0x40; ++i)
-				{
-					paletteManager.writePaletteEntryPacked(0, i, buffer[i]);
-					paletteManager.writePaletteEntryPacked(1, i, buffer[i]);
-				}
-			}
-			else
-			{
-				for (int i = 0; i < 0x40; ++i)
-				{
-					buffer[i] = paletteManager.getPaletteEntryPacked(0, i, true);
-				}
-				serializer.serialize(buffer, 0x80);
-			}
-		}
+		mRenderParts.getPaletteManager().serializeSaveState(serializer, formatVersion);
 
 		// VSRAM
 		serializer.serialize(emulatorInterface.getVSRam(), 0x80);
 
-		// VDP config
-		PlaneManager& planeManager = mRenderParts.getPlaneManager();
-		ScrollOffsetsManager& scrollOffsetsManager = mRenderParts.getScrollOffsetsManager();
-		if (serializer.isReading())
-		{
-			planeManager.setNameTableBaseA(serializer.read<uint16>());
-			planeManager.setNameTableBaseB(serializer.read<uint16>());
+		// Other graphics managers
+		mRenderParts.getPlaneManager().serializeSaveState(serializer, formatVersion);
+		mRenderParts.getScrollOffsetsManager().serializeSaveState(serializer, formatVersion);
+		mRenderParts.getSpriteManager().serializeSaveState(serializer, formatVersion);
 
-			Vec2i playfieldSize;
-			playfieldSize.x = serializer.read<uint16>();
-			playfieldSize.y = serializer.read<uint16>();
-			planeManager.setPlayfieldSizeInPixels(playfieldSize);
-
-			scrollOffsetsManager.setVerticalScrolling(serializer.read<uint8>() != 0);
-			scrollOffsetsManager.setHorizontalScrollMask(serializer.read<uint8>());
-
-			if (formatVersion >= 2)
-			{
-				scrollOffsetsManager.setHorizontalScrollTableBase(serializer.read<uint16>());
-			}
-		}
-		else
-		{
-			serializer.write<uint16>(planeManager.getNameTableBaseA());
-			serializer.write<uint16>(planeManager.getNameTableBaseB());
-
-			const Vec2i playfieldSize = planeManager.getPlayfieldSizeInPixels();
-			serializer.write<uint16>(playfieldSize.x);
-			serializer.write<uint16>(playfieldSize.y);
-
-			serializer.write<uint8>(scrollOffsetsManager.getVerticalScrolling() ? 1 : 0);
-			serializer.write<uint8>(scrollOffsetsManager.getHorizontalScrollMask());
-
-			if (formatVersion >= 2)
-			{
-				serializer.write<uint16>(scrollOffsetsManager.getHorizontalScrollTableBase());
-			}
-		}
+		// TODO: How about overlay manager and spaces manager?
 
 		// Lemon script runtime state
 		if (!mCodeExec.getLemonScriptRuntime().serializeRuntime(serializer))
@@ -250,7 +186,7 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 
 	if (serializer.isReading())
 	{
-		mRenderParts.getSpriteManager().reset();
+		VideoOut::instance().initAfterSaveStateLoad();
 	}
 
 	return true;
@@ -281,13 +217,15 @@ bool SaveStateSerializer::readGensxState(VectorBinarySerializer& serializer)
 
 		// Load VRAM
 		serializer.serialize(emulatorInterface.getVRam(), 0x10000);
+		if (serializer.isReading())
+			emulatorInterface.getVRamChangeBits().setAllBits();
 
 		// Load CRAM
 		{
 			PaletteManager& paletteManager = mRenderParts.getPaletteManager();
 			uint16 buffer[0x40];
 			serializer.serialize(buffer, 0x80);
-			for (int i = 0; i < 0x40; ++i)
+			for (uint16 i = 0; i < 0x40; ++i)
 			{
 				const uint16 packedColor = (((buffer[i])      & 0x07) << 1)
 										 + (((buffer[i] >> 3) & 0x07) << 5)

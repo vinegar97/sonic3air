@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -27,6 +27,9 @@ public:
 		Vec2f mFaceButtonsCenter;
 		float mFaceButtonsSize = 1.0f;
 		Vec2f mStartButtonCenter;
+		Vec2f mGameRecButtonCenter;
+		Vec2f mShoulderLButtonCenter;
+		Vec2f mShoulderRButtonCenter;
 	};
 	Setup mSetup;
 
@@ -58,8 +61,11 @@ private:
 			DONE_BUTTON_UP,
 			DONE_BUTTON_DOWN,
 			MOVING_DPAD,
-			MOVING_BUTTONS,
+			MOVING_FACE_BUTTONS,
 			MOVING_START,
+			MOVING_GAMEREC,
+			MOVING_L,
+			MOVING_R,
 			SCALING_DPAD,
 			SCALING_BUTTONS
 		};
@@ -72,6 +78,13 @@ private:
 
 	struct TouchArea
 	{
+		enum class SpecialType
+		{
+			NONE,
+			GAMEREC
+		};
+
+		SpecialType mSpecialType = SpecialType ::NONE;
 		Rectf mRect;				// Main rectangle, using the touch area coordinate system
 		float mRadius = 0.0f;		// Additional radius outside of the rectangle
 		float mPriority = 1.0f;
@@ -84,20 +97,23 @@ private:
 	{
 		Vec2f mCenter;			// Center position on screen (see remarks on the coordinate system above)
 		Vec2f mHalfExtend;		// Relative half size on screen
-		DrawerTexture* mTexture = nullptr;
+		uint64 mSpriteKeys[2] = { 0, 0 };
 		InputManager::Control* mControl = nullptr;
 		ConfigMode::State mReactToState;
 	};
 
 private:
 	void buildPointButton(const Vec2f& center, float radius, float priority, InputManager::Control& control, InputManager::Control* control2);
-	void buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, DrawerTexture& texture, InputManager::Control& control, ConfigMode::State reactToState);
-	void buildRoundButton(const Vec2f& center, float radius, DrawerTexture& texture, InputManager::Control& control, ConfigMode::State reactToState);
+	void buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, const char* spriteKey, InputManager::Control* control, ConfigMode::State reactToState, TouchArea::SpecialType specialType = TouchArea::SpecialType::NONE, float radius = 0.35f);
+	void buildRoundButton(const Vec2f& center, float radius, const char* spriteKey, InputManager::Control& control, ConfigMode::State reactToState);
 
 	const TouchArea* getTouchAreaAtNormalizedPosition(const Vec2f& position) const;
 	Vec2f getNormalizedTouchFromScreenPosition(Vec2f vec) const;
 	Vec2f getScreenFromNormalizedTouchPosition(Vec2f vec) const;
 	Rectf getScreenFromNormalizedTouchRect(Rectf rect) const;
+
+	void updateConfigMode();
+	void updateButtonPosition(Vec2i& position, Vec2f touchPosition);
 
 private:
 	Vec2i mLastScreenSize;
@@ -107,20 +123,12 @@ private:
 	Vec2f mScreenScale;		// Used for coordinate system conversion: Screen scale in screen space
 
 	std::vector<VisualElement> mVisualElements;
-	DrawerTexture mDirectionalPadTextureLeft;
-	DrawerTexture mDirectionalPadTextureRight;
-	DrawerTexture mDirectionalPadTextureUp;
-	DrawerTexture mDirectionalPadTextureDown;
-	DrawerTexture mButtonTextureStart;
-	DrawerTexture mButtonTextureA;
-	DrawerTexture mButtonTextureB;
-	DrawerTexture mButtonTextureX;
-	DrawerTexture mButtonTextureY;
 	DrawerTexture mDoneText;
 
 	float mAutoHideTimer = 0.0f;
 	bool mForceHidden = false;
 	float mVisibility = 0.0f;
+	bool mGameRecPressed = false;
 
 	ConfigMode mConfigMode;
 };

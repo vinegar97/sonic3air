@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -16,48 +16,14 @@
 namespace emulatorinterface
 {
 
-	struct Internal
+	struct Internal : public RuntimeMemory
 	{
 	public:
-		// State
-		uint8 mRom[0x400000] = { 0 };			// Up to 4 MB for the ROM
-		uint8 mRam[0x10000] = { 0 };			// 64 KB RAM
-		uint8 mVRam[0x10000] = { 0 };			// 64 KB Video RAM
-		uint16 mVSRam[0x40] = { 0 };			// Buffer for vertical scroll offsets
-		uint8 mSharedMemory[0x100000] = { 0 };	// 1 MB of additional shared memory between script and C++ (usage similar to RAM, but not used by original code, obviously)
-		uint64 mSharedMemoryUsage = 0;			// Each bit represents 16 KB of shared memory and tells us if anything non-zero is written there at all
-		std::vector<uint8> mSRam;				// Persistent memory to be saved on disk
-		uint32 mRegisters[16] = { 0 };			// Registers
-		bool mFlagZ = false;					// Zero flag
-		bool mFlagN = false;					// Negative flag
-
 		// Debugging
 		std::vector<EmulatorInterface::Watch> mWatches;
 		DebugNotificationInterface* mDebugNotificationInterface = nullptr;
 
 	public:
-		void clear()
-		{
-			// Reset ROM to unmodified version
-			{
-				const std::vector<uint8>& unmodifiedROM = ResourcesCache::instance().getUnmodifiedRom();
-				memcpy(mRom, &unmodifiedROM[0], unmodifiedROM.size());
-				if (sizeof(mRom) > unmodifiedROM.size())
-					memset(&mRom[unmodifiedROM.size()], 0, sizeof(mRom) - unmodifiedROM.size());
-			}
-
-			memset(mRam, 0, sizeof(mRam));
-			memset(mSharedMemory, 0, sizeof(mSharedMemory));
-			mSharedMemoryUsage = 0;
-			memset(mRegisters, 0, sizeof(mRegisters));
-			mRegisters[15] = GameProfile::instance().mAsmStackRange.second;   // Initialization of A7 (just leaving it 0 is no good idea)
-		}
-
-		void applyRomInjections()
-		{
-			ResourcesCache::instance().applyRomInjections(mRom, sizeof(mRom));
-		}
-
 		FORCE_INLINE bool isValidMemoryRegion(uint32 address, uint32 size)
 		{
 			address &= 0x00ffffff;
@@ -117,8 +83,9 @@ namespace emulatorinterface
 			{
 				//if ((address & 0xfffff0) == 0xc00000)
 				//	_asm nop;
-				mDummy_uint8 = 0;
-				return &mDummy_uint8;
+				static uint64 dummy;
+				dummy = 0;
+				return (uint8*)&dummy;
 			}
 			else
 			{
@@ -143,13 +110,34 @@ namespace emulatorinterface
 				}
 			}
 		}
-
-	private:
-		uint8 mDummy_uint8 = 0;
 	};
 
 }
 
+
+void RuntimeMemory::clear()
+{
+	// Reset ROM to unmodified version
+	{
+		const std::vector<uint8>& unmodifiedROM = ResourcesCache::instance().getUnmodifiedRom();
+		memcpy(mRom, &unmodifiedROM[0], unmodifiedROM.size());
+		if (sizeof(mRom) > unmodifiedROM.size())
+			memset(&mRom[unmodifiedROM.size()], 0, sizeof(mRom) - unmodifiedROM.size());
+	}
+
+	memset(mRam, 0, sizeof(mRam));
+	memset(mVRam, 0, sizeof(mVRam));
+	mVRamChangeBits.setAllBits();		// Count all VRAM as changed
+	memset(mSharedMemory, 0, sizeof(mSharedMemory));
+	mSharedMemoryUsage = 0;
+	memset(mRegisters, 0, sizeof(mRegisters));
+	mRegisters[15] = GameProfile::instance().mAsmStackRange.second;   // Initialization of A7 (just leaving it 0 is no good idea)
+}
+
+void RuntimeMemory::applyRomInjections()
+{
+	ResourcesCache::instance().applyRomInjections(mRom, sizeof(mRom));
+}
 
 
 EmulatorInterface::EmulatorInterface() :
@@ -175,6 +163,11 @@ void EmulatorInterface::applyRomInjections()
 void EmulatorInterface::setDebugNotificationInterface(DebugNotificationInterface* debugNotificationInterface)
 {
 	mInternal.mDebugNotificationInterface = debugNotificationInterface;
+}
+
+RuntimeMemory& EmulatorInterface::getRuntimeMemory()
+{
+	return mInternal;
 }
 
 uint32 EmulatorInterface::getRomSize()
@@ -228,23 +221,20 @@ uint8 EmulatorInterface::readMemory8(uint32 address)
 
 uint16 EmulatorInterface::readMemory16(uint32 address)
 {
-	return swapBytes16(*(uint16*)mInternal.accessMemory<MEMORY_MODE_READ>(address, 2));
+	const uint8* pointer = mInternal.accessMemory<MEMORY_MODE_READ>(address, 2);
+	return rmx::readMemoryUnalignedSwapped<uint16>(pointer);
 }
 
 uint32 EmulatorInterface::readMemory32(uint32 address)
 {
-	return swapBytes32(*(uint32*)mInternal.accessMemory<MEMORY_MODE_READ>(address, 4));
+	const uint8* pointer = mInternal.accessMemory<MEMORY_MODE_READ>(address, 4);
+	return rmx::readMemoryUnalignedSwapped<uint32>(pointer);
 }
 
 uint64 EmulatorInterface::readMemory64(uint32 address)
 {
-#if defined(__arm__)
-	// Do not access memory directly, but byte-wise to avoid "SIGBUS illegal alignment" issues (this happened on Android Release builds, but not in Debug for some reason)
 	const uint8* pointer = mInternal.accessMemory<MEMORY_MODE_READ>(address, 8);
-	return ((uint64)pointer[7]) + ((uint64)pointer[6] << 8) + ((uint64)pointer[5] << 16) + ((uint64)pointer[4] << 24) + ((uint64)pointer[3] << 32) + ((uint64)pointer[2] << 40) + ((uint64)pointer[1] << 48) + ((uint64)pointer[0] << 56);
-#else
-	return swapBytes64(*(uint64*)mInternal.accessMemory<MEMORY_MODE_READ>(address, 8));
-#endif
+	return rmx::readMemoryUnalignedSwapped<uint64>(pointer);
 }
 
 void EmulatorInterface::writeMemory8(uint32 address, uint8 value)
@@ -329,52 +319,65 @@ uint8* EmulatorInterface::getVRam()
 	return mInternal.mVRam;
 }
 
+uint16 EmulatorInterface::readVRam16(uint16 vramAddress)
+{
+	return *(uint16*)(mInternal.mVRam + vramAddress);
+}
+
+void EmulatorInterface::writeVRam16(uint16 vramAddress, uint16 value)
+{
+	uint16* dst = (uint16*)(mInternal.mVRam + vramAddress);
+	*dst = value;
+
+	// Mark as changed
+	mInternal.mVRamChangeBits.setBit(vramAddress >> 5);
+}
+
+void EmulatorInterface::fillVRam(uint16 vramAddress, uint16 fillValue, uint16 bytes)
+{
+	if (bytes == 0)
+		return;
+
+	uint16* dst = (uint16*)(mInternal.mVRam + vramAddress);
+	for (uint16 i = 0; i < bytes; i += 2)
+	{
+		*dst = fillValue;
+		++dst;
+	}
+
+	// Mark as changed
+	const size_t bitIndexStart = (vramAddress >> 5);
+	const size_t bitIndexEnd = ((vramAddress + bytes - 1) >> 5);
+	mInternal.mVRamChangeBits.setBitsInRange(bitIndexStart, bitIndexEnd);
+}
+
+void EmulatorInterface::copyFromMemoryToVRam(uint16 vramAddress, uint32 sourceAddress, uint16 bytes)
+{
+	if (bytes == 0)
+		return;
+
+	uint16* dst = (uint16*)(mInternal.mVRam + vramAddress);
+	const uint16* src = (uint16*)(mInternal.accessMemory<MEMORY_MODE_READ>(sourceAddress, bytes));
+	const uint16* end = src + (bytes / 2);
+	for (; src != end; ++src, ++dst)
+	{
+		*dst = swapBytes16(*src);
+	}
+
+	// Mark as changed
+	const size_t bitIndexStart = (vramAddress >> 5);
+	const size_t bitIndexEnd = ((vramAddress + bytes - 1) >> 5);
+	mInternal.mVRamChangeBits.setBitsInRange(bitIndexStart, bitIndexEnd);
+}
+
+BitArray<0x800>& EmulatorInterface::getVRamChangeBits()
+{
+	return mInternal.mVRamChangeBits;
+}
+
 uint16* EmulatorInterface::getVSRam()
 {
 	return mInternal.mVSRam;
-}
-
-size_t EmulatorInterface::loadSRAM(uint32 address, size_t offset, size_t bytes)
-{
-	if (mInternal.mSRam.empty())
-	{
-		// Load from disk first
-		FTX::FileSystem->readFile(Configuration::instance().mSRamFilename, mInternal.mSRam);
-	}
-
-	bytes = (offset >= mInternal.mSRam.size()) ? 0 : std::min(bytes, mInternal.mSRam.size() - offset);
-	if (bytes > 0)
-	{
-		uint8* mem = mInternal.accessMemory<MEMORY_MODE_WRITE>(address, (uint32)bytes);
-		memcpy(mem, &mInternal.mSRam[offset], bytes);
-	}
-	return bytes;
-}
-
-void EmulatorInterface::saveSRAM(uint32 address, size_t offset, size_t bytes)
-{
-	const uint8* mem = mInternal.accessMemory<MEMORY_MODE_READ>(address, (uint32)bytes);
-
-	// Check if there's any change
-	const size_t checkBytes = (offset >= mInternal.mSRam.size()) ? 0 : std::min(bytes, mInternal.mSRam.size() - offset);
-	if (checkBytes == bytes)
-	{
-		if (memcmp(mem, &mInternal.mSRam[offset], checkBytes) == 0)
-		{
-			// Nothing to do
-			return;
-		}
-	}
-
-	// Extend SRAM if needed and write data
-	if (mInternal.mSRam.size() < offset + bytes)
-	{
-		mInternal.mSRam.resize(offset + bytes);
-	}
-	memcpy(&mInternal.mSRam[offset], mem, bytes);
-
-	// Save to disk
-	FTX::FileSystem->saveFile(Configuration::instance().mSRamFilename, mInternal.mSRam);
 }
 
 std::vector<EmulatorInterface::Watch>& EmulatorInterface::getWatches()
@@ -392,11 +395,11 @@ void EmulatorInterface::getDirectAccessSpecialization(SpecializationResult& outR
 		if (address + size > sizeof(mInternal.mRam))
 		{
 			RMX_ERROR("Too large memory " << (writeAccess ? "write" : "read") << " access of " << rmx::hexString(size) << " bytes at RAM address " << rmx::hexString(0xffff0000 + address, 6), );
-			outResult.mResult = SpecializationResult::INVALID_ACCESS;
+			outResult.mResult = SpecializationResult::Result::INVALID_ACCESS;
 		}
 		else
 		{
-			outResult.mResult = SpecializationResult::HAS_SPECIALIZATION;
+			outResult.mResult = SpecializationResult::Result::HAS_SPECIALIZATION;
 			outResult.mDirectAccessPointer = &mInternal.mRam[address];
 		}
 	}
@@ -405,11 +408,11 @@ void EmulatorInterface::getDirectAccessSpecialization(SpecializationResult& outR
 		if (address + size > sizeof(mInternal.mRom))
 		{
 			RMX_ERROR("Too large memory " << (writeAccess ? "write" : "read") << " access of " << rmx::hexString(size) << " bytes at ROM address " << rmx::hexString(address, 6), );
-			outResult.mResult = SpecializationResult::INVALID_ACCESS;
+			outResult.mResult = SpecializationResult::Result::INVALID_ACCESS;
 		}
 		else
 		{
-			outResult.mResult = SpecializationResult::HAS_SPECIALIZATION;
+			outResult.mResult = SpecializationResult::Result::HAS_SPECIALIZATION;
 			outResult.mDirectAccessPointer = &mInternal.mRom[address];
 		}
 	}
@@ -419,29 +422,29 @@ void EmulatorInterface::getDirectAccessSpecialization(SpecializationResult& outR
 		if (address + size > sizeof(mInternal.mSharedMemory))
 		{
 			RMX_ERROR("Too large memory " << (writeAccess ? "write" : "read") << " access of " << rmx::hexString(size) << " bytes at shared memory address " << rmx::hexString(0x800000 + address, 6), );
-			outResult.mResult = SpecializationResult::INVALID_ACCESS;
+			outResult.mResult = SpecializationResult::Result::INVALID_ACCESS;
 		}
 		else
 		{
 			// Write access is not supported because mSharedMemoryUsage can't be updated this way
 			if (writeAccess)
 			{
-				outResult.mResult = SpecializationResult::NO_SPECIALIZATION;
+				outResult.mResult = SpecializationResult::Result::NO_SPECIALIZATION;
 				return;
 			}
 
-			outResult.mResult = SpecializationResult::HAS_SPECIALIZATION;
+			outResult.mResult = SpecializationResult::Result::HAS_SPECIALIZATION;
 			outResult.mDirectAccessPointer = &mInternal.mSharedMemory[address];
 		}
 	}
 	else if (address >= 0xa00000 && address < 0xd00000)
 	{
-		outResult.mResult = SpecializationResult::NO_SPECIALIZATION;
+		outResult.mResult = SpecializationResult::Result::NO_SPECIALIZATION;
 	}
 	else
 	{
 		RMX_ERROR("Invalid memory access at " << rmx::hexString(address, 6) << " of " << rmx::hexString(size) << " bytes", );
-		outResult.mResult = SpecializationResult::INVALID_ACCESS;
+		outResult.mResult = SpecializationResult::Result::INVALID_ACCESS;
 	}
 }
 
@@ -463,7 +466,7 @@ void EmulatorInterfaceDev::getDirectAccessSpecialization(SpecializationResult& o
 	if (writeAccess)
 	{
 		// No specialization for write access, as this would not trigger debug watches
-		outResult.mResult = SpecializationResult::NO_SPECIALIZATION;
+		outResult.mResult = SpecializationResult::Result::NO_SPECIALIZATION;
 	}
 	else
 	{

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -17,12 +17,16 @@ class DrawerTexture;
 class DrawerTextureImplementation
 {
 public:
+	explicit DrawerTextureImplementation(DrawerTexture& owner) : mOwner(owner) {}
 	virtual ~DrawerTextureImplementation() {}
 
 	virtual void updateFromBitmap(const Bitmap& bitmap) = 0;
-	virtual void setupAsRenderTarget(const Vec2i& size, DrawerTexture& owner) = 0;
+	virtual void setupAsRenderTarget(const Vec2i& size) = 0;
 	virtual void writeContentToBitmap(Bitmap& outBitmap) = 0;
-	virtual void refreshImplementation(DrawerTexture& owner, bool setupRenderTarget, const Vec2i& size) = 0;
+	virtual void refreshImplementation(bool setupRenderTarget, const Vec2i& size) = 0;
+
+protected:
+	DrawerTexture& mOwner;
 };
 
 
@@ -44,6 +48,8 @@ public:
 	int getWidth() const			{ return mSize.x; }
 	int getHeight() const			{ return mSize.y; }
 
+	void clearBitmap();
+
 	Bitmap& accessBitmap();
 	void bitmapUpdated();
 	void setupAsRenderTarget(uint32 width, uint32 height);
@@ -55,8 +61,8 @@ private:
 	Drawer* mRegisteredOwner = nullptr;
 	size_t mRegisteredIndex = 0;
 
-	Bitmap mBitmap;		// Holding the texture content, except if this is a hardware render target
-	Vec2i mSize;		// Resolution of the texture -- either the size of the bitmap or of a hardware render target
+	Bitmap mBitmap;		// Holding the texture content, except if this is an OpenGL render target
+	Vec2i mSize;		// Resolution of the texture -- either the size of the bitmap or of an OpenGL render target
 	bool mSetupAsRenderTarget = false;
 
 	DrawerTextureImplementation* mImplementation = nullptr;

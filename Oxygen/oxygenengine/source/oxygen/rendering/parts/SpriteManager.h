@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,8 +8,7 @@
 
 #pragma once
 
-#include "oxygen/resources/SpriteCache.h"
-#include "oxygen/helper/Transform2D.h"
+#include "oxygen/rendering/parts/RenderItem.h"
 
 
 class PatternManager;
@@ -17,143 +16,108 @@ class PatternManager;
 class SpriteManager
 {
 public:
-	enum class Space
+	using Space = SpacesManager::Space;
+
+	struct SpriteHandleData
 	{
-		SCREEN,
-		WORLD
-	};
-
-	struct SpriteInfo
-	{
-	public:
-		enum class Type
-		{
-			INVALID = 0,
-			VDP,
-			PALETTE,
-			COMPONENT,
-			MASK
-		};
-
-	public:
-		inline Type getType() const  { return mType; }
-
-	public:
+		uint32 mHandle = 0;		// Sprite handle ID
+		uint64 mKey = 0;		// Sprite key
 		Vec2i  mPosition;
-		bool   mPriorityFlag = false;
 		uint16 mRenderQueue = 0;
+		bool   mFlipX = false;
+		bool   mFlipY = false;
+		bool   mPriorityFlag = false;
 		Color  mTintColor = Color::WHITE;
 		Color  mAddedColor = Color::TRANSPARENT;
 		bool   mUseGlobalComponentTint = true;
-		bool   mFullyOpaque = false;
+		BlendMode mBlendMode = BlendMode::ALPHA;
 		Space  mCoordinatesSpace = Space::SCREEN;	// The coordinate system that "mPosition" is referring to
-		Space  mLogicalSpace = Space::SCREEN;		// The coordinate system used for frame interpolation, can be different from the coordinates space
-
-		// Frame interpolation
-		bool   mHasLastPosition = false;
-		Vec2i  mLastPositionChange;
-		Vec2i  mInterpolatedPosition;
-
-	protected:
-		inline SpriteInfo(Type type) : mType(type) {}
-		inline ~SpriteInfo() {}
-
-	private:
-		Type mType;
-	};
-
-	struct VdpSpriteInfo : public SpriteInfo
-	{
-		inline VdpSpriteInfo() : SpriteInfo(Type::VDP) {}
-
-		Vec2i  mSize;				// In columns / rows of 8 pixels
-		uint16 mFirstPattern = 0;	// Incl. flip bits and atex
-	};
-
-	struct CustomSpriteInfoBase : public SpriteInfo
-	{
-		inline CustomSpriteInfoBase(Type type) : SpriteInfo(type) {}
-
-		uint64 mKey = 0;
-		const SpriteCache::CacheItem* mCacheItem = nullptr;
-		Vec2i mSize;
-		Vec2i mPivotOffset;
 		Transform2D mTransformation;
-		bool  mUseUpscaledSprite = false;	// Currently only supported for palette sprites
-	};
-
-	struct PaletteSpriteInfo : public CustomSpriteInfoBase
-	{
-		inline PaletteSpriteInfo() : CustomSpriteInfoBase(Type::PALETTE) {}
-
-		uint8 mAtex = 0;
-	};
-
-	struct ComponentSpriteInfo : public CustomSpriteInfoBase
-	{
-		inline ComponentSpriteInfo() : CustomSpriteInfoBase(Type::COMPONENT) {}
-	};
-
-	struct SpriteMaskInfo : public SpriteInfo
-	{
-		inline SpriteMaskInfo() : SpriteInfo(Type::MASK) {}
-
-		Vec2i mSize;
-		float mDepth = 0.0f;
+		float  mRotation = 0.0f;
+		Vec2f  mScale = Vec2f(1.0f, 1.0f);
+		bool   mUseUpscaledSprite = false;			// Only supported for palette sprites
+		uint16 mAtex = 0;							// Only supported for palette sprites
+		uint64 mSpriteTag = 0;
+		Vec2i  mTaggedSpritePosition;
 	};
 
 public:
-	SpriteManager(PatternManager& patternManager);
+	SpriteManager(PatternManager& patternManager, SpacesManager& spacesManager);
+	inline ~SpriteManager()  { clear(); }
 
-	void reset();
-	void resetSprites();
+	void clear();
+	void clearLifetimeContext(RenderItem::LifetimeContext lifetimeContext);
+
 	void preFrameUpdate();
-	void refresh();
+	void postFrameUpdate();
+	void postRefreshDebugging();
+
+	inline void setResetRenderItems(bool reset)  { mResetRenderItems = reset; }
 
 	void drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, const Color& tintColor = Color::WHITE, const Color& addedColor = Color::TRANSPARENT);
-	void drawCustomSprite(uint64 key, const Vec2i& position, uint8 atex, uint8 flags, uint16 renderQueue, const Color& tintColor = Color::WHITE, float angle = 0.0f, float scale = 1.0f);
-	void drawCustomSpriteWithTransform(uint64 key, const Vec2i& position, uint8 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, const Transform2D& transformation);
+	void drawCustomSprite(uint64 key, const Vec2i& position, uint16 atex, uint8 flags, uint16 renderQueue, const Color& tintColor = Color::WHITE, float angle = 0.0f, float scale = 1.0f);
+	void drawCustomSprite(uint64 key, const Vec2i& position, uint16 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, float angle, Vec2f scale);
+	void drawCustomSpriteWithTransform(uint64 key, const Vec2i& position, uint16 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, const Transform2D& transformation);
 	void addSpriteMask(const Vec2i& position, const Vec2i& size, uint16 renderQueue, bool priorityFlag, Space space);
+
+	void addRectangle(const Recti& rect, const Color& color, uint16 renderQueue, Space space, bool useGlobalComponentTint);
+	void addText(std::string_view fontKeyString, uint64 fontKeyHash, const Vec2i& position, std::string_view textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space, bool useGlobalComponentTint);
+
+	uint32 addSpriteHandle(uint64 key, const Vec2i& position, uint16 renderQueue);
+	SpriteHandleData* getSpriteHandleData(uint32 spriteHandle);
 
 	void setLogicalSpriteSpace(Space space);
 	void clearSpriteTag();
 	void setSpriteTagWithPosition(uint64 spriteTag, const Vec2i& position);
 
-	inline const std::vector<SpriteInfo*>& getSprites() const  { return mSprites; }
+	inline const std::vector<RenderItem*>& getRenderItems(RenderItem::LifetimeContext context) const  { return mContexts[(int)context].mItems; }
+	inline const std::vector<RenderItem*>& getAddedItems() const  { return mAddedItems.mItems; }
 
 	inline uint16 getSpriteAttributeTableBase() const  { return mSpriteAttributeTableBase; }
 	inline void setSpriteAttributeTableBase(uint16 vramAddress)  { mSpriteAttributeTableBase = vramAddress; }
 
-	const Vec2i& getWorldSpaceOffset() const  { return mWorldSpaceOffset; }
-	void setWorldSpaceOffset(const Vec2i& offset);
+	void serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion);
 
 public:
 	bool mLegacyVdpSpriteMode = false;
 
 private:
-	void checkSpriteTag(SpriteInfo& sprite);
+	struct ItemSet
+	{
+		std::vector<RenderItem*> mItems;
+	};
+
+private:
+	void clearItemSet(ItemSet& itemSet);
+	void clearAllContexts();
+	ItemSet& getItemsByContext(RenderItem::LifetimeContext lifetimeContext);
+
+	renderitems::CustomSpriteInfoBase* addSpriteByKey(uint64 key);
+	void checkSpriteTag(renderitems::SpriteInfo& sprite);
+
+	bool checkRenderItemLimit();
+	void processSpriteHandles();
+	void grabAddedItems();
+	void collectLegacySprites();
 
 private:
 	PatternManager& mPatternManager;
+	SpacesManager& mSpacesManager;
 
-	bool mResetSprites = false;
+	RenderItem::LifetimeContext mCurrentContext = RenderItem::LifetimeContext::OUTSIDE_FRAME;
 	Space mLogicalSpriteSpace = Space::SCREEN;
-	Vec2i mWorldSpaceOffset;
+	bool mResetRenderItems = false;
+	uint16 mSpriteAttributeTableBase = 0xf800;	// Only used in legacy VDP sprite mode
 
-	struct SpriteSets
-	{
-		std::vector<VdpSpriteInfo>		 mVdpSprites;
-		std::vector<PaletteSpriteInfo>	 mPaletteSprites;
-		std::vector<ComponentSpriteInfo> mComponentSprites;
-		std::vector<SpriteMaskInfo>		 mSpriteMasks;
-		void clear();
-		void swap(SpriteSets& other);
-	};
-	SpriteSets mCurrSpriteSets;
-	SpriteSets mNextSpriteSets;
-	std::vector<SpriteInfo*> mSprites;
+	PoolOfRenderItems mPoolOfRenderItems;
 
-	uint16 mSpriteAttributeTableBase = 0xf800;	// Only used in legacy VPD sprite mode
+	ItemSet mContexts[RenderItem::NUM_CONTEXTS];
+	ItemSet mAddedItems;
+	bool mLoggedLimitWarning = false;
+
+	uint32 mNextSpriteHandle = 1;
+	std::vector<SpriteHandleData> mSpritesHandles;
+	std::pair<uint32, SpriteHandleData*> mLatestSpriteHandle;
 
 	struct TaggedSpriteData
 	{

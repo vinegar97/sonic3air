@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -45,7 +45,7 @@ namespace lemon
 
 		void translateNodeInternal(CppWriter& writer, const Node& node, bool withExtraIndentation = false)
 		{
-			if (node.getType() == Node::Type::BLOCK)
+			if (node.isA<BlockNode>())
 			{
 				withExtraIndentation = false;		// Block does its own intendation
 			}
@@ -85,7 +85,7 @@ namespace lemon
 				{
 					const LabelNode& labelNode = node.as<LabelNode>();
 					writer.decreaseIndentation();
-					writer.writeLine(labelNode.mLabel + ":");
+					writer.writeLine(std::string(labelNode.mLabel.getString()) + ":");
 					writer.increaseIndentation();
 					break;
 				}
@@ -93,7 +93,7 @@ namespace lemon
 				case Node::Type::JUMP:
 				{
 					const JumpNode& jumpNode = node.as<JumpNode>();
-					writer.writeLine("goto " + jumpNode.mLabelToken->mName + ";");
+					writer.writeLine("goto " + std::string(jumpNode.mLabelToken->mName.getString()) + ";");
 					break;
 				}
 
@@ -209,7 +209,7 @@ namespace lemon
 
 			if (isn.mContentElse.valid())
 			{
-				if (isn.mContentElse->getType() == Node::Type::IF_STATEMENT)
+				if (isn.mContentElse->isA<IfStatementNode>())
 				{
 					writeIfStatement(writer, isn.mContentElse->as<IfStatementNode>(), true);
 				}
@@ -236,7 +236,7 @@ namespace lemon
 				case Token::Type::CONSTANT:
 				{
 					const ConstantToken& ct = token.as<ConstantToken>();
-					line << rmx::hexString(ct.mValue);
+					line << rmx::hexString(ct.mValue.get<uint64>());	// TODO: Support float and double here as well
 					break;
 				}
 
@@ -339,23 +339,21 @@ namespace lemon
 				case Token::Type::VARIABLE:
 				{
 					const VariableToken& vt = token.as<VariableToken>();
-					CppWriter::addIdentifier(line, vt.mVariable->getName());
+					CppWriter::addIdentifier(line, vt.mVariable->getName().getString());
 					break;
 				}
 
 				case Token::Type::FUNCTION:
 				{
 					const FunctionToken& ft = token.as<FunctionToken>();
-					CppWriter::addIdentifier(line, ft.mFunctionName);
+					CppWriter::addIdentifier(line, ft.mFunction->getName().getString());
 					line << "(";
 
-					// TODO: Is this parameter list actually used as a list, or only a single comma-separated value in each case anyways?
-					const TokenList& parameters = ft.mParenthesis->mContent;
-					for (size_t k = 0; k < parameters.size(); ++k)
+					for (size_t k = 0; k < ft.mParameters.size(); ++k)
 					{
 						if (k > 0)
 							line << ", ";
-						translateTokenInternal(line, static_cast<const StatementToken&>(parameters[k]));
+						translateTokenInternal(line, ft.mParameters[k]);
 					}
 
 					line << ")";
@@ -399,6 +397,13 @@ namespace lemon
 	{
 		CppTranslator cppTranslator;
 		cppTranslator.translate(output, rootNode);
+	}
+
+	void Translator::translateToCppAndSave(std::wstring_view filename, const BlockNode& rootNode)
+	{
+		String output;
+		translateToCpp(output, rootNode);
+		output.saveFile(filename);
 	}
 
 }

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,7 +9,11 @@
 #pragma once
 
 #include "lemon/compiler/Definitions.h"
+#include "lemon/compiler/Operators.h"
 #include "lemon/compiler/Token.h"
+#include "lemon/program/GlobalsLookup.h"
+#include "lemon/utility/AnyBaseValue.h"
+#include "lemon/utility/FlyweightString.h"
 
 
 namespace lemon
@@ -72,7 +76,7 @@ namespace lemon
 		inline LabelToken() : Token(TYPE) {}
 
 	public:
-		std::string mName;
+		FlyweightString mName;
 	};
 
 
@@ -88,7 +92,7 @@ namespace lemon
 		inline ConstantToken() : StatementToken(TYPE) {}
 
 	public:
-		int64 mValue = 0;
+		AnyBaseValue mValue { 0 };
 	};
 
 
@@ -101,7 +105,8 @@ namespace lemon
 		inline IdentifierToken() : StatementToken(TYPE) {}
 
 	public:
-		std::string mIdentifier;
+		FlyweightString mName;
+		const GlobalsLookup::Identifier* mResolved = nullptr;
 	};
 
 
@@ -158,6 +163,7 @@ namespace lemon
 		Operator mOperator = Operator::_INVALID;
 		TokenPtr<StatementToken> mLeft;
 		TokenPtr<StatementToken> mRight;
+		const Function* mFunction = nullptr;	// Usually a null pointer, except if a certain function is enforced
 	};
 
 
@@ -183,10 +189,9 @@ namespace lemon
 		inline FunctionToken() : StatementToken(TYPE) {}
 
 	public:
-		std::string mFunctionName;
 		const Function* mFunction = nullptr;
 		bool mIsBaseCall = false;
-		TokenPtr<ParenthesisToken> mParenthesis;
+		std::vector<TokenPtr<StatementToken>> mParameters;
 	};
 
 

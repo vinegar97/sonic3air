@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oxygen/application/input/InputConfig.h"
+
 #include <lemon/compiler/PreprocessorDefinition.h>
 
 class JsonHelper;
@@ -19,10 +20,10 @@ class Configuration
 public:
 	enum class RenderMethod
 	{
-		UNDEFINED		= 0x00,
-		SOFTWARE		= 0x10,
-		OPENGL_SOFT		= 0x20,		// Formerly "Software Renderer"
-		OPENGL_FULL		= 0x21		// Formerly "Hardware Renderer"
+		UNDEFINED	= 0x00,
+		SOFTWARE	= 0x10,
+		OPENGL_SOFT	= 0x20,
+		OPENGL_FULL	= 0x21
 	};
 
 	enum class WindowMode
@@ -30,6 +31,29 @@ public:
 		WINDOWED,
 		BORDERLESS_FULLSCREEN,
 		EXCLUSIVE_FULLSCREEN
+	};
+
+	enum class FrameSyncType
+	{
+		VSYNC_OFF,
+		VSYNC_ON,
+		VSYNC_FRAMECAP,
+		FRAME_INTERPOLATION,
+		_NUM
+	};
+
+	struct DevModeSettings
+	{
+		bool mEnabled = false;
+	};
+
+	struct GameRecorder
+	{
+		int mRecordingMode = -1;		// -1 = Auto, 0 = Recording disabled, 1 = Recording enabled
+		bool mIsRecording = false;
+		bool mIsPlayback = false;
+		int mPlaybackStartFrame = 0;
+		bool mPlaybackIgnoreKeys = false;
 	};
 
 	struct VirtualGamepad
@@ -40,6 +64,9 @@ public:
 		Vec2i mFaceButtonsCenter;
 		int   mFaceButtonsSize = 100;
 		Vec2i mStartButtonCenter;
+		Vec2i mGameRecButtonCenter;
+		Vec2i mShoulderLButtonCenter;
+		Vec2i mShoulderRButtonCenter;
 	};
 
 	struct Mod
@@ -65,6 +92,8 @@ public:
 	inline static bool hasInstance()		 { return (nullptr != mSingleInstance); }
 	inline static Configuration& instance()  { return *mSingleInstance; }
 
+	static RenderMethod getHighestSupportedRenderMethod();
+
 public:
 	Configuration();
 
@@ -74,6 +103,8 @@ public:
 	void saveSettings();
 
 	inline void setSettingsReadOnly(bool enable)  { mSettingsReadOnly = enable; }
+
+	void evaluateGameRecording();
 
 protected:
 	virtual void preLoadInitialization() = 0;
@@ -101,7 +132,6 @@ public:
 	std::wstring mSaveStatesDir;
 	std::wstring mSaveStatesDirLocal;
 	std::wstring mAnalysisDir;
-	std::wstring mSRamFilename;
 	std::wstring mPersistentDataFilename;
 
 	// General
@@ -110,14 +140,14 @@ public:
 
 	// Game
 	std::wstring mLoadSaveState;
-	int	   mLoadLevel = -1;
-	int	   mUseCharacters = 1;
-	int    mStartPhase = 0;
-	bool   mDevMode = false;
-	int    mSimulationFrequency = 60;
-	int    mGameRecording = -1;
-	int    mGameRecPlayFrom = 0;
-	bool   mGameRecIgnoreKeys = false;
+	int	 mLoadLevel = -1;
+	int	 mUseCharacters = 1;
+	int  mStartPhase = 0;
+	int  mSimulationFrequency = 60;
+	GameRecorder mGameRecorder;
+
+	// Dev mode
+	DevModeSettings mDevMode;
 
 	// Video
 	WindowMode mWindowMode = WindowMode::WINDOWED;
@@ -126,35 +156,42 @@ public:
 	int   mDisplayIndex = 0;
 	RenderMethod mRenderMethod = RenderMethod::UNDEFINED;
 	bool  mAutoDetectRenderMethod = true;
-	int   mFrameSync = 1;
+	FrameSyncType mFrameSync = FrameSyncType::VSYNC_ON;
 	int   mUpscaling = 0;
 	int   mBackdrop = 0;
 	int   mFiltering = 0;
 	int   mScanlines = 0;
 	int   mBackgroundBlur = 0;
-	bool  mFullEmulationRendering = true;
 	int   mPerformanceDisplay = 0;
 
 	// Audio
 	int   mAudioSampleRate = 48000;
 	float mAudioVolume = 1.0f;
-	bool  mUseAudioThreading = true;	// Disabled in constructor for platforms that don't support it
+	bool  mUseAudioThreading = true;		// Disabled in constructor for platforms that don't support it
 
 	// Input
 	std::vector<InputConfig::DeviceDefinition> mInputDeviceDefinitions;
 	VirtualGamepad mVirtualGamepad;
 	std::string mPreferredGamepad[2];
 	int mAutoAssignGamepadPlayerIndex = 0;	// Default is player 1 (who has index 0)
+	float mControllerRumbleIntensity[2] = { 0, 0 };
 
 	// Input recorder
 	std::wstring mInputRecorderInput;
 	std::wstring mInputRecorderOutput;
 
+	// Misc
+	bool mMirrorMode = false;
+
 	// Internal
 	bool mForceCompileScripts = false;
-	int mScriptOptimizationLevel = 3;
+	int mScriptOptimizationLevel = -1;		// -1: Auto, 0: No optimization at all, up to 3: Full optimization
 	std::wstring mCompiledScriptSavePath;
-	bool mEnableROMDataAnalyzer = false;
+	bool mEnableROMDataAnalyser = false;
+	bool mExitAfterScriptLoading = false;
+	int mRunScriptNativization = 0;			// 0: Disabled, 1: Run nativization, 2: Nativization done
+	std::wstring mScriptNativizationOutput;
+	std::wstring mDumpCppDefinitionsOutput;
 
 	// Mod settings
 	std::map<uint64, Mod> mModSettings;

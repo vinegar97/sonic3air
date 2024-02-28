@@ -16,12 +16,6 @@
     <Filter Include="rendering\utils">
       <UniqueIdentifier>{d3c52cf0-8f00-480f-8f02-63ff30588b05}</UniqueIdentifier>
     </Filter>
-    <Filter Include="rendering\hardware">
-      <UniqueIdentifier>{de361638-d9ff-4a77-8c81-bcd42f32c888}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="rendering\hardware\shaders">
-      <UniqueIdentifier>{5deef7ad-6389-4ab8-98f5-02398dd27146}</UniqueIdentifier>
-    </Filter>
     <Filter Include="rendering\software">
       <UniqueIdentifier>{92d5eaed-a935-4f84-aa4f-c19c11b24241}</UniqueIdentifier>
     </Filter>
@@ -52,9 +46,6 @@
     <Filter Include="resources">
       <UniqueIdentifier>{2f8f51cf-6e63-45aa-b331-70c7a2f83820}</UniqueIdentifier>
     </Filter>
-    <Filter Include="base">
-      <UniqueIdentifier>{1a6fb333-fe3a-4e1f-af20-540374f54e8e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="drawing">
       <UniqueIdentifier>{f7e88c35-532b-4eea-87c3-1252bbda7c22}</UniqueIdentifier>
     </Filter>
@@ -79,6 +70,24 @@
     <Filter Include="application\gameview">
       <UniqueIdentifier>{966bc23b-1c4a-4d58-830f-bf7ddf86fe96}</UniqueIdentifier>
     </Filter>
+    <Filter Include="rendering\sprite">
+      <UniqueIdentifier>{90c5c534-16d1-435b-841a-5303039a83ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rendering\opengl">
+      <UniqueIdentifier>{de361638-d9ff-4a77-8c81-bcd42f32c888}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rendering\opengl\shaders">
+      <UniqueIdentifier>{5deef7ad-6389-4ab8-98f5-02398dd27146}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="download">
+      <UniqueIdentifier>{3f957152-f46c-4836-9d9d-b9655a560856}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="simulation\bindings">
+      <UniqueIdentifier>{8bad1afb-2428-4f4e-8187-4dbd48347a39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="simulation\debug">
+      <UniqueIdentifier>{75bf8c7b-7f6c-4f46-8328-a9f4bf832b4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -90,7 +99,7 @@
     <ClCompile Include="..\..\source\oxygen\helper\FileHelper.cpp">
       <Filter>helper</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\helper\Log.cpp">
+    <ClCompile Include="..\..\source\oxygen\helper\Logging.cpp">
       <Filter>helper</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\helper\Utils.cpp">
@@ -123,38 +132,11 @@
     <ClCompile Include="..\..\source\oxygen\rendering\utils\BufferTexture.cpp">
       <Filter>rendering\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\utils\ComponentSprite.cpp">
-      <Filter>rendering\utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.cpp">
-      <Filter>rendering\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\utils\PaletteSprite.cpp">
       <Filter>rendering\utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\utils\RenderUtils.cpp">
       <Filter>rendering\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\hardware\HardwareRenderer.cpp">
-      <Filter>rendering\hardware</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\hardware\HardwareRenderResources.cpp">
-      <Filter>rendering\hardware</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\DebugDrawPlaneShader.cpp">
-      <Filter>rendering\hardware\shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\RenderComponentSpriteShader.cpp">
-      <Filter>rendering\hardware\shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\RenderPaletteSpriteShader.cpp">
-      <Filter>rendering\hardware\shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\RenderPlaneShader.cpp">
-      <Filter>rendering\hardware\shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\RenderVdpSpriteShader.cpp">
-      <Filter>rendering\hardware\shaders</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\software\SoftwareRenderer.cpp">
       <Filter>rendering\software</Filter>
@@ -201,9 +183,6 @@
     <ClCompile Include="..\..\source\oxygen\simulation\CodeExec.cpp">
       <Filter>simulation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptBindings.cpp">
-      <Filter>simulation</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptRuntime.cpp">
       <Filter>simulation</Filter>
     </ClCompile>
@@ -228,9 +207,6 @@
     <ClCompile Include="..\..\source\oxygen\simulation\sound\ym2612.cpp">
       <Filter>simulation\sound</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteBase.cpp">
-      <Filter>rendering\utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\EngineMain.cpp">
       <Filter>application</Filter>
     </ClCompile>
@@ -243,12 +219,6 @@
     <ClCompile Include="..\..\source\oxygen\pch.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\Configuration.cpp">
       <Filter>application</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteDump.cpp">
-      <Filter>rendering\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\helper\PackageFileCrawler.cpp">
-      <Filter>helper</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\utils\Kosinski.cpp">
       <Filter>rendering\utils</Filter>
@@ -264,9 +234,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\simulation\PersistentData.cpp">
       <Filter>simulation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\base\PlatformFunctions.cpp">
-      <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\GameProfile.cpp">
       <Filter>application</Filter>
@@ -301,20 +268,11 @@
     <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.cpp">
       <Filter>drawing\software</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\drawing\software\Blitter.cpp">
-      <Filter>drawing\software</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\overlays\DebugSidePanelCategory.cpp">
       <Filter>application\overlays</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\audio\AudioCollection.cpp">
       <Filter>application\audio</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\parts\OverlayManager.cpp">
-      <Filter>rendering\parts</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\base\CrashHandler.cpp">
-      <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerResources.cpp">
       <Filter>drawing\opengl</Filter>
@@ -394,6 +352,81 @@
     <ClCompile Include="..\..\source\oxygen\application\input\InputConfig.cpp">
       <Filter>application\input</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\resources\PrintedTextCache.cpp">
+      <Filter>resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\resources\FontCollection.cpp">
+      <Filter>resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\sprite\ComponentSprite.cpp">
+      <Filter>rendering\sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\sprite\PaletteSprite.cpp">
+      <Filter>rendering\sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\sprite\SpriteDump.cpp">
+      <Filter>rendering\sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderer.cpp">
+      <Filter>rendering\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderResources.cpp">
+      <Filter>rendering\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\DebugDrawPlaneShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderComponentSpriteShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPaletteSpriteShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPlaneShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderVdpSpriteShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.cpp">
+      <Filter>drawing\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\input\RumbleEffectQueue.cpp">
+      <Filter>application\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\download\Downloader.cpp">
+      <Filter>download</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\download\DownloadManager.cpp">
+      <Filter>download</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\platform\CrashHandler.cpp">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\platform\PlatformFunctions.cpp">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\OpenGLShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\software\Blitter.cpp">
+      <Filter>drawing\software</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\TextInputHandler.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\bindings\LemonScriptBindings.cpp">
+      <Filter>simulation\bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\bindings\RendererBindings.cpp">
+      <Filter>simulation\bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\debug\DebugTracking.cpp">
+      <Filter>simulation\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\RenderItem.cpp">
+      <Filter>rendering\parts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -402,7 +435,7 @@
     <ClInclude Include="..\..\source\oxygen\helper\JsonHelper.h">
       <Filter>helper</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\helper\Log.h">
+    <ClInclude Include="..\..\source\oxygen\helper\Logging.h">
       <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\helper\Utils.h">
@@ -441,38 +474,11 @@
     <ClInclude Include="..\..\source\oxygen\rendering\utils\BufferTexture.h">
       <Filter>rendering\utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\utils\ComponentSprite.h">
-      <Filter>rendering\utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.h">
-      <Filter>rendering\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\utils\PaletteSprite.h">
       <Filter>rendering\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\utils\RenderUtils.h">
       <Filter>rendering\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\hardware\HardwareRenderer.h">
-      <Filter>rendering\hardware</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\hardware\HardwareRenderResources.h">
-      <Filter>rendering\hardware</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\DebugDrawPlaneShader.h">
-      <Filter>rendering\hardware\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\RenderComponentSpriteShader.h">
-      <Filter>rendering\hardware\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\RenderPaletteSpriteShader.h">
-      <Filter>rendering\hardware\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\RenderPlaneShader.h">
-      <Filter>rendering\hardware\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\RenderVdpSpriteShader.h">
-      <Filter>rendering\hardware\shaders</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\software\SoftwareRenderer.h">
       <Filter>rendering\software</Filter>
@@ -522,16 +528,10 @@
     <ClInclude Include="..\..\source\oxygen\simulation\CodeExec.h">
       <Filter>simulation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptBindings.h">
-      <Filter>simulation</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptRuntime.h">
       <Filter>simulation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\simulation\LogDisplay.h">
-      <Filter>simulation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\simulation\Runtime.h">
       <Filter>simulation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\simulation\SaveStateSerializer.h">
@@ -552,9 +552,6 @@
     <ClInclude Include="..\..\source\oxygen\simulation\sound\ym2612.h">
       <Filter>simulation\sound</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteBase.h">
-      <Filter>rendering\utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\EngineMain.h">
       <Filter>application</Filter>
     </ClInclude>
@@ -571,12 +568,6 @@
     <ClInclude Include="..\..\source\oxygen\application\Configuration.h">
       <Filter>application</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteDump.h">
-      <Filter>rendering\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\helper\PackageFileCrawler.h">
-      <Filter>helper</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\utils\Kosinski.h">
       <Filter>rendering\utils</Filter>
     </ClInclude>
@@ -591,9 +582,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\simulation\PersistentData.h">
       <Filter>simulation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\base\PlatformFunctions.h">
-      <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\GameProfile.h">
       <Filter>application</Filter>
@@ -631,20 +619,11 @@
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.h">
       <Filter>drawing\software</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\drawing\software\Blitter.h">
-      <Filter>drawing\software</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\overlays\DebugSidePanelCategory.h">
       <Filter>application\overlays</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\audio\AudioCollection.h">
       <Filter>application\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\parts\OverlayManager.h">
-      <Filter>rendering\parts</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\base\CrashHandler.h">
-      <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerResources.h">
       <Filter>drawing\opengl</Filter>
@@ -730,60 +709,153 @@
     <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderPartsDefinitions.h">
       <Filter>rendering\parts</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\SpacesManager.h">
+      <Filter>rendering\parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\resources\PrintedTextCache.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\resources\FontCollection.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\sprite\ComponentSprite.h">
+      <Filter>rendering\sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\sprite\PaletteSprite.h">
+      <Filter>rendering\sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\sprite\SpriteBase.h">
+      <Filter>rendering\sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\sprite\SpriteDump.h">
+      <Filter>rendering\sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderer.h">
+      <Filter>rendering\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderResources.h">
+      <Filter>rendering\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\DebugDrawPlaneShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderComponentSpriteShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPaletteSpriteShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPlaneShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderVdpSpriteShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.h">
+      <Filter>drawing\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\input\RumbleEffectQueue.h">
+      <Filter>application\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\download\Downloader.h">
+      <Filter>download</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\download\DownloadManager.h">
+      <Filter>download</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\platform\CrashHandler.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\platform\PlatformFunctions.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\OpenGLShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\software\Blitter.h">
+      <Filter>drawing\software</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\software\BlitterHelper.h">
+      <Filter>drawing\software</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\RenderingDefinitions.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\RuntimeEnvironment.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\TextInputHandler.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\bindings\LemonScriptBindings.h">
+      <Filter>simulation\bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\bindings\RendererBindings.h">
+      <Filter>simulation\bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\software\SoftwareBlur.h">
+      <Filter>rendering\software</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\debug\DebugTracking.h">
+      <Filter>simulation\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderItem.h">
+      <Filter>rendering\parts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Oxygen.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\data\shader\debugdraw_plane.shader">
+    <None Include="..\..\data\shader\debugdraw_plane.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\postfx_blur.shader">
+    <None Include="..\..\data\shader\postfx_blur.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\render_plane.shader">
+    <None Include="..\..\data\shader\render_plane.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\render_sprite_component.shader">
+    <None Include="..\..\data\shader\render_sprite_component.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\render_sprite_palette.shader">
+    <None Include="..\..\data\shader\render_sprite_palette.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\render_sprite_vdp.shader">
+    <None Include="..\..\data\shader\render_sprite_vdp.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_copy_screen.shader">
+    <None Include="..\..\data\shader\simple_copy_screen.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_rect_colored.shader">
+    <None Include="..\..\data\shader\simple_rect_colored.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_rect_depthwrite.shader">
+    <None Include="..\..\data\shader\simple_rect_depthwrite.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_rect_overdraw.shader">
+    <None Include="..\..\data\shader\simple_rect_overdraw.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_rect_textured.shader">
+    <None Include="..\..\data\shader\simple_rect_textured.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_rect_textured_uv.shader">
+    <None Include="..\..\data\shader\simple_rect_textured_uv.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_rect_vertexcolor.shader">
+    <None Include="..\..\data\shader\simple_rect_vertexcolor.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\upscaler_hqx.shader">
+    <None Include="..\..\data\shader\upscaler_hqx.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\upscaler_soft.shader">
+    <None Include="..\..\data\shader\upscaler_soft.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\upscaler_xbrz-freescale-pass0.shader">
+    <None Include="..\..\data\shader\upscaler_xbrz-freescale-pass0.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\upscaler_xbrz-freescale-pass1.shader">
+    <None Include="..\..\data\shader\upscaler_xbrz-freescale-pass1.shader">
       <Filter>_shader</Filter>
     </None>
   </ItemGroup>

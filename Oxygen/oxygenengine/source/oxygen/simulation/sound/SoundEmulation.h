@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -32,11 +32,11 @@ private:
 	struct Internal;
 	Internal& mInternal;
 
-	blip_t* blips[2];  /* Blip Buffer resampling */
+	blip_t* blips[2] = { nullptr, nullptr };  /* Blip Buffer resampling */
 
 	/* FM output buffer (large enough to hold a whole frame at original chips rate) */
-	int fm_buffer[1080 * 2];
-	int fm_last[2];
+	int fm_buffer[1080 * 2] = { 0 };
+	int fm_last[2] = { 0, 0 };
 	int* fm_ptr = nullptr;
 
 	/* Cycle-accurate FM samples */

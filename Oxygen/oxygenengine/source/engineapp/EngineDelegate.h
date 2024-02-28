@@ -17,7 +17,7 @@ public:
 	bool onEnginePreStartup() override;
 	bool setupCustomGameProfile() override;
 
-	void startupGame() override;
+	void startupGame(EmulatorInterface& emulatorInterface) override;
 	void shutdownGame() override;
 	void updateGame(float timeElapsed) override;
 
@@ -33,6 +33,7 @@ public:
 	bool mayLoadScriptMods() override;
 	bool allowModdedData() override;
 	bool useDeveloperFeatures() override;
+	void onActiveModsChanged() override;
 
 	void onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer) override;
 	void onGameRecordingHeaderSave(std::vector<uint8>& buffer) override;

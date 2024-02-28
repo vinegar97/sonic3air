@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,52 +10,72 @@
 #include "oxygen/helper/HighResolutionTimer.h"
 
 
-void HighResolutionTimer::Reset()
+void HighResolutionTimer::reset()
 {
-	mLastTime = mCurrentTime;
-	mCurrentTime = Duration::zero();
 	mRunning = false;
 }
 
-void HighResolutionTimer::Restart()
+void HighResolutionTimer::start()
 {
-	mLastTime = mCurrentTime;
-	mCurrentTime = Duration::zero();
 	mStart = std::chrono::high_resolution_clock::now();
 	mRunning = true;
 }
 
-void HighResolutionTimer::Start()
-{
-	if (!mRunning)
-	{
-		mStart = std::chrono::high_resolution_clock::now();
-		mRunning = true;
-	}
-}
-
-void HighResolutionTimer::Stop()
+double HighResolutionTimer::getSecondsSinceStart() const
 {
 	if (mRunning)
 	{
-		const TimePoint end = std::chrono::high_resolution_clock::now();
-		mCurrentTime += (end - mStart);
+		const Duration duration = (std::chrono::high_resolution_clock::now() - mStart);
+		return duration.count();
+	}
+	return 0.0;
+}
+
+
+void AccumulativeTimer::resetTiming()
+{
+	reset();
+	mAccumulatedTime = Duration::zero();
+}
+
+void AccumulativeTimer::resumeTiming()
+{
+	if (!mRunning)
+	{
+		start();
+	}
+}
+
+void AccumulativeTimer::pauseTiming()
+{
+	if (mRunning)
+	{
+		mAccumulatedTime += (std::chrono::high_resolution_clock::now() - mStart);
 		mRunning = false;
 	}
 }
 
-double HighResolutionTimer::GetCurrentSeconds()
+double AccumulativeTimer::getAccumulatedSeconds() const
 {
+	Duration totalDuration = mAccumulatedTime;
 	if (mRunning)
 	{
-		const TimePoint end = std::chrono::high_resolution_clock::now();
-		mCurrentTime += (end - mStart);
-		mStart = end;
+		totalDuration += (std::chrono::high_resolution_clock::now() - mStart);
 	}
-	return mCurrentTime.count();
+	return totalDuration.count();
 }
 
-double HighResolutionTimer::GetLastSeconds() const
+double AccumulativeTimer::getAccumulatedSecondsAndRestart()
 {
-	return mLastTime.count();
+	const TimePoint now = std::chrono::high_resolution_clock::now();
+	Duration totalDuration = mAccumulatedTime;
+	if (mRunning)
+	{
+		totalDuration += (now - mStart);
+	}
+
+	mStart = now;
+	mAccumulatedTime = Duration::zero();
+	mRunning = true;
+	return totalDuration.count();
 }

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,7 +9,9 @@
 #pragma once
 
 #include "lemon/program/Opcode.h"
+#include "lemon/program/SourceFileInfo.h"
 #include "lemon/program/Variable.h"
+#include "lemon/utility/FlyweightString.h"
 
 
 namespace lemon
@@ -20,30 +22,51 @@ namespace lemon
 	class API_EXPORT Function
 	{
 	friend class Module;
+	friend class ModuleSerializer;
 
 	public:
 		enum class Type : uint8
 		{
 			SCRIPT,
-			USER
+			NATIVE
 		};
+
 		struct Parameter
 		{
-			const DataTypeDefinition* mType = nullptr;
-			std::string mIdentifier;
+			const DataTypeDefinition* mDataType = nullptr;
+			FlyweightString mName;
 		};
 		typedef std::vector<Parameter> ParameterList;
+
+		struct SignatureBuilder
+		{
+			void clear(const DataTypeDefinition& returnType);
+			void addParameterType(const DataTypeDefinition& dataType);
+			uint32 getSignatureHash();
+
+			std::vector<uint32> mData;
+		};
+
+		enum class Flag
+		{
+			ALLOW_INLINE_EXECUTION = 0x01,	// Native only: Function can be called directly inside the opcode run loop and does not interfere with control flow
+			COMPILE_TIME_CONSTANT  = 0x02	// Native only: Function only does calculation on the parameters, does not read from run-time sources and has no side-effects
+		};
 
 	public:
 		static uint32 getVoidSignatureHash();
 
 	public:
 		inline Type getType() const  { return mType; }
-		inline uint32 getId() const  { return mId; }
+		inline uint32 getID() const  { return mID; }
 
-		inline const std::string& getName() const { return mName; }
-		inline uint64 getNameHash() const { return mNameHash; }
+		inline BitFlagSet<Flag> getFlags() const  { return mFlags; }
+		inline bool hasFlag(Flag flag) const	  { return mFlags.isSet(flag); }
+
+		inline FlyweightString getContext() const { return mContext; }
+		inline FlyweightString getName() const    { return mName; }
 		inline uint64 getNameAndSignatureHash() const { return mNameAndSignatureHash; }
+		inline const std::vector<FlyweightString>& getAliasNames() const { return mAliasNames; }
 
 		const DataTypeDefinition* getReturnType() const  { return mReturnType; }
 		const ParameterList& getParameters() const  { return mParameters; }
@@ -58,12 +81,14 @@ namespace lemon
 
 	protected:
 		Type mType;
-		uint32 mId = 0;
+		uint32 mID = 0;
+		BitFlagSet<Flag> mFlags;
 
 		// Metadata
-		std::string mName;
-		uint64 mNameHash = 0;
+		FlyweightString mContext;		// Name of the type if this is a method-like function
+		FlyweightString mName;
 		uint64 mNameAndSignatureHash = 0;
+		std::vector<FlyweightString> mAliasNames;
 
 		// Signature
 		const DataTypeDefinition* mReturnType = &PredefinedDataTypes::VOID;
@@ -75,38 +100,54 @@ namespace lemon
 	class ScriptFunction : public Function
 	{
 	public:
+		struct Label
+		{
+			FlyweightString mName;
+			uint32 mOffset = 0;
+		};
+
+	public:
 		inline ScriptFunction() : Function(Type::SCRIPT) {}
 		~ScriptFunction();
 
 		inline const Module& getModule() const	{ return *mModule; }
 		inline void setModule(Module& module)	{ mModule = &module; }
 
-		LocalVariable* getLocalVariableByIdentifier(const std::string& identifier) const;
-		LocalVariable& getLocalVariableById(uint32 id) const;
-		LocalVariable& addLocalVariable(const std::string& identifier, const DataTypeDefinition* dataType, uint32 lineNumber);
+		LocalVariable* getLocalVariableByIdentifier(uint64 nameHash) const;
+		LocalVariable& getLocalVariableByID(uint32 id) const;
+		LocalVariable& addLocalVariable(FlyweightString name, const DataTypeDefinition* dataType, uint32 lineNumber);
 
-		bool getLabel(const std::string& labelName, size_t& outOffset) const;
-		void addLabel(const std::string& labelName, size_t offset);
-		const std::string* findLabelByOffset(size_t offset) const;
+		bool getLabel(FlyweightString labelName, size_t& outOffset) const;
+		void addLabel(FlyweightString labelName, size_t offset);
+		const Label* findLabelByOffset(size_t offset) const;
 
+		const std::vector<uint32>& getAddressHooks() const  { return mAddressHooks; }
+
+		void addOrProcessPragma(std::string_view pragmaString, bool consumeIfProcessed);
 		inline const std::vector<std::string>& getPragmas() const  { return mPragmas; }
+
+		uint64 addToCompiledHash(uint64 hash) const;
 
 	public:
 		// Variables
-		std::map<std::string, LocalVariable*> mLocalVariablesByIdentifier;
-		std::vector<LocalVariable*> mLocalVariablesById;
+		std::map<uint64, LocalVariable*> mLocalVariablesByIdentifier;
+		std::vector<LocalVariable*> mLocalVariablesByID;
 
 		// Code
 		std::vector<Opcode> mOpcodes;
 
 		// Labels
-		std::map<std::string, uint32> mLabels;
+		std::vector<Label> mLabels;
+
+		// Address hooks
+		std::vector<uint32> mAddressHooks;
 
 		// Pragmas
 		std::vector<std::string> mPragmas;
 
 		// Source
-		std::wstring mSourceFilename;
+		const SourceFileInfo* mSourceFileInfo = nullptr;
+		uint32 mStartLineNumber = 0;
 		uint32 mSourceBaseLineOffset = 0;	// Offset translating from the full line number (when all includes are fully resolved) to line number inside the original script file
 
 	private:
@@ -114,7 +155,7 @@ namespace lemon
 	};
 
 
-	class UserDefinedFunction : public Function
+	class NativeFunction : public Function
 	{
 	public:
 		struct Context
@@ -132,21 +173,17 @@ namespace lemon
 			virtual std::vector<const DataTypeDefinition*> getParameterTypes() const = 0;
 		};
 
-		enum Flags
-		{
-			FLAG_ALLOW_INLINE_EXECUTION = 0x01
-		};
-
 	public:
-		inline UserDefinedFunction() : Function(Type::USER) {}
-		inline virtual ~UserDefinedFunction()  { delete mFunctionWrapper; }
+		inline NativeFunction() : Function(Type::NATIVE) {}
+		inline virtual ~NativeFunction()  { delete mFunctionWrapper; }
 
 		void setFunction(const FunctionWrapper& functionWrapper);
+		NativeFunction& setParameterInfo(size_t index, const std::string& identifier);
+
 		void execute(const Context context) const;
 
 	public:
 		const FunctionWrapper* mFunctionWrapper = nullptr;
-		uint8 mFlags = 0;
 	};
 
 

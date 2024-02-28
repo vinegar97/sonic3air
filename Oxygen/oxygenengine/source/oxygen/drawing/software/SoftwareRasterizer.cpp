@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -133,8 +133,6 @@ void SoftwareRasterizer::drawTriangle(const Vertex_P2_C4* vertices)
 
 void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Vertex_P2_T2& vertex10, const Vertex_P2_T2& vertex01, const Vertex_P2_T2& vertex11, const Bitmap& texture)
 {
-	const bool useBilinearSampling = mOptions.mUseBilinearSampling;
-
 	const float startY = vertex00.mPosition.y;	// Can be assumed to be the same as vertex10.mPosition.y
 	const float endY = vertex01.mPosition.y;	// Can be assumed to be the same as vertex11.mPosition.y
 
@@ -164,8 +162,8 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 
 	int minY = (int)(firstIntegerY);
 	int maxY = (int)(std::floor(endY));
-	minY = clamp(minY, 0, mOutput.mSize.y);
-	maxY = clamp(maxY, -1, mOutput.mSize.y-1);
+	minY = clamp(minY, 0, mOutput.getSize().y);
+	maxY = clamp(maxY, -1, mOutput.getSize().y-1);
 
 	const float scaleU = (float)(texture.getWidth() - 1);
 	const float scaleV = (float)(texture.getHeight() - 1);
@@ -174,8 +172,8 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 	{
 		int minX = (int)(std::ceil(vertexLeft.mPosition.x));
 		int maxX = (int)(std::floor(vertexRight.mPosition.x));
-		minX = clamp(minX, 0, mOutput.mSize.x);
-		maxX = clamp(maxX, -1, mOutput.mSize.x-1);
+		minX = clamp(minX, 0, mOutput.getSize().x);
+		maxX = clamp(maxX, -1, mOutput.getSize().x-1);
 
 		if (minX <= maxX)
 		{
@@ -183,10 +181,10 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 			const Vec2f diffUV = (vertexRight.mUV - vertexLeft.mUV) / std::max(vertexRight.mPosition.x - vertexLeft.mPosition.x, 1.0f);
 			Vec2f currentUV = vertexLeft.mUV + diffUV * ((float)(minX) - vertexLeft.mPosition.x);
 
-			if (mOptions.mUseAlphaBlending)
+			if (mOptions.mBlendMode == BlendMode::ALPHA)
 			{
 				uint8* bytes = (uint8*)data;
-				if (!useBilinearSampling)
+				if (mOptions.mSamplingMode == SamplingMode::POINT)
 				{
 					for (int x = minX; x <= maxX; ++x)
 					{
@@ -196,7 +194,7 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 						// Point sampling
 						const int sampleX = roundToInt(u * scaleU);
 						const int sampleY = roundToInt(v * scaleV);
-						const uint32 texColor = texture.mData[sampleX + sampleY * texture.getWidth()];
+						const uint32 texColor = texture.getPixel(sampleX, sampleY);
 
 						// Alpha blending
 						const uint16 multiplierA = ((texColor >> 16) & 0xff00) / 255;
@@ -205,8 +203,6 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 						bytes[1] = (((texColor >> 8)  & 0xff) * multiplierA + bytes[1] * multiplierB) >> 8;
 						bytes[2] = (((texColor >> 16) & 0xff) * multiplierA + bytes[2] * multiplierB) >> 8;
 						bytes[3] = 0xff;
-
-						// TODO: Support red-blue swap here
 
 						bytes += 4;
 						currentUV += diffUV;
@@ -229,22 +225,20 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 						const int sampleY0 = (int)(sampleFloatY);
 						const int sampleX1 = std::min(sampleX0 + 1, texture.getWidth() - 1);
 						const int sampleY1 = std::min(sampleY0 + 1, texture.getHeight() - 1);
-						const uint8* sample00 = (uint8*)&texture.mData[sampleX0 + sampleY0 * texture.getWidth()];
-						const uint8* sample01 = (uint8*)&texture.mData[sampleX0 + sampleY1 * texture.getWidth()];
-						const uint8* sample10 = (uint8*)&texture.mData[sampleX1 + sampleY0 * texture.getWidth()];
-						const uint8* sample11 = (uint8*)&texture.mData[sampleX1 + sampleY1 * texture.getWidth()];
+						const uint8* sample00 = (const uint8*)texture.getPixelPointer(sampleX0, sampleY0);
+						const uint8* sample01 = (const uint8*)texture.getPixelPointer(sampleX0, sampleY1);
+						const uint8* sample10 = (const uint8*)texture.getPixelPointer(sampleX1, sampleY0);
+						const uint8* sample11 = (const uint8*)texture.getPixelPointer(sampleX1, sampleY1);
 						const float r = ((float)sample00[0] * (1.0f - factorX) + (float)sample10[0] * factorX) * (1.0f - factorY) + ((float)sample01[0] * (1.0f - factorX) + (float)sample11[0] * factorX) * factorY;
 						const float g = ((float)sample00[1] * (1.0f - factorX) + (float)sample10[1] * factorX) * (1.0f - factorY) + ((float)sample01[1] * (1.0f - factorX) + (float)sample11[1] * factorX) * factorY;
 						const float b = ((float)sample00[2] * (1.0f - factorX) + (float)sample10[2] * factorX) * (1.0f - factorY) + ((float)sample01[2] * (1.0f - factorX) + (float)sample11[2] * factorX) * factorY;
 						const float a = ((float)sample00[3] * (1.0f - factorX) + (float)sample10[3] * factorX) * (1.0f - factorY) + ((float)sample01[3] * (1.0f - factorX) + (float)sample11[3] * factorX) * factorY;
 
 						// Alpha blending
-						bytes[0] = (int)((r * a + (float)bytes[0] * (255.0f - a)) / 255.0f);
-						bytes[1] = (int)((g * a + (float)bytes[1] * (255.0f - a)) / 255.0f);
-						bytes[2] = (int)((b * a + (float)bytes[2] * (255.0f - a)) / 255.0f);
+						bytes[0] = (uint8)((r * a + (float)bytes[0] * (255.0f - a)) / 255.0f);
+						bytes[1] = (uint8)((g * a + (float)bytes[1] * (255.0f - a)) / 255.0f);
+						bytes[2] = (uint8)((b * a + (float)bytes[2] * (255.0f - a)) / 255.0f);
 						bytes[3] = 0xff;
-
-						// TODO: Support red-blue swap here
 
 						bytes += 4;
 						currentUV += diffUV;
@@ -261,10 +255,9 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 					// Point sampling
 					const int sampleX = roundToInt(u * scaleU);
 					const int sampleY = roundToInt(v * scaleV);
-					const uint32 texColor = texture.mData[sampleX + sampleY * texture.getWidth()];
+					const uint32 texColor = texture.getPixel(sampleX, sampleY);
 
 					// TODO: Support bilinear sampling here as well
-					// TODO: Support red-blue swap here
 
 					// No blending
 					*data = texColor;
@@ -284,8 +277,6 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 
 void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_C4& vertex00, const Vertex_P2_C4& vertex10, const Vertex_P2_C4& vertex01, const Vertex_P2_C4& vertex11)
 {
-	const bool useBilinearSampling = mOptions.mUseBilinearSampling;
-
 	const float startY = vertex00.mPosition.y;	// Can be assumed to be the same as vertex10.mPosition.y
 	const float endY = vertex01.mPosition.y;	// Can be assumed to be the same as vertex11.mPosition.y
 
@@ -296,24 +287,20 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_C4& vertex00, const Verte
 	const float rangeY = endY - startY;
 	Vertex_P2_C4 vertexLeft  = vertex00;
 	Vertex_P2_C4 vertexRight = vertex10;
+	const bool anyColorFade = (vertex00.mColor != vertex01.mColor || vertex00.mColor != vertex10.mColor || vertex00.mColor != vertex11.mColor);
 
 	// Changes of left and right vertex when advancing by one in y-direction
 	Vertex_P2_C4 advanceLeft;
 	Vertex_P2_C4 advanceRight;
 	advanceLeft.mPosition  = (vertex01.mPosition - vertex00.mPosition) / rangeY;
 	advanceRight.mPosition = (vertex11.mPosition - vertex10.mPosition) / rangeY;
-	for (int k = 0; k < 4; ++k)
+	if (anyColorFade)
 	{
-		advanceLeft.mColor[k]  = (vertex01.mColor[k] - vertex00.mColor[k]) / rangeY;
-		advanceRight.mColor[k]  = (vertex11.mColor[k] - vertex10.mColor[k]) / rangeY;
-	}
-
-	if (mOptions.mSwapRedBlue)
-	{
-		vertexLeft.mColor.swapRedBlue();
-		vertexRight.mColor.swapRedBlue();
-		advanceLeft.mColor.swapRedBlue();
-		advanceRight.mColor.swapRedBlue();
+		for (int k = 0; k < 4; ++k)
+		{
+			advanceLeft.mColor[k]  = (vertex01.mColor[k] - vertex00.mColor[k]) / rangeY;
+			advanceRight.mColor[k]  = (vertex11.mColor[k] - vertex10.mColor[k]) / rangeY;
+		}
 	}
 
 	// Move to the first integer line
@@ -321,71 +308,88 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_C4& vertex00, const Verte
 	const float firstStepY = firstIntegerY - startY;
 	vertexLeft.mPosition  += advanceLeft.mPosition * firstStepY;
 	vertexRight.mPosition += advanceRight.mPosition * firstStepY;
-	for (int k = 0; k < 4; ++k)
+	if (anyColorFade)
 	{
-		vertexLeft.mColor[k] += advanceLeft.mColor[k] * firstStepY;
-		vertexRight.mColor[k] += advanceRight.mColor[k] * firstStepY;
+		for (int k = 0; k < 4; ++k)
+		{
+			vertexLeft.mColor[k] += advanceLeft.mColor[k] * firstStepY;
+			vertexRight.mColor[k] += advanceRight.mColor[k] * firstStepY;
+		}
 	}
 
 	int minY = (int)(firstIntegerY);
 	int maxY = (int)(std::floor(endY));
-	minY = clamp(minY, 0, mOutput.mSize.y);
-	maxY = clamp(maxY, -1, mOutput.mSize.y-1);
+	minY = clamp(minY, 0, mOutput.getSize().y);
+	maxY = clamp(maxY, -1, mOutput.getSize().y-1);
 
 	for (int y = minY; y <= maxY; ++y)
 	{
 		int minX = (int)(std::ceil(vertexLeft.mPosition.x));
 		int maxX = (int)(std::floor(vertexRight.mPosition.x));
-		minX = clamp(minX, 0, mOutput.mSize.x);
-		maxX = clamp(maxX, -1, mOutput.mSize.x-1);
+		minX = clamp(minX, 0, mOutput.getSize().x);
+		maxX = clamp(maxX, -1, mOutput.getSize().x-1);
 
 		if (minX <= maxX)
 		{
 			uint32* data = mOutput.getPixelPointer(minX, y);
 			const float factor1 = 1.0f / std::max(vertexRight.mPosition.x - vertexLeft.mPosition.x, 1.0f);
 			const float factor2 = (float)minX - vertexLeft.mPosition.x;
-			Color diffColor;
-			Color currentColor;
-			for (int k = 0; k < 4; ++k)
-			{
-				diffColor[k] = (vertexRight.mColor[k] - vertexLeft.mColor[k]) * factor1;
-				currentColor[k] = vertexLeft.mColor[k] + diffColor[k] * factor2;
-			}
 
-			if (mOptions.mUseAlphaBlending)
+			if (anyColorFade)
 			{
-				uint8* bytes = (uint8*)data;
-				for (int x = minX; x <= maxX; ++x)
+				Color diffColor;
+				Color currentColor;
+				for (int k = 0; k < 4; ++k)
 				{
-					const uint32 texColor = currentColor.getABGR32();
+					diffColor[k] = (vertexRight.mColor[k] - vertexLeft.mColor[k]) * factor1;
+					currentColor[k] = vertexLeft.mColor[k] + diffColor[k] * factor2;
+				}
 
-					// Alpha blending
-					const uint16 multiplierA = ((texColor >> 16) & 0xff00) / 255;
-					const uint16 multiplierB = 256 - multiplierA;
-					bytes[0] = (((texColor)       & 0xff) * multiplierA + bytes[0] * multiplierB) >> 8;
-					bytes[1] = (((texColor >> 8)  & 0xff) * multiplierA + bytes[1] * multiplierB) >> 8;
-					bytes[2] = (((texColor >> 16) & 0xff) * multiplierA + bytes[2] * multiplierB) >> 8;
-					bytes[3] = 0xff;
-
-					bytes += 4;
-					for (int k = 0; k < 4; ++k)
+				if (mOptions.mBlendMode == BlendMode::ALPHA)
+				{
+					uint8* bytes = (uint8*)data;
+					for (int x = minX; x <= maxX; ++x)
 					{
-						currentColor[k] += diffColor[k];
+						const uint32 texColor = currentColor.getABGR32();
+
+						// Alpha blending
+						const uint16 multiplierA = ((texColor >> 16) & 0xff00) / 255;
+						const uint16 multiplierB = 256 - multiplierA;
+						bytes[0] = (((texColor)       & 0xff) * multiplierA + bytes[0] * multiplierB) >> 8;
+						bytes[1] = (((texColor >> 8)  & 0xff) * multiplierA + bytes[1] * multiplierB) >> 8;
+						bytes[2] = (((texColor >> 16) & 0xff) * multiplierA + bytes[2] * multiplierB) >> 8;
+						bytes[3] = 0xff;
+
+						bytes += 4;
+						for (int k = 0; k < 4; ++k)
+						{
+							currentColor[k] += diffColor[k];
+						}
+					}
+				}
+				else
+				{
+					// No blending, but color fade
+					for (int x = minX; x <= maxX; ++x)
+					{
+						*data = currentColor.getABGR32();
+
+						++data;
+						for (int k = 0; k < 4; ++k)
+						{
+							currentColor[k] += diffColor[k];
+						}
 					}
 				}
 			}
 			else
 			{
+				// No blending, fixed color
+				const uint32 fixedColorABGR = vertex00.mColor.getABGR32();
 				for (int x = minX; x <= maxX; ++x)
 				{
-					// No blending
-					*data = currentColor.getABGR32();
-
+					*data = fixedColorABGR;
 					++data;
-					for (int k = 0; k < 4; ++k)
-					{
-						currentColor[k] += diffColor[k];
-					}
 				}
 			}
 		}

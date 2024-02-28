@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -17,13 +17,16 @@ public:
 	struct RomCheck
 	{
 		uint32 mSize = 0;
-		uint32 mChecksum = 0;
-		std::vector<std::pair<uint32, uint8>> mOverwrites;
+		uint64 mChecksum = 0;
 	};
-	struct RomAutoDiscover
+	struct RomInfo
 	{
-		std::string  mSteamGameName;
+		std::string mSteamGameName;
 		std::wstring mSteamRomName;
+		uint64 mHeaderChecksum = 0;
+		std::vector<std::pair<uint32, uint8>> mOverwrites;		// First value: address -- second value: byte value to write there
+		std::vector<std::pair<uint32, uint32>> mBlankRegions;	// First value: start address -- second value: end address (included)
+		std::wstring mDiffFileName;
 	};
 
 	struct DataPackage
@@ -57,7 +60,7 @@ public:
 
 	// ROM
 	RomCheck mRomCheck;
-	RomAutoDiscover mRomAutoDiscover;
+	std::vector<RomInfo> mRomInfos;
 
 	// Paths
 	std::wstring mGameDataPath;		// As a path relative to the project directory; can stay empty to use the default path

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,13 +10,14 @@
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
-#include "oxygen/drawing/DrawerTexture.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/drawing/opengl/OpenGLDrawer.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/Geometry.h"
 #include "oxygen/rendering/RenderResources.h"
-#include "oxygen/rendering/hardware/HardwareRenderer.h"
+#include "oxygen/rendering/opengl/OpenGLRenderer.h"
 #include "oxygen/rendering/software/SoftwareRenderer.h"
 #include "oxygen/rendering/parts/RenderParts.h"
+#include "oxygen/resources/FontCollection.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/Simulation.h"
@@ -30,25 +31,26 @@ VideoOut::VideoOut() :
 
 VideoOut::~VideoOut()
 {
-	delete mHardwareRenderer;
-	delete mSoftwareRenderer;
 	delete mRenderParts;
 	delete &mRenderResources;
+	delete mSoftwareRenderer;
+#ifdef RMX_WITH_OPENGL_SUPPORT
+	delete mOpenGLRenderer;
+#endif
 }
 
 void VideoOut::startup()
 {
 	mGameResolution = Configuration::instance().mGameScreen;
 
-	LOG_INFO("VideoOut: Setup of game screen");
+	RMX_LOG_INFO("VideoOut: Setup of game screen");
 	EngineMain::instance().getDrawer().createTexture(mGameScreenTexture);
 	mGameScreenTexture.setupAsRenderTarget(mGameResolution.x, mGameResolution.y);
 
 	if (nullptr == mRenderParts)
 	{
-		LOG_INFO("VideoOut: Creating render parts");
+		RMX_LOG_INFO("VideoOut: Creating render parts");
 		mRenderParts = new RenderParts();
-		mRenderParts->setFullEmulation(Configuration::instance().mFullEmulationRendering);
 	}
 
 	createRenderer(false);
@@ -63,44 +65,59 @@ void VideoOut::reset()
 {
 	mRenderParts->reset();
 	mActiveRenderer->reset();
+
+	mFrameInterpolation.mUseInterpolationLastUpdate = false;
+	mFrameInterpolation.mUseInterpolationThisUpdate = false;
+	mDebugDrawRenderingRequested = false;
+	mPreviouslyHadNewRenderItems = false;
+}
+
+void VideoOut::handleActiveModsChanged()
+{
+	// Better reset everything, as sprite references might have become invalid and should be removed
+	reset();
 }
 
 void VideoOut::createRenderer(bool reset)
 {
-	setActiveRenderer(Configuration::instance().mRenderMethod != Configuration::RenderMethod::OPENGL_FULL, reset);
+	setActiveRenderer(Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_FULL, reset);
 }
 
 void VideoOut::destroyRenderer()
 {
-	SAFE_DELETE(mHardwareRenderer);
 	SAFE_DELETE(mSoftwareRenderer);
+#ifdef RMX_WITH_OPENGL_SUPPORT
+	SAFE_DELETE(mOpenGLRenderer);
+#endif
 }
 
-void VideoOut::setActiveRenderer(bool useSoftwareRenderer, bool reset)
+void VideoOut::setActiveRenderer(bool useOpenGLRenderer, bool reset)
 {
-	if (useSoftwareRenderer)
+#ifdef RMX_WITH_OPENGL_SUPPORT
+	if (useOpenGLRenderer)
+	{
+		if (nullptr == mOpenGLRenderer)
+		{
+			RMX_LOG_INFO("VideoOut: Creating OpenGL renderer");
+			mOpenGLRenderer = new OpenGLRenderer(*mRenderParts, mGameScreenTexture);
+
+			RMX_LOG_INFO("VideoOut: Renderer initialization");
+			mOpenGLRenderer->initialize();
+		}
+		mActiveRenderer = mOpenGLRenderer;
+	}
+	else
+#endif
 	{
 		if (nullptr == mSoftwareRenderer)
 		{
-			LOG_INFO("VideoOut: Creating software renderer");
+			RMX_LOG_INFO("VideoOut: Creating software renderer");
 			mSoftwareRenderer = new SoftwareRenderer(*mRenderParts, mGameScreenTexture);
 
-			LOG_INFO("VideoOut: Renderer initialization");
+			RMX_LOG_INFO("VideoOut: Renderer initialization");
 			mSoftwareRenderer->initialize();
 		}
 		mActiveRenderer = mSoftwareRenderer;
-	}
-	else
-	{
-		if (nullptr == mHardwareRenderer)
-		{
-			LOG_INFO("VideoOut: Creating hardware renderer");
-			mHardwareRenderer = new HardwareRenderer(*mRenderParts, mGameScreenTexture);
-
-			LOG_INFO("VideoOut: Renderer initialization");
-			mHardwareRenderer->initialize();
-		}
-		mActiveRenderer = mHardwareRenderer;
 	}
 
 	if (reset)
@@ -118,14 +135,17 @@ void VideoOut::setScreenSize(uint32 width, uint32 height)
 	mGameScreenTexture.setupAsRenderTarget(mGameResolution.x, mGameResolution.y);
 
 	mActiveRenderer->setGameResolution(mGameResolution);
+
+	// Render game screen again (this is particularly needed when switching from in-game Options back to the Pause Menu)
+	mRequireGameScreenUpdate = true;
 }
 
 Vec2i VideoOut::getInterpolatedWorldSpaceOffset() const
 {
-	Vec2i offset = mRenderParts->getSpriteManager().getWorldSpaceOffset();
-	if (mUsingFrameInterpolation)
+	Vec2i offset = mRenderParts->getSpacesManager().getWorldSpaceOffset();
+	if (mFrameInterpolation.mCurrentlyInterpolating)
 	{
-		const Vec2f interpolatedDifference = Vec2f(mLastWorldSpaceOffset - offset) * (1.0f - mInterFramePosition);
+		const Vec2f interpolatedDifference = Vec2f(mLastWorldSpaceOffset - offset) * (1.0f - mFrameInterpolation.mInterFramePosition);
 		offset += Vec2i(roundToInt(interpolatedDifference.x), roundToInt(interpolatedDifference.y));
 	}
 	return offset;
@@ -134,7 +154,7 @@ Vec2i VideoOut::getInterpolatedWorldSpaceOffset() const
 void VideoOut::preFrameUpdate()
 {
 	mRenderParts->preFrameUpdate();
-	mLastWorldSpaceOffset = mRenderParts->getSpriteManager().getWorldSpaceOffset();
+	mLastWorldSpaceOffset = mRenderParts->getSpacesManager().getWorldSpaceOffset();
 
 	// Skipped frames without rendering?
 	if (mFrameState == FrameState::FRAME_READY)
@@ -144,7 +164,9 @@ void VideoOut::preFrameUpdate()
 		refreshParameters.mSkipThisFrame = true;
 		mRenderParts->refresh(refreshParameters);
 	}
+
 	mFrameState = FrameState::INSIDE_FRAME;
+	mDebugDrawRenderingRequested = false;
 }
 
 void VideoOut::postFrameUpdate()
@@ -154,41 +176,48 @@ void VideoOut::postFrameUpdate()
 	// Signal for rendering
 	mFrameState = FrameState::FRAME_READY;
 	mLastFrameTicks = SDL_GetTicks();
+	mFrameInterpolation.mUseInterpolationLastUpdate = mFrameInterpolation.mUseInterpolationThisUpdate;
+	mFrameInterpolation.mUseInterpolationThisUpdate = true;		// Could be set differently, e.g. if we had a script binding to disable interpolation for an update
+	mDebugDrawRenderingRequested = false;
+}
+
+void VideoOut::initAfterSaveStateLoad()
+{
+	mFrameState = FrameState::FRAME_READY;
+	mLastFrameTicks = SDL_GetTicks();
+	mFrameInterpolation.mUseInterpolationThisUpdate = false;
+	mDebugDrawRenderingRequested = false;
 }
 
 void VideoOut::setInterFramePosition(float position)
 {
-	mInterFramePosition = position;
+	mFrameInterpolation.mInterFramePosition = position;
 }
 
 bool VideoOut::updateGameScreen()
 {
-	#if 0
-		// This is highly experimental stuff
-		mUsingFrameInterpolation = FTX::keyState(SDLK_LCTRL);
-	#endif
+	mFrameInterpolation.mCurrentlyInterpolating = (Configuration::instance().mFrameSync == Configuration::FrameSyncType::FRAME_INTERPOLATION && mFrameInterpolation.mUseInterpolationLastUpdate && mFrameInterpolation.mUseInterpolationThisUpdate);
 
 	// Only render something if a frame simulation was completed in the meantime
 	const bool hasNewSimulationFrame = (mFrameState == FrameState::FRAME_READY);
-	if (!hasNewSimulationFrame && !mUsingFrameInterpolation)
+	if (!hasNewSimulationFrame && !mFrameInterpolation.mCurrentlyInterpolating && !mDebugDrawRenderingRequested && !mRequireGameScreenUpdate)
 	{
 		// No update
 		return false;
 	}
 
 	mFrameState = FrameState::OUTSIDE_FRAME;
+	mRequireGameScreenUpdate = false;
 
 	RefreshParameters refreshParameters;
 	refreshParameters.mSkipThisFrame = false;
 	refreshParameters.mHasNewSimulationFrame = hasNewSimulationFrame;
-	refreshParameters.mUsingFrameInterpolation = mUsingFrameInterpolation;
-	refreshParameters.mInterFramePosition = mInterFramePosition;
+	refreshParameters.mUsingFrameInterpolation = mFrameInterpolation.mCurrentlyInterpolating;
+	refreshParameters.mInterFramePosition = mFrameInterpolation.mInterFramePosition;
 	mRenderParts->refresh(refreshParameters);
 
 	// Render a new image
 	renderGameScreen();
-
-	mRenderParts->setEnforceClearScreen(false);
 
 	// Game screen got updated
 	return true;
@@ -196,10 +225,12 @@ bool VideoOut::updateGameScreen()
 
 void VideoOut::blurGameScreen()
 {
-	if (mActiveRenderer == mHardwareRenderer)
+#ifdef RMX_WITH_OPENGL_SUPPORT
+	if (mActiveRenderer == mOpenGLRenderer)
 	{
-		mHardwareRenderer->blurGameScreen();
+		mOpenGLRenderer->blurGameScreen();
 	}
+#endif
 }
 
 void VideoOut::toggleLayerRendering(int index)
@@ -230,6 +261,9 @@ void VideoOut::clearGeometries()
 		mGeometryFactory.destroy(*geometry);
 	}
 	mGeometries.clear();
+
+	// Regularly cleanup old cache items -- it's safe now that no geometry references a texture in there any more
+	RenderResources::instance().mPrintedTextCache.regularCleanup();
 }
 
 void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
@@ -301,63 +335,135 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 	}
 
 	// Add sprite geometries
-	SpriteManager& spriteManager = mRenderParts->getSpriteManager();
 	{
-		const auto& sprites = spriteManager.getSprites();
-		for (auto spriteIterator = sprites.begin(); spriteIterator != sprites.end(); ++spriteIterator)
+		SpriteManager& spriteManager = mRenderParts->getSpriteManager();
+		const Vec2i worldSpaceOffset = mRenderParts->getSpacesManager().getWorldSpaceOffset();
+		FontCollection& fontCollection = FontCollection::instance();
+
+		for (int index = 0; index < RenderItem::NUM_CONTEXTS; ++index)
 		{
-			SpriteManager::SpriteInfo& sprite = **spriteIterator;
-			bool accept = true;
-			switch (sprite.getType())
+			const RenderItem::LifetimeContext lifetimeContext = (RenderItem::LifetimeContext)index;
+			const std::vector<RenderItem*>& renderItems = spriteManager.getRenderItems(lifetimeContext);
+
+			for (RenderItem* renderItem : renderItems)
 			{
-				case SpriteManager::SpriteInfo::Type::VDP:
+				switch (renderItem->getType())
 				{
-					accept = (mRenderParts->mLayerRendering[sprite.mPriorityFlag ? 6 : 2]);
-					break;
+					case RenderItem::Type::RECTANGLE:
+					{
+						const renderitems::Rectangle& rectangle = static_cast<const renderitems::Rectangle&>(*renderItem);
+
+						Color color = rectangle.mColor;
+						if (rectangle.mUseGlobalComponentTint)
+						{
+							mRenderParts->getPaletteManager().applyGlobalComponentTint(color);
+						}
+
+						Geometry& geometry = mGeometryFactory.createRectGeometry(Recti(rectangle.mPosition, rectangle.mSize), color);
+						geometry.mRenderQueue = rectangle.mRenderQueue;
+						geometries.push_back(&geometry);
+						break;
+					}
+
+					case RenderItem::Type::TEXT:
+					{
+						const renderitems::Text& text = static_cast<const renderitems::Text&>(*renderItem);
+
+						Font* font = fontCollection.getFontByKey(text.mFontKeyHash);
+						if (nullptr == font)
+						{
+							font = fontCollection.createFontByKey(text.mFontKeyString);
+						}
+						if (nullptr != font)
+						{
+							const PrintedTextCache::Key key(text.mFontKeyHash, text.mTextHash, (uint8)text.mSpacing);
+							PrintedTextCache& cache = RenderResources::instance().mPrintedTextCache;
+							PrintedTextCache::CacheItem* cacheItem = cache.getCacheItem(key);
+							if (nullptr == cacheItem)
+							{
+								cacheItem = &cache.addCacheItem(key, *font, text.mTextString);
+							}
+							const Vec2i drawPosition = Font::applyAlignment(Recti(text.mPosition, Vec2i(0, 0)), cacheItem->mInnerRect, text.mAlignment);
+							const Recti rect(drawPosition, cacheItem->mTexture.getSize());
+
+							Color tintColor = text.mColor;
+							Color addedColor = Color::TRANSPARENT;
+							if (text.mUseGlobalComponentTint)
+							{
+								mRenderParts->getPaletteManager().applyGlobalComponentTint(tintColor, addedColor);
+							}
+
+							Geometry& geometry = mGeometryFactory.createTexturedRectGeometry(rect, cacheItem->mTexture, tintColor, addedColor);
+							geometry.mRenderQueue = text.mRenderQueue;
+							geometries.push_back(&geometry);
+						}
+						break;
+					}
+
+					case RenderItem::Type::VDP_SPRITE:
+					case RenderItem::Type::PALETTE_SPRITE:
+					case RenderItem::Type::COMPONENT_SPRITE:
+					case RenderItem::Type::SPRITE_MASK:
+					{
+						renderitems::SpriteInfo& sprite = static_cast<renderitems::SpriteInfo&>(*renderItem);
+						bool accept = true;
+						switch (renderItem->getType())
+						{
+							case RenderItem::Type::VDP_SPRITE:
+							{
+								accept = (mRenderParts->mLayerRendering[sprite.mPriorityFlag ? 6 : 2]);
+								break;
+							}
+
+							case RenderItem::Type::PALETTE_SPRITE:
+							case RenderItem::Type::COMPONENT_SPRITE:
+							{
+								accept = (mRenderParts->mLayerRendering[sprite.mPriorityFlag ? 7 : 3]);
+								break;
+							}
+
+							default:
+								// Accept everything else
+								break;
+						}
+
+						if (accept)
+						{
+							sprite.mInterpolatedPosition = sprite.mPosition;
+							if (mFrameInterpolation.mCurrentlyInterpolating)
+							{
+								Vec2i difference;
+								if (sprite.mHasLastPosition)
+								{
+									difference = sprite.mLastPositionChange;
+								}
+								else if (sprite.mLogicalSpace == SpriteManager::Space::WORLD)
+								{
+									// Assume sprite is standing still in world space, i.e. moving entirely with camera
+									difference = mLastWorldSpaceOffset - worldSpaceOffset;
+								}
+								else
+								{
+									// Assume sprite is standing still in screen space, i.e. not moving on the screen
+								}
+
+								if ((difference.x != 0 || difference.y != 0) && (abs(difference.x) < 0x40 && abs(difference.y) < 0x40))
+								{
+									const Vec2f interpolatedDifference = Vec2f(difference) * (1.0f - mFrameInterpolation.mInterFramePosition);
+									sprite.mInterpolatedPosition -= Vec2i(roundToInt(interpolatedDifference.x), roundToInt(interpolatedDifference.y));
+								}
+							}
+
+							SpriteGeometry& spriteGeometry = mGeometryFactory.createSpriteGeometry(sprite);
+							spriteGeometry.mRenderQueue = sprite.mRenderQueue;
+							geometries.push_back(&spriteGeometry);
+						}
+						break;
+					}
+
+					default:
+						break;
 				}
-
-				case SpriteManager::SpriteInfo::Type::PALETTE:
-				case SpriteManager::SpriteInfo::Type::COMPONENT:
-				{
-					accept = (mRenderParts->mLayerRendering[sprite.mPriorityFlag ? 7 : 3]);
-					break;
-				}
-
-				default:
-					// Accept everything else
-					break;
-			}
-
-			if (accept)
-			{
-				sprite.mInterpolatedPosition = sprite.mPosition;
-				if (mUsingFrameInterpolation)
-				{
-					Vec2i difference;
-					if (sprite.mHasLastPosition)
-					{
-						difference = sprite.mLastPositionChange;
-					}
-					else if (sprite.mLogicalSpace == SpriteManager::Space::WORLD)
-					{
-						// Assume sprite is standing still in world space, i.e. moving entirely with camera
-						difference = mLastWorldSpaceOffset - spriteManager.getWorldSpaceOffset();
-					}
-					else
-					{
-						// Assume sprite is standing still in screen space, i.e. not moving on the screen
-					}
-
-					if ((difference.x != 0 || difference.y != 0) && (abs(difference.x) < 0x40 && abs(difference.y) < 0x40))
-					{
-						const Vec2f interpolatedDifference = Vec2f(difference) * (1.0f - mInterFramePosition);
-						sprite.mInterpolatedPosition -= Vec2i(roundToInt(interpolatedDifference.x), roundToInt(interpolatedDifference.y));
-					}
-				}
-
-				SpriteGeometry& spriteGeometry = mGeometryFactory.createSpriteGeometry(sprite);
-				spriteGeometry.mRenderQueue = sprite.mRenderQueue;
-				geometries.push_back(&spriteGeometry);
 			}
 		}
 	}
@@ -395,28 +501,6 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 		geometries.push_back(&geometry);
 	}
 
-	// Insert debug draw rects
-	{
-		const std::vector<OverlayManager::DebugDrawRect>& debugDrawRects = RenderParts::instance().getOverlayManager().getDebugDrawRects();
-		if (!debugDrawRects.empty())
-		{
-			const Vec2i offset = getInterpolatedWorldSpaceOffset();
-			for (const OverlayManager::DebugDrawRect& debugDrawRect : debugDrawRects)
-			{
-				// Translate rect
-				Recti screenRect;
-				screenRect.x = debugDrawRect.mRect.x - offset.x;
-				screenRect.y = debugDrawRect.mRect.y - offset.y;
-				screenRect.width = debugDrawRect.mRect.width;
-				screenRect.height = debugDrawRect.mRect.height;
-
-				Geometry& geometry = mGeometryFactory.createRectGeometry(screenRect, debugDrawRect.mColor);
-				geometry.mRenderQueue = 0xffff;		// Always on top
-				geometries.push_back(&geometry);
-			}
-		}
-	}
-
 	// Sort everything by render queue
 	std::stable_sort(geometries.begin(), geometries.end(),
 					 [](const Geometry* a, const Geometry* b) { return a->mRenderQueue < b->mRenderQueue; });
@@ -433,6 +517,23 @@ void VideoOut::renderGameScreen()
 
 	// Render them
 	mActiveRenderer->renderGameScreen(mGeometries);
+}
+
+void VideoOut::preRefreshDebugging()
+{
+	mRenderParts->getSpriteManager().clearLifetimeContext(RenderItem::LifetimeContext::OUTSIDE_FRAME);
+}
+
+void VideoOut::postRefreshDebugging()
+{
+	const bool hasNewRenderItems = !mRenderParts->getSpriteManager().getAddedItems().empty();
+	mDebugDrawRenderingRequested = hasNewRenderItems || mPreviouslyHadNewRenderItems;
+	mPreviouslyHadNewRenderItems = hasNewRenderItems;
+
+	if (hasNewRenderItems)
+	{
+		mRenderParts->getSpriteManager().postRefreshDebugging();
+	}
 }
 
 void VideoOut::renderDebugDraw(int debugDrawMode, const Recti& rect)

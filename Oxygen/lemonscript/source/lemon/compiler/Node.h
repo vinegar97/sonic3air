@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -29,13 +29,13 @@ namespace lemon
 			FUNCTION,
 			LABEL,
 			JUMP,
+			JUMP_INDIRECT,
 			BREAK,
 			CONTINUE,
 			RETURN,
 			EXTERNAL,
 			STATEMENT,
 			IF_STATEMENT,
-			ELSE_STATEMENT,
 			WHILE_STATEMENT,
 			FOR_STATEMENT
 		};
@@ -43,7 +43,9 @@ namespace lemon
 	public:
 		virtual ~Node() {}
 
-		inline Type getType() const { return mType; }
+		inline Type getType() const  { return (Type)genericmanager::Element<Node>::getType(); }
+
+		template<typename T> bool isA() const { return getType() == T::TYPE; }
 
 		template<typename T> const T& as() const { return *static_cast<const T*>(this); }
 		template<typename T> T& as() { return *static_cast<T*>(this); }
@@ -52,10 +54,9 @@ namespace lemon
 		inline void setLineNumber(uint32 lineNumber)  { mLineNumber = lineNumber; }
 
 	protected:
-		inline Node(Type type) : genericmanager::Element<Node>((uint32)type), mType(type) {}
+		inline Node(Type type) : genericmanager::Element<Node>((uint32)type) {}
 
 	private:
-		const Type mType;
 		uint32 mLineNumber = 0;
 	};
 
@@ -151,7 +152,7 @@ namespace lemon
 		inline LabelNode() : Node(TYPE) {}
 
 	public:
-		std::string mLabel;
+		FlyweightString mLabel;
 	};
 
 
@@ -165,6 +166,20 @@ namespace lemon
 
 	public:
 		TokenPtr<LabelToken> mLabelToken;
+	};
+
+
+	class JumpIndirectNode : public Node
+	{
+	public:
+		static const Type TYPE = Type::JUMP_INDIRECT;
+
+	public:
+		inline JumpIndirectNode() : Node(TYPE) {}
+
+	public:
+		TokenPtr<StatementToken> mIndexToken;
+		std::vector<TokenPtr<LabelToken>> mLabelTokens;
 	};
 
 
@@ -247,16 +262,6 @@ namespace lemon
 		TokenPtr<StatementToken> mConditionToken;
 		NodePtr<Node> mContentIf;
 		NodePtr<Node> mContentElse;
-	};
-
-
-	class ElseStatementNode : public Node
-	{
-	public:
-		static const Type TYPE = Type::ELSE_STATEMENT;
-
-	public:
-		inline ElseStatementNode() : Node(TYPE) {}
 	};
 
 

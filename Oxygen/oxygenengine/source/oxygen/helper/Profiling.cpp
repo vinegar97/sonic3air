@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -13,16 +13,16 @@
 namespace profiling
 {
 	Profiling::Region mRootRegion;
-	std::map<uint16, Profiling::Region> mRegionsById;		// Does not contain root region
+	std::map<uint16, Profiling::Region> mRegionsByID;		// Does not contain root region
 	std::vector<Profiling::Region*> mAllRegions;
 	std::vector<Profiling::Region*> mRegionStack;
 	Profiling::AdditionalData mAdditionalData;
 	int mAccumulatedFrames = 0;
 
-	Profiling::Region* getRegionById(uint16 id)
+	Profiling::Region* getRegionByID(uint16 id)
 	{
-		const auto it = mRegionsById.find(id);
-		return (it == mRegionsById.end()) ? nullptr : &it->second;
+		const auto it = mRegionsByID.find(id);
+		return (it == mRegionsByID.end()) ? nullptr : &it->second;
 	}
 }
 
@@ -42,9 +42,9 @@ void Profiling::startup()
 
 void Profiling::registerRegion(uint16 id, const char* name, const Color& color)
 {
-	RMX_ASSERT(mRegionsById.count(id) == 0, "Profiling region with id " << id << " registered twice, second time with name '" << name << "'");
+	RMX_ASSERT(mRegionsByID.count(id) == 0, "Profiling region with id " << id << " registered twice, second time with name '" << name << "'");
 
-	Profiling::Region& region = mRegionsById[id];
+	Profiling::Region& region = mRegionsByID[id];
 	region.mName = name;
 	region.mColor = color;
 	mAllRegions.push_back(&region);
@@ -52,16 +52,16 @@ void Profiling::registerRegion(uint16 id, const char* name, const Color& color)
 
 void Profiling::pushRegion(uint16 id)
 {
-	Region* region = getRegionById(id);
+	Region* region = getRegionByID(id);
 	RMX_ASSERT(nullptr != region, "Profiling region with id " << id << " not found");
 	RMX_ASSERT(!region->mOnStack, "Profiling region with name '" << region->mName << "' is already on the stack");
 	RMX_ASSERT(mRegionStack.size() >= 1, "Profiling region stack got emptied before");
 
 	mRegionStack.push_back(region);
 	region->mOnStack = true;
-	region->mTimer.Start();
+	region->mTimer.resumeTiming();
 
-	if (region->mParent == nullptr)
+	if (nullptr == region->mParent)
 	{
 		region->mParent = mRegionStack[mRegionStack.size() - 2];
 		region->mParent->mChildren.push_back(region);
@@ -74,14 +74,14 @@ void Profiling::pushRegion(uint16 id)
 
 void Profiling::popRegion(uint16 id)
 {
-	Region* region = getRegionById(id);
+	Region* region = getRegionByID(id);
 	RMX_ASSERT(nullptr != region, "Profiling region with id " << id << " not found");
 	RMX_ASSERT(mRegionStack.size() >= 2, "Can't pop another profiling region from stack, that would remove the root region");
 	RMX_ASSERT(mRegionStack.back() == region, "Profiling region to be popped must be top of stack");
 
 	mRegionStack.pop_back();
 	region->mOnStack = false;
-	region->mTimer.Stop();
+	region->mTimer.pauseTiming();
 }
 
 void Profiling::nextFrame(int simulationFrameNumber)
@@ -90,7 +90,7 @@ void Profiling::nextFrame(int simulationFrameNumber)
 
 	for (Region* region : mAllRegions)
 	{
-		const double lastTime = region->mTimer.GetCurrentSeconds();		// For root timer (which is usually still running), this will perform a stop and immediate restart
+		const double lastTime = region->mTimer.getAccumulatedSecondsAndRestart();	// For root timer (which is usually still running), this will perform a stop and immediate restart
 		while (region->mFrameTimes.size() >= MAX_FRAMES)
 			region->mFrameTimes.pop_front();
 		region->mFrameTimes.emplace_back();
@@ -98,7 +98,7 @@ void Profiling::nextFrame(int simulationFrameNumber)
 		frame.mInclusiveTime = lastTime;
 		frame.mExclusiveTime = lastTime;
 		region->mAccumulatedTime += lastTime;
-		region->mTimer.Reset();
+		region->mTimer.resetTiming();
 	}
 	for (Region* region : mAllRegions)
 	{
@@ -107,7 +107,7 @@ void Profiling::nextFrame(int simulationFrameNumber)
 			region->mParent->mFrameTimes.back().mExclusiveTime -= region->mFrameTimes.back().mExclusiveTime;
 		}
 	}
-	mRootRegion.mTimer.Start();		// Needed for first frame
+	mRootRegion.mTimer.resumeTiming();		// Needed for first frame to start timing
 
 	static const PerFrameData dummy;
 	const PerFrameData& oldData = mAdditionalData.mFrames.empty() ? dummy : mAdditionalData.mFrames.back();

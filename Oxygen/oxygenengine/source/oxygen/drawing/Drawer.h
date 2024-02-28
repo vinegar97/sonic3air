@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -36,11 +36,11 @@ public:
 	Type getType() const;
 
 	template<typename T>
-	void createDrawer()
+	bool createDrawer()
 	{
 		destroyDrawer();
 		mActiveDrawer = new T();
-		onDrawerCreated();
+		return onDrawerCreated();
 	}
 
 	void destroyDrawer();
@@ -51,25 +51,34 @@ public:
 
 	void createTexture(DrawerTexture& outTexture);
 
+	Recti getSpriteRect(uint64 spriteKey) const;	// Return sprite size and pivot offset (usually negative)
+
 	void setRenderTarget(DrawerTexture& texture, const Recti& rect);
 	void setWindowRenderTarget(const Recti& rect);
-	void setBlendMode(DrawerBlendMode blendMode);
-	void setSamplingMode(DrawerSamplingMode samplingMode);
-	void setWrapMode(DrawerWrapMode wrapMode);
+	void setBlendMode(BlendMode blendMode);
+	void setSamplingMode(SamplingMode samplingMode);
+	void setWrapMode(TextureWrapMode wrapMode);
 
 	void drawRect(const Rectf& rect, const Color& color);
 	void drawRect(const Rectf& rect, DrawerTexture& texture);
 	void drawRect(const Rectf& rect, DrawerTexture& texture, const Color& tintColor);
 	void drawRect(const Rectf& rect, DrawerTexture& texture, const Vec2f& uv0, const Vec2f& uv1, const Color& tintColor);
+	void drawRect(const Rectf& rect, DrawerTexture& texture, const Recti& textureInnerRect, const Color& tintColor = Color::WHITE);
 	void drawUpscaledRect(const Rectf& rect, DrawerTexture& texture);
+	void drawSprite(Vec2i position, uint64 spriteKey, const Color& tintColor = Color::WHITE, Vec2f scale = Vec2f(1.0f, 1.0f));
+	void drawSpriteRect(const Recti& rect, uint64 spriteKey, const Color& tintColor = Color::WHITE);
 	void drawMesh(const std::vector<DrawerMeshVertex>& triangles, DrawerTexture& texture);
 	void drawMesh(const std::vector<DrawerMeshVertex_P2_C4>& triangles);
 	void drawQuad(const DrawerMeshVertex* quad, DrawerTexture& texture);
 
 	void printText(Font& font, const Recti& rect, const String& text, int alignment = 1, Color color = Color::WHITE);
-	void printText(Font& font, const Recti& rect, const String& text, const rmx::Painter::PrintOptions& printOptions);
+	void printText(Font& font, const Vec2i& position, const String& text, int alignment = 1, Color color = Color::WHITE);
+	void printText(Font& font, const Recti& rect, const String& text, const DrawerPrintOptions& printOptions);
+	void printText(Font& font, const Vec2i& position, const String& text, const DrawerPrintOptions& printOptions);
 	void printText(Font& font, const Recti& rect, const WString& text, int alignment = 1, Color color = Color::WHITE);
-	void printText(Font& font, const Recti& rect, const WString& text, const rmx::Painter::PrintOptions& printOptions);
+	void printText(Font& font, const Vec2i& position, const WString& text, int alignment = 1, Color color = Color::WHITE);
+	void printText(Font& font, const Recti& rect, const WString& text, const DrawerPrintOptions& printOptions);
+	void printText(Font& font, const Vec2i& position, const WString& text, const DrawerPrintOptions& printOptions);
 
 	void pushScissor(const Recti& rect);
 	void popScissor();
@@ -79,7 +88,7 @@ public:
 	void presentScreen();
 
 private:
-	void onDrawerCreated();
+	bool onDrawerCreated();
 	void unregisterTexture(DrawerTexture& texture);
 
 private:

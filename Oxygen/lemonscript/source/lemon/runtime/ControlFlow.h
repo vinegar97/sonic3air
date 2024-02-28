@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,7 +8,9 @@
 
 #pragma once
 
+#include "lemon/compiler/Definitions.h"
 #include "lemon/program/DataType.h"
+#include "lemon/utility/AnyBaseValue.h"
 
 
 namespace lemon
@@ -19,8 +21,14 @@ namespace lemon
 	class RuntimeFunction;
 	class ScriptFunction;
 
+
 	class API_EXPORT ControlFlow
 	{
+	friend class Runtime;
+	friend class OpcodeExec;
+	friend class OptimizedOpcodeExec;
+	friend struct RuntimeOpcodeContext;
+
 	public:
 		struct State
 		{
@@ -37,10 +45,11 @@ namespace lemon
 		};
 
 	public:
-		ControlFlow(Runtime& runtime);
+		explicit ControlFlow(Runtime& runtime);
 
 		inline Runtime& getRuntime()  { return mRuntime; }
 		inline const Program& getProgram()  { return *mProgram; }
+		inline MemoryAccessHandler& getMemoryAccessHandler() { return *mMemoryAccessHandler; }
 
 		void reset();
 
@@ -52,29 +61,31 @@ namespace lemon
 
 		inline size_t getValueStackSize() const  { return mValueStackPtr - mValueStackStart; }
 
-		FORCE_INLINE uint64 popValueStack(const DataTypeDefinition* dataType)
+		template<typename T>
+		FORCE_INLINE T popValueStack()
 		{
 			--mValueStackPtr;
-			return *mValueStackPtr;
+			return BaseTypeConversion::convert<uint64, T>(*mValueStackPtr);
 		}
 
-		FORCE_INLINE void pushValueStack(const DataTypeDefinition* dataType, uint64 value)
+		template<typename T>
+		FORCE_INLINE void pushValueStack(T value)
 		{
-			*mValueStackPtr = value;
+			*mValueStackPtr = BaseTypeConversion::convert<T, uint64>(value);
 			++mValueStackPtr;
-			RMX_ASSERT(mValueStackPtr < &mValueStackBuffer[0x78], "Value stack error: Too many elements");
+			RMX_ASSERT(mValueStackPtr < &mValueStackBuffer[VALUE_STACK_LAST_INDEX], "Value stack error: Too many elements");
 		}
 
 		template<typename T>
 		FORCE_INLINE T readValueStack(int offset) const
 		{
-			return (T)mValueStackPtr[offset];
+			return BaseTypeConversion::convert<uint64, T>(mValueStackPtr[offset]);
 		}
 
 		template<typename T>
 		FORCE_INLINE void writeValueStack(int offset, T value) const
 		{
-			mValueStackPtr[offset] = value;
+			mValueStackPtr[offset] = BaseTypeConversion::convert<T, uint64>(value);
 		}
 
 		FORCE_INLINE void moveValueStack(int change)
@@ -83,23 +94,24 @@ namespace lemon
 		}
 
 	private:
-		Runtime& mRuntime;
+		inline static const size_t VALUE_STACK_MAX_SIZE    = 128;
+		inline static const size_t VALUE_STACK_FIRST_INDEX = 4;			// Leave 4 elements so that removing too many elements from the stack doesn't break everything immediately
+		inline static const size_t VALUE_STACK_LAST_INDEX  = VALUE_STACK_MAX_SIZE - 8;
+		inline static const size_t VAR_STACK_LIMIT         = 1024;
 
-	// TODO: Move more functionality from runtime to this class, and change the following part to private
-	public:
+		Runtime& mRuntime;
 		const Program* mProgram = nullptr;
 
 		CArray<State> mCallStack;	// Not using std::vector for performance reasons in debug builds
-		uint64 mValueStackBuffer[0x80] = { 0 };
-		uint64* mValueStackStart = &mValueStackBuffer[4];	// Leave 4 elements so that removing too many elements from the stack doesn't break everything immediately
-		uint64* mValueStackPtr   = &mValueStackBuffer[4];
-		int64 mLocalVariablesBuffer[0x400] = { 0 };
-		size_t mLocalVariablesSize = 0;
-		State mLastStepState;
+		uint64 mValueStackBuffer[VALUE_STACK_MAX_SIZE] = { 0 };
+		uint64* mValueStackStart = &mValueStackBuffer[VALUE_STACK_FIRST_INDEX];
+		uint64* mValueStackPtr   = &mValueStackBuffer[VALUE_STACK_FIRST_INDEX];
+		int64 mLocalVariablesBuffer[VAR_STACK_LIMIT] = { 0 };
+		size_t mLocalVariablesSize = 0;							// Current used size of the local variables buffer
 
 		// Only as optimization for OpcodeExec
 		int64* mCurrentLocalVariables = nullptr;
-		int64* mGlobalVariables = nullptr;
 		MemoryAccessHandler* mMemoryAccessHandler = nullptr;
 	};
+
 }

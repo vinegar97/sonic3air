@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -45,43 +45,47 @@ namespace lemon
 		String line;
 		addDataType(line, function.getReturnType());
 		line << " ";
-		addIdentifier(line, function.getName());
+		addIdentifier(line, function.getName().getString());
 		line << "(";
 		for (size_t i = 0; i < function.getParameters().size(); ++i)
 		{
 			if (i > 0)
 				line << ", ";
-			addDataType(line, function.getParameters()[i].mType);
+			addDataType(line, function.getParameters()[i].mDataType);
 			line << " ";
-			addIdentifier(line, function.getParameters()[i].mIdentifier);
+			addIdentifier(line, function.getParameters()[i].mName.getString());
 		}
 		line << ")";
 		writeLine(line);
 	}
 
-	void CppWriter::addDataType(String& line, BaseType dataType)
+	void CppWriter::addDataType(String& line, const DataTypeDefinition* dataType)
 	{
-		switch (dataType)
+		if (dataType->getClass() == DataTypeDefinition::Class::VOID)
 		{
-			case BaseType::VOID:	line << "void";		break;
-			case BaseType::INT_8:	line << "int8";		break;
-			case BaseType::UINT_8:	line << "uint8";	break;
-			case BaseType::INT_16:	line << "int16";	break;
-			case BaseType::UINT_16:	line << "uint16";	break;
-			case BaseType::INT_32:	line << "int32";	break;
-			case BaseType::UINT_32:	line << "uint32";	break;
-			case BaseType::INT_64:	line << "int64";	break;
-			case BaseType::UINT_64:	line << "uint64";	break;
-			default:				line << "<unknown_type>";	break;
+			line << "void";
+		}
+		else if (dataType->getClass() == DataTypeDefinition::Class::INTEGER)
+		{
+			const IntegerDataType& integerType = dataType->as<IntegerDataType>();
+			if (integerType.mSemantics == IntegerDataType::Semantics::BOOLEAN)
+			{
+				line << "bool";
+			}
+			else
+			{
+				switch (integerType.getBytes())
+				{
+					case 1:  line << (integerType.mIsSigned ? "int8"  : "uint8" );  break;
+					case 2:  line << (integerType.mIsSigned ? "int16" : "uint16");  break;
+					case 4:  line << (integerType.mIsSigned ? "int32" : "uint32");  break;
+					case 8:  line << (integerType.mIsSigned ? "int64" : "uint64");  break;
+				}
+			}
 		}
 	}
 
-	void CppWriter::addDataType(String& line, const DataTypeDefinition* dataType)
-	{
-		addDataType(line, DataTypeHelper::getBaseType(dataType));
-	}
-
-	void CppWriter::addIdentifier(String& line, const std::string& identifier)
+	void CppWriter::addIdentifier(String& line, std::string_view identifier)
 	{
 		for (size_t i = 0; i < identifier.length(); ++i)
 		{

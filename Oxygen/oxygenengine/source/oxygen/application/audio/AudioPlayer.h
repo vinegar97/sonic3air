@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -37,6 +37,7 @@ public:
 
 	void stopAllSounds(bool immediately = false);
 	void stopAllSoundsByChannel(int channelId);
+	void stopAllSoundsByChannelAndContext(int channelId, int contextId);
 
 	void fadeInChannel(int channelId, float length);
 	void fadeOutChannel(int channelId, float length);
@@ -51,7 +52,7 @@ public:
 	void resetChannelOverrides();
 
 	void resetAudioModifiers();
-	void enableAudioModifier(int channelId, int contextId, const std::string& postfix, float relativeSpeed);
+	void enableAudioModifier(int channelId, int contextId, std::string_view postfix, float relativeSpeed);
 	void disableAudioModifier(int channelId, int contextId);
 
 	inline size_t getNumPlayingSounds() const  { return mPlayingSounds.size(); }
@@ -92,6 +93,7 @@ private:
 	{
 		int mPlayingChannelId = -1;
 		int mOverriddenChannelId = -1;
+		uint8 mContextId = 0;
 		uint32 mPlayingSoundUniqueId = 0;
 		bool mActive = true;
 	};
@@ -133,13 +135,14 @@ private:
 	PlayingSound* getPlayingSound(AudioReference& audioRef);
 	const PlayingSound* getPlayingSound(AudioReference& audioRef) const;
 
-	void applyChannelOverride(int overriddenChannelId);
-	void removeChannelOverride(int overriddenChannelId);
-	bool isChannelOverridden(int channelId) const;
+	void applyChannelOverride(int overriddenChannelId, uint8 contextId);
+	void removeChannelOverride(int overriddenChannelId, uint8 contextId);
+	bool isChannelOverridden(int channelId, uint8 contextId) const;
 
 	AudioModifier* findAudioModifier(int channelId, int contextId, int* outIndex = nullptr);
-	SourceRegistration* getModifiedSourceRegistration(SourceRegistration& baseSourceReg, const std::string& postfix) const;
-	void applyAudioModifier(int channelId, int contextId, const std::string& postfix, float relativeSpeed, float speedChange);
+	SourceRegistration* getModifiedSourceRegistration(SourceRegistration& baseSourceReg, std::string_view postfix) const;
+	void applyAudioModifier(int channelId, int contextId, std::string_view postfix, float relativeSpeed, float speedChange);
+	void applyAudioModifierSingle(SoundIterator& iterator, std::string_view postfix, float relativeSpeed, float speedChange);
 
 	void startAutoStreamer(AudioSourceBase& audioSource, float currentTime, float speed = 1.0f);
 	void stopAutoStreamer(AudioSourceBase& audioSource);

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -18,15 +18,25 @@ namespace
 		return (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F');
 	}
 
-	int compareSourceRegistrationPackages(AudioCollection::Package a, AudioCollection::Package b, bool preferOriginal)
+	int compareSourceRegistrationPackages(AudioCollection::Package a, AudioCollection::Package b, bool preferOriginalSoundtrack)
 	{
-		const int prioritiesA[3] = { 0, 1, 2 };		// Preferring remastered over original, but modded will always be first
-		const int prioritiesB[3] = { 1, 0, 2 };		// Preferring original over remastered, but modded will always be first
-		const int* priorities = preferOriginal ? prioritiesB : prioritiesA;
+		static_assert((int)AudioCollection::Package::_NUM == 4);
+		const int prioritiesA[4] = { 0, 1, 2, 3 };		// Preferring remastered over original, but modded will always be first
+		const int prioritiesB[4] = { 0, 2, 1, 3 };		// Preferring original over remastered, but modded will always be first
+		const int* priorities = preferOriginalSoundtrack ? prioritiesB : prioritiesA;
 
 		const int prioA = priorities[(int)a];
 		const int prioB = priorities[(int)b];
 		return (prioA == prioB) ? 0 : (prioA < prioB) ? 1 : -1;
+	}
+
+	bool shouldPreferSoundRegistration(AudioCollection::SourceRegistration& soundRegToCheck, AudioCollection::SourceRegistration* bestFoundSoFar, bool preferOriginalSoundtrack)
+	{
+		if (nullptr == bestFoundSoFar)
+			return true;
+
+		// Using <= instead of < here, so that with multiple modded sources, the last one will get used - that's the one with highest priority
+		return (compareSourceRegistrationPackages(soundRegToCheck.mPackage, bestFoundSoFar->mPackage, preferOriginalSoundtrack) <= 0);
 	}
 
 	bool getHexCodeRetranslation(uint64& outKey, uint64 hexCodeString)
@@ -63,6 +73,8 @@ AudioCollection::~AudioCollection()
 void AudioCollection::clear()
 {
 	mAudioDefinitions.clear();
+	for (size_t i = 0; i < (size_t)Package::_NUM; ++i)
+		mNumSourcesByPackageType[i] = 0;
 }
 
 void AudioCollection::clearPackage(Package package)
@@ -88,6 +100,7 @@ void AudioCollection::clearPackage(Package package)
 			++it;
 		}
 	}
+	mNumSourcesByPackageType[(size_t)package] = 0;
 }
 
 bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstring& filename, Package package)
@@ -102,35 +115,41 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 		keyString.lowerCase();
 
 		// Numeric key is either a string hash, or the value in case of keys like "2C"
-		uint64 key = 0;
+		uint64 numericKey = 0;
 		{
 			if (keyString.length() == 2 && isHexDigit(keyString[0]) && isHexDigit(keyString[1]))
 			{
-				key = rmx::parseInteger(String("0x") + keyString);
+				numericKey = rmx::parseInteger(String("0x") + keyString);
 			}
 			else
 			{
-				key = rmx::getMurmur2_64(keyString);
+				numericKey = rmx::getMurmur2_64(keyString);
 			}
 		}
 
 		// Read definition from JSON
 		AudioDefinition::Type type = AudioDefinition::Type::SOUND;
+		std::string displayName;
 		WString audioFilename;
 		uint32 sourceAddress = 0;
 		uint32 contentOffset = 0;
-		uint8 emulationSfxId = (key <= 0xff) ? (uint8)key : 0;
+		uint8 emulationSfxId = (numericKey <= 0xff) ? (uint8)numericKey : 0;
 		SourceRegistration::Type sourceType = SourceRegistration::Type::FILE;
 		int loopStart = 0;
 		float volume = 1.0f;
-		uint8 channel = (key < 0xff) ? (uint8)key : 0xff;
+		uint8 channel = (numericKey < 0xff) ? (uint8)numericKey : 0xff;
+		AudioDefinition::Visibility soundTestVisibility = AudioDefinition::Visibility::AUTO;
 
 		for (auto it = iterator->begin(); it != iterator->end(); ++it)
 		{
 			const std::string key = it.key().asString();
 			const std::string value = it->asString();
 
-			if (key == "Type")
+			if (key == "Name")
+			{
+				displayName = value;
+			}
+			else if (key == "Type")
 			{
 				if (value == "Music")
 				{
@@ -160,7 +179,7 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 			}
 			else if (key == "Source" && !value.empty())
 			{
-				sourceType = (value == "EmulationContinuous") ? SourceRegistration::Type::EMULATION_CONTINUOUS : 
+				sourceType = (value == "EmulationContinuous") ? SourceRegistration::Type::EMULATION_CONTINUOUS :
 							 (value == "EmulationDirect") ? SourceRegistration::Type::EMULATION_DIRECT : SourceRegistration::Type::EMULATION_BUFFERED;
 			}
 			else if (key == "Address" && !value.empty())
@@ -190,13 +209,19 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 			{
 				volume = String(value).parseFloat();
 			}
+			else if (key == "SoundTestVisibility" && !value.empty())
+			{
+				soundTestVisibility = (value == "visible") ? AudioDefinition::Visibility::ALWAYS_VISIBLE
+									: (value == "hidden")  ? AudioDefinition::Visibility::ALWAYS_HIDDEN
+									: (value == "devmode") ? AudioDefinition::Visibility::DEV_MODE_ONLY : AudioDefinition::Visibility::AUTO;
+			}
 		}
 
-		AudioDefinition* audioDefinition = mapFind(mAudioDefinitions, key);
+		AudioDefinition* audioDefinition = mapFind(mAudioDefinitions, numericKey);
 		if (nullptr == audioDefinition)
 		{
-			audioDefinition = &mAudioDefinitions[key];
-			audioDefinition->mKeyId = key;
+			audioDefinition = &mAudioDefinitions[numericKey];
+			audioDefinition->mKeyId = numericKey;
 			audioDefinition->mKeyString = *keyString;
 			audioDefinition->mType = type;
 
@@ -215,6 +240,12 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 			// Definition already exists, ignore the properties that are not specifying the source
 		}
 
+		// Set or overwrite values in audio definition
+		if (!displayName.empty())
+			audioDefinition->mDisplayName = displayName;
+		if (soundTestVisibility != AudioDefinition::Visibility::AUTO)
+			audioDefinition->mSoundTestVisibility = soundTestVisibility;
+
 		// Add audio source
 		SourceRegistration& sourceRegistration = vectorAdd(audioDefinition->mSources);
 		sourceRegistration.mAudioDefinition = audioDefinition;
@@ -223,6 +254,7 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 		sourceRegistration.mIsLooping = (type == AudioDefinition::Type::MUSIC);
 		sourceRegistration.mLoopStart = loopStart;
 		sourceRegistration.mVolume = volume;
+		++mNumSourcesByPackageType[(size_t)package];
 
 		if (sourceType == SourceRegistration::Type::FILE)
 		{
@@ -243,26 +275,20 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 	return true;
 }
 
-void AudioCollection::determineActiveSourceRegistrations(bool preferOriginal)
+void AudioCollection::determineActiveSourceRegistrations(bool preferOriginalSoundtrack)
 {
-	for (auto& pair : mAudioDefinitions)
+	for (auto& [key, audioDefinition] : mAudioDefinitions)
 	{
 		// Search for the right one considering settings
 		SourceRegistration* bestSourceReg = nullptr;
+		for (SourceRegistration& soundReg : audioDefinition.mSources)
 		{
-			for (SourceRegistration& soundReg : pair.second.mSources)
+			if (shouldPreferSoundRegistration(soundReg, bestSourceReg, preferOriginalSoundtrack))
 			{
-				if (bestSourceReg == nullptr)
-				{
-					bestSourceReg = &soundReg;
-				}
-				else if (compareSourceRegistrationPackages(soundReg.mPackage, bestSourceReg->mPackage, preferOriginal) < 0)
-				{
-					bestSourceReg = &soundReg;
-				}
+				bestSourceReg = &soundReg;
 			}
 		}
-		pair.second.mActiveSource = bestSourceReg;
+		audioDefinition.mActiveSource = bestSourceReg;
 	}
 }
 

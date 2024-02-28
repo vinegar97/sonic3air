@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,16 +8,14 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/Configuration.h"
-#include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/JsonHelper.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 #include <lemon/translator/SourceCodeWriter.h>
 
 
 namespace
 {
-	static const std::string InputMappingKeys[12] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back" };
-
 	void tryParseWindowSize(String string, Vec2i& result)
 	{
 		std::vector<String> resolution;
@@ -78,9 +76,9 @@ namespace
 
 			// Read mappings
 			std::vector<InputConfig::Assignment> newAssignments;
-			for (size_t buttonIndex = 0; buttonIndex < (size_t)InputConfig::DeviceDefinition::Button::_NUM; ++buttonIndex)
+			for (size_t buttonIndex = 0; buttonIndex < InputConfig::DeviceDefinition::NUM_BUTTONS; ++buttonIndex)
 			{
-				const Json::Value& mappingJson = (*it)[InputMappingKeys[buttonIndex]];
+				const Json::Value& mappingJson = (*it)[InputConfig::DeviceDefinition::BUTTON_NAME[buttonIndex]];
 				newAssignments.clear();
 				if (mappingJson.isArray())
 				{
@@ -110,6 +108,11 @@ namespace
 							}
 						}
 					}
+				}
+				else
+				{
+					// Use the previously set default assignments (unfortunately, this only works for keyboards)
+					continue;
 				}
 
 				// Set assignments, and allow for duplicate assignments (i.e. having a real button mapped to multiple controls) in this case
@@ -185,9 +188,20 @@ namespace
 					const std::string key = it2.key().asString();
 					const uint64 keyHash = rmx::getMurmur2_64(key);
 
+					uint32 value = 0;
+					try
+					{
+						value = it2->asUInt();
+					}
+					catch (std::exception& e)	// Catching exception like "LargestInt out of UInt range"
+					{
+						RMX_ERROR("Failed to read '" << key << "' setting for mod '" << modName << "' with error: " << e.what(), );
+						continue;
+					}
+
 					Configuration::Mod::Setting& setting = mod.mSettings[keyHash];
 					setting.mIdentifier = key;
-					setting.mValue = (uint32)it2->asInt();
+					setting.mValue = value;
 				}
 			}
 		}
@@ -215,6 +229,16 @@ namespace
 
 
 Configuration* Configuration::mSingleInstance = nullptr;
+
+Configuration::RenderMethod Configuration::getHighestSupportedRenderMethod()
+{
+#if defined(PLATFORM_WEB) || (defined(PLATFORM_MAC) && defined(__arm64__))
+	return RenderMethod::OPENGL_SOFT;
+#else
+	// Default is OpenGL Hardware render method (as it's the highest one), but this can be lowered as needed, e.g. for individual platforms or depending on the execution environment
+	return RenderMethod::OPENGL_FULL;
+#endif
+}
 
 Configuration::Configuration()
 {
@@ -318,12 +342,9 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 		// Graphics
 		tryReadRenderMethod(rootHelper, mFailSafeMode, mRenderMethod, mAutoDetectRenderMethod);
 
-		int windowMode = 0;
-		rootHelper.tryReadInt("Fullscreen", windowMode);
-		mWindowMode = (WindowMode)windowMode;
-
+		rootHelper.tryReadAsInt("Fullscreen", mWindowMode);
 		rootHelper.tryReadInt("DisplayIndex", mDisplayIndex);
-		rootHelper.tryReadInt("FrameSync", mFrameSync);
+		rootHelper.tryReadAsInt("FrameSync", mFrameSync);
 		rootHelper.tryReadInt("Upscaling", mUpscaling);
 		rootHelper.tryReadInt("Backdrop", mBackdrop);
 		rootHelper.tryReadInt("Filtering", mFiltering);
@@ -337,22 +358,36 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 		// Input
 		rootHelper.tryReadString("PreferredGamepadPlayer1", mPreferredGamepad[0]);
 		rootHelper.tryReadString("PreferredGamepadPlayer2", mPreferredGamepad[1]);
+		rootHelper.tryReadFloat("ControllerRumblePlayer1", mControllerRumbleIntensity[0]);
+		rootHelper.tryReadFloat("ControllerRumblePlayer2", mControllerRumbleIntensity[1]);
 		rootHelper.tryReadInt("AutoAssignGamepadPlayerIndex", mAutoAssignGamepadPlayerIndex);
 
 		// Virtual gamepad
 		if (!root["VirtualGamepad"].isNull())
 		{
 			JsonHelper vgHelper(root["VirtualGamepad"]);
+			const auto tryReadVec2i = [&](const std::string& key, Vec2i& outValue)
+			{
+				vgHelper.tryReadInt(key + "X", outValue.x);
+				vgHelper.tryReadInt(key + "Y", outValue.y);
+			};
+
 			vgHelper.tryReadFloat("Opacity", mVirtualGamepad.mOpacity);
-			vgHelper.tryReadInt("DPadPosX", mVirtualGamepad.mDirectionalPadCenter.x);
-			vgHelper.tryReadInt("DPadPosY", mVirtualGamepad.mDirectionalPadCenter.y);
+			tryReadVec2i("DPadPos", mVirtualGamepad.mDirectionalPadCenter);
 			vgHelper.tryReadInt("DPadSize", mVirtualGamepad.mDirectionalPadSize);
-			vgHelper.tryReadInt("ButtonsPosX", mVirtualGamepad.mFaceButtonsCenter.x);
-			vgHelper.tryReadInt("ButtonsPosY", mVirtualGamepad.mFaceButtonsCenter.y);
+			tryReadVec2i("ButtonsPos", mVirtualGamepad.mFaceButtonsCenter);
 			vgHelper.tryReadInt("ButtonsSize", mVirtualGamepad.mFaceButtonsSize);
-			vgHelper.tryReadInt("StartPosX", mVirtualGamepad.mStartButtonCenter.x);
-			vgHelper.tryReadInt("StartPosY", mVirtualGamepad.mStartButtonCenter.y);
+			tryReadVec2i("StartPos", mVirtualGamepad.mStartButtonCenter);
+			tryReadVec2i("GameRecPos", mVirtualGamepad.mGameRecButtonCenter);
+			tryReadVec2i("ShoulderLPos", mVirtualGamepad.mShoulderLButtonCenter);
+			tryReadVec2i("ShoulderRPos", mVirtualGamepad.mShoulderRButtonCenter);
 		}
+
+		// Game recorder
+		rootHelper.tryReadInt("GameRecordingMode", mGameRecorder.mRecordingMode);
+
+		// Script
+		rootHelper.tryReadInt("ScriptOptimizationLevel", mScriptOptimizationLevel);
 
 		// Mod settings
 		loadModSettings(root, mModSettings);
@@ -430,7 +465,7 @@ void Configuration::saveSettings()
 		// Graphics
 		root["Fullscreen"] = (int)mWindowMode;
 		root["DisplayIndex"] = mDisplayIndex;
-		root["FrameSync"] = mFrameSync;
+		root["FrameSync"] = (int)mFrameSync;
 		root["Upscaling"] = mUpscaling;
 		root["Backdrop"] = mBackdrop;
 		root["Filtering"] = mFiltering;
@@ -445,21 +480,35 @@ void Configuration::saveSettings()
 		root["PreferredGamepadPlayer1"] = mPreferredGamepad[0];
 		root["PreferredGamepadPlayer2"] = mPreferredGamepad[1];
 		root["AutoAssignGamepadPlayerIndex"] = mAutoAssignGamepadPlayerIndex;
+		root["ControllerRumblePlayer1"] = mControllerRumbleIntensity[0];
+		root["ControllerRumblePlayer2"] = mControllerRumbleIntensity[1];
 
 		// Virtual gamepad
 		{
 			Json::Value vg = root["VirtualGamepad"];
+			const auto saveVec2i = [&](const std::string& key, Vec2i value)
+			{
+				vg[key + "X"] = value.x;
+				vg[key + "Y"] = value.y;
+			};
+
 			vg["Opacity"] = mVirtualGamepad.mOpacity;
-			vg["DPadPosX"] = mVirtualGamepad.mDirectionalPadCenter.x;
-			vg["DPadPosY"] = mVirtualGamepad.mDirectionalPadCenter.y;
+			saveVec2i("DPadPos", mVirtualGamepad.mDirectionalPadCenter);
 			vg["DPadSize"] = mVirtualGamepad.mDirectionalPadSize;
-			vg["ButtonsPosX"] = mVirtualGamepad.mFaceButtonsCenter.x;
-			vg["ButtonsPosY"] = mVirtualGamepad.mFaceButtonsCenter.y;
+			saveVec2i("ButtonsPos", mVirtualGamepad.mFaceButtonsCenter);
 			vg["ButtonsSize"] = mVirtualGamepad.mFaceButtonsSize;
-			vg["StartPosX"] = mVirtualGamepad.mStartButtonCenter.x;
-			vg["StartPosY"] = mVirtualGamepad.mStartButtonCenter.y;
+			saveVec2i("StartPos", mVirtualGamepad.mStartButtonCenter);
+			saveVec2i("GameRecPos", mVirtualGamepad.mGameRecButtonCenter);
+			saveVec2i("ShoulderLPos", mVirtualGamepad.mShoulderLButtonCenter);
+			saveVec2i("ShoulderRPos", mVirtualGamepad.mShoulderRButtonCenter);
 			root["VirtualGamepad"] = vg;
 		}
+
+		// Game recorder
+		root["GameRecordingMode"] = mGameRecorder.mRecordingMode;
+
+		// Script
+		root["ScriptOptimizationLevel"] = mScriptOptimizationLevel;
 
 		// Mod settings
 		saveModSettings(root, mModSettings);
@@ -500,13 +549,45 @@ void Configuration::saveSettings()
 	}
 }
 
+void Configuration::evaluateGameRecording()
+{
+	if (mGameRecorder.mRecordingMode == 0 || mGameRecorder.mIsPlayback)
+	{
+		mGameRecorder.mIsRecording = false;
+	}
+	else if (mGameRecorder.mRecordingMode == 1)
+	{
+		mGameRecorder.mIsRecording = true;
+	}
+	else
+	{
+		#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WEB)
+			// Disable game recording unless explicitly enabled, as it can be really slow on mobile devices
+			mGameRecorder.mIsRecording = false;
+		#else
+			mGameRecorder.mIsRecording = !mFailSafeMode;
+		#endif
+	}
+}
+
 void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 {
 	// Read dev mode setting first, as other settings rely on it
-	if (!mDevMode)	// If either config or settings set this to true, then it stays true
+	if (!mDevMode.mEnabled)	// If either config or settings set this to true, then it stays true
 	{
-		rootHelper.tryReadBool("DevMode", mDevMode);
-		rootHelper.tryReadBool("DebugMode", mDevMode);		// Not a mistake -- this is intentional
+		Json::Value devModeJson = rootHelper.mJson["DevMode"];
+		if (devModeJson.isObject())
+		{
+			JsonHelper devModeHelper(devModeJson);
+			devModeHelper.tryReadBool("Enabled", mDevMode.mEnabled);
+
+			devModeHelper.tryReadString("LoadSaveState", mLoadSaveState);
+			devModeHelper.tryReadInt("LoadLevel", mLoadLevel);
+			devModeHelper.tryReadInt("UseCharacters", mUseCharacters);
+			mUseCharacters = clamp(mUseCharacters, 0, 4);
+
+			devModeHelper.tryReadBool("EnableROMDataAnalyser", mEnableROMDataAnalyser);
+		}
 	}
 
 	// Paths
@@ -523,7 +604,7 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 	}
 	rootHelper.tryReadString("MainScriptName", mMainScriptName);
 
-	if (mDevMode)
+	if (mDevMode.mEnabled)
 	{
 		if (rootHelper.tryReadString("SaveStatesDir", mSaveStatesDir))
 		{
@@ -535,20 +616,22 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 	rootHelper.tryReadInt("PlatformFlags", mPlatformFlags);
 
 	// Game
-	if (mDevMode)
-	{
-		rootHelper.tryReadString("LoadSaveState", mLoadSaveState);
-	}
-	rootHelper.tryReadInt("LoadLevel", mLoadLevel);
-	rootHelper.tryReadInt("UseCharacters", mUseCharacters);
-	mUseCharacters = clamp(mUseCharacters, 0, 4);
-
 	rootHelper.tryReadInt("StartPhase", mStartPhase);
-	rootHelper.tryReadInt("GameRecording", mGameRecording);
-	rootHelper.tryReadInt("GameRecPlayFrom", mGameRecPlayFrom);
-	rootHelper.tryReadBool("GameRecIgnoreKeys", mGameRecIgnoreKeys);
 
-	if (mLoadLevel != -1 || mGameRecording == 2)
+	// Game recorder
+	Json::Value gamerecJson = rootHelper.mJson["GameRecording"];
+	if (gamerecJson.isObject())
+	{
+		JsonHelper gamerecHelper(gamerecJson);
+		gamerecHelper.tryReadBool("EnablePlayback", mGameRecorder.mIsPlayback);
+		if (mGameRecorder.mIsPlayback)
+		{
+			gamerecHelper.tryReadInt("PlaybackStartFrame", mGameRecorder.mPlaybackStartFrame);
+			gamerecHelper.tryReadBool("PlaybackIgnoreKeys", mGameRecorder.mPlaybackIgnoreKeys);
+		}
+	}
+
+	if (mLoadLevel != -1 || mGameRecorder.mIsPlayback)
 	{
 		// Enforce start phase 3 (in-game) when a level to load directly is defined, and in game recording playback mode
 		mStartPhase = 3;
@@ -556,7 +639,7 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 
 	// Video
 	tryParseWindowSize(rootHelper.mJson["WindowSize"].asString(), mWindowSize);
-	if (mDevMode)
+	if (mDevMode.mEnabled)
 	{
 		tryParseWindowSize(rootHelper.mJson["GameScreen"].asString(), mGameScreen);
 	}
@@ -571,20 +654,15 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 	rootHelper.tryReadInt("AudioSampleRate", mAudioSampleRate);
 
 	// Input recorder
-	if (mDevMode)
+	if (mDevMode.mEnabled)
 	{
 		JsonHelper jsonHelper(rootHelper.mJson["InputRecorder"]);
 		jsonHelper.tryReadString("Playback", mInputRecorderInput);
 		jsonHelper.tryReadString("Record", mInputRecorderOutput);
 	}
 
-	// Script
-	rootHelper.tryReadInt("ScriptOptimizationLevel", mScriptOptimizationLevel);
-	if (mDevMode)
-	{
-		rootHelper.tryReadBool("EnableROMDataAnalyzer", mEnableROMDataAnalyzer);
-	}
 #if DEBUG
+	// Script
 	rootHelper.tryReadBool("CompileScripts", mForceCompileScripts);
 #endif
 }
@@ -646,9 +724,9 @@ void Configuration::saveSettingsInput(const std::wstring& filename) const
 			writer.writeLine(line);
 		}
 
-		for (size_t i = 0; i < (size_t)InputConfig::DeviceDefinition::Button::_NUM; ++i)
+		for (size_t i = 0; i < InputConfig::DeviceDefinition::NUM_BUTTONS; ++i)
 		{
-			const std::string& name = InputMappingKeys[i];
+			const std::string& name = InputConfig::DeviceDefinition::BUTTON_NAME[i];
 			String line = "\"" + name + "\":";
 			line.add(' ', 6 - (int)name.length());
 			line << "[ ";
@@ -665,7 +743,7 @@ void Configuration::saveSettingsInput(const std::wstring& filename) const
 				isFirst = false;
 			}
 			line << " ]";
-			if (i+1 < (size_t)InputConfig::DeviceDefinition::Button::_NUM)
+			if (i+1 < InputConfig::DeviceDefinition::NUM_BUTTONS)
 				line << ",";
 			writer.writeLine(line);
 		}

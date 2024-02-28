@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -21,7 +21,7 @@ public:
 
 	const bool isLoaded() const  { return mLoaded; }
 
-	bool exists(const std::wstring& filename) override;
+	bool exists(const std::wstring& path) override;
 	bool readFile(const std::wstring& filename, std::vector<uint8>& outData) override;
 	bool listFiles(const std::wstring& path, bool recursive, std::vector<rmx::FileIO::FileEntry>& outFileEntries) override;
 	bool listFilesByMask(const std::wstring& filemask, bool recursive, std::vector<rmx::FileIO::FileEntry>& outFileEntries) override;

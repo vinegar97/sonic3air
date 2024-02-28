@@ -1,20 +1,25 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
+#include "oxygen/drawing/opengl/OpenGLSpriteTextureManager.h"
 #include "oxygen/drawing/opengl/Upscaler.h"
 #include "oxygen/drawing/DrawCollection.h"
 #include "oxygen/drawing/DrawCommand.h"
 #include "oxygen/application/EngineMain.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
+#include "oxygen/resources/SpriteCache.h"
 
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
@@ -52,6 +57,18 @@ namespace opengldrawer
 	#endif
 	}
 
+	bool applyShaderBlendMode(Shader::BlendMode blendMode)
+	{
+		switch (blendMode)
+		{
+			case Shader::BlendMode::OPAQUE:		OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);		return true;
+			case Shader::BlendMode::ALPHA:		OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);		return true;
+			case Shader::BlendMode::ADD:		OpenGLDrawerResources::setBlendMode(BlendMode::ADDITIVE);	return true;
+			case Shader::BlendMode::UNDEFINED:	break;
+		}
+		return false;
+	}
+
 #ifdef USE_OPENGL_MESSAGE_CALLBACK
 	void GLAPIENTRY openGLMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 	{
@@ -68,17 +85,17 @@ namespace opengldrawer
 
 		const char* titleString = (type == GL_DEBUG_TYPE_ERROR) ? "OpenGL Error" : "OpenGL Message";
 		const char* severityString = (severity == GL_DEBUG_SEVERITY_HIGH)		  ? "High" :
-									 (severity == GL_DEBUG_SEVERITY_MEDIUM)		  ? "Medium" :
-									 (severity == GL_DEBUG_SEVERITY_LOW)		  ? "Low" :
-									 (severity == GL_DEBUG_SEVERITY_NOTIFICATION) ? "Notification" : "<unknown>";
+										(severity == GL_DEBUG_SEVERITY_MEDIUM)		  ? "Medium" :
+										(severity == GL_DEBUG_SEVERITY_LOW)		  ? "Low" :
+										(severity == GL_DEBUG_SEVERITY_NOTIFICATION) ? "Notification" : "<unknown>";
 		const char* typeString = (type == GL_DEBUG_TYPE_ERROR)				 ? "Error" :
-								 (type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR) ? "Deprecated Behavior" :
-								 (type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)	 ? "Undefined Behavior" :
-								 (type == GL_DEBUG_TYPE_PORTABILITY)		 ? "Portability" :
-								 (type == GL_DEBUG_TYPE_PERFORMANCE)		 ? "Performance" :
-								 (type == GL_DEBUG_TYPE_MARKER)				 ? "Marker" :
-								 (type == GL_DEBUG_TYPE_PUSH_GROUP)			 ? "Push Group" :
-								 (type == GL_DEBUG_TYPE_POP_GROUP)			 ? "Pop Group" : "<other>";
+									(type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR) ? "Deprecated Behavior" :
+									(type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)	 ? "Undefined Behavior" :
+									(type == GL_DEBUG_TYPE_PORTABILITY)		 ? "Portability" :
+									(type == GL_DEBUG_TYPE_PERFORMANCE)		 ? "Performance" :
+									(type == GL_DEBUG_TYPE_MARKER)				 ? "Marker" :
+									(type == GL_DEBUG_TYPE_PUSH_GROUP)			 ? "Push Group" :
+									(type == GL_DEBUG_TYPE_POP_GROUP)			 ? "Pop Group" : "<other>";
 
 		RMX_ERROR(titleString << " (severity = " << severityString << ", type = " << typeString << "):\n" << message, );
 	}
@@ -90,21 +107,29 @@ namespace opengldrawer
 	public:
 		Internal()
 		{
-			// Register oxygen-specific callback for shader source code post-processing
-			//  -> Must be done before loading first shaders in "OpenGLDrawerResources::startup" and "Upscaler::startup"
-			Shader::mShaderSourcePostProcessCallback = std::bind(&opengldrawer::performShaderSourcePostProcessing, std::placeholders::_1, std::placeholders::_2);
-
 		#if defined(RMX_USE_GLEW)
 			// GLEW initialization
-			LOG_INFO("GLEW initialization...");
-			glewInit();
+			RMX_LOG_INFO("GLEW initialization...");
+			const GLenum result = glewInit();
+			if (result != GLEW_OK)
+			{
+				RMX_ERROR("Error in OpenGL initialization (glewInit):\n" << glewGetErrorString(result), );
+				return;
+			}
 		#endif
 
 		#if defined(RMX_USE_GLAD)
 			// GLAD initialization
-			LOG_INFO("GLAD initialization...");
+			RMX_LOG_INFO("GLAD initialization...");
 			gladLoadGL();
 		#endif
+
+			// Register oxygen-specific callback for shader source code post-processing
+			//  -> Must be done before loading first shaders in "OpenGLDrawerResources::startup" and "Upscaler::startup"
+			Shader::mShaderSourcePostProcessCallback = std::bind(&opengldrawer::performShaderSourcePostProcessing, std::placeholders::_1, std::placeholders::_2);
+
+			// Also register callback for blend mode changes by shaders
+			Shader::mShaderApplyBlendModeCallback = std::bind(&opengldrawer::applyShaderBlendMode, std::placeholders::_1);
 
 		#ifdef USE_OPENGL_MESSAGE_CALLBACK
 			// Register OpenGL message callback for debugging
@@ -113,32 +138,32 @@ namespace opengldrawer
 		#endif
 
 			// Setup OpenGL defaults
-			LOG_INFO("Setting OpenGL defaults...");
-			setBlendMode(DrawerBlendMode::NONE);
+			RMX_LOG_INFO("Setting OpenGL defaults...");
+			setBlendMode(BlendMode::OPAQUE);
 
 			// Startup OpenGL drawer resources, including quad VAO and some basic shaders
-			LOG_INFO("OpenGL drawer resources startup");
+			RMX_LOG_INFO("OpenGL drawer resources startup");
 			OpenGLDrawerResources::startup();
 
 			// Startup upscaler
-			LOG_INFO("Upscaler startup");
+			RMX_LOG_INFO("Upscaler startup");
 			mUpscaler.startup();
+
+			mSetupSuccessful = true;
 		}
 
 		~Internal()
 		{
-			mUpscaler.shutdown();
-			OpenGLDrawerResources::shutdown();
-
-			for (auto& pair : mFontOutputMap)
+			if (mSetupSuccessful)
 			{
-				delete pair.second;
+				mUpscaler.shutdown();
+				OpenGLDrawerResources::shutdown();
 			}
 		}
 
-		OpenGLDrawerTexture* createTexture()
+		OpenGLDrawerTexture* createTexture(DrawerTexture& outTexture)
 		{
-			OpenGLDrawerTexture* texture = new OpenGLDrawerTexture();
+			OpenGLDrawerTexture* texture = new OpenGLDrawerTexture(outTexture);
 			return texture;
 		}
 
@@ -161,21 +186,49 @@ namespace opengldrawer
 			return !mInvalidScissorRegion;
 		}
 
-		void setBlendMode(DrawerBlendMode blendMode)
+		BlendMode getBlendMode()
 		{
-			mCurrentBlendMode = blendMode;
-			switch (blendMode)
+			return OpenGLDrawerResources::getBlendMode();
+		}
+
+		void setBlendMode(BlendMode blendMode)
+		{
+			OpenGLDrawerResources::setBlendMode(blendMode);
+		}
+
+		void applySamplingMode()
+		{
+			switch (mCurrentSamplingMode)
 			{
-				case DrawerBlendMode::NONE:
+				case SamplingMode::POINT:
 				{
-					glDisable(GL_BLEND);
-					glBlendFunc(GL_ONE, GL_ZERO);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 					break;
 				}
-				case DrawerBlendMode::ALPHA:
+				case SamplingMode::BILINEAR:
 				{
-					glEnable(GL_BLEND);
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					break;
+				}
+			}
+		}
+
+		void applyWrapMode()
+		{
+			switch (mCurrentWrapMode)
+			{
+				case TextureWrapMode::CLAMP:
+				{
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+					break;
+				}
+				case TextureWrapMode::REPEAT:
+				{
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 					break;
 				}
 			}
@@ -183,92 +236,138 @@ namespace opengldrawer
 
 		GLuint setupTexture(DrawerTexture& drawerTexture)
 		{
-			OpenGLDrawerTexture& openGLDrawerTexture = *drawerTexture.getImplementation<OpenGLDrawerTexture>();
-			const GLuint textureHandle = openGLDrawerTexture.getTextureHandle();
+			OpenGLDrawerTexture* openGLDrawerTexture = drawerTexture.getImplementation<OpenGLDrawerTexture>();
+			RMX_CHECK(nullptr != openGLDrawerTexture, "Invalid OpenGL texture implementation", return 0);
+			const GLuint textureHandle = openGLDrawerTexture->getTextureHandle();
 
-			if (openGLDrawerTexture.mSamplingMode != mCurrentSamplingMode || openGLDrawerTexture.mWrapMode != mCurrentWrapMode)
+			if (openGLDrawerTexture->mSamplingMode != mCurrentSamplingMode || openGLDrawerTexture->mWrapMode != mCurrentWrapMode)
 			{
 				glBindTexture(GL_TEXTURE_2D, textureHandle);
-				switch (mCurrentSamplingMode)
-				{
-					case DrawerSamplingMode::POINT:
-					{
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-						break;
-					}
-					case DrawerSamplingMode::BILINEAR:
-					{
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-						break;
-					}
-				}
-				switch (mCurrentWrapMode)
-				{
-					case DrawerWrapMode::CLAMP:
-					{
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-						break;
-					}
-					case DrawerWrapMode::REPEAT:
-					{
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-						break;
-					}
-				}
-				openGLDrawerTexture.mSamplingMode = mCurrentSamplingMode;
-				openGLDrawerTexture.mWrapMode = mCurrentWrapMode;
+				applySamplingMode();
+				applyWrapMode();
+				openGLDrawerTexture->mSamplingMode = mCurrentSamplingMode;
+				openGLDrawerTexture->mWrapMode = mCurrentWrapMode;
 			}
 			return textureHandle;
 		}
 
-		FontOutput& getFontOutput(Font& font)
+		OpenGLFontOutput& getOpenGLFontOutput(Font& font)
 		{
-			// Get or create FontOutput instance
-			const FontKey& key = font.getKey();
-			const auto it = mFontOutputMap.find(key);
-			if (it != mFontOutputMap.end())
+			// Get or create OpenGLFontOutput instance
+			OpenGLFontOutput* fontOutput = mapFind(mFontOutputMap, &font);
+			if (nullptr != fontOutput)
+				return *fontOutput;
+
+			const auto pair = mFontOutputMap.emplace(&font, font);
+			return pair.first->second;
+		}
+
+		void drawRect(Recti targetRect, GLuint textureHandle, const Color& color, Vec2f uv0 = Vec2f(0.0f, 0.0f), Vec2f uv1 = Vec2f(1.0f, 1.0f))
+		{
+			const Vec4f rectParam = getTransformOfRectInViewport(targetRect);
+
+			if (textureHandle != 0)
 			{
-				return *it->second;
+				const bool needsTintColor = (color != Color::WHITE);
+
+				if (uv0.x == 0.0f && uv0.y == 0.0f && uv1.x == 1.0f && uv1.y == 1.0f)
+				{
+					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
+					shader.bind();
+					shader.setParam("Transform", rectParam);
+					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
+					if (needsTintColor)
+					{
+						shader.setParam("TintColor", color);
+						shader.setParam("AddedColor", Color::TRANSPARENT);
+					}
+
+					OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
+				}
+				else
+				{
+					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
+					shader.bind();
+					shader.setParam("Transform", rectParam);
+					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
+					if (needsTintColor)
+						shader.setParam("TintColor", color);
+
+					const float vertexData[] =
+					{
+						0.0f, 0.0f, uv0.x, uv0.y,		// Upper left
+						0.0f, 1.0f, uv0.x, uv1.y,		// Lower left
+						1.0f, 1.0f, uv1.x, uv1.y,		// Lower right
+						1.0f, 1.0f, uv1.x, uv1.y,		// Lower right
+						1.0f, 0.0f, uv1.x, uv0.y,		// Upper right
+						0.0f, 0.0f, uv0.x, uv0.y		// Upper left
+					};
+
+					mMeshVAO.setup(opengl::VertexArrayObject::Format::P2_T2);
+					mMeshVAO.updateVertexData(&vertexData[0], 6);
+					mMeshVAO.draw(GL_TRIANGLES);
+				}
 			}
 			else
 			{
-				FontOutput* fontOutput = new FontOutput(key);
-				mFontOutputMap.emplace(key, fontOutput);
-				return *fontOutput;
+				Shader& shader = OpenGLDrawerResources::getSimpleRectColoredShader();
+				shader.bind();
+				shader.setParam("Transform", rectParam);
+				shader.setParam("Color", Vec4f(color.data));
+
+				OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
 			}
 		}
 
-		void printText(Font& font, const StringReader& text, const Recti& rect, const rmx::Painter::PrintOptions& printOptions)
+		void printText(Font& font, const StringReader& text, const Recti& rect, const DrawerPrintOptions& printOptions)
 		{
-			FontOutput& output = getFontOutput(font);
+			OpenGLFontOutput& fontOutput = getOpenGLFontOutput(font);
 			const Vec2f pos = font.alignText(rect, text, printOptions.mAlignment);
 
-			static std::vector<Font::TypeInfo> typeinfos;
-			typeinfos.clear();
-			font.getTypeInfos(typeinfos, pos, text, printOptions.mSpacing);
+			static std::vector<Font::TypeInfo> typeInfos;
+			typeInfos.clear();
+			font.getTypeInfos(typeInfos, pos, text, printOptions.mSpacing);
+			if (typeInfos.empty())
+				return;
 
-			static std::vector<FontOutput::VertexGroup> vertexGroups;
-			vertexGroups.clear();
-			output.buildVertexGroups(vertexGroups, typeinfos);
+			// Simple culling by checking the bounding box before rendering
+			// TODO: This is not particularly precise, as it's not considering the real impact of effects (outlines, shadows, etc.) - instead, we're using a fixed tolerance value
+			{
+				const constexpr int TOLERANCE = 10;
+				Vec2f boundingBoxMin(1e10f, 1e10f);
+				Vec2f boundingBoxMax(-1e10f, -1e10f);
+				for (const Font::TypeInfo& typeInfo : typeInfos)
+				{
+					if (nullptr != typeInfo.mBitmap)
+					{
+						boundingBoxMin.x = std::min(boundingBoxMin.x, typeInfo.mPosition.x);
+						boundingBoxMin.y = std::min(boundingBoxMin.y, typeInfo.mPosition.y);
+						boundingBoxMax.x = std::max(boundingBoxMax.x, typeInfo.mPosition.x + typeInfo.mBitmap->getWidth());
+						boundingBoxMax.y = std::max(boundingBoxMax.y, typeInfo.mPosition.y + typeInfo.mBitmap->getHeight());
+					}
+				}
+				if (boundingBoxMin.x >= mCurrentViewport.x + mCurrentViewport.width + TOLERANCE || boundingBoxMax.x <= mCurrentViewport.x - TOLERANCE ||
+					boundingBoxMin.y >= mCurrentViewport.y + mCurrentViewport.height + TOLERANCE || boundingBoxMax.y <= mCurrentViewport.y - TOLERANCE)
+					return;
+			}
+
+			static OpenGLFontOutput::VertexGroups vertexGroups;
+			fontOutput.buildVertexGroups(vertexGroups, typeInfos);
 
 			Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(true, true);
 			shader.bind();
 			shader.setParam("Transform", getPixelToViewSpaceTransform());
 
-			for (const FontOutput::VertexGroup& vertexGroup : vertexGroups)
+			for (const OpenGLFontOutput::VertexGroup& vertexGroup : vertexGroups.mVertexGroups)
 			{
 				shader.setTexture("Texture", *vertexGroup.mTexture);
 				shader.setParam("TintColor", printOptions.mTintColor);
 
 				static std::vector<float> vertexData;
-				vertexData.resize(vertexGroup.mVertices.size() * 4);
-				for (size_t i = 0; i < vertexGroup.mVertices.size(); ++i)
+				vertexData.resize(vertexGroup.mNumVertices * 4);
+				for (size_t i = 0; i < vertexGroup.mNumVertices; ++i)
 				{
-					const FontOutput::Vertex& src = vertexGroup.mVertices[i];
+					const OpenGLFontOutput::Vertex& src = vertexGroups.mVertices[vertexGroup.mStartIndex + i];
 					float* dst = &vertexData[i * 4];
 					dst[0] = src.mPosition.x;
 					dst[1] = src.mPosition.y;
@@ -277,21 +376,22 @@ namespace opengldrawer
 				}
 
 				mMeshVAO.setup(opengl::VertexArrayObject::Format::P2_T2);
-				mMeshVAO.updateVertexData(&vertexData[0], vertexGroup.mVertices.size());
+				mMeshVAO.updateVertexData(&vertexData[0], vertexGroup.mNumVertices);
 				mMeshVAO.draw(GL_TRIANGLES);
 			}
 		}
 
 	public:
+		bool mSetupSuccessful = false;
 		SDL_Window* mOutputWindow = nullptr;
 		Upscaler mUpscaler;
+		OpenGLSpriteTextureManager mSpriteTextureManager;
 
 		Recti mCurrentViewport;
 		Vec4f mPixelToViewSpaceTransform;	// Transformation from pixel-based coordinates view space, in the form: (x, y) = offset; (z, w) = scale
 
-		DrawerBlendMode mCurrentBlendMode = DrawerBlendMode::NONE;
-		DrawerSamplingMode mCurrentSamplingMode = DrawerSamplingMode::POINT;
-		DrawerWrapMode mCurrentWrapMode = DrawerWrapMode::CLAMP;
+		SamplingMode mCurrentSamplingMode = SamplingMode::POINT;
+		TextureWrapMode mCurrentWrapMode = TextureWrapMode::CLAMP;
 
 		std::vector<Recti> mScissorStack;
 		bool mInvalidScissorRegion = false;
@@ -299,7 +399,7 @@ namespace opengldrawer
 		opengl::VertexArrayObject mMeshVAO;			// Always using the same instances with different contents -- TODO: Some kind of caching could be useful
 
 	private:
-		std::map<FontKey, FontOutput*> mFontOutputMap;
+		std::unordered_map<Font*, OpenGLFontOutput> mFontOutputMap;
 	};
 }
 
@@ -315,9 +415,14 @@ OpenGLDrawer::~OpenGLDrawer()
 	delete &mInternal;
 }
 
+bool OpenGLDrawer::wasSetupSuccessful()
+{
+	return mInternal.mSetupSuccessful;
+}
+
 void OpenGLDrawer::createTexture(DrawerTexture& outTexture)
 {
-	outTexture.setImplementation(mInternal.createTexture());
+	outTexture.setImplementation(mInternal.createTexture(outTexture));
 }
 
 void OpenGLDrawer::refreshTexture(DrawerTexture& texture)
@@ -386,57 +491,13 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 					break;
 
 				RectDrawCommand& dc = drawCommand->as<RectDrawCommand>();
-				const Vec4f rectParam = mInternal.getTransformOfRectInViewport(dc.mRect);
-
+				GLuint textureHandle = 0;
 				if (nullptr != dc.mTexture)
 				{
-					const GLuint textureHandle = mInternal.setupTexture(*dc.mTexture);
-					const bool needsTintColor = (dc.mColor != Color::WHITE);
-
-					if (dc.mUV0.x == 0.0f && dc.mUV0.y == 0.0f && dc.mUV1.x == 1.0f && dc.mUV1.y == 1.0f)
-					{
-						Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, mInternal.mCurrentBlendMode == DrawerBlendMode::ALPHA);
-						shader.bind();
-						shader.setParam("Transform", rectParam);
-						shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
-						if (needsTintColor)
-							shader.setParam("TintColor", dc.mColor);
-
-						OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
-					}
-					else
-					{
-						Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, mInternal.mCurrentBlendMode == DrawerBlendMode::ALPHA);
-						shader.bind();
-						shader.setParam("Transform", rectParam);
-						shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
-						if (needsTintColor)
-							shader.setParam("TintColor", dc.mColor);
-
-						const float vertexData[] =
-						{
-							0.0f, 0.0f, dc.mUV0.x, dc.mUV0.y,		// Upper left
-							0.0f, 1.0f, dc.mUV0.x, dc.mUV1.y,		// Lower left
-							1.0f, 1.0f, dc.mUV1.x, dc.mUV1.y,		// Lower right
-							1.0f, 1.0f, dc.mUV1.x, dc.mUV1.y,		// Lower right
-							1.0f, 0.0f, dc.mUV1.x, dc.mUV0.y,		// Upper right
-							0.0f, 0.0f, dc.mUV0.x, dc.mUV0.y		// Upper left
-						};
-
-						mInternal.mMeshVAO.setup(opengl::VertexArrayObject::Format::P2_T2);
-						mInternal.mMeshVAO.updateVertexData(&vertexData[0], 6);
-						mInternal.mMeshVAO.draw(GL_TRIANGLES);
-					}
+					textureHandle = mInternal.setupTexture(*dc.mTexture);
 				}
-				else
-				{
-					Shader& shader = OpenGLDrawerResources::getSimpleRectColoredShader();
-					shader.bind();
-					shader.setParam("Transform", rectParam);
-					shader.setParam("Color", Vec4f(dc.mColor.data));
 
-					OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
-				}
+				mInternal.drawRect(dc.mRect, textureHandle, dc.mColor, dc.mUV0, dc.mUV1);
 				break;
 			}
 
@@ -447,6 +508,62 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 
 				UpscaledRectDrawCommand& dc = drawCommand->as<UpscaledRectDrawCommand>();
 				mInternal.mUpscaler.renderImage(dc.mRect, dc.mTexture->getImplementation<OpenGLDrawerTexture>()->getTextureHandle(), dc.mTexture->getSize());
+				break;
+			}
+
+			case DrawCommand::Type::SPRITE:
+			{
+				SpriteDrawCommand& sc = drawCommand->as<SpriteDrawCommand>();
+				const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(sc.mSpriteKey);
+				if (nullptr == item)
+					break;
+				if (!item->mUsesComponentSprite)
+					break;
+
+				OpenGLTexture* texture = mInternal.mSpriteTextureManager.getComponentSpriteTexture(*item);
+				if (nullptr == texture)
+					break;
+
+				ComponentSprite& sprite = *static_cast<ComponentSprite*>(item->mSprite);
+				Vec2i offset = sprite.mOffset;
+				Vec2i size = sprite.getBitmap().getSize();
+				if (sc.mScale.x != 1.0f || sc.mScale.y != 1.0f)
+				{
+					offset.x = roundToInt((float)offset.x * sc.mScale.x);
+					offset.y = roundToInt((float)offset.y * sc.mScale.y);
+					size.x = roundToInt((float)size.x * sc.mScale.x);
+					size.y = roundToInt((float)size.y * sc.mScale.y);
+				}
+				const Recti targetRect(sc.mPosition + offset, size);
+
+				// TODO: Cache sampling mode for the texture?
+				//  -> That requires the sprite texture manager to store (more high level) OpenGLDrawerTexture instead of OpenGLTexture instances
+				glBindTexture(GL_TEXTURE_2D, texture->getHandle());
+				mInternal.applySamplingMode();
+
+				mInternal.drawRect(targetRect, texture->getHandle(), sc.mTintColor);
+				break;
+			}
+
+			case DrawCommand::Type::SPRITE_RECT:
+			{
+				SpriteRectDrawCommand& sc = drawCommand->as<SpriteRectDrawCommand>();
+				const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(sc.mSpriteKey);
+				if (nullptr == item)
+					break;
+				if (!item->mUsesComponentSprite)
+					break;
+
+				OpenGLTexture* texture = mInternal.mSpriteTextureManager.getComponentSpriteTexture(*item);
+				if (nullptr == texture)
+					break;
+
+				// TODO: Cache sampling mode for the texture?
+				//  -> That requires the sprite texture manager to store (more high level) OpenGLDrawerTexture instead of OpenGLTexture instances
+				glBindTexture(GL_TEXTURE_2D, texture->getHandle());
+				mInternal.applySamplingMode();
+
+				mInternal.drawRect(sc.mRect, texture->getHandle(), sc.mTintColor);
 				break;
 			}
 
@@ -603,3 +720,5 @@ void OpenGLDrawer::presentScreen()
 {
 	SDL_GL_SwapWindow(mInternal.mOutputWindow);
 }
+
+#endif

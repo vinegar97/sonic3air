@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,7 +9,6 @@
 #pragma once
 
 #include <rmxbase.h>
-#include <chrono>
 
 class Font;
 
@@ -19,7 +18,11 @@ namespace utils
 	bool startsWith(const std::wstring& fullString, const std::wstring& prefix);
 
 	void splitTextIntoLines(std::vector<std::string>& outLines, const std::string& text, Font& font, int maxLineWidth);
+	void splitTextIntoLines(std::vector<std::string_view>& outLines, std::string_view text, Font& font, int maxLineWidth);
 	void shortenTextToFit(std::string& text, Font& font, int maxLineWidth);
+
+	uint32 getVersionNumberFromString(const std::string& versionString);
+	std::string getVersionStringFromNumber(uint32 versionNumber);
 
 	void buildSpriteAtlas(const std::wstring& outputFilename, const std::wstring& imagesFileMask);	// For 32-bit bitmaps (uses RMX SpriteAtlas)
 	void buildSpriteAtlas2(const std::wstring& outputFilename, const std::wstring& imagesFileMask);	// For 8-bit bitmaps (uses fixed grid)

@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -55,7 +55,7 @@ public:
 	float getFilePosition();
 
 	inline bool isStreaming() const        { return mIsStreaming; }
-	inline bool isStreamingVorbis() const  { return (mAudioBuffer != nullptr); }
+	inline bool isStreamingVorbis() const  { return (nullptr != mAudioBuffer); }
 	inline OggLoaderState getAudioState() const  { return mAudioState; }
 
 	inline OggLoaderError getError() const  { return mError; }

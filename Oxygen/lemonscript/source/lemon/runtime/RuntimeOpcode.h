@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -25,26 +25,25 @@ namespace lemon
 	class API_EXPORT RuntimeOpcodeProvider
 	{
 	public:
-		virtual bool buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int& outNumOpcodesConsumed, const Runtime& runtime) = 0;
+		virtual bool buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime) = 0;
 	};
 
 
 	struct API_EXPORT RuntimeOpcodeBase
 	{
 	public:
-		enum Flags
+		enum class Flag : uint8
 		{
-			FLAG_CALL_INLINE_RESOLVED		= 0x10,		// For CALL opcodes only: Call target is already resolved and is a user function meant to be inline executed
-			FLAG_CALL_IS_BASE_CALL			= 0x20,		// For CALL opcodes only: It is a base call
-			FLAG_CALL_TARGET_RESOLVED		= 0x40,		// For CALL opcodes only: Call target is already resolved and can be found in the parameter (as pointer)
-			FLAG_CALL_TARGET_RUNTIME_FUNC	= 0x80		// For CALL opcodes only: Resolved call target is a RuntimeFunction, not a Function
+			CALL_IS_BASE_CALL		 = 0x20,	// For CALL opcodes only: It is a base call
+			CALL_TARGET_RESOLVED	 = 0x40,	// For CALL opcodes only: Call target is already resolved and can be found in the parameter (as pointer)
+			CALL_TARGET_RUNTIME_FUNC = 0x80		// For CALL opcodes only: Call target is resolved and is a RuntimeFunction, not a Function
 		};
 
 		ExecFunc mExecFunc;
 		RuntimeOpcode* mNext = nullptr;
 		Opcode::Type mOpcodeType = Opcode::Type::NOP;
 		uint8 mSize = 0;
-		uint8 mFlags = 0;
+		BitFlagSet<Flag> mFlags;
 		uint8 mSuccessiveHandledOpcodes = 0;	// Number of internally handled opcodes (i.e. not manipulating control flow) in a row from this one -- including this one, so if this is 0, the opcode is not handled
 	};
 

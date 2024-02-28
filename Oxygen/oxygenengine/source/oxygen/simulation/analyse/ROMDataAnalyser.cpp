@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -16,6 +16,11 @@ ROMDataAnalyser::ROMDataAnalyser()
 {
 	// Load files
 	loadDataFromJSONs(Configuration::instance().mAnalysisDir);
+
+#ifdef DEBUG
+	// Just for generating some data for development
+//	processData();
+#endif
 }
 
 ROMDataAnalyser::~ROMDataAnalyser()
@@ -27,12 +32,12 @@ ROMDataAnalyser::~ROMDataAnalyser()
 	}
 }
 
-bool ROMDataAnalyser::hasEntry(const std::string& categoryName, uint32 address) const
+bool ROMDataAnalyser::hasEntry(std::string_view categoryName, uint32 address) const
 {
 	return (nullptr != const_cast<ROMDataAnalyser*>(this)->findEntry(categoryName, address, false));
 }
 
-void ROMDataAnalyser::beginEntry(const std::string& categoryName, uint32 address)
+void ROMDataAnalyser::beginEntry(std::string_view categoryName, uint32 address)
 {
 	RMX_CHECK(nullptr == mCurrentCategory, "ROMDataAnalyser: Don't call \"beginEntry\" without closing old entry with \"endEntry\"", );
 	RMX_CHECK(nullptr == mCurrentEntry,    "ROMDataAnalyser: Don't call \"beginEntry\" without closing old entry with \"endEntry\"", );
@@ -53,19 +58,19 @@ void ROMDataAnalyser::endEntry()
 	mCurrentObjectStack.clear();
 }
 
-void ROMDataAnalyser::addKeyValue(const std::string& key, const std::string& value)
+void ROMDataAnalyser::addKeyValue(std::string_view key, std::string_view value)
 {
 	RMX_CHECK(!mCurrentObjectStack.empty(), "ROMDataAnalyser: No current object when calling \"addKeyValue\"", return);
 
-	mCurrentObjectStack.back()->mKeyValuePairs[key] = value;
+	mCurrentObjectStack.back()->mKeyValuePairs[std::string(key)] = value;
 	mAnyChange = true;
 }
 
-void ROMDataAnalyser::beginObject(const std::string& key)
+void ROMDataAnalyser::beginObject(std::string_view key)
 {
 	RMX_CHECK(!mCurrentObjectStack.empty(), "ROMDataAnalyser: No current object when calling \"beginObject\"", return);
 
-	Object& child = mCurrentObjectStack.back()->mChildObjects[key];
+	Object& child = mCurrentObjectStack.back()->mChildObjects[std::string(key)];
 	mCurrentObjectStack.push_back(&child);
 	mAnyChange = true;
 }
@@ -77,7 +82,7 @@ void ROMDataAnalyser::endObject()
 	mCurrentObjectStack.pop_back();
 }
 
-ROMDataAnalyser::Category* ROMDataAnalyser::findCategory(const std::string& categoryName, bool create)
+ROMDataAnalyser::Category* ROMDataAnalyser::findCategory(std::string_view categoryName, bool create)
 {
 	const uint64 hash = rmx::getMurmur2_64(categoryName);
 	const auto it = mCategories.find(hash);
@@ -96,7 +101,7 @@ ROMDataAnalyser::Category* ROMDataAnalyser::findCategory(const std::string& cate
 	}
 }
 
-ROMDataAnalyser::Entry* ROMDataAnalyser::findEntry(const std::string& categoryName, uint32 address, bool create, Category** outCategory)
+ROMDataAnalyser::Entry* ROMDataAnalyser::findEntry(std::string_view categoryName, uint32 address, bool create, Category** outCategory)
 {
 	Category* category = findCategory(categoryName, create);
 	if (nullptr != outCategory)
@@ -120,19 +125,19 @@ ROMDataAnalyser::Entry* ROMDataAnalyser::findEntry(const std::string& categoryNa
 	}
 }
 
-void ROMDataAnalyser::loadDataFromJSONs(const std::wstring& filepath)
+void ROMDataAnalyser::loadDataFromJSONs(std::wstring_view filepath)
 {
 	mCategories.clear();
 
 	FileCrawler fc;
-	fc.addFiles(filepath + L"romdata_*.json");
+	fc.addFiles(std::wstring(filepath) + L"romdata_*.json");
 	for (size_t fileIndex = 0; fileIndex < fc.size(); ++fileIndex)
 	{
 		const FileCrawler::FileEntry* fileEntry = fc[fileIndex];
 		if (nullptr == fileEntry)
 			continue;
 
-		const std::wstring filename = filepath + fileEntry->mFilename;
+		const std::wstring filename = std::wstring(filepath) + fileEntry->mFilename;
 		Json::Value root = JsonHelper::loadFile(filename);
 		if (root.isNull())
 			continue;
@@ -165,7 +170,7 @@ void ROMDataAnalyser::recursiveLoadDataFromJSON(const Json::Value& json, Object&
 	}
 }
 
-void ROMDataAnalyser::saveDataToJSONs(const std::wstring& filepath)
+void ROMDataAnalyser::saveDataToJSONs(std::wstring_view filepath)
 {
 	for (const auto& pair : mCategories)
 	{
@@ -183,7 +188,7 @@ void ROMDataAnalyser::saveDataToJSONs(const std::wstring& filepath)
 		root[category.mName] = categoryJson;
 
 		// Save file
-		const std::wstring filename = filepath + L"romdata_" + *String(category.mName).toWString() + L".json";
+		const std::wstring filename = std::wstring(filepath) + L"romdata_" + *String(category.mName).toWString() + L".json";
 		JsonHelper::saveFile(filename, root);
 
 	#if 0
@@ -221,4 +226,54 @@ void ROMDataAnalyser::recursiveSaveDataToJSON(Json::Value& outJson, const Object
 		recursiveSaveDataToJSON(childJson, pair.second);
 		outJson[pair.first] = childJson;
 	}
+}
+
+void ROMDataAnalyser::processData()
+{
+#ifdef DEBUG
+	String output[2];
+	String entryOutput;
+	for (const auto& pair : mCategories[16289744412002469748].mEntries)
+	{
+		entryOutput.clear();
+		const Object& parent = pair.second.mContent;
+		const auto& keyValue = parent.mKeyValuePairs;
+
+		if (*mapFind(keyValue, std::string("function")) == "SpawnChildObjects")
+		{
+			for (size_t index = 0; ; ++index)
+			{
+				const Object* child = mapFind(parent.mChildObjects, std::to_string(index));
+				if (nullptr == child)
+					break;
+
+				const uint32 updateAddress = (uint32)rmx::parseInteger(*mapFind(child->mKeyValuePairs, std::string("update_routine")));
+				const uint8 subType = (uint8)rmx::parseInteger(*mapFind(child->mKeyValuePairs, std::string("subtype")));
+				const int offset_x = (int8)(uint8)rmx::parseInteger(*mapFind(child->mKeyValuePairs, std::string("offset_x")));
+				const int offset_y = (int8)(uint8)rmx::parseInteger(*mapFind(child->mKeyValuePairs, std::string("offset_y")));
+
+				entryOutput << "spawnChildObject(" << rmx::hexString(updateAddress, 6) << ", " << rmx::hexString(subType, 2) << ", " << offset_x << ", " << offset_y << ")\r\n";
+			}
+
+			if (entryOutput.nonEmpty())
+			{
+				output[0] << "\r\n";
+				output[0] << "// \"spawnChildObjects(" << rmx::hexString(pair.first, 6) << ")\" replaced by:\r\n";
+				output[0] << entryOutput;
+				output[0] << "\r\n\r\n";
+			}
+		}
+		else if (*mapFind(keyValue, std::string("function")) == "SpawnSimpleChildObjects")
+		{
+			const uint32 updateAddress = (uint32)rmx::parseInteger(*mapFind(keyValue, std::string("update_routine")));
+			const uint8 count = (uint8)rmx::parseInteger(*mapFind(keyValue, std::string("count")));
+
+			output[1] << "\r\n";
+			output[1] << "// \"spawnSimpleChildObjects(" << rmx::hexString(pair.first, 6) << ")\" replaced by:\r\n";
+			output[1] << "spawnSimpleChildObjects(" << rmx::hexString(updateAddress, 6) << ", " << count << ")\r\n\r\n";
+		}
+	}
+	output[0].saveFile("___internal/analysis/romdata_out_SpawnChildObjects.lemon");
+	output[1].saveFile("___internal/analysis/romdata_out_SpawnSimpleChildObjects.lemon");
+#endif
 }

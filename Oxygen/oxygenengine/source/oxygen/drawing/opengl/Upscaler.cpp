@@ -1,12 +1,15 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/drawing/opengl/Upscaler.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/application/Configuration.h"
@@ -142,7 +145,7 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 	}
 
 	// Disable blending (though it shouldn't be necessary, as upscaling shaders usually do this already)
-	glBlendFunc(GL_ONE, GL_ZERO);
+	OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);
 
 	opengl::VertexArrayObject& vao = OpenGLDrawerResources::getSimpleQuadVAO();
 	vao.bind();
@@ -176,3 +179,5 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 
 	secondShader->unbind();
 }
+
+#endif

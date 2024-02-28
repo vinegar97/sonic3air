@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -36,8 +36,7 @@ void AudioOutBase::startup()
 	// Load audio definitions
 	//  -> No mods yet here, that's coming later in "handleGameLoaded"
 	mAudioCollection.loadFromJson(L"data/audio/original", L"audio_default.json", AudioCollection::Package::ORIGINAL);
-	mAudioCollection.loadFromJson(L"data/audio/remastered", L"audio_replacements.json", AudioCollection::Package::REMASTERED);
-	determineActiveSourceRegistrations();
+	reloadRemasteredSoundtrack();
 
 	// Startup
 	mAudioPlayer.startup();
@@ -61,10 +60,27 @@ void AudioOutBase::realtimeUpdate(float secondsPassed)
 	mAudioPlayer.updatePlayback(secondsPassed);
 }
 
+void AudioOutBase::reloadRemasteredSoundtrack()
+{
+	mAudioCollection.clearPackage(AudioCollection::Package::REMASTERED);
+	mAudioCollection.loadFromJson(L"data/audio/remastered", L"audio_replacements.json", AudioCollection::Package::REMASTERED);
+	mLoadedRemasteredSoundtrack = (mAudioCollection.getNumSourcesByPackageType(AudioCollection::Package::REMASTERED) != 0);
+	determineActiveSourceRegistrations();
+}
+
 void AudioOutBase::setGlobalVolume(float volume)
 {
 	mGlobalVolume = volume;
 	FTX::Audio->setGlobalVolume(mGlobalVolume);
+}
+
+AudioOutBase::AudioKeyType AudioOutBase::getAudioKeyType(uint64 sfxId) const
+{
+	AudioCollection::SourceRegistration* sourceReg = mAudioCollection.getSourceRegistration(sfxId);
+	if (nullptr == sourceReg)
+		return AudioKeyType::INVALID;
+
+	return (AudioKeyType)sourceReg->mPackage;
 }
 
 bool AudioOutBase::isPlayingSfxId(uint64 sfxId) const
@@ -72,9 +88,9 @@ bool AudioOutBase::isPlayingSfxId(uint64 sfxId) const
 	return mAudioPlayer.isPlayingSfxId(sfxId);
 }
 
-void AudioOutBase::playAudioBase(uint64 sfxId, uint8 contextId)
+bool AudioOutBase::playAudioBase(uint64 sfxId, uint8 contextId)
 {
-	mAudioPlayer.playAudio(sfxId, contextId);
+	return mAudioPlayer.playAudio(sfxId, contextId);
 }
 
 void AudioOutBase::playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, uint8 overriddenChannelId)
@@ -97,7 +113,7 @@ void AudioOutBase::fadeOutChannel(uint8 channelId, float length)
 	mAudioPlayer.fadeOutChannel(channelId, length);
 }
 
-void AudioOutBase::enableAudioModifier(uint8 channelId, uint8 contextId, const std::string& postfix, float relativeSpeed)
+void AudioOutBase::enableAudioModifier(uint8 channelId, uint8 contextId, std::string_view postfix, float relativeSpeed)
 {
 	mAudioPlayer.enableAudioModifier(channelId, contextId, postfix, relativeSpeed);
 }

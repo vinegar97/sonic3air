@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -34,6 +34,14 @@ public:
 		CONTEXT_MENU	= 0x10
 	};
 
+	enum class AudioKeyType
+	{
+		INVALID		= 0,
+		EMULATED	= 1,
+		REMASTERED	= 2,
+		MODDED		= 3
+	};
+
 public:
 	AudioOutBase();
 	virtual ~AudioOutBase();
@@ -49,18 +57,22 @@ public:
 	AudioCollection& getAudioCollection()  { return mAudioCollection; }
 	AudioPlayer& getAudioPlayer()		   { return mAudioPlayer; }
 
+	void reloadRemasteredSoundtrack();
+	bool hasLoadedRemasteredSoundtrack() const  { return mLoadedRemasteredSoundtrack; }
+
 	inline float getGlobalVolume() const   { return mGlobalVolume; }
 	void setGlobalVolume(float volume);
 
+	AudioKeyType getAudioKeyType(uint64 sfxId) const;
 	bool isPlayingSfxId(uint64 sfxId) const;
 
-	void playAudioBase(uint64 sfxId, uint8 contextId);
+	bool playAudioBase(uint64 sfxId, uint8 contextId);
 	void playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, uint8 overriddenChannelId);
 	void stopChannel(uint8 channelId);
 	void fadeInChannel(uint8 channelId, float length);
 	void fadeOutChannel(uint8 channelId, float length);
 
-	void enableAudioModifier(uint8 channelId, uint8 contextId, const std::string& postfix, float relativeSpeed);
+	void enableAudioModifier(uint8 channelId, uint8 contextId, std::string_view postfix, float relativeSpeed);
 	void disableAudioModifier(uint8 channelId, uint8 contextId);
 
 	void handleGameLoaded();
@@ -72,5 +84,6 @@ protected:
 protected:
 	AudioCollection mAudioCollection;
 	AudioPlayer mAudioPlayer;
+	bool mLoadedRemasteredSoundtrack = false;
 	float mGlobalVolume = 1.0f;
 };

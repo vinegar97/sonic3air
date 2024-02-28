@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,13 +9,11 @@
 #include "oxygen/pch.h"
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/application/Configuration.h"
-#include "oxygen/application/GameProfile.h"
 #include "oxygen/application/modding/ModManager.h"
-#include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
-#include "oxygen/helper/Log.h"
-#include "oxygen/helper/PackageFileCrawler.h"
+#include "oxygen/helper/Logging.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 
 bool ResourcesCache::loadRom()
@@ -32,10 +30,15 @@ bool ResourcesCache::loadRom()
 	// First have a look at the game's app data, where the ROM gets copied to after it was found once
 	if (!loaded && !config.mAppDataPath.empty())
 	{
-		romPath = config.mAppDataPath + L'/' + gameProfile.mRomAutoDiscover.mSteamRomName;
-		loaded = loadRomFile(romPath);
+		for (const GameProfile::RomInfo& romInfo : gameProfile.mRomInfos)
+		{
+			romPath = config.mAppDataPath + romInfo.mSteamRomName;
+			loaded = loadRomFile(romPath, romInfo);
+			if (loaded)
+				break;
+		}
 
-		// If ROM is found is one of the next steps, make sure to copy it into the app data folder afterwards
+		// If ROM is not found yet, but in one of the next steps, then make sure to copy it into the app data folder afterwards
 		saveRom = !loaded;
 	}
 
@@ -58,19 +61,29 @@ bool ResourcesCache::loadRom()
 	// Or is it the Steam ROM right inside the installation directory?
 	if (!loaded)
 	{
-		romPath = gameProfile.mRomAutoDiscover.mSteamRomName;
-		loaded = loadRomFile(romPath);
+		for (const GameProfile::RomInfo& romInfo : gameProfile.mRomInfos)
+		{
+			romPath = romInfo.mSteamRomName;
+			loaded = loadRomFile(romPath, romInfo);
+			if (loaded)
+				break;
+		}
 	}
 
 #if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
 	// If still not loaded, search for Steam installation of the game
-	if (!loaded && !gameProfile.mRomAutoDiscover.mSteamRomName.empty())
+	if (!loaded && !gameProfile.mRomInfos.empty())
 	{
-		LOG_INFO("Trying to find Steam ROM");
-		romPath = PlatformFunctions::tryGetSteamRomPath(gameProfile.mRomAutoDiscover.mSteamRomName);
-		if (!romPath.empty())
+		RMX_LOG_INFO("Trying to find Steam ROM");
+		for (const GameProfile::RomInfo& romInfo : gameProfile.mRomInfos)
 		{
-			loaded = loadRomFile(romPath);
+			romPath = PlatformFunctions::tryGetSteamRomPath(romInfo.mSteamRomName);
+			if (!romPath.empty())
+			{
+				loaded = loadRomFile(romPath, romInfo);
+				if (loaded)
+					break;
+			}
 		}
 	}
 #endif
@@ -111,8 +124,7 @@ bool ResourcesCache::loadRomFromFile(const std::wstring& filename)
 
 bool ResourcesCache::loadRomFromMemory(const std::vector<uint8>& content)
 {
-	mRom = content;
-	if (!checkRomContent())
+	if (!loadRomMemory(content))
 		return false;
 
 	saveRomToAppData();
@@ -133,7 +145,7 @@ void ResourcesCache::loadAllResources()
 
 	// Load palettes
 	mPalettes.clear();
-	loadRawData(L"data/palettes", false);
+	loadPalettes(L"data/palettes", false);
 	for (const Mod* mod : ModManager::instance().getActiveMods())
 	{
 		loadPalettes(mod->mFullPath + L"palettes", true);
@@ -149,8 +161,7 @@ const std::vector<const ResourcesCache::RawData*>& ResourcesCache::getRawData(ui
 
 const ResourcesCache::Palette* ResourcesCache::getPalette(uint64 key, uint8 line) const
 {
-	const auto it = mPalettes.find(key + line);
-	return (it == mPalettes.end()) ? nullptr : &it->second;
+	return mapFind(mPalettes, key + line);
 }
 
 void ResourcesCache::applyRomInjections(uint8* rom, uint32 romSize) const
@@ -166,11 +177,122 @@ void ResourcesCache::applyRomInjections(uint8* rom, uint32 romSize) const
 bool ResourcesCache::loadRomFile(const std::wstring& filename)
 {
 	const GameProfile::RomCheck& romCheck = GameProfile::instance().mRomCheck;
+	std::vector<uint8> content;
+	content.reserve(romCheck.mSize > 0 ? romCheck.mSize : 0x400000);
+	if (!FTX::FileSystem->readFile(filename, content))
+		return false;
+
+	return loadRomMemory(content);
+}
+
+bool ResourcesCache::loadRomFile(const std::wstring& filename, const GameProfile::RomInfo& romInfo)
+{
+	const GameProfile::RomCheck& romCheck = GameProfile::instance().mRomCheck;
 	mRom.reserve(romCheck.mSize > 0 ? romCheck.mSize : 0x400000);
 	if (!FTX::FileSystem->readFile(filename, mRom))
 		return false;
 
-	return checkRomContent();
+	// If ROM info defines a required header checksum, make sure it fits (this is meant to be an early-out before doing the potentially expensive code below)
+	const uint64 headerChecksum = getHeaderChecksum(mRom);
+	if (romInfo.mHeaderChecksum != 0 && romInfo.mHeaderChecksum != headerChecksum)
+		return false;
+
+	if (applyRomModifications(romInfo))
+	{
+		if (checkRomContent())
+		{
+			mLoadedRomInfo = &romInfo;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool ResourcesCache::loadRomMemory(const std::vector<uint8>& content)
+{
+	const uint64 headerChecksum = getHeaderChecksum(content);
+	if (GameProfile::instance().mRomInfos.empty())
+	{
+		mRom = content;
+		if (checkRomContent())
+			return true;
+	}
+	else
+	{
+		for (const GameProfile::RomInfo& romInfo : GameProfile::instance().mRomInfos)
+		{
+			// If ROM info defines a required header checksum, make sure it fits (this is meant to be an early-out before doing the potentially expensive code below)
+			if (romInfo.mHeaderChecksum != 0 && romInfo.mHeaderChecksum != headerChecksum)
+				continue;
+
+			mRom = content;
+			if (applyRomModifications(romInfo))
+			{
+				if (checkRomContent())
+				{
+					mLoadedRomInfo = &romInfo;
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+uint64 ResourcesCache::getHeaderChecksum(const std::vector<uint8>& content)
+{
+	if (content.empty())
+		return 0;
+
+	// Regard the first 512 byte as header
+	return rmx::getMurmur2_64(&content[0], std::min<size_t>(512, content.size()));
+}
+
+bool ResourcesCache::applyRomModifications(const GameProfile::RomInfo& romInfo)
+{
+	if (!romInfo.mDiffFileName.empty())
+	{
+		// Load diff file if needed
+		std::vector<uint8>* content = nullptr;
+		const auto it = mDiffFileCache.find(&romInfo);
+		if (it == mDiffFileCache.end())
+		{
+			content = &mDiffFileCache[&romInfo];
+			FTX::FileSystem->readFile(romInfo.mDiffFileName, *content);
+		}
+		else
+		{
+			content = &it->second;
+		}
+
+		// Apply diff file by XORing it in
+		if (content->size() != mRom.size())
+			return false;
+
+		uint64* ptr = (uint64*)&mRom[0];
+		uint64* diff = (uint64*)&(*content)[0];
+		const size_t count = content->size() / 8;
+		for (size_t i = 0; i < count; ++i)
+		{
+			ptr[i] ^= diff[i];
+		}
+	}
+
+	for (auto& pair : romInfo.mBlankRegions)
+	{
+		if (pair.first > pair.second || pair.second >= mRom.size())
+			return false;
+		memset(&mRom[pair.first], 0, pair.second - pair.first + 1);
+	}
+
+	for (auto& pair : romInfo.mOverwrites)
+	{
+		if (pair.first >= mRom.size())
+			return false;
+		mRom[pair.first] = pair.second;
+	}
+
+	return true;
 }
 
 bool ResourcesCache::checkRomContent()
@@ -183,26 +305,23 @@ bool ResourcesCache::checkRomContent()
 			return false;
 	}
 
-	for (auto& pair : romCheck.mOverwrites)
-	{
-		RMX_CHECK(pair.first < mRom.size(), "Invalid overwrite address", continue);
-		mRom[pair.first] = pair.second;
-	}
-
 	if (romCheck.mChecksum != 0)
 	{
-		const uint32 crc = rmx::getCRC32(&mRom[0], mRom.size());
-		if (crc != romCheck.mChecksum)
+		const uint64 checksum = rmx::getMurmur2_64(&mRom[0], mRom.size());
+		if (checksum != romCheck.mChecksum)
 			return false;
 	}
+
+	// ROM check succeeded
+	mDiffFileCache.clear();		// This cache is not needed again now
 	return true;
 }
 
 void ResourcesCache::saveRomToAppData()
 {
-	if (!GameProfile::instance().mRomAutoDiscover.mSteamRomName.empty())
+	if (nullptr != mLoadedRomInfo && !mLoadedRomInfo->mSteamRomName.empty())
 	{
-		const std::wstring filepath = Configuration::instance().mAppDataPath + L'/' + GameProfile::instance().mRomAutoDiscover.mSteamRomName;
+		const std::wstring filepath = Configuration::instance().mAppDataPath + mLoadedRomInfo->mSteamRomName;
 		const bool success = FTX::FileSystem->saveFile(filepath, mRom);
 		if (success)
 		{
@@ -218,12 +337,12 @@ void ResourcesCache::saveRomToAppData()
 void ResourcesCache::loadRawData(const std::wstring& path, bool isModded)
 {
 	// Load raw data from the given path
-	PackageFileCrawler fc;
-	fc.addFiles(path + L"/*.json", true);
-	for (size_t fileIndex = 0; fileIndex < fc.size(); ++fileIndex)
+	std::vector<rmx::FileIO::FileEntry> fileEntries;
+	fileEntries.reserve(8);
+	FTX::FileSystem->listFilesByMask(path + L"/*.json", true, fileEntries);
+	for (const rmx::FileIO::FileEntry& fileEntry : fileEntries)
 	{
-		const FileCrawler::FileEntry& entry = *fc[fileIndex];
-		const Json::Value root = JsonHelper::loadFile(entry.mPath + entry.mFilename);
+		const Json::Value root = JsonHelper::loadFile(fileEntry.mPath + fileEntry.mFilename);
 
 		for (auto it = root.begin(); it != root.end(); ++it)
 		{
@@ -238,7 +357,7 @@ void ResourcesCache::loadRawData(const std::wstring& path, bool isModded)
 				const uint64 key = rmx::getMurmur2_64(String(it.key().asCString()));
 				rawData = &mRawDataPool.createObject();
 				rawData->mIsModded = isModded;
-				if (!FTX::FileSystem->readFile(entry.mPath + String(filename).toStdWString(), rawData->mContent))
+				if (!FTX::FileSystem->readFile(fileEntry.mPath + String(filename).toStdWString(), rawData->mContent))
 				{
 					mRawDataPool.destroyObject(*rawData);
 					continue;
@@ -262,31 +381,31 @@ void ResourcesCache::loadRawData(const std::wstring& path, bool isModded)
 void ResourcesCache::loadPalettes(const std::wstring& path, bool isModded)
 {
 	// Load palettes from the given path
-	PackageFileCrawler fc;
-	fc.addFiles(path + L"/*.png", true);
-	for (size_t fileIndex = 0; fileIndex < fc.size(); ++fileIndex)
+	std::vector<rmx::FileIO::FileEntry> fileEntries;
+	fileEntries.reserve(8);
+	FTX::FileSystem->listFilesByMask(path + L"/*.png", true, fileEntries);
+	for (const rmx::FileIO::FileEntry& fileEntry : fileEntries)
 	{
-		const FileCrawler::FileEntry& entry = *fc[fileIndex];
-		if (!FTX::FileSystem->exists(entry.mPath + entry.mFilename))
+		if (!FTX::FileSystem->exists(fileEntry.mPath + fileEntry.mFilename))
 			continue;
 
 		std::vector<uint8> content;
-		if (!FTX::FileSystem->readFile(entry.mPath + entry.mFilename, content))
+		if (!FTX::FileSystem->readFile(fileEntry.mPath + fileEntry.mFilename, content))
 			continue;
 
 		Bitmap bitmap;
-		if (!bitmap.load(entry.mPath + entry.mFilename))
+		if (!bitmap.load(fileEntry.mPath + fileEntry.mFilename))
 		{
-			RMX_ERROR("Failed to load PNG at '" << *WString(entry.mPath + entry.mFilename).toString() << "'", );
+			RMX_ERROR("Failed to load PNG at '" << *WString(fileEntry.mPath + fileEntry.mFilename).toString() << "'", );
 			continue;
 		}
 
-		String name = WString(entry.mFilename).toString();
+		String name = WString(fileEntry.mFilename).toString();
 		name.remove(name.length() - 4, 4);
 
 		uint64 key = rmx::getMurmur2_64(name);		// Hash is the key of the first palette, the others are enumerated from there
-		const int numLines = std::min(bitmap.mHeight, 64);
-		const int numColorsPerLine = std::min(bitmap.mWidth, 64);
+		const int numLines = std::min(bitmap.getHeight(), 64);
+		const int numColorsPerLine = std::min(bitmap.getWidth(), 64);
 
 		for (int y = 0; y < numLines; ++y)
 		{
@@ -296,7 +415,7 @@ void ResourcesCache::loadPalettes(const std::wstring& path, bool isModded)
 
 			for (int x = 0; x < numColorsPerLine; ++x)
 			{
-				palette.mColors[x] = Color::fromABGR32(bitmap[x + y * bitmap.mWidth]);
+				palette.mColors[x] = Color::fromABGR32(bitmap.getPixel(x, y));
 			}
 			++key;
 		}

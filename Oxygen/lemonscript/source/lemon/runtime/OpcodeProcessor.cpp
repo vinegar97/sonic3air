@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -25,11 +25,11 @@ namespace lemon
 		uint8 sequenceLength = 1;
 		for (int i = (int)numOpcodes-1; i >= 0; --i)
 		{
-			if (opcodes[i].mFlags & Opcode::Flag::CTRLFLOW)
+			if (opcodes[i].mFlags.isSet(Opcode::Flag::CTRLFLOW))
 			{
 				sequenceLength = 0;
 			}
-			else if (opcodes[i].mFlags & Opcode::Flag::SEQ_BREAK)
+			else if (opcodes[i].mFlags.isSet(Opcode::Flag::SEQ_BREAK))
 			{
 				sequenceLength = 1;
 			}

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -22,14 +22,29 @@ namespace lemon
 
 	RuntimeOpcodeBuffer::~RuntimeOpcodeBuffer()
 	{
-		delete[] mBuffer;
+		if (mSelfManagedBuffer)
+			delete[] mBuffer;
+	}
+
+	void RuntimeOpcodeBuffer::clear()
+	{
+		mSize = 0;
+		mOpcodePointers.clear();
+		// Not touching the reserved memory here
 	}
 
 	void RuntimeOpcodeBuffer::reserveForOpcodes(size_t numOpcodes)
 	{
-		delete[] mBuffer;
-		mReserved = numOpcodes * (sizeof(RuntimeOpcode) + 16);	// Estimate for maximum size
-		mBuffer = new uint8[mReserved];
+		const size_t memoryRequired = numOpcodes * (sizeof(RuntimeOpcode) + 16);	// Estimate for maximum size
+		if (memoryRequired > mReserved)
+		{
+			if (mSelfManagedBuffer)
+				delete[] mBuffer;
+
+			mReserved = memoryRequired;
+			mBuffer = new uint8[mReserved];
+			mSelfManagedBuffer = true;
+		}
 	}
 
 	RuntimeOpcode& RuntimeOpcodeBuffer::addOpcode(size_t parameterSize)
@@ -47,96 +62,134 @@ namespace lemon
 		runtimeOpcode.mExecFunc = nullptr;
 		runtimeOpcode.mOpcodeType = Opcode::Type::NOP;
 		runtimeOpcode.mSize = (uint8)size;
-		runtimeOpcode.mFlags = 0;
+		runtimeOpcode.mFlags.clearAll();
 		runtimeOpcode.mSuccessiveHandledOpcodes = 1;
 		return runtimeOpcode;
 	}
 
+	void RuntimeOpcodeBuffer::copyFrom(const RuntimeOpcodeBuffer& other, rmx::OneTimeAllocPool& memoryPool)
+	{
+		if (mSelfManagedBuffer)
+			delete[] mBuffer;
 
-	void RuntimeFunction::build(const Runtime& runtime)
+		mBuffer = memoryPool.allocateMemory(other.mSize);
+		mSelfManagedBuffer = false;
+		mSize = other.mSize;
+		mReserved = other.mSize;
+		memcpy(mBuffer, other.mBuffer, mSize);
+
+		mOpcodePointers.resize(other.mOpcodePointers.size());
+		for (size_t k = 0; k < mOpcodePointers.size(); ++k)
+		{
+			const size_t offset = (size_t)((uint8*)other.mOpcodePointers[k] - other.mBuffer);
+			mOpcodePointers[k] = (RuntimeOpcode*)(mBuffer + offset);
+		}
+	}
+
+
+	void RuntimeFunction::build(Runtime& runtime)
 	{
 		// First check if it is built already
 		if (!mRuntimeOpcodeBuffer.empty() || mFunction->mOpcodes.empty())
 			return;
 
-		// Initialize runtime opcodes now that they are needed
-		const std::vector<Opcode>& opcodes = mFunction->mOpcodes;
-		const size_t numOpcodes = opcodes.size();
-
-		// Preparation: Build some useful information about opcodes
-		static std::vector<OpcodeProcessor::OpcodeData> opcodeData;
-		OpcodeProcessor::buildOpcodeData(opcodeData, *mFunction);
-
 		// Create the runtime opcodes
-		mRuntimeOpcodeBuffer.reserveForOpcodes(numOpcodes);
-		mProgramCounterByOpcodeIndex.resize(numOpcodes, 0xffffffff);
-
-		for (size_t i = 0; i < numOpcodes; )
 		{
-			const size_t start = mRuntimeOpcodeBuffer.size();
+			// Initialize runtime opcodes now that they are needed
+			const std::vector<Opcode>& opcodes = mFunction->mOpcodes;
+			const size_t numOpcodes = opcodes.size();
 
-			int numOpcodesConsumed = 1;
-			createRuntimeOpcode(mRuntimeOpcodeBuffer, &opcodes[i], opcodeData[i].mRemainingSequenceLength, numOpcodesConsumed, runtime);
-			for (int k = 0; k < numOpcodesConsumed; ++k)
+			// Preparation: Build some useful information about opcodes
+			static std::vector<OpcodeProcessor::OpcodeData> opcodeData;
+			OpcodeProcessor::buildOpcodeData(opcodeData, *mFunction);
+
+			// Using a static buffer as temporary buffer before knowing the final size
+			static RuntimeOpcodeBuffer tempBuffer;
+			tempBuffer.clear();
+			tempBuffer.reserveForOpcodes(numOpcodes);
+
+			mProgramCounterByOpcodeIndex.resize(numOpcodes, 0xffffffff);
+
+			// Let the opcode providers create runtime opcodes
+			//  -> They may choose to merge more than one opcode into a runtime opcode, where that's feasible
+			for (size_t i = 0; i < numOpcodes; )
 			{
-				mProgramCounterByOpcodeIndex[k + i] = start;
+				const size_t start = tempBuffer.size();
+
+				int numOpcodesConsumed = 1;
+				createRuntimeOpcode(tempBuffer, &opcodes[i], opcodeData[i].mRemainingSequenceLength, (int)i, numOpcodesConsumed, runtime);
+				for (int k = 0; k < numOpcodesConsumed; ++k)
+				{
+					mProgramCounterByOpcodeIndex[k + i] = start;
+				}
+				i += numOpcodesConsumed;
 			}
-			i += numOpcodesConsumed;
+
+			// Copy the runtime opcodes over into the actual opcode buffer for this function
+			mRuntimeOpcodeBuffer.copyFrom(tempBuffer, runtime.mRuntimeOpcodesPool);
 		}
 
-		// Translation of jumps
-		const std::vector<RuntimeOpcode*>& runtimeOpcodePointers = mRuntimeOpcodeBuffer.getOpcodePointers();
-		for (size_t i = 0; i < runtimeOpcodePointers.size(); ++i)
+		// Post-processing
 		{
-			RuntimeOpcode& runtimeOpcode = *runtimeOpcodePointers[i];
-			if (runtimeOpcode.mOpcodeType == Opcode::Type::JUMP || runtimeOpcode.mOpcodeType == Opcode::Type::JUMP_CONDITIONAL)
+			// Translation of jumps
+			const std::vector<RuntimeOpcode*>& runtimeOpcodePointers = mRuntimeOpcodeBuffer.getOpcodePointers();
+			for (size_t i = 0; i < runtimeOpcodePointers.size(); ++i)
 			{
-				const size_t oldJumpTarget = (size_t)runtimeOpcode.getParameter<uint32>();
-				if (oldJumpTarget < opcodeData.size())
+				RuntimeOpcode& runtimeOpcode = *runtimeOpcodePointers[i];
+				if (runtimeOpcode.mOpcodeType == Opcode::Type::JUMP || runtimeOpcode.mOpcodeType == Opcode::Type::JUMP_SWITCH)
 				{
-					const size_t newJumpTarget = mProgramCounterByOpcodeIndex[oldJumpTarget];
-					runtimeOpcode.setParameter((uint32)newJumpTarget);
+					runtimeOpcode.setParameter(translateJumpTarget(runtimeOpcode.getParameter<uint32>()));
+				}
+				else if (runtimeOpcode.mOpcodeType == Opcode::Type::JUMP_CONDITIONAL)
+				{
+					runtimeOpcode.setParameter(translateJumpTarget(runtimeOpcode.getParameter<uint32>(0)), 0);
+				#ifdef USE_JUMP_CONDITIONAL_RUNTIME_EXEC
+					runtimeOpcode.setParameter(translateJumpTarget(runtimeOpcode.getParameter<uint32>(8)), 8);
+				#endif
+				}
+			}
+
+			// Update successive handled opcode counts
+			uint8 sequenceLength = 0;
+			for (int i = (int)runtimeOpcodePointers.size()-1; i >= 0; --i)
+			{
+				if (runtimeOpcodePointers[i]->mSuccessiveHandledOpcodes == 0)
+				{
+					sequenceLength = 0;
+				}
+				else if (runtimeOpcodePointers[i]->mOpcodeType == Opcode::Type::JUMP_CONDITIONAL)
+				{
+					sequenceLength = 1;		// Sequence needs to stop after executing the conditional jump
 				}
 				else
 				{
-					RMX_ASSERT(runtimeOpcodePointers.back()->mOpcodeType == Opcode::Type::RETURN, "Functions must end with a return in all cases");
-					const size_t newJumpTarget = (size_t)((uint8*)runtimeOpcodePointers.back() - (uint8*)runtimeOpcodePointers[0]);
-					runtimeOpcode.setParameter((uint32)newJumpTarget);
+					if (sequenceLength < 0xff)
+						++sequenceLength;
 				}
+				runtimeOpcodePointers[i]->mSuccessiveHandledOpcodes = sequenceLength;
 			}
-		}
 
-		// Update successive handled opcode counts
-		uint8 sequenceLength = 0;
-		for (int i = (int)runtimeOpcodePointers.size()-1; i >= 0; --i)
-		{
-			if (runtimeOpcodePointers[i]->mSuccessiveHandledOpcodes == 0)
+			// Fill in the pointers to the next opcode
+			for (size_t i = 0; i < runtimeOpcodePointers.size() - 1; ++i)
 			{
-				sequenceLength = 0;
-			}
-			else
-			{
-				if (sequenceLength < 0xff)
-					++sequenceLength;
-			}
-			runtimeOpcodePointers[i]->mSuccessiveHandledOpcodes = sequenceLength;
-		}
+				RuntimeOpcode& runtimeOpcode = *runtimeOpcodePointers[i];
+				runtimeOpcode.mNext = (RuntimeOpcode*)((uint8*)&runtimeOpcode + (size_t)runtimeOpcode.mSize);
 
-		// Fill in the pointers to the next opcode
-		for (size_t i = 0; i < runtimeOpcodePointers.size() - 1; ++i)
-		{
-			RuntimeOpcode& runtimeOpcode = *runtimeOpcodePointers[i];
-			runtimeOpcode.mNext = (RuntimeOpcode*)((uint8*)&runtimeOpcode + (size_t)runtimeOpcode.mSize);
-			if (runtimeOpcode.mNext->mOpcodeType == Opcode::Type::JUMP)
-			{
-				// Take a shortcut by skipping the jump opcode and directly pointing to its target as next opcode
-				//  -> But only do that for jumps forward, otherwise it messes with the tracking of steps executed too much, leading to buggy behavior
-				//  -> In fact, the steps counting is quite imprecise for the forward jumps, as they're counted as if everything in between would have been executed (but that's going to be ignored for performance's sake...)
-				const size_t targetOffset = (size_t)runtimeOpcode.mNext->getParameter<uint32>();
-				const size_t ownOffset = (size_t)((uint8*)&runtimeOpcode - mRuntimeOpcodeBuffer.getStart());
-				if (targetOffset > ownOffset)
+				for (int runs = 0; runs < 5; ++runs)
 				{
-					runtimeOpcode.mNext = (RuntimeOpcode*)(mRuntimeOpcodeBuffer.getStart() + targetOffset);
+					if (runtimeOpcode.mNext->mOpcodeType != Opcode::Type::JUMP)
+						break;
+
+					// Take a shortcut by skipping the jump opcode and directly pointing to its target as next opcode
+					//  -> But only do that for jumps forward, otherwise it's possible that script execution can get stuck in an infinite loop
+					//  -> That's because counted steps are only checked in actually executed jumps, but not in those that we optimize away here
+					RuntimeOpcode* targetPointer = reinterpret_cast<RuntimeOpcode*>(runtimeOpcode.mNext->getParameter<uint64>());
+					RuntimeOpcode* ownPointer = &runtimeOpcode;
+					if (targetPointer <= ownPointer)
+						break;
+
+					runtimeOpcode.mNext = targetPointer;
+					// Continue the for-loop, in case mNext is yet another jump that can be resolved by a shortcut
 				}
 			}
 		}
@@ -144,9 +197,16 @@ namespace lemon
 
 	size_t RuntimeFunction::translateFromRuntimeProgramCounter(const uint8* runtimeProgramCounter) const
 	{
+		const int result = translateFromRuntimeProgramCounterOptional(runtimeProgramCounter);
+		RMX_ASSERT(result >= 0, "Program counter couldn't be translated");
+		return (size_t)std::max(result, 0);
+	}
+
+	int RuntimeFunction::translateFromRuntimeProgramCounterOptional(const uint8* runtimeProgramCounter) const
+	{
 		// Binary search
 		if (mProgramCounterByOpcodeIndex.empty())
-			return 0;
+			return -1;
 
 		const size_t programCounter = (size_t)(runtimeProgramCounter - getFirstRuntimeOpcode());
 		size_t minimum = 0;
@@ -164,11 +224,10 @@ namespace lemon
 			}
 			else
 			{
-				return median;
+				return (int)median;
 			}
 		}
-		RMX_ASSERT(false, "Program counter couldn't be translated");
-		return 0;
+		return -1;
 	}
 
 	const uint8* RuntimeFunction::translateToRuntimeProgramCounter(size_t originalProgramCounter) const
@@ -177,12 +236,12 @@ namespace lemon
 		return &mRuntimeOpcodeBuffer[index];
 	}
 
-	void RuntimeFunction::createRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int& outNumOpcodesConsumed, const Runtime& runtime)
+	void RuntimeFunction::createRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime)
 	{
 		const Program& program = runtime.getProgram();
 		if (program.getOptimizationLevel() >= 2 && nullptr != program.mNativizedOpcodeProvider)
 		{
-			const bool success = program.mNativizedOpcodeProvider->buildRuntimeOpcode(buffer, opcodes, numOpcodesAvailable, outNumOpcodesConsumed, runtime);
+			const bool success = program.mNativizedOpcodeProvider->buildRuntimeOpcode(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime);
 			if (success)
 				return;
 		}
@@ -190,13 +249,27 @@ namespace lemon
 		// Runtime opcode generation by merging multiple opcodes where possible
 		if (program.getOptimizationLevel() >= 1)
 		{
-			const bool success = OptimizedOpcodeProvider::buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, outNumOpcodesConsumed, runtime);
+			const bool success = OptimizedOpcodeProvider::buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime);
 			if (success)
 				return;
 		}
 
 		// Fallback: Direct translation of one opcode to the respective runtime opcode
-		DefaultOpcodeProvider::buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, outNumOpcodesConsumed, runtime);
+		DefaultOpcodeProvider::buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime);
+	}
+
+	const uint8* RuntimeFunction::translateJumpTarget(uint32 targetOpcodeIndex) const
+	{
+		const size_t oldJumpTarget = (size_t)targetOpcodeIndex;
+		if (oldJumpTarget < mProgramCounterByOpcodeIndex.size())
+		{
+			return mRuntimeOpcodeBuffer.getStart() + mProgramCounterByOpcodeIndex[oldJumpTarget];
+		}
+		else
+		{
+			RMX_ASSERT(mRuntimeOpcodeBuffer.getOpcodePointers().back()->mOpcodeType == Opcode::Type::RETURN, "Functions must end with a return in all cases");
+			return (const uint8*)mRuntimeOpcodeBuffer.getOpcodePointers().back();
+		}
 	}
 
 }

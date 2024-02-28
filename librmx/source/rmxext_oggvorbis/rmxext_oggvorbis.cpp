@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -16,9 +16,11 @@ void rmxext_oggvorbis::initialize()
 	callbacks.push_back(OggLoader::staticLoadVorbis);
 
 	AudioBuffer::LoadCallbackList& cblist = AudioBuffer::mStaticLoadCallbacks;
-	for (const AudioBuffer::LoadCallbackType& callback : callbacks)
+	for (const AudioBuffer::LoadCallbackType callback : callbacks)
 	{
-		if (std::find(cblist.begin(), cblist.end(), callback) == cblist.end())
+		if (!containsElement(cblist, callback))
+		{
 			cblist.push_back(callback);
+		}
 	}
 }

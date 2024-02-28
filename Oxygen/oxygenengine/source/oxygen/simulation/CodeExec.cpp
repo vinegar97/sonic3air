@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -16,7 +16,7 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/GameProfile.h"
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 #include <lemon/program/Function.h>
 #include <lemon/runtime/Runtime.h>
@@ -77,32 +77,189 @@ namespace
 
 		return nullptr;
 	}
+
+	const uint8* getCallingPCAfterCall()
+	{
+		// After a call was already added to the call stack, we need to go up to the second-to-last element on the stack to get the program counter there
+		//  -> Note that this program counter is already pointing to the next runtime opcode, this needs to be accounted for later
+		const CArray<lemon::ControlFlow::State>& callStack = lemon::Runtime::getActiveControlFlow()->getCallStack();
+		if (callStack.count >= 2)
+			return callStack[callStack.count - 2].mProgramCounter;
+		else
+			return nullptr;
+	}
 }
 
 
-
-const std::string& CodeExec::Location::toString() const
+struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
 {
-	if (mResolvedString.empty())
+	CodeExec& mCodeExec;
+
+	inline explicit RuntimeExecuteConnector(CodeExec& codeExec) : mCodeExec(codeExec) {}
+
+	bool handleCall(const lemon::Function* func, uint64 callTarget) override
 	{
-		if (nullptr == mFunction)
+		if (nullptr == func)
 		{
-			mResolvedString = "<unable to resolve location>";
+			mCodeExec.showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(callTarget, 16) + ").");
+			return false;
 		}
-		else
+		return true;
+	}
+
+	bool handleReturn() override
+	{
+		if (mCodeExec.mHasCallFramesToAdd)
 		{
-			std::string scriptFilename;
-			uint32 lineNumber;
-			mCodeExec->getLemonScriptProgram().resolveLocation(*mFunction, (uint32)mProgramCounter, scriptFilename, lineNumber);
-			mResolvedString = mFunction->getName() + ", line " + std::to_string(lineNumber);
+			mCodeExec.applyCallFramesToAdd();
+		}
+		return true;
+	}
+
+	bool handleExternalCall(uint64 address) override
+	{
+		// Check for address hook at the target address
+		//  -> If it fails, we will just continue after the call
+		mCodeExec.tryCallAddressHook((uint32)address);
+		return true;
+	}
+
+	bool handleExternalJump(uint64 address) override
+	{
+		handleReturn();
+		return handleExternalCall(address);
+	}
+};
+
+
+struct RuntimeExecuteConnectorDev : public RuntimeExecuteConnector
+{
+	inline explicit RuntimeExecuteConnectorDev(CodeExec& codeExec) : RuntimeExecuteConnector(codeExec) {}
+
+	bool handleCall(const lemon::Function* func, uint64 callTarget) override
+	{
+		if (nullptr == func)
+		{
+			mCodeExec.showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(callTarget, 16) + ").");
+			return false;
+		}
+		if (func->getType() == lemon::Function::Type::SCRIPT)
+		{
+			CodeExec::CallFrame& callFrame = mCodeExec.mActiveCallFrameTracking->pushCallFrame(CodeExec::CallFrame::Type::SCRIPT_DIRECT);
+			callFrame.mFunction = func;
+			callFrame.mCallingPC = getCallingPCAfterCall();
+		}
+		return true;
+	}
+
+	bool handleReturn() override
+	{
+		mCodeExec.popCallFrame();
+		return true;
+	}
+
+	bool handleExternalCall(uint64 address) override
+	{
+		// Check for address hook at the target address
+		//  -> If it fails, we will just continue after the call
+		mCodeExec.tryCallAddressHookDev((uint32)address);
+		return true;
+	}
+
+	bool handleExternalJump(uint64 address) override
+	{
+		handleReturn();
+		return handleExternalCall(address);
+	}
+};
+
+
+
+CodeExec::CallFrame& CodeExec::CallFrameTracking::pushCallFrame(CallFrame::Type type)
+{
+	const int parentIndex = mCallStack.empty() ? -1 : (int)mCallStack.back();
+	CallFrame& callFrame = (mCallFrames.size() == CALL_FRAMES_LIMIT) ? mCallFrames.back() : vectorAdd(mCallFrames);
+	callFrame.mType = type;
+	callFrame.mParentIndex = parentIndex;
+	callFrame.mDepth = (int)mCallStack.size();
+	mCallStack.emplace_back(mCallFrames.size() - 1);
+	return callFrame;
+}
+
+CodeExec::CallFrame& CodeExec::CallFrameTracking::pushCallFrameFailed(CallFrame::Type type)
+{
+	const int parentIndex = mCallFrames.empty() ? -1 : (int)mCallStack.back();
+	CallFrame& callFrame = (mCallFrames.size() == CALL_FRAMES_LIMIT) ? mCallFrames.back() : vectorAdd(mCallFrames);
+	callFrame.mType = type;
+	callFrame.mParentIndex = parentIndex;
+	callFrame.mDepth = (int)mCallStack.size();
+	return callFrame;
+}
+
+void CodeExec::CallFrameTracking::popCallFrame()
+{
+	if (mCallStack.empty())
+		return;
+
+	const uint32 steps = (uint32)mCallFrames[mCallStack.back()].mSteps;
+	mCallStack.pop_back();
+
+	if (!mCallStack.empty() && mCallStack.back() < mCallFrames.size())
+	{
+		// Accumulate steps of children
+		mCallFrames[mCallStack.back()].mSteps += steps;
+	}
+}
+
+void CodeExec::CallFrameTracking::writeCurrentCallStack(std::vector<uint64>& outCallStack)
+{
+	outCallStack.clear();
+	outCallStack.reserve(mCallStack.size());
+	for (int i = (int)mCallStack.size() - 1; i >= 0; --i)
+	{
+		const lemon::Function* function = mCallFrames[mCallStack[i]].mFunction;
+		outCallStack.push_back((nullptr != function) ? function->getName().getHash() : 0);
+	}
+}
+
+void CodeExec::CallFrameTracking::writeCurrentCallStack(std::vector<std::string>& outCallStack)
+{
+	outCallStack.clear();
+	outCallStack.reserve(mCallStack.size());
+	for (int i = (int)mCallStack.size() - 1; i >= 0; --i)
+	{
+		const lemon::Function* function = mCallFrames[mCallStack[i]].mFunction;
+		outCallStack.push_back((nullptr != function) ? std::string(function->getName().getString()) : "");
+	}
+}
+
+void CodeExec::CallFrameTracking::processCallFrames()
+{
+	for (size_t i = 0; i < mCallFrames.size(); )
+	{
+		i = processCallFramesRecursive(i);
+	}
+}
+
+size_t CodeExec::CallFrameTracking::processCallFramesRecursive(size_t index)
+{
+	CallFrame& current = mCallFrames[index];
+	current.mAnyChildFailed = (current.mType == CallFrame::Type::FAILED_HOOK);
+
+	++index;
+	while (index < mCallFrames.size())
+	{
+		CallFrame& child = mCallFrames[index];
+		if (child.mDepth <= current.mDepth)
+			break;
+
+		index = processCallFramesRecursive(index);
+		if (child.mAnyChildFailed)
+		{
+			current.mAnyChildFailed = true;
 		}
 	}
-	return mResolvedString;
-}
-
-bool CodeExec::Location::operator==(const Location& other) const
-{
-	return (mFunction == other.mFunction && mProgramCounter == other.mProgramCounter);
+	return index;
 }
 
 
@@ -110,18 +267,19 @@ bool CodeExec::Location::operator==(const Location& other) const
 CodeExec::CodeExec() :
 	mLemonScriptProgram(*new LemonScriptProgram()),
 	mEmulatorInterface(EngineMain::getDelegate().useDeveloperFeatures() ? *new EmulatorInterfaceDev() : *new EmulatorInterface()),
-	mLemonScriptRuntime(*new LemonScriptRuntime(mLemonScriptProgram, mEmulatorInterface))
+	mLemonScriptRuntime(*new LemonScriptRuntime(mLemonScriptProgram, mEmulatorInterface)),
+	mDebugTracking(*this, mEmulatorInterface, mLemonScriptRuntime)
 {
-	mLemonScriptProgram.startup();
+	mRuntimeEnvironment.mEmulatorInterface = &mEmulatorInterface;
 
 	mIsDeveloperMode = EngineMain::getDelegate().useDeveloperFeatures();
 	if (mIsDeveloperMode)
 	{
-		mLemonScriptProgram.getLemonScriptBindings().setDebugNotificationInterface(this);
-		mEmulatorInterface.setDebugNotificationInterface(this);
-		mCallFrames.reserve(CALL_FRAMES_LIMIT);
-		mCallStack.reserve(0x40);
-		mVRAMWrites.reserve(0x800);
+		mLemonScriptProgram.getLemonScriptBindings().setDebugNotificationInterface(&mDebugTracking);
+		mEmulatorInterface.setDebugNotificationInterface(&mDebugTracking);
+		mMainCallFrameTracking.mCallFrames.reserve(CALL_FRAMES_LIMIT);
+		mMainCallFrameTracking.mCallStack.reserve(0x40);
+		mDebugTracking.setupForDevMode();
 	}
 }
 
@@ -151,63 +309,65 @@ void CodeExec::reset()
 void CodeExec::cleanScriptDebug()
 {
 	LogDisplay::instance().clearLogErrors();
-	LogDisplay::instance().clearScriptLogValues();
-	LogDisplay::instance().clearColorLogEntries();
 
-	mCallFrames.clear();
+	mMainCallFrameTracking.clear();
 	mUnknownAddressesSet.clear();
 	mUnknownAddressesInOrder.clear();
-	clearWatches();
-	mVRAMWritePool.clear();
-	mVRAMWrites.clear();
+	mDebugTracking.clear();
 }
 
-bool CodeExec::reloadScripts(bool enforceFullReload, bool performReinitRuntime, bool hasSaveState)
+bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 {
-	// If the runtime is already active, save its current state
-	if (hasValidState() && mLemonScriptRuntime.getCallStackSize() != 0)
+	if (retainRuntimeState)
 	{
-		VectorBinarySerializer serializer(false, mSerializedRuntimeState);
-		if (!getLemonScriptRuntime().serializeRuntime(serializer))
+		// If the runtime is already active, save its current state
+		if (hasValidState() && mLemonScriptRuntime.getCallStackSize() != 0)
 		{
-			mSerializedRuntimeState.clear();
+			VectorBinarySerializer serializer(false, mSerializedRuntimeState);
+			if (!getLemonScriptRuntime().serializeRuntime(serializer))
+			{
+				mSerializedRuntimeState.clear();
+			}
 		}
+	}
+	else
+	{
+		// Clear the old serialization, it's not needed
+		mSerializedRuntimeState.clear();
 	}
 	mExecutionState = ExecutionState::INACTIVE;
 
 	const Configuration& config = Configuration::instance();
 	LemonScriptProgram::LoadOptions options;
-	options.mPreprocessorDefinitions = config.mPreprocessorDefinitions;
 	options.mEnforceFullReload = enforceFullReload;
 	options.mModuleSelection = EngineMain::getDelegate().mayLoadScriptMods() ? LemonScriptProgram::LoadOptions::ModuleSelection::ALL_MODS : LemonScriptProgram::LoadOptions::ModuleSelection::BASE_GAME_ONLY;
+	options.mAppVersion = EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber;
 	const WString mainScriptPath = config.mScriptsDir + config.mMainScriptName;
-	
-	const bool result = mLemonScriptProgram.loadScripts(mainScriptPath.toStdString(), options);
-	if (result)
+
+	const LemonScriptProgram::LoadScriptsResult result = mLemonScriptProgram.loadScripts(mainScriptPath.toStdString(), options);
+	if (result == LemonScriptProgram::LoadScriptsResult::PROGRAM_CHANGED)
 	{
+		lemon::Runtime::setActiveEnvironment(&mRuntimeEnvironment);
 		mLemonScriptRuntime.onProgramUpdated();
 	}
-	
-	if (result && performReinitRuntime)
+	cleanScriptDebug();
+
+	return (result != LemonScriptProgram::LoadScriptsResult::FAILED);
+}
+
+void CodeExec::restoreRuntimeState(bool hasSaveState)
+{
+	if (mSerializedRuntimeState.empty())
 	{
-		if (mSerializedRuntimeState.empty())
-		{
-			// We don't have a valid runtime state, so it has to be reloaded from ASM, or we have to reset
-			reinitRuntime(nullptr, hasSaveState ? CallStackInitPolicy::READ_FROM_ASM : CallStackInitPolicy::RESET);
-		}
-		else
-		{
-			// Scripts got reloaded in-game
-			reinitRuntime(nullptr, CallStackInitPolicy::READ_FROM_ASM, &mSerializedRuntimeState);
-			mSerializedRuntimeState.clear();	// Not needed any more now
-		}
+		// We don't have a valid runtime state, so it has to be reloaded from ASM, or we have to reset
+		reinitRuntime(nullptr, hasSaveState ? CallStackInitPolicy::READ_FROM_ASM : CallStackInitPolicy::RESET);
 	}
 	else
 	{
-		cleanScriptDebug();
+		// Scripts got reloaded in-game
+		reinitRuntime(nullptr, CallStackInitPolicy::READ_FROM_ASM, &mSerializedRuntimeState);
+		mSerializedRuntimeState.clear();	// Not needed any more now
 	}
-
-	return result;
 }
 
 void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enforcedCallStack, CallStackInitPolicy callStackInitPolicy, const std::vector<uint8>* serializedRuntimeState)
@@ -225,14 +385,16 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 		if (!mLemonScriptRuntime.hasValidProgram())
 			return;
 
+		mLemonScriptRuntime.getInternalLemonRuntime().clearAllControlFlows();
+
 		bool success = false;
-		if (serializedRuntimeState != nullptr && !serializedRuntimeState->empty())
+		if (nullptr != serializedRuntimeState && !serializedRuntimeState->empty())
 		{
 			VectorBinarySerializer serializer(true, *serializedRuntimeState);
 			success = getLemonScriptRuntime().serializeRuntime(serializer);
 		}
 
-		if (enforcedCallStack != nullptr && !enforcedCallStack->empty())
+		if (nullptr != enforcedCallStack && !enforcedCallStack->empty())
 		{
 			for (const auto& pair : *enforcedCallStack)
 			{
@@ -248,7 +410,7 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 			uint32 stackPointer = mEmulatorInterface.getRegister(EmulatorInterface::Register::A7);
 			RMX_CHECK((stackPointer & 0x00ff0000) == 0x00ff0000, "Stack pointer in register A7 is not pointing to a RAM address", );
 			stackPointer |= 0xffff0000;
-			RMX_CHECK(stackPointer >= GameProfile::instance().mAsmStackRange.first && stackPointer <= GameProfile::instance().mAsmStackRange.second, "Stack pointer in register A7 is not iside the ASM stack range", );
+			RMX_CHECK(stackPointer >= GameProfile::instance().mAsmStackRange.first && stackPointer <= GameProfile::instance().mAsmStackRange.second, "Stack pointer in register A7 is not inside the ASM stack range", );
 			while (stackPointer < GameProfile::instance().mAsmStackRange.second)
 			{
 				callstack.push_back(mEmulatorInterface.readMemory32(stackPointer));
@@ -298,6 +460,8 @@ bool CodeExec::performFrameUpdate()
 	if (!canExecute())
 		return false;
 
+	lemon::Runtime::setActiveEnvironment(&mRuntimeEnvironment);
+
 	const bool beginningNewFrame = (mExecutionState != ExecutionState::INTERRUPTED);
 	if (beginningNewFrame)
 	{
@@ -305,33 +469,17 @@ bool CodeExec::performFrameUpdate()
 
 		if (mIsDeveloperMode)
 		{
-			// Reset debug draws etc.
-			LogDisplay::instance().clearColorLogEntries();
+			// Reset debug tracking (watches etc.)
+			mDebugTracking.onBeginFrame();
 
-			// Sanity check: Make sure no one else changed the emulator interface's watches
-			RMX_ASSERT(mWatches.size() == mEmulatorInterface.getWatches().size(), "Watches got changed by someone");
-
-			// Reset watches
-			for (Watch& watch : mWatches)
-			{
-				watch.mInitialValue = getCurrentWatchValue(watch.mAddress, watch.mBytes);
-				watch.mHits.clear();
-			}
-
-			// Reset VRAM writes
-			for (VRAMWrite* write : mVRAMWrites)
-				mVRAMWritePool.returnObject(*write);
-			mVRAMWrites.clear();
-
-			// Reset call frames
-			mCallFrames.clear();
-			mCallStack.clear();
+			// Reset call frame tracking
+			mMainCallFrameTracking.clear();
 
 			static std::vector<const lemon::Function*> callstack;	// This is static to avoid reallocations
 			mLemonScriptRuntime.getCallStack(callstack);
 			for (const lemon::Function* func : callstack)
 			{
-				CallFrame& callFrame = pushCallFrame(CallFrame::Type::SCRIPT_STACK);
+				CallFrame& callFrame = mMainCallFrameTracking.pushCallFrame(CallFrame::Type::SCRIPT_STACK);
 				callFrame.mFunction = func;
 			}
 		}
@@ -342,7 +490,7 @@ bool CodeExec::performFrameUpdate()
 	}
 
 	// Run script
-	runScript(false);
+	runScript(false, &mMainCallFrameTracking);
 
 	const bool completedNewFrame = (mExecutionState == ExecutionState::YIELDED);
 	if (completedNewFrame)
@@ -351,7 +499,7 @@ bool CodeExec::performFrameUpdate()
 		//  -> Note that the hook must yield execution, otherwise parts of the next frame get executed
 		if (canExecute() && tryCallUpdateHook(true))
 		{
-			runScript(true);
+			runScript(true, &mMainCallFrameTracking);
 		}
 		mAccumulatedStepsOfCurrentFrame = 0;
 	}
@@ -363,30 +511,55 @@ bool CodeExec::performFrameUpdate()
 void CodeExec::yieldExecution()
 {
 	mCurrentlyRunningScript = false;
+	mLemonScriptRuntime.getInternalLemonRuntime().triggerStopSignal();
 }
 
-bool CodeExec::executeScriptFunction(const std::string& functionName, bool showErrorOnFail)
+bool CodeExec::executeScriptFunction(const std::string& functionName, bool showErrorOnFail, FunctionExecData* execData)
 {
 	if (canExecute())
 	{
-		if (mLemonScriptRuntime.callFunctionByName(functionName, showErrorOnFail))
+		// TODO: This would be a good use case for using a different control flow than the main one
+		lemon::Runtime::setActiveEnvironment(&mRuntimeEnvironment);
+
+		bool success = false;
+		if (nullptr == execData)
+		{
+			success = mLemonScriptRuntime.callFunctionByName(functionName, showErrorOnFail);
+		}
+		else
+		{
+			success = mLemonScriptRuntime.getInternalLemonRuntime().callFunctionWithParameters(functionName, execData->mParams);
+		}
+
+		if (success)
 		{
 			const size_t oldAccumulatedSteps = mAccumulatedStepsOfCurrentFrame;
 
-			if (mIsDeveloperMode)
+		#if 0
+			// Dead code, as call frame tracking is always disabled for single script function calls
+			//  -> However, this might change later on, e.g. if we had tracking for multiple control flows individually (see TODO above)
+			CallFrameTracking* tracking = nullptr;
+			if (nullptr != tracking)
 			{
-				const size_t originalNumCallFrames = mCallFrames.size();
+				const size_t originalNumCallFrames = tracking->mCallFrames.size();
 
-				CallFrame& callFrame = pushCallFrame(CallFrame::Type::SCRIPT_STACK);
+				CallFrame& callFrame = tracking->pushCallFrame(CallFrame::Type::SCRIPT_STACK);
 				callFrame.mFunction = mLemonScriptRuntime.getCurrentFunction();
-				runScript(true);
+				runScript(true, tracking);
 
 				// Revert call frames from that call
-				mCallFrames.resize(originalNumCallFrames);
+				tracking->mCallFrames.resize(originalNumCallFrames);
 			}
 			else
+		#endif
 			{
-				runScript(true);
+				runScript(true, nullptr);
+			}
+
+			// Evaluate the return value
+			if (nullptr != execData && nullptr != execData->mParams.mReturnType)
+			{
+				execData->mReturnValueStorage = mLemonScriptRuntime.getInternalLemonRuntime().getSelectedControlFlowMutable().popValueStack<uint64>();
 			}
 
 			// Revert accumulated steps
@@ -398,7 +571,7 @@ bool CodeExec::executeScriptFunction(const std::string& functionName, bool showE
 	return false;
 }
 
-void CodeExec::setupCallFrame(const std::string& functionName, const std::string& labelName)
+void CodeExec::setupCallFrame(std::string_view functionName, std::string_view labelName)
 {
 	mCallFramesToAdd.emplace_back(functionName, labelName);
 	mHasCallFramesToAdd = true;
@@ -406,81 +579,7 @@ void CodeExec::setupCallFrame(const std::string& functionName, const std::string
 
 void CodeExec::processCallFrames()
 {
-	for (size_t i = 0; i < mCallFrames.size(); )
-	{
-		i = processCallFramesRecursive(i);
-	}
-}
-
-void CodeExec::clearWatches(bool clearPersistent)
-{
-	std::vector<std::pair<uint32, uint16>> readdWatches;
-	if (!clearPersistent)
-	{
-		// Save persistent watched
-		readdWatches.reserve(mWatches.size());
-		for (const Watch& watch : mWatches)
-		{
-			if (watch.mPersistent)
-			{
-				readdWatches.emplace_back(watch.mAddress, watch.mBytes);
-			}
-		}
-	}
-
-	mWatches.clear();
-	mEmulatorInterface.getWatches().clear();
-
-	for (const auto& pair : readdWatches)
-	{
-		addWatch(pair.first, pair.second, true);
-	}
-}
-
-void CodeExec::addWatch(uint32 address, uint16 bytes, bool persistent)
-{
-	address &= 0x00ffffff;
-
-	// Check if already exists
-	for (const Watch& watch : mWatches)
-	{
-		if (watch.mAddress == address && watch.mBytes == bytes)
-			return;
-	}
-
-	// Add a new watch in EmulatorInterface
-	EmulatorInterface::Watch& internalWatch = vectorAdd(mEmulatorInterface.getWatches());
-	internalWatch.mAddress = address;
-	internalWatch.mBytes = bytes;
-
-	// Add a new watch here
-	Watch& watch = vectorAdd(mWatches);
-	watch.mAddress = address;
-	watch.mBytes = bytes;
-	watch.mPersistent = persistent;
-	watch.mInitialValue = getCurrentWatchValue(watch.mAddress, watch.mBytes);
-}
-
-void CodeExec::removeWatch(uint32 address, uint16 bytes)
-{
-	// Try to find the watch
-	int index = -1;
-	for (int i = 0; i < (int)mWatches.size(); ++i)
-	{
-		if (mWatches[i].mAddress == address && mWatches[i].mBytes == bytes)
-		{
-			index = i;
-			break;
-		}
-	}
-	if (index == -1)
-		return;
-
-	// Remove it here
-	mWatches.erase(mWatches.begin() + index);
-
-	// Remove it in EmulatorInterface
-	mEmulatorInterface.getWatches().erase(mEmulatorInterface.getWatches().begin() + index);
+	mMainCallFrameTracking.processCallFrames();
 }
 
 bool CodeExec::canExecute() const
@@ -517,7 +616,7 @@ bool CodeExec::hasValidState() const
 	}
 }
 
-void CodeExec::runScript(bool executeSingleFunction)
+void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFrameTracking)
 {
 	// There are four stop conditions:
 	//  a) Yield from script, sets mCurrentlyRunningScript to false     -> this is the usual case if executeSingleFunction == false (but must not happen otherwise)
@@ -529,7 +628,8 @@ void CodeExec::runScript(bool executeSingleFunction)
 
 	mActiveInstance = this;
 	mCurrentlyRunningScript = true;
-	const size_t abortOnCallStackSize = std::max<size_t>(mLemonScriptRuntime.getCallStackSize(), 1) - 1;
+	const size_t abortOnCallStackSize = executeSingleFunction ? (std::max<size_t>(mLemonScriptRuntime.getCallStackSize(), 1) - 1) : 0;
+	mActiveCallFrameTracking = mIsDeveloperMode ? callFrameTracking : nullptr;
 
 	size_t stepsCounter = 0;
 	size_t nextCheckSteps = 0x40000;
@@ -541,7 +641,7 @@ void CodeExec::runScript(bool executeSingleFunction)
 		size_t stepsExecutedThisCall;
 		try
 		{
-			const bool success = mIsDeveloperMode ? executeRuntimeStepsDev(stepsExecutedThisCall) : executeRuntimeSteps(stepsExecutedThisCall);
+			const bool success = (nullptr != mActiveCallFrameTracking) ? executeRuntimeStepsDev(stepsExecutedThisCall, abortOnCallStackSize) : executeRuntimeSteps(stepsExecutedThisCall, abortOnCallStackSize);
 			if (!success)
 			{
 				if (executeSingleFunction)
@@ -551,7 +651,6 @@ void CodeExec::runScript(bool executeSingleFunction)
 				}
 				else
 				{
-					RMX_ERROR("Script execution completely stopped because call stack was emptied", );
 					mExecutionState = ExecutionState::HALTED;
 				}
 				break;
@@ -592,22 +691,12 @@ void CodeExec::runScript(bool executeSingleFunction)
 				if (showMessageBox)
 				{
 					bool gameRecordingSaved = false;
-					if (Configuration::instance().mGameRecording == 1)
+					if (Configuration::instance().mGameRecorder.mIsRecording)
 					{
 						gameRecordingSaved = (Application::instance().getSimulation().saveGameRecording() != 0);
 					}
 
-					std::string text = "Reached limit for runtime steps per update; if this happens, the program probably got stuck in a loop.";
-					{
-						std::string locationString = mLemonScriptRuntime.getOwnCurrentScriptLocationString();
-						if (!locationString.empty())
-						{
-							text += "\nIn " + locationString + ".";
-						}
-					}
-					if (gameRecordingSaved)
-						text += "\nA game recording file was written that could be helpful for debugging this issue.";
-					RMX_ERROR(text, );
+					showErrorWithScriptLocation("Reached limit for runtime steps per update; if this happens, the program probably got stuck in a loop.", gameRecordingSaved ? "A game recording file was written that could be helpful for debugging this issue." : "");
 					showMessageBox = false;
 				}
 				break;
@@ -629,140 +718,35 @@ void CodeExec::runScript(bool executeSingleFunction)
 	mActiveInstance = nullptr;
 }
 
-bool CodeExec::executeRuntimeSteps(size_t& stepsExecuted)
+bool CodeExec::executeRuntimeSteps(size_t& stepsExecuted, size_t minimumCallStackSize)
 {
 	lemon::Runtime& runtime = mLemonScriptRuntime.getInternalLemonRuntime();
-	lemon::Runtime::ExecuteResult result;
-	runtime.executeSteps(result, 5000);
+	RuntimeExecuteConnector connector(*this);
+	runtime.executeSteps(connector, 5000, minimumCallStackSize);
 
-	switch (result.mResult)
-	{
-		case lemon::Runtime::ExecuteResult::CALL:
-		{
-			const lemon::Function* func = runtime.handleResultCall(result);
-			RMX_CHECK(nullptr != func, "Call failed, probably due to invalid function (target = " << rmx::hexString(result.mCallTarget, 16) << ")", break);
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::RETURN:
-		{
-			if (mHasCallFramesToAdd)
-			{
-				applyCallFramesToAdd();
-			}
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::EXTERNAL_JUMP:
-		{
-			// Note that lemon script internal runtime already performed a return in this case
-			if (mHasCallFramesToAdd)
-			{
-				applyCallFramesToAdd();
-			}
-
-			// Fallthrough
-		}
-
-		case lemon::Runtime::ExecuteResult::EXTERNAL_CALL:
-		{
-			// Check for address hook at the target address
-			//  -> If it fails, we will just continue after the call
-			tryCallAddressHook((uint32)result.mCallTarget);
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::HALT:
-		{
-			return false;
-		}
-
-		default: break;
-	}
-
-	stepsExecuted = result.mStepsExecuted;
-	return true;
+	stepsExecuted = connector.mStepsExecuted;
+	return (connector.mResult != lemon::Runtime::ExecuteResult::Result::HALT);
 }
 
-bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted)
+bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted, size_t minimumCallStackSize)
 {
-	// Same as "executeRuntimeSteps", but with additional developer mode stuff
-	if (mCallFrames.empty())
+	// Same as "executeRuntimeSteps", but with additional developer mode stuff, incl. tracking of call frames
+	if (mActiveCallFrameTracking->mCallFrames.empty())
 		return false;
 
 	lemon::Runtime& runtime = mLemonScriptRuntime.getInternalLemonRuntime();
-	lemon::Runtime::ExecuteResult result;
-	runtime.executeSteps(result, 5000);
+	RuntimeExecuteConnectorDev connector(*this);
+	runtime.executeSteps(connector, 5000, minimumCallStackSize);
 
 	{
-		mCallFrames.back().mSteps += result.mStepsExecuted;
+		mActiveCallFrameTracking->mCallFrames.back().mSteps += connector.mStepsExecuted;
 
 		// Correct written values for all watches that triggered in this update
-		if (!mWatchHitsThisUpdate.empty())
-		{
-			for (auto& pair : mWatchHitsThisUpdate)
-			{
-				Watch& watch = *pair.first;
-				Watch::Hit& hit = *pair.second;
-				hit.mWrittenValue = (watch.mBytes <= 4) ? getCurrentWatchValue(watch.mAddress, watch.mBytes) : getCurrentWatchValue(hit.mAddress, hit.mBytes);
-			}
-			mWatchHitsThisUpdate.clear();
-		}
+		mDebugTracking.updateWatches();
 	}
 
-	switch (result.mResult)
-	{
-		case lemon::Runtime::ExecuteResult::CALL:
-		{
-			const lemon::Function* func = runtime.handleResultCall(result);
-			RMX_CHECK(nullptr != func, "Call failed, probably due to invalid function (target = " << rmx::hexString(result.mCallTarget, 16) << ")", break);
-
-			if (func->getType() == lemon::Function::Type::SCRIPT)
-			{
-				CallFrame& callFrame = pushCallFrame(CallFrame::Type::SCRIPT_DIRECT);
-				callFrame.mFunction = mLemonScriptRuntime.getCurrentFunction();
-			}
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::RETURN:
-		{
-			popCallFrame();
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::EXTERNAL_JUMP:
-		{
-			// Note that lemon script internal runtime already performed a return in this case
-			popCallFrame();
-
-			// Fallthrough
-		}
-
-		case lemon::Runtime::ExecuteResult::EXTERNAL_CALL:
-		{
-			// Check for address hook at the target address
-			//  -> If it fails, we will just continue after the call
-			tryCallAddressHookDev((uint32)result.mCallTarget);
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::HALT:
-		{
-			return false;
-		}
-
-		default: break;
-	}
-
-	stepsExecuted = result.mStepsExecuted;
-	return true;
-}
-
-void CodeExec::getLastStepLocation(Location& outLocation)
-{
-	outLocation.mCodeExec = this;
-	mLemonScriptRuntime.getLastStepLocation(outLocation.mFunction, outLocation.mProgramCounter);
+	stepsExecuted = connector.mStepsExecuted;
+	return (connector.mResult != lemon::Runtime::ExecuteResult::Result::HALT);
 }
 
 bool CodeExec::tryCallAddressHook(uint32 address)
@@ -775,14 +759,15 @@ bool CodeExec::tryCallAddressHookDev(uint32 address)
 	if (mLemonScriptRuntime.callAddressHook(address))
 	{
 		// Call script function
-		CallFrame& callFrame = pushCallFrame(CallFrame::Type::SCRIPT_HOOK);
+		CallFrame& callFrame = mActiveCallFrameTracking->pushCallFrame(CallFrame::Type::SCRIPT_HOOK);
 		callFrame.mFunction = mLemonScriptRuntime.getCurrentFunction();
 		callFrame.mAddress = address;
+		callFrame.mCallingPC = getCallingPCAfterCall();
 		return true;
 	}
 	else
 	{
-		CallFrame& callFrame = pushCallFrameFailed(CallFrame::Type::FAILED_HOOK);
+		CallFrame& callFrame = mActiveCallFrameTracking->pushCallFrameFailed(CallFrame::Type::FAILED_HOOK);
 		callFrame.mAddress = address;
 
 		if (mUnknownAddressesSet.count(address) == 0)
@@ -798,9 +783,9 @@ bool CodeExec::tryCallUpdateHook(bool postUpdate)
 {
 	if (mLemonScriptRuntime.callUpdateHook(postUpdate))
 	{
-		if (mIsDeveloperMode)
+		if (nullptr != mActiveCallFrameTracking)
 		{
-			CallFrame& callFrame = pushCallFrame(CallFrame::Type::SCRIPT_DIRECT);
+			CallFrame& callFrame = mActiveCallFrameTracking->pushCallFrame(CallFrame::Type::SCRIPT_DIRECT);
 			callFrame.mFunction = mLemonScriptRuntime.getCurrentFunction();
 		}
 		return true;
@@ -816,9 +801,9 @@ void CodeExec::applyCallFramesToAdd()
 		const bool success = mLemonScriptRuntime.callFunctionByNameAtLabel(pair.first, pair.second, true);
 		RMX_CHECK(success, "Could not insert outer call frame", continue);
 
-		if (mIsDeveloperMode)
+		if (nullptr != mActiveCallFrameTracking)
 		{
-			CallFrame& callFrame = pushCallFrame(CallFrame::Type::SCRIPT_STACK);
+			CallFrame& callFrame = mActiveCallFrameTracking->pushCallFrame(CallFrame::Type::SCRIPT_STACK);
 			callFrame.mFunction = mLemonScriptRuntime.getCurrentFunction();
 		}
 	}
@@ -826,150 +811,25 @@ void CodeExec::applyCallFramesToAdd()
 	mHasCallFramesToAdd = false;
 }
 
-size_t CodeExec::processCallFramesRecursive(size_t index)
-{
-	CallFrame& current = mCallFrames[index];
-	current.mAnyChildFailed = (current.mType == CallFrame::Type::FAILED_HOOK);
-
-	++index;
-	while (index < mCallFrames.size())
-	{
-		CallFrame& child = mCallFrames[index];
-		if (child.mDepth <= current.mDepth)
-			break;
-
-		index = processCallFramesRecursive(index);
-		if (child.mAnyChildFailed)
-		{
-			current.mAnyChildFailed = true;
-		}
-	}
-	return index;
-}
-
-CodeExec::CallFrame& CodeExec::pushCallFrame(CallFrame::Type type)
-{
-	CallFrame& callFrame = (mCallFrames.size() == CALL_FRAMES_LIMIT) ? mCallFrames.back() : vectorAdd(mCallFrames);
-	callFrame.mType = type;
-	callFrame.mDepth = (int)mCallStack.size();
-	mCallStack.emplace_back(mCallFrames.size() - 1);
-	return callFrame;
-}
-
-CodeExec::CallFrame& CodeExec::pushCallFrameFailed(CallFrame::Type type)
-{
-	CallFrame& callFrame = (mCallFrames.size() == CALL_FRAMES_LIMIT) ? mCallFrames.back() : vectorAdd(mCallFrames);
-	callFrame.mType = type;
-	callFrame.mDepth = (int)mCallStack.size();
-	return callFrame;
-}
-
 void CodeExec::popCallFrame()
 {
-	RMX_ASSERT(!mCallStack.empty(), "Trying to remove an element from already empty call stack");
-
-	const uint32 steps = (uint32)mCallFrames[mCallStack.back()].mSteps;
-	mCallStack.pop_back();
-
-	if (!mCallStack.empty() && mCallStack.back() < mCallFrames.size())
-	{
-		// Accumulate steps of children
-		mCallFrames[mCallStack.back()].mSteps += steps;
-	}
+	mActiveCallFrameTracking->popCallFrame();
 
 	if (mHasCallFramesToAdd)
+	{
 		applyCallFramesToAdd();
-}
-
-void CodeExec::writeCurrentCallStack(std::vector<uint64>& outCallStack)
-{
-	outCallStack.clear();
-	outCallStack.reserve(mCallStack.size());
-	for (int i = (int)mCallStack.size() - 1; i >= 0; --i)
-	{
-		const lemon::Function* function = mCallFrames[mCallStack[i]].mFunction;
-		outCallStack.push_back((nullptr != function) ? function->getNameHash() : 0);
 	}
 }
 
-void CodeExec::writeCurrentCallStack(std::vector<std::string>& outCallStack)
+void CodeExec::showErrorWithScriptLocation(const std::string& errorText, const std::string& subText)
 {
-	outCallStack.clear();
-	outCallStack.reserve(mCallStack.size());
-	for (int i = (int)mCallStack.size() - 1; i >= 0; --i)
+	std::string locationString = mLemonScriptRuntime.getOwnCurrentScriptLocationString();
+	if (locationString.empty())
 	{
-		const lemon::Function* function = mCallFrames[mCallStack[i]].mFunction;
-		outCallStack.push_back((nullptr != function) ? function->getName() : "");
+		RMX_ERROR(errorText << "\n" << subText, );
 	}
-}
-
-uint32 CodeExec::getCurrentWatchValue(uint32 address, uint16 bytes) const
-{
-	switch (bytes)
+	else
 	{
-		case 1:  return mEmulatorInterface.readMemory8 (address);
-		case 2:  return mEmulatorInterface.readMemory16(address);
-		case 4:  return mEmulatorInterface.readMemory32(address);
+		RMX_ERROR(errorText << "\nIn " << locationString << "." << (subText.empty() ? "" : "\n") << subText, );
 	}
-	return 0;
-}
-
-void CodeExec::onWatchTriggered(size_t watchIndex, uint32 address, uint16 bytes)
-{
-	if (watchIndex >= mWatches.size())	// This may happen if a watch gets added and changed in the same frame
-		return;
-
-	Location location;
-	getLastStepLocation(location);
-
-	Watch& watch = mWatches[watchIndex];
-	{
-		// Add hit
-		Watch::Hit& hit = vectorAdd(watch.mHits);
-		hit.mWrittenValue = (watch.mBytes <= 4) ? getCurrentWatchValue(watch.mAddress, watch.mBytes) : getCurrentWatchValue(hit.mAddress, hit.mBytes);
-		hit.mAddress = address;
-		hit.mBytes = bytes;
-		hit.mLocation = location;
-		writeCurrentCallStack(hit.mCallStack);
-
-		mWatchHitsThisUpdate.emplace_back(&watch, &hit);
-	}
-	watch.mLastHitLocation = location;
-
-	Application::instance().getSimulation().stopSingleStepContinue();
-}
-
-void CodeExec::onVRAMWrite(uint16 address, uint16 bytes)
-{
-	// Not more than the limit
-	if (mVRAMWrites.size() >= mVRAMWrites.capacity())
-		return;
-
-	Location location;
-	getLastStepLocation(location);
-
-	// Check if this can be merged with the VRAM write just before
-	if (!mVRAMWrites.empty())
-	{
-		VRAMWrite& other = *mVRAMWrites.back();
-		if (other.mAddress + other.mSize == address && other.mLocation == location)
-		{
-			other.mSize += bytes;
-			return;
-		}
-	}
-
-	// Add a new VRAM write
-	VRAMWrite& write = mVRAMWritePool.rentObject();
-	write.mAddress = address;
-	write.mSize = bytes;
-	write.mLocation = location;
-	write.mCallStack.clear();
-	writeCurrentCallStack(write.mCallStack);
-	mVRAMWrites.push_back(&write);
-}
-
-void CodeExec::onLog(LogDisplay::ScriptLogSingleEntry& scriptLogSingleEntry)
-{
-	writeCurrentCallStack(scriptLogSingleEntry.mCallStack);
 }

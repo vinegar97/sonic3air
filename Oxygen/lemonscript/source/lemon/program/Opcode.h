@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -23,8 +23,6 @@ namespace lemon
 			MOVE_STACK,
 			MOVE_VAR_STACK,
 			PUSH_CONSTANT,
-			DUPLICATE,		// Not created any more, could be removed sooner or later
-			EXCHANGE,		// Not created any more, could be removed sooner or later
 			GET_VARIABLE_VALUE,
 			SET_VARIABLE_VALUE,
 			READ_MEMORY,
@@ -52,6 +50,7 @@ namespace lemon
 			COMPARE_GE,
 			JUMP,
 			JUMP_CONDITIONAL,
+			JUMP_SWITCH,
 			CALL,
 			RETURN,
 			EXTERNAL_CALL,
@@ -60,25 +59,25 @@ namespace lemon
 			_NUM_TYPES
 		};
 
-		struct Flag
+		enum class Flag : uint8
 		{
-			enum Flags
-			{
-				LABEL		= 0x01,		// Opcode is a label target
-				JUMP_TARGET = 0x02,		// Opcode is a jump target
-				NEW_LINE	= 0x04,		// Start of a new line
-				CTRLFLOW	= 0x08,		// Control flow opcode like jump, call, etc.
-				JUMP		= 0x10,		// Conditional or unconditional jump (implies FLAG_CTRLFLOW)
-				SEQ_BREAK	= 0x20,		// There's a sequence break just after this opcode; this is a result of the other flags of this and the next opcode
-				TEMP_FLAG	= 0x80		// Only used temporarily during optimization
-			};
+			LABEL		= 0x01,		// Opcode is a label target
+			JUMP_TARGET = 0x02,		// Opcode is a jump target
+			NEW_LINE	= 0x04,		// Start of a new line
+			CTRLFLOW	= 0x08,		// Control flow opcode like jump, call, etc.
+			JUMP		= 0x10,		// Conditional or unconditional jump (implies FLAG_CTRLFLOW)
+			SEQ_BREAK	= 0x20,		// There's a sequence break just after this opcode; this is a result of the other flags of this and the next opcode
+			TEMP_FLAG	= 0x80		// Only used temporarily during optimization
 		};
 
 		Type mType = Type::NOP;
-		BaseType mDataType;
-		uint8 mFlags = 0;
-		int64 mParameter = 0;	// For constants, or ID in case of variables and calls
+		BaseType mDataType = BaseType::VOID;
+		BitFlagSet<Flag> mFlags;
 		uint32 mLineNumber = 0;
+		int64 mParameter = 0;	// For constants, or ID in case of variables and calls
+
+	public:
+		static const char* GetTypeString(Type type);
 	};
 
 }

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -27,6 +27,10 @@ public:
 
 	inline uint8* getData()				{ return mData; }
 	inline const uint8* getData() const	{ return mData; }
+
+	inline uint8 getPixel(int x, int y) const				{ return mData[x + y * mWidth]; }
+	inline uint8* getPixelPointer(int x, int y)				{ return &mData[x + y * mWidth]; }
+	inline const uint8* getPixelPointer(int x, int y) const { return &mData[x + y * mWidth]; }
 
 	void create(uint32 width, uint32 height);
 	void create(uint32 width, uint32 height, uint8 fillValue);

@@ -9,7 +9,8 @@ const EngineDelegateInterface::AppMetaData& EngineDelegate::getAppMetaData()
 	if (mAppMetaData.mTitle.empty())
 	{
 		mAppMetaData.mTitle = "Oxygen Engine";
-		mAppMetaData.mBuildVersion = "pre-alpha";
+		mAppMetaData.mBuildVersionString = "0.1.0";		// Oxygen Engine currently doesn't use a version number to take serious in any way...
+		mAppMetaData.mBuildVersionNumber = 0x00010000;
 	}
 	mAppMetaData.mAppDataFolder = L"OxygenEngine";
 	return mAppMetaData;
@@ -36,7 +37,7 @@ bool EngineDelegate::setupCustomGameProfile()
 	return false;
 }
 
-void EngineDelegate::startupGame()
+void EngineDelegate::startupGame(EmulatorInterface& emulatorInterface)
 {
 }
 
@@ -100,6 +101,10 @@ bool EngineDelegate::useDeveloperFeatures()
 	return true;
 }
 
+void EngineDelegate::onActiveModsChanged()
+{
+}
+
 void EngineDelegate::onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer)
 {
 }
@@ -113,15 +118,15 @@ Font& EngineDelegate::getDebugFont(int size)
 	if (size >= 10)
 	{
 		static Font font10;
-		if (font10.getHeight() == 0)
-			font10.load("data/font/freefont_pixeled.json", 0.0f);
+		if (font10.getLineHeight() == 0)
+			font10.loadFromFile("data/font/oxyfont_regular.json", 0.0f);
 		return font10;
 	}
 	else
 	{
 		static Font font3;
-		if (font3.getHeight() == 0)
-			font3.load("data/font/smallfont.json", 0.0f);
+		if (font3.getLineHeight() == 0)
+			font3.loadFromFile("data/font/smallfont.json", 0.0f);
 		return font3;
 	}
 }

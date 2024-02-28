@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -57,6 +57,7 @@ public:
 
 	uint16 getPlaneBaseVRAMAddress(int planeIndex) const;
 	const uint16* getPlaneDataInVRAM(int planeIndex) const;
+	size_t getPlaneSizeInVRAM(int planeIndex) const;
 
 	uint16 getPatternVRAMAddress(int planeIndex, uint16 patternIndex) const;
 	uint16 getPatternAtIndex(int planeIndex, uint16 patternIndex) const;
@@ -73,12 +74,10 @@ public:
 	const std::vector<CustomPlane>& getCustomPlanes() const  { return mCustomPlanes; }
 	void setupCustomPlane(const Recti& rect, uint8 sourcePlane, uint8 scrollOffsets, uint16 renderQueue);
 
-public:
-	bool mAbstractionModeForPlaneA = false;
+	void serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion);
 
 private:
-	uint16* accessPlaneContent(int planeIndex, uint16 patternIndex = 0);
-	const uint16* accessPlaneContent(int planeIndex, uint16 patternIndex = 0) const;
+	const uint16* getPlaneContent(int planeIndex, uint16 patternIndex = 0) const;
 
 private:
 	PatternManager& mPatternManager;

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -106,7 +106,7 @@ void PlaneManager::refresh()
 			{
 				if (isDeveloperMode)
 				{
-					for (int k = 0; k < 0x800; ++k)
+					for (uint16 k = 0; k < 0x800; ++k)
 					{
 						buffer[k] = k + ((uint16)mPatternManager.getLastUsedAtex(k) << 9);
 					}
@@ -114,22 +114,9 @@ void PlaneManager::refresh()
 				break;
 			}
 
-			case PLANE_A:
-			{
-				if (mAbstractionModeForPlaneA)
-				{
-					const uint32 cameraX = EmulatorInterface::instance().readMemory16(0xffffee78);
-					const uint32 cameraY = EmulatorInterface::instance().readMemory16(0xffffee7c);
-
-					fillBufferByAbstraction(buffer, Vec2i(cameraX, cameraY), Vec2i(mPlayfieldSize.x * 8, mPlayfieldSize.y * 8));
-					break;
-				}
-				// Fallthrough to the default case
-			}
-
 			default:
 			{
-				const uint16* src = accessPlaneContent(index);
+				const uint16* src = getPlaneContent(index);
 				memcpy(buffer, src, numPatterns * sizeof(uint16));
 				if (isDeveloperMode)
 				{
@@ -220,6 +207,11 @@ const uint16* PlaneManager::getPlaneDataInVRAM(int planeIndex) const
 	return (const uint16*)(EmulatorInterface::instance().getVRam() + getPlaneBaseVRAMAddress(planeIndex));
 }
 
+size_t PlaneManager::getPlaneSizeInVRAM(int planeIndex) const
+{
+	return (size_t)(mPlayfieldSize.x * mPlayfieldSize.y * 2);
+}
+
 uint16 PlaneManager::getPatternVRAMAddress(int planeIndex, uint16 patternIndex) const
 {
 	return getPlaneBaseVRAMAddress(planeIndex) + patternIndex * 2;
@@ -232,20 +224,15 @@ uint16 PlaneManager::getPatternAtIndex(int planeIndex, uint16 patternIndex) cons
 		if (planeIndex == PLANE_DEBUG)
 			return patternIndex;
 	}
-	return *accessPlaneContent(planeIndex, patternIndex);
+	return *getPlaneContent(planeIndex, patternIndex);
 }
 
 void PlaneManager::setPatternAtIndex(int planeIndex, uint16 patternIndex, uint16 value)
 {
-	*accessPlaneContent(planeIndex, patternIndex) = value;
+	EmulatorInterface::instance().writeVRam16(getPatternVRAMAddress(planeIndex, patternIndex), value);
 }
 
-uint16* PlaneManager::accessPlaneContent(int planeIndex, uint16 patternIndex)
-{
-	return (uint16*)(EmulatorInterface::instance().getVRam() + getPatternVRAMAddress(planeIndex, patternIndex));
-}
-
-const uint16* PlaneManager::accessPlaneContent(int planeIndex, uint16 patternIndex) const
+const uint16* PlaneManager::getPlaneContent(int planeIndex, uint16 patternIndex) const
 {
 	return (uint16*)(EmulatorInterface::instance().getVRam() + getPatternVRAMAddress(planeIndex, patternIndex));
 }
@@ -284,4 +271,48 @@ void PlaneManager::setupCustomPlane(const Recti& rect, uint8 sourcePlane, uint8 
 	plane.mSourcePlane = sourcePlane;
 	plane.mScrollOffsets = scrollOffsets;
 	plane.mRenderQueue = renderQueue;
+}
+
+void PlaneManager::serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion)
+{
+	serializer.serialize(mNameTableBaseA);
+	serializer.serialize(mNameTableBaseB);
+
+	if (serializer.isReading())
+	{
+		Vec2i playfieldSize;
+		playfieldSize.x = serializer.read<uint16>();
+		playfieldSize.y = serializer.read<uint16>();
+		setPlayfieldSizeInPixels(playfieldSize);
+	}
+	else
+	{
+		const Vec2i playfieldSize = getPlayfieldSizeInPixels();
+		serializer.write<uint16>(playfieldSize.x);
+		serializer.write<uint16>(playfieldSize.y);
+	}
+
+	if (formatVersion >= 4)
+	{
+		serializer.serialize(mNameTableBaseW);
+		serializer.serializeAs<uint8>(mUsingPlaneW);
+		serializer.serialize(mPlaneAWSplit);
+
+		for (int k = 0; k < 4; ++k)
+		{
+			serializer.serialize(mDisabledDefaultPlane[k]);
+		}
+
+		serializer.serializeArraySize(mCustomPlanes, 64);
+		for (CustomPlane& customPlane : mCustomPlanes)
+		{
+			serializer.serializeAs<int16>(customPlane.mRect.x);
+			serializer.serializeAs<int16>(customPlane.mRect.y);
+			serializer.serializeAs<int16>(customPlane.mRect.width);
+			serializer.serializeAs<int16>(customPlane.mRect.height);
+			serializer.serialize(customPlane.mSourcePlane);
+			serializer.serialize(customPlane.mScrollOffsets);
+			serializer.serialize(customPlane.mRenderQueue);
+		}
+	}
 }

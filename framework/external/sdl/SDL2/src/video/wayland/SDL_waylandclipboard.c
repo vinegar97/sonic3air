@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,6 +24,7 @@
 
 #include "SDL_waylanddatamanager.h"
 #include "SDL_waylandevents_c.h"
+#include "SDL_waylandclipboard.h"
 
 int
 Wayland_SetClipboardText(_THIS, const char *text)
@@ -42,7 +43,7 @@ Wayland_SetClipboardText(_THIS, const char *text)
             if (text[0] != '\0') {
                 SDL_WaylandDataSource* source = Wayland_data_source_create(_this);
                 Wayland_data_source_add_data(source, TEXT_MIME, text,
-                                             SDL_strlen(text) + 1);
+                                             SDL_strlen(text));
 
                 status = Wayland_data_device_set_selection(data_device, source);
                 if (status != 0) {

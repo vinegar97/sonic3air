@@ -1,8 +1,16 @@
+/*
+*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
+*	Copyright (C) 2017-2024 by Eukaryot
+*
+*	Published under the GNU GPLv3 open source software license, see license.txt
+*	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
 #define RMX_LIB
 #include "engineapp/pch.h"
 #include "engineapp/EngineDelegate.h"
 
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 
 #if defined(PLATFORM_WINDOWS) && !defined(__GNUC__)
@@ -19,7 +27,12 @@ int main(int argc, char** argv)
 	EngineMain::earlySetup();
 
 	// Make sure we're in the correct working directory
-	PlatformFunctions::changeWorkingDirectory(argc == 0 ? "" : argv[0]);
+	if (argc > 0)
+	{
+		WString wstr;
+		wstr.fromUTF8(std::string(argv[0]));
+		PlatformFunctions::changeWorkingDirectory(wstr.toStdWString());
+	}
 
 	// Create engine delegate and angine main instance
 	{

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -13,33 +13,75 @@
 
 namespace lemon
 {
+	namespace
+	{
+		const size_t NUM_PREDEFINED_DATA_TYPES = 14;
+	}
+
+
+	GlobalsLookup::GlobalsLookup()
+	{
+		// Add predefined data types
+		PredefinedDataTypes::collectPredefinedDataTypes(mDataTypes);
+		RMX_ASSERT(mDataTypes.size() == NUM_PREDEFINED_DATA_TYPES, "Wrong number of predefined data types");
+	}
 
 	void GlobalsLookup::clear()
 	{
+		mAllIdentifiers.clear();
 		mFunctionsByName.clear();
-		mGlobalVariablesByName.clear();
-		mDefinesByName.clear();
+
+		mNextFunctionID = 0;
+		mNextVariableID = 0;
+		mNextConstantArrayID = 0;
+
+		// Clear all data types except for the predefined ones
+		mDataTypes.resize(NUM_PREDEFINED_DATA_TYPES);
 	}
 
 	void GlobalsLookup::addDefinitionsFromModule(const Module& module)
 	{
+		for (Constant* constant : module.mPreprocessorDefinitions)
+		{
+			mPreprocessorDefinitions.setDefinition(constant->getName(), constant->getValue().get<int64>());
+			registerConstant(*constant);	// Also add as a normal constant to be able to access them outside of preprocessor directives as well
+		}
 		for (Function* function : module.mFunctions)
 		{
 			registerFunction(*function);
 		}
 		for (Variable* variable : module.mGlobalVariables)
 		{
-			registerVariable(*variable);
+			registerGlobalVariable(*variable);
+		}
+		for (Constant* constant : module.mConstants)
+		{
+			registerConstant(*constant);
+		}
+		for (size_t i = 0; i < module.mNumGlobalConstantArrays; ++i)
+		{
+			registerConstantArray(*module.mConstantArrays[i]);
 		}
 		for (Define* define : module.mDefines)
 		{
 			registerDefine(*define);
 		}
+		for (const CustomDataType* dataType : module.mDataTypes)
+		{
+			registerDataType(dataType);
+		}
 
-		RMX_ASSERT(mNextFunctionId == module.mFirstFunctionId, "Mismatch in function ID when adding module '" << module.getModuleName() << "' (" << mNextFunctionId << " vs. " << module.mFirstFunctionId << ")");
-		RMX_ASSERT(mNextVariableId == module.mFirstVariableId, "Mismatch in variable ID when adding module '" << module.getModuleName() << "' (" << mNextVariableId << " vs. " << module.mFirstVariableId << ")");
-		mNextFunctionId += (uint32)module.mFunctions.size();
-		mNextVariableId += (uint32)module.mGlobalVariables.size();
+		RMX_ASSERT(mNextFunctionID == module.mFirstFunctionID, "Mismatch in function ID when adding module '" << module.getModuleName() << "' (" << mNextFunctionID << " vs. " << module.mFirstFunctionID << ")");
+		RMX_ASSERT(mNextVariableID == module.mFirstVariableID, "Mismatch in variable ID when adding module '" << module.getModuleName() << "' (" << mNextVariableID << " vs. " << module.mFirstVariableID << ")");
+		RMX_ASSERT(mNextConstantArrayID == module.mFirstConstantArrayID, "Mismatch in constant array ID when adding module '" << module.getModuleName() << "' (" << mNextConstantArrayID << " vs. " << module.mFirstConstantArrayID << ")");
+		mNextFunctionID += (uint32)module.mFunctions.size();
+		mNextVariableID += (uint32)module.mGlobalVariables.size();
+		mNextConstantArrayID += (uint32)module.mConstantArrays.size();
+	}
+
+	const GlobalsLookup::Identifier* GlobalsLookup::resolveIdentifierByHash(uint64 nameHash) const
+	{
+		return mapFind(mAllIdentifiers, nameHash);
 	}
 
 	const std::vector<Function*>& GlobalsLookup::getFunctionsByName(uint64 nameHash) const
@@ -49,37 +91,92 @@ namespace lemon
 		return (it == mFunctionsByName.end()) ? EMPTY_FUNCTIONS : it->second;
 	}
 
+	const std::vector<Function*>& GlobalsLookup::getMethodsByName(uint64 contextNameHash) const
+	{
+		static const std::vector<Function*> EMPTY_FUNCTIONS;
+		const auto it = mMethodsByName.find(contextNameHash);
+		return (it == mMethodsByName.end()) ? EMPTY_FUNCTIONS : it->second;
+	}
+
 	void GlobalsLookup::registerFunction(Function& function)
 	{
-		mFunctionsByName[function.getNameHash()].push_back(&function);
+		const uint64 nameHash = function.getName().getHash();
+		if (function.getContext().isEmpty())
+		{
+			mFunctionsByName[nameHash].push_back(&function);
+			for (const FlyweightString& str : function.getAliasNames())
+			{
+				mFunctionsByName[str.getHash()].push_back(&function);
+			}
+		}
+		else
+		{
+			const uint64 contextHash = function.getContext().getHash();
+			mMethodsByName[contextHash + nameHash].push_back(&function);
+			for (const FlyweightString& str : function.getAliasNames())
+			{
+				mMethodsByName[contextHash + str.getHash()].push_back(&function);
+			}
+		}
 	}
 
-	const Variable* GlobalsLookup::getGlobalVariableByName(uint64 nameHash) const
+	void GlobalsLookup::registerGlobalVariable(Variable& variable)
 	{
-		const auto it = mGlobalVariablesByName.find(nameHash);
-		return (it == mGlobalVariablesByName.end()) ? nullptr : it->second;
+		const uint64 nameHash = variable.getName().getHash();
+		mAllIdentifiers[nameHash].set(&variable);
 	}
 
-	void GlobalsLookup::registerVariable(Variable& variable)
+	void GlobalsLookup::registerConstant(Constant& constant)
 	{
-		mGlobalVariablesByName[variable.getNameHash()] = &variable;
+		const uint64 nameHash = constant.getName().getHash();
+		mAllIdentifiers[nameHash].set(&constant);
 	}
 
-	const Define* GlobalsLookup::getDefineByName(uint64 nameHash) const
+	void GlobalsLookup::registerConstantArray(ConstantArray& constantArray)
 	{
-		const auto it = mDefinesByName.find(nameHash);
-		return (it == mDefinesByName.end()) ? nullptr : it->second;
+		const uint64 nameHash = constantArray.getName().getHash();
+		mAllIdentifiers[nameHash].set(&constantArray);
 	}
 
 	void GlobalsLookup::registerDefine(Define& define)
 	{
-		const uint64 nameHash = rmx::getMurmur2_64(define.getName());
-		mDefinesByName[nameHash] = &define;
+		const uint64 nameHash = define.getName().getHash();
+		mAllIdentifiers[nameHash].set(&define);
+
+		// Invalidate the "resolved" pointer in identifiers, as they possible got invalid by now
+		define.invalidateResolvedIdentifiers();
 	}
 
-	const StoredString* GlobalsLookup::getStringLiteralByHash(uint64 hash) const
+	const FlyweightString* GlobalsLookup::getStringLiteralByHash(uint64 hash) const
 	{
 		return mStringLiterals.getStringByHash(hash);
+	}
+
+	void GlobalsLookup::registerDataType(const CustomDataType* dataTypeDefinition)
+	{
+		RMX_ASSERT(dataTypeDefinition->getID() == mDataTypes.size(), "Wrong data type ID");
+		mDataTypes.push_back(dataTypeDefinition);
+		mAllIdentifiers[dataTypeDefinition->getName().getHash()].set(dataTypeDefinition);
+	}
+
+	const DataTypeDefinition* GlobalsLookup::readDataType(VectorBinarySerializer& serializer) const
+	{
+		uint16 index = serializer.read<uint16>();
+		if (index >= mDataTypes.size())
+			index = 0;
+		return mDataTypes[index];
+	}
+
+	void GlobalsLookup::serializeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition*& dataTypeDefinition) const
+	{
+		if (serializer.isReading())
+		{
+			dataTypeDefinition = readDataType(serializer);
+		}
+		else
+		{
+			serializer.write<uint16>((nullptr == dataTypeDefinition) ? 0 : dataTypeDefinition->getID());
+		}
 	}
 
 }

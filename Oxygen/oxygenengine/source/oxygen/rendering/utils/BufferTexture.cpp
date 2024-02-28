@@ -1,12 +1,15 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/rendering/utils/BufferTexture.h"
 
 
@@ -77,6 +80,11 @@ void BufferTexture::create(PixelFormat pixelFormat, int width, int height, const
 #endif
 }
 
+void BufferTexture::create(PixelFormat pixelFormat, Vec2i size, const void* data)
+{
+	create(pixelFormat, size.x, size.y, data);
+}
+
 void BufferTexture::bindBuffer() const
 {
 #if defined(SUPPORTS_BUFFER_TEXTURES)
@@ -118,3 +126,5 @@ void BufferTexture::bufferData(const void* data, int width, int height)
 	glBindTexture(GL_TEXTURE_2D, 0);
 #endif
 }
+
+#endif

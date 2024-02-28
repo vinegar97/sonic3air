@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,13 +8,14 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/rendering/software/SoftwareRenderer.h"
+#include "oxygen/rendering/software/SoftwareBlur.h"
 #include "oxygen/rendering/Geometry.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/drawing/Drawer.h"
 #include "oxygen/drawing/DrawerTexture.h"
-#include "oxygen/drawing/software/Blitter.h"
+#include "oxygen/drawing/software/BlitterHelper.h"
 
 
 namespace detail
@@ -141,14 +142,10 @@ void SoftwareRenderer::renderGameScreen(const std::vector<Geometry*>& geometries
 {
 	Bitmap& gameScreenBitmap = mGameScreenTexture.accessBitmap();
 
-	// Clear depth buffer
+	// Clear the screen
+	gameScreenBitmap.clear(mRenderParts.getPaletteManager().getBackdropColor());
 	memset(mDepthBuffer, 0, sizeof(mDepthBuffer));
 	mEmptyDepthBuffer = true;
-
-	if (mRenderParts.getEnforceClearScreen())
-	{
-		gameScreenBitmap.clear(0);
-	}
 
 	mCurrentViewport.set(0, 0, mGameResolution.x, mGameResolution.y);
 	mFullViewport = true;
@@ -158,12 +155,12 @@ void SoftwareRenderer::renderGameScreen(const std::vector<Geometry*>& geometries
 		mBufferedPlaneData[i].mValid = false;
 	}
 
-	// Do some analysis on what's to render
+	// Check if sprite masking needed
 	bool usingSpriteMask = false;
 	{
 		for (const Geometry* geometry : geometries)
 		{
-			if (geometry->getType() == Geometry::Type::SPRITE && geometry->as<SpriteGeometry>().mSpriteInfo.getType() == SpriteManager::SpriteInfo::Type::MASK)
+			if (geometry->getType() == Geometry::Type::SPRITE && geometry->as<SpriteGeometry>().mSpriteInfo.getType() == RenderItem::Type::SPRITE_MASK)
 			{
 				usingSpriteMask = true;
 				break;
@@ -190,7 +187,7 @@ void SoftwareRenderer::renderGameScreen(const std::vector<Geometry*>& geometries
 
 	// Set alpha channel to 0xff to make sure nothing gets lost due to alpha test
 	{
-		uint64* RESTRICT ptr = (uint64*)gameScreenBitmap.mData;
+		uint64* RESTRICT ptr = (uint64*)gameScreenBitmap.getData();
 		uint64* RESTRICT end = ptr + gameScreenBitmap.getPixelCount() / 2;
 		for (; ptr < end; ++ptr)
 		{
@@ -229,14 +226,14 @@ void SoftwareRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 		const PlaneManager& planeManager = mRenderParts.getPlaneManager();
 		const PaletteManager& paletteManager = mRenderParts.getPaletteManager();
 		const PatternManager& patternManager = mRenderParts.getPatternManager();
-		const uint32* palettes[2] = { paletteManager.getPalette(0), paletteManager.getPalette(1) };
+		const uint32* palettes[2] = { paletteManager.getPalette(0).getData(), paletteManager.getPalette(1).getData() };
 		const PatternManager::CacheItem* patternCache = patternManager.getPatternCache();
-		const uint16 numPatternsPerLine = bitmapSize.x / 8;
+		const uint16 numPatternsPerLine = (uint16)(bitmapSize.x / 8);
 		const bool highlightPrioPatterns = (FTX::keyState(SDLK_LSHIFT) != 0);
 
 		for (int y = 0; y < bitmapSize.y; ++y)
 		{
-			uint32* destRGBA = &gameScreenBitmap.mData[y * gameScreenBitmap.mWidth];
+			uint32* destRGBA = gameScreenBitmap.getPixelPointer(0, y);
 			const uint32* palette = (y < paletteManager.mSplitPositionY) ? palettes[0] : palettes[1];
 
 			for (int x = 0; x < bitmapSize.x; )
@@ -268,7 +265,7 @@ void SoftwareRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 	mGameScreenTexture.bitmapUpdated();
 
 	drawer.setWindowRenderTarget(FTX::screenRect());
-	drawer.setBlendMode(DrawerBlendMode::NONE);
+	drawer.setBlendMode(BlendMode::OPAQUE);
 	drawer.drawUpscaledRect(RenderUtils::getLetterBoxRect(rect, (float)bitmapSize.x / (float)bitmapSize.y), mGameScreenTexture);
 	drawer.performRendering();
 
@@ -298,13 +295,21 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 		case Geometry::Type::RECT:
 		{
 			const RectGeometry& rg = static_cast<const RectGeometry&>(geometry);
+			mBlitter.blitColor(Blitter::OutputWrapper(mGameScreenTexture.accessBitmap(), rg.mRect), rg.mColor, BlendMode::ALPHA);
+			break;
+		}
+
+		case Geometry::Type::TEXTURED_RECT:
+		{
+			const TexturedRectGeometry& tg = static_cast<const TexturedRectGeometry&>(geometry);
 			Bitmap& gameScreenBitmap = mGameScreenTexture.accessBitmap();
-			BitmapWrapper gameScreenWrapper(gameScreenBitmap);
 
-			Blitter::Options options;
-			options.mUseAlphaBlending = true;
+			Blitter::Options blitterOptions;
+			blitterOptions.mBlendMode = BlendMode::ALPHA;
+			blitterOptions.mTintColor = &tg.mTintColor;
+			blitterOptions.mAddedColor = &tg.mAddedColor;
 
-			Blitter::blitColor(gameScreenWrapper, rg.mRect, rg.mColor, options);
+			mBlitter.blitSprite(Blitter::OutputWrapper(mGameScreenTexture.accessBitmap()), Blitter::SpriteWrapper(tg.mDrawerTexture.accessBitmap(), Vec2i()), tg.mRect.getPos(), blitterOptions);
 			break;
 		}
 
@@ -313,31 +318,9 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 			const EffectBlurGeometry& ebg = static_cast<const EffectBlurGeometry&>(geometry);
 			Bitmap& gameScreenBitmap = mGameScreenTexture.accessBitmap();
 
-			// Blur x-direction
 			if (ebg.mBlurValue >= 1)
 			{
-				for (int y = 0; y < gameScreenBitmap.mHeight; ++y)
-				{
-					uint32* data = gameScreenBitmap.getPixelPointer(0, y);
-					for (int x = gameScreenBitmap.mWidth - 1; x >= 1; --x)
-					{
-						data[x] = (data[x] & 0xff000000) + (((data[x] & 0xfefefe) + (data[x-1] & 0xfefefe)) >> 1);
-					}
-				}
-			}
-
-			// Blur y-direction
-			if (ebg.mBlurValue >= 3)
-			{
-				const int stride = gameScreenBitmap.mWidth;
-				for (int y = 0; y < gameScreenBitmap.mHeight-1; ++y)
-				{
-					uint32* data = gameScreenBitmap.getPixelPointer(0, y);
-					for (int x = 0; x < gameScreenBitmap.mWidth; ++x)
-					{
-						data[x] = (data[x] & 0xff000000) + (((data[x] & 0xfefefe) + (data[x+stride] & 0xfefefe)) >> 1);
-					}
-				}
+				SoftwareBlur::blurBitmap(gameScreenBitmap, ebg.mBlurValue);
 			}
 			break;
 		}
@@ -437,7 +420,7 @@ void SoftwareRenderer::renderPlane(const PlaneGeometry& geometry)
 
 		for (int y = minY; y < maxY; ++y)
 		{
-			const int position = y * gameScreenBitmap.mWidth;
+			const int position = y * gameScreenBitmap.getWidth();
 			pixelBlockWriter.newLine(y, position, (y < paletteManager.mSplitPositionY) ? 0 : 1);
 
 			int vx = minX;
@@ -548,14 +531,14 @@ void SoftwareRenderer::renderPlane(const PlaneGeometry& geometry)
 	{
 		BufferedPlaneData& bufferedPlaneData = mBufferedPlaneData[foundFittingBufferedPlaneDataIndex];
 
-		const uint32* palettes[2] = { paletteManager.getPalette(0), paletteManager.getPalette(1) };
+		const uint32* palettes[2] = { paletteManager.getPalette(0).getData(), paletteManager.getPalette(1).getData() };
 		const bool isBackground = (geometry.mPlaneIndex == PlaneManager::PLANE_B && !geometry.mPriorityFlag);
 
 		const std::vector<BufferedPlaneData::PixelBlock>& blocks = geometry.mPriorityFlag ? bufferedPlaneData.mPrioBlocks : bufferedPlaneData.mNonPrioBlocks;
 		for (const BufferedPlaneData::PixelBlock& block : blocks)
 		{
 			const uint8* RESTRICT src = &bufferedPlaneData.mContent[block.mLinearPosition];
-			uint32* RESTRICT dstRGBA = &gameScreenBitmap.mData[block.mLinearPosition];
+			uint32* RESTRICT dstRGBA = &gameScreenBitmap.getData()[block.mLinearPosition];
 			const uint32* RESTRICT paletteWithAtex = &palettes[block.mPaletteIndex][block.mAtex];
 
 			if (isBackground)
@@ -600,12 +583,12 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 
 	switch (geometry.mSpriteInfo.getType())
 	{
-		case SpriteManager::SpriteInfo::Type::VDP:
+		case RenderItem::Type::VDP_SPRITE:
 		{
-			const SpriteManager::VdpSpriteInfo& sprite = static_cast<const SpriteManager::VdpSpriteInfo&>(geometry.mSpriteInfo);
+			const renderitems::VdpSpriteInfo& sprite = static_cast<const renderitems::VdpSpriteInfo&>(geometry.mSpriteInfo);
 
 			const PaletteManager& paletteManager = mRenderParts.getPaletteManager();
-			const uint32* palettes[2] = { paletteManager.getPalette(0), paletteManager.getPalette(1) };
+			const uint32* palettes[2] = { paletteManager.getPalette(0).getData(), paletteManager.getPalette(1).getData() };
 			const PatternManager::CacheItem* patternCache = mRenderParts.getPatternManager().getPatternCache();
 
 			const uint8 depthValue = (sprite.mPriorityFlag) ? 0x80 : 0;
@@ -646,7 +629,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 					colorIndex += (patternIndex >> 9) & 0x30;
 					if (colorIndex & 0x0f)
 					{
-						uint32& dst = gameScreenBitmap.mData[x + y * gameScreenBitmap.mWidth];
+						uint32& dst = *gameScreenBitmap.getPixelPointer(x, y);
 						if (useTintColor)
 						{
 							Color color = Color::fromABGR32(palette[colorIndex]);
@@ -654,14 +637,8 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 							color.g = saturate(sprite.mAddedColor.g + color.g * sprite.mTintColor.g);
 							color.b = saturate(sprite.mAddedColor.b + color.b * sprite.mTintColor.b);
 							color.a = saturate(sprite.mAddedColor.a + color.a * sprite.mTintColor.a);
-
-							if (color.a < 1.0f)
-							{
-								color = color.blendOver(Color::fromABGR32(dst));
-								color.a = 1.0f;
-							}
-
-							dst = color.getABGR32();
+							uint32 src = color.getABGR32();
+							BlitterHelper::blendPixelAlpha((uint8*)&dst, (uint8*)&src);
 						}
 						else
 						{
@@ -670,107 +647,100 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 					}
 				}
 			}
-
 			break;
 		}
 
-		case SpriteManager::SpriteInfo::Type::PALETTE:
+		case RenderItem::Type::PALETTE_SPRITE:
+		case RenderItem::Type::COMPONENT_SPRITE:
 		{
-			const SpriteManager::PaletteSpriteInfo& sprite = static_cast<const SpriteManager::PaletteSpriteInfo&>(geometry.mSpriteInfo);
-			const PaletteSprite& paletteSprite = *static_cast<PaletteSprite*>(sprite.mCacheItem->mSprite);
-			const bool hasTransform = !sprite.mTransformation.isIdentity();
+			// Shared code for palette & component sprite rendering
+			const renderitems::CustomSpriteInfoBase& spriteBase = static_cast<const renderitems::CustomSpriteInfoBase&>(geometry.mSpriteInfo);
+			const bool isPaletteSprite = (geometry.mSpriteInfo.getType() == RenderItem::Type::PALETTE_SPRITE);
 
 			const PaletteManager& paletteManager = mRenderParts.getPaletteManager();
+			BitmapViewMutable<uint8> depthBufferView(mDepthBuffer, Vec2i(0x200, 0x100));	// Depth buffer uses a fixed size...
 
-			SpriteBase::BlitOptions blitOptions;
-			blitOptions.mTargetRect = mFullViewport ? nullptr : &mCurrentViewport;
-			blitOptions.mTransform = hasTransform ? *sprite.mTransformation.mMatrix : nullptr;
-			blitOptions.mInvTransform = hasTransform ? *sprite.mTransformation.mInverse : nullptr;
-			blitOptions.mDepthBuffer = (mEmptyDepthBuffer && !sprite.mPriorityFlag) ? nullptr : mDepthBuffer;
-			blitOptions.mDepthValue = (sprite.mPriorityFlag) ? 0x80 : 0;
-			blitOptions.mIgnoreAlpha = sprite.mFullyOpaque;
-			blitOptions.mTintColor = (sprite.mTintColor != Color::WHITE) ? &sprite.mTintColor : nullptr;
-			blitOptions.mAddedColor = (sprite.mAddedColor != Color::TRANSPARENT) ? &sprite.mAddedColor : nullptr;
-			blitOptions.mUseUpscaledSprite = sprite.mUseUpscaledSprite;
-
-			const int splitY = paletteManager.mSplitPositionY;
-			if (splitY < mGameResolution.y)
+			// Build blitter options
+			Blitter::Options blitterOptions;
+			Color tintColor = spriteBase.mTintColor;
+			Color addedColor = spriteBase.mAddedColor;
 			{
-				Recti targetRect(0, 0, mGameResolution.x, splitY);
-				blitOptions.mTargetRect = &targetRect;
-				if (!mFullViewport)
-					targetRect.intersect(mCurrentViewport);
-				paletteSprite.blitInto(gameScreenBitmap, sprite.mInterpolatedPosition, paletteManager.getPalette(0) + sprite.mAtex, blitOptions);
+				if (spriteBase.mUseGlobalComponentTint && !isPaletteSprite)
+				{
+					paletteManager.applyGlobalComponentTint(tintColor, addedColor);
+				}
 
-				targetRect.y = splitY;
-				targetRect.height = mGameResolution.y - splitY;
-				if (!mFullViewport)
-					targetRect.intersect(mCurrentViewport);
-				paletteSprite.blitInto(gameScreenBitmap, sprite.mInterpolatedPosition, paletteManager.getPalette(1) + sprite.mAtex, blitOptions);
+				const bool hasTransform = !spriteBase.mTransformation.isIdentity();
+				blitterOptions.mTransform = hasTransform ? *spriteBase.mTransformation.mMatrix : nullptr;
+				blitterOptions.mInvTransform = hasTransform ? *spriteBase.mTransformation.mInverse : nullptr;
+				blitterOptions.mSamplingMode = SamplingMode::POINT;
+				blitterOptions.mBlendMode = spriteBase.mBlendMode;
+				blitterOptions.mTintColor = (tintColor != Color::WHITE) ? &tintColor : nullptr;
+				blitterOptions.mAddedColor = (addedColor != Color::TRANSPARENT) ? &addedColor : nullptr;
+				blitterOptions.mDepthBuffer = (mEmptyDepthBuffer && !spriteBase.mPriorityFlag) ? nullptr : &depthBufferView;
+				blitterOptions.mDepthTestValue = (spriteBase.mPriorityFlag) ? 0x80 : 0;
+			}
+
+			if (isPaletteSprite)
+			{
+				// Palette sprite specific code
+				const renderitems::PaletteSpriteInfo& spriteInfo = static_cast<const renderitems::PaletteSpriteInfo&>(spriteBase);
+
+				const PaletteSprite& paletteSprite = *static_cast<PaletteSprite*>(spriteInfo.mCacheItem->mSprite);
+				const PaletteBitmap& paletteBitmap = spriteInfo.mUseUpscaledSprite ? paletteSprite.getUpscaledBitmap() : paletteSprite.getBitmap();
+				const Blitter::IndexedSpriteWrapper spriteWrapper(paletteBitmap.getData(), paletteBitmap.getSize(), -paletteSprite.mOffset);
+				const Blitter::PaletteWrapper paletteWrapper(paletteManager.getPalette(0).getData() + spriteInfo.mAtex, paletteManager.getPalette(0).getSize() - spriteInfo.mAtex);
+
+				// Handle screen palette split
+				const int splitY = paletteManager.mSplitPositionY;
+				if (splitY < mGameResolution.y)
+				{
+					const Blitter::PaletteWrapper paletteWrapper2(paletteManager.getPalette(1).getData() + spriteInfo.mAtex, paletteManager.getPalette(1).getSize() - spriteInfo.mAtex);
+
+					Recti targetRect = Recti::getIntersection(mCurrentViewport, Recti(0, 0, mGameResolution.x, splitY));
+					mBlitter.blitIndexed(Blitter::OutputWrapper(gameScreenBitmap, targetRect), spriteWrapper, paletteWrapper, spriteInfo.mInterpolatedPosition, blitterOptions);
+
+					targetRect = Recti::getIntersection(mCurrentViewport, Recti(0, splitY, mGameResolution.x, mGameResolution.y - splitY));
+					mBlitter.blitIndexed(Blitter::OutputWrapper(gameScreenBitmap, targetRect), spriteWrapper, paletteWrapper2, spriteInfo.mInterpolatedPosition, blitterOptions);
+				}
+				else
+				{
+					mBlitter.blitIndexed(Blitter::OutputWrapper(gameScreenBitmap, mCurrentViewport), spriteWrapper, paletteWrapper, spriteInfo.mInterpolatedPosition, blitterOptions);
+				}
 			}
 			else
 			{
-				paletteSprite.blitInto(gameScreenBitmap, sprite.mInterpolatedPosition, paletteManager.getPalette(0) + sprite.mAtex, blitOptions);
+				// Component sprite specific code
+				const renderitems::ComponentSpriteInfo& spriteInfo = static_cast<const renderitems::ComponentSpriteInfo&>(spriteBase);
+
+				const ComponentSprite& componentSprite = *static_cast<ComponentSprite*>(spriteInfo.mCacheItem->mSprite);
+				const Blitter::SpriteWrapper spriteWrapper(componentSprite.getBitmap(), -componentSprite.mOffset);
+
+				mBlitter.blitSprite(Blitter::OutputWrapper(gameScreenBitmap, mCurrentViewport), spriteWrapper, spriteInfo.mInterpolatedPosition, blitterOptions);
 			}
 
-			if (sprite.mPriorityFlag)
+			if (spriteBase.mPriorityFlag)
 				mEmptyDepthBuffer = false;
 			break;
 		}
 
-		case SpriteManager::SpriteInfo::Type::COMPONENT:
-		{
-			const SpriteManager::ComponentSpriteInfo& sprite = static_cast<const SpriteManager::ComponentSpriteInfo&>(geometry.mSpriteInfo);
-			const ComponentSprite& componentSprite = *static_cast<ComponentSprite*>(sprite.mCacheItem->mSprite);
-			const bool hasTransform = !sprite.mTransformation.isIdentity();
-
-			const PaletteManager& paletteManager = mRenderParts.getPaletteManager();
-
-			Vec4f tintColor = sprite.mTintColor;
-			Vec4f addedColor = sprite.mAddedColor;
-			if (sprite.mUseGlobalComponentTint)
-			{
-				tintColor.r *= paletteManager.getGlobalComponentTintColor().r;
-				tintColor.g *= paletteManager.getGlobalComponentTintColor().g;
-				tintColor.b *= paletteManager.getGlobalComponentTintColor().b;
-				tintColor.a *= paletteManager.getGlobalComponentTintColor().a;
-				addedColor += paletteManager.getGlobalComponentAddedColor();
-			}
-
-			SpriteBase::BlitOptions blitOptions;
-			blitOptions.mTargetRect = mFullViewport ? nullptr : &mCurrentViewport;
-			blitOptions.mTransform = hasTransform ? *sprite.mTransformation.mMatrix : nullptr;
-			blitOptions.mInvTransform = hasTransform ? *sprite.mTransformation.mInverse : nullptr;
-			blitOptions.mDepthBuffer = (mEmptyDepthBuffer && !sprite.mPriorityFlag) ? nullptr : mDepthBuffer;
-			blitOptions.mDepthValue = (sprite.mPriorityFlag) ? 0x80 : 0;
-			blitOptions.mIgnoreAlpha = sprite.mFullyOpaque;
-			blitOptions.mTintColor = (tintColor != Color::WHITE) ? &tintColor : nullptr;
-			blitOptions.mAddedColor = (addedColor != Color::TRANSPARENT) ? &addedColor : nullptr;
-
-			componentSprite.blitInto(gameScreenBitmap, sprite.mInterpolatedPosition, blitOptions);
-
-			if (sprite.mPriorityFlag)
-				mEmptyDepthBuffer = false;
-			break;
-		}
-
-		case SpriteManager::SpriteInfo::Type::MASK:
+		case RenderItem::Type::SPRITE_MASK:
 		{
 			// Overwrite sprites with plane rendering results in given rect
-			const SpriteManager::SpriteMaskInfo& mask = static_cast<const SpriteManager::SpriteMaskInfo&>(geometry.mSpriteInfo);
+			const renderitems::SpriteMaskInfo& mask = static_cast<const renderitems::SpriteMaskInfo&>(geometry.mSpriteInfo);
 			if (mask.mSize.x > 0 && mask.mSize.y > 0)
 			{
-				const int minX = clamp(mask.mInterpolatedPosition.x, 0, gameScreenBitmap.mWidth);
-				const int maxX = clamp(mask.mInterpolatedPosition.x + mask.mSize.x, 0, gameScreenBitmap.mWidth);
+				const int minX = clamp(mask.mInterpolatedPosition.x, 0, gameScreenBitmap.getWidth());
+				const int maxX = clamp(mask.mInterpolatedPosition.x + mask.mSize.x, 0, gameScreenBitmap.getWidth());
 				const int bytes = (maxX - minX) * 4;
 				if (bytes > 0)
 				{
-					const int minY = clamp(mask.mInterpolatedPosition.y, 0, gameScreenBitmap.mHeight);
-					const int maxY = clamp(mask.mInterpolatedPosition.y + mask.mSize.y, 0, gameScreenBitmap.mHeight);
+					const int minY = clamp(mask.mInterpolatedPosition.y, 0, gameScreenBitmap.getHeight());
+					const int maxY = clamp(mask.mInterpolatedPosition.y + mask.mSize.y, 0, gameScreenBitmap.getHeight());
 
 					for (int line = minY; line < maxY; ++line)
 					{
-						const uint32 offset = minX + line * gameScreenBitmap.mWidth;
+						const uint32 offset = minX + line * gameScreenBitmap.getWidth();
 						memcpy(&gameScreenBitmap[offset], &mGameScreenCopy[offset], bytes);
 					}
 				}
@@ -778,7 +748,9 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			break;
 		}
 
-		case SpriteManager::SpriteInfo::Type::INVALID:
+		case RenderItem::Type::RECTANGLE:
+		case RenderItem::Type::TEXT:
+		case RenderItem::Type::INVALID:
 			break;
 	}
 }

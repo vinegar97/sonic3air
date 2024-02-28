@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2021 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -50,7 +50,7 @@ write_pipe(int fd, const void* buffer, size_t total_length, size_t *pos)
     sigset_t old_sig_set;
     struct timespec zerotime = {0};
 
-    ready = SDL_IOReady(fd, SDL_TRUE, PIPE_MS_TIMEOUT);
+    ready = SDL_IOReady(fd, SDL_IOR_WRITE, PIPE_MS_TIMEOUT);
 
     sigemptyset(&sig_set);
     sigaddset(&sig_set, SIGPIPE);  
@@ -96,7 +96,7 @@ read_pipe(int fd, void** buffer, size_t* total_length, SDL_bool null_terminate)
     ssize_t bytes_read = 0;
     size_t pos = 0;
 
-    ready = SDL_IOReady(fd, SDL_FALSE, PIPE_MS_TIMEOUT);
+    ready = SDL_IOReady(fd, SDL_IOR_READ, PIPE_MS_TIMEOUT);
   
     if (ready == 0) {
         bytes_read = SDL_SetError("Pipe timeout");
@@ -305,14 +305,22 @@ Wayland_data_source_get_data(SDL_WaylandDataSource *source,
     } else {
         mime_data = mime_data_list_find(&source->mimes, mime_type);
         if (mime_data != NULL && mime_data->length > 0) {
-            buffer = SDL_malloc(mime_data->length);
+            size_t buffer_length = mime_data->length;
+
+            if (null_terminate == SDL_TRUE) {
+                ++buffer_length;
+            }
+            buffer = SDL_malloc(buffer_length);
             if (buffer == NULL) {
                 *length = SDL_OutOfMemory();
             } else {
                 *length = mime_data->length;
                 SDL_memcpy(buffer, mime_data->data, mime_data->length);
+                if (null_terminate) {
+                    *((Uint8 *)buffer + mime_data->length) = 0;
+                }
             }
-       }
+        }
     }
 
     return buffer;
@@ -322,6 +330,10 @@ void
 Wayland_data_source_destroy(SDL_WaylandDataSource *source)
 {
     if (source != NULL) {
+        SDL_WaylandDataDevice *data_device = (SDL_WaylandDataDevice *) source->data_device;
+        if (data_device && (data_device->selection_source == source)) {
+            data_device->selection_source = NULL;
+        }
         wl_data_source_destroy(source->source);
         mime_data_list_free(&source->mimes);
         SDL_free(source);
@@ -396,8 +408,9 @@ Wayland_data_device_clear_selection(SDL_WaylandDataDevice *data_device)
 
     if (data_device == NULL || data_device->data_device == NULL) {
         status = SDL_SetError("Invalid Data Device");
-    } else if (data_device->selection_source != 0) {
+    } else if (data_device->selection_source != NULL) {
         wl_data_device_set_selection(data_device->data_device, NULL, 0);
+        Wayland_data_source_destroy(data_device->selection_source);
         data_device->selection_source = NULL;
     }
     return status;
@@ -444,7 +457,11 @@ Wayland_data_device_set_selection(SDL_WaylandDataDevice *data_device,
                                              source->source,
                                              data_device->selection_serial); 
             }
+            if (data_device->selection_source != NULL) {
+                Wayland_data_source_destroy(data_device->selection_source);
+            }
             data_device->selection_source = source;
+            source->data_device = data_device;
         }
     }
 

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -16,19 +16,22 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
-#include "oxygen/base/CrashHandler.h"
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/download/DownloadManager.h"
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/software/SoftwareDrawer.h"
+#include "oxygen/platform/CrashHandler.h"
+#include "oxygen/platform/PlatformFunctions.h"
+#include "oxygen/resources/FontCollection.h"
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/file/PackedFileProvider.h"
 #include "oxygen/helper/FileHelper.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/JsonHelper.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/RenderResources.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/PersistentData.h"
 #include "oxygen/simulation/Simulation.h"
-#if defined (PLATFORM_ANDROID)
+#if defined(PLATFORM_ANDROID)
 	#include "oxygen/platform/AndroidJavaInterface.h"
 #endif
 
@@ -36,6 +39,25 @@
 #if !defined(PLATFORM_MAC) && !defined(PLATFORM_ANDROID)	// Maybe other platforms can be excluded as well? Possibly only Windows and Linux need this
 	#define LOAD_APP_ICON_PNG
 #endif
+
+
+struct EngineMain::Internal
+{
+	GameProfile		mGameProfile;
+	InputManager	mInputManager;
+	LogDisplay		mLogDisplay;
+	ModManager		mModManager;
+	ResourcesCache	mResourcesCache;
+	FontCollection	mFontCollection;
+	PersistentData	mPersistentData;
+	VideoOut		mVideoOut;
+	ControlsIn		mControlsIn;
+	DownloadManager mDownloadManager;
+
+#if defined(PLATFORM_ANDROID)
+	AndroidJavaInterface mAndroidJavaInterface;
+#endif
+};
 
 
 void EngineMain::earlySetup()
@@ -59,33 +81,13 @@ void EngineMain::earlySetup()
 
 EngineMain::EngineMain(EngineDelegateInterface& delegate_) :
 	mDelegate(delegate_),
-	mGameProfile(*new GameProfile()),
-	mInputManager(*new InputManager()),
-	mLogDisplay(*new LogDisplay()),
-	mModManager(*new ModManager()),
-	mResourcesCache(*new ResourcesCache()),
-	mPersistentData(*new PersistentData()),
-	mVideoOut(*new VideoOut()),
-	mControlsIn(*new ControlsIn())
-#if defined (PLATFORM_ANDROID)
-	, mAndroidJavaInterface(*new AndroidJavaInterface())
-#endif
+	mInternal(*new Internal())
 {
 }
 
 EngineMain::~EngineMain()
 {
-	delete &mGameProfile;
-	delete &mInputManager;
-	delete &mLogDisplay;
-	delete &mModManager;
-	delete &mResourcesCache;
-	delete &mPersistentData;
-	delete &mVideoOut;
-	delete &mControlsIn;
-#if defined (PLATFORM_ANDROID)
-	delete &mAndroidJavaInterface;
-#endif
+	delete &mInternal;
 }
 
 void EngineMain::execute(int argc, char** argv)
@@ -116,11 +118,37 @@ void EngineMain::onActiveModsChanged()
 	// Update the resource cache -> palettes, raw data
 	ResourcesCache::instance().loadAllResources();
 
+	// Update fonts
+	mInternal.mFontCollection.collectFromMods();
+
+	// Update video
+	mInternal.mVideoOut.handleActiveModsChanged();
+
 	// Update audio
 	mAudioOut->handleActiveModsChanged();
 
+	// Update input
+	mInternal.mInputManager.handleActiveModsChanged();
+
 	// Scripts need to be reloaded
-	Application::instance().getSimulation().requireScriptReload();
+	Application::instance().getSimulation().reloadScriptsAfterModsChange();
+
+	// Inform the delegate as well
+	mDelegate.onActiveModsChanged();
+}
+
+bool EngineMain::reloadFilePackage(std::wstring_view packageName, bool forceReload)
+{
+	GameProfile& gameProfile = GameProfile::instance();
+	for (size_t index = 0; index < gameProfile.mDataPackages.size(); ++index)
+	{
+		const GameProfile::DataPackage& dataPackage = gameProfile.mDataPackages[index];
+		if (dataPackage.mFilename == packageName)
+		{
+			return loadFilePackageByIndex(index, forceReload);
+		}
+	}
+	return false;
 }
 
 uint32 EngineMain::getPlatformFlags() const
@@ -134,7 +162,7 @@ uint32 EngineMain::getPlatformFlags() const
 		uint32 flags = 0;
 	#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
 		flags |= 0x0001;
-	#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
+	#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
 		flags |= 0x0002;
 	#endif
 		return flags;
@@ -147,35 +175,34 @@ void EngineMain::switchToRenderMethod(Configuration::RenderMethod newRenderMetho
 	const bool wasUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
 	config.mRenderMethod = newRenderMethod;
 
-	const bool nowUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
-	if (nowUsingOpenGL)
-	{
-		config.mAutoDetectRenderMethod = false;
-	}
-
+	bool nowUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
 	if (nowUsingOpenGL != wasUsingOpenGL)
 	{
 		// Need to recreate the window
 		destroyWindow();
 		createWindow();
+
+		// Check OpenGL in the config again, it could have changed - namely if OpenGL initialization failed
+		nowUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
+	}
+
+	if (nowUsingOpenGL)
+	{
+		config.mAutoDetectRenderMethod = false;
 	}
 
 	// Switch the renderer
 	VideoOut::instance().createRenderer(true);
 }
 
-void EngineMain::setVSyncMode(int mode)
+void EngineMain::setVSyncMode(Configuration::FrameSyncType frameSyncMode)
 {
 	Configuration& config = Configuration::instance();
 	if ((config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL) || (config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT))
 	{
-		if (mode >= 1)
+		if (frameSyncMode >= Configuration::FrameSyncType::VSYNC_ON)
 		{
-			// First try adaptive V-Sync; if that's not supported, use regular V-Sync
-			if (SDL_GL_SetSwapInterval(-1) < 0)
-			{
-				SDL_GL_SetSwapInterval(1);
-			}
+			SDL_GL_SetSwapInterval(1);
 		}
 		else
 		{
@@ -194,6 +221,8 @@ bool EngineMain::startupEngine()
 		FTX::FileSystem->addMountPoint(*provider, L"", L"", 1);
 	}
 #endif
+
+	PlatformFunctions::onEngineStartup();
 
 	if (!mDelegate.onEnginePreStartup())
 		return false;
@@ -231,43 +260,15 @@ bool EngineMain::startupEngine()
 	//  -> It should be disabled by default according to the SDL2 docs, but that does not seem to be always the case
 	SDL_DisableScreenSaver();
 
-#ifndef PLATFORM_ANDROID
-	config.mExePath = *String(mArguments[0]).toWString();
-
-	// Choose app data path
-	{
-		const std::wstring appDataPath = PlatformFunctions::getAppDataPath();
-		const bool useLocalSaveDataDirectory = (FTX::FileSystem->exists(L"savedata") || appMetaData.mAppDataFolder.empty() || appDataPath.empty());
-		if (!useLocalSaveDataDirectory)
-		{
-			// This is the default case: Use the app data path
-			config.mAppDataPath = appDataPath + L'/' + appMetaData.mAppDataFolder + L'/';
-		}
-		else
-		{
-			// Special case & fallback: Use local "savedata" path instead
-			std::wstring currentDirectory = rmx::FileSystem::getCurrentDirectory();
-			rmx::FileSystem::normalizePath(currentDirectory, true);
-			config.mAppDataPath = currentDirectory + L"savedata/";
-		}
-	}
-#else
-	// Android
-	// TODO: Use internal storage path as a fallback?
-	WString storagePath = String(SDL_AndroidGetExternalStoragePath()).toWString();
-	config.mAppDataPath = *(storagePath + L'/');
-#endif
-
-	config.mSaveStatesDirLocal = config.mAppDataPath + L"savestates/";
-	config.mSRamFilename = config.mAppDataPath + L"sram.bin";
-	config.mPersistentDataFilename = config.mAppDataPath + L"persistentdata.bin";
+	// Determine verious directory and file paths in config
+	initDirectories();
 
 	// Startup logging
 	{
-		Log::startup(config.mAppDataPath + L"logfile.txt");
-		LOG_INFO("--- STARTUP ---");
-		LOG_INFO("Logging started");
-		LOG_INFO("Application version: " << appMetaData.mBuildVersion);
+		oxygen::Logging::startup(config.mAppDataPath + L"logfile.txt");
+		RMX_LOG_INFO("--- STARTUP ---");
+		RMX_LOG_INFO("Logging started");
+		RMX_LOG_INFO("Application version: " << appMetaData.mBuildVersionString);
 
 		String commandLine;
 		for (std::string& arg : mArguments)
@@ -276,8 +277,8 @@ bool EngineMain::startupEngine()
 				commandLine.add(' ');
 			commandLine.add(arg);
 		}
-		LOG_INFO("Command line:  " << commandLine.toStdString());
-		LOG_INFO("App data path: " << WString(config.mAppDataPath).toStdString());
+		RMX_LOG_INFO("Command line:  " << commandLine.toStdString());
+		RMX_LOG_INFO("App data path: " << WString(config.mAppDataPath).toStdString());
 	}
 
 	// Load configuration and settings
@@ -285,12 +286,12 @@ bool EngineMain::startupEngine()
 		return false;
 
 	// Setup file system
-	LOG_INFO("File system setup");
+	RMX_LOG_INFO("File system setup");
 	if (!initFileSystem())
 		return false;
 
 	// System
-	LOG_INFO("System initialization...");
+	RMX_LOG_INFO("System initialization...");
 	if (!FTX::System->initialize())
 	{
 		RMX_ERROR("System initialization failed", );
@@ -298,42 +299,42 @@ bool EngineMain::startupEngine()
 	}
 
 	// Video
-	LOG_INFO("Video initialization...");
+	RMX_LOG_INFO("Video initialization...");
 	if (!createWindow())
 	{
 		RMX_ERROR("Unable to create window" << (config.mFailSafeMode ? " in fail-safe mode" : "") << " with error: " << SDL_GetError(), );
 		return false;
 	}
 
-	LOG_INFO("Startup of VideoOut");
-	mVideoOut.startup();
+	RMX_LOG_INFO("Startup of VideoOut");
+	mInternal.mVideoOut.startup();
 
 	// Input manager startup after config is loaded
-	LOG_INFO("Input initialization...");
+	RMX_LOG_INFO("Input initialization...");
 	InputManager::instance().startup();
 
-	LOG_INFO("Startup of ControlsIn");
-	mControlsIn.startup();
+	RMX_LOG_INFO("Startup of ControlsIn");
+	mInternal.mControlsIn.startup();
 
 	// Audio
-	LOG_INFO("Audio initialization...");
+	RMX_LOG_INFO("Audio initialization...");
 	FTX::Audio->initialize(config.mAudioSampleRate, 2, 1024);
 
-	LOG_INFO("Startup of AudioOut");
+	RMX_LOG_INFO("Startup of AudioOut");
 	mAudioOut = &EngineMain::getDelegate().createAudioOut();
 	mAudioOut->startup();
 
 	// Done
-	LOG_INFO("Engine startup successful");
+	RMX_LOG_INFO("Engine startup successful");
 	return true;
 }
 
 void EngineMain::run()
 {
 	// Run RMX application
-	LOG_INFO("");
-	LOG_INFO("--- MAIN LOOP ---");
-	LOG_INFO("Starting main application loop");
+	RMX_LOG_INFO("");
+	RMX_LOG_INFO("--- MAIN LOOP ---");
+	RMX_LOG_INFO("Starting main application loop");
 
 	Application application;
 	FTX::System->run(application);
@@ -344,39 +345,107 @@ void EngineMain::shutdown()
 	destroyWindow();
 
 	// Shutdown subsystems
-	mVideoOut.shutdown();
+	mInternal.mVideoOut.shutdown();
 	if (nullptr != mAudioOut)
 	{
 		mAudioOut->shutdown();
 		SAFE_DELETE(mAudioOut);
 	}
-	mControlsIn.shutdown();
+	mInternal.mControlsIn.shutdown();
 
 	// Shutdown drawer
 	mDrawer.shutdown();
 
 	// Cleanup system
-	LOG_INFO("System shutdown");
+	RMX_LOG_INFO("System shutdown");
 	FTX::Audio->exit();
 	FTX::System->exit();
+	FTX::JobManager->~JobManager();
 
-	mModManager.copyModSettingsToConfig();
+	mInternal.mModManager.copyModSettingsToConfig();
 	Configuration::instance().saveSettings();
-	Log::shutdown();
+	oxygen::Logging::shutdown();
+}
+
+void EngineMain::initDirectories()
+{
+	const EngineDelegateInterface::AppMetaData& appMetaData = mDelegate.getAppMetaData();
+	Configuration& config = Configuration::instance();
+
+#if !defined(PLATFORM_ANDROID)
+	config.mExePath = *String(mArguments[0]).toWString();
+#endif
+
+	// Get app data path
+	{
+	#if defined(PLATFORM_ANDROID)
+		// Android
+		// TODO: Use internal storage path as a fallback?
+		WString storagePath = String(SDL_AndroidGetExternalStoragePath()).toWString();
+		config.mAppDataPath = *(storagePath + L'/');
+	#elif !defined(PLATFORM_IOS)
+		// Choose app data path
+		{
+			const std::wstring appDataPath = PlatformFunctions::getAppDataPath();
+			const bool useLocalSaveDataDirectory = (FTX::FileSystem->exists(L"savedata") || appMetaData.mAppDataFolder.empty() || appDataPath.empty());
+			if (!useLocalSaveDataDirectory)
+			{
+				// This is the default case: Use the app data path
+				config.mAppDataPath = appDataPath + L'/' + appMetaData.mAppDataFolder + L'/';
+			}
+			else
+			{
+				// Special case & fallback: Use local "savedata" path instead
+				std::wstring currentDirectory = rmx::FileSystem::getCurrentDirectory();
+				rmx::FileSystem::normalizePath(currentDirectory, true);
+				config.mAppDataPath = currentDirectory + L"savedata/";
+			}
+		}
+	#endif
+
+		// In any case: Check for redirect there
+		for (int iteration = 0; iteration < 3; ++iteration)
+		{
+			Json::Value redirectRoot = JsonHelper::loadFile(config.mAppDataPath + L"redirect.json");
+			if (redirectRoot.isNull())
+				break;
+
+			JsonHelper rootHelper(redirectRoot);
+			std::wstring redirectedPath;
+			if (!rootHelper.tryReadString("Redirect", redirectedPath))
+				break;
+
+			rmx::FileSystem::normalizePath(redirectedPath, true);
+			if (!FTX::FileSystem->exists(redirectedPath))
+				break;
+
+			config.mAppDataPath = redirectedPath;
+		}
+	}
+
+	config.mSaveStatesDirLocal = config.mAppDataPath + L"savestates/";
+	config.mPersistentDataFilename = config.mAppDataPath + L"persistentdata.bin";
 }
 
 bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 {
-	LOG_INFO("Initializing configuration");
+	RMX_LOG_INFO("Initializing configuration");
 	Configuration& config = Configuration::instance();
 	config.initialization();
 
-	LOG_INFO("Loading configuration");
-#ifdef PLATFORM_MAC
-	config.loadConfiguration(config.mGameDataPath + L"/config.json");
+	RMX_LOG_INFO("Loading configuration");
+	if (FTX::FileSystem->exists(config.mAppDataPath + L"config.json"))
+	{
+		config.loadConfiguration(config.mAppDataPath + L"config.json");
+	}
+	else
+	{
+#if (defined(PLATFORM_MAC) || defined(PLATFORM_IOS)) && defined(ENDUSER)
+		config.loadConfiguration(config.mGameDataPath + L"/config.json");
 #else
-	config.loadConfiguration(L"config.json");
+		config.loadConfiguration(L"config.json");
 #endif
+	}
 
 	// Setup a custom game profile (like S3AIR does) or load the "oxygenproject.json"
 	const bool hasCustomGameProfile = mDelegate.setupCustomGameProfile();
@@ -389,13 +458,13 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 		}
 		if (!config.mProjectPath.empty())
 		{
-			LOG_INFO("Loading game profile");
-			const bool loadedProject = mGameProfile.loadOxygenProjectFromFile(config.mProjectPath + L"oxygenproject.json");
+			RMX_LOG_INFO("Loading game profile");
+			const bool loadedProject = mInternal.mGameProfile.loadOxygenProjectFromFile(config.mProjectPath + L"oxygenproject.json");
 			RMX_CHECK(loadedProject, "Failed to load game profile from '" << *WString(config.mProjectPath).toString() << "oxygenproject.json'", );
 		}
 	}
 
-	LOG_INFO("Loading settings");
+	RMX_LOG_INFO("Loading settings");
 	const bool loadedSettings = config.loadSettings(config.mAppDataPath + L"settings.json", Configuration::SettingsType::STANDARD);
 	config.loadSettings(config.mAppDataPath + L"settings_input.json", Configuration::SettingsType::INPUT);
 	config.loadSettings(config.mAppDataPath + L"settings_global.json", Configuration::SettingsType::GLOBAL);
@@ -408,7 +477,7 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 	// Evaluate fail-safe mode
 	if (config.mFailSafeMode)
 	{
-		LOG_INFO("Using fail-safe mode");
+		RMX_LOG_INFO("Using fail-safe mode");
 		config.mRenderMethod = Configuration::RenderMethod::SOFTWARE;	// Should already be set actually, but why not play it safe
 	}
 	else if (config.mRenderMethod == Configuration::RenderMethod::UNDEFINED)
@@ -416,21 +485,20 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 		config.mRenderMethod = Configuration::RenderMethod::OPENGL_FULL;
 	}
 
-	if (config.mGameRecording == -1)
-	{
-		config.mGameRecording = config.mFailSafeMode ? 0 : 1;
-	}
+	// Respect the platform's settings for supported render methods
+	if (config.mRenderMethod > Configuration::getHighestSupportedRenderMethod())
+		config.mRenderMethod = Configuration::getHighestSupportedRenderMethod();
 
-#ifdef PLATFORM_ANDROID
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
 	// Use fullscreen, with no borders please
+	//  -> Note that this doesn't work for the web version, if running in mobile browsers - we rely on a window with fixed size (see config.json) there
 	config.mWindowMode = Configuration::WindowMode::EXCLUSIVE_FULLSCREEN;
-
-	// Disable game recording, as it's really slow on Android
-	config.mGameRecording = 0;
 #endif
 
-	LOG_INFO(((config.mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Using pure software renderer" :
-			 (config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Using opengl-soft renderer" : "Using opengl-full renderer"));
+	config.evaluateGameRecording();
+
+	RMX_LOG_INFO(((config.mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Using pure software renderer" :
+				  (config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Using opengl-soft renderer" : "Using opengl-full renderer"));
 	return true;
 }
 
@@ -450,37 +518,76 @@ bool EngineMain::initFileSystem()
 	}
 
 	// Add package providers
-	GameProfile& gameProfile = GameProfile::instance();
-	int priority = 0x20;
-	for (const GameProfile::DataPackage& dataPackage : gameProfile.mDataPackages)
-	{
-		const std::wstring basePath = config.mGameDataPath + L"/";
-		PackedFileProvider* provider = new PackedFileProvider(basePath + dataPackage.mFilename);
-		if (provider->isLoaded())
-		{
-			// Mount to "data" in any case, otherwise OxygenApp won't work when the game data path is somewhere different
-			FTX::FileSystem->addManagedFileProvider(*provider);
-			FTX::FileSystem->addMountPoint(*provider, L"data/", L"data/", priority);
-		}
-		else
-		{
-			// Oops, could not load package file
-			delete provider;
+	return loadFilePackages(false);
+}
 
+bool EngineMain::loadFilePackages(bool forceReload)
+{
+	Configuration& config = Configuration::instance();
+	GameProfile& gameProfile = GameProfile::instance();
+	mPackedFileProviders.resize(gameProfile.mDataPackages.size(), nullptr);
+
+	for (size_t index = 0; index < gameProfile.mDataPackages.size(); ++index)
+	{
+		const bool success = loadFilePackageByIndex(index, forceReload);
+		if (!success)
+		{
 			// Is this a required package after all?
+			const GameProfile::DataPackage& dataPackage = gameProfile.mDataPackages[index];
 			if (dataPackage.mRequired)
 			{
-				// We still accept missing packages if data is present in unpacked form
+				// We still accept missing packages if any data is present in unpacked form
 				//  -> Just checking the "icon.png" to know whether that's the case
 				static const bool hasUnpackedData = FTX::FileSystem->exists(config.mGameDataPath + L"/images/icon.png");
-				RMX_CHECK(hasUnpackedData, "Could not find or open package '" << *WString(basePath + dataPackage.mFilename).toString() << "', application will close now again.", return false);
+				RMX_CHECK(hasUnpackedData, "Could not find or open package '" << *WString(dataPackage.mFilename).toString() << "', application will close now again.", return false);
 			}
 		}
-
-		++priority;
 	}
 
 	return true;
+}
+
+bool EngineMain::loadFilePackageByIndex(size_t index, bool forceReload)
+{
+	// Already loaded?
+	if (nullptr != mPackedFileProviders[index])
+	{
+		if (forceReload)
+		{
+			FTX::FileSystem->destroyManagedFileProvider(*mPackedFileProviders[index]);
+			mPackedFileProviders[index] = nullptr;
+		}
+		else
+		{
+			// Just ignore that one, it's already loaded
+			return true;
+		}
+	}
+
+	const GameProfile::DataPackage& dataPackage = GameProfile::instance().mDataPackages[index];
+	Configuration& config = Configuration::instance();
+
+	// First try loading from game installation
+	const std::wstring gameDataBasePath = config.mGameDataPath + L"/";
+	PackedFileProvider* provider = PackedFileProvider::createPackedFileProvider(gameDataBasePath + dataPackage.mFilename);
+	if (nullptr == provider)
+	{
+		// Then try loading from save data (e.g. downloaded packages)
+		const std::wstring saveDataBasePath = config.mAppDataPath + L"/data/";
+		provider = PackedFileProvider::createPackedFileProvider(saveDataBasePath + dataPackage.mFilename);
+	}
+
+	if (nullptr != provider)
+	{
+		// Mount to "data" in any case, otherwise OxygenApp won't work when the game data path is somewhere different
+		FTX::FileSystem->addManagedFileProvider(*provider);
+		FTX::FileSystem->addMountPoint(*provider, L"data/", L"data/", 0x20 + (int)index);
+		mPackedFileProviders[index] = provider;
+		return true;
+	}
+
+	// Failed
+	return false;
 }
 
 bool EngineMain::createWindow()
@@ -492,50 +599,59 @@ bool EngineMain::createWindow()
 
 	// Setup video config
 	rmx::VideoConfig videoConfig(config.mWindowMode != Configuration::WindowMode::WINDOWED, config.mWindowSize.x, config.mWindowSize.y, appMetaData.mTitle.c_str());
-	videoConfig.renderer = useOpenGL ? rmx::VideoConfig::Renderer::OPENGL : rmx::VideoConfig::Renderer::SOFTWARE;
-	videoConfig.resizeable = true;
-	videoConfig.autoclearscreen = useOpenGL;
-	videoConfig.autoswapbuffers = false;
-	videoConfig.vsync = (config.mFrameSync >= 1);
-	videoConfig.iconResource = appMetaData.mWindowsIconResource;
+	videoConfig.mRenderer = useOpenGL ? rmx::VideoConfig::Renderer::OPENGL : rmx::VideoConfig::Renderer::SOFTWARE;
+	videoConfig.mResizeable = true;
+	videoConfig.mAutoClearScreen = useOpenGL;
+	videoConfig.mAutoSwapBuffers = false;
+	videoConfig.mVSync = (config.mFrameSync >= Configuration::FrameSyncType::VSYNC_ON);
+	videoConfig.mIconResource = appMetaData.mWindowsIconResource;
 
-	SDL_SetHint(SDL_HINT_RENDER_VSYNC, videoConfig.vsync ? "1" : "0");
+	SDL_SetHint(SDL_HINT_RENDER_VSYNC, videoConfig.mVSync ? "1" : "0");
 
 #if defined(LOAD_APP_ICON_PNG)
 	// Load app icon
 	if (!appMetaData.mIconFile.empty())
 	{
-		LOG_INFO("Loading application icon...");
-		FileHelper::loadBitmap(videoConfig.iconBitmap, appMetaData.mIconFile);
+		RMX_LOG_INFO("Loading application icon...");
+		FileHelper::loadBitmap(videoConfig.mIconBitmap, appMetaData.mIconFile);
 	}
 #endif
 
 	if (useOpenGL)
 	{
 		// Set SDL OpenGL attributes
-		LOG_INFO("Setup of OpenGL attributes...");
-	#ifndef RMX_USE_GLES2
+		RMX_LOG_INFO("Setup of OpenGL attributes...");
+	#if !defined(RMX_USE_GLES2)
 		{
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-
-		#ifdef PLATFORM_MAC
+			// OpenGL 3.1 or 3.2
+			const int majorVersion = 3;
+		#if defined(PLATFORM_MAC)
 			// macOS needs OpenGL 3.2 for GLSL 140 shaders to work. https://stackoverflow.com/a/31805596
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+			const int minorVersion = 2;
 		#else
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+			const int minorVersion = 1;
 
 			SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		#endif
+
+			RMX_LOG_INFO("Using OpenGL " << majorVersion << "." << minorVersion);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minorVersion);
 		}
 	#else
 		{
+			// GL ES 2.0
+			const int majorVersion = 2;
+			const int minorVersion = 0;
+
+			RMX_LOG_INFO("Using OpenGL ES " << majorVersion << "." << minorVersion);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minorVersion);
 		}
 	#endif
 	}
@@ -550,7 +666,7 @@ bool EngineMain::createWindow()
 			case Configuration::WindowMode::WINDOWED:
 			{
 				// (Non-maximized) Window
-				if (videoConfig.resizeable)
+				if (videoConfig.mResizeable)
 					flags |= SDL_WINDOW_RESIZABLE;
 				break;
 			}
@@ -561,16 +677,16 @@ bool EngineMain::createWindow()
 				SDL_Rect rect;
 				if (SDL_GetDisplayBounds(displayIndex, &rect) == 0)
 				{
-					videoConfig.rect.width = rect.w;
-					videoConfig.rect.height = rect.h;
+					videoConfig.mWindowRect.width = rect.w;
+					videoConfig.mWindowRect.height = rect.h;
 				}
 				else
 				{
 					SDL_DisplayMode dm;
 					if (SDL_GetDesktopDisplayMode(displayIndex, &dm) == 0)
 					{
-						videoConfig.rect.width = dm.w;
-						videoConfig.rect.height = dm.h;
+						videoConfig.mWindowRect.width = dm.w;
+						videoConfig.mWindowRect.height = dm.h;
 					}
 				}
 				flags |= SDL_WINDOW_BORDERLESS;
@@ -586,29 +702,29 @@ bool EngineMain::createWindow()
 			}
 		}
 
-		LOG_INFO("Creating window...");
-		mSDLWindow = SDL_CreateWindow(*videoConfig.caption, SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), videoConfig.rect.width, videoConfig.rect.height, flags);
+		RMX_LOG_INFO("Creating window...");
+		mSDLWindow = SDL_CreateWindow(*videoConfig.mCaption, SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), videoConfig.mWindowRect.width, videoConfig.mWindowRect.height, flags);
 		if (nullptr == mSDLWindow)
 		{
 			return false;
 		}
 
-		LOG_INFO("Retrieving actual window size...");
-		SDL_GetWindowSize(mSDLWindow, &videoConfig.rect.width, &videoConfig.rect.height);
-		SDL_ShowCursor(!videoConfig.hidecursor);
+		RMX_LOG_INFO("Retrieving actual window size...");
+		SDL_GetWindowSize(mSDLWindow, &videoConfig.mWindowRect.width, &videoConfig.mWindowRect.height);
+		SDL_ShowCursor(!videoConfig.mHideCursor);
 
 		if (useOpenGL)
 		{
-			LOG_INFO("Creating OpenGL context...");
+			RMX_LOG_INFO("Creating OpenGL context...");
 			SDL_GLContext context = SDL_GL_CreateContext(mSDLWindow);
 			if (nullptr != context)
 			{
-				LOG_INFO("Vsync setup...");
+				RMX_LOG_INFO("Vsync setup...");
 				setVSyncMode(config.mFrameSync);
 			}
 			else
 			{
-				LOG_INFO("Failed to create OpenGL context, fallback to pure software renderer");
+				RMX_LOG_INFO("Failed to create OpenGL context, fallback to pure software renderer");
 				config.mRenderMethod = Configuration::RenderMethod::SOFTWARE;
 				// TODO: In this case, the SDL window was created with SDL_WINDOW_OPENGL flag, but that does not seem to be a problem
 			}
@@ -616,13 +732,21 @@ bool EngineMain::createWindow()
 	}
 
 	// Create drawer depending on render method
-	if (config.mRenderMethod == Configuration::RenderMethod::SOFTWARE)
+#ifdef RMX_WITH_OPENGL_SUPPORT
+	if (config.mRenderMethod >= Configuration::RenderMethod::OPENGL_SOFT)
 	{
-		mDrawer.createDrawer<SoftwareDrawer>();
+		if (!mDrawer.createDrawer<OpenGLDrawer>())
+		{
+			// Fallback to software drawer
+			RMX_LOG_INFO("OpenGL drawer setup failed, using software rendering");
+			config.mRenderMethod = Configuration::RenderMethod::SOFTWARE;
+			mDrawer.createDrawer<SoftwareDrawer>();
+		}
 	}
 	else
+#endif
 	{
-		mDrawer.createDrawer<OpenGLDrawer>();
+		mDrawer.createDrawer<SoftwareDrawer>();
 	}
 
 	// Tell FTX video manager that everything is okay
@@ -630,24 +754,24 @@ bool EngineMain::createWindow()
 
 #if defined(PLATFORM_WINDOWS)
 	// Set window icon (using a Windows-specific method)
-	if (videoConfig.iconResource != 0)
+	if (videoConfig.mIconResource != 0)
 	{
-		LOG_INFO("Setting window icon (Windows)...");
-		PlatformFunctions::setAppIcon(videoConfig.iconResource);
+		RMX_LOG_INFO("Setting window icon (Windows)...");
+		PlatformFunctions::setAppIcon(videoConfig.mIconResource);
 	}
 #endif
 
 #if defined(LOAD_APP_ICON_PNG)
 	// Set window icon (using SDL functionality)
-	if (nullptr != videoConfig.iconBitmap.getData() || videoConfig.iconSource.nonEmpty())
+	if (nullptr != videoConfig.mIconBitmap.getData() || videoConfig.mIconSource.nonEmpty())
 	{
-		LOG_INFO("Setting window icon from loaded bitmap...");
+		RMX_LOG_INFO("Setting window icon from loaded bitmap...");
 		Bitmap tmp;
-		Bitmap* bitmap = &videoConfig.iconBitmap;
-		if (bitmap->mData == nullptr)
+		Bitmap* bitmap = &videoConfig.mIconBitmap;
+		if (bitmap->empty())
 		{
 			bitmap = nullptr;
-			if (tmp.load(videoConfig.iconSource.toWString()))
+			if (tmp.load(videoConfig.mIconSource.toWString()))
 			{
 				bitmap = &tmp;
 			}
@@ -656,7 +780,7 @@ bool EngineMain::createWindow()
 		if (nullptr != bitmap)
 		{
 			bitmap->rescale(32, 32);
-			SDL_Surface* icon = SDL_CreateRGBSurfaceFrom(bitmap->mData, 32, 32, 32, bitmap->mWidth * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+			SDL_Surface* icon = SDL_CreateRGBSurfaceFrom(bitmap->getData(), 32, 32, 32, bitmap->getWidth() * sizeof(uint32), 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 			SDL_SetWindowIcon(mSDLWindow, icon);
 			SDL_FreeSurface(icon);
 		}
@@ -668,7 +792,7 @@ bool EngineMain::createWindow()
 
 void EngineMain::destroyWindow()
 {
-	mVideoOut.destroyRenderer();
+	mInternal.mVideoOut.destroyRenderer();
 	mDrawer.destroyDrawer();
 	SDL_DestroyWindow(mSDLWindow);
 	mSDLWindow = nullptr;

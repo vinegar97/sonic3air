@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,7 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/simulation/LemonScriptRuntime.h"
-#include "oxygen/simulation/LemonScriptBindings.h"
+#include "oxygen/simulation/bindings/LemonScriptBindings.h"
 #include "oxygen/simulation/LemonScriptProgram.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LogDisplay.h"
@@ -18,7 +18,6 @@
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/helper/Utils.h"
 
-#include <lemon/compiler/Compiler.h>
 #include <lemon/compiler/TokenManager.h>
 #include <lemon/program/GlobalsLookup.h>
 #include <lemon/program/Module.h>
@@ -32,12 +31,12 @@ namespace
 
 	class RuntimeDetailHandler final : public lemon::RuntimeDetailHandler
 	{
-		void preExecuteExternalFunction(const lemon::UserDefinedFunction& function, const lemon::ControlFlow& controlFlow) override
+		void preExecuteExternalFunction(const lemon::NativeFunction& function, const lemon::ControlFlow& controlFlow) override
 		{
 			Profiling::pushRegion(ProfilingRegion::SIMULATION_USER_CALL);
 		}
 
-		void postExecuteExternalFunction(const lemon::UserDefinedFunction& function, const lemon::ControlFlow& controlFlow) override
+		void postExecuteExternalFunction(const lemon::NativeFunction& function, const lemon::ControlFlow& controlFlow) override
 		{
 			Profiling::popRegion(ProfilingRegion::SIMULATION_USER_CALL);
 		}
@@ -46,57 +45,8 @@ namespace
 
 	bool isOperatorToken(const lemon::Token& token, lemon::Operator op)
 	{
-		return (token.getType() == lemon::Token::Type::OPERATOR) && (token.as<lemon::OperatorToken>().mOperator == op);
+		return token.isA<lemon::OperatorToken>() && (token.as<lemon::OperatorToken>().mOperator == op);
 	}
-
-
-	// TODO: Move this into a helper!
-	class PragmaSplitter
-	{
-	public:
-		struct Entry
-		{
-			std::string mArgument;
-			std::string mValue;
-		};
-		std::vector<Entry> mEntries;
-
-	public:
-		PragmaSplitter(const std::string& input)
-		{
-			size_t pos = 0;
-			while (pos < input.length())
-			{
-				// Skip all spaces
-				while (pos < input.length() && input[pos] == 32)
-					++pos;
-
-				if (pos < input.length())
-				{
-					const size_t startPos = pos;
-					while (pos < input.length() && input[pos] != 32)
-						++pos;
-
-					mEntries.emplace_back();
-
-					// Split part string into argument and value
-					const std::string part = input.substr(startPos, pos - startPos);
-					const size_t left = part.find_first_of('(');
-					if (left != std::string::npos)
-					{
-						RMX_CHECK(part.back() == ')', "No matching parentheses in pragma found", continue);
-
-						mEntries.back().mArgument = part.substr(0, left);
-						mEntries.back().mValue = part.substr(left + 1, part.length() - left - 2);
-					}
-					else
-					{
-						mEntries.back().mArgument = part;
-					}
-				}
-			}
-		}
-	};
 
 }
 
@@ -110,24 +60,23 @@ struct LemonScriptRuntime::Internal
 
 
 
-bool LemonScriptRuntime::getCurrentScriptFunction(std::string* outFunctionName, std::wstring* outFileName, uint32* outLineNumber, std::string* outModuleName)
+bool LemonScriptRuntime::getCurrentScriptFunction(std::string_view* outFunctionName, std::wstring* outFileName, uint32* outLineNumber, std::string* outModuleName)
 {
-	lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
-	if (nullptr == runtime)
+	lemon::ControlFlow* controlFlow = lemon::Runtime::getActiveControlFlow();
+	if (nullptr == controlFlow)
 		return false;
 
 	lemon::ControlFlow::Location location;
-	runtime->getLastStepLocation(location);
+	controlFlow->getLastStepLocation(location);
 	if (nullptr == location.mFunction)
 		return false;
 
-	const auto& opcodes = location.mFunction->mOpcodes;
 	if (nullptr != outFunctionName)
-		*outFunctionName = location.mFunction->getName();
+		*outFunctionName = location.mFunction->getName().getString();
 	if (nullptr != outFileName)
-		*outFileName = location.mFunction->mSourceFilename;
+		*outFileName = location.mFunction->mSourceFileInfo->mFilename;
 	if (nullptr != outLineNumber)
-		*outLineNumber = ((location.mProgramCounter < opcodes.size()) ? opcodes[location.mProgramCounter].mLineNumber : opcodes.back().mLineNumber) - location.mFunction->mSourceBaseLineOffset;
+		*outLineNumber = getLineNumberInFile(*location.mFunction, location.mProgramCounter);
 	if (nullptr != outModuleName)
 		*outModuleName = location.mFunction->getModule().getModuleName();
 	return true;
@@ -135,24 +84,24 @@ bool LemonScriptRuntime::getCurrentScriptFunction(std::string* outFunctionName, 
 
 std::string LemonScriptRuntime::getCurrentScriptLocationString()
 {
-	lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
-	if (nullptr == runtime)
+	lemon::ControlFlow* controlFlow = lemon::Runtime::getActiveControlFlow();
+	if (nullptr == controlFlow)
 		return "";
 
-	return buildScriptLocationString(*runtime);
+	return buildScriptLocationString(*controlFlow);
 }
 
-const std::string* LemonScriptRuntime::tryResolveStringHash(uint64 hash)
+const std::string_view* LemonScriptRuntime::tryResolveStringHash(uint64 hash)
 {
 	lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
 	if (nullptr == runtime)
 		return nullptr;
 
-	const lemon::StoredString* str = runtime->resolveStringByKey(hash);
+	const lemon::FlyweightString* str = runtime->resolveStringByKey(hash);
 	if (nullptr == str)
 		return nullptr;
 
-	return &str->getString();
+	return &str->getStringRef();
 }
 
 
@@ -219,7 +168,7 @@ bool LemonScriptRuntime::callAddressHook(uint32 address)
 	const lemon::RuntimeFunction** runtimeFunctionPtr = mInternal.mAddressHookLookup.find(address);
 	if (nullptr != runtimeFunctionPtr)
 	{
-		mInternal.mRuntime.callFunction(**runtimeFunctionPtr);
+		mInternal.mRuntime.callRuntimeFunction(**runtimeFunctionPtr);
 	}
 	else
 	{
@@ -234,7 +183,7 @@ bool LemonScriptRuntime::callAddressHook(uint32 address)
 		if (nullptr != runtimeFunction)
 		{
 			mInternal.mAddressHookLookup.add(address, runtimeFunction);
-			mInternal.mRuntime.callFunction(*runtimeFunction);
+			mInternal.mRuntime.callRuntimeFunction(*runtimeFunction);
 		}
 		else
 		{
@@ -250,23 +199,23 @@ void LemonScriptRuntime::callFunction(const lemon::ScriptFunction& function)
 	mInternal.mRuntime.callFunction(function);
 }
 
-bool LemonScriptRuntime::callFunctionByName(const std::string& functionName, bool showErrorOnFail)
+bool LemonScriptRuntime::callFunctionByName(lemon::FlyweightString functionName, bool showErrorOnFail)
 {
 	return callFunctionByNameAtLabel(functionName, "", showErrorOnFail);
 }
 
-bool LemonScriptRuntime::callFunctionByNameAtLabel(const std::string& functionName, const std::string& labelName, bool showErrorOnFail)
+bool LemonScriptRuntime::callFunctionByNameAtLabel(lemon::FlyweightString functionName, lemon::FlyweightString labelName, bool showErrorOnFail)
 {
 	const bool success = mInternal.mRuntime.callFunctionByName(functionName, labelName);
 	if (!success && showErrorOnFail)
 	{
-		if (labelName.empty())
+		if (labelName.isEmpty())
 		{
-			RMX_ERROR("Failed to call function '" + functionName + "'", );
+			RMX_ERROR("Failed to call function '" << functionName.getString() << "'", );
 		}
 		else
 		{
-			RMX_ERROR("Failed to call label '" + labelName + "' in '" + functionName + "'", );
+			RMX_ERROR("Failed to call label '" << labelName.getString() << "' in '" << functionName.getString() << "'", );
 		}
 	}
 	return success;
@@ -295,10 +244,10 @@ void LemonScriptRuntime::getCallStackWithLabels(CallStackWithLabels& outCallStac
 	mInternal.mRuntime.getMainControlFlow().getCallStack(locations);
 	for (const lemon::ControlFlow::Location& location : locations)
 	{
-		const std::string* labelName = location.mFunction->findLabelByOffset(location.mProgramCounter);
-		if (nullptr != labelName)
+		const lemon::ScriptFunction::Label* label = location.mFunction->findLabelByOffset(location.mProgramCounter);
+		if (nullptr != label)
 		{
-			outCallStack.emplace_back(location.mFunction->getName(), *labelName);
+			outCallStack.emplace_back(location.mFunction->getName().getString(), label->mName.getString());
 		}
 	}
 }
@@ -309,76 +258,55 @@ const lemon::Function* LemonScriptRuntime::getCurrentFunction() const
 	return (nullptr == runtimeFunction) ? nullptr : runtimeFunction->mFunction;
 }
 
-void LemonScriptRuntime::setGlobalVariableValue(const std::string& variableName, uint64 value)
+int64 LemonScriptRuntime::getGlobalVariableValue_int64(lemon::FlyweightString variableName)
 {
-	lemon::Variable* variable = mProgram.getGlobalVariableByHash(rmx::getMurmur2_64(variableName));
+	lemon::Variable* variable = mProgram.getGlobalVariableByHash(variableName.getHash());
 	if (nullptr != variable)
 	{
-		mInternal.mRuntime.setGlobalVariableValue(*variable, value);
+		return mInternal.mRuntime.getGlobalVariableValue_int64(*variable);
+	}
+	return 0;
+}
+
+void LemonScriptRuntime::setGlobalVariableValue_int64(lemon::FlyweightString variableName, int64 value)
+{
+	lemon::Variable* variable = mProgram.getGlobalVariableByHash(variableName.getHash());
+	if (nullptr != variable)
+	{
+		mInternal.mRuntime.setGlobalVariableValue_int64(*variable, value);
 	}
 }
 
 void LemonScriptRuntime::getLastStepLocation(const lemon::ScriptFunction*& outFunction, size_t& outProgramCounter) const
 {
 	lemon::ControlFlow::Location location;
-	mInternal.mRuntime.getLastStepLocation(location);
+	mInternal.mRuntime.getSelectedControlFlow().getLastStepLocation(location);
 	outFunction = location.mFunction;
 	outProgramCounter = location.mProgramCounter;
 }
 
 std::string LemonScriptRuntime::getOwnCurrentScriptLocationString() const
 {
-	return buildScriptLocationString(mInternal.mRuntime);
+	return buildScriptLocationString(mInternal.mRuntime.getSelectedControlFlow());
 }
 
-std::string LemonScriptRuntime::buildScriptLocationString(lemon::Runtime& runtime)
+std::string LemonScriptRuntime::buildScriptLocationString(const lemon::ControlFlow& controlFlow)
 {
 	lemon::ControlFlow::Location location;
-	runtime.getLastStepLocation(location);
+	controlFlow.getLastStepLocation(location);
 	if (nullptr == location.mFunction)
 		return "";
 
-	const auto& opcodes = location.mFunction->mOpcodes;
-	const std::string& functionName = location.mFunction->getName();
-	const std::wstring& fileName = location.mFunction->mSourceFilename;
-	uint32 lineNumber = ((location.mProgramCounter < opcodes.size()) ? opcodes[location.mProgramCounter].mLineNumber : opcodes.back().mLineNumber) - location.mFunction->mSourceBaseLineOffset;
+	const std::string functionName(location.mFunction->getName().getString());
+	const std::wstring& fileName = location.mFunction->mSourceFileInfo->mFilename;
+	const uint32 lineNumber = getLineNumberInFile(*location.mFunction, location.mProgramCounter);
 	const std::string& moduleName = location.mFunction->getModule().getModuleName();
-	return "function '" + functionName + "' at line " + std::to_string(lineNumber) + " of file '" + WString(fileName).toStdString() + "' in module '" + moduleName + "'";	return std::string();
+	return "function '" + functionName + "' at line " + std::to_string(lineNumber) + " of file '" + WString(fileName).toStdString() + "' in module '" + moduleName + "'";
 }
 
-bool LemonScriptRuntime::loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename, const lemon::PreprocessorDefinitionMap& preprocessorDefinitions)
+uint32 LemonScriptRuntime::getLineNumberInFile(const lemon::ScriptFunction& function, size_t programCounter)
 {
-	try
-	{
-		// Compile script source
-		lemon::Compiler::CompileOptions options;
-		options.mPreprocessorDefinitions = preprocessorDefinitions;
-		//options.mOutputCombinedSource = L"combined_source.lemon";	// Just for debugging preprocessor issues
-		//options.mOutputTranslatedSource = L"output.cpp";			// For testing translation
-		lemon::Compiler compiler(module, globalsLookup, options);
-
-		const bool compileSuccess = compiler.loadScript(filename);
-		if (!compileSuccess && !compiler.getErrors().empty())
-		{
-			for (const auto& error : compiler.getErrors())
-			{
-				LogDisplay::instance().addLogError(String(0, "Compile error: %s (in '%s', line %d)", error.mMessage.c_str(), *WString(error.mFilename).toString(), error.mLineNumber));
-			}
-
-			const auto& error = compiler.getErrors().front();
-			std::string text = "Script compile error:\n" + error.mMessage + "\n";
-			if (error.mFilename.empty())
-				text += "in module " + module.getModuleName();
-			else
-				text += "in file '" + WString(error.mFilename).toStdString() + "', line " + std::to_string(error.mLineNumber) + ", of module '" + module.getModuleName() + "'";
-			RMX_ERROR(text, );
-			return false;
-		}
-	}
-	catch (...)
-	{
-		return false;
-	}
-
-	return true;
+	const auto& opcodes = function.mOpcodes;
+	const uint32 lineNumber = (programCounter < opcodes.size()) ? opcodes[programCounter].mLineNumber : opcodes.back().mLineNumber;
+	return (lineNumber < function.mSourceBaseLineOffset) ? 0 : (lineNumber - function.mSourceBaseLineOffset);
 }

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -51,15 +51,14 @@ private:
 	void onAccept(bool loadingAllowed, bool savingAllowed);
 
 private:
-	bool mIsActive;
+	bool mIsActive = false;
 	bool mHadFirstUpdate = false;
-	bool mForLoading;
+	bool mForLoading = true;
 	bool mEditing = false;
-
 	std::vector<Entry> mEntries;
 	std::wstring mSaveStateDirectory[2];
 
-	uint32 mHighlightedIndex;
+	uint32 mHighlightedIndex = 0;
 	std::wstring mHighlightedName;
 
 	bool mHasPreview = false;

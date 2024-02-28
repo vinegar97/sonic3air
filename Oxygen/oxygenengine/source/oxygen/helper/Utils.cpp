@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,7 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/helper/Utils.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/utils/PaletteBitmap.h"
 #include <rmxmedia.h>
 
@@ -75,6 +75,59 @@ namespace utils
 		}
 	}
 
+	void splitTextIntoLines(std::vector<std::string_view>& outLines, std::string_view text, Font& font, int maxLineWidth)
+	{
+		outLines.clear();
+		std::string_view line;
+		size_t lineStart = 0;
+		size_t position = 0;
+		while (position < text.length())
+		{
+			const size_t start = position;
+			while (position < text.length() && text[position] != ' ' && text[position] != '\n')
+				++position;
+
+			if (position > start)	// Ignore multiple spaces
+			{
+				if (line.empty())
+				{
+					lineStart = start;
+					line = text.substr(start, position - start);
+				}
+				else
+				{
+					const std::string_view linePlusWord = text.substr(lineStart, position - lineStart);
+					if (font.getWidth(linePlusWord) <= maxLineWidth)
+					{
+						line = linePlusWord;
+					}
+					else
+					{
+						// New line needed
+						outLines.emplace_back(line);
+						lineStart = start;
+						line = text.substr(start, position - start);
+					}
+				}
+			}
+
+			if (position < text.length() && text[position] == '\n')
+			{
+				// New line needed
+				outLines.emplace_back(line);
+				lineStart = position + 1;
+				line = std::string_view();
+			}
+
+			++position;
+		}
+
+		if (!line.empty())
+		{
+			outLines.emplace_back(line);
+		}
+	}
+
 	void shortenTextToFit(std::string& text, Font& font, int maxLineWidth)
 	{
 		// Any change needed at all?
@@ -99,6 +152,60 @@ namespace utils
 		}
 	}
 
+	uint32 getVersionNumberFromString(const std::string& versionString)
+	{
+		// Version string is expected to use the following format: "XX.XX.XX" or "XX.XX.XX.X" with X being decimal digits
+		if (versionString.length() < 8)
+			return 0;
+
+		// If there's a 'v' at the start, skip that one
+		size_t pos = 0;
+		if (versionString[0] == 'v')
+			++pos;
+
+		uint32 output = 0;
+		uint8 currentNumber = 0;
+		int currentNumDigits = 0;
+		int shiftOffset = 24;
+		for (; pos < versionString.length(); ++pos)
+		{
+			if (versionString[pos] == '.')
+			{
+				if (currentNumDigits == 0)
+					return 0;
+				if (shiftOffset <= 0)
+					return 0;
+				output |= ((uint32)currentNumber << shiftOffset);
+				shiftOffset -= 8;
+				currentNumber = 0;
+				currentNumDigits = 0;
+			}
+			else
+			{
+				const int digit = (versionString[pos] - '0');
+				if (digit < 0 || digit > 9)
+					return 0;
+				if (currentNumDigits >= 2)
+					return 0;
+				currentNumber = (currentNumber << 4) + (uint8)digit;
+				++currentNumDigits;
+			}
+		}
+
+		if (currentNumDigits == 0)
+			return 0;
+		if (shiftOffset > 8)	// Both 0 and 8 are allowed
+			return 0;
+		output |= ((uint32)currentNumber << shiftOffset);
+
+		return output;
+	}
+
+	std::string getVersionStringFromNumber(uint32 versionNumber)
+	{
+		return String(0, "%02x.%02x.%02x.%x", (versionNumber >> 24) & 0xff, (versionNumber >> 16) & 0xff, (versionNumber >> 8) & 0xff, versionNumber & 0xff).toStdString();
+	}
+
 	void buildSpriteAtlas(const std::wstring& outputFilename, const std::wstring& imagesFileMask)
 	{
 		FileCrawler fc;
@@ -116,7 +223,7 @@ namespace utils
 			Bitmap& bitmap = vectorAdd(sprites);
 			if (bitmap.load(fc[fileIndex]->mPath + fc[fileIndex]->mFilename))
 			{
-				spriteAtlas.add((uint32)sprites.size(), Vec2i(bitmap.mWidth, bitmap.mHeight));
+				spriteAtlas.add((uint32)sprites.size(), bitmap.getSize());
 			}
 			else
 			{

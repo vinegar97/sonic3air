@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oxygen/application/input/InputConfig.h"
+#include "oxygen/application/input/RumbleEffectQueue.h"
 
 
 class InputManager;
@@ -22,7 +23,7 @@ class InputFeeder
 {
 public:
 	virtual ~InputFeeder();
-	
+
 	void registerAtInputManager(InputManager& inputManager);
 	void unregisterAtInputManager();
 
@@ -59,11 +60,13 @@ public:
 		bool mChange = false;
 		bool mRepeat = false;
 		float mRepeatTimeout = 0.0f;
+		int mPlayerIndex = 0;
 
-		inline bool isPressed() const	{ return mState; }
-		inline bool hasChanged() const	{ return mChange; }
-		inline bool justPressed() const	{ return mState && mChange; }
+		inline bool isPressed() const			{ return mState; }
+		inline bool hasChanged() const			{ return mChange; }
+		inline bool justPressed() const			{ return mState && mChange; }
 		inline bool justPressedOrRepeat() const	{ return justPressed() || mRepeat; }
+		inline bool justReleased() const		{ return !mState && mChange; }
 
 		void clearInputs();
 		void addInput(RealDevice& device, InputConfig::Assignment::Type type, uint32 index);
@@ -82,6 +85,8 @@ public:
 		Control Y;
 		Control Start;
 		Control Back;
+		Control L;
+		Control R;
 	};
 
 	struct Touch
@@ -102,6 +107,7 @@ public:
 		SDL_Joystick* mSDLJoystick = nullptr;
 		SDL_GameController* mSDLGameController = nullptr;
 		int32 mSDLJoystickInstanceId = 0;			// This changes every time the controller is reconnected, but stays fixed from there on
+		bool mSupportsRumble = false;
 		std::vector<InputConfig::ControlMapping> mControlMappings;
 		int mAssignedPlayer = 0;
 		bool mDirty = false;		// Only for temporary use
@@ -119,6 +125,8 @@ public:
 	InputManager();
 
 	void startup();
+	void enableTouchInput(bool enable);
+
 	void updateInput(float timeElapsed);
 	void injectSDLInputEvent(const SDL_Event& ev);
 
@@ -143,6 +151,7 @@ public:
 	InputConfig::DeviceDefinition* getDeviceDefinition(const RealDevice& device) const;
 	const std::vector<InputConfig::Assignment>* getControlMapping(const RealDevice& device, InputConfig::DeviceDefinition::Button button) const;
 	void redefineControlMapping(const RealDevice& device, InputConfig::DeviceDefinition::Button button, const std::vector<InputConfig::Assignment>& newAssignments);
+	uint32 getMappingsChangeCounter() const  { return mMappingsChangeCounter; }
 
 	void registerInputFeeder(InputFeeder& inputFeeder);
 	void unregisterInputFeeder(InputFeeder& inputFeeder);
@@ -154,7 +163,14 @@ public:
 
 	void setControlState(Control& control, bool pressed);
 	void setTouchInputMode(TouchInputMode mode);
-	void setControllerLEDsForPlayer(int playerIndex, const Color& color);
+
+	void resetControllerRumbleForPlayer(int playerIndex);
+	void setControllerRumbleForPlayer(int playerIndex, float lowFrequencyRumble, float highFrequencyRumble, uint32 milliseconds);
+
+	void setControllerLEDsForPlayer(int playerIndex, const Color& color) const;
+
+	inline bool isUsingControlsLR() const  { return mUsingControlsLR; }
+	void handleActiveModsChanged();
 
 private:
 	enum class WaitInputState
@@ -170,28 +186,43 @@ private:
 		// The joystick / game controller name is stored in Configuration instead
 	};
 
+	struct Player
+	{
+		ControllerScheme mController;
+		std::vector<Control*> mPlayerControls;
+		PreferredGamepad mPreferredGamepad;
+		RumbleEffectQueue mRumbleEffectQueue;
+		RealDevice* mLastInputDevice = nullptr;
+		RealDevice* mRumblingDevice = nullptr;
+	};
+
 private:
 	RealDevice* findGamepadBySDLJoystickInstanceId(int32 joystickInstanceId);
-	InputConfig::DeviceDefinition* getInputDeviceDefinitionByIdentifier(const std::string& identifier) const;
+	InputConfig::DeviceDefinition* getInputDeviceDefinitionByIdentifier(std::string_view identifier) const;
 
 	bool isPressed(const Control& control);
 	bool isPressed(const ControlInput& input);
 	bool isPressed(SDL_Joystick* joystick, const ControlInput& input);
 
+	void reapplyControllerRumble(int playerIndex);
+	void stopControllerRumbleForDevice(RealDevice& device);
+
 private:
-	ControllerScheme mController[2];
+	static const constexpr size_t NUM_PLAYERS = 2;
+	Player mPlayers[NUM_PLAYERS];
 
 	std::vector<Control*> mAllControls;
 	std::vector<RealDevice> mKeyboards;
 	std::vector<RealDevice> mGamepads;
-	PreferredGamepad mPreferredGamepadByPlayer[2];
 	int mLastCheckJoysticks = 0;
 	uint32 mGamepadsChangeCounter = 0;		// Gets increased whenever a gamepad is connected or unplugged
+	uint32 mMappingsChangeCounter = 0;		// Gets increased whenever the buttons mappings get changed
 
 	std::set<InputFeeder*> mInputFeeders;
 
 	std::set<SDL_Keycode> mOneFrameKeyboardInputs;
 
+	bool mTouchInputEnabled = false;
 	std::vector<Touch> mActiveTouches;
 
 	// Device type of last input -- for keyboard and gamepads, this is affected only by assigned controls, not by any pressed keys/buttons
@@ -202,4 +233,6 @@ private:
 
 	TouchInputMode mTouchInputMode = TouchInputMode::HIDDEN_CONTROLS;
 	WaitInputState mWaitingForSingleInput = WaitInputState::NONE;
+
+	bool mUsingControlsLR = false;
 };

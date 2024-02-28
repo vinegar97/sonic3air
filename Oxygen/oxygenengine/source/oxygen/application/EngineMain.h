@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -14,17 +14,9 @@
 class AudioOutBase;
 class CodeExec;
 class Configuration;
-class GameProfile;
-class ControlsIn;
-class InputManager;
-class ModManager;
-class VideoOut;
-class ResourcesCache;
+class EmulatorInterface;
 class LogDisplay;
-class PersistentData;
-#if defined (PLATFORM_ANDROID)
-	class AndroidJavaInterface;
-#endif
+class PackedFileProvider;
 
 namespace lemon
 {
@@ -40,8 +32,9 @@ public:
 	{
 		std::string  mTitle;
 		std::wstring mIconFile;
-		int			 mWindowsIconResource;
-		std::string	 mBuildVersion;
+		int			 mWindowsIconResource = 0;
+		std::string	 mBuildVersionString;
+		uint32		 mBuildVersionNumber;
 		std::wstring mAppDataFolder;
 	};
 
@@ -53,7 +46,7 @@ public:
 	virtual bool onEnginePreStartup() = 0;
 	virtual bool setupCustomGameProfile() = 0;
 
-	virtual void startupGame() = 0;
+	virtual void startupGame(EmulatorInterface& emulatorInterface) = 0;
 	virtual void shutdownGame() = 0;
 	virtual void updateGame(float timeElapsed) = 0;
 
@@ -71,6 +64,7 @@ public:
 	virtual bool mayLoadScriptMods() = 0;
 	virtual bool allowModdedData() = 0;
 	virtual bool useDeveloperFeatures() = 0;
+	virtual void onActiveModsChanged() = 0;
 
 	virtual void onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer) = 0;
 	virtual void onGameRecordingHeaderSave(std::vector<uint8>& buffer) = 0;
@@ -93,24 +87,27 @@ public:
 	void execute(int argc, char** argv);
 
 	void onActiveModsChanged();
+	bool reloadFilePackage(std::wstring_view packageName, bool forceReload);
 
 	inline AudioOutBase& getAudioOut() { return *mAudioOut; }
-	inline ControlsIn& getControlsIn() { return mControlsIn; }
 
 	inline SDL_Window& getSDLWindow() const	{ return *mSDLWindow; }
 	inline Drawer& getDrawer()				{ return mDrawer; }
 
 	uint32 getPlatformFlags() const;
 	void switchToRenderMethod(Configuration::RenderMethod newRenderMethod);
-	void setVSyncMode(int mode);
+	void setVSyncMode(Configuration::FrameSyncType frameSyncMode);
 
 private:
 	bool startupEngine();
 	void run();
 	void shutdown();
 
+	void initDirectories();
 	bool initConfigAndSettings(const std::wstring& argumentProjectPath);
 	bool initFileSystem();
+	bool loadFilePackages(bool forceReload);
+	bool loadFilePackageByIndex(size_t index, bool forceReload);
 
 	bool createWindow();
 	void destroyWindow();
@@ -119,21 +116,11 @@ private:
 	EngineDelegateInterface& mDelegate;
 	std::vector<std::string> mArguments;
 
-	GameProfile&	mGameProfile;
-	InputManager&	mInputManager;
-	LogDisplay&		mLogDisplay;
-	ModManager&		mModManager;
-	ResourcesCache&	mResourcesCache;
-	PersistentData&	mPersistentData;
+	struct Internal;
+	Internal& mInternal;
 
-	VideoOut&		mVideoOut;
-	AudioOutBase*   mAudioOut = nullptr;
-	ControlsIn&		mControlsIn;
-
-	SDL_Window*		mSDLWindow = nullptr;
-	Drawer			mDrawer;
-
-#if defined(PLATFORM_ANDROID)
-	AndroidJavaInterface& mAndroidJavaInterface;
-#endif
+	AudioOutBase* mAudioOut = nullptr;
+	SDL_Window*	  mSDLWindow = nullptr;
+	Drawer		  mDrawer;
+	std::vector<PackedFileProvider*> mPackedFileProviders;
 };

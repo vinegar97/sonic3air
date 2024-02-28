@@ -1,12 +1,22 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2021 by Eukaryot
+*	Copyright (C) 2008-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
 #pragma once
+
+
+// Platforms overview:
+//  - PLATFORM_WINDOWS	-> Windows
+//  - PLATFORM_LINUX	-> Linux
+//  - PLATFORM_MAC		-> macOS
+//  - PLATFORM_ANDROID	-> Android
+//  - PLATFORM_IOS		-> iOS
+//  - PLATFORM_WEB		-> Web version (via emscripten)
+//  - PLATFORM_SWITCH	-> Nintendo Switch (homebrew)
 
 
 // Platform specific
@@ -21,7 +31,12 @@
 	#define USE_UTF8_PATHS		// Linux supports UTF-8 file names instead of wchar_t
 
 #elif __APPLE__
-	#define PLATFORM_MAC
+	#include <TargetConditionals.h>
+	#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
+		#define PLATFORM_IOS
+	#else
+		#define PLATFORM_MAC
+	#endif
 	#define USE_UTF8_PATHS
 
 #elif __ANDROID__

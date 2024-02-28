@@ -1,3 +1,11 @@
+/*
+*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
+*	Copyright (C) 2017-2023 by Eukaryot
+*
+*	Published under the GNU GPLv3 open source software license, see license.txt
+*	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
 #define RMX_LIB
 
 #include "lemon/compiler/Compiler.h"
@@ -54,6 +62,47 @@ void moveOutOfBinDir(const std::string& path)
 }
 
 
+struct ObjectHandleWrapper
+{
+	uint32 mContent;
+
+	static inline const CustomDataType* mObjectHandleDataType = nullptr;
+};
+
+ObjectHandleWrapper makeObjectHandle(uint32 value)
+{
+	return ObjectHandleWrapper { value };
+}
+
+ObjectHandleWrapper increaseObjectHandle(ObjectHandleWrapper value)
+{
+	return ObjectHandleWrapper { value.mContent + 1 };
+}
+
+namespace lemon
+{
+	namespace traits
+	{
+		template<> const DataTypeDefinition* getDataType<ObjectHandleWrapper>()  { return ObjectHandleWrapper::mObjectHandleDataType; }
+	}
+
+	namespace internal
+	{
+		template<>
+		void pushStackGeneric<ObjectHandleWrapper>(ObjectHandleWrapper value, const NativeFunction::Context context)
+		{
+			context.mControlFlow.pushValueStack(value.mContent);
+		};
+
+		template<>
+		ObjectHandleWrapper popStackGeneric(const NativeFunction::Context context)
+		{
+			return ObjectHandleWrapper { context.mControlFlow.popValueStack<uint32>() };
+		}
+	}
+}
+
+
 void logValue(int64 value)
 {
 	std::cout << rmx::hexString(value, 8) << std::endl;
@@ -64,21 +113,51 @@ void logValueStr(int64 key)
 	Runtime* runtime = Runtime::getActiveRuntime();
 	RMX_CHECK(nullptr != runtime, "No lemon script runtime active", return);
 
-	const StoredString* storedString = runtime->resolveStringByKey((uint64)key);
+	const FlyweightString* storedString = runtime->resolveStringByKey((uint64)key);
 	RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
 
-	std::cout << storedString->getString().c_str() << std::endl;
+	std::cout << storedString->getString() << std::endl;
 }
 
-void debugLog(uint64 stringHash)
+void debugLog(AnyTypeWrapper param)
 {
-	Runtime* runtime = Runtime::getActiveRuntime();
-	RMX_CHECK(nullptr != runtime, "No lemon script runtime active", return);
+	if (param.mType == &PredefinedDataTypes::UINT_8)
+	{
+		std::cout << rmx::hexString(param.mValue.get<uint8>(), 2) << std::endl;
+	}
+	else if (param.mType == &PredefinedDataTypes::UINT_64)
+	{
+		std::cout << rmx::hexString(param.mValue.get<uint64>(), 8) << std::endl;
+	}
+	else if (param.mType == &PredefinedDataTypes::FLOAT)
+	{
+		std::cout << param.mValue.get<float>() << std::endl;
+	}
+	else if (param.mType == &PredefinedDataTypes::DOUBLE)
+	{
+		std::cout << param.mValue.get<double>() << std::endl;
+	}
+	else if (param.mType == &PredefinedDataTypes::STRING)
+	{
+		Runtime* runtime = Runtime::getActiveRuntime();
+		RMX_CHECK(nullptr != runtime, "No lemon script runtime active", return);
+		const FlyweightString* storedString = runtime->resolveStringByKey(param.mValue.get<uint64>());
+		RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
+		std::cout << storedString->getString() << std::endl;
+	}
+	else if (param.mType == ObjectHandleWrapper::mObjectHandleDataType)
+	{
+		std::cout << "[ObjectHandle: " << param.mValue.get<uint32>() << "]" << std::endl;
+	}
+	else
+	{
+		std::cout << "Oops, type support not implemented yet" << std::endl;
+	}
+}
 
-	const StoredString* storedString = runtime->resolveStringByKey((uint64)stringHash);
-	RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
-
-	std::cout << storedString->getString().c_str() << std::endl;
+void logFloat(float value)
+{
+	std::cout << value << std::endl;
 }
 
 uint32 valueD0 = 0;
@@ -92,6 +171,11 @@ uint32 getterD0()
 void setterD0(int64 value)
 {
 	valueD0 = (uint32)value;
+}
+
+int64* accessA0()
+{
+	return (int64*)&valueA0;
 }
 
 int8 testFunctionA(int8 a, int8 b)
@@ -182,6 +266,44 @@ void doNothing()	// This function serves only as a point where to place breakpoi
 }
 
 
+struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
+{
+	Runtime& mRuntime;
+	bool mStopped = false;
+
+	inline RuntimeExecuteConnector(Runtime& runtime) : mRuntime(runtime) {}
+
+	bool handleCall(const lemon::Function* func, uint64 callTarget) override
+	{
+		if (nullptr == func)
+		{
+			throw std::runtime_error("Call failed, probably due to an invalid function");
+		}
+		return true;
+	}
+
+	bool handleReturn() override
+	{
+		if (mRuntime.getMainControlFlow().getCallStack().count == 0)
+		{
+			mStopped = true;
+			return false;
+		}
+		return true;
+	}
+
+	bool handleExternalCall(uint64 address) override
+	{
+		return true;
+	}
+
+	bool handleExternalJump(uint64 address) override
+	{
+		return true;
+	}
+};
+
+
 int main(int argc, char** argv)
 {
 	INIT_RMX;
@@ -190,41 +312,50 @@ int main(int argc, char** argv)
 	moveOutOfBinDir(argv[0]);
 
 	Module module("test_module");
+	GlobalsLookup globalsLookup;
+	module.startCompiling(globalsLookup);
+
 	UserDefinedVariable& varD0 = module.addUserDefinedVariable("D0", &PredefinedDataTypes::UINT_32);
 	varD0.mGetter = getterD0;
 	varD0.mSetter = setterD0;
-	lemon::ExternalVariable& varA0 = module.addExternalVariable("A0", &lemon::PredefinedDataTypes::UINT_32);
-	varA0.mPointer = &valueA0;
+	lemon::ExternalVariable& varA0 = module.addExternalVariable("A0", &lemon::PredefinedDataTypes::UINT_32, std::bind(accessA0));
 	UserDefinedVariable& var = module.addUserDefinedVariable("Log", &PredefinedDataTypes::INT_64);
 	var.mSetter = logValue;
 	UserDefinedVariable& var2 = module.addUserDefinedVariable("LogStr", &PredefinedDataTypes::INT_64);
 	var2.mSetter = logValueStr;
 
-	module.addUserDefinedFunction("debugLog", lemon::wrap(&debugLog));
-	module.addUserDefinedFunction("maximum", wrap(&testFunctionA));
-	module.addUserDefinedFunction("maximum", wrap(&testFunctionB));
+	module.addNativeFunction("debugLog", lemon::wrap(&debugLog));
+	module.addNativeFunction("logFloat", lemon::wrap(&logFloat));
+	module.addNativeFunction("maximum", wrap(&testFunctionA), Function::Flag::COMPILE_TIME_CONSTANT);
+	module.addNativeFunction("maximum", wrap(&testFunctionB), Function::Flag::COMPILE_TIME_CONSTANT);
 
 	SomeClass instance;
-	module.addUserDefinedFunction("sayHello", wrap(instance, &SomeClass::sayHello));
-	module.addUserDefinedFunction("incTen", wrap(instance, &SomeClass::incTen));
+	module.addNativeFunction("sayHello", wrap(instance, &SomeClass::sayHello));
+	module.addNativeFunction("incTen", wrap(instance, &SomeClass::incTen));
+
+	ObjectHandleWrapper::mObjectHandleDataType = module.addDataType("ObjectHandle", BaseType::UINT_32);
+	module.addNativeFunction("makeObjectHandle", wrap(&makeObjectHandle));
+	module.addNativeFunction("increaseObjectHandle", wrap(&increaseObjectHandle));
+	module.addNativeMethod("ObjectHandle", "increase", wrap(&increaseObjectHandle));
 
 	StandardLibrary::registerBindings(module);
 
-	GlobalsLookup globalsLookup;
 	globalsLookup.addDefinitionsFromModule(module);
 
 	{
-		lemon::Compiler::CompileOptions options;
+		std::cout << "=== Compilation ===\r\n";
+		lemon::CompileOptions options;
 		Compiler compiler(module, globalsLookup, options);
-		const bool compileSuccess = compiler.loadScript(L"script01.lemon");
+		const bool compileSuccess = compiler.loadScript(L"script/mainscript.lemon");
 		if (!compileSuccess)
 		{
 			for (const Compiler::ErrorMessage& error : compiler.getErrors())
 			{
-				RMX_ERROR("Compile error in line " << error.mLineNumber << ":\n" << error.mMessage, );
+				RMX_ERROR("Compile error in line " << error.mError.mLineNumber << ":\n" << error.mMessage, );
 			}
 			return 0;
 		}
+		std::cout << "\r\n";
 	}
 
 #if 0
@@ -240,8 +371,8 @@ int main(int argc, char** argv)
 		UserDefinedVariable& var = newModule.addUserDefinedVariable("Log", &PredefinedDataTypes::INT_64);
 		var.mSetter = logValue;
 
-		newModule.addUserDefinedFunction("max", wrap(&testFunctionA));
-		newModule.addUserDefinedFunction("max", wrap(&testFunctionB));
+		newModule.addNativeFunction("max", wrap(&testFunctionA));
+		newModule.addNativeFunction("max", wrap(&testFunctionB));
 
 		VectorBinarySerializer serializer2(true, buffer);
 		newModule.serialize(serializer2);
@@ -255,14 +386,14 @@ int main(int argc, char** argv)
 	Program program;
 	program.addModule(module);
 
-#if 1
+#if 0
 	// Run nativization
 	program.runNativization(module, L"source/NativizedCode.inc", memoryAccess);
 #endif
 
 	try
 	{
-	#if 1
+	#if 0
 		// Use nativization
 		static NativizedOpcodeProvider instance(&createNativizedCodeLookup);
 		program.mNativizedOpcodeProvider = instance.isValid() ? &instance : nullptr;
@@ -271,46 +402,20 @@ int main(int argc, char** argv)
 		const Function* func = program.getFunctionBySignature(rmx::getMurmur2_64(String("main")) + Function::getVoidSignatureHash());
 		RMX_CHECK(nullptr != func, "Function not found", RMX_REACT_THROW);
 
+		std::cout << "=== Execution ===\r\n";
 		Runtime runtime;
 		runtime.setProgram(program);
 		runtime.setMemoryAccessHandler(&memoryAccess);
 		runtime.callFunction(*func);
 
-		Runtime::ExecuteResult result;
-		bool running = true;
-		while (running)
+		RuntimeExecuteConnector connector(runtime);
+		while (!connector.mStopped)
 		{
-			runtime.executeSteps(result, 10);
-			switch (result.mResult)
+			runtime.executeSteps(connector, 10, 0);
+
+			if (connector.mResult == Runtime::ExecuteResult::Result::HALT)
 			{
-				case Runtime::ExecuteResult::CALL:
-				{
-					if (nullptr == runtime.handleResultCall(result))
-					{
-						throw std::runtime_error("Call failed, probably due to an invalid function");
-					}
-					break;
-				}
-
-				case Runtime::ExecuteResult::RETURN:
-				{
-					if (runtime.getMainControlFlow().getCallStack().count == 0)
-						running = false;
-					break;
-				}
-
-				case Runtime::ExecuteResult::EXTERNAL_CALL:
-				case Runtime::ExecuteResult::EXTERNAL_JUMP:
-				{
-					doNothing();
-					break;
-				}
-
-				case Runtime::ExecuteResult::HALT:
-				{
-					running = false;
-					break;
-				}
+				connector.mStopped = true;
 			}
 		}
 

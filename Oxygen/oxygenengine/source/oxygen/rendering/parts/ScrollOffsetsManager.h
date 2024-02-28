@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -44,11 +44,10 @@ public:
 	inline const Vec2i& getPlaneWScrollOffset() const			 { return mScrollOffsetW; }
 	inline void setPlaneWScrollOffset(const Vec2i& scrollOffset) { mScrollOffsetW = scrollOffset; }
 
-	inline int16 getVerticalScrollOffsetBias() const		{ return mVerticalScrollOffsetBias; }
+	inline int16 getVerticalScrollOffsetBias() const	{ return mVerticalScrollOffsetBias; }
 	void setVerticalScrollOffsetBias(int16 bias);
 
-public:
-	bool mAbstractionModeForPlaneA = false;
+	void serializeSaveState(VectorBinarySerializer& serializer, uint8 formatVersion);
 
 private:
 	PlaneManager& mPlaneManager;
@@ -59,11 +58,11 @@ private:
 
 	struct ScrollOffsetSet
 	{
-		uint16 mScrollOffsetsH[0x100] = { 0 };		// One scroll offset per single pixel line
+		uint16 mScrollOffsetsH[0x100]   = { 0 };	// One scroll offset per single pixel line
 		bool mExplicitOverwriteH[0x100] = { 0 };	// One flag per horizontal scroll offset; set if it was explicitly overwritten
-		uint16 mScrollOffsetsV[0x20] = { 0 };		// One scroll offset per row of 0x10 pixels
-		bool mExplicitOverwriteV[0x20] = { 0 };		// One flag per vertical scroll offset; set if it was explicitly overwritten
-		bool mHorizontalScrollNoRepeat = false;
+		uint16 mScrollOffsetsV[0x20]    = { 0 };	// One scroll offset per row of 0x10 pixels
+		bool mExplicitOverwriteV[0x20]  = { 0 };	// One flag per vertical scroll offset; set if it was explicitly overwritten
+		bool mHorizontalScrollNoRepeat  = false;
 	};
 	ScrollOffsetSet mSets[4];		// First two are for the planes, the others are used for certain effects that require an additional set of scroll offsets
 	Vec2i mScrollOffsetW;
@@ -73,6 +72,7 @@ private:
 	struct InterpolatedScrollOffsetSet
 	{
 		bool mValid = false;
+		bool mHasLastScrollOffsets = false;
 		uint16 mInterpolatedScrollOffsetsH[0x100] = { 0 };
 		uint16 mInterpolatedScrollOffsetsV[0x20] = { 0 };
 		uint16 mLastScrollOffsetsH[0x100] = { 0 };
@@ -80,5 +80,5 @@ private:
 		int16 mDifferenceScrollOffsetsH[0x100] = { 0 };
 		int16 mDifferenceScrollOffsetsV[0x20] = { 0 };
 	};
-	InterpolatedScrollOffsetSet mInterpolatedSets[2];
+	InterpolatedScrollOffsetSet mInterpolatedSets[4];
 };

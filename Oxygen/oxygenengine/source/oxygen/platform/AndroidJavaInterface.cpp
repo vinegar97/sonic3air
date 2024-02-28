@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,13 +8,13 @@
 
 #include "oxygen/pch.h"
 
-#if defined (PLATFORM_ANDROID)
+#if defined(PLATFORM_ANDROID)
 
 	#include "oxygen/platform/AndroidJavaInterface.h"
 	#include "oxygen/application/Configuration.h"
-	#include "oxygen/base/PlatformFunctions.h"
 	#include "oxygen/helper/FileHelper.h"
-	#include "oxygen/helper/Log.h"
+	#include "oxygen/helper/Logging.h"
+	#include "oxygen/platform/PlatformFunctions.h"
 
 	#include <jni.h>
 
@@ -22,7 +22,7 @@
 	{
 		JNIEXPORT void JNICALL Java_org_eukaryot_sonic3air_GameActivity_receivedRomContent(JNIEnv* env, jclass jclazz, jboolean success, jbyteArray data)
 		{
-			LOG_INFO("C++ receive ROM content... " << (success ? "success" : "failure"));
+			RMX_LOG_INFO("C++ receive ROM content... " << (success ? "success" : "failure"));
 			AndroidJavaInterface& instance = AndroidJavaInterface::instance();
 			if (success)
 			{
@@ -41,7 +41,7 @@
 		JNIEXPORT void JNICALL Java_org_eukaryot_sonic3air_GameActivity_gotApkPath(JNIEnv* env, jclass jclazz, jstring path)
 		{
 			const char* str = env->GetStringUTFChars(path, 0);
-			LOG_INFO("C++ APK path = " << str);
+			RMX_LOG_INFO("C++ APK path = " << str);
 
 			FileHelper::extractZipFile(String(str).toStdWString(), Configuration::instance().mAppDataPath + L"apkContent/");
 			env->ReleaseStringUTFChars(path, str);
@@ -49,16 +49,92 @@
 	}
 
 
+	struct JNIStringParam
+	{
+		JNIStringParam(JNIEnv* env, const char* str) :
+			mEnv(env)
+		{
+			mJString = mEnv->NewStringUTF(str);
+		}
+
+		~JNIStringParam()
+		{
+			if (nullptr != mJString)
+				mEnv->DeleteLocalRef(mJString);
+		}
+
+		inline bool IsValid() const  { return nullptr != mJString; }
+		inline jstring operator*() const  { return mJString; }
+
+		JNIEnv* mEnv = nullptr;
+		jstring mJString = nullptr;
+	};
+
+	struct JNICallHelper
+	{
+		JNICallHelper()
+		{
+			mEnv = (JNIEnv*)SDL_AndroidGetJNIEnv();
+			mActivity = (jobject)SDL_AndroidGetActivity();
+			mActivityClass = mEnv->GetObjectClass(mActivity);
+		}
+
+		~JNICallHelper()
+		{
+			mEnv->DeleteLocalRef(mActivity);
+			mEnv->DeleteLocalRef(mActivityClass);
+		}
+
+		void callVoidMethod(const char* methodName)
+		{
+			jmethodID methodId = mEnv->GetMethodID(mActivityClass, methodName, "()V");
+			mEnv->CallVoidMethod(mActivity, methodId);
+		}
+
+		bool callBooleanMethod(const char* methodName, uint64 a)
+		{
+			jmethodID methodId = mEnv->GetMethodID(mActivityClass, methodName, "(J)Z");
+			return (bool)mEnv->CallBooleanMethod(mActivity, methodId, (jlong)a);
+		}
+
+		int callIntMethod(const char* methodName, uint64 a)
+		{
+			jmethodID methodId = mEnv->GetMethodID(mActivityClass, methodName, "(J)I");
+            return mEnv->CallIntMethod(mActivity, methodId, (jlong)a);
+		}
+
+		uint64 callLongMethod(const char* methodName, uint64 a)
+		{
+			jmethodID methodId = mEnv->GetMethodID(mActivityClass, methodName, "(J)J");
+			return (uint64)mEnv->CallLongMethod(mActivity, methodId, (jlong)a);
+		}
+
+		uint64 callLongMethod(const char* methodName, const char* a, const char* b)
+		{
+			jmethodID methodId = mEnv->GetMethodID(mActivityClass, methodName, "(Ljava/lang/String;Ljava/lang/String;)J");
+			JNIStringParam stringA(mEnv, a);
+			JNIStringParam stringB(mEnv, b);
+			if (!stringA.IsValid() || !stringB.IsValid())
+				return 0;
+			return (uint64)mEnv->CallLongMethod(mActivity, methodId, *stringA, *stringB);
+		}
+
+		bool callBoolMethod(const char* methodName)
+		{
+			jmethodID methodId = mEnv->GetMethodID(mActivityClass, methodName, "()Z");
+			jboolean result = mEnv->CallBooleanMethod(mActivity, methodId);
+			return (result != 0);
+		}
+
+		JNIEnv* mEnv = nullptr;
+		jobject mActivity = nullptr;
+		jclass mActivityClass = nullptr;
+	};
+
+
 	bool AndroidJavaInterface::hasRomFileAlready()
 	{
-		JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
-		jobject activity = (jobject)SDL_AndroidGetActivity();
-		jclass clazz(env->GetObjectClass(activity));
-		jmethodID method_id = env->GetMethodID(clazz, "hasRomFileAlready", "()Z");
-		jboolean result = env->CallBooleanMethod(activity, method_id);
-		env->DeleteLocalRef(activity);
-		env->DeleteLocalRef(clazz);
-		return (result != 0);
+		return JNICallHelper().callBoolMethod("hasRomFileAlready");
 	}
 
 	void AndroidJavaInterface::openRomFileSelectionDialog()
@@ -73,13 +149,7 @@
 		mRomFileInjection.mDialogResult = BinaryDialogResult::PENDING;
 
 		// Open file selection dialog
-		JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
-		jobject activity = (jobject)SDL_AndroidGetActivity();
-		jclass clazz(env->GetObjectClass(activity));
-		jmethodID method_id = env->GetMethodID(clazz, "openRomFileSelectionDialog", "()V");
-		env->CallVoidMethod(activity, method_id);
-		env->DeleteLocalRef(activity);
-		env->DeleteLocalRef(clazz);
+		JNICallHelper().callVoidMethod("openRomFileSelectionDialog");
 	}
 
 	void AndroidJavaInterface::onReceivedRomContent(const uint8* content, size_t bytes)
@@ -92,6 +162,37 @@
 	void AndroidJavaInterface::onRomContentSelectionFailed()
 	{
 		mRomFileInjection.mDialogResult = BinaryDialogResult::FAILED;
+	}
+
+	uint64 AndroidJavaInterface::startFileDownload(const char* url, const char* filenameUTF8)
+	{
+		return JNICallHelper().callLongMethod("startFileDownload", url, filenameUTF8);
+	}
+
+	bool AndroidJavaInterface::stopFileDownload(uint64 downloadId)
+	{
+		return JNICallHelper().callBooleanMethod("stopFileDownload", downloadId);
+	}
+
+	void AndroidJavaInterface::getDownloadStatus(uint64 downloadId, int& outStatus, uint64& outCurrentBytes, uint64& outTotalBytes)
+	{
+		outCurrentBytes = 0;
+		outTotalBytes = 0;
+		outStatus = JNICallHelper().callIntMethod("getDownloadStatus", downloadId);
+		if (outStatus == 0x00)
+			return;
+
+		outTotalBytes = JNICallHelper().callLongMethod("getDownloadTotalBytes", downloadId);
+		if (outStatus <= 0x04)
+		{
+			// Download still active (running, pending, paused)
+			outCurrentBytes = JNICallHelper().callLongMethod("getDownloadCurrentBytes", downloadId);
+		}
+		else if (outStatus == 0x08)
+		{
+			// Finished
+			outCurrentBytes = outTotalBytes;
+		}
 	}
 
 #endif

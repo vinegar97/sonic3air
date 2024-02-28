@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -15,6 +15,14 @@ class Simulation;
 
 class GameView : public GuiBase
 {
+public:
+	enum class StillImageMode
+	{
+		NONE,			// Normal running simulation, no still image
+		STILL_IMAGE,	// Permanently showing the last rendered image
+		BLURRING		// Showing & incrementally blurring the last rendered image
+	};
+
 public:
 	GameView(Simulation& simulation);
 	~GameView();
@@ -41,11 +49,19 @@ public:
 	void startFadingOut(float fadeTime = 0.25f);
 	inline void setWhiteOverlayAlpha(float alpha)  { mWhiteOverlayAlpha = alpha; }
 
-	void setBlurringStillImage(bool enable, float timeout = 0.0f);
+	void setStillImageMode(StillImageMode mode, float timeout = 0.0f);
 
 private:
 	void setLogDisplay(const String& string, float time = 2.0f);
 	void setGameSpeed(float speed);
+
+private:
+	struct StillImage
+	{
+		StillImageMode mMode = StillImageMode::NONE;
+		float mBlurringTimeout = 0.0f;
+		float mBlurringStepTimer = 0.0f;
+	};
 
 private:
 	Simulation& mSimulation;
@@ -56,9 +72,7 @@ private:
 	float mFadeChange = 0.0f;
 	float mWhiteOverlayAlpha = 0.0f;
 
-	bool  mBlurringStillImage = false;
-	float mBlurringTimeout = 0.0f;
-	float mBlurringStepTimer = 0.0f;
+	StillImage mStillImage;
 
 	int  mDebugOutput = -1;
 	int  mDebugPaletteDisplay = -1;
@@ -67,4 +81,7 @@ private:
 	DrawerTexture mDebugVisualizationsOverlay;
 
 	DrawerTexture mFinalGameTexture;
+
+	float mRewindTimer = 0.0f;
+	int mRewindCounter = 0;
 };

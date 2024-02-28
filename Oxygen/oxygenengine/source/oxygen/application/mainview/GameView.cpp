@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,16 +8,18 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/mainview/GameView.h"
+#include "oxygen/application/Application.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/drawing/DrawerTexture.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/HighResolutionTimer.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/rendering/RenderResources.h"
+#include "oxygen/resources/FontCollection.h"
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
@@ -36,16 +38,18 @@ namespace
 
 	bool dumpPaletteAsBMP(int paletteIndex)
 	{
-		PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
-		std::vector<uint8> fileContent;
-		Color palette[256] = { Color::TRANSPARENT };
+		const PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
+		Color palette[0x100] = { Color::TRANSPARENT };
+		paletteManager.getPalette(paletteIndex).dumpColors(palette, 0x100);
+
 		PaletteBitmap bmp;
 		bmp.create(16, 16);
-		for (int colorIndex = 0; colorIndex < 256; ++colorIndex)
+		for (int colorIndex = 0; colorIndex < 0x100; ++colorIndex)
 		{
-			palette[colorIndex] = paletteManager.getPaletteEntry(paletteIndex, colorIndex);
-			bmp.getData()[colorIndex] = colorIndex;
+			bmp.getData()[colorIndex] = (uint8)colorIndex;
 		}
+
+		std::vector<uint8> fileContent;
 		if (!bmp.saveBMP(fileContent, palette))
 			return false;
 		return FTX::FileSystem->saveFile("palette_dump.bmp", fileContent);
@@ -55,14 +59,14 @@ namespace
 #if 0
 	bool dumpPaletteAsPAL(int paletteIndex)
 	{
-		PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
+		const PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
 		String str;
 		str << "JASC-PAL\r\n";
 		str << "0100\r\n";
 		str << "256\r\n";
 		for (int colorIndex = 0; colorIndex < 64; ++colorIndex)
 		{
-			const Color color = paletteManager.getPaletteEntry(paletteIndex, colorIndex);
+			const Color color = paletteManager.getPalette(paletteIndex).getColor(colorIndex);
 			str << roundToInt(color.r * 255.0f) << ' ' << roundToInt(color.g * 255.0f) << ' ' << roundToInt(color.b * 255.0f) << "\r\n";
 		}
 		for (int colorIndex = 64; colorIndex < 256; ++colorIndex)
@@ -185,7 +189,7 @@ void GameView::initialize()
 
 	const Vec2i& resolution = Configuration::instance().mGameScreen;
 
-	LOG_INFO("Creating game screen texture");
+	RMX_LOG_INFO("Creating game screen texture");
 	EngineMain::instance().getDrawer().createTexture(mFinalGameTexture);
 	mFinalGameTexture.setupAsRenderTarget(resolution.x, resolution.y);
 }
@@ -240,12 +244,12 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 
 					case 'h':
 					{
-						int& frameSync = Configuration::instance().mFrameSync;
-						frameSync = (frameSync + 1) % 3;
+						Configuration::FrameSyncType& frameSync = Configuration::instance().mFrameSync;
+						frameSync = Configuration::FrameSyncType(((int)frameSync + 1) % (int)Configuration::FrameSyncType::_NUM);
 						EngineMain::instance().setVSyncMode(frameSync);
 
-						static const std::string FRAME_SYNC_NAME[] = { "V-Sync Off", "VSync On", "V-Sync + FPS Cap" };
-						setLogDisplay("Frame Sync: " + FRAME_SYNC_NAME[frameSync]);
+						static const std::string FRAME_SYNC_NAME[(int)Configuration::FrameSyncType::_NUM] = { "V-Sync Off", "VSync On", "V-Sync + FPS Cap", "Frame Interpolation" };
+						setLogDisplay("Frame Sync: " + FRAME_SYNC_NAME[(int)frameSync]);
 						break;
 					}
 				}
@@ -295,9 +299,12 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 
 						case SDLK_F10:
 						{
+							HighResolutionTimer timer;
+							timer.start();
 							RenderResources::instance().loadSpriteCache();
 							ResourcesCache::instance().loadAllResources();
-							setLogDisplay("Reloaded resources");
+							FontCollection::instance().reloadAll();
+							setLogDisplay(String(0, "Reloaded resources in %0.2f sec", timer.getSecondsSinceStart()));
 							break;
 						}
 					}
@@ -342,13 +349,7 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 
 						case 't':
 						{
-							RenderParts& renderer = RenderParts::instance();
-							renderer.setFullEmulation(!renderer.getFullEmulation());
-
-							if (renderer.getFullEmulation())
-								setLogDisplay("Set renderer mode: Full emulation");
-							else
-								setLogDisplay("Set renderer mode: Abstraction (allows for Alt-click / Alt-rightclick)");
+							mSimulation.getCodeExec().executeScriptFunction("OxygenCallback.debugAltT", false);
 							break;
 						}
 					}
@@ -374,11 +375,6 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 							setGameSpeed(FTX::keyState(SDLK_LCTRL) ? 0.01f : 0.05f);
 							break;
 
-						case SDLK_KP_PERIOD:
-							// Supporting both Shift and Ctrl, as the Shift + Peroid combination does not seem to work for all keyboards
-							mSimulation.setNextSingleStep(true, FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL));
-							break;
-
 						case SDLK_F7:
 						{
 							mSimulation.reloadLastState();
@@ -387,13 +383,13 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 						}
 
 						case SDLK_F11:
+						case SDLK_BACKQUOTE:	// Alternative, especially for Macs, where F11 has other functions already
 						{
 							HighResolutionTimer timer;
-							timer.Start();
-							if (mSimulation.reloadScripts(true))
+							timer.start();
+							if (mSimulation.triggerFullScriptsReload())
 							{
-								timer.Stop();
-								setLogDisplay(String(0, "Reloaded scripts in %0.2f sec", timer.GetCurrentSeconds()));
+								setLogDisplay(String(0, "Reloaded scripts in %0.2f sec", timer.getSecondsSinceStart()));
 							}
 							break;
 						}
@@ -420,8 +416,11 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 				{
 					case SDLK_KP_PERIOD:
 					{
-						// Supporting both Shift and Ctrl, as the SHift + Peroid combination does not seem to work for all keyboards
-						mSimulation.setNextSingleStep(true, FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL));
+						// Supporting both Shift and Ctrl, as the Shift + Peroid combination does not seem to work for all keyboards
+						const bool continueToDebugEvent = FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL);
+						mSimulation.setNextSingleStep(true, continueToDebugEvent);
+						if (!continueToDebugEvent)
+							setLogDisplay(String(0, "Single step | Frame: %d", mSimulation.getFrameNumber() + 1));
 						break;
 					}
 				}
@@ -432,36 +431,30 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 
 void GameView::mouse(const rmx::MouseEvent& ev)
 {
-	// TODO: This functionality (as well as abstraction plane A rendering) is entirely S3AIR specific and should be moved out of the core engine
-	if (EngineMain::getDelegate().useDeveloperFeatures() && !RenderParts::instance().getFullEmulation())
+	if (FTX::keyState(SDLK_LALT) && !FTX::keyState(SDLK_RALT))
 	{
-		if (ev.state && FTX::keyState(SDLK_LALT) && !FTX::keyState(SDLK_RALT))
+		const char* functionName = nullptr;
+		if (ev.button == rmx::MouseButton::Left)
 		{
-			// Translate mouse position into game screen position
+			functionName = ev.state ? "OxygenCallback.debugAltLeftMouseDown" : "OxygenCallback.debugAltLeftMouseUp";
+		}
+		else if (ev.button == rmx::MouseButton::Right)
+		{
+			functionName = ev.state ? "OxygenCallback.debugAltRightMouseDown" : "OxygenCallback.debugAltRightMouseUp";
+		}
+
+		if (nullptr != functionName)
+		{
 			Vec2f relativePosition;
 			if (translatePositionIntoGameViewport(relativePosition, ev.position))
 			{
-				EmulatorInterface& emulatorInterface = mSimulation.getCodeExec().getEmulatorInterface();
+				const uint8 flags = (FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_RSHIFT)) ? 0x01 : 0x00;
 
-				const uint32 cameraX = emulatorInterface.readMemory16(0xffffee78);
-				const uint32 cameraY = emulatorInterface.readMemory16(0xffffee7c);
-
-				const uint32 globalColumn = cameraX + roundToInt(relativePosition.x);
-				const uint32 globalRow = cameraY + roundToInt(relativePosition.y);
-
-				const uint32 chunkColumn = globalColumn / 128;
-				const uint32 chunkRow = (globalRow / 128) & 0x1f;		// Looks like there are only 32 chunks in y-direction allowed in a level; that makes a maximum level height of 4096 pixels
-
-				const uint32 chunkAddress = 0xffff0000 + emulatorInterface.readMemory16(0xffff8008 + chunkRow * 4) + chunkColumn;
-				uint8 chunkType = emulatorInterface.readMemory8(chunkAddress);
-
-				int8 change = (ev.button == rmx::MouseButton::Left) ? 1 : (ev.button == rmx::MouseButton::Right) ? -1 : 0;
-				if (FTX::keyState(SDLK_LSHIFT))
-					change *= 0x10;
-				chunkType += change;
-				emulatorInterface.writeMemory8(chunkAddress, chunkType);
-
-				LogDisplay::instance().updateScriptLogValue("chunk", rmx::hexString(chunkAddress, 8) + " -> " + rmx::hexString(chunkType, 2));
+				CodeExec::FunctionExecData execData;
+				execData.addParam(lemon::PredefinedDataTypes::INT_16, roundToInt(relativePosition.x));
+				execData.addParam(lemon::PredefinedDataTypes::INT_16, roundToInt(relativePosition.y));
+				execData.addParam(lemon::PredefinedDataTypes::UINT_8, flags);
+				mSimulation.getCodeExec().executeScriptFunction(functionName, false, &execData);
 			}
 		}
 	}
@@ -474,10 +467,51 @@ void GameView::update(float timeElapsed)
 		mFadeValue = saturate(mFadeValue + timeElapsed * mFadeChange);
 	}
 
-	if (mBlurringStillImage && mBlurringTimeout > 0.0f)
+	if (mStillImage.mMode == StillImageMode::BLURRING)
 	{
-		mBlurringTimeout -= timeElapsed;
-		mBlurringStepTimer += timeElapsed;
+		if (mStillImage.mBlurringTimeout > 0.0f)
+		{
+			mStillImage.mBlurringTimeout -= timeElapsed;
+			mStillImage.mBlurringStepTimer += timeElapsed;
+		}
+		if (mStillImage.mBlurringTimeout <= 0.0f)
+		{
+			mStillImage.mBlurringTimeout = 0.0f;
+			mStillImage.mMode = StillImageMode::STILL_IMAGE;
+		}
+	}
+
+	if (EngineMain::getDelegate().useDeveloperFeatures() && FTX::keyState(SDLK_KP_9) && mSimulation.getFrameNumber() > 0)
+	{
+		int rewindSteps = 0;
+		if (mRewindCounter == 0)
+		{
+			// Rewind in the first frame the key was just pressed
+			rewindSteps = 1;
+		}
+		else
+		{
+			mRewindTimer += (SDL_GetModState() & KMOD_SHIFT) ? (timeElapsed * 3.0f) : timeElapsed;
+			const float speed = (mRewindCounter == 1) ? 5 : (float)std::min(10 + mRewindCounter / 3, 120);
+			const float delay = 1.0f / speed;
+			if (mRewindTimer >= delay)
+			{
+				rewindSteps = (int)std::floor(mRewindTimer / delay);
+				mRewindTimer -= delay * (float)rewindSteps;
+			}
+		}
+
+		if (rewindSteps > 0)
+		{
+			setLogDisplay(String(0, "  Rewinding | Frame: %d", mSimulation.getFrameNumber() - rewindSteps));
+			mSimulation.setRewind(rewindSteps);
+			++mRewindCounter;
+		}
+	}
+	else
+	{
+		mRewindTimer = 0.0f;
+		mRewindCounter = 0;
 	}
 
 	// Debug output
@@ -501,17 +535,19 @@ void GameView::update(float timeElapsed)
 				mDebugOutput = 3;
 			}
 
-			LogDisplay::instance().clearScriptLogValue("~index");
-			LogDisplay::instance().clearScriptLogValue("~addr");
-			LogDisplay::instance().clearScriptLogValue("~ptrn");
+			DebugTracking& debugTracking = Application::instance().getSimulation().getCodeExec().getDebugTracking();
+			debugTracking.clearScriptLogValue("~index");
+			debugTracking.clearScriptLogValue("~addr");
+			debugTracking.clearScriptLogValue("~ptrn");
 
 			if (mDebugOutput >= 0)
 			{
 				// Get the mouse position inside the debug output
+				PlaneManager& planeManager = VideoOut::instance().getRenderParts().getPlaneManager();
 				Rectf rect;
 				if (mDebugOutput <= PlaneManager::PLANE_A)
 				{
-					const Vec2i playfieldSize = VideoOut::instance().getRenderParts().getPlaneManager().getPlayfieldSizeInPixels();
+					const Vec2i playfieldSize = planeManager.getPlayfieldSizeInPixels();
 					rect = RenderUtils::getLetterBoxRect(mRect, (float)playfieldSize.x / (float)playfieldSize.y);
 				}
 				else
@@ -523,17 +559,17 @@ void GameView::update(float timeElapsed)
 				if (translatePositionIntoRect(relativePosition, rect, FTX::mousePos()))
 				{
 					const uint32 index = (int)(relativePosition.x * 64.0f) + (int)(relativePosition.y * 32.0f) * 64;
-					LogDisplay::instance().updateScriptLogValue("~index", rmx::hexString(index, 4));
+					debugTracking.updateScriptLogValue("~index", rmx::hexString(index, 4));
 					if (mDebugOutput < 2)
 					{
-						const uint16 address = VideoOut::instance().getRenderParts().getPlaneManager().getPatternVRAMAddress(mDebugOutput, index);
-						const uint16 pattern = VideoOut::instance().getRenderParts().getPlaneManager().getPatternAtIndex(mDebugOutput, index);
-						LogDisplay::instance().updateScriptLogValue("~addr", rmx::hexString(address, 4));
-						LogDisplay::instance().updateScriptLogValue("~ptrn", rmx::hexString(pattern, 4));
+						const uint16 address = planeManager.getPatternVRAMAddress(mDebugOutput, (uint16)index);
+						const uint16 pattern = planeManager.getPatternAtIndex(mDebugOutput, (uint16)index);
+						debugTracking.updateScriptLogValue("~addr", rmx::hexString(address, 4));
+						debugTracking.updateScriptLogValue("~ptrn", rmx::hexString(pattern, 4));
 					}
 					else
 					{
-						LogDisplay::instance().updateScriptLogValue("~addr", rmx::hexString((uint32)(index * 0x20), 4));
+						debugTracking.updateScriptLogValue("~addr", rmx::hexString((uint32)(index * 0x20), 4));
 					}
 				}
 			}
@@ -553,12 +589,12 @@ void GameView::render()
 	mFinalGameTexture.setupAsRenderTarget(gameScreenRect.width, gameScreenRect.height);
 
 	// Refresh simulation output image
-	if (mBlurringStillImage)
+	if (mStillImage.mMode != StillImageMode::NONE)
 	{
-		const constexpr float REDUCTION = 0.0333f;	// Can't remember any more why this is 1/30...
-		if (mBlurringStepTimer >= REDUCTION)
+		const constexpr float REDUCTION = 0.0333f;	// One blur step every 1/30 second
+		if (mStillImage.mBlurringStepTimer >= REDUCTION)
 		{
-			mBlurringStepTimer -= REDUCTION;
+			mStillImage.mBlurringStepTimer -= REDUCTION;
 			videoOut.blurGameScreen();
 		}
 	}
@@ -580,39 +616,36 @@ void GameView::render()
 	if (mDebugOutput >= 0)
 	{
 		// Draw a dark background over the full screen
-		drawer.setBlendMode(DrawerBlendMode::NONE);
+		drawer.setBlendMode(BlendMode::OPAQUE);
 		drawer.drawRect(FTX::screenRect(), Color(0.15f, 0.15f, 0.15f));
 		drawer.performRendering();
 
 		videoOut.renderDebugDraw(mDebugOutput, mRect);
 
 		// Enable alpha again for the UI
-		drawer.setBlendMode(DrawerBlendMode::ALPHA);
+		drawer.setBlendMode(BlendMode::ALPHA);
 		drawer.performRendering();
 
-		GuiBase::render();
+		// No "GuiBase::render()" call here, as this would e.g. draw menus on top (and in wrong resolutions)
 		return;
 	}
 
 	// Here goes the real rendering
 	drawer.setRenderTarget(mFinalGameTexture, gameScreenRect);
-	drawer.setBlendMode(DrawerBlendMode::NONE);
-#if 0
-	// Test: Lazy version of a simple mirror mode
-	//  -> TODO: ControlsIn needs to support mirror mode as well
-	if (drawer.getType() != Drawer::Type::SOFTWARE)
+	drawer.setBlendMode(BlendMode::OPAQUE);
+
+	// Simple mirror mode implementation: Just mirror the whole screen
+	if (Configuration::instance().mMirrorMode)
 	{
-		const Recti drawRect(gameScreenRect.x + gameScreenRect.width, gameScreenRect.y, -gameScreenRect.width, gameScreenRect.height);
-		drawer.drawRect(drawRect, videoOut.getGameScreenTexture());
+		drawer.drawRect(gameScreenRect, videoOut.getGameScreenTexture(), Vec2f(1.0f, 0.0f), Vec2f(0.0f, 1.0f), Color::WHITE);
 	}
 	else
-#endif
 	{
 		drawer.drawRect(gameScreenRect, videoOut.getGameScreenTexture());
 	}
 
 	// Enable alpha for the UI
-	drawer.setBlendMode(DrawerBlendMode::ALPHA);
+	drawer.setBlendMode(BlendMode::ALPHA);
 
 	// Debug visualizations
 	if (mDebugVisualizationsEnabled)
@@ -643,9 +676,9 @@ void GameView::render()
 			int py = baseY + 1;
 			for (int k = 0; k < 0x100; ++k)
 			{
-				const int px = baseX + 1 + (k % 0x10) * 5;
+				const int px = baseX + 1 + (k & 0x0f) * 5;
 				const int height = (k < 0x40) ? 4 : 2;
-				Color color = paletteManager.getPaletteEntry(paletteIndex, k);
+				Color color = paletteManager.getPalette(paletteIndex).getColor(k);
 				color.a = 1.0f;
 				drawer.drawRect(Recti(px, py, 4, height), color);
 
@@ -666,18 +699,18 @@ void GameView::render()
 			{
 				const float fraction = (float)k / 15.0f;
 				const Color color1 = Color(fraction, fraction, fraction);
-				const Color color2 = Color(paletteManager.getGlobalComponentAddedColor().r + paletteManager.getGlobalComponentTintColor().r * fraction,
-										   paletteManager.getGlobalComponentAddedColor().g + paletteManager.getGlobalComponentTintColor().g * fraction,
-										   paletteManager.getGlobalComponentAddedColor().b + paletteManager.getGlobalComponentTintColor().b * fraction);
+				const Color color2 = paletteManager.getGlobalComponentAddedColor() + color1 * paletteManager.getGlobalComponentTintColor();
 				drawer.drawRect(Recti(baseX + 1, baseY + 1 + k * 3, 3, 3), color2);
 				drawer.drawRect(Recti(baseX + 3, baseY + 1 + k * 3, 1, 1), color1);
 			}
 		}
 
+	#ifdef RMX_WITH_OPENGL_SUPPORT
 		if (drawer.getType() == Drawer::Type::OPENGL)
 		{
 			FTX::Painter->setColor(Color::WHITE);	// Prevent possible broken display in UI (e.g. in S3AIR's menus)
 		}
+	#endif
 	}
 	drawer.performRendering();
 
@@ -697,16 +730,16 @@ void GameView::render()
 		const double averageTime = Profiling::getRootRegion().mAverageTime;
 		if (averageTime > 0.0)
 		{
-			drawer.printText(EngineMain::getDelegate().getDebugFont(3), Recti(gameScreenRect.width - 3, 2, 0, 0), String(0, "%d FPS", roundToInt((float)(1.0 / averageTime))), 3);
+			drawer.printText(EngineMain::getDelegate().getDebugFont(3), Vec2i(gameScreenRect.width - 3, 2), String(0, "%d FPS", roundToInt((float)(1.0 / averageTime))), 3);
 		}
 	}
 
 	// Draw the combined image
 	drawer.setWindowRenderTarget(FTX::screenRect());
-	drawer.setBlendMode(DrawerBlendMode::NONE);
+	drawer.setBlendMode(BlendMode::OPAQUE);
 	drawer.drawUpscaledRect(mGameViewport, mFinalGameTexture);
 
-	if (!FTX::Video->getVideoConfig().autoclearscreen)
+	if (!FTX::Video->getVideoConfig().mAutoClearScreen)
 	{
 		// Draw black bars so no screen clearing is needed
 		const float x1 = mGameViewport.x;
@@ -724,7 +757,7 @@ void GameView::render()
 
 	// Enable alpha again
 	// TODO: Better do the fading inside the game viewport (instead of the full window) for performance reasons -- or apply to "drawUpscaledRect"
-	drawer.setBlendMode(DrawerBlendMode::ALPHA);
+	drawer.setBlendMode(BlendMode::ALPHA);
 	if (mFadeValue < 1.0f)
 	{
 		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 1.0f - mFadeValue));
@@ -737,27 +770,27 @@ void GameView::setFadedIn()
 {
 	mFadeValue = 1.0f;
 	mFadeChange = 0.0f;
-	setBlurringStillImage(false);
+	setStillImageMode(StillImageMode::NONE);
 }
 
 void GameView::startFadingIn(float fadeTime)
 {
 	mFadeValue = 0.0f;
 	mFadeChange = 1.0f / fadeTime;
-	setBlurringStillImage(false);
+	setStillImageMode(StillImageMode::NONE);
 }
 
 void GameView::startFadingOut(float fadeTime)
 {
 	mFadeChange = -1.0f / fadeTime;
-	setBlurringStillImage(false);
+	setStillImageMode(StillImageMode::NONE);
 }
 
-void GameView::setBlurringStillImage(bool enable, float timeout)
+void GameView::setStillImageMode(StillImageMode mode, float timeout)
 {
-	mBlurringStillImage = enable;
-	mBlurringTimeout = enable ? (timeout == 0.0f ? 3.0f : timeout) : 0.0f;
-	mBlurringStepTimer = 0.0f;
+	mStillImage.mMode = mode;
+	mStillImage.mBlurringTimeout = (mode != StillImageMode::NONE) ? (timeout == 0.0f ? 3.0f : timeout) : 0.0f;
+	mStillImage.mBlurringStepTimer = 0.0f;
 }
 
 void GameView::setLogDisplay(const String& string, float time)

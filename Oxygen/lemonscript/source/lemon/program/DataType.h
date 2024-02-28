@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,77 +8,79 @@
 
 #pragma once
 
-#include <rmxbase.h>
+#include "lemon/program/BaseType.h"
+#include "lemon/utility/FlyweightString.h"
 
 
 namespace lemon
 {
 
-	enum class BaseType : uint8
-	{
-		VOID	  = 0x00,
-		UINT_8	  = 0x10 + 0x00,
-		UINT_16	  = 0x10 + 0x01,
-		UINT_32	  = 0x10 + 0x02,
-		UINT_64	  = 0x10 + 0x03,
-		INT_8	  = 0x18 + 0x00,
-		INT_16	  = 0x18 + 0x01,
-		INT_32	  = 0x18 + 0x02,
-		INT_64	  = 0x18 + 0x03,
-		BOOL	  = UINT_8,
-		INT_CONST = 0x1f			// Constants have an undefined int type
-	};
-
-	enum class CastType : uint8
-	{
-		// Cast down (signed or unsigned makes no difference here)
-		INT16_TO_INT8 = 0x10,
-		INT32_TO_INT8 = 0x20,
-		INT64_TO_INT8 = 0x30,
-		INT32_TO_INT16 = 0x21,
-		INT64_TO_INT16 = 0x31,
-		INT64_TO_INT32 = 0x32,
-
-		// Cast up (value is unsigned -> adding zeroes)
-		UINT8_TO_INT16  = 0x01,
-		UINT8_TO_INT32  = 0x02,
-		UINT8_TO_INT64  = 0x03,
-		UINT16_TO_INT32 = 0x12,
-		UINT16_TO_INT64 = 0x13,
-		UINT32_TO_INT64 = 0x23,
-
-		// Cast up (value is signed -> adding highest bit)
-		SINT8_TO_INT16  = 0x80 + 0x01,
-		SINT8_TO_INT32  = 0x80 + 0x02,
-		SINT8_TO_INT64  = 0x80 + 0x03,
-		SINT16_TO_INT32 = 0x80 + 0x12,
-		SINT16_TO_INT64 = 0x80 + 0x13,
-		SINT32_TO_INT64 = 0x80 + 0x23
-	};
-
-
-
 	struct DataTypeDefinition
 	{
-		enum class Class
+	public:
+		enum class Class : uint8
 		{
 			VOID,
-			INTEGER
+			ANY,
+			INTEGER,
+			FLOAT,
+			STRING,
+			CUSTOM
 		};
 
-		Class mClass = Class::VOID;
-		size_t mBytes = 0;
-
-		inline DataTypeDefinition(Class class_, size_t bytes) : mClass(class_), mBytes(bytes) {}
+	public:
+		inline DataTypeDefinition(const char* name, uint16 id, Class class_, size_t bytes, BaseType baseType) :
+			mNameString(name),
+			mID(id),
+			mClass(class_),
+			mBytes(bytes),
+			mBaseType(baseType)
+		{}
 		virtual ~DataTypeDefinition() {}
 
 		template<typename T> const T& as() const  { return static_cast<const T&>(*this); }
 
-		virtual const std::string& toString() const;
+		FlyweightString getName() const;
+		inline uint16 getID() const			{ return mID; }
+		inline size_t getBytes() const		{ return mBytes; }
+		inline Class getClass() const		{ return mClass; }
+		inline BaseType getBaseType() const	{ return mBaseType; }
+		inline bool isPredefined() const	{ return mClass > Class::STRING; }
+
+		virtual uint16 getDataTypeHash() const  { return mID; }
+
+	private:
+		const char* mNameString;
+		mutable FlyweightString mName;
+
+		uint16 mID = 0;
+		const size_t mBytes = 0;
+		const Class mClass = Class::VOID;
+		const BaseType mBaseType = BaseType::VOID;	// If compatible to a base type (from the runtime's point of view), set this to something different than VOID
 	};
+
+
+	struct VoidDataType : public DataTypeDefinition
+	{
+	public:
+		inline VoidDataType() :
+			DataTypeDefinition("void", 0, Class::VOID, 0, BaseType::VOID)
+		{}
+	};
+
+
+	struct AnyDataType : public DataTypeDefinition
+	{
+	public:
+		inline AnyDataType() :
+			DataTypeDefinition("any", 1, Class::ANY, 0, BaseType::UINT_64)
+		{}
+	};
+
 
 	struct IntegerDataType : public DataTypeDefinition
 	{
+	public:
 		enum class Semantics
 		{
 			DEFAULT,
@@ -86,109 +88,79 @@ namespace lemon
 			BOOLEAN
 		};
 
-		Semantics mSemantics = Semantics::DEFAULT;
-		bool mIsSigned = false;
+		const Semantics mSemantics = Semantics::DEFAULT;
+		const bool mIsSigned = false;
+		const uint8 mSizeBits = 0;	// 0 for 8-bit data types, 1 for 16-bit, 2 for 32-bit, 3 for 64-bit
 
-		IntegerDataType(size_t bytes, Semantics semantics, bool isSigned) :
-			DataTypeDefinition(Class::INTEGER, bytes), mSemantics(semantics), mIsSigned(isSigned)
-		{
-		}
-	
-		const std::string& toString() const override;
+	public:
+		inline IntegerDataType(const char* name, uint16 id, size_t bytes, Semantics semantics, bool isSigned, BaseType baseType) :
+			DataTypeDefinition(name, id, Class::INTEGER, bytes, baseType),
+			mSemantics(semantics),
+			mSizeBits((bytes == 1) ? 0 : (bytes == 2) ? 1 : (bytes == 4) ? 2 : 3),
+			mIsSigned(isSigned)
+		{}
+	};
+
+
+	struct FloatDataType : public DataTypeDefinition
+	{
+	public:
+		inline FloatDataType(const char* name, uint16 id, size_t bytes) :
+			DataTypeDefinition(name, id, Class::FLOAT, bytes, (bytes == 4) ? BaseType::FLOAT : BaseType::DOUBLE)
+		{}
+	};
+
+
+	struct StringDataType : public DataTypeDefinition
+	{
+	public:
+		inline explicit StringDataType(uint16 id) :
+			DataTypeDefinition("string", id, Class::STRING, 8, BaseType::UINT_64)
+		{}
+
+		// Rather unfortunately, the data type hash for string needs to be the same as for u64, for feature level 1 compatibility regarding function overloading
+		uint16 getDataTypeHash() const override;
+	};
+
+
+	struct CustomDataType : public DataTypeDefinition
+	{
+	public:
+		explicit CustomDataType(const char* name, uint16 id, BaseType baseType);
 	};
 
 
 	struct PredefinedDataTypes
 	{
-		inline static const DataTypeDefinition VOID   = DataTypeDefinition(DataTypeDefinition::Class::VOID, 0);
+		inline static const VoidDataType VOID		  = VoidDataType();
+		inline static const AnyDataType ANY			  = AnyDataType();
 
-		inline static const IntegerDataType UINT_8	  = IntegerDataType(1, IntegerDataType::Semantics::DEFAULT, false);
-		inline static const IntegerDataType UINT_16	  = IntegerDataType(2, IntegerDataType::Semantics::DEFAULT, false);
-		inline static const IntegerDataType UINT_32	  = IntegerDataType(4, IntegerDataType::Semantics::DEFAULT, false);
-		inline static const IntegerDataType UINT_64	  = IntegerDataType(8, IntegerDataType::Semantics::DEFAULT, false);
-		inline static const IntegerDataType INT_8	  = IntegerDataType(1, IntegerDataType::Semantics::DEFAULT, true);
-		inline static const IntegerDataType INT_16	  = IntegerDataType(2, IntegerDataType::Semantics::DEFAULT, true);
-		inline static const IntegerDataType INT_32	  = IntegerDataType(4, IntegerDataType::Semantics::DEFAULT, true);
-		inline static const IntegerDataType INT_64	  = IntegerDataType(8, IntegerDataType::Semantics::DEFAULT, true);
-		inline static const IntegerDataType CONST_INT = IntegerDataType(8, IntegerDataType::Semantics::CONSTANT, true);
-		//inline static const IntegerDataType BOOL	  = IntegerDataType(1, IntegerDataType::Semantics::BOOLEAN, false);
-		inline static const IntegerDataType& BOOL	  = UINT_8;
+		inline static const IntegerDataType BOOL	  = IntegerDataType("bool", 2, 1, IntegerDataType::Semantics::BOOLEAN, false, BaseType::UINT_8);	// Using the same ID as u8, to not break overriding from before introduction of bool
+		inline static const IntegerDataType UINT_8	  = IntegerDataType("u8",   2, 1, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_8);
+		inline static const IntegerDataType UINT_16	  = IntegerDataType("u16",  3, 2, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_16);
+		inline static const IntegerDataType UINT_32	  = IntegerDataType("u32",  4, 4, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_32);
+		inline static const IntegerDataType UINT_64	  = IntegerDataType("u64",  5, 8, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_64);
+		inline static const IntegerDataType INT_8	  = IntegerDataType("s8",   6, 1, IntegerDataType::Semantics::DEFAULT, true,  BaseType::INT_8);
+		inline static const IntegerDataType INT_16	  = IntegerDataType("s16",  7, 2, IntegerDataType::Semantics::DEFAULT, true,  BaseType::INT_16);
+		inline static const IntegerDataType INT_32	  = IntegerDataType("s32",  8, 4, IntegerDataType::Semantics::DEFAULT, true,  BaseType::INT_32);
+		inline static const IntegerDataType INT_64	  = IntegerDataType("s64",  9, 8, IntegerDataType::Semantics::DEFAULT, true,  BaseType::INT_64);
+		inline static const IntegerDataType CONST_INT = IntegerDataType("const_int", 10, 8, IntegerDataType::Semantics::CONSTANT, true, BaseType::INT_CONST);
+
+		inline static const FloatDataType& FLOAT	  = FloatDataType("float", 11, 4);
+		inline static const FloatDataType& DOUBLE	  = FloatDataType("double", 12, 8);
+
+		inline static const StringDataType STRING     = StringDataType(13);
+
+		static void collectPredefinedDataTypes(std::vector<const DataTypeDefinition*>& outDataTypes);
 	};
 
 
 	struct DataTypeHelper
 	{
-		// TODO: Remove these on the long run
-		static inline BaseType getBaseType(const DataTypeDefinition* dataType)
-		{
-			if (nullptr == dataType || dataType->mClass == DataTypeDefinition::Class::VOID)
-			{
-				return BaseType::VOID;
-			}
-			else
-			{
-				const IntegerDataType& integerType = dataType->as<IntegerDataType>();
-				if (integerType.mSemantics == IntegerDataType::Semantics::BOOLEAN)
-				{
-					return BaseType::BOOL;
-				}
-				else if (integerType.mSemantics == IntegerDataType::Semantics::CONSTANT)
-				{
-					return BaseType::INT_CONST;
-				}
+		static size_t getSizeOfBaseType(BaseType baseType);
+		static const DataTypeDefinition* getDataTypeDefinitionForBaseType(BaseType baseType);
 
-				BaseType result = (integerType.mBytes == 1) ? BaseType::UINT_8 : (integerType.mBytes == 2) ? BaseType::UINT_16 : (integerType.mBytes == 4) ? BaseType::UINT_32 : BaseType::UINT_64;
-				if (integerType.mIsSigned)
-					result = (BaseType)((uint8)result + 0x08);
-				return result;
-			}
-		}
-
-		static const DataTypeDefinition* getDefinitionFromBaseType(BaseType baseType)
-		{
-			switch (baseType)
-			{
-				case BaseType::VOID:		return &PredefinedDataTypes::VOID;
-				case BaseType::UINT_8:		return &PredefinedDataTypes::UINT_8;
-				case BaseType::UINT_16:		return &PredefinedDataTypes::UINT_16;
-				case BaseType::UINT_32:		return &PredefinedDataTypes::UINT_32;
-				case BaseType::UINT_64:		return &PredefinedDataTypes::UINT_64;
-				case BaseType::INT_8:		return &PredefinedDataTypes::INT_8;
-				case BaseType::INT_16:		return &PredefinedDataTypes::INT_16;
-				case BaseType::INT_32:		return &PredefinedDataTypes::INT_32;
-				case BaseType::INT_64:		return &PredefinedDataTypes::INT_64;
-				//case BaseType::BOOL:
-				case BaseType::INT_CONST:	return &PredefinedDataTypes::CONST_INT;
-			}
-			return &PredefinedDataTypes::VOID;
-		}
-
-		static inline const DataTypeDefinition* readDataType(VectorBinarySerializer& serializer)
-		{
-			// TODO: How about some more sophisticated serialization...?
-			const BaseType baseType = (BaseType)serializer.read<uint8>();
-			return getDefinitionFromBaseType(baseType);
-		}
-
-		static inline void writeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition* const dataTypeDefinition)
-		{
-			// TODO: How about some more sophisticated serialization...?
-			const BaseType baseType = getBaseType(dataTypeDefinition);
-			serializer.writeAs<uint8>(baseType);
-		}
-
-		static inline void serializeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition*& dataTypeDefinition)
-		{
-			if (serializer.isReading())
-			{
-				dataTypeDefinition = readDataType(serializer);
-			}
-			else
-			{
-				const BaseType baseType = getBaseType(dataTypeDefinition);
-				serializer.writeAs<uint8>(baseType);
-			}
-		}
+		static bool isPureIntegerBaseCast(BaseCastType baseCastType);
 	};
 
 }

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -17,12 +17,28 @@
 #include "oxygen/application/input/InputRecorder.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
-#include "oxygen/base/PlatformFunctions.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/simulation/GameRecorder.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/analyse/ROMDataAnalyser.h"
+
+
+namespace
+{
+	void recordKeyFrame(uint32 frameNumber, CodeExec& codeExec, GameRecorder& gameRecorder, const GameRecorder::InputData& inputData)
+	{
+		static std::vector<uint8> data;
+		data.reserve(0x128000);
+		data.clear();
+
+		SaveStateSerializer serializer(codeExec, RenderParts::instance());
+		serializer.saveState(data);
+
+		gameRecorder.addKeyFrame(frameNumber, inputData, data);
+	}
+}
 
 
 Simulation::Simulation() :
@@ -48,12 +64,16 @@ bool Simulation::startup()
 {
 	Configuration& config = Configuration::instance();
 
-	LOG_INFO("Setup of EmulatorInterface");
+	RMX_LOG_INFO("Setup of EmulatorInterface");
 	mCodeExec.startup();
 
 	// Load scripts
-	LOG_INFO("Loading scripts");
-	bool success = mCodeExec.reloadScripts(true, true, false);
+	RMX_LOG_INFO("Loading scripts");
+	bool success = mCodeExec.reloadScripts(true, false);	// Note: First parameter could just as well be set to false
+	if (success)
+	{
+		mCodeExec.reinitRuntime(nullptr, CodeExec::CallStackInitPolicy::RESET);
+	}
 
 	// Optionally load save state
 	mStateLoaded.clear();
@@ -63,7 +83,7 @@ bool Simulation::startup()
 		if (!success)
 			loadState(config.mSaveStatesDir + config.mLoadSaveState + L".state");
 	}
-	LOG_INFO("Runtime environment ready");
+	RMX_LOG_INFO("Runtime environment ready");
 
 	if (EngineMain::getDelegate().useDeveloperFeatures())
 	{
@@ -71,23 +91,23 @@ bool Simulation::startup()
 		mInputRecorder.initFromConfig();
 	}
 
-	if (config.mGameRecording == 2)
+	if (config.mGameRecorder.mIsPlayback)
 	{
 		// Try the long and short name
 		if (mGameRecorder.loadRecording(L"gamerecording.bin"))
 		{
-			LOG_INFO("Playback of 'gamerecording.bin'");
+			RMX_LOG_INFO("Playback of 'gamerecording.bin'");
 		}
 		else if (mGameRecorder.loadRecording(L"gamerec.bin"))
 		{
-			LOG_INFO("Playback of 'gamerec.bin'");
+			RMX_LOG_INFO("Playback of 'gamerec.bin'");
 		}
 
-		if (mGameRecorder.isPlaying())
+		if (mGameRecorder.hasFrameNumber(mFrameNumber))
 		{
-			mGameRecorder.setIgnoreKeys(config.mGameRecIgnoreKeys);
-			mFastForwardTarget = config.mGameRecPlayFrom;
+			mGameRecorder.setIgnoreKeys(config.mGameRecorder.mPlaybackIgnoreKeys);
 			config.setSettingsReadOnly(true);	// Do not overwrite settings
+			jumpToFrame(config.mGameRecorder.mPlaybackStartFrame, false);
 		}
 	}
 
@@ -96,24 +116,24 @@ bool Simulation::startup()
 
 void Simulation::shutdown()
 {
-	LOG_INFO("Simulation shutdown");
+	RMX_LOG_INFO("Simulation shutdown");
 	mInputRecorder.shutdown();
 
 	mIsRunning = false;
 }
 
-void Simulation::requireScriptReload()
+void Simulation::reloadScriptsAfterModsChange()
 {
-	// First variant immediately reloads the scripts
-#if 1
-	if (mCodeExec.reloadScripts(true, false, false))
+	// Immediate reload of the scripts (while the loading text box is shown)
+	if (mCodeExec.reloadScripts(false, false))
 	{
 		mCodeExec.reinitRuntime(nullptr, CodeExec::CallStackInitPolicy::RESET);
 	}
-	mScriptReloadNeeded = false;
-#else
-	mScriptReloadNeeded = true;
-#endif
+}
+
+EmulatorInterface& Simulation::getEmulatorInterface()
+{
+	return mCodeExec.getEmulatorInterface();
 }
 
 void Simulation::resetState()
@@ -136,7 +156,7 @@ void Simulation::resetIntoGame(const std::vector<std::pair<std::string, std::str
 	mStateLoaded.clear();
 
 	// Reload and initialize scripts as needed
-	if (mCodeExec.reloadScripts(mScriptReloadNeeded, false, false))		// Reload if flag is set, or if detecting changes in whether mod scripts should be active
+	if (mCodeExec.reloadScripts(false, false))
 	{
 		mCodeExec.reinitRuntime(enforcedCallStack, CodeExec::CallStackInitPolicy::RESET);
 	}
@@ -148,18 +168,16 @@ void Simulation::resetIntoGame(const std::vector<std::pair<std::string, std::str
 		{
 			for (Mod::Setting& modSetting : modSettingCategory.mSettings)
 			{
-				mCodeExec.getLemonScriptRuntime().setGlobalVariableValue(modSetting.mBinding, modSetting.mCurrentValue);
+				mCodeExec.getLemonScriptRuntime().setGlobalVariableValue_int64(modSetting.mBinding, modSetting.mCurrentValue);
 			}
 		}
 	}
 
-	const float tickLength = 1.0f / getSimulationFrequency();
-	const float tickAccumInitial = tickLength * 0.25f;		// You would usually except this to be zero, but that's a bit too far from the stable center
-
-	mScriptReloadNeeded = false;
-	mAccumulatedTime = tickAccumInitial;
+	mFrameNumber = 0;
+	mCurrentTargetFrame = 0.0;
 	mNextSingleStep = false;
 	mSingleStepContinue = false;
+	mGameRecorder.clear();
 }
 
 void Simulation::resetIntoGame(const std::string& entryFunctionName)
@@ -194,6 +212,13 @@ bool Simulation::loadState(const std::wstring& filename, bool showError)
 
 	mStateLoaded = filename;
 	mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
+
+	mFrameNumber = 0;
+	mCurrentTargetFrame = 0.0;
+	mNextSingleStep = false;
+	mSingleStepContinue = false;
+
+	mGameRecorder.clear();
 	return true;
 }
 
@@ -212,9 +237,17 @@ void Simulation::saveState(const std::wstring& filename)
 	mStateLoaded = filename;
 }
 
-bool Simulation::reloadScripts(bool enforceFullReload)
+bool Simulation::triggerFullScriptsReload()
 {
-	return mCodeExec.reloadScripts(enforceFullReload, true, !mStateLoaded.empty());
+	if (mCodeExec.reloadScripts(true, true))
+	{
+		mCodeExec.restoreRuntimeState(!mStateLoaded.empty());
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void Simulation::update(float timeElapsed)
@@ -222,100 +255,99 @@ void Simulation::update(float timeElapsed)
 	if (!isRunning() || !mCodeExec.isCodeExecutionPossible())
 		return;
 
-	const float tickLength = 1.0f / getSimulationFrequency();
-	const float tickStableCenter = tickLength * 0.5f;		// Right in between the tick length, where it's most clearly inside the tick (towards the edges 0.0f and tick length, things get a bit ambiguous)
-	const float tickAccumInitial = tickLength * 0.25f;		// You would usually except this to be zero, but that's a bit too far from the stable center
-
-	// Handle fast forwarding (for game recording playback)
-	if (mFrameNumber < mFastForwardTarget)
+	if (mRewindSteps >= 0)
 	{
-		for (int i = std::min<int>(mFastForwardTarget - mFrameNumber, 500); i > 0; --i)
-		{
-			// Update emulation
-			const bool result = generateFrame();
-			if (!result)
-				break;
-		}
-		mAccumulatedTime = tickAccumInitial;
-		return;
+		setSpeed(0.0f);
+		if (mRewindSteps >= 1)
+			jumpToFrame(mFrameNumber - mRewindSteps);
+		mRewindSteps = -1;
 	}
 
 	// Limit length of one frame to 100ms
 	timeElapsed = clamp(timeElapsed, 0.0f, 0.1f);
 
 	// Do nothing as long as not enough time has passed
+	const double oldTargetFrame = mCurrentTargetFrame;
 	if (mSimulationSpeed <= 0.0f)
 	{
 		if (mNextSingleStep)
 		{
-			mAccumulatedTime = tickLength;
+			mCurrentTargetFrame = roundToDouble(mCurrentTargetFrame + 1.0);
 			mNextSingleStep = mSingleStepContinue;
 		}
 		else
 		{
-			mAccumulatedTime = tickAccumInitial;
+			mCurrentTargetFrame = roundToDouble(mCurrentTargetFrame);
 		}
 	}
 	else
 	{
 		const float step = timeElapsed * mSimulationSpeed;
-		mAccumulatedTime += step;
+		mCurrentTargetFrame += (double)step * (double)getSimulationFrequency();
 	}
 
-	if (mAccumulatedTime >= tickLength)
+	const bool useFrameInterpolation = (Configuration::instance().mFrameSync == Configuration::FrameSyncType::FRAME_INTERPOLATION);
+	const uint32 requiredFrameNumber = useFrameInterpolation ? (uint32)std::ceil(mCurrentTargetFrame) : (uint32)roundToInt(mCurrentTargetFrame);
+
+	if (mFrameNumber < requiredFrameNumber)
 	{
 		const uint32 startTime = SDL_GetTicks();
 		const uint32 limitTime = startTime + 200;
 
-		while (true)
+		while (mFrameNumber < requiredFrameNumber)
 		{
 			// Update emulation
 			const bool result = generateFrame();
-			mAccumulatedTime -= tickLength;
-
-			if (!result || mAccumulatedTime < tickLength)
+			if (!result)
 				break;
 
 			// Time limit to prevent non-responding application
 			if (SDL_GetTicks() >= limitTime)
 			{
-				mAccumulatedTime = tickAccumInitial;
+				// Reset target frame to an earlier frame, but still make sure we had any progress at all
+				mCurrentTargetFrame = std::max((double)mFrameNumber, oldTargetFrame);
 				break;
 			}
 		}
 
 		// Each second, a small correction to the accumulated time gets applied
-		if (mFrameNumber - mLastCorrectionFrame >= 60)
+		if ((int)(mFrameNumber - mLastCorrectionFrame) >= (int)getSimulationFrequency())
 		{
 			// The idea here is to bring the accumulated time towards the midpoint, where it's most stable against unintentional double frames or frame skips (which might happen otherwise)
 			//  -> This is most useful for 60 Hz displays with V-sync on, but should have a similar effect on e.g. 75 Hz, 90 Hz, 120 Hz
 			//  -> It should not introduce any noticeable issues or game speed changes in other cases
-			const float diff = mAccumulatedTime - tickStableCenter;
-			const float maxChange = tickLength * 0.1f;
-			if (std::fabs(diff) < tickLength * 0.4f)	// Don't do this while close to the instable edges
-			{
-				mAccumulatedTime += clamp(-diff, -maxChange, maxChange);
-				mLastCorrectionFrame = mFrameNumber;
-			}
+			const double stableOffset = useFrameInterpolation ? 0.25 : 0.0;
+			const double diff = mCurrentTargetFrame - (roundToDouble(mCurrentTargetFrame - stableOffset) + stableOffset);
+			const constexpr double maxChange = 0.1;
+			mCurrentTargetFrame += clamp(-diff, -maxChange, maxChange);
+			mLastCorrectionFrame = mFrameNumber;
 		}
 	}
 
-	VideoOut::instance().setInterFramePosition(saturate(mAccumulatedTime / tickLength));
+	if (mFrameNumber == requiredFrameNumber)
+	{
+		const float position = saturate((float)(mCurrentTargetFrame - (double)(mFrameNumber - 1)));
+		VideoOut::instance().setInterFramePosition(position);
+	}
+	else
+	{
+		VideoOut::instance().setInterFramePosition(0.0f);
+	}
 
 #if 0
 	// Meant for debugging of accumulated time stability
 	if ((mFrameNumber % 6) == 0)
-		LogDisplay::instance().setModeDisplay(String(0, "accum = %02d%%", roundToInt(mAccumulatedTime / tickLength * 100)));
+		LogDisplay::instance().setModeDisplay(String(0, "diff = %+0.3f", (float)(mCurrentTargetFrame - roundToDouble(mCurrentTargetFrame))));
 #endif
 }
 
 bool Simulation::generateFrame()
 {
 	ControlsIn& controlsIn = ControlsIn::instance();
-	const bool isGameRecorderPlayback = (Configuration::instance().mGameRecording == 2);
-	const bool isGameRecorderRecording = (Configuration::instance().mGameRecording == 1);
+	const bool isGameRecorderPlayback = Configuration::instance().mGameRecorder.mIsPlayback;
+	const bool isGameRecorderRecording = Configuration::instance().mGameRecorder.mIsRecording;
 
-	const bool beginningNewFrame = (mCodeExec.willBeginNewFrame() || isGameRecorderPlayback);
+	const bool beginningNewFrame = mCodeExec.willBeginNewFrame();
 	const float tickLength = 1.0f / getSimulationFrequency();
 
 	bool completedCurrentFrame = false;
@@ -330,31 +362,41 @@ bool Simulation::generateFrame()
 		// Tell video that we begin a new frame
 		VideoOut::instance().preFrameUpdate();
 
-		// Game recorder playback
-		if (isGameRecorderPlayback)
+		// Game recorder: Save initial frame
+		if (isGameRecorderRecording && mGameRecorder.getRangeEnd() == 0)
 		{
-			GameRecorder::PlaybackResult result;
-			if (mGameRecorder.updatePlayback(result))
+			recordKeyFrame(0, mCodeExec, mGameRecorder, GameRecorder::InputData());
+		}
+
+		// If game recorder has input data for the frame transition, then use that
+		//  -> This is particularly relevant for rewinds, namely for the small fast forwards from the previous keyframe
+		GameRecorder::PlaybackResult result;
+		if (mGameRecorder.getFrameData(mFrameNumber + 1, result))
+		{
+			if (isGameRecorderPlayback)
+				LogDisplay::instance().setModeDisplay("Game recorder playback at frame: " + std::to_string(mFrameNumber + 1));
+
+			if (nullptr != result.mData && !Configuration::instance().mGameRecorder.mPlaybackIgnoreKeys)
 			{
-				if (nullptr != result.mData)
+				// Load save state
+				SaveStateSerializer::StateType stateType;
+				SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
+
+				const bool success = serializer.loadState(*result.mData, &stateType);
+				if (success)
 				{
-					SaveStateSerializer::StateType stateType;
-					SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
-
-					const bool success = serializer.loadState(*result.mData, &stateType);
-					if (success)
-					{
-						mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
-						completedCurrentFrame = true;
-					}
-					else
-						RMX_ERROR("Failed to load save state", );
+					mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
+					completedCurrentFrame = true;
 				}
-
-				ControlsIn::instance().injectInput(0, result.mInputs[0]);
-				ControlsIn::instance().injectInput(1, result.mInputs[1]);
-				inputWasInjected = true;
+				else
+				{
+					RMX_ERROR("Failed to load save state", );
+				}
 			}
+
+			ControlsIn::instance().injectInput(0, result.mInput->mInputs[0]);
+			ControlsIn::instance().injectInput(1, result.mInput->mInputs[1]);
+			inputWasInjected = true;
 		}
 
 		// Update input state
@@ -412,25 +454,36 @@ bool Simulation::generateFrame()
 		// Update game recording
 		if (isGameRecorderRecording)
 		{
-			InputRecorder::InputState inputState;
-			inputState.mInputFlags[0] = controlsIn.getInputPad(0);
-			inputState.mInputFlags[1] = controlsIn.getInputPad(1);
-
-			if ((mGameRecorder.getRangeEnd() % 180) == 0)	// Keyframe every 3 seconds
+			if (!mGameRecorder.hasFrameNumber(mFrameNumber + 1))
 			{
-				static std::vector<uint8> data;
-				data.reserve(0x128000);
-				data.clear();
+				GameRecorder::InputData inputData;
+				inputData.mInputs[0] = controlsIn.getInputPad(0);
+				inputData.mInputs[1] = controlsIn.getInputPad(1);
 
-				SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
-				serializer.saveState(data);
-
-				mGameRecorder.addKeyFrame(inputState.mInputFlags, data);
-				mGameRecorder.discardOldFrames(1800);
+				// Keyframe every 3 seconds - except when dev mode is active, because rewinding requires more frequent keyframes
+				const int keyframeFrequency = EngineMain::getDelegate().useDeveloperFeatures() ? 10 : 180;
+				const int framesToKeep = EngineMain::getDelegate().useDeveloperFeatures() ? 3600 : 1800;
+				if (((mFrameNumber + 1) % keyframeFrequency) == 0)
+				{
+					recordKeyFrame(mFrameNumber + 1, mCodeExec, mGameRecorder, inputData);
+					mGameRecorder.discardOldFrames(framesToKeep);
+				}
+				else
+				{
+					mGameRecorder.addFrame(mFrameNumber + 1, inputData);
+				}
 			}
-			else
+		}
+		else if (isGameRecorderPlayback && EngineMain::getDelegate().useDeveloperFeatures())
+		{
+			// Generate a keyframe every 10 frames, to allow for quick rewinds during game recording playback as well
+			const int keyframeFrequency = 10;
+			if (((mFrameNumber + 1) % keyframeFrequency) == 0 && !mGameRecorder.isKeyframe(mFrameNumber + 1))
 			{
-				mGameRecorder.addFrame(inputState.mInputFlags);
+				GameRecorder::InputData inputData;
+				inputData.mInputs[0] = controlsIn.getInputPad(0);
+				inputData.mInputs[1] = controlsIn.getInputPad(1);
+				recordKeyFrame(mFrameNumber + 1, mCodeExec, mGameRecorder, inputData);
 			}
 		}
 
@@ -441,6 +494,57 @@ bool Simulation::generateFrame()
 	//  -> In this case, the outer loop should break
 	//  -> Same if code execution is not possible any more
 	return (completedCurrentFrame && mCodeExec.isCodeExecutionPossible());
+}
+
+bool Simulation::jumpToFrame(uint32 frameNumber, bool clearRecordingAfterwards)
+{
+	const bool isGameRecorderPlayback = Configuration::instance().mGameRecorder.mIsPlayback;
+	const bool isGameRecorderRecording = Configuration::instance().mGameRecorder.mIsRecording;
+
+	if (isGameRecorderRecording || isGameRecorderPlayback)
+	{
+		if (isGameRecorderPlayback)
+			clearRecordingAfterwards = false;
+
+		// Go back until the most recent keyframe, in case the selected frame is not a keyframe itself
+		GameRecorder::PlaybackResult result;
+		uint32 keyframeNumber = frameNumber;
+		if (!mGameRecorder.getFrameData(keyframeNumber, result))
+			return false;
+
+		while (nullptr == result.mData)
+		{
+			if (keyframeNumber == 0)
+				return false;
+			--keyframeNumber;
+			if (!mGameRecorder.getFrameData(keyframeNumber, result))
+				return false;
+		}
+
+		SaveStateSerializer::StateType stateType;
+		SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
+
+		const bool success = serializer.loadState(*result.mData, &stateType);
+		if (success)
+		{
+			// Inject inputs for this frame, so that previous input will be set correctly in the next frame
+			ControlsIn::instance().injectInput(0, result.mInput->mInputs[0]);
+			ControlsIn::instance().injectInput(1, result.mInput->mInputs[1]);
+
+			mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
+			mFrameNumber = keyframeNumber;
+			mCurrentTargetFrame = (float)frameNumber;
+
+			if (clearRecordingAfterwards)
+			{
+				// Discard later frames to disable the logic that uses their recorded inputs instead of player input
+				mGameRecorder.discardFramesAfter(frameNumber);
+			}
+			return true;
+		}
+	}
+
+	return false;
 }
 
 float Simulation::getSimulationFrequency() const
@@ -473,20 +577,22 @@ void Simulation::stopSingleStepContinue()
 
 void Simulation::refreshDebugging()
 {
+	VideoOut::instance().preRefreshDebugging();
 	mCodeExec.executeScriptFunction("OxygenCallback.setupCustomSidePanelEntries", false);
+	VideoOut::instance().postRefreshDebugging();
 }
 
 uint32 Simulation::saveGameRecording(WString* outFilename)
 {
-	WString filename = L"gamerecording.bin";
-	const std::string timeString = PlatformFunctions::getSystemTimeString();
+	std::wstring filename = L"gamerecording.bin";
+	const std::string timeString = PlatformFunctions::getCompactSystemTimeString();
 	if (!timeString.empty())
 	{
-		filename.format(L"gamerecording_%s.bin", *String(timeString).toWString());
+		filename = L"gamerecording_" + String(timeString).toStdWString() + L".bin";
 	}
-	filename = WString(Configuration::instance().mAppDataPath) + L"gamerecordings/" + filename;
+	filename = Configuration::instance().mAppDataPath + L"gamerecordings/" + filename;
 
-	if (!mGameRecorder.saveRecording(*filename))
+	if (!mGameRecorder.saveRecording(filename, 180))
 		return 0;
 
 	if (nullptr != outFilename)

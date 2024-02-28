@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -12,7 +12,7 @@
 #include "oxygen/rendering/Geometry.h"
 
 class Renderer;
-class HardwareRenderer;
+class OpenGLRenderer;
 class SoftwareRenderer;
 class RenderParts;
 class RenderResources;
@@ -28,9 +28,11 @@ public:
 	void shutdown();
 	void reset();
 
+	void handleActiveModsChanged();
+
 	void createRenderer(bool reset);
 	void destroyRenderer();
-	void setActiveRenderer(bool useSoftwareRenderer, bool reset);
+	void setActiveRenderer(bool useOpenGLRenderer, bool reset);
 
 	inline uint32 getScreenWidth() const   { return mGameResolution.x; }
 	inline uint32 getScreenHeight() const  { return mGameResolution.y; }
@@ -42,10 +44,16 @@ public:
 
 	void preFrameUpdate();
 	void postFrameUpdate();
-	void setInterFramePosition(float position);
-	bool updateGameScreen();
+	void initAfterSaveStateLoad();
 
+	inline bool useFrameInterpolation() const  { return mFrameInterpolation.mUseInterpolationThisUpdate; }
+	void setInterFramePosition(float position);
+
+	bool updateGameScreen();
 	void blurGameScreen();
+
+	void preRefreshDebugging();
+	void postRefreshDebugging();
 
 	void renderDebugDraw(int debugDrawMode, const Recti& rect);
 	void dumpDebugDraw(int debugDrawMode);
@@ -74,10 +82,20 @@ private:
 		FRAME_READY			// Last frame was completed, waiting to be rendered
 	};
 
+	struct FrameInterpolation
+	{
+		bool mCurrentlyInterpolating = false;
+		bool mUseInterpolationLastUpdate = false;
+		bool mUseInterpolationThisUpdate = false;
+		float mInterFramePosition = 0.0f;
+	};
+
 private:
 	Renderer* mActiveRenderer = nullptr;
-	HardwareRenderer* mHardwareRenderer = nullptr;
 	SoftwareRenderer* mSoftwareRenderer = nullptr;
+#ifdef RMX_WITH_OPENGL_SUPPORT
+	OpenGLRenderer* mOpenGLRenderer = nullptr;
+#endif
 
 	RenderParts* mRenderParts = nullptr;
 	DrawerTexture mGameScreenTexture;
@@ -87,10 +105,13 @@ private:
 	FrameState mFrameState = FrameState::OUTSIDE_FRAME;
 	uint32 mLastFrameTicks = 0;
 
-	bool mUsingFrameInterpolation = false;
-	float mInterFramePosition = 0.0f;
+	FrameInterpolation mFrameInterpolation;
 	Vec2i mLastWorldSpaceOffset;
 
 	std::vector<Geometry*> mGeometries;
 	GeometryFactory mGeometryFactory;
+
+	bool mDebugDrawRenderingRequested = false;
+	bool mPreviouslyHadNewRenderItems = false;
+	bool mRequireGameScreenUpdate = false;
 };

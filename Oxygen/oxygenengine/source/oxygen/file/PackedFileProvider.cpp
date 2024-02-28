@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,7 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/file/PackedFileProvider.h"
 #include "oxygen/file/FileStructureTree.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 
 
 struct PackedFileProvDetail
@@ -73,14 +73,32 @@ struct PackedFileProvider::Internal
 
 
 
-PackedFileProvider::PackedFileProvider(const std::wstring& packageFilename) :
+PackedFileProvider* PackedFileProvider::createPackedFileProvider(std::wstring_view packageFilename)
+{
+	if (!FTX::FileSystem->exists(packageFilename))
+		return nullptr;
+
+	PackedFileProvider* provider = new PackedFileProvider(packageFilename);
+	if (provider->isLoaded())
+	{
+		return provider;
+	}
+	else
+	{
+		// Oops, could not load package file
+		delete provider;
+		return nullptr;
+	}
+}
+
+PackedFileProvider::PackedFileProvider(std::wstring_view packageFilename) :
 	mInternal(*new Internal())
 {
 	// Load the package if there is one
 	mLoaded = FilePackage::loadPackage(packageFilename, mPackedFiles, mInputStream, true);	// TODO: Use streaming instead of loading all content right away
 	if (mLoaded)
 	{
-		LOG_INFO("Loaded file package '" << WString(packageFilename).toStdString() << "' with " << mPackedFiles.size() << " entries");
+		RMX_LOG_INFO("Loaded file package '" << WString(packageFilename).toStdString() << "' with " << mPackedFiles.size() << " entries");
 
 		// Setup file structure tree
 		for (const auto& pair : mPackedFiles)
@@ -92,7 +110,7 @@ PackedFileProvider::PackedFileProvider(const std::wstring& packageFilename) :
 	}
 	else
 	{
-		LOG_INFO("Failed to load file package '" << WString(packageFilename).toStdString() << "'");
+		RMX_LOG_INFO("Failed to load file package '" << WString(packageFilename).toStdString() << "'");
 	}
 }
 
@@ -107,9 +125,13 @@ void PackedFileProvider::unregisterPackedFileInputStream(PackedFileInputStream& 
 	mPackedFileInputStreams.erase(&packedFileInputStream);
 }
 
-bool PackedFileProvider::exists(const std::wstring& filename)
+bool PackedFileProvider::exists(const std::wstring& path)
 {
-	return (nullptr != findPackedFile(filename));
+	if (nullptr != findPackedFile(path))
+		return true;
+
+	// Fallback needed specifically if the path refers to a directory
+	return mInternal.mFileStructureTree.pathExists(path);
 }
 
 bool PackedFileProvider::readFile(const std::wstring& filename, std::vector<uint8>& outData)

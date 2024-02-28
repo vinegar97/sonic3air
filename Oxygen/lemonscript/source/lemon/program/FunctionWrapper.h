@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,14 +10,22 @@
 
 #include "lemon/program/Function.h"
 #include "lemon/runtime/Runtime.h"
+#include "lemon/utility/AnyBaseValue.h"
 
 
 namespace lemon
 {
 
+	struct AnyTypeWrapper
+	{
+		const DataTypeDefinition* mType = nullptr;
+		AnyBaseValue mValue;
+	};
+
+
 	namespace traits
 	{
-		template<typename T> const DataTypeDefinition* getDataType()	{ return T::UNKNOWN_TYPE; }
+		template<typename T> const DataTypeDefinition* getDataType()  { return T::UNKNOWN_TYPE; }
 		template<> const DataTypeDefinition* getDataType<void>();
 		template<> const DataTypeDefinition* getDataType<bool>();
 		template<> const DataTypeDefinition* getDataType<int8>();
@@ -28,33 +36,67 @@ namespace lemon
 		template<> const DataTypeDefinition* getDataType<uint32>();
 		template<> const DataTypeDefinition* getDataType<int64>();
 		template<> const DataTypeDefinition* getDataType<uint64>();
+		template<> const DataTypeDefinition* getDataType<float>();
+		template<> const DataTypeDefinition* getDataType<double>();
+		template<> const DataTypeDefinition* getDataType<StringRef>();
+		template<> const DataTypeDefinition* getDataType<AnyTypeWrapper>();
 	}
 
 
 	namespace internal
 	{
 
-		// Return type handlers for functions
+		// Stack interactions templates for base types - these functions are used as a basis for return type and parameter type handling
 
 		template<typename R>
-		void handleResult(R result, const UserDefinedFunction::Context context)
+		void pushStackGeneric(R value, const NativeFunction::Context context)
 		{
-			context.mControlFlow.pushValueStack(traits::getDataType<R>(), result);
+			context.mControlFlow.pushValueStack<R>(value);
 		};
+
+		template<typename T>
+		T popStackGeneric(const NativeFunction::Context context)
+		{
+			return static_cast<T>(context.mControlFlow.popValueStack<T>());
+		}
+
+
+
+		// Template specializations for StringRef, representing the "string" type in script
+
+		template<>
+		void pushStackGeneric<StringRef>(StringRef value, const NativeFunction::Context context);
+
+		template<>
+		StringRef popStackGeneric(const NativeFunction::Context context);
+
+
+
+		// Template specializations for AnyTypeWrapper, representing the "any" type in script
+
+		template<>
+		void pushStackGeneric<AnyTypeWrapper>(AnyTypeWrapper value, const NativeFunction::Context context);
+
+		template<>
+		AnyTypeWrapper popStackGeneric(const NativeFunction::Context context);
+
+
+
+		// Return type handlers for functions
 
 		template<typename R>
 		struct ReturnTypeHandler0
 		{
-			void call(R(*pointer)(), const UserDefinedFunction::Context context)
+			void call(R(*pointer)(), const NativeFunction::Context context)
 			{
-				handleResult(pointer(), context);
+				pushStackGeneric(pointer(), context);
 			}
 		};
 
 		template<>
 		struct ReturnTypeHandler0<void>
 		{
-			void call(void(*pointer)(), const UserDefinedFunction::Context context)
+			void call(void(*pointer)(), const NativeFunction::Context context)
 			{
 				pointer();
 			}
@@ -63,16 +105,16 @@ namespace lemon
 		template<typename R, typename A>
 		struct ReturnTypeHandler1
 		{
-			void call(R(*pointer)(A), const UserDefinedFunction::Context context, A a)
+			void call(R(*pointer)(A), const NativeFunction::Context context, A a)
 			{
-				handleResult(pointer(a), context);
+				pushStackGeneric(pointer(a), context);
 			}
 		};
 
 		template<typename A>
 		struct ReturnTypeHandler1<void, A>
 		{
-			void call(void(*pointer)(A), const UserDefinedFunction::Context context, A a)
+			void call(void(*pointer)(A), const NativeFunction::Context context, A a)
 			{
 				pointer(a);
 			}
@@ -81,16 +123,16 @@ namespace lemon
 		template<typename R, typename A, typename B>
 		struct ReturnTypeHandler2
 		{
-			void call(R(*pointer)(A, B), const UserDefinedFunction::Context context, A a, B b)
+			void call(R(*pointer)(A, B), const NativeFunction::Context context, A a, B b)
 			{
-				handleResult(pointer(a, b), context);
+				pushStackGeneric(pointer(a, b), context);
 			}
 		};
 
 		template<typename A, typename B>
 		struct ReturnTypeHandler2<void, A, B>
 		{
-			void call(void(*pointer)(A, B), const UserDefinedFunction::Context context, A a, B b)
+			void call(void(*pointer)(A, B), const NativeFunction::Context context, A a, B b)
 			{
 				pointer(a, b);
 			}
@@ -99,16 +141,16 @@ namespace lemon
 		template<typename R, typename A, typename B, typename C>
 		struct ReturnTypeHandler3
 		{
-			void call(R(*pointer)(A, B, C), const UserDefinedFunction::Context context, A a, B b, C c)
+			void call(R(*pointer)(A, B, C), const NativeFunction::Context context, A a, B b, C c)
 			{
-				handleResult(pointer(a, b, c), context);
+				pushStackGeneric(pointer(a, b, c), context);
 			}
 		};
 
 		template<typename A, typename B, typename C>
 		struct ReturnTypeHandler3<void, A, B, C>
 		{
-			void call(void(*pointer)(A, B, C), const UserDefinedFunction::Context context, A a, B b, C c)
+			void call(void(*pointer)(A, B, C), const NativeFunction::Context context, A a, B b, C c)
 			{
 				pointer(a, b, c);
 			}
@@ -117,16 +159,16 @@ namespace lemon
 		template<typename R, typename A, typename B, typename C, typename D>
 		struct ReturnTypeHandler4
 		{
-			void call(R(*pointer)(A, B, C, D), const UserDefinedFunction::Context context, A a, B b, C c, D d)
+			void call(R(*pointer)(A, B, C, D), const NativeFunction::Context context, A a, B b, C c, D d)
 			{
-				handleResult(pointer(a, b, c, d), context);
+				pushStackGeneric(pointer(a, b, c, d), context);
 			}
 		};
 
 		template<typename A, typename B, typename C, typename D>
 		struct ReturnTypeHandler4<void, A, B, C, D>
 		{
-			void call(void(*pointer)(A, B, C, D), const UserDefinedFunction::Context context, A a, B b, C c, D d)
+			void call(void(*pointer)(A, B, C, D), const NativeFunction::Context context, A a, B b, C c, D d)
 			{
 				pointer(a, b, c, d);
 			}
@@ -135,16 +177,16 @@ namespace lemon
 		template<typename R, typename A, typename B, typename C, typename D, typename E>
 		struct ReturnTypeHandler5
 		{
-			void call(R(*pointer)(A, B, C, D, E), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e)
+			void call(R(*pointer)(A, B, C, D, E), const NativeFunction::Context context, A a, B b, C c, D d, E e)
 			{
-				handleResult(pointer(a, b, c, d, e), context);
+				pushStackGeneric(pointer(a, b, c, d, e), context);
 			}
 		};
 
 		template<typename A, typename B, typename C, typename D, typename E>
 		struct ReturnTypeHandler5<void, A, B, C, D, E>
 		{
-			void call(void(*pointer)(A, B, C, D, E), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e)
+			void call(void(*pointer)(A, B, C, D, E), const NativeFunction::Context context, A a, B b, C c, D d, E e)
 			{
 				pointer(a, b, c, d, e);
 			}
@@ -153,16 +195,16 @@ namespace lemon
 		template<typename R, typename A, typename B, typename C, typename D, typename E, typename F>
 		struct ReturnTypeHandler6
 		{
-			void call(R(*pointer)(A, B, C, D, E, F), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f)
+			void call(R(*pointer)(A, B, C, D, E, F), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f)
 			{
-				handleResult(pointer(a, b, c, d, e, f), context);
+				pushStackGeneric(pointer(a, b, c, d, e, f), context);
 			}
 		};
 
 		template<typename A, typename B, typename C, typename D, typename E, typename F>
 		struct ReturnTypeHandler6<void, A, B, C, D, E, F>
 		{
-			void call(void(*pointer)(A, B, C, D, E, F), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f)
+			void call(void(*pointer)(A, B, C, D, E, F), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f)
 			{
 				pointer(a, b, c, d, e, f);
 			}
@@ -171,16 +213,16 @@ namespace lemon
 		template<typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G>
 		struct ReturnTypeHandler7
 		{
-			void call(R(*pointer)(A, B, C, D, E, F, G), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g)
+			void call(R(*pointer)(A, B, C, D, E, F, G), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g)
 			{
-				handleResult(pointer(a, b, c, d, e, f, g), context);
+				pushStackGeneric(pointer(a, b, c, d, e, f, g), context);
 			}
 		};
 
 		template<typename A, typename B, typename C, typename D, typename E, typename F, typename G>
 		struct ReturnTypeHandler7<void, A, B, C, D, E, F, G>
 		{
-			void call(void(*pointer)(A, B, C, D, E, F, G), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g)
+			void call(void(*pointer)(A, B, C, D, E, F, G), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g)
 			{
 				pointer(a, b, c, d, e, f, g);
 			}
@@ -189,16 +231,16 @@ namespace lemon
 		template<typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H>
 		struct ReturnTypeHandler8
 		{
-			void call(R(*pointer)(A, B, C, D, E, F, G, H), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h)
+			void call(R(*pointer)(A, B, C, D, E, F, G, H), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h)
 			{
-				handleResult(pointer(a, b, c, d, e, f, g, h), context);
+				pushStackGeneric(pointer(a, b, c, d, e, f, g, h), context);
 			}
 		};
 
 		template<typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H>
 		struct ReturnTypeHandler8<void, A, B, C, D, E, F, G, H>
 		{
-			void call(void(*pointer)(A, B, C, D, E, F, G, H), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h)
+			void call(void(*pointer)(A, B, C, D, E, F, G, H), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h)
 			{
 				pointer(a, b, c, d, e, f, g, h);
 			}
@@ -207,16 +249,16 @@ namespace lemon
 		template<typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I>
 		struct ReturnTypeHandler9
 		{
-			void call(R(*pointer)(A, B, C, D, E, F, G, H, I), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i)
+			void call(R(*pointer)(A, B, C, D, E, F, G, H, I), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i)
 			{
-				handleResult(pointer(a, b, c, d, e, f, g, h, i), context);
+				pushStackGeneric(pointer(a, b, c, d, e, f, g, h, i), context);
 			}
 		};
 
 		template<typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I>
 		struct ReturnTypeHandler9<void, A, B, C, D, E, F, G, H, I>
 		{
-			void call(void(*pointer)(A, B, C, D, E, F, G, H, I), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i)
+			void call(void(*pointer)(A, B, C, D, E, F, G, H, I), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i)
 			{
 				pointer(a, b, c, d, e, f, g, h, i);
 			}
@@ -225,16 +267,16 @@ namespace lemon
 		template<typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J>
 		struct ReturnTypeHandler10
 		{
-			void call(R(*pointer)(A, B, C, D, E, F, G, H, I, J), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j)
+			void call(R(*pointer)(A, B, C, D, E, F, G, H, I, J), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j)
 			{
-				handleResult(pointer(a, b, c, d, e, f, g, h, i, j), context);
+				pushStackGeneric(pointer(a, b, c, d, e, f, g, h, i, j), context);
 			}
 		};
 
 		template<typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J>
 		struct ReturnTypeHandler10<void, A, B, C, D, E, F, G, H, I, J>
 		{
-			void call(void(*pointer)(A, B, C, D, E, F, G, H, I, J), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j)
+			void call(void(*pointer)(A, B, C, D, E, F, G, H, I, J), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j)
 			{
 				pointer(a, b, c, d, e, f, g, h, i, j);
 			}
@@ -243,16 +285,16 @@ namespace lemon
 		template<typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K>
 		struct ReturnTypeHandler11
 		{
-			void call(R(*pointer)(A, B, C, D, E, F, G, H, I, J, K), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k)
+			void call(R(*pointer)(A, B, C, D, E, F, G, H, I, J, K), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k)
 			{
-				handleResult(pointer(a, b, c, d, e, f, g, h, i, j, k), context);
+				pushStackGeneric(pointer(a, b, c, d, e, f, g, h, i, j, k), context);
 			}
 		};
 
 		template<typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K>
 		struct ReturnTypeHandler11<void, A, B, C, D, E, F, G, H, I, J, K>
 		{
-			void call(void(*pointer)(A, B, C, D, E, F, G, H, I, J, K), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k)
+			void call(void(*pointer)(A, B, C, D, E, F, G, H, I, J, K), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k)
 			{
 				pointer(a, b, c, d, e, f, g, h, i, j, k);
 			}
@@ -265,16 +307,16 @@ namespace lemon
 		template<typename CLASS, typename R>
 		struct ReturnTypeHandlerM0
 		{
-			void call(CLASS& object, R(CLASS::*pointer)(), const UserDefinedFunction::Context context)
+			void call(CLASS& object, R(CLASS::*pointer)(), const NativeFunction::Context context)
 			{
-				handleResult((object.*pointer)(), context);
+				pushStackGeneric((object.*pointer)(), context);
 			}
 		};
 
 		template<typename CLASS>
 		struct ReturnTypeHandlerM0<CLASS, void>
 		{
-			void call(CLASS& object, void(CLASS::*pointer)(), const UserDefinedFunction::Context context)
+			void call(CLASS& object, void(CLASS::*pointer)(), const NativeFunction::Context context)
 			{
 				(object.*pointer)();
 			}
@@ -283,16 +325,16 @@ namespace lemon
 		template<typename CLASS, typename R, typename A>
 		struct ReturnTypeHandlerM1
 		{
-			void call(CLASS& object, R(CLASS::*pointer)(A), const UserDefinedFunction::Context context, A a)
+			void call(CLASS& object, R(CLASS::*pointer)(A), const NativeFunction::Context context, A a)
 			{
-				handleResult((object.*pointer)(a), context);
+				pushStackGeneric((object.*pointer)(a), context);
 			}
 		};
 
 		template<typename CLASS, typename A>
 		struct ReturnTypeHandlerM1<CLASS, void, A>
 		{
-			void call(CLASS& object, void(CLASS::*pointer)(A), const UserDefinedFunction::Context context, A a)
+			void call(CLASS& object, void(CLASS::*pointer)(A), const NativeFunction::Context context, A a)
 			{
 				(object.*pointer)(a);
 			}
@@ -301,16 +343,16 @@ namespace lemon
 		template<typename CLASS, typename R, typename A, typename B>
 		struct ReturnTypeHandlerM2
 		{
-			void call(CLASS& object, R(CLASS::*pointer)(A, B), const UserDefinedFunction::Context context, A a, B b)
+			void call(CLASS& object, R(CLASS::*pointer)(A, B), const NativeFunction::Context context, A a, B b)
 			{
-				handleResult((object.*pointer)(a, b), context);
+				pushStackGeneric((object.*pointer)(a, b), context);
 			}
 		};
 
 		template<typename CLASS, typename A, typename B>
 		struct ReturnTypeHandlerM2<CLASS, void, A, B>
 		{
-			void call(CLASS& object, void(CLASS::*pointer)(A, B), const UserDefinedFunction::Context context, A a, B b)
+			void call(CLASS& object, void(CLASS::*pointer)(A, B), const NativeFunction::Context context, A a, B b)
 			{
 				(object.*pointer)(a, b);
 			}
@@ -319,16 +361,16 @@ namespace lemon
 		template<typename CLASS, typename R, typename A, typename B, typename C>
 		struct ReturnTypeHandlerM3
 		{
-			void call(CLASS& object, R(CLASS::*pointer)(A, B, C), const UserDefinedFunction::Context context, A a, B b, C c)
+			void call(CLASS& object, R(CLASS::*pointer)(A, B, C), const NativeFunction::Context context, A a, B b, C c)
 			{
-				handleResult((object.*pointer)(a, b, c), context);
+				pushStackGeneric((object.*pointer)(a, b, c), context);
 			}
 		};
 
 		template<typename CLASS, typename A, typename B, typename C>
 		struct ReturnTypeHandlerM3<CLASS, void, A, B, C>
 		{
-			void call(CLASS& object, void(CLASS::*pointer)(A, B, C), const UserDefinedFunction::Context context, A a, B b, C c)
+			void call(CLASS& object, void(CLASS::*pointer)(A, B, C), const NativeFunction::Context context, A a, B b, C c)
 			{
 				(object.*pointer)(a, b, c);
 			}
@@ -337,16 +379,16 @@ namespace lemon
 		template<typename CLASS, typename R, typename A, typename B, typename C, typename D>
 		struct ReturnTypeHandlerM4
 		{
-			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D), const UserDefinedFunction::Context context, A a, B b, C c, D d)
+			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D), const NativeFunction::Context context, A a, B b, C c, D d)
 			{
-				handleResult((object.*pointer)(a, b, c, d), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d), context);
 			}
 		};
 
 		template<typename CLASS, typename A, typename B, typename C, typename D>
 		struct ReturnTypeHandlerM4<CLASS, void, A, B, C, D>
 		{
-			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D), const UserDefinedFunction::Context context, A a, B b, C c, D d)
+			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D), const NativeFunction::Context context, A a, B b, C c, D d)
 			{
 				(object.*pointer)(a, b, c, d);
 			}
@@ -355,16 +397,16 @@ namespace lemon
 		template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E>
 		struct ReturnTypeHandlerM5
 		{
-			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e)
+			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E), const NativeFunction::Context context, A a, B b, C c, D d, E e)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e), context);
 			}
 		};
 
 		template<typename CLASS, typename A, typename B, typename C, typename D, typename E>
 		struct ReturnTypeHandlerM5<CLASS, void, A, B, C, D, E>
 		{
-			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e)
+			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E), const NativeFunction::Context context, A a, B b, C c, D d, E e)
 			{
 				(object.*pointer)(a, b, c, d, e);
 			}
@@ -373,16 +415,16 @@ namespace lemon
 		template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E, typename F>
 		struct ReturnTypeHandlerM6
 		{
-			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f)
+			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e, f), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e, f), context);
 			}
 		};
 
 		template<typename CLASS, typename A, typename B, typename C, typename D, typename E, typename F>
 		struct ReturnTypeHandlerM6<CLASS, void, A, B, C, D, E, F>
 		{
-			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E, F), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f)
+			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E, F), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f)
 			{
 				(object.*pointer)(a, b, c, d, e, f);
 			}
@@ -391,16 +433,16 @@ namespace lemon
 		template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G>
 		struct ReturnTypeHandlerM7
 		{
-			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g)
+			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e, f, g), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e, f, g), context);
 			}
 		};
 
 		template<typename CLASS, typename A, typename B, typename C, typename D, typename E, typename F, typename G>
 		struct ReturnTypeHandlerM7<CLASS, void, A, B, C, D, E, F, G>
 		{
-			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E, F, G), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g)
+			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E, F, G), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g)
 			{
 				(object.*pointer)(a, b, c, d, e, f, g);
 			}
@@ -409,16 +451,16 @@ namespace lemon
 		template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H>
 		struct ReturnTypeHandlerM8
 		{
-			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h)
+			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e, f, g, h), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e, f, g, h), context);
 			}
 		};
 
 		template<typename CLASS, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H>
 		struct ReturnTypeHandlerM8<CLASS, void, A, B, C, D, E, F, G, H>
 		{
-			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E, F, G, H), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h)
+			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E, F, G, H), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h)
 			{
 				(object.*pointer)(a, b, c, d, e, f, g, h);
 			}
@@ -427,16 +469,16 @@ namespace lemon
 		template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I>
 		struct ReturnTypeHandlerM9
 		{
-			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i)
+			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e, f, g, h, i), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e, f, g, h, i), context);
 			}
 		};
 
 		template<typename CLASS, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I>
 		struct ReturnTypeHandlerM9<CLASS, void, A, B, C, D, E, F, G, H, I>
 		{
-			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E, F, G, H, I), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i)
+			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E, F, G, H, I), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i)
 			{
 				(object.*pointer)(a, b, c, d, e, f, g, h, i);
 			}
@@ -445,16 +487,16 @@ namespace lemon
 		template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J>
 		struct ReturnTypeHandlerM10
 		{
-			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j)
+			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e, f, g, h, i, j), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e, f, g, h, i, j), context);
 			}
 		};
 
 		template<typename CLASS, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J>
 		struct ReturnTypeHandlerM10<CLASS, void, A, B, C, D, E, F, G, H, I, J>
 		{
-			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j)
+			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j)
 			{
 				(object.*pointer)(a, b, c, d, e, f, g, h, i, j);
 			}
@@ -463,16 +505,16 @@ namespace lemon
 		template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K>
 		struct ReturnTypeHandlerM11
 		{
-			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J, K), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k)
+			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J, K), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e, f, g, h, i, j, k), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e, f, g, h, i, j, k), context);
 			}
 		};
 
 		template<typename CLASS, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K>
 		struct ReturnTypeHandlerM11<CLASS, void, A, B, C, D, E, F, G, H, I, J, K>
 		{
-			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J, K), const UserDefinedFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k)
+			void call(CLASS& object, void(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J, K), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k)
 			{
 				(object.*pointer)(a, b, c, d, e, f, g, h, i, j, k);
 			}
@@ -483,7 +525,7 @@ namespace lemon
 		// Function wrappers
 
 		template<typename R>
-		class FunctionWrapperBase : public UserDefinedFunction::FunctionWrapper
+		class FunctionWrapperBase : public NativeFunction::FunctionWrapper
 		{
 		protected:
 			virtual const DataTypeDefinition* getReturnType() const override
@@ -492,9 +534,9 @@ namespace lemon
 			}
 
 			template<typename T>
-			static inline T popStack(const UserDefinedFunction::Context context)
+			static inline T popStack(const NativeFunction::Context context)
 			{
-				return static_cast<T>(context.mControlFlow.popValueStack(traits::getDataType<T>()));
+				return popStackGeneric<T>(context);
 			}
 		};
 
@@ -509,7 +551,7 @@ namespace lemon
 			inline FunctionWrapper0(Pointer pointer) : mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Call the actual function
 				ReturnTypeHandler0<R>().call(mPointer, context);
@@ -535,7 +577,7 @@ namespace lemon
 			inline FunctionWrapper1(Pointer pointer) : mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const A a = FunctionWrapperBase<R>::template popStack<A>(context);
@@ -564,7 +606,7 @@ namespace lemon
 			inline FunctionWrapper2(Pointer pointer) : mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const B b = FunctionWrapperBase<R>::template popStack<B>(context);
@@ -594,7 +636,7 @@ namespace lemon
 			inline FunctionWrapper3(Pointer pointer) : mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const C c = FunctionWrapperBase<R>::template popStack<C>(context);
@@ -625,7 +667,7 @@ namespace lemon
 			inline FunctionWrapper4(Pointer pointer) : mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const D d = FunctionWrapperBase<R>::template popStack<D>(context);
@@ -657,7 +699,7 @@ namespace lemon
 			inline FunctionWrapper5(Pointer pointer) : mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const E e = FunctionWrapperBase<R>::template popStack<E>(context);
@@ -690,7 +732,7 @@ namespace lemon
 			inline FunctionWrapper6(Pointer pointer) : mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const F f = FunctionWrapperBase<R>::template popStack<F>(context);
@@ -724,7 +766,7 @@ namespace lemon
 			inline FunctionWrapper7(Pointer pointer) : mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const G g = FunctionWrapperBase<R>::template popStack<G>(context);
@@ -759,7 +801,7 @@ namespace lemon
 			inline FunctionWrapper8(Pointer pointer) : mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const H h = FunctionWrapperBase<R>::template popStack<H>(context);
@@ -795,7 +837,7 @@ namespace lemon
 			inline FunctionWrapper9(Pointer pointer) : mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const I i = FunctionWrapperBase<R>::template popStack<I>(context);
@@ -832,7 +874,7 @@ namespace lemon
 			inline FunctionWrapper10(Pointer pointer) : mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const J j = FunctionWrapperBase<R>::template popStack<J>(context);
@@ -870,7 +912,7 @@ namespace lemon
 			inline FunctionWrapper11(Pointer pointer) : mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const K k = FunctionWrapperBase<R>::template popStack<K>(context);
@@ -912,7 +954,7 @@ namespace lemon
 			inline FunctionWrapperM0(CLASS& object, Pointer pointer) : mObject(object), mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Call the actual function
 				ReturnTypeHandlerM0<CLASS, R>().call(mObject, mPointer, context);
@@ -939,7 +981,7 @@ namespace lemon
 			inline FunctionWrapperM1(CLASS& object, Pointer pointer) : mObject(object), mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const A a = FunctionWrapperBase<R>::template popStack<A>(context);
@@ -969,7 +1011,7 @@ namespace lemon
 			inline FunctionWrapperM2(CLASS& object, Pointer pointer) : mObject(object), mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const B b = FunctionWrapperBase<R>::template popStack<B>(context);
@@ -1000,7 +1042,7 @@ namespace lemon
 			inline FunctionWrapperM3(CLASS& object, Pointer pointer) : mObject(object), mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const C c = FunctionWrapperBase<R>::template popStack<C>(context);
@@ -1032,7 +1074,7 @@ namespace lemon
 			inline FunctionWrapperM4(CLASS& object, Pointer pointer) : mObject(object), mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const D d = FunctionWrapperBase<R>::template popStack<D>(context);
@@ -1065,7 +1107,7 @@ namespace lemon
 			inline FunctionWrapperM5(CLASS& object, Pointer pointer) : mObject(object), mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const E e = FunctionWrapperBase<R>::template popStack<E>(context);
@@ -1099,7 +1141,7 @@ namespace lemon
 			inline FunctionWrapperM6(CLASS& object, Pointer pointer) : mObject(object), mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const F f = FunctionWrapperBase<R>::template popStack<F>(context);
@@ -1134,7 +1176,7 @@ namespace lemon
 			inline FunctionWrapperM7(CLASS& object, Pointer pointer) : mObject(object), mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const G g = FunctionWrapperBase<R>::template popStack<G>(context);
@@ -1170,7 +1212,7 @@ namespace lemon
 			inline FunctionWrapperM8(CLASS& object, Pointer pointer) : mObject(object), mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const H h = FunctionWrapperBase<R>::template popStack<H>(context);
@@ -1207,7 +1249,7 @@ namespace lemon
 			inline FunctionWrapperM9(CLASS& object, Pointer pointer) : mObject(object), mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const I i = FunctionWrapperBase<R>::template popStack<I>(context);
@@ -1245,7 +1287,7 @@ namespace lemon
 			inline FunctionWrapperM10(CLASS& object, Pointer pointer) : mObject(object), mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const J j = FunctionWrapperBase<R>::template popStack<J>(context);
@@ -1284,7 +1326,7 @@ namespace lemon
 			inline FunctionWrapperM11(CLASS& object, Pointer pointer) : mObject(object), mPointer(pointer) {}
 
 		protected:
-			virtual void execute(const UserDefinedFunction::Context context) const override
+			virtual void execute(const NativeFunction::Context context) const override
 			{
 				// Pop parameters
 				const K k = FunctionWrapperBase<R>::template popStack<K>(context);
@@ -1319,146 +1361,146 @@ namespace lemon
 	// --- Function wrapper functionality ---
 
 	template<typename R>
-	static UserDefinedFunction::FunctionWrapper& wrap(R(*pointer)())
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)())
 	{
 		return *new internal::FunctionWrapper0<R>(pointer);
 	}
 
 	template<typename R, typename A>
-	static UserDefinedFunction::FunctionWrapper& wrap(R(*pointer)(A))
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(A))
 	{
 		return *new internal::FunctionWrapper1<R, A>(pointer);
 	}
 
 	template<typename R, typename A, typename B>
-	static UserDefinedFunction::FunctionWrapper& wrap(R(*pointer)(A, B))
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(A, B))
 	{
 		return *new internal::FunctionWrapper2<R, A, B>(pointer);
 	}
 
 	template<typename R, typename A, typename B, typename C>
-	static UserDefinedFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C))
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C))
 	{
 		return *new internal::FunctionWrapper3<R, A, B, C>(pointer);
 	}
 
 	template<typename R, typename A, typename B, typename C, typename D>
-	static UserDefinedFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D))
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D))
 	{
 		return *new internal::FunctionWrapper4<R, A, B, C, D>(pointer);
 	}
 
 	template<typename R, typename A, typename B, typename C, typename D, typename E>
-	static UserDefinedFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E))
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E))
 	{
 		return *new internal::FunctionWrapper5<R, A, B, C, D, E>(pointer);
 	}
 
 	template<typename R, typename A, typename B, typename C, typename D, typename E, typename F>
-	static UserDefinedFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E, F))
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E, F))
 	{
 		return *new internal::FunctionWrapper6<R, A, B, C, D, E, F>(pointer);
 	}
 
 	template<typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G>
-	static UserDefinedFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E, F, G))
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E, F, G))
 	{
 		return *new internal::FunctionWrapper7<R, A, B, C, D, E, F, G>(pointer);
 	}
 
 	template<typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H>
-	static UserDefinedFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E, F, G, H))
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E, F, G, H))
 	{
 		return *new internal::FunctionWrapper8<R, A, B, C, D, E, F, G, H>(pointer);
 	}
 
 	template<typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I>
-	static UserDefinedFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E, F, G, H, I))
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E, F, G, H, I))
 	{
 		return *new internal::FunctionWrapper9<R, A, B, C, D, E, F, G, H, I>(pointer);
 	}
 
 	template<typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J>
-	static UserDefinedFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E, F, G, H, I, J))
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E, F, G, H, I, J))
 	{
 		return *new internal::FunctionWrapper10<R, A, B, C, D, E, F, G, H, I, J>(pointer);
 	}
 
 	template<typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K>
-	static UserDefinedFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E, F, G, H, I, J, K))
+	static NativeFunction::FunctionWrapper& wrap(R(*pointer)(A, B, C, D, E, F, G, H, I, J, K))
 	{
 		return *new internal::FunctionWrapper11<R, A, B, C, D, E, F, G, H, I, J, K>(pointer);
 	}
 
 
 	template<typename CLASS, typename R>
-	static UserDefinedFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)())
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)())
 	{
 		return *new internal::FunctionWrapperM0<CLASS, R>(object, pointer);
 	}
 
 	template<typename CLASS, typename R, typename A>
-	static UserDefinedFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A))
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A))
 	{
 		return *new internal::FunctionWrapperM1<CLASS, R, A>(object, pointer);
 	}
 
 	template<typename CLASS, typename R, typename A, typename B>
-	static UserDefinedFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B))
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B))
 	{
 		return *new internal::FunctionWrapperM2<CLASS, R, A, B>(object, pointer);
 	}
 
 	template<typename CLASS, typename R, typename A, typename B, typename C>
-	static UserDefinedFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C))
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C))
 	{
 		return *new internal::FunctionWrapperM3<CLASS, R, A, B, C>(object, pointer);
 	}
 
 	template<typename CLASS, typename R, typename A, typename B, typename C, typename D>
-	static UserDefinedFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D))
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D))
 	{
 		return *new internal::FunctionWrapperM4<CLASS, R, A, B, C, D>(object, pointer);
 	}
 
 	template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E>
-	static UserDefinedFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E))
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E))
 	{
 		return *new internal::FunctionWrapperM5<CLASS, R, A, B, C, D, E>(object, pointer);
 	}
 
 	template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E, typename F>
-	static UserDefinedFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F))
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F))
 	{
 		return *new internal::FunctionWrapperM6<CLASS, R, A, B, C, D, E, F>(object, pointer);
 	}
 
 	template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G>
-	static UserDefinedFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G))
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G))
 	{
 		return *new internal::FunctionWrapperM7<CLASS, R, A, B, C, D, E, F, G>(object, pointer);
 	}
 
 	template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H>
-	static UserDefinedFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H))
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H))
 	{
 		return *new internal::FunctionWrapperM8<CLASS, R, A, B, C, D, E, F, G, H>(object, pointer);
 	}
 
 	template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I>
-	static UserDefinedFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I))
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I))
 	{
 		return *new internal::FunctionWrapperM9<CLASS, R, A, B, C, D, E, F, G, H, I>(object, pointer);
 	}
 
 	template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J>
-	static UserDefinedFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J))
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J))
 	{
 		return *new internal::FunctionWrapperM10<CLASS, R, A, B, C, D, E, F, G, H, I, J>(object, pointer);
 	}
 
 	template<typename CLASS, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K>
-	static UserDefinedFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J, K))
+	static NativeFunction::FunctionWrapper& wrap(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J, K))
 	{
 		return *new internal::FunctionWrapperM11<CLASS, R, A, B, C, D, E, F, G, H, I, J, K>(object, pointer);
 	}

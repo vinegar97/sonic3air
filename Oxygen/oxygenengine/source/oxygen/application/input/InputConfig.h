@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2021 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -35,7 +35,7 @@ public:
 		inline Assignment()  {}
 		inline Assignment(Type type, uint32 index) : mType(type), mIndex(index)  {}
 		inline bool operator==(const Assignment& other) const  { return (mType == other.mType && mIndex == other.mIndex); }
-		
+
 		void getMappingString(String& outString, DeviceType deviceType) const;
 		static bool setFromMappingString(Assignment& output, const String& mappingString, DeviceType deviceType);
 	};
@@ -60,13 +60,18 @@ public:
 			Y,
 			START,
 			BACK,
+			L,
+			R,
 			_NUM
 		};
 
-		DeviceType mDeviceType;
+		static const size_t NUM_BUTTONS = (size_t)Button::_NUM;
+		static const std::string BUTTON_NAME[NUM_BUTTONS];
+
+		DeviceType mDeviceType = DeviceType::KEYBOARD;
 		std::string mIdentifier;
 		std::map<uint64, std::string> mDeviceNames;		// Uses string hash as key
-		ControlMapping mMappings[(size_t)Button::_NUM];
+		ControlMapping mMappings[NUM_BUTTONS];
 	};
 
 public:
@@ -76,4 +81,7 @@ public:
 	static void clearAssignments(DeviceDefinition& deviceDefinition, size_t buttonIndex);
 	static void addAssignment(DeviceDefinition& deviceDefinition, size_t buttonIndex, const Assignment& newAssignment, bool removeDuplicates);
 	static void setAssignments(DeviceDefinition& deviceDefinition, size_t buttonIndex, const std::vector<Assignment>& assignments, bool removeDuplicates);
+
+private:
+	static ControlMapping& getMapping(DeviceDefinition& deviceDefinition, size_t buttonIndex);
 };
