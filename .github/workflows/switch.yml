@@ -14,7 +14,7 @@ jobs:
     - name: make clean
       run: make PLATFORM=Switch clean
       working-directory: Oxygen/sonic3air/build/_make
-    - name: make 
+    - name: make
       run: make PLATFORM=Switch
       working-directory: Oxygen/sonic3air/build/_make
     - name: Create directory structure
@@ -22,7 +22,10 @@ jobs:
       run: |
         mkdir -p bin/Switch/sd/switch/sonic3air
         mv bin/Switch/sonic3air.nro bin/Switch/sd/switch/sonic3air/
+        cp -r -v ../../../sonic3air/_master_image_template/* bin/Switch/sd/switch/sonic3air/
+        cp -v ../../../oxygenengine/_master_image_template/Handbook.pdf bin/Switch/sd/switch/sonic3air/bonus/
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
-        path: Oxygen/sonic3air/build/_make/bin/Switch/sd
+        name: sonic3air_game-switch
+        path: Oxygen/sonic3air/build/_make/bin/
