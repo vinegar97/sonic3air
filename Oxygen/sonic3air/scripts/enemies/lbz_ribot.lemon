@@ -16,7 +16,7 @@
 //# alias(fn08c2e2) deprecated
 function void Ribot.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Ribot.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Ribot.BaseUpdate))			// Address: 0x08c2e8
 }
 
 

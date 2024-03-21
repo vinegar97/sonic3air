@@ -212,8 +212,8 @@ function void UpdateLevelScrolling.DDZ()
 {
 	fn0596ea()
 
-	A6 = addressof(camera.background.y)
-	A5 = addressof(camera.background.y.old)
+	A6 = addressof(camera.background.y)			// Address: 0xffffee90
+	A5 = addressof(camera.background.y.old)			// Address: 0xffffee96
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -446,7 +446,7 @@ function void fn08167c()
 	{
 		fn05fcce()
 		u32[0xffffcd7c] = 0x019348		// Hyper Sonic stars
-		u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
+		u32[0xffffcbc0] = addressof(AfterImages.Init)			// Address:  0x01a494
 	}
 
 	addPatternLoadingCue(0x083d64)		// Boss explosion sprites

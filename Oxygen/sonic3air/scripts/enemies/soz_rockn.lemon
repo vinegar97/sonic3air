@@ -16,7 +16,7 @@
 //# alias(fn08eda0) deprecated
 function void Rockn.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Rockn.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Rockn.BaseUpdate))			// Address: 0x08eda6
 }
 
 

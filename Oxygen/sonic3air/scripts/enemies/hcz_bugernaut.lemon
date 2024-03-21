@@ -16,7 +16,7 @@
 //# alias(fn087a24) deprecated
 function void Bugernaut.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Bugernaut.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Bugernaut.BaseUpdate))			// Address: 0x087a2a
 }
 
 
@@ -120,7 +120,7 @@ function void fn087ae6()
 {
 	Object.AnimationProgressByLocalA1()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (objA1.update_address != addressof(Bugernaut.BaseUpdate))
+	if (objA1.update_address != addressof(Bugernaut.BaseUpdate))			// Address: 0x087a2a
 	{
 		fn087b56()
 		if (_equal())
@@ -168,7 +168,7 @@ function void fn087b56()
 	A2 = 0xffffb128
 	for (u8 i = 0; i < 0x5a; ++i)
 	{
-		if (u32[A2] == addressof(Bugernaut.BaseUpdate))
+		if (u32[A2] == addressof(Bugernaut.BaseUpdate))			// Address: 0x087a2a
 		{
 			D1.u8 = u8[A2 + 0x39] + 1
 			if (D1.u8 <= 4)

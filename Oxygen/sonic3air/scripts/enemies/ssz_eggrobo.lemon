@@ -15,7 +15,7 @@
 //# address-hook(0x091518) end(0x091518)
 function void EggRobo.Init()
 {
-	Object.InitWithUpdateAddress(addressof(EggRobo.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(EggRobo.BaseUpdate))			// Address: 0x09151e
 
 #if STANDALONE
 	objA0.box_size.x = 0x30
@@ -290,7 +290,7 @@ function void fn0917b4()
 //# address-hook(0x0917c0) end(0x091858)
 function void fn0917c0()
 {
-	objA0.update_address = addressof(FreedAnimal.BaseUpdate)
+	objA0.update_address = addressof(FreedAnimal.BaseUpdate)			// Address: 0x02c778
 	objA0.base_state += 2
 
 	// Randomly decide which critter to spawn

@@ -480,7 +480,7 @@ function void fn07f486()
 //# address-hook(0x07f4ac) end(0x07f4b4)
 function void fn07f4ac()
 {
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 	fn07f4c0()
 }
 
@@ -934,7 +934,7 @@ function void fn07f79c()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x10)
 	{
-		objA0.update_address = addressof(DrawOrUnloadObject)
+		objA0.update_address = addressof(DrawOrUnloadObject)			// Address: 0x01b588
 		objA0.animation.sprite = 0x15
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:

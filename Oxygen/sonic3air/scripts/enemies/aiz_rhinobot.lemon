@@ -15,7 +15,7 @@
 //# address-hook(0x086e56) end(0x086e56)
 function void Rhinobot.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Rhinobot.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Rhinobot.BaseUpdate))			// Address: 0x086e5c
 }
 
 
@@ -187,7 +187,7 @@ function void fn08701c()
 		playSound(0x48)
 
 		// "spawnChildObjects(0x087122)" replaced by:
-		spawnChildObject(addressof(Rhinobot.DustEffect), 0x00, 12, 8)
+		spawnChildObject(addressof(Rhinobot.DustEffect), 0x00, 12, 8)			// Address: 0x086efc
 		if (_equal())
 		{
 			u32[A1 + 0x30] = 0x08713a
@@ -233,7 +233,7 @@ function void fn086f92()
 	playSound(0x48)
 
 	// "spawnChildObjects(0x08712a)" replaced by:
-	spawnChildObject(addressof(Rhinobot.DustEffect), 0x00, 16, 8)
+	spawnChildObject(addressof(Rhinobot.DustEffect), 0x00, 16, 8)			// Address: 0x086efc
 	if (_equal())
 	{
 		u32[A1 + 0x30] = 0x08714a

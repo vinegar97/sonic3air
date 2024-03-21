@@ -16,7 +16,7 @@
 //# alias(fn08ea66) deprecated
 function void Sandworm.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Sandworm.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Sandworm.BaseUpdate))			// Address: 0x08ea6c
 }
 
 
@@ -219,7 +219,7 @@ function void fn08ec5e()
 {
 	objA0.velocity.y = 0x40
 	objA0.countdown_value = 0x1f
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 }
 
 
@@ -305,7 +305,7 @@ function void fn08ed1e()
 	objA0.animation.timer = 0
 	objA0.animation.frame = 0
 	u32[A0 + 0x30] = 0x08ed98
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 }
 
 

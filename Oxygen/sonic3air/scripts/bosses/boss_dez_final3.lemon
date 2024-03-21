@@ -352,7 +352,7 @@ function void fn0804d2()
 	else
 	{
 		objA0.update_address = 0x08565e
-		objA0.countdown_callback = addressof(Object.TriggerUnloading)
+		objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 	}
 }
 

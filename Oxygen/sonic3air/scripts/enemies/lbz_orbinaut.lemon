@@ -16,7 +16,7 @@
 //# alias(fn08c632) deprecated
 function void Orbinaut.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Orbinaut.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Orbinaut.BaseUpdate))			// Address: 0x08c638
 }
 
 

@@ -31,7 +31,7 @@ function void SmallExplosion.Init1()
 	if (allocDynamicObjectStd())
 	{
 		// Create a freed critter
-		objA1.update_address = addressof(FreedAnimal.BaseUpdate)
+		objA1.update_address = addressof(FreedAnimal.BaseUpdate)			// Address: 0x02c778
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		u16[A1 + 0x3e] = objA0.value3e
@@ -64,7 +64,7 @@ function void fn01e626()
 	objA0.animation.timer = 3
 	objA0.animation.sprite = 0
 
-	objA0.update_address = addressof(SmallExplosion.Update)
+	objA0.update_address = addressof(SmallExplosion.Update)			// Address: 0x01e66e
 	SmallExplosion.Update()
 }
 
@@ -96,7 +96,7 @@ function void SmallExplosion.Update()
 function void fn083f52()
 {
 	objA0.update_address = 0x083f68
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 	playSound(0xb4)
 	fn083f68()
 }

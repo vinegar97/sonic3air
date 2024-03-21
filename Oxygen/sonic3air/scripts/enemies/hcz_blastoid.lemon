@@ -16,7 +16,7 @@
 //# alias(fn087928) deprecated
 function void Blastoid.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Blastoid.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Blastoid.BaseUpdate))			// Address: 0x08792e
 }
 
 

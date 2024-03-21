@@ -15,7 +15,7 @@
 //# address-hook(0x08fd30) end(0x08fd30)
 function void Toxomister.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Toxomister.PostInit))
+	Object.InitWithUpdateAddress(addressof(Toxomister.PostInit))			// Address: 0x08fd36
 }
 
 
@@ -24,7 +24,7 @@ function void Toxomister.PostInit()
 {
 	setupObjectAttributesFull(0x09002e)
 
-	objA0.update_address = addressof(Toxomister.Update)
+	objA0.update_address = addressof(Toxomister.Update)			// Address: 0x08fd76
 	objA0.render_flags |= render_flag.COMPOUND
 	objA0.compound.count = 0x01
 
@@ -68,7 +68,7 @@ function void fn08fda0()
 //# address-hook(0x08fdb0) end(0x08fdb6)
 function void fn08fdb0()
 {
-	objA0.update_address = addressof(Toxomister.Update)
+	objA0.update_address = addressof(Toxomister.Update)			// Address: 0x08fd76
 	fn08ff72()
 }
 
@@ -141,7 +141,7 @@ function void fn08fe36()
 	objA0.base_state = 0x06
 	objA0.velocity.y = 0
 	objA0.countdown_value = 0x7f
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 }
 
 
@@ -233,7 +233,7 @@ function void fn08fedc()
 	objA0.velocity.y = 0
 	objA0.update_address = 0x08ff42
 	u32[A0 + 0x30] = 0x090085
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 	fn0850d4()
 }
 

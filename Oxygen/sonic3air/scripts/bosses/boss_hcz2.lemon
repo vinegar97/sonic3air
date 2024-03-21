@@ -639,7 +639,7 @@ function void fn06b4a2()
 
 	objA0.update_address = 0x0856c4
 	u32[A0 + 0x30] = 0x06be36
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 	objA0.position.y.u16 = water.height.current - 4
 }
 
@@ -649,7 +649,7 @@ function void fn06b4c4()
 {
 	setupObjectAttributesFull(0x06bd5a)
 
-	objA0.update_address = addressof(Object.CountdownAndTrigger)
+	objA0.update_address = addressof(Object.CountdownAndTrigger)			// Address: 0x08488a
 	objA0.countdown_callback = 0x06b4f2
 	fn06b96c()
 
@@ -730,7 +730,7 @@ function void fn06b598()
 	{
 		objA0.update_address = 0x06b56c
 		objA0.countdown_value = 0x1f
-		objA0.countdown_callback = addressof(Object.TriggerUnloading)
+		objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 	}
 }
 

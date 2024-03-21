@@ -345,7 +345,7 @@ function void fn06364e()
 		if (allocDynamicObjectStd())
 		{
 			// Show title card
-			objA1.update_address = addressof(TitleCard.Update)
+			objA1.update_address = addressof(TitleCard.Update)			// Address: 0x02d690
 		}
 
 		global.level_started = -0x6f	// Let HUD fly in
@@ -600,7 +600,7 @@ function void fn063916()
 {
 	setupObjectAttributesBasic(0x066498)
 	objA0.update_address = 0x063946
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 
 	GetRandomNumber()
 	objA0.velocity.x = (D0.u16 & 0x7f) - 0x3f
@@ -623,7 +623,7 @@ function void fn063946()
 function void fn06395c()
 {
 	setupObjectAttributesFull(0x083fb4)
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 	playSound(0xb4)
 
 	D0 = objA0.subtype2c

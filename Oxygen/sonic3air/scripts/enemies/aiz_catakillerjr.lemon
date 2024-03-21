@@ -15,7 +15,7 @@
 //# address-hook(0x0876ca) end(0x0876de)
 function void CatakillerJr.Init()
 {
-	Object.InitWithUpdateAddress(addressof(CatakillerJr.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(CatakillerJr.BaseUpdate))			// Address: 0x0876d0
 }
 
 
@@ -183,7 +183,7 @@ function void fn08780a()
 {
 	setupObjectAttributesBasic(0x087892)
 	objA0.update_address = 0x08782c
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	fn084920()
 }

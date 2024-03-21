@@ -16,7 +16,7 @@
 //# alias(fn087f56) deprecated
 function void Piranha.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Piranha.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Piranha.BaseUpdate))			// Address: 0x087f5c
 }
 
 

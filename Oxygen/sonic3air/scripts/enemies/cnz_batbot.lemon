@@ -16,7 +16,7 @@
 //# alias(fn089376) deprecated
 function void Batbot.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Batbot.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Batbot.BaseUpdate))			// Address: 0x08937c
 }
 
 

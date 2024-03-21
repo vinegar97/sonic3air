@@ -16,7 +16,7 @@
 //# alias(fn08daf6) deprecated
 function void Mushmeanie.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Mushmeanie.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Mushmeanie.BaseUpdate))			// Address: 0x08dafc
 }
 
 

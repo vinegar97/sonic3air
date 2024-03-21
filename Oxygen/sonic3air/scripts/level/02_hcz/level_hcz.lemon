@@ -151,8 +151,8 @@ function void fn050bce()
 
 	UpdateBackground.HCZ1()
 
-	A6 = addressof(camera.background.y)
-	A5 = addressof(camera.background.y.old)
+	A6 = addressof(camera.background.y)			// Address: 0xffffee90
+	A5 = addressof(camera.background.y.old)			// Address: 0xffffee96
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -177,7 +177,7 @@ function void fn050c4c()
 		global.in_extra_stage = 0
 		fn04f8f8()
 
-		u32[0xffffb172] = addressof(RunOnWaterHandler.Init)		// HCZ run-on-water handler
+		u32[0xffffb172] = addressof(RunOnWaterHandler.Init)			// Address: 0x0383bc
 		u8[0xffffb172 + 0x2c] = 0x01
 
 		u32 backupD7 = D7
@@ -227,8 +227,8 @@ function void fn050c4c()
 
 	UpdateBackground.HCZ1()
 
-	A6 = addressof(camera.background.y)
-	A5 = addressof(camera.background.y.old)
+	A6 = addressof(camera.background.y)			// Address: 0xffffee90
+	A5 = addressof(camera.background.y.old)			// Address: 0xffffee96
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -673,8 +673,8 @@ function void fn050fca()
 //# address-hook(0x050fce) end(0x050fec)
 function void fn050fce()
 {
-	A6 = addressof(camera.background.y)
-	A5 = addressof(camera.background.y.old)
+	A6 = addressof(camera.background.y)			// Address: 0xffffee90
+	A5 = addressof(camera.background.y.old)			// Address: 0xffffee96
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()

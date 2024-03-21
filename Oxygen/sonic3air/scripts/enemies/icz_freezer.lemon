@@ -17,13 +17,13 @@
 //# address-hook(0x08a640) end(0x08a640)
 function void Freezer.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Freezer.Init2))
+	Object.InitWithUpdateAddress(addressof(Freezer.Init2))			// Address: 0x08a644
 }
 
 //# address-hook(0x08a644) end(0x08a652)
 function void Freezer.Init2()
 {
-	objA0.update_address = addressof(Freezer.Update)
+	objA0.update_address = addressof(Freezer.Update)			// Address: 0x08a656
 	setupObjectAttributesFull(0x08aa96)
 	Enemy.DrawOrUnload()
 }
@@ -76,7 +76,7 @@ function void fn08a67e()
 	}
 	else
 	{
-		objA0.update_address = addressof(Freezer.Update)
+		objA0.update_address = addressof(Freezer.Update)			// Address: 0x08a656
 		objA0.flags38 &= ~0x02
 		playSound(0xe4)
 	}
@@ -231,7 +231,7 @@ function void fn08a78c()
 {
 	objA0.update_address = 0x08a7a2
 	objA0.countdown_value = 0x1f
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 }
 
 

@@ -59,7 +59,7 @@ function void fn063d1a()
 
 	if (allocDynamicObjectStd())
 	{
-		objA1.update_address = addressof(CheckForBossStart)
+		objA1.update_address = addressof(CheckForBossStart)			// Address: 0x085ca4
 		objA1.countdown_callback = 0x063dd4
 		u16[A1 + 0x2e] = 0x78
 		u8[A1 + 0x27] = u8[A0 + 0x27]

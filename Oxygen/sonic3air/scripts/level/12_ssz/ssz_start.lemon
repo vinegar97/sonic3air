@@ -700,7 +700,7 @@ function void fn065b42()
 {
 	setupObjectAttributesBasic(0x0664d4)
 	objA0.update_address = 0x065b5a
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 	fn065b5a()
 }
 

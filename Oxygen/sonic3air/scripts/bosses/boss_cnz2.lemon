@@ -277,7 +277,7 @@ function void fn06e6aa()
 //# address-hook(0x06e6c6) end(0x06e6de)
 function void fn06e6c6()
 {
-	objA0.update_address = addressof(Object.CountdownAndTrigger)
+	objA0.update_address = addressof(Object.CountdownAndTrigger)			// Address: 0x08488a
 	objA0.flags38 |= 0x10
 	objA0.countdown_callback = 0x06e6e4
 
@@ -905,7 +905,7 @@ function void fn06ed22()
 	if ((u8[A1 + 0x38] & 0x10) == 0)
 		return
 
-	objA0.update_address = addressof(UnloadObject)
+	objA0.update_address = addressof(UnloadObject)			// Address: 0x01abb6
 
 	// Spawn boss giblets
 	// "spawnChildObjects(0x06edf2)" replaced by:

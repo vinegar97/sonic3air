@@ -16,7 +16,7 @@
 //# alias(fn08d580) deprecated
 function void Madmole.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Madmole.Hole.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Madmole.Hole.BaseUpdate))			// Address: 0x08d586
 }
 
 
@@ -54,7 +54,7 @@ function void fn08d5b0()
 	objA0.flags38 |= 0x02
 
 	// "spawnChildObjects(0x08d9c0)" replaced by:
-	spawnChildObject(addressof(Madmole.BaseUpdate), 0x00, 0, 16)			// Madmole
+	spawnChildObject(addressof(Madmole.BaseUpdate), 0x00, 0, 16)			// Address: 0x08d602; Madmole
 }
 
 

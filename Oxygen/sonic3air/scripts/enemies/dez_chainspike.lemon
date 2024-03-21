@@ -16,7 +16,7 @@
 //# alias(fn091c3c) deprecated
 function void Chainspike.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Chainspike.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Chainspike.BaseUpdate))			// Address: 0x091c42
 }
 
 

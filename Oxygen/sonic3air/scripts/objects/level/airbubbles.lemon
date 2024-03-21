@@ -300,7 +300,7 @@ function void fn02fbb2()
 
 	if (u8[A1 + 0x2a] & char.flag.ROLLING)
 	{
-		if (objA1.update_address == addressof(Character.BaseUpdate.Sonic))		// Checking for Sonic, might be clearer to check `u8[A1 + 0x38] == CHARACTER_SONIC` instead
+		if (objA1.update_address == addressof(Character.BaseUpdate.Sonic))			// Address: 0x010a94; Checking for Sonic, might be clearer to check `u8[A1 + 0x38] == CHARACTER_SONIC` instead
 		{
 			u8[A1 + 0x2a] &= ~char.flag.ROLLING
 			objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT

@@ -16,7 +16,7 @@
 //# alias(fn08fae6) deprecated
 function void Iwamodoki.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Iwamodoki.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Iwamodoki.BaseUpdate))			// Address: 0x08faec
 }
 
 
@@ -85,7 +85,7 @@ function void fn08fb70()
 //# address-hook(0x08fb76) end(0x08fb8a)
 function void fn08fb76()
 {
-	objA0.update_address = addressof(SmallExplosion.BaseUpdate)
+	objA0.update_address = addressof(SmallExplosion.BaseUpdate)			// Address: 0x01e5e0
 	objA0.flags2a |= 0x80
 #if STANDALONE
 	// Do not spawn an animal & floating points, as you won't get points...

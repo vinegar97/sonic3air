@@ -25,7 +25,7 @@ function void DynamicRing.Init()
 	objA0.hitbox_extends.x = 8
 	objA0.hitbox_extends.y = 8
 
-	objA0.update_address = addressof(DynamicRing.Update)
+	objA0.update_address = addressof(DynamicRing.Update)			// Address: 0x01a88c
 	DynamicRing.Update()
 }
 
@@ -87,7 +87,7 @@ function void DynamicRing.Update()
 		--level.total_rings
 		CollectRing()
 
-		objA0.update_address = addressof(DynamicRing.FadeOut)
+		objA0.update_address = addressof(DynamicRing.FadeOut)			// Address: 0x01a920
 		objA0.base_state = 0
 		DynamicRing.FadeOut()
 	}

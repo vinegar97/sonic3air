@@ -18,13 +18,13 @@ function void CNZBarberPole.Init()
 	if (objA0.subtype2c != 0)
 	{
 		// Variant from upper right to lower left
-		objA0.update_address = addressof(CNZBarberPole.UpdateVariantRightToLeft)
+		objA0.update_address = addressof(CNZBarberPole.UpdateVariantRightToLeft)			// Address: 0x0335a8
 		CNZBarberPole.UpdateVariantRightToLeft()
 	}
 	else
 	{
 		// Variant from upper left to lower right
-		objA0.update_address = addressof(CNZBarberPole.UpdateVariantLeftToRight)
+		objA0.update_address = addressof(CNZBarberPole.UpdateVariantLeftToRight)			// Address: 0x033376
 		CNZBarberPole.UpdateVariantLeftToRight()
 	}
 }
@@ -91,7 +91,7 @@ function void fn033392()
 						return
 
 					A3 = 0xffff0000 + u16[A1 + 0x42]
-					if (u32[A3] == addressof(CNZBarberPole.UpdateVariantLeftToRight))
+					if (u32[A3] == addressof(CNZBarberPole.UpdateVariantLeftToRight))			// Address: 0x033376
 					{
 						u32[A2] = objA1.position.x
 						D0.u16 = u16[A2] - objA0.position.x.u16 + 0x40
@@ -245,7 +245,7 @@ function void fn0335c4()
 						return
 
 					A3 = 0xffff0000 + u16[A1 + 0x42]
-					if (u32[A3] == addressof(CNZBarberPole.UpdateVariantRightToLeft))
+					if (u32[A3] == addressof(CNZBarberPole.UpdateVariantRightToLeft))			// Address: 0x0335a8
 					{
 						u32[A2] = objA1.position.x
 						D0.u16 = u16[A2] - objA0.position.x.u16 + 0x60

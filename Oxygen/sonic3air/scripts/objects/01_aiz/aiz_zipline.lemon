@@ -56,7 +56,7 @@ function void fn021cb8()
 		--D1.s16
 		if (D1.s16 < 0)
 		{
-			objA1.update_address = addressof(AIZZipLine.BaseUpdate)
+			objA1.update_address = addressof(AIZZipLine.BaseUpdate)			// Address: 0x022074
 			objA1.animation.sprite = 0x20
 			u16[A0 + 0x40] = A1.u16
 			break
@@ -698,7 +698,7 @@ function void AIZZipLineEndPole.Init()
 	objA0.box_size.x = 0x20
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0324)
-	objA0.update_address = addressof(AIZZipLineEndPole.Update)
+	objA0.update_address = addressof(AIZZipLineEndPole.Update)			// Address: 0x01e7dc
 	AIZZipLineEndPole.Update()
 }
 

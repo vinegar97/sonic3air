@@ -16,7 +16,7 @@
 //# alias(fn088fb4) deprecated
 function void Clamer.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Clamer.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Clamer.BaseUpdate))			// Address: 0x088fba
 }
 
 
@@ -106,7 +106,7 @@ function void fn089064()
 	if (D2.u16 != 0 && objA0.animation.sprite == 8 && objA0.render_flags & render_flag.VISIBLE)
 	{
 		// "spawnProjectileChildObjectsInDir(0x089150)" replaced by:
-		spawnProjectileChildObjectInDir(0x086d4a, 0x00, -16, 2, -512, 0, 0x08913c, 0x000000, addressof(UpdateMovementStraightSimple))		// Spike ball
+		spawnProjectileChildObjectInDir(0x086d4a, 0x00, -16, 2, -512, 0, 0x08913c, 0x000000, addressof(UpdateMovementStraightSimple))			// Address: 0x01ab52; Spike ball
 	}
 }
 

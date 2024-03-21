@@ -25,8 +25,8 @@
 //# address-hook(0x010a94) end(0x010ae8)
 function void Character.BaseUpdate.Sonic()
 {
-	A4 = addressof(global.move.speedcap)	// Base address of speed caps & acceleration/deceleration
-	A5 = addressof(camera.yoffset.player)
+	A4 = addressof(global.move.speedcap)			// Address: 0xfffff760; Base address of speed caps & acceleration/deceleration
+	A5 = addressof(camera.yoffset.player)			// Address: 0xffffee2c
 	A6 = 0xffffcc54							// Base address of dust cloud object
 
 	// Check for debug mode
@@ -52,8 +52,8 @@ function void Character.BaseUpdate.Sonic()
 //# address-hook(0x01365c) end(0x0136b8)
 function void Character.BaseUpdate.Tails()
 {
-	A4 = addressof(global.move.speedcap.tails)	// Base address of speed caps & acceleration/deceleration for Tails
-	A5 = addressof(camera.yoffset.tails)
+	A4 = addressof(global.move.speedcap.tails)			// Address: 0xfffffec0; Base address of speed caps & acceleration/deceleration for Tails
+	A5 = addressof(camera.yoffset.tails)			// Address: 0xffffee2e
 	A6 = 0xffffcc9e								// Base address of dust cloud object for Tails
 
 	// Check for debug mode
@@ -79,8 +79,8 @@ function void Character.BaseUpdate.Tails()
 //# address-hook(0x016444) end(0x016498)
 function void Character.BaseUpdate.Knuckles()
 {
-	A4 = addressof(global.move.speedcap)	// Base address of speed caps & acceleration/deceleration
-	A5 = addressof(camera.yoffset.player)
+	A4 = addressof(global.move.speedcap)			// Address: 0xfffff760; Base address of speed caps & acceleration/deceleration
+	A5 = addressof(camera.yoffset.player)			// Address: 0xffffee2c
 	A6 = 0xffffcc54							// Base address of dust cloud object
 
 	// Check for debug mode
@@ -198,7 +198,7 @@ function void Character.Initialization.shared(u8 character)
 		tails.respawn_counter = 0
 
 		// Init Tails' tails object
-		u32[0xffffcc0a] = addressof(TailsTails.Init)
+		u32[0xffffcc0a] = addressof(TailsTails.Init)			// Address: 0x0160a6
 		u16[0xffffcc0a + 0x30] = A0.u16
 
 		checkpoint.number.backup.tails = checkpoint.number
@@ -3207,7 +3207,7 @@ function bool Character.performSuperTransformation()
 		{
 			super.active = 0xff
 			u32[0xffffcd7c] = 0x019348		// Hyper Sonic stars
-			u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
+			u32[0xffffcbc0] = addressof(AfterImages.Init)			// Address:  0x01a494
 		}
 		else
 		{
@@ -3237,7 +3237,7 @@ function bool Character.performSuperTransformation()
 		if (possibleSuperForm == 2)
 		{
 			super.active = 0xff
-			u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
+			u32[0xffffcbc0] = addressof(AfterImages.Init)			// Address:  0x01a494
 		}
 		else
 		{
@@ -3542,7 +3542,7 @@ function bool makeDynamicRing()
 	A3 = A1
 	if (allocDynamicObjectStd())
 	{
-		objA1.update_address = addressof(DynamicRing.Init)
+		objA1.update_address = addressof(DynamicRing.Init)			// Address: 0x01a84e
 		objA1.position.x.u16 = u16[A3]
 		objA1.position.y.u16 = u16[A3 + 2]
 		u16[A1 + 0x30] = A4.u16
@@ -3819,13 +3819,13 @@ function void Character.checkForWaterSurface()
 		// Spawn underwater update object
 		if (char.character == CHARACTER_TAILS)
 		{
-			u32[0xffffcb76] = addressof(UnderwaterUpdate.BaseUpdate)
+			u32[0xffffcb76] = addressof(UnderwaterUpdate.BaseUpdate)			// Address: 0x018164
 			u8[0xffffcb76 + 0x2c] = 0x81
 			u32[0xffffcb76 + 0x40] = A0
 		}
 		else
 		{
-			u32[0xffffcb2c] = addressof(UnderwaterUpdate.BaseUpdate)
+			u32[0xffffcb2c] = addressof(UnderwaterUpdate.BaseUpdate)			// Address: 0x018164
 			u8[0xffffcb2c + 0x2c] = 0x81
 			u32[0xffffcb2c + 0x40] = A0
 		}
@@ -5029,7 +5029,7 @@ function void Character.CheckCollisionsWithDynamicObjects_partial()
 #endif
 
 	u16 numObjects = global.dynamic_objects.size	// Actually it's twice the number of dynamic objects
-	A4 = addressof(global.dynamic_objects.size) + 2
+	A4 = addressof(global.dynamic_objects.size) + 2			// Address: 0xffffe380
 	while (numObjects != 0)
 	{
 		// Get address of dynamic object
@@ -5240,7 +5240,7 @@ function void Character.OnCollisionWithDynamicObject()
 			// Grant bonus points
 			Enemy.addScore(A1, 0x010216)
 
-			objA1.update_address = addressof(SmallExplosion.BaseUpdate)
+			objA1.update_address = addressof(SmallExplosion.BaseUpdate)			// Address: 0x01e5e0
 			u8[A1 + 0x05] = 0
 			if (char.velocity.y < 0)
 			{
@@ -5656,7 +5656,7 @@ function void UpdateShieldDeflecting()
 #endif
 
 	u16 numObjects = global.dynamic_objects.size	// Actually it's twice the number of dynamic objects
-	A4 = addressof(global.dynamic_objects.size) + 2
+	A4 = addressof(global.dynamic_objects.size) + 2			// Address: 0xffffe380
 	while (numObjects != 0)
 	{
 		// Get address of dynamic object
@@ -5873,7 +5873,7 @@ function void Character.clearEnemiesOnScreen(u16 minY)
 
 	// Go through all the badniks to destroy
 	D6.u16 = global.dynamic_objects.size
-	A4 = addressof(global.dynamic_objects.size) + 2
+	A4 = addressof(global.dynamic_objects.size) + 2			// Address: 0xffffe380
 	while (D6.u16 != 0)
 	{
 		// Get address of dynamic object
@@ -5948,7 +5948,7 @@ function void fn01052e()
 
 	A3 = 0xffff0000 + A0.u16
 
-	objA1.update_address = addressof(SmallExplosion.BaseUpdate)
+	objA1.update_address = addressof(SmallExplosion.BaseUpdate)			// Address: 0x01e5e0
 	u8[A1 + 0x05] = 0
 }
 

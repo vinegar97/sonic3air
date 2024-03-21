@@ -16,7 +16,7 @@
 //# alias(fn08e17e) deprecated
 function void Cluckoid.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Cluckoid.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Cluckoid.BaseUpdate))			// Address: 0x08e184
 }
 
 
@@ -207,7 +207,7 @@ function void fn08e250()
 
 		if (D1.u8 == 0x03)
 		{
-			objA0.update_address = addressof(MHZSingleLeaf.Type2)
+			objA0.update_address = addressof(MHZSingleLeaf.Type2)			// Address: 0x03dbe0
 			u16[A0 + 0x34] = 0x02
 		}
 

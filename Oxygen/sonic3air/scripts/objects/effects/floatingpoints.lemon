@@ -22,7 +22,7 @@ function void FloatingPoints.Init()
 	objA0.box_size.x = 8
 	objA0.velocity.y = -0x300
 
-	objA0.update_address = addressof(FloatingPoints.Update)
+	objA0.update_address = addressof(FloatingPoints.Update)			// Address: 0x02cd0c
 	FloatingPoints.Update()
 }
 

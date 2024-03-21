@@ -332,7 +332,7 @@ function void fn0504f8()
 			}
 		}
 
-		objA0.update_address = addressof(UnloadObject)
+		objA0.update_address = addressof(UnloadObject)			// Address: 0x01abb6
 	}
 }
 

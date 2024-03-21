@@ -16,7 +16,7 @@
 //# alias(fn08dd32) deprecated
 function void Dragonfly.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Dragonfly.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Dragonfly.BaseUpdate))			// Address: 0x08dd38
 }
 
 

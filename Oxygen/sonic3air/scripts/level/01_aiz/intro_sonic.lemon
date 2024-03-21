@@ -440,14 +440,14 @@ function void fn067888()
 //# address-hook(0x0678a0) end(0x0678d2)
 function void AIZIntro.WaveEffect.Init()
 {
-	objA0.update_address = addressof(AIZIntro.WaveEffect.Update)
+	objA0.update_address = addressof(AIZIntro.WaveEffect.Update)			// Address: 0x0678da
 	objA0.mapping_offset = 0x22119a
 	objA0.sprite_attributes = 0x03d1
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x10
 	objA0.render_flags |= render_flag.FLIP_X
 	u32[A0 + 0x30] = 0x067a9b
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 
 	AIZIntro.WaveEffect.Update()
 }
@@ -758,7 +758,7 @@ function void fn061f10()
 	if (allocDynamicObjectStd())
 	{
 		// Show title card
-		objA1.update_address = addressof(TitleCard.Update)
+		objA1.update_address = addressof(TitleCard.Update)			// Address: 0x02d690
 	}
 
 	global.level_started = -0x6f	// Let HUD fly in
@@ -796,7 +796,7 @@ function void fn061f70()
 
 	A4 = 0x02a8b0
 	++objA0.animation.sprite
-	objA0.update_address = addressof(CorkFloor.Update)
+	objA0.update_address = addressof(CorkFloor.Update)			// Address: 0x02a5f8
 	Wall.Destroy()
 }
 

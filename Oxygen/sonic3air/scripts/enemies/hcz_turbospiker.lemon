@@ -15,7 +15,7 @@
 //# address-hook(0x087bc4) end(0x087bc4)
 function void TurboSpiker.Init()
 {
-	Object.InitWithUpdateAddress(addressof(TurboSpiker.Update))
+	Object.InitWithUpdateAddress(addressof(TurboSpiker.Update))			// Address: 0x087bca
 }
 
 
@@ -296,7 +296,7 @@ function void fn087e1a()
 
 	objA0.update_address = 0x087e3e
 	u32[A0 + 0x30] = 0x087f30
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 	DrawObject()
 }
 
@@ -328,7 +328,7 @@ function void fn087e66()
 
 	objA0.update_address = 0x087e86
 	u32[A0 + 0x30] = 0x087f37
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 }
 
 

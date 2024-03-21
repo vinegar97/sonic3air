@@ -15,7 +15,7 @@
 //# address-hook(0x08948e) end(0x0894a2)
 function void Blaster.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Blaster.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(Blaster.BaseUpdate))			// Address: 0x089494
 }
 
 
@@ -206,7 +206,7 @@ function void fn089626()
 {
 	setupObjectAttributesBasic(0x089708)
 	objA0.update_address = 0x08963e
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 }
 
 
@@ -259,7 +259,7 @@ function void fn08968a()
 //# address-hook(0x08969e) end(0x0896d4)
 function void fn08969e()
 {
-	objA0.update_address = addressof(Blaster.BaseUpdate)
+	objA0.update_address = addressof(Blaster.BaseUpdate)			// Address: 0x089494
 	objA0.base_state = 0x02
 	objA0.countdown_value = 0x3f
 	u16[A0 + 0x3a] = 0x7f

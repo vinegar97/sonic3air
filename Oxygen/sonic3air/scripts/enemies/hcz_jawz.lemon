@@ -15,7 +15,7 @@
 //# address-hook(0x0878b2) end(0x0878b2)
 function void Jawz.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Jawz.PostInit))
+	Object.InitWithUpdateAddress(addressof(Jawz.PostInit))			// Address: 0x0878b8
 }
 
 
@@ -24,7 +24,7 @@ function void Jawz.PostInit()
 {
 	setupObjectAttributesFull(0x087918)
 
-	objA0.update_address = addressof(Jawz.Update)
+	objA0.update_address = addressof(Jawz.Update)			// Address: 0x0878ce
 	D4.u16 = -0x200
 	fn085416()
 }
@@ -73,7 +73,7 @@ function void fn06b77c()
 	setupObjectAttributesFull(0x06bd66)
 	objA0.update_address = 0x06b7a2
 	u32[A0 + 0x30] = 0x06bf02
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 	Enemy.DrawDynamicObject()
 }
 

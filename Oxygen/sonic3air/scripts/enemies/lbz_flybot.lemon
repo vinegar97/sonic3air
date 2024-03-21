@@ -16,7 +16,7 @@
 //# alias(fn08c966) deprecated
 function void FlyBot.Init()
 {
-	Object.InitWithUpdateAddress(addressof(FlyBot.BaseUpdate))
+	Object.InitWithUpdateAddress(addressof(FlyBot.BaseUpdate))			// Address: 0x08c96c
 }
 
 
@@ -207,7 +207,7 @@ function void FlyBotAlert.Init()
 	objA0.sprite_priority = 0x0280
 	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 
-	objA0.update_address = addressof(FlyBotAlert.Update)
+	objA0.update_address = addressof(FlyBotAlert.Update)			// Address: 0x02946a
 	FlyBotAlert.Update()
 }
 
@@ -267,7 +267,7 @@ function void FlyBotAlert.CallFlyBot()
 
 	if (allocDynamicObjectAfterA0())
 	{
-		objA1.update_address = addressof(FlyBot.Init)
+		objA1.update_address = addressof(FlyBot.Init)			// Address: 0x08c966
 
 		// Note: offsetX is always -0xc0 or 0xc0, offsetY is always -0x60
 		D0.u16 = (objA0.subtype2c * 4) & 0x0c

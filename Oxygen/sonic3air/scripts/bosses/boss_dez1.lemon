@@ -744,7 +744,7 @@ function void fn07e44c()
 			if (allocDynamicObjectStd())
 			{
 				// Show title card for act 2
-				objA1.update_address = addressof(TitleCard.Update)
+				objA1.update_address = addressof(TitleCard.Update)			// Address: 0x02d690
 				u8[A1 + 0x3e] = 0xff
 			}
 		}

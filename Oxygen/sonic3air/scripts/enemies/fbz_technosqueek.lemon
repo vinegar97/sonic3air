@@ -15,7 +15,7 @@
 //# address-hook(0x089820) end(0x089820)
 function void Technosqueek.Init()
 {
-	Object.InitWithUpdateAddress(addressof(Technosqueek.Update))
+	Object.InitWithUpdateAddress(addressof(Technosqueek.Update))			// Address: 0x089826
 }
 
 
@@ -280,7 +280,7 @@ function void fn089aa2()
 //# address-hook(0x089ab6) end(0x089b04)
 function void fn089ab6()
 {
-	objA0.update_address = addressof(Technosqueek.Update)
+	objA0.update_address = addressof(Technosqueek.Update)			// Address: 0x089826
 	objA0.base_state = 0x02
 	objA0.countdown_value = 0x0800
 	objA0.countdown_callback = 0x089926

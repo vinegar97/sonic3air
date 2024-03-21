@@ -283,9 +283,9 @@ function void MonitorIntact.Init()
 		{
 			objA0.animation.sprite = 0x0b
 		#if STANDALONE
-			objA0.update_address = addressof(MonitorIntact.Render)		// Needed for render hook, simply calls "DrawOrUnloadObject"
+			objA0.update_address = addressof(MonitorIntact.Render)			// Address: 0x01d61a; Needed for render hook, simply calls "DrawOrUnloadObject"
 		#else
-			objA0.update_address = addressof(DrawOrUnloadObject)
+			objA0.update_address = addressof(DrawOrUnloadObject)			// Address: 0x01b588
 		#endif
 			return
 		}
@@ -353,7 +353,7 @@ function void fn01d61e()
 	// Broken monitor
 	if (objA0.animation.sprite == 0x0b)
 	{
-		objA0.update_address = addressof(MonitorIntact.Render)
+		objA0.update_address = addressof(MonitorIntact.Render)			// Address: 0x01d61a
 	}
 
 	Object.animationUpdate(0x01db3a)
@@ -532,7 +532,7 @@ function void MonitorIntact.Opening()
 	if (allocDynamicObjectAfterA0())
 	{
 		// Effect icon from the monitor
-		objA1.update_address = addressof(ItemEffect.BaseUpdate)
+		objA1.update_address = addressof(ItemEffect.BaseUpdate)			// Address: 0x01d7ba
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		objA1.render_flags = objA0.render_flags
@@ -548,7 +548,7 @@ function void MonitorIntact.Opening()
 	if (allocDynamicObjectAfterA0())
 	{
 		// Explosion
-		objA1.update_address = addressof(SmallExplosion.BaseUpdate)
+		objA1.update_address = addressof(SmallExplosion.BaseUpdate)			// Address: 0x01e5e0
 		objA1.base_state += 2
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
@@ -682,7 +682,7 @@ function void ItemEffect.UpdateDefaultInternal()
 #if STANDALONE
 	if (objA0.state == 0x0b)	// Classic Shield
 	{
-		ItemEffect.applyShield(0, addressof(InstaShield.Init), SFX_CLASSICSHIELD)
+		ItemEffect.applyShield(0, addressof(InstaShield.Init), SFX_CLASSICSHIELD)			// Address: 0x0194ce
 	}
 	else
 #endif
@@ -760,11 +760,11 @@ function void ItemEffect.ApplySpeedUp()
 	A0 = A1
 	if (A0 == 0xffffb000 && !isMainCharacter(CHARACTER_TAILS))
 	{
-		setSpeedCapProperties(addressof(global.move.speedcap))
+		setSpeedCapProperties(addressof(global.move.speedcap))			// Address: 0xfffff760
 	}
 	else
 	{
-		setSpeedCapProperties(addressof(global.move.speedcap.tails))
+		setSpeedCapProperties(addressof(global.move.speedcap.tails))			// Address: 0xfffffec0
 	}
 	A0 = backupA0
 #else
@@ -796,7 +796,7 @@ function void ItemEffect.applyShield(u8 shieldType, u32 updateRoutine, u8 soundI
 	u32 shieldObjectAddress = (u8[A0 + 0x43] == 0) ? 0xffffcce8 : 0xffffcd32
 #if STANDALONE
 	// Attention if we're right during lightning shield flash effect in water
-	if (u32[shieldObjectAddress] == addressof(LightningShield.ResetWaterPalette))
+	if (u32[shieldObjectAddress] == addressof(LightningShield.ResetWaterPalette))			// Address: 0x01989e
 	{
 		copyMemory(0xfffff080, 0xfffff000, 0x80)
 	}
@@ -810,21 +810,21 @@ function void ItemEffect.applyShield(u8 shieldType, u32 updateRoutine, u8 soundI
 //# address-hook(0x01d954) end(0x01d990)
 function void ItemEffect.ApplyShieldFire()
 {
-	ItemEffect.applyShield(char.bonus.SHIELD_FIRE, addressof(FireShield.Init), SFX_FIRESHIELD)
+	ItemEffect.applyShield(char.bonus.SHIELD_FIRE, addressof(FireShield.Init), SFX_FIRESHIELD)			// Address: 0x0195a6
 }
 
 
 //# address-hook(0x01d992) end(0x01d9ce)
 function void ItemEffect.ApplyShieldLightning()
 {
-	ItemEffect.applyShield(char.bonus.SHIELD_LIGHTNING, addressof(LightningShield.Init), SFX_LIGHTNINGSHIELD)
+	ItemEffect.applyShield(char.bonus.SHIELD_LIGHTNING, addressof(LightningShield.Init), SFX_LIGHTNINGSHIELD)			// Address: 0x0196c2
 }
 
 
 //# address-hook(0x01d9d0) end(0x01da0c)
 function void ItemEffect.ApplyShieldBubble()
 {
-	ItemEffect.applyShield(char.bonus.SHIELD_BUBBLE, addressof(BubbleShield.Init), SFX_BUBBLESHIELD)
+	ItemEffect.applyShield(char.bonus.SHIELD_BUBBLE, addressof(BubbleShield.Init), SFX_BUBBLESHIELD)			// Address: 0x0198be
 }
 
 
@@ -850,12 +850,12 @@ function void ItemEffect.ApplyInvincibility()
 
 		if (u8[A0 + 0x43] == 0)
 		{
-			u32[0xffffcd7c] = addressof(Invincibility.Init)	// Invincibility stars
+			u32[0xffffcd7c] = addressof(Invincibility.Init)			// Address: 0x0187f0
 			u16[0xffffcd7c + 0x42] = A1.u16
 		}
 		else
 		{
-			u32[0xffffcea4] = addressof(Invincibility.Init)	// Invincibility stars
+			u32[0xffffcea4] = addressof(Invincibility.Init)			// Address: 0x0187f0
 			u16[0xffffcea4 + 0x42] = A1.u16
 		}
 	}
@@ -872,7 +872,7 @@ function void ItemEffect.ApplySuperTransformation()
 	super.active = 1
 	super.ring_dec.frames = 60
 #if STANDALONE
-	setSpeedCapProperties(addressof(global.move.speedcap), true)
+	setSpeedCapProperties(addressof(global.move.speedcap), true)			// Address: 0xfffff760
 #else
 	global.move.speedcap = 0x800
 	global.move.acceleration = 0x18
@@ -886,14 +886,14 @@ function void ItemEffect.ApplySuperTransformation()
 		u32[0xffffb000 + 0x0c] = 0x146816		// "char.mapping_offset"
 		super.active = 0xff
 	#if STANDALONE
-		setSpeedCapProperties(addressof(global.move.speedcap), true)
+		setSpeedCapProperties(addressof(global.move.speedcap), true)			// Address: 0xfffff760
 	#else
 		global.move.speedcap = 0xa00
 		global.move.acceleration = 0x30
 		global.move.deceleration = 0x100
 	#endif
 		u32[0xffffcd7c] = 0x019348		// Hyper Sonic stars
-		u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
+		u32[0xffffcbc0] = addressof(AfterImages.Init)			// Address:  0x01a494
 	}
 	else if (isMainCharacter(CHARACTER_TAILS))
 	{
@@ -906,7 +906,7 @@ function void ItemEffect.ApplySuperTransformation()
 	#endif
 		u8[0xffffb000 + 0x20] = char.state.TAILS_TRANSFORM
 	#if STANDALONE
-		setSpeedCapProperties(addressof(global.move.speedcap.tails), true)
+		setSpeedCapProperties(addressof(global.move.speedcap.tails), true)			// Address: 0xfffffec0
 	#else
 		global.move.speedcap.tails = 0x800
 		global.move.acceleration.tails = 0x18
@@ -917,7 +917,7 @@ function void ItemEffect.ApplySuperTransformation()
 	else
 	{
 		// Knuckles
-		u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
+		u32[0xffffcbc0] = addressof(AfterImages.Init)			// Address:  0x01a494
 	#if STANDALONE
 		super.active = 0xff
 	#endif

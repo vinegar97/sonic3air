@@ -160,7 +160,7 @@ function void fn04a362()
 //# address-hook(0x04a384) end(0x04a3cc)
 function void fn04a384()
 {
-	objA0.update_address = addressof(UnloadObject)
+	objA0.update_address = addressof(UnloadObject)			// Address: 0x01abb6
 	D1 = objA0.subtype2c
 	D2 = 1
 	if (D1.u8 == 3)
@@ -310,7 +310,7 @@ function void fn061176()
 function void fn0611d6()
 {
 	A1 = 0xffffb000
-	u32[0xffffcce8] = addressof(FireShield.Init)
+	u32[0xffffcce8] = addressof(FireShield.Init)			// Address: 0x0195a6
 	u16[0xffffcce8 + 0x42] = A1.u16
 	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
@@ -325,7 +325,7 @@ function void fn0611d6()
 function void fn061200()
 {
 	A1 = 0xffffb000
-	u32[0xffffcce8] = addressof(BubbleShield.Init)
+	u32[0xffffcce8] = addressof(BubbleShield.Init)			// Address: 0x0198be
 	u16[0xffffcce8 + 0x42] = A1.u16
 	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
@@ -340,7 +340,7 @@ function void fn061200()
 function void fn06122a()
 {
 	A1 = 0xffffb000
-	u32[0xffffcce8] = addressof(LightningShield.Init)
+	u32[0xffffcce8] = addressof(LightningShield.Init)			// Address: 0x0196c2
 	u16[0xffffcce8 + 0x42] = A1.u16
 	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
@@ -357,7 +357,7 @@ function void fn061254()
 	u8 shield = (1 << D0.u8)
 
 	u8[A1 + 0x2b] |= shield
-	A2 = addressof(global.shields_backup_1)
+	A2 = addressof(global.shields_backup_1)			// Address: 0xfffffe47
 	u8[A2] &= ~char.bonus.ELEMENTAL_SHIELDS
 	u8[A2] |= shield
 }

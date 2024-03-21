@@ -318,7 +318,7 @@ function void fn08a036()
 				if (allocDynamicObjectAfterA0())
 				{
 					// Create spring
-					objA1.update_address = addressof(Spring.BaseUpdate)
+					objA1.update_address = addressof(Spring.BaseUpdate)			// Address: 0x022d06
 					objA1.position.x.u16 = 0x5d5a
 					objA1.position.y.u16 = 0x027a
 					u8[A1 + 0x2c] = 0

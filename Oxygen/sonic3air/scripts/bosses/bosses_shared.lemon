@@ -37,7 +37,7 @@ function void fn085bda()
 	level.boss_encounter = 0
 
 	// "spawnSimpleChildObjects(0x085bfa)" replaced by:
-	spawnSimpleChildObjects(addressof(SignPost.BaseUpdate), 1)		// Signpost
+	spawnSimpleChildObjects(addressof(SignPost.BaseUpdate), 1)		// Address: 0x0837b2
 
 	addPatternLoadingCue(0x085bc8)		// Signpost pole sprite
 
@@ -595,7 +595,7 @@ function void fn083ec6()
 	objA0.countdown_value = 2
 
 	// "spawnSimpleChildObjects(0x083ff6)" replaced by:
-	spawnSimpleChildObjects(addressof(SmallExplosion.BaseUpdate), 1)
+	spawnSimpleChildObjects(addressof(SmallExplosion.BaseUpdate), 1)			// Address: 0x01e5e0
 	if (_equal())
 	{
 		u8[A1 + 0x05] = 0x02
@@ -672,7 +672,7 @@ function void fn083f80()
 {
 	setupObjectAttributesFull(0x083fb4)
 	objA0.update_address = 0x083f9e
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)			// Address: 0x0852a0
 
 	playSound(0xb4)
 	fn083f9e()

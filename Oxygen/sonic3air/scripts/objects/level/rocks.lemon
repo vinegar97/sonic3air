@@ -84,7 +84,7 @@ function void Rocks.Init()
 		return
 	}
 
-	objA0.update_address = addressof(Rocks.Update)
+	objA0.update_address = addressof(Rocks.Update)			// Address: 0x01faf2
 	D0.u16 = objA0.respawn_entry
 	if (D0.u16 != 0)
 	{

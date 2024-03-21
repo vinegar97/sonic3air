@@ -28,7 +28,7 @@ function void AfterImages.Init()
 	objA0.box_size.y = 0x18
 	objA0.render_flags = render_flag.WORLD
 
-	objA0.update_address = addressof(AfterImages.Update)
+	objA0.update_address = addressof(AfterImages.Update)			// Address: 0x01a4d0
 	AfterImages.Update()
 }
 
