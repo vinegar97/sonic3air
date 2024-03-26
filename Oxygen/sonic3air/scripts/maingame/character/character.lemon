@@ -267,34 +267,7 @@ function void Character.UpdateNormalState.Sonic()
 	}
 
 #if STANDALONE
-	if (Game.getSetting(SETTING_DROPDASH) && !competition_mode.active)
-	{
-		if (sonic.dropdash_counter > 0)
-		{
-			// Check if hit the ground with drop dash charged
-			if ((sonic.dropdash_counter == DROPDASH_FULLCHARGE) && (char.flags & char.flag.IN_AIR) == 0)
-			{
-				if (char.state != char.state.WIN_POSE)		// This check is only needed for drop dash vs. win pose after FBZ 2 boss
-				{
-					releaseDropDash()
-				}
-				else
-				{
-					// Abort drop dash (e.g. when jumping on a spring)
-					sonic.dropdash_counter = 0
-				}
-			}
-			else
-			{
-				u8 expectedState = (sonic.dropdash_counter < DROPDASH_FULLCHARGE) ? char.state.ROLLING : char.state.SONIC_DROPDASH
-				if (char.state != expectedState)
-				{
-					// Abort drop dash (e.g. when jumping on a spring)
-					sonic.dropdash_counter = 0
-				}
-			}
-		}
-	}
+	Character.UpdateDropDash()
 
 	if (Game.getSetting(SETTING_SUPERFAST_RUNANIM) && !super.active && abs(char.groundspeed) >= 0x0d00)
 	{
@@ -2849,36 +2822,6 @@ function void Character.updateJumpMoves()
 				}
 			}
 
-		#if STANDALONE
-			if (Game.getSetting(SETTING_DROPDASH) && char.character == CHARACTER_SONIC && !competition_mode.active)
-			{
-				// Handle drop dash
-				//  -> Can only be charged if there is no shield active (only exception: drop dash charge started already, when shield gets active -- this reflects Sonic Mania's behavior)
-				//  -> But can be charged if invincible (incl. Super / Hyper Sonic)
-				bool chargeDropDash = (control.player1.state & CONTROL_ABC) && ((char.bonus_effect & char.bonus.ELEMENTAL_SHIELDS) == 0 || (char.bonus_effect & char.bonus.INVINCIBLE) || sonic.dropdash_counter > 0) && char.double_jump_state
-				if (chargeDropDash)
-				{
-					if (sonic.dropdash_counter < DROPDASH_FULLCHARGE)
-					{
-						// Drop dash charging
-						++sonic.dropdash_counter
-						if (sonic.dropdash_counter == DROPDASH_FULLCHARGE)
-						{
-							// Fully charged now
-							char.state = char.state.SONIC_DROPDASH
-							Audio.playAudio("dropdash_charge", AudioContext.CONTEXT_SOUND)
-						}
-					}
-					Input.setControllerRumbleByAddress(A0, 0.0f, 0.25f, 100)
-				}
-				else if (sonic.dropdash_counter > 0)
-				{
-					// Abort drop dash
-					sonic.dropdash_counter = 0
-					char.state = char.state.ROLLING
-				}
-			}
-		#endif
 		}
 	}
 	else
@@ -4174,6 +4117,66 @@ function void releaseSpindash()
 
 
 #if STANDALONE
+function bool Character.UpdateDropDash()
+{
+	if (Game.getSetting(SETTING_DROPDASH) && char.character == CHARACTER_SONIC && !competition_mode.active)
+	{
+		// Handle drop dash
+		//  -> Can only be charged if there is no shield active (only exception: drop dash charge started already, when shield gets active -- this reflects Sonic Mania's behavior)
+		//  -> But can be charged if invincible (incl. Super / Hyper Sonic)
+		bool chargeDropDash = (control.player1.state & CONTROL_ABC) && ((char.bonus_effect & char.bonus.ELEMENTAL_SHIELDS | char.bonus.INVINCIBLE) == char.bonus.INVINCIBLE || sonic.dropdash_counter > 0) && char.double_jump_state && (char.flags & char.flag.IN_AIR)
+		if (chargeDropDash)
+		{
+			if (sonic.dropdash_counter < DROPDASH_FULLCHARGE)
+			{
+				// Drop dash charging
+				++sonic.dropdash_counter
+				if (sonic.dropdash_counter == DROPDASH_FULLCHARGE)
+				{
+					// Fully charged now
+					char.state = char.state.SONIC_DROPDASH
+					Audio.playAudio("dropdash_charge", AudioContext.CONTEXT_SOUND)
+				}
+			}
+			Input.setControllerRumbleByAddress(A0, 0.0f, 0.25f, 100)
+		}
+		else if (sonic.dropdash_counter > 0)
+		{
+			// Check if hit the ground with drop dash charged
+			if (sonic.dropdash_counter == DROPDASH_FULLCHARGE)
+			{
+				if ((char.flags & char.flag.IN_AIR) == 0)
+				{
+					if (char.state != char.state.WIN_POSE)		// This check is only needed for drop dash vs. win pose after FBZ 2 boss
+					{
+						releaseDropDash()
+					}
+					else
+					{
+						// Abort drop dash (e.g. when jumping on a spring)
+						sonic.dropdash_counter = 0
+						char.state = char.state.ROLLING
+					}
+				}
+			}
+			else
+			{
+				u8 expectedState = (sonic.dropdash_counter < DROPDASH_FULLCHARGE) ? char.state.ROLLING : char.state.SONIC_DROPDASH
+				if (char.state != expectedState)
+				{
+					// Abort drop dash (e.g. when jumping on a spring)
+					sonic.dropdash_counter = 0
+					char.state = char.state.ROLLING
+				}
+			}
+		}
+		return true
+	}
+
+	return false
+}
+
+
 function void releaseDropDash()
 {
 	// Release drop dash!
