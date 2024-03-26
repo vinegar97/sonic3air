@@ -347,7 +347,7 @@ function void fn00c376()
 //# address-hook(0x00c3c2) end(0x00c3c2)
 function void fn00c3c2()
 {
-	sram.block_interrupts.u8 = 0xff
+	sram.block_interrupts.u8 = -1
 	fn00c3c6()
 }
 

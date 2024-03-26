@@ -314,13 +314,13 @@ function void fn037430()
 		u8[A1 + 0x0d] = competition_mode.character.player1
 		u32[A1 + 0x08] = u32[A1 + 0x04]
 		u32[A1 + 0x04] = D0
-		competition_mode.timeattack.new_record = 0x01
+		competition_mode.timeattack.new_record = 1
 	}
 	else if (D0 < u32[A1 + 0x08])
 	{
 		u8[A1 + 0x0e] = competition_mode.character.player1
 		u32[A1 + 0x08] = D0
-		competition_mode.timeattack.new_record = 0x02
+		competition_mode.timeattack.new_record = 2
 	}
 
 	fn00c3c2()

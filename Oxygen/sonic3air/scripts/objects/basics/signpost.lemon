@@ -246,7 +246,7 @@ function void fn0838c2()
 		objA0.velocity.x = 0
 		objA0.velocity.y = 0
 		objA0.animation.sprite = u8[0x08390e + global.characters]
-		player2.control_override = 0xff
+		player2.control_override = -1
 	}
 	else
 	{

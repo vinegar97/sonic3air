@@ -50,7 +50,7 @@ function void InitLevelTiles.DEZBossAct()
 	}
 
 	level.display_routine = 0x06c0
-	player1.camera_lock = 0xff
+	player1.camera_lock = -1
 	D0.u16 = 0x80
 	camera.position.x.u16 = D0.u16
 	camera.foreground.x.u16 = D0.u16
@@ -109,7 +109,7 @@ function void fn05a49a()
 	{
 		level.backup.timer.alldata = 0
 		timer.alldata = D0
-		hud.dirty.timer = 0xff
+		hud.dirty.timer = -1
 	}
 
 	u16[0xffffeec0] += 4

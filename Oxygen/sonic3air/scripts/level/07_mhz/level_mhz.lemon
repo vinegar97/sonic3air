@@ -926,7 +926,7 @@ function void fn055312()
 		A1 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x0558f8 : 0x0558e8
 		u8[0xffffeed9] = u8[A1]
 
-		player1.camera_lock = 0xff
+		player1.camera_lock = -1
 		level.special_scrolling = 0x0c
 
 		push(A3)
@@ -1324,7 +1324,7 @@ function void fn05560c()
 			{
 				newCameraX = screenPosBeforeTree
 				move_area.right = 0x45a0
-				player1.camera_lock = 0xff
+				player1.camera_lock = -1
 				level.special_scrolling = 0
 			}
 		}

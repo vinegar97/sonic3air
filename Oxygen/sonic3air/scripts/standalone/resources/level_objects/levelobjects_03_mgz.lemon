@@ -590,7 +590,7 @@ function void LevelObjectTableBuilder.buildObjects_MGZ1()
 	LevelObjectTableBuilder.addObject(0x2f00, 0x0e60, OBJECTTABLE1_9f, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x2f00, 0x0ee0, OBJECTTABLE1_80, 0x05, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }
 
@@ -1051,6 +1051,6 @@ function void LevelObjectTableBuilder.buildObjects_MGZ2()
 
 	LevelObjectTableBuilder.addObject(0x3e78, 0x0000, OBJECTTABLE1_a2, 0x00, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }

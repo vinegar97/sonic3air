@@ -323,7 +323,7 @@ function void fn081554()
 	u16[0xfffffa8e] = A0.u16
 	objA0.countdown_value = 0x17
 	objA0.velocity.x = 0x0400
-	player1.camera_lock = 0xff
+	player1.camera_lock = -1
 	level.boss_encounter = 1
 	u32[0xfffffa82] = 0x010000
 	u32[0xfffffa8a] = 0x0800

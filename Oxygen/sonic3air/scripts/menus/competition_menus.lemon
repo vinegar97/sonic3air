@@ -236,7 +236,7 @@ function void fn00aa74()
 {
 	if (control.pad1.pressed & (CONTROL_START | CONTROL_A | CONTROL_C))
 	{
-		u16[0xffffff8a] = 0xffff	// Items off (competition_mode.item_flag = 0xff), set game mode to time attack (competition_mode.game_mode = -1)
+		u16[0xffffff8a] = -1	// Items off (competition_mode.item_flag = -1), set game mode to time attack (competition_mode.game_mode = -1)
 
 		competition_mode.multiplay = 0
 		global.game_mode = 0xc0		// Competition Mode Level Select, fading
@@ -309,7 +309,7 @@ function void fn00ab00()
 		D0.u16 = (control.pad1.pressed | control.pad2.pressed) & (CONTROL_LEFT | CONTROL_RIGHT)
 		if (D0.u16 != 0)
 		{
-			competition_mode.menu.items_toggle = (competition_mode.menu.items_toggle == 0) ? 0xff : 0x00
+			competition_mode.menu.items_toggle = (competition_mode.menu.items_toggle == 0) ? -1 : 0
 			playSound(SFX_CLICK)
 		}
 

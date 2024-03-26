@@ -16,8 +16,8 @@ function void InitLevelTiles.Outro()
 		objA1.update_address = 0x05d86a
 	}
 
-	global.pause_disabled.u8 = 0xff
-	player1.camera_lock = 0xff
+	global.pause_disabled.u8 = -1
+	player1.camera_lock = -1
 	u8[0xffffb000 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 
 	D0 = 0x02000000
@@ -190,7 +190,7 @@ function void fn05ab6e()
 	palette_fade.range = 0x003f
 	u16[0xffffeeda] = 0x15
 	u8[0xffffee50] = 0xff
-	level.palettefx.state = 0xff
+	level.palettefx.state = -1
 	u16[0xffffeec0] += 4
 
 	fn05abc0()
@@ -383,7 +383,7 @@ function void fn05ad56()
 	palette_fade.range = 0x003f
 	u16[0xffffeeda] = 0x15
 	u8[0xffffee50] = 0xff
-	level.palettefx.state = 0xff
+	level.palettefx.state = -1
 	u16[0xffffeec0] += 4
 
 	fn05ad8e()

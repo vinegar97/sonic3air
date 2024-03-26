@@ -227,7 +227,7 @@ function void LevelObjectTableBuilder.buildObjects_SSZ1()
 	LevelObjectTableBuilder.addObject(0x1a40, 0x06c0, OBJECTTABLE2_02, 0x45, 0)
 	LevelObjectTableBuilder.addObject(0x1a40, 0x09b0, OBJECTTABLE2_79, 0x32, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }
 
@@ -240,6 +240,6 @@ function void LevelObjectTableBuilder.buildObjects_SSZ2()
 	LevelObjectTableBuilder.addObject(0x00a0 + getScreenExtend(), 0x04b0, OBJECTTABLE2_79, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x0180, 0x0430, OBJECTTABLE2_b2, 0x00, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }

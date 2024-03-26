@@ -101,7 +101,7 @@ function void LevelTilesAnim.BonusGS()
 			A2 = A1
 			A1.u16 += u16[0x0285ce + D7.u16]
 			A2.u16 += u16[0x0285d6 + D7.u16]
-			D2 = 0xffffffff
+			D2 = -1
 			D3 = 0
 			D4 = 7
 			while (D4.s16 >= 0)

@@ -15,7 +15,7 @@
 //# address-hook(0x058a46) end(0x058a9a)
 function void InitLevelTiles.SSZ_Knuckles()
 {
-	level.palettefx.state = 0xff
+	level.palettefx.state = -1
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x057c1e
@@ -27,7 +27,7 @@ function void InitLevelTiles.SSZ_Knuckles()
 		D1 = 0x0649
 		camera.foreground.y.u16 = D1.u16
 		camera.position.y.u16 = D1.u16
-		player1.camera_lock = 0xff
+		player1.camera_lock = -1
 
 		if (allocDynamicObjectAfterA1())
 		{
@@ -132,7 +132,7 @@ function void fn058ae0()
 	u8[A1] = 0x17
 	u8[A5] = 0x19
 
-	global.pause_disabled.u8 = 0xff
+	global.pause_disabled.u8 = -1
 	u16[0xffffeec0] += 4
 
 #if STANDALONE
@@ -923,7 +923,7 @@ function void fn07cb64()
 	if (objA0.countdown_value == 0)
 	{
 		objA0.update_address = 0x07cba4
-		player1.camera_lock = 0xff
+		player1.camera_lock = -1
 
 		if (allocDynamicObjectStd())
 		{

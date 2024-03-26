@@ -248,7 +248,7 @@ function void fn06b0e8()
 {
 	objA0.update_address = 0x06b154
 	objA0.render_flags &= ~render_flag.VISIBLE
-	level.wait_for_results = 0xff
+	level.wait_for_results = -1
 	level.boss_encounter = 0
 	screenmover_target.right = level.bossarea.left + 0x0180 + getScreenExtend()
 
@@ -300,8 +300,8 @@ function void fn06b154()
 
 	control.player1 = 0
 	control.tails = 0
-	player1.control_override = 0xff
-	player2.control_override = 0xff
+	player1.control_override = -1
+	player2.control_override = -1
 	u8[0xffffb000 + 0x2e] = control_flag.DISABLE_INTERACTION
 
 	stopCharacterWinPose(0xffffb000)
@@ -929,7 +929,7 @@ function void fn06b7bc()
 	objA0.update_address = 0x06b7ec
 	objA0.countdown_value = 0x5f
 	objA0.countdown_callback = 0x06b804
-	camera.screenshake.state.hi = 0xff
+	camera.screenshake.state.hi = -1
 }
 
 
@@ -980,8 +980,8 @@ function void fn06b832()
 	objA0.update_address = 0x06b882
 	if (objA0.subtype2c == 0)
 	{
-		level.palettefx.state = 0xff
-		camera.screenshake.state.hi = 0xff
+		level.palettefx.state = -1
+		camera.screenshake.state.hi = -1
 		playSound(0x57)
 		A1 = 0xffffb000
 	}

@@ -88,7 +88,7 @@ function void fn0865de()
 {
 	if (global.zone != 0x02)
 	{
-		player2.control_override = 0xff
+		player2.control_override = -1
 	#if STANDALONE
 		control.tails = 0
 	#endif
@@ -96,7 +96,7 @@ function void fn0865de()
 
 	objA0.animation.sprite = 1		// Opened capsule
 	objA0.countdown_value = 0x40
-	level.capsule_opened = 0xff
+	level.capsule_opened = -1
 
 	// Spawn opened capsule giblets
 	// "spawnChildObjects(0x086b7a)" replaced by:

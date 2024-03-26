@@ -680,7 +680,7 @@ function void LevelObjectTableBuilder.buildObjects_LBZ1()
 	LevelObjectTableBuilder.addObject(0x3f30, 0x0210, OBJECTTABLE1_80, 0x03, 0)
 	LevelObjectTableBuilder.addObject(0x3f50, 0x0210, OBJECTTABLE1_80, 0x07, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }
 
@@ -1619,6 +1619,6 @@ function void LevelObjectTableBuilder.buildObjects_LBZ2()
 
 	LevelObjectTableBuilder.addObject(0x4410, 0x0440, OBJECTTABLE1_cd, 0x00, LVLOBJ_IGNORE_Y)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }

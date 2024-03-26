@@ -216,7 +216,7 @@ function void fn08813a()
 	if (D2.u16 == 0x01)
 	{
 		control.player1 = 0
-		player1.control_override = 0xff
+		player1.control_override = -1
 		objA0.flags38 |= 0x04
 	}
 

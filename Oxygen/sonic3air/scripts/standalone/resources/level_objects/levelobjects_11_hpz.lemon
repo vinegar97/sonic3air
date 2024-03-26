@@ -54,6 +54,6 @@ function void LevelObjectTableBuilder.buildObjects_HPZ1()
 	LevelObjectTableBuilder.addObject(0x16e0, 0x0358, OBJECTTABLE2_b4, 0x04, 0)
 	LevelObjectTableBuilder.addObject(0x1730, 0x0398, OBJECTTABLE2_b4, 0x06, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }

@@ -613,7 +613,7 @@ function void LevelObjectTableBuilder.buildObjects_MHZ1()
 	LevelObjectTableBuilder.addObject(0x44b0, 0x07bc, OBJECTTABLE2_2f, 0x1a, 0)
 	LevelObjectTableBuilder.addObject(0x4530, 0x07bc, OBJECTTABLE2_2f, 0x1a, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }
 
@@ -1187,6 +1187,6 @@ function void LevelObjectTableBuilder.buildObjects_MHZ2()
 
 	LevelObjectTableBuilder.addObject(0x4580, 0x0320, OBJECTTABLE2_02, 0x10, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }

@@ -202,7 +202,7 @@ function void fn05583e()
 	{
 		u8[0xfffffaa9] = 0xff
 		u8[0xffffeec4] = 0xff
-		player1.camera_lock = 0xff
+		player1.camera_lock = -1
 	}
 
 	D0.u16 = (level.framecounter - 1) & 0x0f

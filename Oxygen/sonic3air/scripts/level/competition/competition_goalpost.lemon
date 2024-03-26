@@ -212,8 +212,8 @@ function void fn036dfc()
 					return
 				}
 
-				player1.control_override = 0x01
-				player2.control_override = 0x01
+				player1.control_override = 1
+				player2.control_override = 1
 				control.player1 = 0
 				control.tails = 0
 				objA0.update_address = 0x036d3e
@@ -269,7 +269,7 @@ function void fn036f5a()
 	zeroMemory(0xffff7828, 0x30)
 	competition_mode.time_record.player1 = 0
 	competition_mode.time_record.player2 = 0
-	competition_mode.timeattack.new_record = 0xff
+	competition_mode.timeattack.new_record = -1
 }
 
 

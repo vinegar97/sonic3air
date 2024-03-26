@@ -170,7 +170,7 @@ function void UpdateStaticRingsAnimation()
 				++u8[A1+1]
 				if (u8[A1+1] == 8)
 				{
-					u16[A1] = 0xffff
+					u16[A1] = -1
 					u16[ringPointer] = 0
 					--u16[0xffffef80]
 				}

@@ -270,12 +270,12 @@ function void ActSelect.Menu(u8 fadeInMethod)
 
 			// Render the border
 			Renderer.drawSprite("level_preview_border_left", 0, 8, 0, 0x00, 0xf008)
-			Renderer.drawSpriteTransformed("level_preview_border_center", getScreenWidth() / 2, 8, 0, 0x00, 0xf008, 0xffffffff, float(getScreenWidth() - 20) / 10.0f, 0.0f, 0.0f, 1.0f)
+			Renderer.drawSpriteTransformed("level_preview_border_center", getScreenWidth() / 2, 8, 0, 0x00, 0xf008, -1, float(getScreenWidth() - 20) / 10.0f, 0.0f, 0.0f, 1.0f)
 			Renderer.drawSprite("level_preview_border_right", getScreenWidth(), 8, 0, 0x00, 0xf008)
 		}
 
 		// Title text
-		Renderer.drawText(TITLE_FONT, anchorX, 12, "ACT SELECT", 0xffffffff, 5, 0, 0xf010, false, true)
+		Renderer.drawText(TITLE_FONT, anchorX, 12, "ACT SELECT", -1, 5, 0, 0xf010, false, true)
 
 		// Character preview
 		{

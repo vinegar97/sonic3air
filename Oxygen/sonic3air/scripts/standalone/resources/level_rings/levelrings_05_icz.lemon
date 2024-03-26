@@ -249,7 +249,7 @@ function void LevelRingsTableBuilder.buildRings_ICZ1()
 	LevelRingsTableBuilder.addRing(0x6778, 0x0210)
 	LevelRingsTableBuilder.addRing(0x6790, 0x0210)
 	LevelRingsTableBuilder.addRing(0x67a8, 0x0210)
-	u32[A1] = 0xffffffff
+	u32[A1] = -1
 	A1 += 4
 }
 
@@ -843,6 +843,6 @@ function void LevelRingsTableBuilder.buildRings_ICZ2()
 		LevelRingsTableBuilder.addRing(0x4054, 0x0400)
 	}
 
-	u32[A1] = 0xffffffff
+	u32[A1] = -1
 	A1 += 4
 }

@@ -18,7 +18,7 @@ function void fn060c56()
 	objA0.position.y.u16 -= 0x0100
 	u16[A0 + 0x3a] = objA0.position.y.u16
 
-	global.passing_floor = 0xff
+	global.passing_floor = -1
 	global.random.seed = global.framecounter
 	ring_counter = checkpoint.rings
 	extra_lives_granted = checkpoint.lives_granted
@@ -29,7 +29,7 @@ function void fn060c56()
 	A1 = 0xffff2000
 	for (u8 i = 0; i < 9; ++i)
 	{
-		u32[A1] = 0xffffffff
+		u32[A1] = -1
 		A1 += 4
 	}
 

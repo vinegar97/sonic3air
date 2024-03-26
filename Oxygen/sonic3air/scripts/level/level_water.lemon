@@ -38,7 +38,7 @@ function void UpdateWater()
 #endif
 	{
 		// Special handling for HCZ 1 first part
-		h_int.line = 0xff
+		h_int.line = -1
 		return
 	}
 
@@ -59,7 +59,7 @@ function void UpdateWater()
 	else
 	{
 		water.fullscreen = 1
-		h_int.line = 0xff
+		h_int.line = -1
 	}
 }
 
@@ -592,7 +592,7 @@ function void UpdateWaterSurfaceLevel.AIZ2()
 		{
 			if (camera.position.x.u16 < 0x2900)
 			{
-				camera.screenshake.state = 0xffff
+				camera.screenshake.state = -1
 				if (allocDynamicObjectStd())
 				{
 					objA1.update_address = addressof(Object.ScreenShakeTimeout)

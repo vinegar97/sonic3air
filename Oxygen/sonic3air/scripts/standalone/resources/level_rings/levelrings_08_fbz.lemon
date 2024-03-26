@@ -318,7 +318,7 @@ function void LevelRingsTableBuilder.buildRings_FBZ1()
 		LevelRingsTableBuilder.addRing(0x2d88, 0x05ac)
 	}
 
-	u32[A1] = 0xffffffff
+	u32[A1] = -1
 	A1 += 4
 }
 
@@ -585,6 +585,6 @@ function void LevelRingsTableBuilder.buildRings_FBZ2()
 	LevelRingsTableBuilder.addRing(0x31a8, 0x02e0)
 	LevelRingsTableBuilder.addRing(0x31c0, 0x02e0)
 	LevelRingsTableBuilder.addRing(0x31d8, 0x02e0)
-	u32[A1] = 0xffffffff
+	u32[A1] = -1
 	A1 += 4
 }

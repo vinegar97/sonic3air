@@ -488,6 +488,6 @@ function void LevelObjectTableBuilder.buildObjects_DDZ()
 	LevelObjectTableBuilder.addObject(0x73a0, 0x0120, OBJECTTABLE2_b7, 0x01, 0)
 	LevelObjectTableBuilder.addObject(0x73d0, 0x01a0, OBJECTTABLE2_b7, 0x25, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }

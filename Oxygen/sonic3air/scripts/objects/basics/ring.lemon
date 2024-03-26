@@ -47,7 +47,7 @@ function void DynamicRing.Update()
 			objA0.update_address = 0x01a64a
 		#endif
 			objA0.base_state = 0x02
-			spilled_rings.speed = 0xff
+			spilled_rings.speed = -1
 		}
 
 		--objA0.animation.timer
@@ -239,7 +239,7 @@ function void SpillRings()
 		objA1.hitbox_extends.x = 8
 		objA1.collision_attributes = (collision.flag.ITEM | collision.size.6x6)
 
-		spilled_rings.speed = 0xff
+		spilled_rings.speed = -1
 		if (D4.s16 >= 0)
 		{
 			// Entered only for every second ring (the others use x-mirrored directions)

@@ -285,7 +285,7 @@ function void TitleScreen()
 
 	outro.wait_time = 0
 	u16[0xfffff662] = 0
-	titleintro.buffer = 0xff
+	titleintro.buffer = -1
 	titleintro.frames = 0
 	titleintro.animstep = 1
 	D0 = 1
@@ -653,7 +653,7 @@ function void fn004352()
 	{
 		copyMemory(0xfffffc00, 0xfffffc80, 0x40)
 
-		titleintro.buffer ^= 0xff
+		titleintro.buffer ^= -1
 		if (titleintro.buffer != 0)
 		{
 			VDP.Config.setNameTableBasePlaneA(0xc000)

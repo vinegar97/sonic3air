@@ -614,7 +614,7 @@ function void LevelObjectTableBuilder.buildObjects_SOZ1()
 	LevelObjectTableBuilder.addObject(0x4308, 0x0918, OBJECTTABLE2_02, 0x27, 0)
 	LevelObjectTableBuilder.addObject(0x4448, 0x0918, OBJECTTABLE2_02, 0x25, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }
 
@@ -1142,6 +1142,6 @@ function void LevelObjectTableBuilder.buildObjects_SOZ2()
 	LevelObjectTableBuilder.addObject(0x5200, 0x0750, OBJECTTABLE2_8b, 0x40, 0)
 	LevelObjectTableBuilder.addObject(0x5250, 0x06d8, OBJECTTABLE2_98, 0x00, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }

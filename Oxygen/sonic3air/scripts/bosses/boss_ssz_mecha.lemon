@@ -654,7 +654,7 @@ function void fn07b888()
 	{
 		// Sonic / Tails
 		objA0.base_state = 0x04
-		level.wait_for_results = 0xff
+		level.wait_for_results = -1
 		objA0.flags38 |= 0x20
 		objA0.flags38 &= ~0x08
 		objA0.countdown_value = 119
@@ -674,7 +674,7 @@ function void fn07b888()
 			objA0.countdown_value = 191
 			objA0.countdown_callback = 0x07b996
 			playMusic(MUSIC_CTRL_FADEOUT)
-			player2.control_override = 0xff
+			player2.control_override = -1
 		}
 		else
 		{

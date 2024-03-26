@@ -221,14 +221,14 @@ function void fn058048()
 {
 	A1 = 0xffffb000
 	A2 = A0 + 0x30
-	D3 = isMainCharacter(CHARACTER_TAILS) ? 0xffffffff : 0
+	D3 = isMainCharacter(CHARACTER_TAILS) ? -1 : 0
 	fn05806e()
 
 	if (getNumPlayers() == 2)
 	{
 		A1 = 0xffffb04a
 		A2 = A0 + 0x32
-		D3 = 0xffffffff
+		D3 = -1
 		fn05806e()
 	}
 }

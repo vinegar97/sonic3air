@@ -565,7 +565,7 @@ function void fn050f20()
 			D0.u16 = u16[0xffffb000 + 0x14]
 			if (D0.u16 >= 0x0600 && D0.u16 < 0x0840)
 			{
-				level.dualplanecollision = 0xff
+				level.dualplanecollision = -1
 			}
 		}
 	}
@@ -713,7 +713,7 @@ function void fn050ff0()
 		{
 			if (u16[0xffffb000 + 0x10] >= 0x0680)
 			{
-				camera.screenshake.state.hi = 0xff
+				camera.screenshake.state.hi = -1
 				goto05103a = true
 			}
 		}

@@ -3220,7 +3220,7 @@ function bool Character.performSuperTransformation()
 
 		if (possibleSuperForm == 2)
 		{
-			super.active = 0xff
+			super.active = -1
 			u32[0xffffcd7c] = 0x019348		// Hyper Sonic stars
 			u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
 		}
@@ -3241,7 +3241,7 @@ function bool Character.performSuperTransformation()
 			u32[0xffffcd7c] = 0x01a170		// Super Flickies (the first one spawns the others)
 
 		#if STANDALONE
-			super.active.tails = 0xff
+			super.active.tails = -1
 		#endif
 		}
 	}
@@ -3251,7 +3251,7 @@ function bool Character.performSuperTransformation()
 
 		if (possibleSuperForm == 2)
 		{
-			super.active = 0xff
+			super.active = -1
 			u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
 		}
 		else
@@ -3262,7 +3262,7 @@ function bool Character.performSuperTransformation()
 	}
 
 #if STANDALONE
-	if (super.active == 0xff)
+	if (super.active == -1 || super.active.tails == -1)
 	{
 		// Stop drowning music
 		if (char.drown_countdown < 12)
@@ -3293,7 +3293,7 @@ function bool Character.performSuperTransformation()
 #endif
 
 #if STANDALONE
-	if (super.active == 0xff || super.active.tails == 0xff)
+	if (super.active == -1 || super.active.tails == -1)
 	{
 		Game.setAchievementComplete(ACHIEVEMENT_GOING_HYPER)
 	}
@@ -3309,7 +3309,7 @@ function void Character.cancelSuperTransformation()
 	super.active.tails = 0
 	super.palettefx.state = 2
 	super.palettefx.frame = 30
-	char.animation.sprite.backup = 0xff
+	char.animation.sprite.backup = -1
 
 	if (char.character == CHARACTER_SONIC)
 	{
@@ -3561,7 +3561,7 @@ function bool makeDynamicRing()
 		objA1.position.x.u16 = u16[A3]
 		objA1.position.y.u16 = u16[A3 + 2]
 		u16[A1 + 0x30] = A4.u16
-		u16[A4] = 0xffff
+		u16[A4] = -1
 		return true
 	}
 	else
@@ -5463,7 +5463,7 @@ function void Character.OnThreatCollision()
 		D0.u8 &= u8[A1 + 0x2b]
 		if (D0.u8 != 0)
 		{
-			D0 = 0xffffffff
+			D0 = -1
 			return
 		}
 
@@ -5473,7 +5473,7 @@ function void Character.OnThreatCollision()
 			{
 				Character.OnThreatCollisionInner()
 			}
-			D0 = 0xffffffff
+			D0 = -1
 			return
 		}
 	}
@@ -5506,7 +5506,7 @@ function void Character.OnThreatCollision()
 	{
 		deflectProjectile()
 	}
-	D0 = 0xffffffff
+	D0 = -1
 }
 
 
@@ -5515,7 +5515,7 @@ function void Character.OnThreatCollisionInner()
 {
 	if (char.invuln.countdown != 0)
 	{
-		D0 = 0xffffffff
+		D0 = -1
 	}
 	else
 	{
@@ -5619,7 +5619,7 @@ function void Character.GettingHurt()
 	{
 		playSound(getSoundIdByObstacleAddress(u32[A2]))
 	}
-	D0 = 0xffffffff
+	D0 = -1
 }
 
 
@@ -5840,7 +5840,7 @@ function void Character.Die()
 		Character.Die_noSound()
 		playSound(0x35)
 	}
-	D0 = 0xffffffff
+	D0 = -1
 }
 
 
@@ -5850,7 +5850,7 @@ function void Character.Die_internal()
 	u8 soundId = D0.u8
 	Character.Die_noSound()
 	playSound(soundId)
-	D0 = 0xffffffff
+	D0 = -1
 }
 
 

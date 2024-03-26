@@ -112,7 +112,7 @@ define global.active_saveslot	= u32[0xffffe660]	// Pointer to the active save ga
 //  - flag 0x80 = if set, object must not spawn again; can be because it's currently loaded or because it got removed entirely (e.g. defeated badniks)
 
 
-define player1.camera_lock		=  u8[0xffffee0a]	// If set (either 1 or 0xff), camera movement is locked
+define player1.camera_lock		=  u8[0xffffee0a]	// If set (either 1 or -1), camera movement is locked
 define player2.camera_lock		=  u8[0xffffee0b]	// Same as above for player 2 in competition mode
 
 define move_area.left.target	= u16[0xffffee0c]	// Left border where character can move (minus 0x10 = 16)
@@ -182,11 +182,11 @@ define global.fade_timer		= s16[0xffffee50]
 
 define competition_mode.time_record.player1		= u32[0xffffee52]	// Stores a backup of player 1's time record after a completed run
 define competition_mode.time_record.player2		= u32[0xffffee56]	// Stores a backup of player 2's time record after a completed run
-define competition_mode.timeattack.new_record	=  u8[0xffffee5a]	// 0xff: no new record, 0x00: 1st place, 0x01: 2nd place, 0x02: 3rd place
+define competition_mode.timeattack.new_record	=  u8[0xffffee5a]	// -1: no new record, 0: 1st place, 1: 2nd place, 2: 3rd place
 define competition_mode.lap_count.player1		=  u8[0xffffee5c]	// Stores how many laps has player 1 completed
 define competition_mode.lap_count.player2		=  u8[0xffffee5d]	// Stores how many laps has player 2 completed
 
-define level.skip_titlecard		=  u8[0xffffee5e]	// If set (to 0xff), this will skip the title card in the next level loading
+define level.skip_titlecard		=  u8[0xffffee5e]	// If set (to -1), this will skip the title card in the next level loading
 // Others inside 0xffffee52 to 0xffffee5f seem to be used only in competition mode
 
 // Actual camera position
@@ -263,7 +263,7 @@ define vint.update_subroutine				= u32[0xffffef44]	// Update sub-routine used in
 
 define competition_mode.menu.game_mode		=  u8[0xffffef48]	// 0 for Grand Prix, 1 for Match Race, 2 for Time Attack
 define competition_mode.menu.stage			=  u8[0xffffef4a]	// 0 for ALZ, 1 for BPZ, etc.
-define competition_mode.menu.items_toggle	=  u8[0xffffef4e]	// Toggles items spawn in competition mode, 0xff is off
+define competition_mode.menu.items_toggle	=  u8[0xffffef4e]	// Toggles items spawn in competition mode, -1 is off
 
 define competition_mode.mode		=  u8[0xffffef48]	// (DEPRECATED) 0 for Grand Prix, 1 for Match Race, 2 for Time Attack
 define competition_mode.multiplay	=  u8[0xffffef49]	// 0 for single player, 1 for 2P multiplay
@@ -288,7 +288,7 @@ define global.pause_disabled.u8		=  u8[0xffffef72]
 
 define rolling_demo.input_timer		=  u8[0xffffef78]	// Frames until next input change from pre-recorded rolling demo data is applied
 define rolling_demo.last_input		=  u8[0xffffef79]	// Last input during rolling demo
-define rolling_demo.pressed_start	=  u8[0xffffef50]	// Set to 0xff if manual Start button input was made during a rolling demo
+define rolling_demo.pressed_start	=  u8[0xffffef50]	// Set to -1 if manual Start button input was made during a rolling demo
 define rolling_demo.progress		= u32[0xffffef52]	// How far into the demo sequence
 
 
@@ -419,8 +419,8 @@ define super.palettefx.frame	= u16[0xfffff65c]
 define super.palettefx.timer	=  s8[0xfffff65e]	// Only for Sonic / Knuckles, as Tails has his own version (though he sometimes uses this one as well...?)
 define super.palettefx.state	=  u8[0xfffff65f]
 
-define level.dualplanecollision		=  u8[0xfffff664]	// If set (to 0xff), game checks against two collision planes instead of just one
-define global.passing_floor			=  u8[0xfffff665]	// If set (to 0xff), hitting the lower level border won't lead to a death (e.g. in MGZ 2 S/T boss)
+define level.dualplanecollision		=  u8[0xfffff664]	// If set (to -1), game checks against two collision planes instead of just one
+define global.passing_floor			=  u8[0xfffff665]	// If set (to -1), hitting the lower level border won't lead to a death (e.g. in MGZ 2 S/T boss)
 define global.whiteflash_timeout	=  u8[0xfffff666]	// Gets set to 4 by Hyper Dash, decreases every frame
 
 define super.active.tails			=  u8[0xfffff667]
@@ -494,8 +494,8 @@ define level.HCZ_breakable_bar_flags			=  u8[0xfffff7c7]		// 3 when next to a wa
 define level.HCZ_water_current_flags.both		= u16[0xfffff7c8]		// Flags that determine if either player is in a water current
 define level.HCZ_water_current_flags.player1	=  u8[0xfffff7c8]		// Set to 1 when in a water current
 define level.HCZ_water_current_flags.tails		=  u8[0xfffff7c9]		// See above
-define player1.control_override	=  s8[0xfffff7ca]	// If set to 1 or 0xff, first character cannot be controlled
-define player2.control_override	=  s8[0xfffff7cb]	// If set to 1 or 0xff, second character cannot be controlled
+define player1.control_override	=  s8[0xfffff7ca]	// If set to 1 or -1, first character cannot be controlled
+define player2.control_override	=  s8[0xfffff7cb]	// If set to 1 or -1, second character cannot be controlled
 
 define score.bonus_counter		= u16[0xfffff7d0]	// Needed for increases bonuses when destroying multiple enemies in a row
 define results.time_bonus		= u16[0xfffff7d2]	// Time bonus value in level results; also used for Perfect bonus in special stage results
@@ -539,8 +539,8 @@ define screenmover_target.top	= u16[0xfffffa96]
 define screenmover_target.bottom= u16[0xfffffa98]
 
 define level.signpost.address	= u16[0xfffffaa6]	// RAM address of current signpost
-define level.wait_for_results	=  u8[0xfffffaa8]	// Set to 0xff when waiting for level results to complete
-define level.results_done		=  u8[0xfffffaaa]	// Set to 0xff when level results are completed
+define level.wait_for_results	=  u8[0xfffffaa8]	// Set to -1 when waiting for level results to complete
+define level.results_done		=  u8[0xfffffaaa]	// Set to -1 when level results are completed
 
 define level.bossarea.top		= u16[0xfffffab0]
 define level.bossarea.bottom	= u16[0xfffffab2]

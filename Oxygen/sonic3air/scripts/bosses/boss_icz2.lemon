@@ -230,7 +230,7 @@ function void fn071d80()
 function void fn071d9e()
 {
 	objA0.update_address = 0x071de2
-	level.wait_for_results = 0xff
+	level.wait_for_results = -1
 	level.boss_encounter = 0
 	if (allocDynamicObjectStd())
 	{

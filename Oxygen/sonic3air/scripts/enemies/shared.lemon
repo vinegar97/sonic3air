@@ -2202,7 +2202,7 @@ function void fn0863ec()
 
 	if (isMainCharacter(CHARACTER_KNUCKLES) && global.zone == 0x09)
 	{
-		sram.block_interrupts.u8 = 0xff
+		sram.block_interrupts.u8 = -1
 		SaveGameOnLevelFinished()
 	}
 

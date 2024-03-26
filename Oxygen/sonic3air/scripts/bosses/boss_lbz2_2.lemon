@@ -51,7 +51,7 @@ function void fn0729de()
 #endif
 	{
 		objA0.countdown_value = 0x7f
-		hud.dirty.timer = 0xff
+		hud.dirty.timer = -1
 		requestLoadingPatterns(0x71)		// Boss sprites
 
 		if (allocDynamicObjectStd())

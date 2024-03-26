@@ -620,7 +620,7 @@ function void UpdateRollingDemo()
 		D1.u8 = rolling_demo.pressed_start & CONTROL_START
 		D1.u8 |= u8[A0-1]
 		D0.u8 = control.pad1.state & CONTROL_START
-		rolling_demo.pressed_start = (D0.u8 != 0) ? 0xff : 0
+		rolling_demo.pressed_start = (D0.u8 != 0) ? -1 : 0
 		D0.u8 |= u8[A0]
 		++A0
 	}
@@ -629,7 +629,7 @@ function void UpdateRollingDemo()
 		// Sonic & Knuckles zone demos
 		D2.u8 = u8[A0]
 		--rolling_demo.input_timer
-		if (rolling_demo.input_timer == 0xff)
+		if (rolling_demo.input_timer == -1)
 		{
 			rolling_demo.input_timer = u8[A0+1]
 			A0 += 2
@@ -639,7 +639,7 @@ function void UpdateRollingDemo()
 		D1.u8 |= rolling_demo.last_input
 		rolling_demo.last_input = D2.u8
 		D0.u8 = control.pad1.state & CONTROL_START
-		rolling_demo.pressed_start = (D0.u8 != 0) ? 0xff : 0
+		rolling_demo.pressed_start = (D0.u8 != 0) ? -1 : 0
 		D0.u8 |= D2.u8
 	}
 

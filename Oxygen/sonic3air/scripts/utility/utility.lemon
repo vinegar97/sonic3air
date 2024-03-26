@@ -427,7 +427,7 @@ function void VDP.Config.enableHInt(bool enable)
 	if (!enable)
 	{
 		// This effectively disables the HInt call inside "waitForNextFrame()"
-		h_int.line = 0xff
+		h_int.line = -1
 	}
 }
 

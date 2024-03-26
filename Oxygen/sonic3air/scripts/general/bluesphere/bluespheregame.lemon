@@ -21,7 +21,7 @@ define bluespheregame.stage_parts.part3	=  u8[0xffffffa4]
 define bluespheregame.stage_parts.part4	=  u8[0xffffffa5]
 define bluespheregame.current_stage		= u32[0xffffffa6]	// Starting with 0, so it's the shown level number minus one
 define bluespheregame.menu_selection	=  u8[0xffffffaa]
-define bluespheregame.enable_progress	=  u8[0xffffffab]	// Set to 0xff when not locked on with Sonic 1 or when a level code is used, enables level progression in the full game mode
+define bluespheregame.enable_progress	=  u8[0xffffffab]	// Set to -1 when not locked on with Sonic 1 or when a level code is used, enables level progression in the full game mode
 define bluespheregame.shown_difficulty	=  u8[0xffffffac]	// Shown difficulty in results after perfect (counts up in the screen)
 define bluespheregame.difficulty_level	=  u8[0xffffffad]	// Actual difficulty
 
@@ -261,7 +261,7 @@ function void fn04cca6()
 		{
 			// No match
 			bluespheregame.fully_unlocked = 0
-			bluespheregame.enable_progress = 0xff
+			bluespheregame.enable_progress = -1
 			fn04cd18()
 			return
 		}
@@ -425,7 +425,7 @@ function void fn04ceb6()
 #endif
 	{
 		control.pad1.pressed = 0
-		D0 = 0xffffffff
+		D0 = -1
 		bluespheres.blue_remaining = D0.u16
 		bluespheres.rings_remaining = D0.u16
 		playSound(0x63)
@@ -1043,7 +1043,7 @@ function void fn04d488()
 		{
 			D1 -= 0x07654321
 			D1 &= 0x07ffffff
-			bluespheregame.enable_progress = 0xff
+			bluespheregame.enable_progress = -1
 		}
 
 		bluespheregame.current_stage = D1

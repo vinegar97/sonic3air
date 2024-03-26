@@ -104,7 +104,7 @@ function void fn055a9a()
 		// Start pyramid rising
 		u16[0xffffeec6] = 0
 		u16[0xffffee9c] = -8
-		camera.screenshake.state.hi = 0xff
+		camera.screenshake.state.hi = -1
 
 		fn055db6()
 		fn04f2f6()
@@ -1555,7 +1555,7 @@ function void fn05675c()
 	}
 
 	A1 = 0xffffa934
-	D0 = 0xffffffff
+	D0 = -1
 	D1 = 0x08
 	while (D1.s16 >= 0)
 	{
@@ -1583,7 +1583,7 @@ function void fn05678a()
 	}
 
 	A1 = 0xffffa934
-	D0 = 0xffffffff
+	D0 = -1
 	D1 = 0x08
 	while (D1.s16 >= 0)
 	{
@@ -1882,7 +1882,7 @@ function void fn05699a()
 function void fn0569ba()
 {
 	// u32[0xffffee9c] is the current height of the sand
-	level.dualplanecollision = 0xff
+	level.dualplanecollision = -1
 	u32[0xffffee9c] += 0xa000
 	u16[0xffffee40] = -(s16[0xffffee9c] + 0x02e0)
 	u16[0xffffee3e] = 0x1930

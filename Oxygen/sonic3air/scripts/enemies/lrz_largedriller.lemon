@@ -390,7 +390,7 @@ function void fn090502()
 {
 	objA0.update_address = 0x090512
 	objA0.countdown_value = 0xb3
-	camera.screenshake.state.hi = 0xff
+	camera.screenshake.state.hi = -1
 	fn090512()
 }
 

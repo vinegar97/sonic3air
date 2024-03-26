@@ -685,7 +685,7 @@ function void fn04ff3a()
 	u16[0xffffeeca] = 0x05
 	u32[0xffffa9f8] = 0
 	u16[0xffffa9fe] = (camera.foreground.x.u16 & 0xfff0) - 0x10
-	player1.camera_lock = 0xff
+	player1.camera_lock = -1
 	level.special_scrolling = 0x04
 	u16[0xffffeec0] += 4
 
@@ -782,7 +782,7 @@ function void fn05001c()
 		camera.foreground.x.old = D0.u16
 		u16[0xffffeed4] = 0x46c0
 		u16[0xffffeed6] = 0
-		h_int.line = 0xff
+		h_int.line = -1
 		u16[0xffffeec0] += 4
 		LoadTileContentDefault()
 	}

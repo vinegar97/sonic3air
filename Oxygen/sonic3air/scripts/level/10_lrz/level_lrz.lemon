@@ -989,7 +989,7 @@ function void fn059b1c()
 	{
 		level.backup.timer.alldata = 0
 		timer.alldata = D0
-		hud.dirty.timer = 0xff
+		hud.dirty.timer = -1
 	}
 
 	u16[0xffffeec0] += 4
@@ -1388,7 +1388,7 @@ function void fn059e46()
 		return
 	}
 
-	player1.camera_lock = 0xff
+	player1.camera_lock = -1
 	call 0x059e5e + level.display_routine
 }
 

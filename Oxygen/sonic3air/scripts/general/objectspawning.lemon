@@ -157,7 +157,7 @@ function void DynamicObjectsLoading.Init()
 		dynobjects.addr.begin = A0
 		dynobjects.respawn.begin = A3.u16
 
-		dynobjects.areastart.x = 0xffff
+		dynobjects.areastart.x = -1
 		dynobjects.areastart.y = camera.position.y.u16 & 0xff80
 
 		DynamicObjectsLoading.UpdateDefault()

@@ -47,7 +47,7 @@ function u8 getSecondCharacter()
 #endif
 	else
 	{
-		return 0xff	// No second character
+		return (-1)	// No second character
 	}
 }
 
@@ -73,5 +73,5 @@ function bool isPlayerCharacter(u8 player, u8 character)
 
 function u8 getNumPlayers()
 {
-	return (isSecondCharacter(0xff)) ? 1 : 2
+	return (isSecondCharacter(-1)) ? 1 : 2
 }

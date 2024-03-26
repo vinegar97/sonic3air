@@ -92,8 +92,8 @@ function void fn063170()
 	move_area.left = D1.u16
 	objA0.base_state = 0x04
 	objA0.countdown_value = 59
-	player1.control_override = 0xff
-	player2.control_override = 0xff
+	player1.control_override = -1
+	player2.control_override = -1
 	control.player1 = 0
 	control.tails = 0
 }

@@ -32,7 +32,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 
 	// Check for characters first
 	{
-		u8 drawCharacterVariant = 0xff
+		u8 drawCharacterVariant = -1
 		if (A0 == 0xffffb000)
 		{
 			// Player 1
@@ -54,18 +54,18 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		{
 			// Check if fading out to special stage, which is only relevant when entering a super emerald stage from the HPZ emerald cave
 			if (gameMode != 0x34 || drawCharacterVariant == 2 || (objA0.update_address != 0x010a94 && objA0.update_address != 0x01365c && objA0.update_address != 0x016444))
-				drawCharacterVariant = 0xff
+				drawCharacterVariant = -1
 		}
 		if ((debug_mode.state & 0xff) == 1)		// Not when in object placement mode
 		{
-			drawCharacterVariant = 0xff
+			drawCharacterVariant = -1
 		}
 		else if ((char.render_flags & render_flag.WORLD) == 0 && global.zone_act != 0x0d01)		// Additional check disables this when fading out Data Select, but not in outro
 		{
-			drawCharacterVariant = 0xff
+			drawCharacterVariant = -1
 		}
 
-		if (drawCharacterVariant != 0xff)
+		if (drawCharacterVariant != -1)
 		{
 			return Standalone.drawCharacterSprite(char.character, drawCharacterVariant, px, py, false)
 		}

@@ -647,7 +647,7 @@ function void LevelObjectTableBuilder.buildObjects_LRZ1()
 	LevelObjectTableBuilder.addObject(0x2cc0, 0x07d2, OBJECTTABLE2_80, 0x03, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x2d40, 0x07d2, OBJECTTABLE2_80, 0x06, LVLOBJ_FLIP_X)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }
 
@@ -1120,7 +1120,7 @@ function void LevelObjectTableBuilder.buildObjects_LRZ2()
 	LevelObjectTableBuilder.addObject(0x3ea0, 0x0130, OBJECTTABLE2_0f, 0x00, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x3fe0, 0x00e0, OBJECTTABLE2_b3, 0x2d, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }
 
@@ -1166,6 +1166,6 @@ function void LevelObjectTableBuilder.buildObjects_LRZ3()
 	LevelObjectTableBuilder.addObject(0x0c60, 0x03b0, OBJECTTABLE2_ad, 0x02, 0)
 	LevelObjectTableBuilder.addObject(0x0ce8, 0x04b0, OBJECTTABLE2_01, 0x06, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }

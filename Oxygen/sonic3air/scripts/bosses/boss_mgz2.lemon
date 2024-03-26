@@ -236,7 +236,7 @@ function void fn06c4be()
 	objA0.countdown_value = 0x3f
 	objA0.countdown_callback = 0x06c4f8
 	u8[0xffffeec4] = 0xff
-	global.passing_floor = 0xff
+	global.passing_floor = -1
 	playSound(0x61)
 
 	// Spawn Tails

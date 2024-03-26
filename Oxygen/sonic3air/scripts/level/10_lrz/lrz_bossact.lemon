@@ -36,8 +36,8 @@ function void fn059fc4()
 function void fn059fda()
 {
 	// Disable control here already, so player does not accidently steer into the lava
-	player1.control_override = 0xff
-	player2.control_override = 0xff
+	player1.control_override = -1
+	player2.control_override = -1
 	control.player1 = 0
 	control.pad2 = 0
 	u16[0xffffb000 + 0x18] = 0		// Velocity x

@@ -356,7 +356,7 @@ function void LevelRingsTableBuilder.buildRings_CNZ1()
 		LevelRingsTableBuilder.addRing(0x2d9e, 0x0252)
 	}
 
-	u32[A1] = 0xffffffff
+	u32[A1] = -1
 	A1 += 4
 }
 
@@ -698,6 +698,6 @@ function void LevelRingsTableBuilder.buildRings_CNZ2()
 	LevelRingsTableBuilder.addRing(0x3628, 0x0948)
 	LevelRingsTableBuilder.addRing(0x3648, 0x0928)
 	LevelRingsTableBuilder.addRing(0x3668, 0x0908)
-	u32[A1] = 0xffffffff
+	u32[A1] = -1
 	A1 += 4
 }

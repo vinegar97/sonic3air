@@ -748,7 +748,7 @@ function void fn005a50()
 	if (u8[A2] != 0)
 	{
 		--u8[A2]
-		D0 = 0xffffffff
+		D0 = -1
 		return
 	}
 
@@ -768,7 +768,7 @@ function void fn005a50()
 			++D0.u8
 			if (D0.u8 != 0)
 			{
-				D0 = 0xffffffff
+				D0 = -1
 				return
 			}
 

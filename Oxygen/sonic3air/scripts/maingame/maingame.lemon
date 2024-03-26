@@ -1014,7 +1014,7 @@ function void copyPaletteDataFromTable(u8 index, u16 ramAddress)
 
 	if (EXTENDED_CHARACTER_PALETTES)
 	{
-		u8 paletteVariant = 0xff
+		u8 paletteVariant = -1
 		if (index == 0x03 || index == 0x05)
 		{
 			paletteVariant = 0
@@ -1036,7 +1036,7 @@ function void copyPaletteDataFromTable(u8 index, u16 ramAddress)
 			paletteVariant = 4		// CNZ/LBZ underwater
 		}
 
-		if (paletteVariant != 0xff)
+		if (paletteVariant != -1)
 		{
 			if (paletteVariant == 0)
 			{
@@ -1271,8 +1271,8 @@ function void Level.SetupLevelSize()
 
 	camera.yoffset.player = 0x60
 	camera.yoffset.tails = 0x60
-	level.width.bitmask = 0xffff
-	level.height.bitmask = 0xffff
+	level.width.bitmask = -1
+	level.height.bitmask = -1
 	SetupCharacterAtStartPosition()
 }
 
@@ -2299,7 +2299,7 @@ function void fn0075d2()
 	control.pad1 = 0x8000		// CONTROL_START, 0
 	control.pad2 = 0x8000		// CONTROL_START, 0
 
-	rolling_demo.pressed_start = 0xff
+	rolling_demo.pressed_start = -1
 }
 
 

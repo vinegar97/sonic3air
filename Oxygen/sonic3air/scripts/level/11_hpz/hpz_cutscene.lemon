@@ -15,7 +15,7 @@ function void fn0643a4()
 {
 	objA0.base_state = 0x1c
 	objA0.countdown_value = 0x7f
-	camera.screenshake.state.hi = 0xff
+	camera.screenshake.state.hi = -1
 
 	// "spawnSimpleChildObjects(0x066602)" replaced by:
 	spawnSimpleChildObjects(0x0652a2, 16)
@@ -980,7 +980,7 @@ function void fn064c70()
 
 	objA0.update_address = 0x064ca6
 	StopObjectA1()
-	player1.control_override = 0xff
+	player1.control_override = -1
 	control.player1 = 0
 
 	if (allocDynamicObjectStd())
@@ -1004,7 +1004,7 @@ function void fn064ca6()
 		return
 
 	objA0.update_address = 0x064d1a
-	player1.camera_lock = 0xff
+	player1.camera_lock = -1
 
 	if (allocDynamicObjectStd())
 	{
@@ -1044,7 +1044,7 @@ function void fn064d38()
 		objA0.update_address = 0x064d5c
 		A1 = 0xffffb000
 		u8[A1 + 0x2e] = 0
-		player1.control_override = 0xff
+		player1.control_override = -1
 
 		control.player1 = 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 	}
@@ -1084,7 +1084,7 @@ function void fn064daa()
 	if (u8[0xfffffab8] & 0x20)
 	{
 		objA0.update_address = 0x064dcc
-		player1.control_override = 0xff
+		player1.control_override = -1
 		if (allocDynamicObjectStd())
 		{
 			objA1.update_address = 0x0863c0
@@ -1243,7 +1243,7 @@ function void fn064f20()
 		objA0.flags38 |= 0x10
 		objA0.velocity.x = 0
 		objA0.collision_attributes = collision.size.24x24
-		boss.remaining_hits = 0xff
+		boss.remaining_hits = -1
 
 		// "spawnIdenticalChildObjects(0x066624)" replaced by:
 		spawnChildObjects(0x06531e, 8, -4, 2)		// Egg Mobile electrifying tentacles

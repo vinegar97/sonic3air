@@ -65,7 +65,7 @@ function void fn0674ac()
 	//  -> Can be used to change the "distance" to the beach
 	//  -> In widescreen, we take a bit more time than usual
 	u16[0xffffeeb6] = 0xe918 - getScreenExtend() * 3
-	char.animation.sprite.backup = 0xff
+	char.animation.sprite.backup = -1
 
 	A1 = 0xffffb000
 	objA1.animation.sprite = 0		// char.animation.sprite
@@ -306,7 +306,7 @@ function void fn067704()
 	if (u16[0xffffb000 + 0x10] < 0x13d0)
 		return
 
-	level.palettefx.state = 0xff
+	level.palettefx.state = -1
 
 	A1 = 0xffffb000
 	u8[A1 + 0x05] = base_state.HURT
@@ -318,7 +318,7 @@ function void fn067704()
 	u8[A1 + 0x2e] = 0
 
 	control.player1 = 0
-	player1.control_override = 0xff
+	player1.control_override = -1
 	super.active = 0
 	super.palettefx.state = 2
 	super.palettefx.frame = 30

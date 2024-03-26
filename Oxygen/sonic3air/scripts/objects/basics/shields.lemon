@@ -45,7 +45,7 @@ function void Shield.sharedInit()
 	objA0.shield.targetInVRAM = Shield.targetInVRAM
 	u8[A0 + 0x0a] |= (u8[0xffffb000 + 0x0a] & 0x80)
 	objA0.state.both = 0x01
-	objA0.shield.animation.sprite.backup = 0xff
+	objA0.shield.animation.sprite.backup = -1
 }
 
 

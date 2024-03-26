@@ -208,7 +208,7 @@ function void fn081ca4()
 	if (objA0.countdown_value >= 0)
 		return
 
-	sram.block_interrupts.u8 = 0xff
+	sram.block_interrupts.u8 = -1
 	SaveGameOnLevelFinished()
 
 	// Start outro
@@ -499,7 +499,7 @@ function void fn082dce()
 			objA0.update_address = 0x081bbe
 			objA0.base_state = 0
 			objA0.flags2a |= 0x80
-			player1.control_override = 0xff
+			player1.control_override = -1
 			super.ring_dec.frames = 0x7fff
 
 			D0.u16 = camera.position.y.u16

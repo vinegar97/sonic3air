@@ -127,13 +127,13 @@ function void SpecialStage()
 	fn00a0e6()
 
 	global.level_started = 0
-	bluespheres.bs_hud_dirty = 0xff
+	bluespheres.bs_hud_dirty = -1
 	bluespheres.rings_flags = 0x80
 	bluespheres.current_gamespeed = 0x1000
 	bluespheres.speedup_countdown = BlueSpheres.useGeneratedStages() ? 2700 : 1800
 	camera.foreground.x.u16 = 0
 	camera.foreground.y.u16 = 0
-	level.height.bitmask = 0xffff
+	level.height.bitmask = -1
 
 	u32[0xffffb000] = 0x008faa			// Main Character
 	if (getNumPlayers() >= 2)
@@ -375,7 +375,7 @@ function void fn0085b0()
 			u32 stageNumber = 0x13571113 + u32(global.game_random_base) * 0x09070503 + global.next_bluespheres + global.sk_bluespheres * 8
 
 			// Limit difficulty to a maximum value of 6, as higher ones tend to get kind of unfair if you can't just try them over and over again
-			u8 difficulty = 0xff
+			u8 difficulty = -1
 			while (difficulty > 6)
 			{
 				stageNumber += 0x050b030f
@@ -1929,7 +1929,7 @@ function void fn009e34()
 //# address-hook(0x009e88) end(0x009e9e)
 function void BlueSpheres.OnBlueSphereCollected()
 {
-	bluespheres.bs_hud_dirty = 0xff
+	bluespheres.bs_hud_dirty = -1
 	--bluespheres.blue_remaining
 	if (bluespheres.blue_remaining == 0)
 	{

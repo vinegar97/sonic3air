@@ -167,8 +167,8 @@ function void TitleCard.Appear()
 		timer.alldata.player2 = 0
 		ring_counter.player2 = 0
 		unused.player2.total_rings = 0
-		hud.dirty.timer = 0xff
-		hud.dirty.rings = 0xff
+		hud.dirty.timer = -1
+		hud.dirty.rings = -1
 		u8[0xffffb000 + 0x2c] = 30
 		u8[0xffffb04a + 0x2c] = 30
 		PlayMusicAfterLevelResults()
@@ -214,7 +214,7 @@ function void TitleCard.Show()
 		{
 			if (objA0.value3e != 0)
 			{
-				level.results_done = 0xff
+				level.results_done = -1
 				if (global.zone_act != 0x1700)
 				{
 					fn02f77c()
