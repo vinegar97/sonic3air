@@ -3583,6 +3583,14 @@ function void CollectLevelRing()
 //# address-hook(0x01a596) end(0x01a5e8)
 function void CollectRing()
 {
+#if STANDALONE
+	if (u8[A0 + 0x3f] != 0)
+	{
+		CollectRing_P2()
+		return
+	}
+#endif
+
 	player.total_rings = min(player.total_rings + 1, 999)
 	if (ring_counter < 999)
 	{
@@ -5283,7 +5291,14 @@ function void Character.OnCollisionWithDynamicObject()
 			u8 timer = competition_mode.active ? char.invuln.countdown : u8[0xffffb000 + 0x34]
 			if (timer < 90)
 			{
-				u8[A1 + 0x05] = 0x04
+				objA1.base_state = 0x04		// Ring collected state
+			#if STANDALONE
+				// Fix ring interaction
+				if (competition_mode.active)
+				{
+					u16[A1 + 0x3e] = A0.u16
+				}
+			#endif
 			}
 		}
 		else
