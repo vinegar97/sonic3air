@@ -830,6 +830,7 @@ function void fn073fe2()
 	{
 		if (boss.remaining_hits == 0)
 		{
+			// Boss beaten
 			objA0.update_address = 0x073a52
 			hud.dirty.timer = 0
 			addScore(100)

@@ -84,7 +84,7 @@ function void fn06da5a()
 {
 	setupObjectAttributesFull(0x06e298)
 	boss.remaining_hits = 6
-	u8[A0 + 0x45] = 0x04
+	u8[A0 + 0x45] = 0x04		// the boss' real hitpoints
 	objA0.flags38 |= 0x08
 	objA0.velocity.y = 0x80
 	objA0.countdown_value = 0x011f
@@ -703,6 +703,7 @@ function void fn06e0b0()
 			--u8[A0 + 0x45]
 			if (u8[A0 + 0x45] == 0)
 			{
+				// Boss beaten
 				objA0.update_address = 0x085668
 				objA0.flags2a |= 0x80
 				objA0.countdown_callback = 0x06db86

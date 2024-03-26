@@ -440,6 +440,7 @@ function void fn072840()
 	{
 		if (boss.remaining_hits == 0)
 		{
+			// Boss beaten
 			objA0.update_address = 0x085694
 			objA0.countdown_callback = 0x072562
 

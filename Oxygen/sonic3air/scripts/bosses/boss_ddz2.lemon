@@ -493,8 +493,9 @@ function void fn082dce()
 			return
 
 		--boss.remaining_hits
-		if (s8[A0 + 0x29] < 0)
+		if (s8(boss.remaining_hits) < 0)
 		{
+			// Boss beaten
 			addScore(100)
 			objA0.update_address = 0x081bbe
 			objA0.base_state = 0

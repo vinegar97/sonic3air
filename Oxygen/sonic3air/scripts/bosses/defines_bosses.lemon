@@ -13,4 +13,8 @@
 //-------------------------------------------------------//
 
 
+define boss.flash_timer			= u8[A0 + 0x20]
 define boss.remaining_hits		= u8[A0 + 0x29]
+
+define bossA1.flash_timer		= u8[A1 + 0x20]
+define bossA1.remaining_hits	= u8[A1 + 0x29]

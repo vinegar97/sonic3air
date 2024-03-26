@@ -83,12 +83,12 @@ function void fn07f10e()
 	objA0.countdown_callback = 0x07f15a
 
 	// "spawnSimpleChildObjects(0x07fc9a)" replaced by:
-	spawnSimpleChildObjects(0x07f336, 1)
+	spawnSimpleChildObjects(0x07f336, 1)		// Shield plate protecting the boss
 
 	if (u32[0xffffb04a] != 0)	// Is Tails here as well?
 	{
 		// "spawnSimpleChildObjects(0x07fc9a)" replaced by:
-		spawnSimpleChildObjects(0x07f336, 1)
+		spawnSimpleChildObjects(0x07f336, 1)		// Shield plate protecting the boss
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x02
@@ -1343,6 +1343,7 @@ function void fn07fb92()
 		--boss.remaining_hits
 		if (boss.remaining_hits == 0)
 		{
+			// Boss beaten
 			objA0.update_address = 0x085694
 			objA0.flags2a |= 0x80
 			u8[0xfffffab8] |= 0x01

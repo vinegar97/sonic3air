@@ -256,6 +256,7 @@ function void fn08566a()
 //# address-hook(0x085694) end(0x0856b0)
 function void fn085694()
 {
+	// Same as above, but without music fade-out
 	--objA0.countdown_value
 	if (objA0.countdown_value >= 0)
 	{

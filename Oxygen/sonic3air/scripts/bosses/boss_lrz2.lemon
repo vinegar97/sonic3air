@@ -619,6 +619,7 @@ function void fn079f58()
 		--boss.remaining_hits
 		if (boss.remaining_hits == 0)
 		{
+			// Boss beaten
 			objA0.update_address = 0x079988
 			objA0.flags2a |= 0x80
 			u8[0xfffffaa3] = 0

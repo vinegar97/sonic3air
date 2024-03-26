@@ -655,6 +655,7 @@ function void fn07acf2()
 
 	if (boss.remaining_hits == 0)
 	{
+		// Boss beaten
 		objA0.update_address = 0x085668
 		objA0.countdown_callback = 0x07ac7a
 		u8[0xfffffa88] = 0xff	// Make all of the decoys pop now

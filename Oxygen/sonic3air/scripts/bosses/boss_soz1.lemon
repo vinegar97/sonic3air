@@ -887,6 +887,7 @@ function void fn0772f6()
 	}
 	else
 	{
+		// Boss beaten
 		objA0.update_address = 0x076e0a
 		objA0.velocity.x = 0
 		objA0.velocity.y = 0x40
