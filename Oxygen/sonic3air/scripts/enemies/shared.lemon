@@ -833,6 +833,18 @@ function void Object.AnimationProgress.CheckEnd(u32 address)
 {
 	A1 = address
 	Object.AnimationProgress.CheckEnd()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("AnimationProgressList", address))
+		{
+			ROMDataAnalyser.beginEntry("AnimationProgressList", address)
+			ROMDataAnalyser.addKeyValue("function", stringformat("Object.AnimationProgress.CheckEnd(0x%06x)", address))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 
@@ -961,6 +973,18 @@ function void Object.AnimationProgress.DistinctTimer(u32 address)
 {
 	A1 = address
 	Object.AnimationProgress.DistinctTimer()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("AnimationProgressList", address))
+		{
+			ROMDataAnalyser.beginEntry("AnimationProgressList", address)
+			ROMDataAnalyser.addKeyValue("function", stringformat("Object.AnimationProgress.DistinctTimer(0x%06x)", address))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 
@@ -1080,6 +1104,18 @@ function void Object.AnimationProgress.DistinctTimer_CheckFlipX(u32 address)
 {
 	A1 = address
 	Object.AnimationProgress.DistinctTimer_CheckFlipX()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("AnimationProgressList", address))
+		{
+			ROMDataAnalyser.beginEntry("AnimationProgressList", address)
+			ROMDataAnalyser.addKeyValue("function", stringformat("Object.AnimationProgress.DistinctTimer_CheckFlipX(0x%06x)", address))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 
@@ -1135,6 +1171,18 @@ function void Object.AnimationProgress.DistinctTimer_CheckFlipY(u32 address)
 {
 	A1 = address
 	Object.AnimationProgress.DistinctTimer_CheckFlipY()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("AnimationProgressList", address))
+		{
+			ROMDataAnalyser.beginEntry("AnimationProgressList", address)
+			ROMDataAnalyser.addKeyValue("function", stringformat("Object.AnimationProgress.DistinctTimer_CheckFlipY(0x%06x)", address))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 
@@ -1198,6 +1246,18 @@ function void Object.AnimationProgress.CheckEnd_DistinctTimer(u32 address)
 {
 	A1 = address
 	Object.AnimationProgress.CheckEnd_DistinctTimer()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("AnimationProgressList", address))
+		{
+			ROMDataAnalyser.beginEntry("AnimationProgressList", address)
+			ROMDataAnalyser.addKeyValue("function", stringformat("Object.AnimationProgress.CheckEnd_DistinctTimer(0x%06x)", address))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 
@@ -1334,6 +1394,18 @@ function void Object.AnimationProgress.SpeedUp(u32 address)
 {
 	A1 = address
 	Object.AnimationProgress.SpeedUp()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("AnimationProgressList", address))
+		{
+			ROMDataAnalyser.beginEntry("AnimationProgressList", address)
+			ROMDataAnalyser.addKeyValue("function", stringformat("Object.AnimationProgress.SpeedUp(0x%06x)", address))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 
@@ -1399,6 +1471,18 @@ function void Object.AnimationProgress.SlowDown(u32 address)
 {
 	A1 = address
 	Object.AnimationProgress.SlowDown()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("AnimationProgressList", address))
+		{
+			ROMDataAnalyser.beginEntry("AnimationProgressList", address)
+			ROMDataAnalyser.addKeyValue("function", stringformat("Object.AnimationProgress.SlowDown(0x%06x)", address))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 
@@ -2028,6 +2112,51 @@ function void fn084f6e()
 function bool SetupObjectAttributesSlotted(u32 sourceAddress)
 {
 	A1 = sourceAddress
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ObjectAttributesList", sourceAddress))
+		{
+			ROMDataAnalyser.beginEntry("ObjectAttributesList", sourceAddress)
+			ROMDataAnalyser.addKeyValue("function", stringformat("SetupObjectAttributesSlotted(0x%06x)", sourceAddress))
+
+			// A1 = sourceAddress
+			// u16 count = u16[A1] + 1
+			// A1 += 2
+
+			// for (u16 i = 0; i < count; ++i)
+			{
+				// u32 slot = 0xffff0000 + u16[A0 + 0x3c]
+				u8 value3b = objA0.value3b
+				u16 spriteAttributes = objA0.sprite_attributes
+				u32 mappingOffset = objA0.mapping_offset
+				u16 spritePriority = objA0.sprite_priority
+				u8 boxSize_x = objA0.box_size.x
+				u8 boxSize_y = objA0.box_size.y
+				u8 animationSprite = objA0.animation.sprite
+				u8 collisionAttributes = objA0.collision_attributes
+
+				// ROMDataAnalyser.beginObject(stringformat("%d", i))
+				// ROMDataAnalyser.addKeyValue("slot", stringformat("0x%06x", slot))
+				ROMDataAnalyser.addKeyValue("value3b", stringformat("0x%02x", value3b))
+				ROMDataAnalyser.addKeyValue("sprite_attributes", stringformat("0x%04x", spriteAttributes))
+				ROMDataAnalyser.addKeyValue("mapping_offset", stringformat("0x%06x", mappingOffset))
+				ROMDataAnalyser.addKeyValue("sprite_priority", stringformat("0x%04x", spritePriority))
+				ROMDataAnalyser.addKeyValue("box_size_x", stringformat("0x%02x", boxSize_x))
+				ROMDataAnalyser.addKeyValue("box_size_y", stringformat("0x%02x", boxSize_y))
+				ROMDataAnalyser.addKeyValue("animation_sprite", stringformat("0x%02x", animationSprite))
+				ROMDataAnalyser.addKeyValue("collision_attributes", stringformat("0x%02x", collisionAttributes))
+				ROMDataAnalyser.endObject()
+			}
+
+			// A1 += 16
+
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
+
 	return SetupObjectAttributesSlotted()
 }
 
