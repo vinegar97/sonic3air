@@ -38,6 +38,21 @@ function void playMusic(u8 soundId)
 }
 
 
+//# address-hook(0x00137a) end(0x00137e)
+function void PlaySoundLocal()
+{
+	playSoundLocal(D0.u8)
+}
+
+function void playSoundLocal(u8 soundId)
+{
+	if (s8(objA0.render_flags) < 0)
+	{
+		playSound(soundId)
+	}
+}
+
+
 //# address-hook(0x001380) end(0x0013c0)
 function void PlaySound()
 {
