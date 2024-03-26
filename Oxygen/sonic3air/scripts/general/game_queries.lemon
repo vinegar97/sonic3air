@@ -9,7 +9,7 @@
 
 
 //-------------------------------------------------------//
-// Characters                                            //
+// Characters queries (using global.characters)          //
 //-------------------------------------------------------//
 
 function u8 getMainCharacter()
@@ -26,6 +26,12 @@ function u8 getMainCharacter()
 	{
 		return CHARACTER_KNUCKLES
 	}
+#if STANDALONE
+	else if (useKnucklesAndTails)
+	{
+		return CHARACTER_KNUCKLES
+	}
+#endif
 	else
 	{
 		assert(false, "Unsupported character selection")
@@ -71,7 +77,93 @@ function bool isPlayerCharacter(u8 player, u8 character)
 	return (player == 1) ? isSecondCharacter(character) : isMainCharacter(character)
 }
 
+function bool isPlayerCharacterAlt(u8 player, u8 character)
+{
+	return (getPlayerCharacter(player) == character)
+}
+
 function u8 getNumPlayers()
 {
 	return (isSecondCharacter(-1)) ? 1 : 2
+}
+
+
+
+//-------------------------------------------------------//
+// Characters queries (using passed parameters)          //
+//-------------------------------------------------------//
+
+function u8 getMainCharacter(u16 characters)
+{
+	if (characters == CHARS_SONIC_AND_TAILS || characters == CHARS_SONIC_ALONE)
+	{
+		return CHARACTER_SONIC
+	}
+	else if (characters == CHARS_TAILS_ALONE)
+	{
+		return CHARACTER_TAILS
+	}
+	else if (characters == CHARS_KNUCKLES_ALONE)
+	{
+		return CHARACTER_KNUCKLES
+	}
+#if STANDALONE
+	else if (characters == CHARS_KNUCKLES_AND_TAILS)
+	{
+		return CHARACTER_KNUCKLES
+	}
+#endif
+	else
+	{
+		assert(false, "Unsupported character selection")
+		return CHARACTER_SONIC
+	}
+}
+
+function u8 getSecondCharacter(u16 characters)
+{
+	if (characters == CHARS_SONIC_AND_TAILS)
+	{
+		return CHARACTER_TAILS
+	}
+#if STANDALONE
+	else if (characters == CHARS_KNUCKLES_AND_TAILS)
+	{
+		return CHARACTER_TAILS
+	}
+#endif
+	else
+	{
+		return (-1)	// No second character
+	}
+}
+
+function u8 getPlayerCharacter(u16 characters, u8 player)
+{
+	return (player == 1) ? getSecondCharacter(characters) : getMainCharacter(characters)
+}
+
+function bool isMainCharacter(u16 characters, u8 character)
+{
+	return (getMainCharacter(characters) == character)
+}
+
+function bool isSecondCharacter(u16 characters, u8 character)
+{
+	return (getSecondCharacter(characters) == character)
+}
+
+function bool isPlayerCharacter(u16 characters, u8 player, u8 character)
+{
+	return (player == 1) ? isSecondCharacter(characters, character) : isMainCharacter(characters, character)
+}
+
+function bool isPlayerCharacterAlt(u16 characters, u8 player, u8 character)
+{
+	return (getPlayerCharacter(characters, character) == character)
+}
+
+function u8 getNumPlayers(u16 characters)
+{
+	return (isSecondCharacter(characters, -1)) ? 1 : 2
 }
