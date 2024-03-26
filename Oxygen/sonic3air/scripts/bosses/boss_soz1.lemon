@@ -809,8 +809,16 @@ function void fn0770ea()
 //# address-hook(0x07710c) end(0x07716c)
 function void fn07710c()
 {
-	D1.u16 = u16[0x07716e + objA0.subtype2c]
-	A1 = 0x07716e + D1.s16
+	// Targets:
+	//  - 0x07717e	-> objA0.subtype2c = 0x00
+	//  - 0x0771a6	-> objA0.subtype2c = 0x02
+	//  - 0x0771ce	-> objA0.subtype2c = 0x04
+	//  - 0x0771f6	-> objA0.subtype2c = 0x06
+	//  - 0x07721e	-> objA0.subtype2c = 0x08
+	//  - 0x077246	-> objA0.subtype2c = 0x0a
+	//  - 0x07726e	-> objA0.subtype2c = 0x0c
+	//  - 0x077296	-> objA0.subtype2c = 0x0e
+	A1 = tableLookupAddress(0x07716e, objA0.subtype2c)
 	A2 = 0xffff0000 + u16[A0 + 0x46]
 	D1 = (u8[A2 + 0x39] & 0x3f) * 4
 	A1 += D1.u16

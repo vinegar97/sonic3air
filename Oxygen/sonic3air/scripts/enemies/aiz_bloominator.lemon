@@ -23,9 +23,9 @@ function void Bloominator.Init()
 function void Bloominator.BaseUpdate()
 {
 	// Targets:
-	//  - 0x086d8a	-> objA0.base_state = 0x00
-	//  - 0x086da2	-> objA0.base_state = 0x02
-	//  - 0x086dc6	-> objA0.base_state = 0x04
+	//  - 0x086d8a	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x086da2	-> objA0.base_state = 0x02	-> Regular Update, waiting for countdown
+	//  - 0x086dc6	-> objA0.base_state = 0x04	-> Spitting spike balls
 	call tableLookupAddress(0x086d84, objA0.base_state)
 
 	Enemy.DrawOrUnload()
