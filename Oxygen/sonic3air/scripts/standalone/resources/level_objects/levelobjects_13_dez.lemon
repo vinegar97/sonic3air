@@ -506,7 +506,7 @@ function void LevelObjectTableBuilder.buildObjects_DEZ1()
 	LevelObjectTableBuilder.addObject(0x35b0, 0x02c0, OBJECTTABLE2_02, 0x21, 0)
 	LevelObjectTableBuilder.addObject(0x3740, 0x02c0, OBJECTTABLE2_a6, 0x00, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }
 
@@ -1011,13 +1011,13 @@ function void LevelObjectTableBuilder.buildObjects_DEZ2()
 	LevelObjectTableBuilder.addObject(0x35d0, 0x032c, OBJECTTABLE2_59, 0x8d, 0)
 	LevelObjectTableBuilder.addObject(0x35d0, 0x04ac, OBJECTTABLE2_59, 0x18, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }
 
 
 function void LevelObjectTableBuilder.buildObjects_DEZ3()
 {
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }

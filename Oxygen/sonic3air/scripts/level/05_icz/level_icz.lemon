@@ -60,7 +60,7 @@ function void fn053682()
 	{
 		if (player1.control_override == 0)
 		{
-			player1.control_override = 0xff
+			player1.control_override = -1
 			control.player1 = 0
 		}
 	}
@@ -182,7 +182,7 @@ function void fn0539ac()
 {
 	if (s16(level.display_routine) > 0xfed2)
 	{
-		camera.screenshake.state.hi = 0xff
+		camera.screenshake.state.hi = -1
 		u32[0xffffeed6] += 0x2400
 		u32[0xffffeed2] -= u32[0xffffeed6]
 		D0 = (level.framecounter - 1) & 0x0f

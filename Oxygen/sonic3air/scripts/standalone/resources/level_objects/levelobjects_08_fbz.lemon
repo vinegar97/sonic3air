@@ -456,7 +456,7 @@ function void LevelObjectTableBuilder.buildObjects_FBZ1()
 	LevelObjectTableBuilder.addObject(0x2f00, 0x05e0, OBJECTTABLE1_aa, 0x00, LVLOBJ_IGNORE_Y)
 	LevelObjectTableBuilder.addObject(0x2f88, 0x0611, OBJECTTABLE1_80, 0x06, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }
 
@@ -904,6 +904,6 @@ function void LevelObjectTableBuilder.buildObjects_FBZ2()
 	LevelObjectTableBuilder.addObject(0x3678, 0x0660, OBJECTTABLE1_8a, 0x00, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x3680, 0x0660, OBJECTTABLE1_ce, 0x00, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }

@@ -473,7 +473,7 @@ function void LevelObjectTableBuilder.buildObjects_HCZ1()
 	LevelObjectTableBuilder.addObject(0x3720, 0x0580, OBJECTTABLE1_99, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x3750, 0x0710, OBJECTTABLE1_80, 0x03, 0)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }
 
@@ -1078,6 +1078,6 @@ function void LevelObjectTableBuilder.buildObjects_HCZ2()
 	LevelObjectTableBuilder.addObject(0x44f2, 0x02c0, OBJECTTABLE1_28, 0x17, 0)
 	LevelObjectTableBuilder.addObject(0x4608, 0x0268, OBJECTTABLE1_9a, 0x00, LVLOBJ_IGNORE_Y)
 
-	u16[A0] = 0xffff
+	u16[A0] = -1
 	A0 += 2
 }

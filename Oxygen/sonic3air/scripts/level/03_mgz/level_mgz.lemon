@@ -315,7 +315,7 @@ function void UpdateLevelTiles.MGZ2()
 	camera.foreground.y.u16 += camera.screenshake.offset
 	if (u16[0xffffeeb4] != 0)
 	{
-		camera.screenshake.state.hi = 0xff
+		camera.screenshake.state.hi = -1
 	}
 	fn05127c()
 
@@ -474,7 +474,7 @@ function void fn05134c()
 			}
 		}
 
-		camera.screenshake.state.hi = 0xff
+		camera.screenshake.state.hi = -1
 		u16[0xffffeed8] = 0
 		u8[0xffffeea2] = 0xff
 		gfx.plane_update_routine = 0x04		// Enter vertical scroll mode
@@ -683,7 +683,7 @@ function void fn051560()
 			objA1.update_address = 0x06bf2a
 			objA1.position.x.u16 = 0x08e0
 			objA1.position.y.u16 = 0x0690
-			camera.screenshake.state.hi = 0xff
+			camera.screenshake.state.hi = -1
 			u8[0xffffeeb4] = 0xff
 		}
 	}
@@ -721,7 +721,7 @@ function void fn0515a4()
 			objA1.render_flags |= render_flag.FLIP_X
 			objA1.position.x.u16 = 0x2fa0
 			objA1.position.y.u16 = 0x02d0
-			camera.screenshake.state.hi = 0xff
+			camera.screenshake.state.hi = -1
 			u8[0xffffeeb4] = 0xff
 		}
 	}
@@ -747,7 +747,7 @@ function void fn05160e()
 				objA1.render_flags |= render_flag.FLIP_X
 				objA1.position.x.u16 = 0x3300
 				objA1.position.y.u16 = 0x0790
-				camera.screenshake.state.hi = 0xff
+				camera.screenshake.state.hi = -1
 				u8[0xffffeeb4] = 0xff
 			}
 		}
@@ -1291,7 +1291,7 @@ function void fn0519e8()
 function void fn051a04()
 {
 	// Sonic's / Tails' earthquake sequence
-	level.dualplanecollision = 0xff
+	level.dualplanecollision = -1
 
 #if STANDALONE
 	// Render background in two parts to avoid background blur being applied to the grass
@@ -1301,7 +1301,7 @@ function void fn051a04()
 	Renderer.setupPlane(0, splitY, getScreenWidth(), getScreenHeight() - splitY, 0x00, 0, 0x1800)
 #endif
 
-	u16 newLevelDisplayRoutine = 0xffff
+	u16 newLevelDisplayRoutine = -1
 	if (D1.u16 < 0x0800)
 	{
 		if (D0.u16 >= 0x3900)
@@ -1342,7 +1342,7 @@ function void fn051a3c()
 	}
 	else
 	{
-		level.dualplanecollision = 0xff
+		level.dualplanecollision = -1
 
 	#if STANDALONE
 		// Render background in two parts to avoid background blur being applied to the grass

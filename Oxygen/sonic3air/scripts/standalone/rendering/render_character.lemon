@@ -353,7 +353,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 	bool useAfterImages
 	if (isPlayer1)
 	{
-		if ((super.active == 0xff) || (super.active.tails == 0xff))
+		if ((super.active == -1) || (super.active.tails == -1))
 		{
 			useAfterImages = true
 		}

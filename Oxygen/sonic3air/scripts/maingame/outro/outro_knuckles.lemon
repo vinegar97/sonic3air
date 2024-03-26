@@ -50,7 +50,7 @@ function void fn05e70e()
 	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	u8[A1 + 0x22] = 0
 
-	player1.camera_lock = 0xff
+	player1.camera_lock = -1
 	u8[0xfffffab8] = 0
 	global.level_started = 0
 	camera.screenshake.state = 0
@@ -79,7 +79,7 @@ function void fn05e70e()
 		if (outro.ending_type != 0)
 		{
 			hud.dirty.timer = 0x01
-			super.palettefx.state = 0xff
+			super.palettefx.state = -1
 			super.palettefx.timer = 0x0f
 			super.active = 1
 			super.ring_dec.frames = 0x7fff
@@ -607,7 +607,7 @@ function void fn05f144()
 	else
 	{
 		objA0.update_address = 0x05f18a
-		level.palettefx.state = 0xff
+		level.palettefx.state = -1
 
 		if (allocDynamicObjectStd())
 		{

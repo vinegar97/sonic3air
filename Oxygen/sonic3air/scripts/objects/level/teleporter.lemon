@@ -87,7 +87,7 @@ function void fn0455cc()
 			if (objA0.render_flags & render_flag.VISIBLE)
 			{
 				u32[0xfffffc62] = 0x040c0408
-				level.palettefx.state = 0xff
+				level.palettefx.state = -1
 			}
 			else
 			{
@@ -257,7 +257,7 @@ function void fn0456f4()
 			Input.setControllerRumble(-1, 0.0f, 0.5f, 500)
 		#endif
 
-			player1.camera_lock = 0xff
+			player1.camera_lock = -1
 		}
 	}
 
@@ -381,7 +381,7 @@ function void fn045b94()
 
 		playMusic(MUSIC_CTRL_FADEOUT)
 
-		sram.block_interrupts.u8 = 0xff
+		sram.block_interrupts.u8 = -1
 		SaveGameOnLevelFinished()
 
 		TriggerNextZone(0x0a01)		// Knuckles' Sky Sanctuary act
@@ -397,7 +397,7 @@ function void fn045b94()
 		}
 
 		u32[0xfffffc62] = 0x040c0408
-		level.palettefx.state = 0xff
+		level.palettefx.state = -1
 		objA1.update_address = 0x045ad6
 		objA0.update_address = 0x045bf4
 	}
@@ -498,7 +498,7 @@ function void fn045c8e()
 				objA1.flags2a |= char.flag.FACING_LEFT	// Another small fix for Tails
 			#endif
 				u16[A2] = 0
-				u8[A3] = 0xff	// Activate player1.control_override / player2.control_override
+				u8[A3] = -1	// Activate player1.control_override / player2.control_override
 				++u8[A4]
 			}
 		}
@@ -519,7 +519,7 @@ function void fn045c8e()
 		// Start camera movement to the transporter
 		u16[A0 + 0x2c] = 0x013c
 		objA0.base_state = 0x48
-		player1.camera_lock = 0xff
+		player1.camera_lock = -1
 		++u8[A4]
 	}
 	else if (D0.u8 == 3)
@@ -576,7 +576,7 @@ function void fn045c8e()
 		{
 			playMusic(MUSIC_CTRL_FADEOUT)
 
-			sram.block_interrupts.u8 = 0xff
+			sram.block_interrupts.u8 = -1
 			SaveGameOnLevelFinished()
 
 			TriggerNextZone(0x0a00)		// Sonic/Tails Sky Sanctuary act
@@ -605,7 +605,7 @@ function void fn0522a0()
 
 		objA1.velocity.x = 0
 		objA1.groundspeed = 0
-		player1.control_override = 0xff
+		player1.control_override = -1
 		control.player1 = 0
 
 		Kosinski.addToDMAQueue(0x159cae, 0xa000)		// Zone warp teleporter sprites
@@ -691,7 +691,7 @@ function void fn05234a()
 			Input.setControllerRumble(-1, 0.0f, 0.5f, 500)
 		#endif
 
-			player1.camera_lock = 0xff
+			player1.camera_lock = -1
 		}
 	}
 }

@@ -51,7 +51,7 @@ function void fn0742a8()
 
 	boss.remaining_hits = 8
 	objA0.flags38 |= 0x08
-	global.passing_floor = 0xff
+	global.passing_floor = -1
 	objA0.position.x.u16 = camera.position.x.u16 + getScreenWidth() - 160
 	objA0.position.y.u16 = camera.position.y.u16 - 0x50
 	objA0.countdown_value = 0x59
@@ -561,7 +561,7 @@ function void fn07473a()
 
 	stopCharacterWinPose(0xffffb000)
 	control.player1 = 0
-	player1.control_override = 0xff
+	player1.control_override = -1
 #if STANDALONE
 	// For Tails
 	stopCharacterWinPose(0xffffb04a)

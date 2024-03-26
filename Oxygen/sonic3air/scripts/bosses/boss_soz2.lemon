@@ -254,7 +254,7 @@ function void fn07789a()
 	}
 
 	objA0.update_address = 0x0778f2
-	level.wait_for_results = 0xff
+	level.wait_for_results = -1
 	objA0.flags38 |= 0x30
 	objA0.render_flags &= ~render_flag.VISIBLE
 }
@@ -276,7 +276,7 @@ function void fn0778f2()
 	stopCharacterWinPose(0xffffb000)
 	PlayMusicAfterLevelResults()
 	control.player1 = 0
-	player1.control_override = 0xff
+	player1.control_override = -1
 	objA0.countdown_value = 0
 	stopCharacterWinPose(0xffffb04a)
 

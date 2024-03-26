@@ -663,7 +663,7 @@ function void fn06284e()
 function void fn06273e()
 {
 	objA0.base_state = 0x0c
-	camera.screenshake.state.hi = 0xff
+	camera.screenshake.state.hi = -1
 	objA0.countdown_value = 0x5f
 	objA0.countdown_callback = 0x062760
 

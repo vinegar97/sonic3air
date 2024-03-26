@@ -294,7 +294,7 @@ function void fn0803d6()
 	A1 = 0xffff0000 + u16[A0 + 0x44]
 	if (u8[A1 + 0x2a] & 0x80)
 	{
-		sram.block_interrupts.u8 = 0xff
+		sram.block_interrupts.u8 = -1
 		SaveGameOnLevelFinished()
 
 		Object.TriggerUnloading()

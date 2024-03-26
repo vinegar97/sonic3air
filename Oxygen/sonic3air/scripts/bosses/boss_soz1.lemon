@@ -527,7 +527,7 @@ function void fn076e5c()
 	spawnChildObject(0x084a76, 0x00, 0, 0)			// Screen mover for the left border
 	spawnChildObject(0x084a48, 0x02, 0, 0)			// Screen mover for the right border
 
-	player1.control_override = 0xff
+	player1.control_override = -1
 
 	if (allocDynamicObjectStd())
 	{

@@ -405,8 +405,8 @@ function void fn06a24c()
 	objA0.update_address = 0x06a270
 	control.player1 = 0
 	control.tails = 0
-	player1.control_override = 0xff
-	player2.control_override = 0xff
+	player1.control_override = -1
+	player2.control_override = -1
 	u8[0xffffb000 + 0x2e] = control_flag.DISABLE_INTERACTION
 
 	fn06a270()
@@ -1092,7 +1092,7 @@ function void fn06a916()
 function void fn06a940()
 {
 	D0.u16 *= 2
-	D2.u8 = (D0.s16 < 0) ? 0xff : 0x00
+	D2.u8 = (D0.s16 < 0) ? -1 : 0
 	D0.u16 = abs(D0.s16)
 	D3.u16 = 0x0100 - D0.u16
 	if (D3.s16 < 0)

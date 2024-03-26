@@ -884,7 +884,7 @@ function void ItemEffect.ApplySuperTransformation()
 	{
 		// Sonic
 		u32[0xffffb000 + 0x0c] = 0x146816		// "char.mapping_offset"
-		super.active = 0xff
+		super.active = -1
 	#if STANDALONE
 		setSpeedCapProperties(addressof(global.move.speedcap), true)	// Address: 0xfffff760
 	#else
@@ -900,7 +900,7 @@ function void ItemEffect.ApplySuperTransformation()
 		// Tails
 		super.active = 0
 	#if STANDALONE
-		super.active.tails = 0xff
+		super.active.tails = -1
 	#else
 		super.active.tails = 1
 	#endif
@@ -919,7 +919,7 @@ function void ItemEffect.ApplySuperTransformation()
 		// Knuckles
 		u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
 	#if STANDALONE
-		super.active = 0xff
+		super.active = -1
 	#endif
 	}
 

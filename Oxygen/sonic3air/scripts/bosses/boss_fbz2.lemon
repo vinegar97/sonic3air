@@ -251,7 +251,7 @@ function void fn070854()
 function void fn070870()
 {
 	objA0.update_address = 0x0708aa
-	level.wait_for_results = 0xff
+	level.wait_for_results = -1
 	level.boss_encounter = 0
 
 	if (allocDynamicObjectStd())
@@ -288,7 +288,7 @@ function void fn0708aa()
 	stopCharacterWinPose(0xffffb000)
 
 	control.player1 = 0
-	player1.control_override = 0xff
+	player1.control_override = -1
 	objA0.countdown_value = 0
 	stopCharacterWinPose(0xffffb04a)
 

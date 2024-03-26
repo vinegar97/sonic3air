@@ -42,7 +42,7 @@ function void Kosinski.Decompress()
 		}
 
 		u16 length = 0
-		s16 offset = 0xffff
+		s16 offset = -1
 		if (Kosinski.readBit() == 0)
 		{
 			// Copy something between 2 and 5 bytes with an 8-bit large offset

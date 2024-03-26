@@ -120,7 +120,7 @@ function void fn0634ca()
 		camera.position.x.u16 = max(0x0540, 0x0560 - getScreenExtend())
 		camera.position.y.u16 = 0x0948
 	}
-	player1.camera_lock = 0xff
+	player1.camera_lock = -1
 	global.random.seed = global.framecounter
 	global.level_started = 0
 

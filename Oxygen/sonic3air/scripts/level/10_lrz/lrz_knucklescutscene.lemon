@@ -166,7 +166,7 @@ function void fn063b9c()
 #endif
 
 	objA0.update_address = 0x063bbe
-	player1.control_override = 0xff
+	player1.control_override = -1
 	StopObjectA1()
 	control.player1 = 0
 }
@@ -186,7 +186,7 @@ function void fn063bbe()
 	objA0.update_address = 0x063bf4
 	u8[0xfffffab8] |= 0x01
 	move_area.left = 0
-	player1.camera_lock = 0xff
+	player1.camera_lock = -1
 	player1.control_override = 0
 	u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_UPDATE)
 	objA1.state = char.state.LOOKING_UP
@@ -211,7 +211,7 @@ function void fn063c14()
 	if (u16[0xffffb000 + 0x14] < 0x04c0)
 		return
 
-	level.skip_titlecard = 0xff
+	level.skip_titlecard = -1
 	level.backup.rings = ring_counter
 	level.backup.timer.alldata = timer.alldata
 	global.shields_backup_2 = u8[0xffffb000 + 0x2b]

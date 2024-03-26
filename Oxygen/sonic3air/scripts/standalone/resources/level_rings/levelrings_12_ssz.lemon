@@ -190,7 +190,7 @@ function void LevelRingsTableBuilder.buildRings_SSZ1()
 	LevelRingsTableBuilder.addRing(0x1958, 0x0ac0)
 	LevelRingsTableBuilder.addRing(0x1958, 0x0ad4)
 	LevelRingsTableBuilder.addRing(0x1964, 0x09a8)
-	u32[A1] = 0xffffffff
+	u32[A1] = -1
 	A1 += 4
 }
 
@@ -198,6 +198,6 @@ function void LevelRingsTableBuilder.buildRings_SSZ1()
 function void LevelRingsTableBuilder.buildRings_SSZ2()
 {
 	LevelRingsTableBuilder.addRing(0x0000, 0x0000)
-	u32[A1] = 0xffffffff
+	u32[A1] = -1
 	A1 += 4
 }

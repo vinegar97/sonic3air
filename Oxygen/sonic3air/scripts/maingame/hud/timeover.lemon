@@ -20,7 +20,7 @@ function void fn02d5c6()
 
 	if (objA0.animation.sprite == 0)
 	{
-		sram.block_interrupts.u8 = 0xff
+		sram.block_interrupts.u8 = -1
 		UpdateLivesContinuesInSaveGame()
 	}
 

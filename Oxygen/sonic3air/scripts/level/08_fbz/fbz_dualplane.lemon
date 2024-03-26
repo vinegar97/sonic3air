@@ -43,7 +43,7 @@ function void fn0532e0()
 //# address-hook(0x0532f0) end(0x05331c)
 function void fn0532f0()
 {
-	level.dualplanecollision = 0xff
+	level.dualplanecollision = -1
 
 	s32 moveX = 0x7800
 	s32 moveY = 0xa000

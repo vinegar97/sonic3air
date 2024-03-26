@@ -334,7 +334,7 @@ function void fn0694d4()
 	stopCharacterWinPose(0xffffb04a)
 
 	PlayMusicAfterLevelResults()
-	player1.control_override = 0xff
+	player1.control_override = -1
 	control.player1 = 0
 
 	if (allocDynamicObjectStd())

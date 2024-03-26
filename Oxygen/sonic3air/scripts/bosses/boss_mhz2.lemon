@@ -265,7 +265,7 @@ function void fn0761e8()
 	{
 		objA0.update_address = 0x07623c
 		u8[0xfffffa88] |= 0x01
-		level.wait_for_results = 0xff
+		level.wait_for_results = -1
 		level.boss_encounter = 0
 		objA0.flags38 |= 0x20
 		StartLoadingPatternsForZone()
@@ -323,10 +323,10 @@ function void fn076270()
 	stopCharacterWinPose(0xffffb04a)
 	PlayMusicAfterLevelResults()
 
-	player1.control_override = 0xff
+	player1.control_override = -1
 	control.player1 = 0x0101		// CONTROL_UP, CONTROL_UP
 
-	player2.control_override = 0xff
+	player2.control_override = -1
 	control.tails = 0x0101		// CONTROL_UP, CONTROL_UP
 	fn08638a()
 
@@ -354,7 +354,7 @@ function void fn0764a0()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u16[A1 + 0x44] = A0.u16
 	u8[A0 + 0x25] = u8[A0 + 0x28]
-	boss.remaining_hits = 0xff
+	boss.remaining_hits = -1
 	fn0764c4()
 }
 
@@ -720,7 +720,7 @@ function void fn0768d2()
 	{
 		objA0.update_address = 0x0768fe
 		u16[0xffffeec6] = 0x55
-		player1.control_override = 0xff
+		player1.control_override = -1
 	}
 }
 

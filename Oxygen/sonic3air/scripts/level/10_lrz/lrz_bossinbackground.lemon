@@ -27,8 +27,8 @@ function void fn078f56()
 //# address-hook(0x078f82) end(0x078fac)
 function void fn078f82()
 {
-	player1.control_override = 0xff
-	player2.control_override = 0xff
+	player1.control_override = -1
+	player2.control_override = -1
 	control.player1 = 0
 	control.tails = 0
 

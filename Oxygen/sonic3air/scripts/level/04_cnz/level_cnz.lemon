@@ -933,7 +933,7 @@ function void fn052086()
 
 	u16[0xffffeeda] = D0.u16
 	move_area.bottom.target = 0x1000
-	level.dualplanecollision = 0xff
+	level.dualplanecollision = -1
 	level.scrolling_routine += 4
 
 	A1 = 0xffff0067 + u16[0xffff8008]

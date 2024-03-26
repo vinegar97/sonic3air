@@ -67,7 +67,7 @@ function void fn034600()
 		{
 			D0 = (objA0.flags2a & 0x01) ? -2 : 2
 			objA0.position.x.u16 += D0.u16
-			camera.screenshake.state = 0xffff
+			camera.screenshake.state = -1
 		}
 	}
 
@@ -112,7 +112,7 @@ function void fn03466e()
 		}
 		else
 		{
-			camera.screenshake.state = 0xffff
+			camera.screenshake.state = -1
 		}
 	}
 

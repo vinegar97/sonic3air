@@ -1702,7 +1702,7 @@ function void InitLevelScrolling.FBZ2()
 		u16[A3 + 0x78] = D0.u16
 		u16[A3 + 0x7c] = D0.u16
 
-		camera.screenshake.state.hi = 0xff
+		camera.screenshake.state.hi = -1
 		D7.u16 = 0xc000
 		fn05318c()
 

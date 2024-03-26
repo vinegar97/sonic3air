@@ -321,7 +321,7 @@ function void LevelRingsTableBuilder.buildRings_DEZ1()
 	LevelRingsTableBuilder.addRing(0x3400, 0x02d4)
 	LevelRingsTableBuilder.addRing(0x3420, 0x02dc)
 	LevelRingsTableBuilder.addRing(0x3440, 0x02e4)
-	u32[A1] = 0xffffffff
+	u32[A1] = -1
 	A1 += 4
 }
 
@@ -536,7 +536,7 @@ function void LevelRingsTableBuilder.buildRings_DEZ2()
 	LevelRingsTableBuilder.addRing(0x3480, 0x0494)
 	LevelRingsTableBuilder.addRing(0x34a8, 0x049e)
 	LevelRingsTableBuilder.addRing(0x34d0, 0x04a8)
-	u32[A1] = 0xffffffff
+	u32[A1] = -1
 	A1 += 4
 }
 
@@ -544,6 +544,6 @@ function void LevelRingsTableBuilder.buildRings_DEZ2()
 function void LevelRingsTableBuilder.buildRings_DEZ3()
 {
 	LevelRingsTableBuilder.addRing(0x0000, 0x0000)
-	u32[A1] = 0xffffffff
+	u32[A1] = -1
 	A1 += 4
 }

@@ -205,6 +205,6 @@ function void LevelRingsTableBuilder.buildRings_DDZ1()
 	LevelRingsTableBuilder.addRing(0x70c8, 0x0158)
 	LevelRingsTableBuilder.addRing(0x70e0, 0x0158)
 	LevelRingsTableBuilder.addRing(0x70f8, 0x0158)
-	u32[A1] = 0xffffffff
+	u32[A1] = -1
 	A1 += 4
 }

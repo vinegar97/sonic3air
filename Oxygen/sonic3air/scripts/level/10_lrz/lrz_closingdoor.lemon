@@ -49,7 +49,7 @@ function void fn042a68()
 		if (D0.s16 >= 0x50)
 		{
 			objA0.update_address = 0x042aae
-			camera.screenshake.state = 0xffff
+			camera.screenshake.state = -1
 			playSound(0xcc)
 
 			if (objA0.respawn_entry)

@@ -295,7 +295,7 @@ function void fn06e6c6()
 function void fn06e6e4()
 {
 	objA0.update_address = 0x06e724
-	level.wait_for_results = 0xff
+	level.wait_for_results = -1
 	level.boss_encounter = 0
 	screenmover_target.right = level.bossarea.left + 0x0190 + getScreenExtend()
 
@@ -388,7 +388,7 @@ function void fn06e7b6()
 	D0.u16 = 0x0200
 	move_area.bottom.target = D0.u16
 	objA0.countdown_value = 0xbf
-	player1.control_override = 0xff
+	player1.control_override = -1
 #if STANDALONE
 	// Reset controls, in case the player starts pressing a button right now (this would lead to the cannon firing immediately)
 	control.player1 = 0
@@ -412,7 +412,7 @@ function void fn06e7e4()
 	objA0.update_address = 0x06e80c
 
 	control.player1 = 0x7070		// CONTROL_ABC, CONTROL_ABC
-	player1.control_override = 0xff
+	player1.control_override = -1
 
 #if STANDALONE
 	// Prevent that character gets stopped by right screen border after getting shot out of the cannon

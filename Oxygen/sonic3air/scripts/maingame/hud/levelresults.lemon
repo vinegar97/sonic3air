@@ -45,7 +45,7 @@ function void fn02dae6()
 	{
 		// Any Act 2, incl. Lava Reef Boss Act
 		A1 = 0x0d6e46
-		D0 = 0xffffffff
+		D0 = -1
 	}
 
 	u16[A0 + 0x2c] = D0.u16
@@ -246,7 +246,7 @@ function void LevelResults.UpdateBonusCounting()
 		// Special handling for Sky Sanctuary Zone (S/T) and probably also Lava Reef Boss
 		if (global.zone_act == 0x0a00 || u16[A0 + 0x2c] != 0)
 		{
-			sram.block_interrupts.u8 = 0xff
+			sram.block_interrupts.u8 = -1
 			SaveGameOnLevelFinished()
 		}
 
@@ -293,7 +293,7 @@ function void LevelResults.AdvanceToNextAct()
 	// Sky Sanctuary, Lava Reef Boss, Hidden Palace, or any Act 2?
 	if (global.zone == 0x0a || global.zone == 0x16 || global.act.apparent != 0)
 	{
-		level.results_done = 0xff
+		level.results_done = -1
 		UnloadObject()
 		return
 	}

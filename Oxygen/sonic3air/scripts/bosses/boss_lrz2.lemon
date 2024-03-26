@@ -238,7 +238,7 @@ function void fn079988()
 	objA0.update_address = 0x0799e0
 	objA0.flags38 |= 0x30
 	objA0.render_flags &= ~render_flag.VISIBLE
-	level.wait_for_results = 0xff
+	level.wait_for_results = -1
 	level.boss_encounter = 0
 
 	if (allocDynamicObjectStd())

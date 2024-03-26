@@ -277,7 +277,7 @@ function void VInt.Update.MainGame()
 		if (u16[0xffffef3e] != 0)
 		{
 			u16[0xffffef3e] = 0
-			u16[0xffffef3c] ^= 0xffff
+			u16[0xffffef3c] ^= -1
 		}
 		if (u16[0xffffef3c] == 0)
 		{
@@ -353,7 +353,7 @@ function void VInt.Update.LevelLoading()
 		if (u16[0xffffef3e] != 0)
 		{
 			u16[0xffffef3e] = 0
-			u16[0xffffef3c] ^= 0xffff
+			u16[0xffffef3c] ^= -1
 		}
 	}
 

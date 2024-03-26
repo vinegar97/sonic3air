@@ -219,7 +219,7 @@ function void fn090a94()
 
 	objA0.update_address = 0x090b22
 	objA0.countdown_value = 0x021f
-	global.traded_emeralds = 0xff
+	global.traded_emeralds = -1
 
 	// "spawnSimpleChildObjects(0x090fea)" replaced by:
 	spawnSimpleChildObjects(0x090d78, 1)
@@ -242,7 +242,7 @@ function void fn090b22()
 function void fn090b32()
 {
 	objA0.update_address = 0x090bd2
-	player1.camera_lock = 0xff
+	player1.camera_lock = -1
 	D0 = objA0.value39
 	++objA0.value39
 
@@ -645,7 +645,7 @@ function void fn090e9a()
 		u16[A0 + 0x44] = A1.u16
 	}
 
-	sram.block_interrupts.u8 = 0xff
+	sram.block_interrupts.u8 = -1
 	CheckSaveGameSlotAfterBlueSpheres()
 }
 

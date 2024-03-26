@@ -22,7 +22,7 @@ function void fn072b18()
 	{
 		objA0.update_address = 0x072b46
 		objA0.countdown_value = 0x3f
-		player2.control_override = 0xff
+		player2.control_override = -1
 	}
 }
 
@@ -88,7 +88,7 @@ function void fn072bbc()
 
 	stopCharacterWinPose(0xffffb000)
 	stopCharacterWinPose(0xffffb04a)
-	player1.control_override = 0xff
+	player1.control_override = -1
 	control.player1 = 0
 
 	if (allocDynamicObjectStd())

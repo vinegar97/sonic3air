@@ -241,7 +241,7 @@ function void fn06c890()
 function void fn06c8b4()
 {
 	objA0.update_address = 0x06c8f4
-	level.wait_for_results = 0xff
+	level.wait_for_results = -1
 	level.boss_encounter = 0
 
 	if (allocDynamicObjectStd())
@@ -272,7 +272,7 @@ function void fn06c8f4()
 	stopCharacterWinPose(0xffffb000)
 	PlayMusicAfterLevelResults()
 	control.player1 = 0
-	player1.control_override = 0xff
+	player1.control_override = -1
 	objA0.countdown_value = 0
 	player1.camera_lock = 1
 	move_area.right += 0x30

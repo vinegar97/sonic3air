@@ -127,7 +127,7 @@ function void fn03d4c2()
 					if (D0.s8 >= 0 && D0.u8 >= 0x40)
 					{
 						D0 = 0x40
-						D1 = 0xffffffff
+						D1 = -1
 						goto03d5c4 = true
 					}
 				}
@@ -149,7 +149,7 @@ function void fn03d4c2()
 					if (D0.s8 >= 0 && D0.u8 >= 0x40)
 					{
 						D0 = 0
-						D1 = 0xffffffff
+						D1 = -1
 						goto03d5c4 = true
 					}
 				}

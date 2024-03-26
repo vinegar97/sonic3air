@@ -1279,7 +1279,7 @@ function void fn05449a()
 	u16[0xffffeee0] = 0x3c
 	u16[0xffffeea2] = 0x1e00
 	u32[0xffffee9c] = 0x6200
-	player1.camera_lock = 0xff
+	player1.camera_lock = -1
 	u8[0xffffef40] = 0xff
 	level.scrolling_routine += 4
 
@@ -1345,7 +1345,7 @@ function void fn0545c4()
 {
 	if (u16[0xffffeec6] != 0)
 	{
-		player1.camera_lock = 0xff
+		player1.camera_lock = -1
 		camera.foreground.y.u16 = camera.position.y.u16
 		camera.position.y.u16 -= 2
 

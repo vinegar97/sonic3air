@@ -21,7 +21,7 @@ function void SetupAsSignpostSpawner()
 	objA0.flags38 |= 0x10
 	objA0.countdown_value = 119
 	objA0.countdown_callback = 0x085bda
-	level.wait_for_results = 0xff
+	level.wait_for_results = -1
 }
 
 
@@ -394,7 +394,7 @@ function void Boss.updateHitFlashing(u8 numColors, u32 destAddresses, u32 source
 //# address-hook(0x0694aa) end(0x0694ce)
 function void fn0694aa()
 {
-	level.wait_for_results = 0xff
+	level.wait_for_results = -1
 	level.boss_encounter = 0
 
 	addPatternLoadingCue(0x083d74)		// Capsule Sprites
