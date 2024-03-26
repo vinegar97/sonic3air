@@ -16,7 +16,11 @@
 function void DynamicRing.Init()
 {
 	objA0.mapping_offset = 0x01a99a
+#if STANDALONE
+	objA0.sprite_attributes = (competition_mode.active) ? (sprite_attribute.PALETTE.LINE3 | 0x03d2) : (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
+#else
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
+#endif
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x100
 	objA0.collision_attributes = (collision.flag.ITEM | collision.size.6x6)
@@ -71,7 +75,11 @@ function void DynamicRing.Update()
 				u8[A2] &= ~0x80
 			}
 
+		#if STANDALONE
+			D0.u16 = u16[A0 + 0x30]
+		#else
 			D0.u16 = u16[0x30]
+		#endif
 			if (D0.u16 != 0)
 			{
 				A2 = 0xffff0000 + D0.u16
@@ -231,7 +239,11 @@ function void SpillRings()
 		objA1.base_state += 2
 		objA1.box_size.x = 8
 		objA1.sprite_priority = 0x180
+	#if STANDALONE
+		objA1.sprite_attributes = (competition_mode.active) ? (sprite_attribute.PALETTE.LINE3 | 0x03d2) : (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
+	#else
 		objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
+	#endif
 		objA1.mapping_offset = 0x01a99a
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
@@ -276,6 +288,17 @@ function void SpillRings()
 	}
 
 	playSound(SFX_SPILLRINGS)
+#if STANDALONE
+	// Fix ring interaction
+	if (competition_mode.active)
+	{
+		if (u8[A0 + 0x3f] == 0)
+			ring_counter = 0
+		else
+			ring_counter.player2 = 0
+	}
+	else
+#endif
 	ring_counter = 0
 	hud.dirty.rings = 0x80
 	extra_lives_granted = 0
@@ -333,6 +356,17 @@ function void fn01a7c2()
 	objA0.base_state += 2
 	u8[A0 + 0x28] = 0
 	objA0.sprite_priority = 0x80
+#if STANDALONE
+	// Fix ring interaction
+	if (competition_mode.active)
+	{
+		if (u8[A0 + 0x3f] == 0)
+			CollectRing()
+		else
+			CollectRing_P2()
+	}
+	else
+#endif
 	CollectRing()
 	fn01a7d6()
 }
@@ -435,6 +469,17 @@ function void fn01a572()
 	objA0.base_state += 2
 	u8[A0 + 0x28] = 0
 	objA0.sprite_priority = 0x80
+#if STANDALONE
+	// Fix ring interaction
+	if (competition_mode.active)
+	{
+		if (u8[A0 + 0x3f] == 0)
+			CollectRing()
+		else
+			CollectRing_P2()
+	}
+	else
+#endif
 	CollectRing()
 	fn01a584()
 }
