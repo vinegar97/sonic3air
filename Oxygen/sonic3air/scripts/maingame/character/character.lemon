@@ -1561,16 +1561,24 @@ function void UpdateKnucklesGlideCollision()
 		}
 
 		// Knuckles climbing up
+		// This function can handle both normal and inverse gravity, but the two are checked separate for compatibility
+		// return
+		// if (global.inv_gravity)
+		/* return */
+
 		if (global.inv_gravity)
 		{
 			fn016da8()
 			return
 		}
 
-		D2.u16 = char.position.y.u16 - 11
+		s8 sign = global.inv_gravity ? -1 : 1
+
+		D2.u16 = char.position.y.u16 - 11 * sign
 		fn016f4e()
 		if (D1.s16 >= 4)
 		{
+			// Reached ledge while climbing up
 			fn016eba()
 			return
 		}
@@ -1578,34 +1586,56 @@ function void UpdateKnucklesGlideCollision()
 		if (D1.u16 != 0)
 		{
 			fn016e60()
+			return
 		}
-
-		D5.u8 = char.layer_flags2
-		D2.u16 = char.position.y.u16 - 8
-		D3.u16 = char.position.x.u16
-		fn00fbee()
-		if (D1.s16 < 0)
+		// else
 		{
-			char.position.y.u16 -= D1.u16
-			D1 = 1
-		}
-		else
-		{
-			--char.position.y.u16
-			if (super.active)
-				--char.position.y.u16
+			D5.u8 = char.layer_flags2
+			D2.u16 = char.position.y.u16 - 8 * sign
+			D3.u16 = char.position.x.u16
 
-			D1 = 1
-			if (level.vertical_wrap != 0xff00)
+			if (global.inv_gravity == 0)
 			{
-				s16 minY = level.vertical_wrap + 0x10
-				if (s16(char.position.y.u16) < minY)
+				fn00fbee()
+			}
+			else
+			{
+				fn00f828()
+			}
+
+			if (D1.s16 < 0)
+			{
+				// Hit ceiling while climbing up
+				char.position.y.u16 -= D1.u16 * sign
+				D1 = 1
+			}
+			else
+			{
+				char.position.y.u16 -= (super.active) ? (2 * sign) : sign
+
+				D1 = 1
+				if (level.vertical_wrap != 0xff00)
 				{
-					char.position.y.u16 = minY
+					if (global.inv_gravity == 0)
+					{
+						s16 minY = level.vertical_wrap + 0x10
+						if (s16(char.position.y.u16) < minY)
+						{
+							char.position.y.u16 = minY
+						}
+					}
+					else
+					{
+						s16 minY = move_area.bottom.current + getScreenHeight()
+						if (s16(char.position.y.u16) > minY)
+						{
+							char.position.y.u16 = minY
+						}
+					}
 				}
 			}
+			fn016e10()
 		}
-		fn016e10()
 	}
 	else if (char.double_jump_state == 5)
 	{
@@ -1668,8 +1698,11 @@ function void fn016d10_unified()
 
 	if (D1.s16 < 0)
 	{
+		// Hit ground while climbing down
+
 		if (global.inv_gravity)
 		{
+			// Stop climbing and land on ceiling
 			char.position.y.u16 -= D1.u16
 			char.rotation = 0x80 - u8[0xfffff768]
 			char.groundspeed = 0
@@ -1711,11 +1744,13 @@ function void fn016d10()
 //# address-hook(0x016d6e)
 function void fn016d6e()
 {
+	// Stop climbing and land on floor
 	char.position.y.u16 += D1.u16
 	char.rotation = u8[0xfffff768]
 	char.groundspeed = 0
 	char.velocity.x = 0
 	char.velocity.y = 0
+
 	Character.LandingOnGroundNoSpindash()
 	char.state = char.state.STANDING
 }
@@ -1756,47 +1791,68 @@ function void fn016f4e()
 //# address-hook(0x016da8) end(0x016ed0)
 function void fn016da8()
 {
-	D2.u16 = char.position.y.u16 + 11
-	fn016f4e()
-	if (D1.s16 < 4)
-	{
-		if (D1.u16 == 0)
-		{
-			D5.u8 = char.layer_flags2
-			D2.u16 = char.position.y.u16 + 8
-			D3.u16 = char.position.x.u16
-			fn00f828()
-			if (D1.s16 < 0)
-			{
-				char.position.y.u16 += D1.u16
-				D1 = 1
-			}
-			else
-			{
-				++char.position.y.u16
-				if (super.active)
-					++char.position.y.u16
+	s8 sign = global.inv_gravity ? -1 : 1
 
-				D1 = 1
-				if (level.vertical_wrap != 0xff00)
-				{
-					D0.u16 = move_area.bottom.current + getScreenHeight()
-					if (s16(char.position.y.u16) > D0.s16)
-					{
-						char.position.y.u16 = D0.u16
-					}
-				}
-			}
-			fn016e10()
+	D2.u16 = char.position.y.u16 - 11 * sign
+	fn016f4e()
+	if (D1.s16 >= 4)
+	{
+		// Reached ledge while climbing up
+		fn016eba()
+		return
+	}
+
+	if (D1.u16 != 0)
+	{
+		fn016e60()
+	}
+	// else
+	{
+		D5.u8 = char.layer_flags2
+		D2.u16 = char.position.y.u16 - 8 * sign
+		D3.u16 = char.position.x.u16
+
+		if (global.inv_gravity == 0)
+		{
+			fn00fbee()
 		}
 		else
 		{
-			fn016e60()
+			fn00f828()
 		}
-	}
-	else
-	{
-		fn016eba()
+
+		if (D1.s16 < 0)
+		{
+			// Hit ceiling while climbing up
+			char.position.y.u16 -= D1.u16 * sign
+			D1 = 1
+		}
+		else
+		{
+			char.position.y.u16 -= (super.active) ? (2 * sign) : sign
+
+			D1 = 1
+			if (level.vertical_wrap != 0xff00)
+			{
+				if (global.inv_gravity == 0)
+				{
+					s16 minY = level.vertical_wrap + 0x10
+					if (s16(char.position.y.u16) < minY)
+					{
+						char.position.y.u16 = minY
+					}
+				}
+				else
+				{
+					s16 minY = move_area.bottom.current + getScreenHeight()
+					if (s16(char.position.y.u16) > minY)
+					{
+						char.position.y.u16 = minY
+					}
+				}
+			}
+		}
+		fn016e10()
 	}
 }
 
@@ -1805,6 +1861,7 @@ function void fn016da8()
 function void fn016e10()
 {
 	// Shared climbing animation update
+	/* return */
 	D0.u8 = control.player1.state & (CONTROL_UP | CONTROL_DOWN)
 	if (D0.u8 == 0)
 	{
@@ -1823,11 +1880,11 @@ function void fn016e10()
 		D2.u16 = char.position.y.u16 + 9
 		D3.u16 = char.position.x.u16
 		fn00f828()
-		if (D1.s16 < 0)
+		/* if (D1.s16 < 0)
 		{
 			fn016d6e()
 			return
-		}
+		} */
 
 	#if STANDALONE
 		// This fixes an animation bug when Knuckles is on a wall, but very close to the ground
@@ -3143,7 +3200,7 @@ function void KnucklesPressedJumpInMidAir()
 	char.flags &= ~(char.flag.ROLLING | char.flag.CONTROL_LOCK)
 	char.hitbox_extends.y = 10
 	char.hitbox_extends.x = 10
-	char.double_jump_state = 1
+	char.double_jump_state = 1		// Knuckles gliding state
 	char.velocity.y += 0x200
 	if (char.velocity.y < 0)
 		char.velocity.y = 0
