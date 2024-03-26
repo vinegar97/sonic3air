@@ -192,7 +192,7 @@ function bool updateTailsAssist()
 			{
 				u8[0xfffffaac] = 0		// Don't know what this is for...
 
-				A2 = 0xfffff73e
+				A2 = addressof(tails.carrying)		// Address: 0xfffff73e
 				A1 = 0xffffb000
 				D0.u16 = control.pad1
 				Tails.UpdateCarrySonic()
@@ -780,7 +780,7 @@ function void fn013ffa()
 	tails.control_counter = 0
 	control.tails = (level.framecounter.low & 0x1f) ? 0 : 0x0808		// Move right
 
-	A2 = 0xfffff73e
+	A2 = addressof(tails.carrying)		// Address: 0xfffff73e
 	A1 = 0xffffb000
 	if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 	{
@@ -862,7 +862,7 @@ function void fn014106()
 		tails.ai_routine = 0x18
 	}
 
-	A2 = 0xfffff73e
+	A2 = addressof(tails.carrying)		// Address: 0xfffff73e
 	A1 = 0xffffb000
 	D0.u16 = control.pad1
 	Tails.UpdateCarrySonic()

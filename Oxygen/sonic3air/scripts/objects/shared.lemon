@@ -175,7 +175,7 @@ function void AddAsDynamicObject()
 	if (global.dynamic_objects.size < 0x7e)
 	{
 		global.dynamic_objects.size += 2
-		u16[0xffffe380 + global.dynamic_objects.size] = A0.u16
+		u16[addressof(global.dynamic_objects.size) + global.dynamic_objects.size] = A0.u16
 	}
 }
 

@@ -96,7 +96,7 @@ function void CompetitionMode.TailsTails.Init()
 	objA0.box_size.y = 0x18
 	objA0.render_flags = render_flag.WORLD
 
-	objA0.update_address = 0x016232
+	objA0.update_address = addressof(CompetitionMode.TailsTails.Update)
 	CompetitionMode.TailsTails.Update()
 }
 

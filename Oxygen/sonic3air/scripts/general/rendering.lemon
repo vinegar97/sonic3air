@@ -654,7 +654,7 @@ function void RenderSprites_CompetitionMode()
 	D7 = 0x4d
 	D6 = 0
 	A5 = 0xffffac00
-	A3 = 0xffffee80
+	A3 = addressof(camera.foreground.x)		// Address: 0xffffee80
 	A6 = (u16[0xffffef3c] != 0) ? 0xffff7890 : 0xfffff810
 
 	if (global.level_started != 0)
@@ -690,7 +690,7 @@ function void RenderSprites_CompetitionMode()
 	// Lower screen
 	D7 = 0x4f
 	A5 = 0xffffac00
-	A3 = 0xffffee68
+	A3 = addressof(camera.foreground.x.player2)		// Address: 0xffffee68
 	A6 = (u16[0xffffef3c] != 0) ? 0xffff7d80 : 0xffff7b00
 
 	while (A5 < 0xffffb000)

@@ -740,7 +740,7 @@ function void Character.UpdateTailsUprightInAir()
 		// Two player game?
 		if (getNumPlayers() >= 2)
 		{
-			A2 = 0xfffff73e
+			A2 = addressof(tails.carrying)		// Address: 0xfffff73e
 			A1 = 0xffffb000
 			D0.u16 = control.pad1
 			Tails.UpdateCarrySonic()

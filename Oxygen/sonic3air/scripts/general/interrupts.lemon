@@ -442,7 +442,7 @@ function void UpdateControllers()
 	}
 	#else
 	{
-		A0 = 0xfffff604		// Address of "control.pad1"
+		A0 = addressof(control.pad1)		// Address: 0xfffff604
 		A1 = 0xa10003		// Hardware address for physical controller port 1
 
 		for (u8 i = 0; i < 2; ++i)

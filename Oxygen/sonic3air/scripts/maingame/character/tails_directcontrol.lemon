@@ -211,7 +211,7 @@ function void fn01414c()
 		control.tails.state = D0.u8
 	}
 
-	A2 = 0xfffff73e
+	A2 = addressof(tails.carrying)		// Address: 0xfffff73e
 	A1 = 0xffffb000
 	D0.u16 = control.pad1
 	Tails.UpdateCarrySonic()
@@ -334,7 +334,7 @@ function void fn0142e2()
 		}
 	}
 
-	A2 = 0xfffff73e
+	A2 = addressof(tails.carrying)		// Address: 0xfffff73e
 	A1 = 0xffffb000
 	D0.u16 = control.pad1
 	Tails.UpdateCarrySonic()

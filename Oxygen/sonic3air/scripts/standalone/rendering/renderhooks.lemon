@@ -607,7 +607,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		}
 
 		// Tails' tails
-		if (objA0.update_address == 0x0160d2)
+		if (objA0.update_address == addressof(TailsTails.Update))
 		{
 			Standalone.drawCharacterSprite(CHARACTER_TAILS, 2, px, py, false)
 			return true
