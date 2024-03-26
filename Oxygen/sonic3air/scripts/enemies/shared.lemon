@@ -1406,29 +1406,31 @@ function void Object.AnimationProgress.SlowDown(u32 address)
 function void fn0847e6()
 {
 	// Hovering motion, used for Robotnik's capsule, flying animal prison, the Tornado plane, some minibosses, etc.
-	s16 step = s16[A0 + 0x40]
-	s16 limit = objA0.value3e
+	s16 step = s16[A0 + 0x40]	// Acceleration
+	s16 limit = objA0.value3e	// Maximum acceleration before "swinging"
 	D3 = 0
 
 	if ((objA0.flags38 & 0x01) == 0)
 	{
-		objA0.velocity.y -= step
+		objA0.velocity.y -= step			// Apply upward acceleration
 		if (objA0.velocity.y > -limit)
 		{
 			D1.u16 = objA0.velocity.y
 			return
 		}
 
+		// Reached max swing up speed
 		objA0.flags38 |= 0x01
 		D3 = 1
 	}
 
 	if (objA0.velocity.y + step < limit)
 	{
-		objA0.velocity.y += step
+		objA0.velocity.y += step			// Apply downward acceleration
 	}
 	else
 	{
+		// Reached max swing down speed
 		objA0.flags38 &= ~0x01
 		D3 = 1
 	}
@@ -1441,19 +1443,20 @@ function void fn0847e6()
 //# address-hook(0x08482a) end(0x08486c)
 function void fn08482a()
 {
-	s16 step = s16[A0 + 0x3c]
-	s16 limit = s16[A0 + 0x3a]
+	s16 step = s16[A0 + 0x3c]		// Acceleration
+	s16 limit = s16[A0 + 0x3a]		// Maximum acceleration before "swaying"
 	D3 = 0
 
 	if ((objA0.flags38 & 0x08) == 0)
 	{
-		objA0.velocity.x -= step
+		objA0.velocity.x -= step			// Apply left acceleration
 		if (objA0.velocity.x > -limit)
 		{
 			D1.u16 = objA0.velocity.x
 			return
 		}
 
+		// Reached max sway left speed
 		objA0.flags38 |= 0x08
 		D3 = 1
 	}
@@ -1464,6 +1467,7 @@ function void fn08482a()
 	}
 	else
 	{
+		// Reached max sway right speed
 		objA0.flags38 &= ~0x08
 		D3 = 1
 	}

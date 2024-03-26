@@ -1083,9 +1083,9 @@ function void fn05ffa6()
 //# address-hook(0x06001e) end(0x060036)
 function void fn06001e()
 {
-	objA0.value3e = 0x80
+	objA0.value3e = 0x80		// Limit
 	objA0.velocity.y = 0x80
-	u16[A0 + 0x40] = 0x08
+	u16[A0 + 0x40] = 0x08		// Step
 	objA0.flags38 &= ~0x01
 }
 

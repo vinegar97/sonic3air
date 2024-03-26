@@ -119,9 +119,9 @@ function void fn0752e6()
 function void fn075302()
 {
 	D0.u16 = 0x80
-	objA0.value3e = D0.u16
+	objA0.value3e = D0.u16		// Limit
 	objA0.velocity.y = D0.u16
-	u16[A0 + 0x40] = 0x10
+	u16[A0 + 0x40] = 0x10		// Step
 	objA0.flags38 &= ~0x01
 }
 
@@ -986,11 +986,11 @@ function void fn075c06()
 		D4.s16 = -D4.s16
 	}
 	objA0.velocity.x = D3.u16
-	u16[A0 + 0x40] = D4.u16
+	u16[A0 + 0x40] = D4.u16		// Step
 
 	D0 = (D0 << 16) + (D0 >> 16)
 	D0.u16 = (D0.u16 & 0x0f) + 8
-	objA0.value3e = D0.u16
+	objA0.value3e = D0.u16		// Limit
 }
 
 

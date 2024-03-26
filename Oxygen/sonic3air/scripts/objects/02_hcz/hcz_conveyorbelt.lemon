@@ -37,10 +37,10 @@ function void fn031164()
 	{
 		D0.u16 -= 8
 	}
-	u16[A0 + 0x40] = D0.u16
+	u16[A0 + 0x40] = D0.u16		// Step
 
 	D0.u16 = u16[(A1+=2)-2]
-	objA0.value3e = D0.u16
+	objA0.value3e = D0.u16		// Limit
 	if (objA0.flags2a & 0x01)
 	{
 		D0.u16 += 8

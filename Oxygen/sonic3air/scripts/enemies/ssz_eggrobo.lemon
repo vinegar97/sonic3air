@@ -383,9 +383,9 @@ function void fn0918c4()
 function void fn0918e2()
 {
 	D0.u16 = 0x0100
-	objA0.value3e = D0.u16
+	objA0.value3e = D0.u16		// Limit
 	objA0.velocity.y = D0.u16
-	u16[A0 + 0x40] = 0x08
+	u16[A0 + 0x40] = 0x08		// Step
 	objA0.flags38 &= ~0x01
 }
 

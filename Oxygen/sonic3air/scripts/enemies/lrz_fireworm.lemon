@@ -147,9 +147,10 @@ function void fn08f82e()
 function void fn08f842()
 {
 	objA0.value39 = 0x08
-	objA0.value3e = 0x80
+
+	objA0.value3e = 0x80		// Limit
 	objA0.velocity.y = 0x80
-	u16[A0 + 0x40] = 0x08
+	u16[A0 + 0x40] = 0x08		// Step
 	objA0.flags38 &= ~0x01
 }
 

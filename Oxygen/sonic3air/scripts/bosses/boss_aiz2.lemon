@@ -244,9 +244,9 @@ function void fn06933a()
 	objA0.countdown_callback = 0x06937e
 
 	D0.u16 = 0xc0
-	objA0.value3e = D0.u16
+	objA0.value3e = D0.u16		// Limit
 	objA0.velocity.y = D0.u16
-	u16[A0 + 0x40] = 0x10
+	u16[A0 + 0x40] = 0x10		// Step
 	objA0.flags38 &= ~0x01
 }
 

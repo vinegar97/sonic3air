@@ -46,9 +46,9 @@ function void fn091a0c()
 	spawnChildObject(0x091ad2, 0x00, 0, 20)
 
 	D0 = 0x40
-	objA0.value3e = D0.u16
+	objA0.value3e = D0.u16		// Limit
 	objA0.velocity.y = D0.u16
-	u16[A0 + 0x40] = 0x04
+	u16[A0 + 0x40] = 0x04		// Step
 	objA0.flags38 &= ~0x01
 }
 

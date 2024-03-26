@@ -43,10 +43,11 @@ function void fn088370()
 
 	objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x80 : -0x80
 	u32[A0 + 0x30] = 0x08844d
+
 	D0.u16 = 0x0100
-	objA0.value3e = D0.u16
+	objA0.value3e = D0.u16		// Limit
 	objA0.velocity.y = D0.u16
-	u16[A0 + 0x40] = 0x02
+	u16[A0 + 0x40] = 0x02		// Step
 	objA0.flags38 &= ~0x01
 }
 
