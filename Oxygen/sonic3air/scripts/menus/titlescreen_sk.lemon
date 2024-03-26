@@ -271,25 +271,29 @@ function void TitleScreen_SK()
 	// Start rolling demo
 	playSound(MUSIC_CTRL_FADEOUT)
 
-#if !STANDALONE
 	global.demo_number = max(global.demo_number, 3)		// This limits the demos to only the ones in Sonic & Knuckles zones
-#endif
 
 	u16[0xffffef7a] = global.demo_number
+#if STANDALONE
+	u16[0xffffef7a] %= 0x07
+
+	D0.u16 = (global.demo_number % 0x07) * 2
+#else
 	D0.u16 = (global.demo_number & 0x07) * 2
+#endif
 	D0.u16 = u16[0x004344 + D0.u16]
 	global.zone_act = D0.u16
 	global.zone_act.apparent = D0.u16
 	checkpoint.zone_act = D0.u16
 
 	++global.demo_number
+#if STANDALONE
+	if (global.demo_number >= 11)	// Later values will loop back to Sonic 3 demos
+#else
 	if (global.demo_number >= 7)	// We've got 7 demos in total
+#endif
 	{
-	#if STANDALONE
-		global.demo_number = 0		// Play all demos
-	#else
 		global.demo_number = 3		// Skip first 3 demos
-	#endif
 	}
 
 	if (D0.s16 < 0)
