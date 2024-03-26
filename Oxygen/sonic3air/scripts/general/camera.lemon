@@ -71,7 +71,7 @@ function void UpdateCamera()
 			A6 = 0xffffe500
 			UpdateCameraPositionX_CompMode()
 
-			A1 = 0xffffee7c
+			A1 = addressof(camera.position.y)			// Address: 0xffffee7c
 			A2 = addressof(move_area.left)				// Address: 0xffffee14
 			A4 = 0xffffee02
 			D3.u16 = isMainCharacter(CHARACTER_TAILS) ? camera.yoffset.tails : camera.yoffset.player
@@ -89,7 +89,7 @@ function void UpdateCamera()
 			A6 = 0xffffe400
 			UpdateCameraPositionX_CompMode()
 
-			A1 = 0xffffee64
+			A1 = addressof(camera.position.y.player2)	// Address: 0xffffee64
 			A2 = addressof(move_area.left.player2)		// Address: 0xffffee1c
 			A4 = 0xffffee06
 			D3.u16 = camera.yoffset.tails
