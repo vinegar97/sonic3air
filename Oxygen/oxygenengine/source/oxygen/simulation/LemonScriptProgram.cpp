@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -240,7 +240,11 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 		// Deserialize from compiled scripts
 		if (!scriptsLoaded && !config.mForceCompileScripts)
 		{
-			if (FTX::FileSystem->readFile(L"data/scripts.bin", buffer))
+			bool loaded = FTX::FileSystem->readFile(L"data/scripts.bin", buffer);
+			if (!loaded && !config.mCompiledScriptSavePath.empty())
+				loaded = FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer);
+
+			if (loaded)
 			{
 				VectorBinarySerializer serializer(true, buffer);
 				scriptsLoaded = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);

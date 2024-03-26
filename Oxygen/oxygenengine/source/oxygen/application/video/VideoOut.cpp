@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -353,20 +353,13 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 					{
 						const renderitems::Rectangle& rectangle = static_cast<const renderitems::Rectangle&>(*renderItem);
 
-						// Translate rect
-						Vec2i screenPos = rectangle.mPosition;
-						if (rectangle.mCoordinatesSpace == SpacesManager::Space::WORLD)
-						{
-							screenPos -= worldSpaceOffset;
-						}
-
 						Color color = rectangle.mColor;
 						if (rectangle.mUseGlobalComponentTint)
 						{
 							mRenderParts->getPaletteManager().applyGlobalComponentTint(color);
 						}
 
-						Geometry& geometry = mGeometryFactory.createRectGeometry(Recti(screenPos, rectangle.mSize), color);
+						Geometry& geometry = mGeometryFactory.createRectGeometry(Recti(rectangle.mPosition, rectangle.mSize), color);
 						geometry.mRenderQueue = rectangle.mRenderQueue;
 						geometries.push_back(&geometry);
 						break;
@@ -375,13 +368,6 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 					case RenderItem::Type::TEXT:
 					{
 						const renderitems::Text& text = static_cast<const renderitems::Text&>(*renderItem);
-
-						// Translate position
-						Vec2i screenPosition = text.mPosition;
-						if (text.mCoordinatesSpace == SpacesManager::Space::WORLD)
-						{
-							screenPosition -= worldSpaceOffset;
-						}
 
 						Font* font = fontCollection.getFontByKey(text.mFontKeyHash);
 						if (nullptr == font)
@@ -397,7 +383,7 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 							{
 								cacheItem = &cache.addCacheItem(key, *font, text.mTextString);
 							}
-							const Vec2i drawPosition = Font::applyAlignment(Recti(screenPosition, Vec2i(0, 0)), cacheItem->mInnerRect, text.mAlignment);
+							const Vec2i drawPosition = Font::applyAlignment(Recti(text.mPosition, Vec2i(0, 0)), cacheItem->mInnerRect, text.mAlignment);
 							const Recti rect(drawPosition, cacheItem->mTexture.getSize());
 
 							Color tintColor = text.mColor;
@@ -474,6 +460,9 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 						}
 						break;
 					}
+
+					default:
+						break;
 				}
 			}
 		}

@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -80,8 +80,7 @@ function void fn0821fc()
 		}
 
 		A2 = u32[0x082346 + D1.u16]
-		D4 = 2
-		while (D4.s16 >= 0)
+		for (u16 k = 0; k < 3; ++k)
 		{
 			// Spawn smaller asteroids
 		#if STANDALONE
@@ -108,8 +107,6 @@ function void fn0821fc()
 			objA1.position.y.u16 = D3.u16
 			D0.u8 = (objA0.subtype2c & 0x0f) + 0x10
 			u8[A1 + 0x2c] = D0.u8
-
-			--D4.s16
 		}
 
 		A1 = 0x082376 + D1.u16

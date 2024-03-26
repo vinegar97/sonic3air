@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -146,7 +146,7 @@ function void fn06ef88()
 		// Create the object that fades out the boss theme and starts the level music afterwards
 		objA1.update_address = 0x085b0a
 	}
-	fn085ba8()
+	SetupAsSignpostSpawner()
 
 	// "spawnSimpleChildObjects(0x06fab0)" replaced by:
 	spawnSimpleChildObjects(0x06f74c, 1)			// Opened capsule

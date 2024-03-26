@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -60,11 +60,20 @@ public:
 			SOUND   = 2
 		};
 
+		enum class Visibility
+		{
+			AUTO,
+			ALWAYS_VISIBLE,
+			ALWAYS_HIDDEN,
+			DEV_MODE_ONLY
+		};
+
 		uint64 mKeyId = 0;
 		std::string mKeyString;
 		std::string mDisplayName;
 		Type mType = Type::SOUND;
 		uint8 mChannel = 0xff;
+		Visibility mSoundTestVisibility = Visibility::AUTO;
 
 		SourceRegistration* mActiveSource = nullptr;
 		std::vector<SourceRegistration> mSources;

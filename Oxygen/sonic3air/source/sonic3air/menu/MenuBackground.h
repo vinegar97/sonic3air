@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -81,7 +81,7 @@ private:
 	// Background
 	struct PreviewImage
 	{
-		DrawerTexture* mTexture = nullptr;
+		uint64 mSpriteKey = 0;
 		int mSubIndex = 0;
 		float mOffset = 0.0f;
 		float mVisibility = 0.0f;

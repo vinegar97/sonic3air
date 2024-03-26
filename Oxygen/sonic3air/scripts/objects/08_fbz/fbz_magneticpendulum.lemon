@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -522,8 +522,8 @@ function void fn03d93a()
 	D1 += D5
 	D0 += D4
 	A1 = A0 + 0x18
-	D4 = 4
-	while (D4.s16 >= 0)
+
+	for (u16 k = 0; k < 5; ++k)
 	{
 		u16[A1]   = D3 >> 16
 		u16[A1+2] = D2 >> 16
@@ -531,7 +531,6 @@ function void fn03d93a()
 		D3 += D1
 		D2 += D0
 		A1 += 6
-		--D4.s16
 	}
 
 	DrawObject()

@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -480,11 +480,11 @@ function void fn081f6a()
 	fn082c86()
 	if ((global.framecounter.low & 0x02) == 0)
 	{
-		fn084920()
+		Child.DrawSprite()
 	}
 	else
 	{
-		fn08494e()
+		Child.CheckParent()
 	}
 }
 

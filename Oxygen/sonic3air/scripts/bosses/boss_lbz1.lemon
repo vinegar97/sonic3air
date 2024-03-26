@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -579,7 +579,7 @@ function void fn072562()
 			objA1.update_address = 0x085b0a
 		}
 		objA0.position.x.u16 = u16[A0 + 0x3c]
-		fn085ba8()
+		SetupAsSignpostSpawner()
 	}
 	else
 	{
@@ -667,6 +667,11 @@ function void fn08d018()
 	{
 		objA0.update_address = 0x08d02e
 		u16[0xffffeec4] = 0x55
+
+	#if STANDALONE
+		// Reload object palette when the platform disappears to fix incorrectly colored animated tiles seen before the signpost lands, #contributed by mrgrassman14
+		copyMemory(0xfffffc20, 0x0a92fc, 0x20)
+	#endif
 	}
 }
 

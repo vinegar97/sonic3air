@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -74,7 +74,7 @@ function void fn0893cc()
 	A1 = 0xffffb000
 	D0.u16 = 0x0200
 	D1 = 8
-	fn085436()
+	Enemy.ChaseObject()
 
 	UpdateMovementStraightSimple()
 }
@@ -91,7 +91,7 @@ function void fn0893e8()
 	//  - 0x089426	-> objA0.base_state = 0x04
 	call tableLookupAddress(0x0893fe, objA0.base_state)
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -136,7 +136,7 @@ function void fn08942e()
 	//  - 0x089452	-> objA0.base_state = 0x04
 	call tableLookupAddress(0x089444, objA0.base_state)
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 

@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -380,7 +380,7 @@ function void fn06a216()
 function void fn06a22a()
 {
 	u8[0xfffffaa2] = 0xff
-	fn085ba8()
+	SetupAsSignpostSpawner()
 
 	if (allocDynamicObjectStd())
 	{
@@ -964,7 +964,7 @@ function void fn06a7c4()
 	if (objA0.subtype2c != 0)
 	{
 		A1 = 0xffffb04a
-		A2 = addressof(player2.control_override)
+		A2 = addressof(player2.control_override)	// Address: 0xfffff7cb
 		if ((u8[A1 + 0x2a] & char.flag.UNDERWATER) == 0)
 		{
 			UnloadObject()
@@ -974,7 +974,7 @@ function void fn06a7c4()
 	else
 	{
 		A1 = 0xffffb000
-		A2 = addressof(player1.control_override)
+		A2 = addressof(player1.control_override)	// Address: 0xfffff7ca
 	}
 
 	u8[A2] = 0

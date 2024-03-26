@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -578,7 +578,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						{
 							postfix += " <" + std::to_string(callFrame.mSteps) + ">";
 							const float log = log10f((float)clamp((int)callFrame.mSteps, 100, 1000000));
-							color.setHSL(Vec3f(0.75f - log / 6.0f, 1.0f, 0.5f));
+							color.setFromHSL(Vec3f((0.75f - log / 6.0f) * 360.0f, 1.0f, 0.5f));
 						}
 						else
 						{

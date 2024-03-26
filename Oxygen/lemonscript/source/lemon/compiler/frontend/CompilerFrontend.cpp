@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -751,7 +751,7 @@ namespace lemon
 			CHECK_ERROR(isOperator(tokens[1], Operator::COLON), "Expected a colon operator after label", lineNumber);
 
 			LabelNode& node = NodeFactory::create<LabelNode>();
-			node.mLabel = tokens[0].as<LabelToken>().mName;
+			node.mLabel = tokens[0].as<LabelToken>().mName;		// Note that the label includes the '@' character
 			node.setLineNumber(lineNumber);
 			return &node;
 		}

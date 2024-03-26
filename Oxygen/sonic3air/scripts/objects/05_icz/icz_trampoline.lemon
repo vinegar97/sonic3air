@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -240,7 +240,7 @@ function void fn08b8c2()
 function void fn08b8f2()
 {
 	fn08b930()
-	fn084920()
+	Child.DrawSprite()
 }
 
 

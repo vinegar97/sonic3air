@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -172,7 +172,7 @@ function void fn08724e()
 		A1 = 0xffff0000 + u16[A1 + 0x46]
 		u16[A0 + 0x44] = A1.u16
 	}
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -190,7 +190,7 @@ function void fn0872cc()
 	//  - 0x087330	-> objA0.base_state = 0x0a
 	call tableLookupAddress(0x0872e2, objA0.base_state)
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -373,7 +373,7 @@ function void fn08741c()
 	//  - 0x08743e	-> objA0.base_state = 0x04
 	call tableLookupAddress(0x087432, objA0.base_state)
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -407,12 +407,19 @@ function void fn08744c()
 {
 	fn087518()
 
+#if STANDALONE
+	// Fix for the coconut palette before it's thrown, #contributed by Legobouwer
+	objA0.sprite_attributes = 0x0548
+	if (objA0.animation.sprite != 6)
+		objA0.sprite_attributes |= sprite_attribute.PALETTE.LINE1
+#endif
+
 	// Targets:
 	//  - 0x087468	-> objA0.base_state = 0x00
 	//  - 0x087472	-> objA0.base_state = 0x02
 	call tableLookupAddress(0x087462, objA0.base_state)
 
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -466,8 +473,7 @@ function void fn08756a()
 	{
 		objA0.base_state = D1.u8
 		objA0.flags38 |= 0x02
-		D0.u8 = objA0.value3a >> 1
-		objA0.value3a = D0.u8
+		objA0.value3a = objA0.value3a >> 1
 		objA0.value3b = 1
 	}
 }

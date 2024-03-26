@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -342,7 +342,7 @@ function void fn0787e0()
 	spawnChildObject(0x078a70, 0x12, -18, 12)
 	spawnChildObject(0x078a70, 0x14, 18, 12)
 
-	fn085ba8()
+	SetupAsSignpostSpawner()
 }
 
 

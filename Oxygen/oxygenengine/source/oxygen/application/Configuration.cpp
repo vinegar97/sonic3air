@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -188,9 +188,20 @@ namespace
 					const std::string key = it2.key().asString();
 					const uint64 keyHash = rmx::getMurmur2_64(key);
 
+					uint32 value = 0;
+					try
+					{
+						value = it2->asUInt();
+					}
+					catch (std::exception& e)	// Catching exception like "LargestInt out of UInt range"
+					{
+						RMX_ERROR("Failed to read '" << key << "' setting for mod '" << modName << "' with error: " << e.what(), );
+						continue;
+					}
+
 					Configuration::Mod::Setting& setting = mod.mSettings[keyHash];
 					setting.mIdentifier = key;
-					setting.mValue = (uint32)it2->asInt();
+					setting.mValue = value;
 				}
 			}
 		}
@@ -218,6 +229,16 @@ namespace
 
 
 Configuration* Configuration::mSingleInstance = nullptr;
+
+Configuration::RenderMethod Configuration::getHighestSupportedRenderMethod()
+{
+#if defined(PLATFORM_WEB) || (defined(PLATFORM_MAC) && defined(__arm64__))
+	return RenderMethod::OPENGL_SOFT;
+#else
+	// Default is OpenGL Hardware render method (as it's the highest one), but this can be lowered as needed, e.g. for individual platforms or depending on the execution environment
+	return RenderMethod::OPENGL_FULL;
+#endif
+}
 
 Configuration::Configuration()
 {

@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -1264,19 +1264,6 @@ function void StopCharacterWinPose()
 		player2.control_override = 0
 	}
 #endif
-}
-
-
-//# address-hook(0x085c00) end(0x085c16)
-function void fn085c00()
-{
-	if (level.wait_for_results)
-		return
-
-	objA0.update_address = 0x085c1a
-
-	stopCharacterWinPose(0xffffb000)
-	stopCharacterWinPose(0xffffb04a)
 }
 
 

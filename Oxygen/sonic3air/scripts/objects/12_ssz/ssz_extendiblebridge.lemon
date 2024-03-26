@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -96,13 +96,11 @@ function void fn045026()
 
 	A1 = A0 + 0x18
 	D0.u16 = objA0.position.x.u16 - 0x40
-	D1 = 2
-	while (D1.s16 >= 0)
+	for (u16 k = 0; k < 3; ++k)
 	{
 		u16[A1]   = D0.u16
 		u16[A1+2] = objA0.position.y.u16
 		A1 += 6
 		D0.u16 += 0x40
-		--D1.s16
 	}
 }

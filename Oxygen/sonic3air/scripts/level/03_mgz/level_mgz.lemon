@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -415,6 +415,7 @@ function void fn05134c()
 		{
 		#if STANDALONE
 			u8[A1-1] = 0	// Need to clear one more chunk on the left for widescreen
+			u8[A1+3] = 0	// And one on the right for ultrawide
 		#endif
 			u8[A1]   = 0
 			u8[A1+1] = 0

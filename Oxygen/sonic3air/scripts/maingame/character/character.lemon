@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -25,8 +25,8 @@
 //# address-hook(0x010a94) end(0x010ae8)
 function void Character.BaseUpdate.Sonic()
 {
-	A4 = addressof(global.move.speedcap)	// Base address of speed caps & acceleration/deceleration
-	A5 = addressof(camera.yoffset.player)
+	A4 = addressof(global.move.speedcap)	// Address: 0xfffff760 = Base address of speed caps & acceleration/deceleration
+	A5 = addressof(camera.yoffset.player)	// Address: 0xffffee2c
 	A6 = 0xffffcc54							// Base address of dust cloud object
 
 	// Check for debug mode
@@ -52,8 +52,8 @@ function void Character.BaseUpdate.Sonic()
 //# address-hook(0x01365c) end(0x0136b8)
 function void Character.BaseUpdate.Tails()
 {
-	A4 = addressof(global.move.speedcap.tails)	// Base address of speed caps & acceleration/deceleration for Tails
-	A5 = addressof(camera.yoffset.tails)
+	A4 = addressof(global.move.speedcap.tails)	// Address: 0xfffffec0 - Base address of speed caps & acceleration/deceleration for Tails
+	A5 = addressof(camera.yoffset.tails)		// Address: 0xffffee2e
 	A6 = 0xffffcc9e								// Base address of dust cloud object for Tails
 
 	// Check for debug mode
@@ -79,8 +79,8 @@ function void Character.BaseUpdate.Tails()
 //# address-hook(0x016444) end(0x016498)
 function void Character.BaseUpdate.Knuckles()
 {
-	A4 = addressof(global.move.speedcap)	// Base address of speed caps & acceleration/deceleration
-	A5 = addressof(camera.yoffset.player)
+	A4 = addressof(global.move.speedcap)	// Address: 0xfffff760 = Base address of speed caps & acceleration/deceleration
+	A5 = addressof(camera.yoffset.player)	// Address: 0xffffee2c
 	A6 = 0xffffcc54							// Base address of dust cloud object
 
 	// Check for debug mode
@@ -839,15 +839,30 @@ function void UpdateTailsFlight_innerB()
 		// Swimming
 		if (tails.flight_countdown == 0)
 		{
-			char.state = char.state.TAILS_SWIMTIRED
-		}
-		else if (tails.carrying)
-		{
-			char.state = char.state.TAILS_SWIMCARRY
+			// Tired
+		#if STANDALONE
+			// Use proper animation when both exhausted and carrying Sonic at the same time underwater, #contributed by mrgrassman14
+			if (tails.carrying)
+			{
+				char.state = char.state.TAILS_SWIMCARRY
+			}
+			else
+		#endif
+			{
+				char.state = char.state.TAILS_SWIMTIRED
+			}
 		}
 		else
 		{
-			char.state = (char.velocity.y < 0) ? char.state.TAILS_SWIMUP : char.state.TAILS_SWIMDOWN
+			// Not tired
+			if (tails.carrying)
+			{
+				char.state = char.state.TAILS_SWIMCARRY
+			}
+			else
+			{
+				char.state = (char.velocity.y < 0) ? char.state.TAILS_SWIMUP : char.state.TAILS_SWIMDOWN
+			}
 		}
 	}
 	else
@@ -5028,8 +5043,8 @@ function void Character.CheckCollisionsWithDynamicObjects_partial()
 		debugDrawRect(D2.u16, D3.u16, D4.u16, D5.u16, 0x8000ff00)
 #endif
 
-	u16 numObjects = global.dynamic_objects.size	// Actually it's twice the number of dynamic objects
-	A4 = addressof(global.dynamic_objects.size) + 2
+	u16 numObjects = global.dynamic_objects.size		// Actually it's twice the number of dynamic objects
+	A4 = addressof(global.dynamic_objects.size) + 2		// Resulting address: 0xffffe382
 	while (numObjects != 0)
 	{
 		// Get address of dynamic object
@@ -5655,8 +5670,8 @@ function void UpdateShieldDeflecting()
 		debugDrawRect(D2.u16, D3.u16, D4.u16, D5.u16, 0x8000ffff)
 #endif
 
-	u16 numObjects = global.dynamic_objects.size	// Actually it's twice the number of dynamic objects
-	A4 = addressof(global.dynamic_objects.size) + 2
+	u16 numObjects = global.dynamic_objects.size		// Actually it's twice the number of dynamic objects
+	A4 = addressof(global.dynamic_objects.size) + 2		// Resulting address: 0xffffe382
 	while (numObjects != 0)
 	{
 		// Get address of dynamic object
@@ -5873,7 +5888,7 @@ function void Character.clearEnemiesOnScreen(u16 minY)
 
 	// Go through all the badniks to destroy
 	D6.u16 = global.dynamic_objects.size
-	A4 = addressof(global.dynamic_objects.size) + 2
+	A4 = addressof(global.dynamic_objects.size) + 2		// Resulting address: 0xffffe382
 	while (D6.u16 != 0)
 	{
 		// Get address of dynamic object

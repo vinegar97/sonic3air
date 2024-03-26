@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -339,7 +339,7 @@ function void fn0713d2()
 //# address-hook(0x0713e8) end(0x07141a)
 function void fn0713e8()
 {
-	fn085ba8()
+	SetupAsSignpostSpawner()
 
 	A1 = 0xffff0000 + u16[0xfffffaae]
 	if (objA1.update_address == 0x08b660)

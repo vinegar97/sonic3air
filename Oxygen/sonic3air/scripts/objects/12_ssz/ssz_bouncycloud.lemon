@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -164,8 +164,7 @@ function void fn045170()
 
 			if (allocDynamicObjectAfterA0())
 			{
-				D2 = 3
-				while (D2.s16 >= 0)
+				for (u16 k = 0; k < 4; ++k)
 				{
 					objA1.update_address = 0x0452da
 					u16[A1 + 0x2e] = A0.u16
@@ -180,8 +179,6 @@ function void fn045170()
 
 					if (!allocDynamicObjectAfterA1())
 						break
-
-					--D2.s16
 				}
 			}
 		}

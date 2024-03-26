@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -375,11 +375,6 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 							setGameSpeed(FTX::keyState(SDLK_LCTRL) ? 0.01f : 0.05f);
 							break;
 
-						case SDLK_KP_PERIOD:
-							// Supporting both Shift and Ctrl, as the Shift + Peroid combination does not seem to work for all keyboards
-							mSimulation.setNextSingleStep(true, FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL));
-							break;
-
 						case SDLK_F7:
 						{
 							mSimulation.reloadLastState();
@@ -388,6 +383,7 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 						}
 
 						case SDLK_F11:
+						case SDLK_BACKQUOTE:	// Alternative, especially for Macs, where F11 has other functions already
 						{
 							HighResolutionTimer timer;
 							timer.start();
@@ -421,14 +417,10 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 					case SDLK_KP_PERIOD:
 					{
 						// Supporting both Shift and Ctrl, as the Shift + Peroid combination does not seem to work for all keyboards
-						mSimulation.setNextSingleStep(true, FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL));
-						break;
-					}
-
-					case SDLK_KP_9:
-					{
-						setGameSpeed(0.0f);
-						mSimulation.jumpToFrame(mSimulation.getFrameNumber() - 1);
+						const bool continueToDebugEvent = FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL);
+						mSimulation.setNextSingleStep(true, continueToDebugEvent);
+						if (!continueToDebugEvent)
+							setLogDisplay(String(0, "Single step | Frame: %d", mSimulation.getFrameNumber() + 1));
 						break;
 					}
 				}
@@ -487,6 +479,39 @@ void GameView::update(float timeElapsed)
 			mStillImage.mBlurringTimeout = 0.0f;
 			mStillImage.mMode = StillImageMode::STILL_IMAGE;
 		}
+	}
+
+	if (EngineMain::getDelegate().useDeveloperFeatures() && FTX::keyState(SDLK_KP_9) && mSimulation.getFrameNumber() > 0)
+	{
+		int rewindSteps = 0;
+		if (mRewindCounter == 0)
+		{
+			// Rewind in the first frame the key was just pressed
+			rewindSteps = 1;
+		}
+		else
+		{
+			mRewindTimer += (SDL_GetModState() & KMOD_SHIFT) ? (timeElapsed * 3.0f) : timeElapsed;
+			const float speed = (mRewindCounter == 1) ? 5 : (float)std::min(10 + mRewindCounter / 3, 120);
+			const float delay = 1.0f / speed;
+			if (mRewindTimer >= delay)
+			{
+				rewindSteps = (int)std::floor(mRewindTimer / delay);
+				mRewindTimer -= delay * (float)rewindSteps;
+			}
+		}
+
+		if (rewindSteps > 0)
+		{
+			setLogDisplay(String(0, "  Rewinding | Frame: %d", mSimulation.getFrameNumber() - rewindSteps));
+			mSimulation.setRewind(rewindSteps);
+			++mRewindCounter;
+		}
+	}
+	else
+	{
+		mRewindTimer = 0.0f;
+		mRewindCounter = 0;
 	}
 
 	// Debug output
@@ -612,8 +637,7 @@ void GameView::render()
 	// Simple mirror mode implementation: Just mirror the whole screen
 	if (Configuration::instance().mMirrorMode)
 	{
-		const Recti drawRect(gameScreenRect.x + gameScreenRect.width, gameScreenRect.y, -gameScreenRect.width, gameScreenRect.height);
-		drawer.drawRect(drawRect, videoOut.getGameScreenTexture());
+		drawer.drawRect(gameScreenRect, videoOut.getGameScreenTexture(), Vec2f(1.0f, 0.0f), Vec2f(0.0f, 1.0f), Color::WHITE);
 	}
 	else
 	{

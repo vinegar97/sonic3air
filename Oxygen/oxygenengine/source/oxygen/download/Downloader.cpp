@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -21,7 +21,7 @@
 	#pragma comment(lib, "wldap32.lib")
 	#pragma comment(lib, "crypt32.lib")
 
-#elif defined(PLATFORM_LINUX)
+#elif defined(PLATFORM_LINUX) || defined(PLATFORM_MAC)
 	#define PLATFORM_SUPPORTS_DOWNLOADER
 	#define USING_CURL
 
@@ -69,6 +69,12 @@ void Downloader::stopDownload()
 		mThread->join();
 		delete mThread;
 		mThread = nullptr;
+	}
+
+	if (mState == State::RUNNING || mState == State::FAILED)
+	{
+		// Delete the output file
+		FTX::FileSystem->removeFile(Configuration::instance().mAppDataPath + mOutputFilename);
 	}
 	mState = State::NONE;
 }

@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -367,7 +367,7 @@ function void fn083a40()
 {
 	MoveWithParent()
 	fn085a5a()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -487,7 +487,7 @@ function void fn08672a()
 		objA1.flags38 |= 0x02
 		objA0.animation.sprite = 0x0c
 	}
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -495,7 +495,7 @@ function void fn08672a()
 function void fn086754()
 {
 	fn086a3e()
-	fn084920()
+	Child.DrawSprite()
 }
 
 

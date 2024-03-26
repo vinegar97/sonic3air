@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -15,15 +15,19 @@
 //# address-hook(0x06d99c) end(0x06d9fa)
 function void fn06d99c()
 {
-	D0.u16 = 0x31e0
-	if (D0.u16 > camera.position.x.u16)
+	u16 leftScreenBorder = 0x31e0
+#if STANDALONE
+	// Properly center the area in ultrawide resolutions
+	if (getScreenWidth() > 448)
+		leftScreenBorder -= (getScreenWidth() - 448) / 2
+#endif
+	if (camera.position.x.u16 < leftScreenBorder)
 		return
 
 	screenmover_target.right = move_area.right
 	level.vertical_wrap = 0x01c0
-	move_area.left = D0.u16
-	D0.u16 += 0x80
-	move_area.right = D0.u16
+	move_area.left = leftScreenBorder
+	move_area.right = leftScreenBorder + 0x80
 	move_area.bottom.current = 0x02b8
 	move_area.bottom.target = 0x02b8
 	objA0.update_address = addressof(Object.CountdownAndTrigger)
@@ -225,7 +229,7 @@ function void fn06dbae()
 {
 	objA0.update_address = 0x085c00
 	level.boss_encounter = 0
-	fn083c06()
+	AfterBoss_Cleanup()
 
 	addPatternLoadingCue(0x085bc8)		// Signpost pole sprite
 }
@@ -581,7 +585,7 @@ function void fn06df4a()
 	MoveWithParent()
 	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 
@@ -604,7 +608,7 @@ function void fn06df94()
 	{
 		MoveWithParent()
 		Object.AnimationProgressByLocalA1.DistinctTimer()
-		fn084934()
+		Child.DrawSprite_DynObj()
 	}
 	else
 	{

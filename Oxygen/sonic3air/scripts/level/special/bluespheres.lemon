@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -1360,6 +1360,12 @@ function void fn00972e()
 				checkpoint.number |= 0x80
 			}
 			playSound(0x6a)
+
+			#if STANDALONE
+				// Correct grid position to avoid jittering of the sphere sprites during the fade-out (noticable on the red sphere just touched)
+				bluespheres.position.x = (bluespheres.position.x + 0x80) & 0xff00
+				bluespheres.position.y = (bluespheres.position.y + 0x80) & 0xff00
+			#endif
 		}
 	}
 	else if (D2.u8 == 2)
@@ -1766,6 +1772,12 @@ function void fn009b62()
 				}
 
 				playSound(0x6a)
+
+			#if STANDALONE
+				// Correct grid position to avoid jittering of the emerald sprite during the fade-out
+				bluespheres.position.x = (bluespheres.position.x + 0x80) & 0xff00
+				bluespheres.position.y = (bluespheres.position.y + 0x80) & 0xff00
+			#endif
 			}
 		}
 	}
@@ -2577,7 +2589,7 @@ function void fn02df64()
 		Kosinski.addToDMAQueue(0x1bee58, 0x0000)
 		Kosinski.addToDMAQueue(0x1c3f2c, D4.u16)
 
-		requestLoadingPatterns(0x48)		// HPZ object sprites
+		requestLoadingPatterns(0x48)	// HPZ object sprites
 
 		global.zone_act = 0x1701		// Hidden Palace emerald cave
 		camera.position.x.u16 = 0x15a0 - getScreenExtend()

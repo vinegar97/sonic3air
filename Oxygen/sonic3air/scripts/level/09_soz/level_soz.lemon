@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -126,8 +126,8 @@ function void fn055a9a()
 		fn055e96()
 		fn055d56()
 
-		A6 = addressof(camera.background.y)
-		A5 = addressof(camera.background.y.old)
+		A6 = addressof(camera.background.y)			// Address: 0xffffee90
+		A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
 		D1 = 0
 		D6 = 0x20
 		LoadTileContentInDirY()
@@ -1117,8 +1117,8 @@ function void fn0563a6()
 
 function void fn0563c0()
 {
-	A6 = addressof(camera.background.y)
-	A5 = addressof(camera.background.y.old)
+	A6 = addressof(camera.background.y)			// Address: 0xffffee90
+	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -1319,8 +1319,8 @@ function void fn0564d4()
 //# address-hook(0x0564e8)
 function void fn0564e8()
 {
-	A6 = addressof(camera.background.y)
-	A5 = addressof(camera.background.y.old)
+	A6 = addressof(camera.background.y)			// Address: 0xffffee90
+	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -1453,8 +1453,8 @@ function void fn0566a4()
 //# address-hook(0x0566a8) end(0x0566b6)
 function void fn0566a8()
 {
-	A6 = addressof(camera.background.y)
-	A5 = addressof(camera.background.y.old)
+	A6 = addressof(camera.background.y)			// Address: 0xffffee90
+	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
 	D1.u16 = 0x0200
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -1556,7 +1556,7 @@ function void fn05675c()
 
 	A1 = 0xffffa934
 	D0 = 0xffffffff
-    D1 = 0x08
+	D1 = 0x08
 	while (D1.s16 >= 0)
 	{
 		u16[A1-=2] = D0.u16

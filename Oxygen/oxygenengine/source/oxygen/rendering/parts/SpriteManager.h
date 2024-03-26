@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -20,7 +20,8 @@ public:
 
 	struct SpriteHandleData
 	{
-		uint64 mKey = 0;
+		uint32 mHandle = 0;		// Sprite handle ID
+		uint64 mKey = 0;		// Sprite key
 		Vec2i  mPosition;
 		uint16 mRenderQueue = 0;
 		bool   mFlipX = false;
@@ -94,8 +95,9 @@ private:
 	renderitems::CustomSpriteInfoBase* addSpriteByKey(uint64 key);
 	void checkSpriteTag(renderitems::SpriteInfo& sprite);
 
+	bool checkRenderItemLimit();
 	void processSpriteHandles();
-	void grabAddedSprites();
+	void grabAddedItems();
 	void collectLegacySprites();
 
 private:
@@ -111,9 +113,10 @@ private:
 
 	ItemSet mContexts[RenderItem::NUM_CONTEXTS];
 	ItemSet mAddedItems;
+	bool mLoggedLimitWarning = false;
 
 	uint32 mNextSpriteHandle = 1;
-	std::unordered_map<uint32, SpriteHandleData> mSpritesHandles;
+	std::vector<SpriteHandleData> mSpritesHandles;
 	std::pair<uint32, SpriteHandleData*> mLatestSpriteHandle;
 
 	struct TaggedSpriteData

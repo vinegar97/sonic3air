@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -20,7 +20,7 @@ UpdateCheck::UpdateCheck()
 	// Stable version
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x22091000;
+		definition.mVersionNumber = 0x24020200;
 		definition.mReleaseChannel = ReleaseChannel::STABLE;
 		definition.addPlatform(Platform::WINDOWS);
 		definition.addPlatform(Platform::MAC);
@@ -30,19 +30,10 @@ UpdateCheck::UpdateCheck()
 		definition.mUpdateURL = "https://sonic3air.org";
 	}
 
-	// Stable version (Switch)
-	{
-		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x21091200;
-		definition.mReleaseChannel = ReleaseChannel::STABLE;
-		definition.addPlatform(Platform::SWITCH);
-		definition.mUpdateURL = "https://sonic3air.org";
-	}
-
 	// Preview version
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x22082700;
+		definition.mVersionNumber = 0x23111800;
 		definition.mReleaseChannel = ReleaseChannel::PREVIEW;
 		definition.addPlatform(Platform::WINDOWS);
 		definition.addPlatform(Platform::MAC);
@@ -52,16 +43,17 @@ UpdateCheck::UpdateCheck()
 		definition.mUpdateURL = "https://sonic3air.org";
 	}
 
-	// Test version (Windows)
+/*
+	// Test build (Windows)
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x23100700;
+		definition.mVersionNumber = 0x23111201;
 		definition.mReleaseChannel = ReleaseChannel::TEST;
 		definition.addPlatform(Platform::WINDOWS);
 		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
 	}
 
-	// Test version (Android)
+	// Test build (Android)
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
 		definition.mVersionNumber = 0x23100700;
@@ -70,13 +62,23 @@ UpdateCheck::UpdateCheck()
 		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
 	}
 
-	// Test version (Mac)
+	// Test build (Mac)
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
 		definition.mVersionNumber = 0x23051401;
 		definition.mReleaseChannel = ReleaseChannel::TEST;
 		definition.addPlatform(Platform::MAC);
 		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
+	}
+*/
+
+	// Old Switch version (actually unused, as the update check was not implemented back then)
+	{
+		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
+		definition.mVersionNumber = 0x21091200;
+		definition.mReleaseChannel = ReleaseChannel::STABLE;
+		definition.addPlatform(Platform::SWITCH);
+		definition.mUpdateURL = "https://sonic3air.org";
 	}
 }
 

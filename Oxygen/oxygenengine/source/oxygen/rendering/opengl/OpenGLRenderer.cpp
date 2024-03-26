@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -125,7 +125,7 @@ void OpenGLRenderer::setGameResolution(const Vec2i& gameResolution)
 		mGameResolution = gameResolution;
 
 		mGameScreenBuffer.setSize(mGameResolution.x, mGameResolution.y);
-		mGameScreenDepth.create(GL_DEPTH_COMPONENT, mGameResolution.x, mGameResolution.y);
+		mGameScreenDepth.create(rmx::OpenGLHelper::FORMAT_DEPTH, mGameResolution.x, mGameResolution.y);
 
 		mProcessingBuffer.setSize(mGameResolution.x, mGameResolution.y);
 		mProcessingTexture.setup(mGameResolution, rmx::OpenGLHelper::FORMAT_RGB);
@@ -439,6 +439,8 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 					break;
 				}
 
+				case RenderItem::Type::RECTANGLE:
+				case RenderItem::Type::TEXT:
 				case RenderItem::Type::INVALID:
 					break;
 			}
@@ -454,6 +456,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			if (needsRefresh)
 			{
 				glDisable(GL_DEPTH_TEST);
+				mLastRenderedGeometryType = Geometry::Type::RECT;
 			}
 			OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
 
@@ -483,6 +486,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			if (needsRefresh)
 			{
 				glDisable(GL_DEPTH_TEST);
+				mLastRenderedGeometryType = Geometry::Type::TEXTURED_RECT;
 			}
 			OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
 
@@ -530,6 +534,11 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			break;
 		}
 	}
+
+#ifdef DEBUG
+	const GLenum err = glGetError();
+	RMX_ASSERT(err == GL_NO_ERROR, "OpenGL error: " << (int)err);
+#endif
 }
 
 void OpenGLRenderer::copyGameScreenToProcessingBuffer()

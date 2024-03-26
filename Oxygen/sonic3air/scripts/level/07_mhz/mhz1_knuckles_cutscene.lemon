@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -577,7 +577,7 @@ function void fn06303c()
 
 		if (u8[0xfffffaa9] == 0 || D0.u16 != 0 || D2.u16 >= 0x40 || D3.u16 >= 0x60)
 		{
-			fn084920()
+			Child.DrawSprite()
 			return
 		}
 		u8[0xfffffaa9] = 0
@@ -604,7 +604,7 @@ function void fn0630a6()
 	UpdateMovementStraightSimple()
 	fn065e4c()
 	Object.CountdownAndTrigger()
-	fn084920()
+	Child.DrawSprite()
 }
 
 

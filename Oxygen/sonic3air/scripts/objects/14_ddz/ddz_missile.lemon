@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -94,7 +94,7 @@ function void fn08209e()
 	objA0.position.y.u16 = objA1.position.y.u16
 	UpdateMovementStraightSimple()
 	Object.CountdownAndTrigger()
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -201,12 +201,12 @@ function void fn082160()
 	if ((global.framecounter.low & 0x02) == 0)
 	{
 		MoveWithParent()
-		fn084920()
+		Child.DrawSprite()
 	}
 	else
 	{
 		objA0.render_flags &= ~render_flag.VISIBLE
-		fn08494e()
+		Child.CheckParent()
 	}
 }
 

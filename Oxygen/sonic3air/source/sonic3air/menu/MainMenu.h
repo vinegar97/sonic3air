@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -38,12 +38,14 @@ private:
 		SHOW,
 		FADE_TO_TITLESCREEN,
 		FADE_TO_DATASELECT,
+		FADE_TO_ACTSELECT,
 		FADE_TO_SUBMENU,
 		FADE_TO_EXIT
 	};
 
 private:
 	void triggerStartNormalGame();
+	void triggerStartActSelect();
 	void startNormalGame();
 	void openActSelectMenu();
 	void openTimeAttack();

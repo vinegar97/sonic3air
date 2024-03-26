@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -38,8 +38,7 @@ function void fn03b2f6()
 		objA1.position.y.u16 = objA0.position.y.u16 - 0x70
 		objA1.render_flags |= render_flag.COMPOUND
 
-		D0 = 8
-		objA1.compound.count = D0.u16
+		objA1.compound.count = 8
 		D1.u16 = objA0.position.y.u16 + 0x0c
 		A2 = A1 + 0x18
 		D0.u16 = objA1.compound.count - 1

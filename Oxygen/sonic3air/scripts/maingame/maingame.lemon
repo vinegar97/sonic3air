@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -709,7 +709,7 @@ function void initializeMainGame()
 	global.level_started = 0
 	if (level.water_present && global.zone == 0x01)
 	{
-		u32[0xffffcf82] = 0x01f202
+		u32[0xffffcf82] = 0x01f202								// HCZ waves effect
 		u32[0xffffb172] = addressof(RunOnWaterHandler.Init)		// HCZ run-on-water handler
 		u8[0xffffb172 + 0x2c] = 1
 	}

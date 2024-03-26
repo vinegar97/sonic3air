@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,6 +10,7 @@
 
 #include "sonic3air/menu/helper/GameMenuControlsDisplay.h"
 #include "sonic3air/menu/helper/GameMenuScrolling.h"
+#include "sonic3air/menu/options/OptionsConfig.h"
 
 
 class GameMenuEntry
@@ -71,6 +72,7 @@ public:
 
 	Option& addOptionRef(const std::string& text, uint32 value = 0);
 	GameMenuEntry& addOption(const std::string& text, uint32 value = 0);
+	GameMenuEntry& addOptions(const OptionsConfig::Setting& setting);
 	GameMenuEntry& addNumberOptions(int minValue, int maxValue, int step);
 	GameMenuEntry& addPercentageOptions(int minValue, int maxValue, int step);
 	Option* getOptionByValue(uint32 value);
@@ -164,11 +166,11 @@ public:
 	inline GameMenuEntry& selected()  { return *mEntries[mSelectedEntryIndex]; }
 
 	bool setSelectedIndexByValue(uint32 value);
-	void changeSelectedIndex(int change);
+	bool changeSelectedIndex(int change, bool loop = true);
 	bool sanitizeSelectedIndex(bool allowNonInteractableEntries = false);
 
-	size_t getPreviousInteractableIndex(size_t index) const;
-	size_t getNextInteractableIndex(size_t index) const;
+	size_t getPreviousInteractableIndex(size_t index, bool loop = true) const;
+	size_t getNextInteractableIndex(size_t index, bool loop = true) const;
 
 private:
 	std::vector<GameMenuEntry*> mEntries;

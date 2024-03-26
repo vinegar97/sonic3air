@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -375,9 +375,6 @@ void SoundtrackDownloadMenuEntry::renderEntry(RenderContext& renderContext_)
 
 			case RemasteredMusicDownload::State::DOWNLOAD_RUNNING:
 				text = "Downloading... " + std::to_string(download.getBytesDownloaded() / (1024*1024)) + " MB";
-			#if defined(PLATFORM_ANDROID)
-				text += "  (Wi-fi required)";
-			#endif
 				mText = "Stop download";
 				break;
 

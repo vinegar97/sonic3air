@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -175,7 +175,7 @@ function void fn051ca6()
 function void fn051caa()
 {
 #if STANDALONE
-	if (camera.position.x.u16 >= 0x3000 - getScreenExtend() && (camera.position.y.u16 < 0x280 || camera.position.y.u16 >= 0x880))
+	if (camera.position.x.u16 >= 0x2f80 && (camera.position.y.u16 < 0x280 || camera.position.y.u16 >= 0x880))
 	{
 		// Lock screen here so nobody can get to see the ugly parts to the left
 		move_area.left = 0x2f80
@@ -209,8 +209,8 @@ function void fn051caa()
 	{
 		UpdateBackground.CNZ1()
 
-		A6 = addressof(camera.background.y)
-		A5 = addressof(camera.background.y.old)
+		A6 = addressof(camera.background.y)			// Address: 0xffffee90
+		A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
 		D1 = 0
 		D6 = 0x20
 		LoadTileContentInDirY()
@@ -247,8 +247,8 @@ function void fn051d2e()
 	fn0520e8()
 	fn051fb0()
 
-	A6 = addressof(camera.background.x)
-	A5 = addressof(camera.background.x.old)
+	A6 = addressof(camera.background.x)			// Address: 0xffffee8c
+	A5 = addressof(camera.background.x.old)		// Address: 0xffffee94
 	D1.u16 = 0x0200
 	D6 = 0x10
 	LoadTileContentInDirX()
@@ -767,7 +767,7 @@ function void fn05227c()
 	// Limit movement to where the boss area ends, to prevent Knuckles from gliding over the boss
 	if (global.zone_act == 0x0301 && move_area.right == 0x6000 && camera.position.x.u16 >= 0x4500 && camera.position.y.u16 < 0x320)
 	{
-		move_area.right = 0x47e0
+		move_area.right = max(0x4620 + getScreenWidth(), 0x47e0)
 		level.vertical_wrap = 0x0200
 	}
 #endif
@@ -777,8 +777,8 @@ function void fn05227c()
 //# address-hook(0x052280) end(0x05229c)
 function void fn052280()
 {
-	A6 = addressof(camera.background.y)
-	A5 = addressof(camera.background.y.old)
+	A6 = addressof(camera.background.y)			// Address: 0xffffee90
+	A5 = addressof(camera.background.y.old)		// Address: 0xffffee96
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()

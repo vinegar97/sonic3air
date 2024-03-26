@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -577,6 +577,12 @@ function void fn0757a0()
 }
 
 
+//# address-hook(0x0757ba) end(0x0757ba)
+function void fn0757ba()
+{
+	SetupAsSignpostSpawner()
+}
+
 
 //# address-hook(0x0757c0) end(0x0757d0)
 function void fn0757c0()
@@ -610,7 +616,7 @@ function void fn0757d6()
 				}
 			}
 
-			fn084934()
+			Child.DrawSprite_DynObj()
 			return
 		}
 	}
@@ -626,7 +632,7 @@ function void fn0757d6()
 function void fn07583a()
 {
 	call tableLookupAddress(0x07584e, objA0.base_state)
-	fn084934()
+	Child.DrawSprite_DynObj()
 }
 
 
@@ -771,7 +777,7 @@ function void fn0759d0()
 	if ((D0 & 0x01) == 0)
 	{
 		MoveWithParent()
-		fn084934()
+		Child.DrawSprite_DynObj()
 	}
 	else if (u8[A1 + 0x2a] & 0x80)
 	{

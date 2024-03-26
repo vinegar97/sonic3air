@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -163,7 +163,7 @@ function void fn023a3c()
 }
 
 
-//# address-hook(0x023a42) end(0x023326)
+//# address-hook(0x023a42) end(0x023a54)
 function void fn023a42()
 {
 	fn023ab8()

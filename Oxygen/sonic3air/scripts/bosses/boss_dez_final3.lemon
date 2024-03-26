@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -159,7 +159,11 @@ function void fn08029c()
 function void fn0802b2()
 {
 	objA0.update_address = 0x0802c0
+
 #if STANDALONE
+	// Reset speed to the default one, to handle the case that the boss got defeated right while leaping forward
+	char.velocity.x = 0x278
+
 	if (!DEZFinalBoss3.shouldEscapeWithMasterEmerald())
 #endif
 	{

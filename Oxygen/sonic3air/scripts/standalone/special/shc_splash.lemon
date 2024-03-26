@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -59,10 +59,6 @@ function void SHCSplash.showSplashScreen()
 {
 	s16 opacity = 0
 	u16 controllerPressed = 0
-
-	// More or less a hack to show the splash screen images in a less stretched way without having to rescale the actual image data:
-	// Just increase the game screen size to something larger
-	Renderer.setScreenSize(512, 288)
 
 	// Wait briefly in a black screen
 	SHCSplash.setPalette(0)
@@ -180,7 +176,4 @@ function void SHCSplash.showSplashScreen()
 
 		yieldExecution()
 	}
-
-	// Back to normal
-	Renderer.setScreenSize(400, 224)
 }

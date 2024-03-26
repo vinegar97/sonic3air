@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -25,6 +25,7 @@ function void ApplyROMManipulations()
 	ROMManipulation.ALZ.MusicFix()
 	ROMManipulation.DPZ.LoopBugFix()
 	ROMManipulation.RollingDemoFix()
+	ROMManipulation.S3A.MusicFix()
 }
 
 
@@ -74,14 +75,31 @@ function void ROMManipulation.RepairSpriteMappings()
 	// Fix missing mapping piece in one of the LRZ turbine sprites
 	u16[0x0447b0] = 0x0a		// Increase mapping count to include missing piece
 	 u8[0x0447ea] = 0x48		// Fix palette on missing piece
+
+	// Fix for offset in Sonic's first ending pose sprite (after credits roll), #contributed by mrgrassman14
+	u16[0x0607f2] = 0xdc0f
+	u16[0x0607f6] = 0xfff0
+	u16[0x0607f8] = 0xe401
+	u16[0x0607fc] = 0x0010
+	u16[0x0607fe] = 0xe402
+	u16[0x060802] = 0xffe8
+	u16[0x060804] = 0xfc0e
+	u16[0x060808] = 0xffe8
+	u16[0x06080a] = 0xfc01
+	u16[0x06080e] = 0x0008
+	u16[0x060810] = 0x1405
+	u16[0x060814] = 0xfff0
 }
 
 
 function void ROMManipulation.RepairAnimations()
 {
-	// Apply changes to Super Sonic's idle animation to use the third frame
-	u8[0x012c45] = 0x5c			// Shift the pointer back a bit to an otherwise empty area
-	u32[0x012c96] = 0x07bcbbba	// Add additional frames
+	// Apply changes to Super Sonic's idle and balancing animations to make the hair flow as it did in Sonic 2, #contributed by Veenee (idle animation) and mrgrassman14 (balancing animation)
+	u8[0x012c45] = 0x5a			// Shift the idle animation pointer back a bit to an otherwise empty area
+	u8[0x012c47] = 0x60			// Shift the balance animation pointer back to our newly created space
+	u32[0x012c94] = 0x07babbbc	// Add additional frames (idle speed + first three idle frames)
+	u32[0x012c98] = 0xbbff07a1  // Add additional frames (4th idle frame + balance speed + first balance frame)
+	u32[0x012c9c] = 0xa2a3a2ff  // Add additional frames (last 3 balance frames)
 
 	// Fix for Tails' rolling animation playing backwards
 	u32[0x015b18] = 0x01989796
@@ -206,7 +224,10 @@ function void ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(u16 d
 
 function void ROMManipulation.HCZ.SetBottomHeight()
 {
-	u16[0x01bce4] = 0x0c00 - getScreenHeight()
+	if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
+		u16[0x01bce4] = 0x0c00 - getScreenHeight()
+	else
+		u16[0x01bce4] = 0x1000
 }
 
 function void ROMManipulation.CNZ2.KnucklesPreBossCutscene()
@@ -251,4 +272,29 @@ function void ROMManipulation.DPZ.LoopBugFix()
 function void ROMManipulation.RollingDemoFix()
 {
 	u8[0x15fd6c] = 0x9d
+}
+
+function void ROMManipulation.S3A.MusicFix.ReplaceInstruments(u32 startAddress, u32 numBytes)
+{
+	// Replace every instance of B2 and B3 in that track with C5 and C6
+	A0 = startAddress
+	for (u32 offset = 0; offset < numBytes; ++offset)
+	{
+		if (u8[A0 + offset] == 0xb2)
+			u8[A0 + offset] = 0xc5
+		else if (u8[A0 + offset] == 0xb3)
+			u8[A0 + offset] = 0xc6
+	}
+}
+
+function void ROMManipulation.S3A.MusicFix()
+{
+	// Fix for emulated Sonic 3 versions of mini-boss music and Knuckles theme, which are otherwise using a wrong instrument, fix #contributed by Legobouwer
+
+	// Adds 2 entries to the DAC pointer list
+	u32[0x2f0088] = 0x5f816481
+
+	// Replaces every instance of B2 and B3 in the S3A mini-boss and Knuckles themes with C5 and C6
+	ROMManipulation.S3A.MusicFix.ReplaceInstruments(0x2c71a0 + 0x704, 0x122)
+	ROMManipulation.S3A.MusicFix.ReplaceInstruments(0x2d97fd + 0x149, 0x64)
 }

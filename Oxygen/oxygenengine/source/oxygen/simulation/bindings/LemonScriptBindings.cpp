@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -221,17 +221,6 @@ namespace
 		}
 	}
 
-	uint32 SRAM_load(uint32 address, uint16 offset, uint16 bytes)
-	{
-		return (uint32)getEmulatorInterface().loadSRAM(address, (size_t)offset, (size_t)bytes);
-	}
-
-	void SRAM_save(uint32 address, uint16 offset, uint16 bytes)
-	{
-		getEmulatorInterface().saveSRAM(address, (size_t)offset, (size_t)bytes);
-	}
-
-
 	bool System_callFunctionByName(lemon::StringRef functionName)
 	{
 		if (!functionName.isValid())
@@ -423,11 +412,11 @@ namespace
 				std::stringstream str;
 				if (param.mType->getBytes() == 4)
 				{
-					str << std::setprecision(std::numeric_limits<float>::digits10) << param.mValue.get<float>() << "f";
+					str << param.mValue.get<float>();
 				}
 				else
 				{
-					str << std::setprecision(std::numeric_limits<double>::digits10) << param.mValue.get<double>();
+					str << param.mValue.get<double>();
 				}
 				debugLogInternal(str.str());
 				break;
@@ -930,18 +919,6 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		module.addNativeFunction("System.savePersistentData", lemon::wrap(&System_savePersistentData), defaultFlags)
 			.setParameterInfo(0, "sourceAddress")
 			.setParameterInfo(1, "key")
-			.setParameterInfo(2, "bytes");
-
-
-		// SRAM
-		module.addNativeFunction("SRAM.load", lemon::wrap(&SRAM_load), defaultFlags)
-			.setParameterInfo(0, "address")
-			.setParameterInfo(1, "offset")
-			.setParameterInfo(2, "bytes");
-
-		module.addNativeFunction("SRAM.save", lemon::wrap(&SRAM_save), defaultFlags)
-			.setParameterInfo(0, "address")
-			.setParameterInfo(1, "offset")
 			.setParameterInfo(2, "bytes");
 
 

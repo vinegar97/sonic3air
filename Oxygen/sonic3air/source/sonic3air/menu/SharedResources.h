@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -41,13 +41,11 @@ namespace global
 	extern DrawerTexture mDataSelectBackground;
 	extern DrawerTexture mDataSelectAltBackground;
 	extern DrawerTexture mLevelSelectBackground;
-	extern DrawerTexture mPreviewBorder;
 	extern DrawerTexture mOptionsTopBar;
-	extern DrawerTexture mCharSelectionBox;
 	extern DrawerTexture mAchievementsFrame;
 	extern DrawerTexture mTimeAttackResultsBG;
 
-	extern std::map<ZoneActPreviewKey, DrawerTexture> mZoneActPreview;
+	extern std::map<ZoneActPreviewKey, uint64> mZoneActPreviewSpriteKeys;
 	extern std::map<uint32, DrawerTexture> mAchievementImage;
 	extern std::map<uint32, DrawerTexture> mSecretImage;
 

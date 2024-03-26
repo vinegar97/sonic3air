@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -151,15 +151,6 @@ function void uncompressKosinskiData(u32 sourceAddress, u16 targetInVRAM)
 
 function void Kosinski.addToDMAQueue(u32 sourceAddress, u16 targetInVRAM)
 {
-//#if STANDALONE
-//	// Just for testing
-//	if (sourceAddress == 0x36ad8a)
-//	{
-//		uncompressKosinskiData(sourceAddress, targetInVRAM)
-//		return
-//	}
-//#endif
-
 	A1 = sourceAddress
 	D2.u16 = targetInVRAM
 	Kosinski.AddToDMAQueue()

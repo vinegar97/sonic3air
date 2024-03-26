@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -21,7 +21,8 @@ namespace
 	//  - 2 and lower: See serialization code for changes
 	//  - 3: Using shared memory access flags
 	//  - 4: Added more rendering data (scroll offsets, sprites, etc.)
-	static const constexpr uint8 STANDALONE_SAVESTATE_FORMATVERSION = 4;
+	//  - 5: Added data for ROM based sprites
+	static const constexpr uint8 OXYGEN_SAVESTATE_FORMATVERSION = 5;
 }
 
 
@@ -65,7 +66,7 @@ bool SaveStateSerializer::saveState(std::vector<uint8>& output)
 {
 	// Save state
 	VectorBinarySerializer serializer(false, output);
-	StateType stateType = StateType::STANDALONE;	// This is actually ignored
+	StateType stateType = StateType::OXYGEN;	// This is actually ignored
 	return serializeState(serializer, stateType);
 }
 
@@ -94,13 +95,13 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 			stateType = StateType::GENSX;
 			readGensxState(serializer);
 		}
-		else if (memcmp(signature, "AIR Standalone", 15) == 0)
+		else if (memcmp(signature, "AIR Standalone", 15) == 0)	// Deprecated since end of 2019
 		{
-			stateType = StateType::STANDALONE;
+			stateType = StateType::OXYGEN;
 		}
 		else if (memcmp(signature, "Oxygen_State__", 15) == 0)
 		{
-			stateType = StateType::STANDALONE;
+			stateType = StateType::OXYGEN;
 		}
 		else
 		{
@@ -109,15 +110,15 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 	}
 	else
 	{
-		stateType = StateType::STANDALONE;
+		stateType = StateType::OXYGEN;
 
 		memcpy(signature, "Oxygen_State__", 15);
-		signature[15] = STANDALONE_SAVESTATE_FORMATVERSION;
+		signature[15] = OXYGEN_SAVESTATE_FORMATVERSION;
 
 		serializer.serialize(signature, 16);
 	}
 
-	if (stateType == StateType::STANDALONE)
+	if (stateType == StateType::OXYGEN)
 	{
 		const uint8 formatVersion = signature[15];
 

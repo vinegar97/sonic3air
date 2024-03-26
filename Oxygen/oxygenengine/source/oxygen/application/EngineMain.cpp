@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -424,7 +424,6 @@ void EngineMain::initDirectories()
 	}
 
 	config.mSaveStatesDirLocal = config.mAppDataPath + L"savestates/";
-	config.mSRamFilename = config.mAppDataPath + L"sram.bin";
 	config.mPersistentDataFilename = config.mAppDataPath + L"persistentdata.bin";
 }
 
@@ -435,11 +434,18 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 	config.initialization();
 
 	RMX_LOG_INFO("Loading configuration");
+	if (FTX::FileSystem->exists(config.mAppDataPath + L"config.json"))
+	{
+		config.loadConfiguration(config.mAppDataPath + L"config.json");
+	}
+	else
+	{
 #if (defined(PLATFORM_MAC) || defined(PLATFORM_IOS)) && defined(ENDUSER)
-	config.loadConfiguration(config.mGameDataPath + L"/config.json");
+		config.loadConfiguration(config.mGameDataPath + L"/config.json");
 #else
-	config.loadConfiguration(L"config.json");
+		config.loadConfiguration(L"config.json");
 #endif
+	}
 
 	// Setup a custom game profile (like S3AIR does) or load the "oxygenproject.json"
 	const bool hasCustomGameProfile = mDelegate.setupCustomGameProfile();
@@ -478,6 +484,10 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 	{
 		config.mRenderMethod = Configuration::RenderMethod::OPENGL_FULL;
 	}
+
+	// Respect the platform's settings for supported render methods
+	if (config.mRenderMethod > Configuration::getHighestSupportedRenderMethod())
+		config.mRenderMethod = Configuration::getHighestSupportedRenderMethod();
 
 #if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
 	// Use fullscreen, with no borders please

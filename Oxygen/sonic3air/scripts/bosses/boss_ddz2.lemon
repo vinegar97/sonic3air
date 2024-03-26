@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -444,7 +444,7 @@ function void fn082588()
 {
 	objA0.update_address = 0x08259a
 	setupObjectAttributesBasic(0x08323e)
-	fn084920()
+	Child.DrawSprite()
 }
 
 
@@ -460,7 +460,7 @@ function void fn08259a()
 	Object.AnimationProgress.DistinctTimer(0x0832c3)
 
 	MoveWithParent()
-	fn084920()
+	Child.DrawSprite()
 }
 
 

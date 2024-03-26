@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -85,17 +85,17 @@ namespace opengldrawer
 
 		const char* titleString = (type == GL_DEBUG_TYPE_ERROR) ? "OpenGL Error" : "OpenGL Message";
 		const char* severityString = (severity == GL_DEBUG_SEVERITY_HIGH)		  ? "High" :
-										(severity == GL_DEBUG_SEVERITY_MEDIUM)		  ? "Medium" :
-										(severity == GL_DEBUG_SEVERITY_LOW)		  ? "Low" :
-										(severity == GL_DEBUG_SEVERITY_NOTIFICATION) ? "Notification" : "<unknown>";
+									 (severity == GL_DEBUG_SEVERITY_MEDIUM)		  ? "Medium" :
+									 (severity == GL_DEBUG_SEVERITY_LOW)		  ? "Low" :
+									 (severity == GL_DEBUG_SEVERITY_NOTIFICATION) ? "Notification" : "<unknown>";
 		const char* typeString = (type == GL_DEBUG_TYPE_ERROR)				 ? "Error" :
-									(type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR) ? "Deprecated Behavior" :
-									(type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)	 ? "Undefined Behavior" :
-									(type == GL_DEBUG_TYPE_PORTABILITY)		 ? "Portability" :
-									(type == GL_DEBUG_TYPE_PERFORMANCE)		 ? "Performance" :
-									(type == GL_DEBUG_TYPE_MARKER)				 ? "Marker" :
-									(type == GL_DEBUG_TYPE_PUSH_GROUP)			 ? "Push Group" :
-									(type == GL_DEBUG_TYPE_POP_GROUP)			 ? "Pop Group" : "<other>";
+								 (type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR) ? "Deprecated Behavior" :
+								 (type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)	 ? "Undefined Behavior" :
+								 (type == GL_DEBUG_TYPE_PORTABILITY)		 ? "Portability" :
+								 (type == GL_DEBUG_TYPE_PERFORMANCE)		 ? "Performance" :
+								 (type == GL_DEBUG_TYPE_MARKER)				 ? "Marker" :
+								 (type == GL_DEBUG_TYPE_PUSH_GROUP)			 ? "Push Group" :
+								 (type == GL_DEBUG_TYPE_POP_GROUP)			 ? "Pop Group" : "<other>";
 
 		RMX_ERROR(titleString << " (severity = " << severityString << ", type = " << typeString << "):\n" << message, );
 	}
@@ -324,12 +324,35 @@ namespace opengldrawer
 			OpenGLFontOutput& fontOutput = getOpenGLFontOutput(font);
 			const Vec2f pos = font.alignText(rect, text, printOptions.mAlignment);
 
-			static std::vector<Font::TypeInfo> typeinfos;
-			typeinfos.clear();
-			font.getTypeInfos(typeinfos, pos, text, printOptions.mSpacing);
+			static std::vector<Font::TypeInfo> typeInfos;
+			typeInfos.clear();
+			font.getTypeInfos(typeInfos, pos, text, printOptions.mSpacing);
+			if (typeInfos.empty())
+				return;
+
+			// Simple culling by checking the bounding box before rendering
+			// TODO: This is not particularly precise, as it's not considering the real impact of effects (outlines, shadows, etc.) - instead, we're using a fixed tolerance value
+			{
+				const constexpr int TOLERANCE = 10;
+				Vec2f boundingBoxMin(1e10f, 1e10f);
+				Vec2f boundingBoxMax(-1e10f, -1e10f);
+				for (const Font::TypeInfo& typeInfo : typeInfos)
+				{
+					if (nullptr != typeInfo.mBitmap)
+					{
+						boundingBoxMin.x = std::min(boundingBoxMin.x, typeInfo.mPosition.x);
+						boundingBoxMin.y = std::min(boundingBoxMin.y, typeInfo.mPosition.y);
+						boundingBoxMax.x = std::max(boundingBoxMax.x, typeInfo.mPosition.x + typeInfo.mBitmap->getWidth());
+						boundingBoxMax.y = std::max(boundingBoxMax.y, typeInfo.mPosition.y + typeInfo.mBitmap->getHeight());
+					}
+				}
+				if (boundingBoxMin.x >= mCurrentViewport.x + mCurrentViewport.width + TOLERANCE || boundingBoxMax.x <= mCurrentViewport.x - TOLERANCE ||
+					boundingBoxMin.y >= mCurrentViewport.y + mCurrentViewport.height + TOLERANCE || boundingBoxMax.y <= mCurrentViewport.y - TOLERANCE)
+					return;
+			}
 
 			static OpenGLFontOutput::VertexGroups vertexGroups;
-			fontOutput.buildVertexGroups(vertexGroups, typeinfos);
+			fontOutput.buildVertexGroups(vertexGroups, typeInfos);
 
 			Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(true, true);
 			shader.bind();

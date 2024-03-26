@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -270,7 +270,7 @@ void ActSelectMenu::render()
 
 	// Show character selection
 	{
-		drawer.drawRect(Recti(anchorX - 162, 115, 80, 88), global::mCharSelectionBox, Color(1.0f, 1.0f, 1.0f, alpha));
+		drawer.drawSprite(Vec2i(anchorX - 122, 159), rmx::getMurmur2_64("charselectionbox"), Color(1.0f, 1.0f, 1.0f, alpha));
 
 		static const uint64 charSpriteKey[5] =
 		{

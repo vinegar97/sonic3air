@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -357,7 +357,7 @@ function void fn061254()
 	u8 shield = (1 << D0.u8)
 
 	u8[A1 + 0x2b] |= shield
-	A2 = addressof(global.shields_backup_1)
+	A2 = addressof(global.shields_backup_1)		// Address: 0xfffffe47
 	u8[A2] &= ~char.bonus.ELEMENTAL_SHIELDS
 	u8[A2] |= shield
 }

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -41,6 +41,29 @@ namespace
 	uint16 getScreenExtend()
 	{
 		return (uint16)(VideoOut::instance().getScreenWidth() - 320) / 2;
+	}
+
+
+	uint32 Color_fromHSVA(float hue, float saturation, float value, float alpha)
+	{
+		Color color;
+		color.setFromHSV(Vec3f(hue, saturation, value));
+		color.a = alpha;
+		return color.getRGBA32();
+	}
+
+	uint32 Color_fromHSV(float hue, float saturation, float value)
+	{
+		return Color_fromHSVA(hue, saturation, value, 1.0f);
+	}
+
+	float Color_HSV_getHue(uint32 color)		{ return Color::fromRGBA32(color).getHSV().x; }
+	float Color_HSV_getSaturation(uint32 color)	{ return Color::fromRGBA32(color).getHSV().y; }
+	float Color_HSV_getValue(uint32 color)		{ return Color::fromRGBA32(color).getHSV().z; }
+
+	uint32 Color_lerp(uint32 a, uint32 b, float factor)
+	{
+		return Color::interpolateColor(Color::fromRGBA32(a), Color::fromRGBA32(b), factor).getRGBA32();
 	}
 
 
@@ -390,27 +413,52 @@ namespace
 
 	uint64 Renderer_setupCustomUncompressedSprite(uint32 sourceBase, uint16 words, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, words / 0x10, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::NONE);
+		SpriteCache::ROMSpriteData romSpriteData;
+		romSpriteData.mPatternsBaseAddress = sourceBase;
+		romSpriteData.mTableAddress = words / 0x10;
+		romSpriteData.mMappingOffset = mappingOffset;
+		romSpriteData.mAnimationSprite = animationSprite;
+		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::NONE;
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
 	}
 
 	uint64 Renderer_setupCustomCharacterSprite(uint32 sourceBase, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, tableAddress, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::CHARACTER);
+		SpriteCache::ROMSpriteData romSpriteData;
+		romSpriteData.mPatternsBaseAddress = sourceBase;
+		romSpriteData.mTableAddress = tableAddress;
+		romSpriteData.mMappingOffset = mappingOffset;
+		romSpriteData.mAnimationSprite = animationSprite;
+		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::CHARACTER;
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
 	}
 
 	uint64 Renderer_setupCustomObjectSprite(uint32 sourceBase, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, tableAddress, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::OBJECT);
-	}
-
-	uint64 Renderer_setupKosinskiCompressedSprite1(uint32 sourceAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
-	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceAddress, 0, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::KOSINSKI);
+		SpriteCache::ROMSpriteData romSpriteData;
+		romSpriteData.mPatternsBaseAddress = sourceBase;
+		romSpriteData.mTableAddress = tableAddress;
+		romSpriteData.mMappingOffset = mappingOffset;
+		romSpriteData.mAnimationSprite = animationSprite;
+		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::OBJECT;
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
 	}
 
 	uint64 Renderer_setupKosinskiCompressedSprite2(uint32 sourceAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, int16 indexOffset)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceAddress, 0, mappingOffset, animationSprite, atex, SpriteCache::ROMSpriteEncoding::KOSINSKI, indexOffset);
+		SpriteCache::ROMSpriteData romSpriteData;
+		romSpriteData.mPatternsBaseAddress = sourceAddress;
+		romSpriteData.mTableAddress = 0;
+		romSpriteData.mMappingOffset = mappingOffset;
+		romSpriteData.mAnimationSprite = animationSprite;
+		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::KOSINSKI;
+		romSpriteData.mIndexOffset = indexOffset;
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
+	}
+
+	uint64 Renderer_setupKosinskiCompressedSprite1(uint32 sourceAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
+	{
+		return Renderer_setupKosinskiCompressedSprite2(sourceAddress, mappingOffset, animationSprite, atex, 0);
 	}
 
 	void Renderer_drawSprite1(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue)
@@ -606,27 +654,27 @@ namespace
 		}
 	}
 
+	void SpriteHandle_setRotationRadians(SpriteHandleWrapper spriteHandle, float radians)
+	{
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mRotation = radians;
+			spriteHandleData->mTransformation.setIdentity();
+		}
+	}
+
 	void SpriteHandle_setRotation(SpriteHandleWrapper spriteHandle, float degrees)
 	{
-		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
-		if (nullptr != spriteHandleData)
-		{
-			spriteHandleData->mRotation = degrees * PI_FLOAT / 180.f;
-			spriteHandleData->mTransformation.setIdentity();
-		}
+		SpriteHandle_setRotationRadians(spriteHandle, degrees * (PI_FLOAT / 180.f));
 	}
 
-	void SpriteHandle_setScale1(SpriteHandleWrapper spriteHandle, float scale)
+	void SpriteHandle_setRotation_u8(SpriteHandleWrapper spriteHandle, uint8 angle)
 	{
-		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
-		if (nullptr != spriteHandleData)
-		{
-			spriteHandleData->mScale = Vec2f(scale);
-			spriteHandleData->mTransformation.setIdentity();
-		}
+		SpriteHandle_setRotationRadians(spriteHandle, (float)angle * (360.0f / 256.0f));
 	}
 
-	void SpriteHandle_setScale2(SpriteHandleWrapper spriteHandle, float scaleX, float scaleY)
+	void SpriteHandle_setScaleXY(SpriteHandleWrapper spriteHandle, float scaleX, float scaleY)
 	{
 		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
 		if (nullptr != spriteHandleData)
@@ -636,12 +684,27 @@ namespace
 		}
 	}
 
+	void SpriteHandle_setScaleUniform(SpriteHandleWrapper spriteHandle, float scale)
+	{
+		SpriteHandle_setScaleXY(spriteHandle, scale, scale);
+	}
+
+	void SpriteHandle_setScaleXY_s32(SpriteHandleWrapper spriteHandle, int32 scaleX, int32 scaleY)
+	{
+		SpriteHandle_setScaleXY(spriteHandle, (float)scaleX / 65536.0f, (float)scaleY / 65536.0f);
+	}
+
+	void SpriteHandle_setScaleUniform_s32(SpriteHandleWrapper spriteHandle, int32 scale)
+	{
+		SpriteHandle_setScaleUniform(spriteHandle, (float)scale / 65536.0f);
+	}
+
 	void SpriteHandle_setRotationScale1(SpriteHandleWrapper spriteHandle, float degrees, float scale)
 	{
 		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
 		if (nullptr != spriteHandleData)
 		{
-			spriteHandleData->mRotation = degrees * PI_FLOAT / 180.0f;
+			spriteHandleData->mRotation = degrees * (PI_FLOAT / 180.0f);
 			spriteHandleData->mScale = Vec2f(scale);
 			spriteHandleData->mTransformation.setIdentity();
 		}
@@ -652,7 +715,7 @@ namespace
 		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
 		if (nullptr != spriteHandleData)
 		{
-			spriteHandleData->mRotation = degrees * PI_FLOAT / 180.0f;
+			spriteHandleData->mRotation = degrees * (PI_FLOAT / 180.0f);
 			spriteHandleData->mScale = Vec2f(scaleX, scaleY);
 			spriteHandleData->mTransformation.setIdentity();
 		}
@@ -716,13 +779,28 @@ namespace
 		}
 	}
 
-	void SpriteHandle_setTintColor(SpriteHandleWrapper spriteHandle, float red, float green, float blue, float alpha)
+	void SpriteHandle_setTintColorInternal(SpriteHandleWrapper spriteHandle, const Color& color)
 	{
 		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
 		if (nullptr != spriteHandleData)
 		{
-			spriteHandleData->mTintColor.set(red, green, blue, alpha);
+			spriteHandleData->mTintColor = color;
 		}
+	}
+
+	void SpriteHandle_setTintColor(SpriteHandleWrapper spriteHandle, float red, float green, float blue, float alpha)
+	{
+		SpriteHandle_setTintColorInternal(spriteHandle, Color(red, green, blue, alpha));
+	}
+
+	void SpriteHandle_setTintColor_u8(SpriteHandleWrapper spriteHandle, uint8 red, uint8 green, uint8 blue, uint8 alpha)
+	{
+		SpriteHandle_setTintColorInternal(spriteHandle, Color((float)red / 255.0f, (float)green / 255.0f, (float)blue / 255.0f, (float)alpha / 255.0f));
+	}
+
+	void SpriteHandle_setTintColorRGBA(SpriteHandleWrapper spriteHandle, uint32 rgba)
+	{
+		SpriteHandle_setTintColorInternal(spriteHandle, Color::fromRGBA32(rgba));
 	}
 
 	void SpriteHandle_setOpacity(SpriteHandleWrapper spriteHandle, float opacity)
@@ -734,13 +812,28 @@ namespace
 		}
 	}
 
-	void SpriteHandle_setAddedColor(SpriteHandleWrapper spriteHandle, float red, float green, float blue)
+	void SpriteHandle_setAddedColorInternal(SpriteHandleWrapper spriteHandle, const Color& color)
 	{
 		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
 		if (nullptr != spriteHandleData)
 		{
-			spriteHandleData->mAddedColor.set(red, green, blue, 0.0f);
+			spriteHandleData->mAddedColor = color;
 		}
+	}
+
+	void SpriteHandle_setAddedColor(SpriteHandleWrapper spriteHandle, float red, float green, float blue)
+	{
+		SpriteHandle_setAddedColorInternal(spriteHandle, Color(red, green, blue, 0.0f));
+	}
+
+	void SpriteHandle_setAddedColor_u8(SpriteHandleWrapper spriteHandle, uint8 red, uint8 green, uint8 blue)
+	{
+		SpriteHandle_setAddedColorInternal(spriteHandle, Color((float)red / 255.0f, (float)green / 255.0f, (float)blue / 255.0f));
+	}
+
+	void SpriteHandle_setAddedColorRGB(SpriteHandleWrapper spriteHandle, uint32 rgb)
+	{
+		SpriteHandle_setAddedColorInternal(spriteHandle, Color::fromRGBA32(rgb << 8));	// With alpha bits = 0
 	}
 
 	void SpriteHandle_setSpriteTag(SpriteHandleWrapper spriteHandle, uint64 spriteTag, int32 px, int32 py)
@@ -786,11 +879,40 @@ void RendererBindings::registerBindings(lemon::Module& module)
 
 
 	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
+	const BitFlagSet<lemon::Function::Flag> compileTimeConstant(lemon::Function::Flag::ALLOW_INLINE_EXECUTION, lemon::Function::Flag::COMPILE_TIME_CONSTANT);
+
 
 	// Screen size query
 	module.addNativeFunction("getScreenWidth", lemon::wrap(&getScreenWidth), defaultFlags);
 	module.addNativeFunction("getScreenHeight", lemon::wrap(&getScreenHeight), defaultFlags);
 	module.addNativeFunction("getScreenExtend", lemon::wrap(&getScreenExtend), defaultFlags);
+
+
+	// Color
+	module.addNativeFunction("Color.fromHSV", lemon::wrap(&Color_fromHSV), compileTimeConstant)
+		.setParameterInfo(0, "hue")
+		.setParameterInfo(1, "saturation")
+		.setParameterInfo(2, "value");
+
+	module.addNativeFunction("Color.fromHSV", lemon::wrap(&Color_fromHSVA), compileTimeConstant)
+		.setParameterInfo(0, "hue")
+		.setParameterInfo(1, "saturation")
+		.setParameterInfo(2, "value")
+		.setParameterInfo(3, "alpha");
+
+	module.addNativeFunction("Color.HSV.getHue", lemon::wrap(&Color_HSV_getHue), compileTimeConstant)
+		.setParameterInfo(0, "color");
+
+	module.addNativeFunction("Color.HSV.getSaturation", lemon::wrap(&Color_HSV_getSaturation), compileTimeConstant)
+		.setParameterInfo(0, "color");
+
+	module.addNativeFunction("Color.HSV.getValue", lemon::wrap(&Color_HSV_getValue), compileTimeConstant)
+		.setParameterInfo(0, "color");
+
+	module.addNativeFunction("Color.lerp", lemon::wrap(&Color_lerp), compileTimeConstant)
+		.setParameterInfo(0, "colorA")
+		.setParameterInfo(1, "colorB")
+		.setParameterInfo(2, "factor");
 
 
 	// VDP emulation
@@ -1223,11 +1345,28 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		.setParameterInfo(0, "this")
 		.setParameterInfo(1, "degrees");
 
-	module.addNativeMethod("SpriteHandle", "setScale", lemon::wrap(&SpriteHandle_setScale1), defaultFlags)
+	module.addNativeMethod("SpriteHandle", "setRotationRadians", lemon::wrap(&SpriteHandle_setRotationRadians), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "radians");
+
+	module.addNativeMethod("SpriteHandle", "setRotation_u8", lemon::wrap(&SpriteHandle_setRotation_u8), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "angle");
+
+	module.addNativeMethod("SpriteHandle", "setScale", lemon::wrap(&SpriteHandle_setScaleUniform), defaultFlags)
 		.setParameterInfo(0, "this")
 		.setParameterInfo(1, "scale");
 
-	module.addNativeMethod("SpriteHandle", "setScale", lemon::wrap(&SpriteHandle_setScale2), defaultFlags)
+	module.addNativeMethod("SpriteHandle", "setScale", lemon::wrap(&SpriteHandle_setScaleXY), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "scaleX")
+		.setParameterInfo(2, "scaleY");
+
+	module.addNativeMethod("SpriteHandle", "setScale_s32", lemon::wrap(&SpriteHandle_setScaleUniform_s32), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "scale");
+
+	module.addNativeMethod("SpriteHandle", "setScale_s32", lemon::wrap(&SpriteHandle_setScaleXY_s32), defaultFlags)
 		.setParameterInfo(0, "this")
 		.setParameterInfo(1, "scaleX")
 		.setParameterInfo(2, "scaleY");
@@ -1277,6 +1416,17 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		.setParameterInfo(3, "blue")
 		.setParameterInfo(4, "alpha");
 
+	module.addNativeMethod("SpriteHandle", "setTintColor_u8", lemon::wrap(&SpriteHandle_setTintColor_u8), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "red")
+		.setParameterInfo(2, "green")
+		.setParameterInfo(3, "blue")
+		.setParameterInfo(4, "alpha");
+
+	module.addNativeMethod("SpriteHandle", "setTintColorRGBA", lemon::wrap(&SpriteHandle_setTintColorRGBA), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "rgba");
+
 	module.addNativeMethod("SpriteHandle", "setOpacity", lemon::wrap(&SpriteHandle_setOpacity), defaultFlags)
 		.setParameterInfo(0, "this")
 		.setParameterInfo(1, "opacity");
@@ -1286,6 +1436,16 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		.setParameterInfo(1, "red")
 		.setParameterInfo(2, "green")
 		.setParameterInfo(3, "blue");
+
+	module.addNativeMethod("SpriteHandle", "setAddedColor_u8", lemon::wrap(&SpriteHandle_setAddedColor_u8), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "red")
+		.setParameterInfo(2, "green")
+		.setParameterInfo(3, "blue");
+
+	module.addNativeMethod("SpriteHandle", "setAddedColorRGB", lemon::wrap(&SpriteHandle_setAddedColorRGB), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "rgb");
 
 	module.addNativeMethod("SpriteHandle", "setSpriteTag", lemon::wrap(&SpriteHandle_setSpriteTag), defaultFlags)
 		.setParameterInfo(0, "this")

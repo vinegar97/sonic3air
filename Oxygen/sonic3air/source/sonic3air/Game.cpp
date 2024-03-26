@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -341,6 +341,16 @@ void Game::startIntoDataSelect()
 	startIntoGameInternal();
 }
 
+void Game::startIntoActSelect()
+{
+	mMode = Mode::ACT_SELECT;
+
+	Simulation& simulation = Application::instance().getSimulation();
+	simulation.resetIntoGame("EntryFunctions.actSelectMenu");
+
+	startIntoGameInternal();
+}
+
 void Game::startIntoLevel(Mode mode, uint32 submode, uint16 zoneAndAct, uint8 characters)
 {
 	mMode = mode;
@@ -619,6 +629,7 @@ void Game::updateSpecialInput(float timeElapsed)
 void Game::onActiveModsChanged()
 {
 	checkActiveModsUsedFeatures();
+	mDynamicSprites.updateSpriteRedirects();
 }
 
 bool Game::shouldPauseOnFocusLoss() const
@@ -675,7 +686,7 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 					if (tile & 0x0800)	// Flip vertically
 						angle = 0x80 - angle;
 
-					baseColor.setHSL(Vec3f((float)angle / 256.0f, 1.0f, 0.5f));
+					baseColor.setFromHSL(Vec3f((float)angle / 256.0f * 360.0f, 1.0f, 0.5f));
 					baseColor.a = 0.7f;
 				}
 

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2023 by Eukaryot
+*	Copyright (C) 2017-2024 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -49,13 +49,16 @@ private:
 	void clearDependencies(ModMenuEntry& modMenuEntry);
 	void refreshDependencies(ModMenuEntry& modMenuEntry, size_t modIndex);
 
+	void refreshControlsDisplay();
 	int getInfoOverlayHeight() const;
+
 	bool applyModChanges(bool dryRun = false);
 	void goBack();
 	GameMenuEntry* getSelectedGameMenuEntry();
 
 private:
 	MenuBackground* mMenuBackground = nullptr;
+	GameMenuControlsDisplay mGameMenuControlsDisplay;
 
 	std::map<Mod*, ModResources> mModResources;
 
@@ -90,4 +93,5 @@ private:
 	float mVisibility = 0.0f;
 	float mFadeInDelay = 0.0f;
 	uint32 mApplyingChangesFrameCounter = 0;
+	bool mInMovementMode = false;
 };

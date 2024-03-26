@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2023 by Eukaryot
+	Copyright (C) 2017-2024 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -280,7 +280,8 @@ function void fn089dee()
 	D2.u16 = u16[0x089e6c + D0.u16]
 	objA0.velocity.y = D2.u16
 	objA0.value3e = D2.u16
-	objA0.sprite_attributes = u16[0x089e74 + (D0.u16 & 0x02)]
+	D0.u16 &= 0x02
+	objA0.sprite_attributes = u16[0x089e74 + D0.u16]
 
 	D2 = global.zone * 2
 	A1 = 0x02c7ba + D2.u16
