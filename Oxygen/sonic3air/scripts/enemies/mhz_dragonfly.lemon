@@ -48,9 +48,9 @@ function void fn08dd52()
 	spawnChildObjectsChain(0x08de26, 7)			// Tail
 
 	D0.u16 = 0x0200
-	objA0.value3e = D0.u16
+	objA0.value3e = D0.u16		// Limit
 	objA0.velocity.y = D0.u16
-	u16[A0 + 0x40] = 0x08
+	u16[A0 + 0x40] = 0x08		// Step
 	objA0.flags38 &= ~0x01
 
 	fn08dd90()
@@ -61,9 +61,9 @@ function void fn08dd52()
 function void fn08dd90()
 {
 	D0.u16 = 0x0200
-	u16[A0 + 0x3a] = D0.u16
+	u16[A0 + 0x3a] = D0.u16		// Limit
 	objA0.velocity.x = D0.u16
-	u16[A0 + 0x3c] = 0x20
+	u16[A0 + 0x3c] = 0x20		// Step
 	objA0.flags38 &= ~0x08
 }
 

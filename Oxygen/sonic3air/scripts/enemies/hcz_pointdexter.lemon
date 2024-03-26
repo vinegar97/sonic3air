@@ -44,9 +44,9 @@ function void fn088298()
 	D4.u16 = -0x40
 	fn085416()
 
-	objA0.value3e = 0x20
+	objA0.value3e = 0x20		// Limit
 	objA0.velocity.y = 0x20
-	u16[A0 + 0x40] = 0x01
+	u16[A0 + 0x40] = 0x01		// Step
 	objA0.flags38 &= ~0x01
 }
 

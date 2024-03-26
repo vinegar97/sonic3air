@@ -180,10 +180,11 @@ function void fn0685d8()
 //# address-hook(0x0685e2)
 function void fn0685e2()
 {
-	objA0.value3e = 0xc0
-	objA0.velocity.y = 0xc0
-	u16[A0 + 0x40] = 0x10
-	objA0.flags38 &= ~0x01
+	// hovering
+	objA0.value3e = 0xc0		// Limit
+	objA0.velocity.y = 0xc0		// 
+	u16[A0 + 0x40] = 0x10		// Step
+	objA0.flags38 &= ~0x01		// 
 }
 
 

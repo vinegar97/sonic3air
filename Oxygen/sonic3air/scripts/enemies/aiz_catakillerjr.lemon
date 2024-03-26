@@ -66,9 +66,10 @@ function void fn087702()
 {
 	objA0.base_state = 0x04
 	objA0.value39 = 3
-	objA0.value3e = 0x80
+
+	objA0.value3e = 0x80		// Limit
 	objA0.velocity.y = 0x80
-	u16[A0 + 0x40] = 8
+	u16[A0 + 0x40] = 8		// Step
 	objA0.flags38 &= ~0x01
 }
 
@@ -134,10 +135,11 @@ function void fn087728()
 	else
 	{
 		objA0.base_state = 0x06
+
 		D0.u16 = 0x100
-		objA0.value3e = D0.u16
+		objA0.value3e = D0.u16		// Limit
 		objA0.velocity.y = D0.u16
-		u16[A0 + 0x40] = 8
+		u16[A0 + 0x40] = 8			// Step
 		objA0.flags38 &= ~0x01
 	}
 }

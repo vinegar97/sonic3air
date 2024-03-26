@@ -980,10 +980,11 @@ function void fn07c328()
 function void fn07c34c()
 {
 	D0.u16 = 0x0100
-	objA0.value3e = D0.u16
+	objA0.value3e = D0.u16		// Limit
 	objA0.velocity.y = D0.u16
-	u16[A0 + 0x40] = 0x10
+	u16[A0 + 0x40] = 0x10		// Step
 	objA0.flags38 &= ~0x01
+
 	objA0.value39 = 0x03
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x07c39e
@@ -1314,9 +1315,10 @@ function void fn07c684()
 	objA0.position.y.u16 = D0.u16
 	objA0.base_state = 0x3c
 	objA0.value39 = 0x06
-	objA0.value3e = 0x100
+
+	objA0.value3e = 0x100		// Limit
 	objA0.velocity.y = -0x100
-	u16[A0 + 0x40] = 0x10
+	u16[A0 + 0x40] = 0x10		// Step
 	objA0.flags38 |= 0x01
 }
 
