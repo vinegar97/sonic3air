@@ -304,17 +304,14 @@ function void fn0803d6()
 			// Yay, Doomsday Zone!
 			TriggerNextZone(0x0c00)
 		}
+		else if (isMainCharacter(CHARACTER_KNUCKLES))
+		{
+			global.game_mode = 0
+		}
 		else
 		{
-			if (!isMainCharacter(CHARACTER_KNUCKLES))
-			{
-				// Outro for Sonic / Tails
-				TriggerNextZone(0x0d01)
-			}
-			else
-			{
-				global.game_mode = 0
-			}
+			// Outro for Sonic / Tails
+			TriggerNextZone(0x0d01)
 		}
 	}
 }

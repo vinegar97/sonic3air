@@ -1315,6 +1315,7 @@ function void fn06bbc4()
 	{
 		if (boss.remaining_hits == 0)
 		{
+			// Boss beaten
 			objA0.update_address = 0x085668
 			objA0.countdown_callback = 0x06b0b0
 			AddScoreForBossEnemy()

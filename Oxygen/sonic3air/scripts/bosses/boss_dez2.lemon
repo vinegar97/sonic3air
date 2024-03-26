@@ -83,12 +83,12 @@ function void fn07f10e()
 	objA0.countdown_callback = 0x07f15a
 
 	// "spawnSimpleChildObjects(0x07fc9a)" replaced by:
-	spawnSimpleChildObjects(0x07f336, 1)
+	spawnSimpleChildObjects(0x07f336, 1)		// Shield plate protecting the boss
 
 	if (u32[0xffffb04a] != 0)	// Is Tails here as well?
 	{
 		// "spawnSimpleChildObjects(0x07fc9a)" replaced by:
-		spawnSimpleChildObjects(0x07f336, 1)
+		spawnSimpleChildObjects(0x07f336, 1)		// Shield plate protecting the boss
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x02
