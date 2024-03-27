@@ -44,7 +44,7 @@ function void fn06101e()
 function void fn061032()
 {
 	--objA0.flags2e
-	if (s8[A0 + 0x2e] < 0)
+	if (s8(objA0.flags2e) < 0)
 	{
 		objA0.update_address = 0x0856d0
 	}

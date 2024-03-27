@@ -123,7 +123,7 @@ function void fn036d3e()
 		objA1.velocity.y = 0
 		objA1.groundspeed = 0
 		u8[A1 + 0x2a] = 0x02
-		u16[A1 + 0x32] = 0
+		objA1.value32 = 0
 
 		if (competition_mode.multiplay)
 		{
@@ -136,7 +136,7 @@ function void fn036d3e()
 			objA1.velocity.y = 0
 			objA1.groundspeed = 0
 			u8[A1 + 0x2a] = 0x02
-			u16[A1 + 0x32] = 0
+			objA1.value32 = 0
 		}
 
 		u16[0xfffffedc] = 0

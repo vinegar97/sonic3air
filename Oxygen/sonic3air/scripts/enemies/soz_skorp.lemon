@@ -444,7 +444,7 @@ function void fn08ea02()
 function void fn08ea1c()
 {
 	--objA0.value3b
-	if (s8[A0 + 0x3b] < 0)
+	if (s8(objA0.value3b) < 0)
 	{
 		objA0.value3b = 0x10
 		objA0.flags38 ^= 0x01

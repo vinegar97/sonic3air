@@ -125,7 +125,7 @@ function void fn0261f2()
 				objA1.velocity.x = u16[A0 + 0x34]
 			}
 
-			u16[A1 + 0x32] = 0x0f
+			objA1.value32 = 0x0f
 			objA1.groundspeed = objA1.velocity.x
 			objA0.flags2a &= ~object.flag.P1_PUSHING
 			objA0.flags2a &= ~object.flag.P2_PUSHING

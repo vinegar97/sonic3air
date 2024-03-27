@@ -357,7 +357,7 @@ function void fn018466()
 		}
 
 		--objA0.flags38
-		if (s8[A0 + 0x38] < 0)
+		if (s8(objA0.flags38) < 0)
 			u16[A0 + 0x3a] = 0
 	}
 }

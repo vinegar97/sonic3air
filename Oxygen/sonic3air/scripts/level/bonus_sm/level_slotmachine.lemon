@@ -767,12 +767,12 @@ function void fn04c0aa()
 			objA1.box_size.x = 0x10
 			objA1.sprite_priority = 0x0200
 			u16[A1 + 0x40] = 0x1e
-			u16[A1 + 0x32] = objA0.value32
+			objA1.value32 = objA0.value32
 			objA0.value32 += 0x90
 			u16[A1 + 0x3c] = objA0.position.x.u16
 			u16[A1 + 0x3e] = objA0.position.y.u16
 
-			D0.u16 = u16[A1 + 0x32]
+			D0.u16 = objA1.value32
 			LookupSinCos()
 			D1.s16 >>= 1
 			D1.u16 += u16[A1 + 0x3c]
@@ -811,13 +811,13 @@ function void fn04c0aa()
 		objA1.sprite_priority = 0x0180
 		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x06bc)
 		objA1.mapping_offset = 0x01a99a
-		u16[A1 + 0x32] = objA0.value32
+		objA1.value32 = objA0.value32
 		objA0.value32 += 0x89
 		u16[A1 + 0x3c] = objA0.position.x.u16
 		u16[A1 + 0x3e] = objA0.position.y.u16
 		u16[A1 + 0x40] = 0x1a
 
-		D0.u16 = u16[A1 + 0x32]
+		D0.u16 = objA1.value32
 		LookupSinCos()
 		D1.u16 = u16[A1 + 0x3c] + (D1.s16 >> 1)
 		u16[A1 + 0x34] = D1.u16

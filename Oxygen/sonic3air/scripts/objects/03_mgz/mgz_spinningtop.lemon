@@ -1035,7 +1035,7 @@ function void fn035868()
 	if (u8[A0 + 0x35] != 2)
 	{
 		--objA0.value3a
-		if (s8[A0 + 0x3a] < 0)
+		if (s8(objA0.value3a) < 0)
 		{
 			if (u8[A0 + 0x35] == 3)
 			{

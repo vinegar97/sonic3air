@@ -44,7 +44,7 @@ function void AIZ_ForegroundDeco.Init()
 function void AIZ_ForegroundDeco_shared(u8 shift)
 {
 	u32 px = u16[A0 + 0x30]
-	u32 py = u16[A0 + 0x32]
+	u32 py = objA0.value32
 	objA0.position.x.u16 = px + (s16(px - camera.position.x.u16 - 160) >> shift)
 	objA0.position.y.u16 = py + (s16(py - camera.position.y.u16 - 112) >> shift)
 
@@ -93,7 +93,7 @@ function void AIZ_ForegroundDeco4_Update()
 function void fn02c37a()
 {
 	u32 px = u16[A0 + 0x30]
-	u32 py = u16[A0 + 0x32]
+	u32 py = objA0.value32
 	objA0.position.x.u16 = px + (s16(px - camera.position.x.u16 - 160) * 2)
 	objA0.position.y.u16 = py + (s16(py - camera.position.y.u16 - 112))
 

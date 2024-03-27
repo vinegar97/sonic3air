@@ -1325,7 +1325,7 @@ function void fn06628c()
 {
 	u8[A0 + 0x3c] += u8[A0 + 0x40]
 	--objA0.value39
-	if (s8[A0 + 0x39] < 0)
+	if (s8(objA0.value39) < 0)
 	{
 		objA0.value39 = u8[A0 + 0x30]
 		s8[A0 + 0x40] = -s8[A0 + 0x40]

@@ -467,7 +467,7 @@ function void fn0367c2()
 			}
 			u16[A1 + 0x1c] = 0
 		}
-		u16[A1 + 0x32] = 0x05
+		objA1.value32 = 0x05
 		u8[A1 + 0x2b] &= 0x7f
 	}
 

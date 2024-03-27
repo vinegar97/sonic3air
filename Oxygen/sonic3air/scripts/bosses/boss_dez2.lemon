@@ -989,7 +989,7 @@ function void fn07f7f6()
 function void fn07f81e()
 {
 	--objA0.value39
-	if (s8[A0 + 0x39] < 0)
+	if (s8(objA0.value39) < 0)
 	{
 		objA0.value39 = 0x03
 		fn083e84()
@@ -1024,7 +1024,7 @@ function void fn07f81e()
 function void fn07f872()
 {
 	--objA0.value39
-	if (s8[A0 + 0x39] < 0)
+	if (s8(objA0.value39) < 0)
 	{
 		objA0.value39 = 0x03
 		fn083e84()

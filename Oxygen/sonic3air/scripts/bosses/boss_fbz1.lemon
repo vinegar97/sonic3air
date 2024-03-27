@@ -661,7 +661,7 @@ function void fn06f416()
 	A1 = 0xffff0000 + u16[A1 + 0x46]
 	u16[A0 + 0x44] = A1.u16
 	u16[A1 + 0x30] = A1.u16
-	u16[A1 + 0x32] = A0.u16
+	objA1.value32 = A0.u16
 }
 
 
@@ -682,7 +682,7 @@ function void fn06f46a()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u16[A0 + 0x30] = u16[A1 + 0x30]
-	objA0.value32 = u16[A1 + 0x32]
+	objA0.value32 = objA1.value32
 	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		objA0.render_flags |= render_flag.FLIP_X
@@ -742,7 +742,7 @@ function void fn06f504()
 function void fn06f53e()
 {
 	--objA0.value3b
-	if (s8[A0 + 0x3b] < 0)
+	if (s8(objA0.value3b) < 0)
 	{
 		objA0.base_state = 0x0a
 	}

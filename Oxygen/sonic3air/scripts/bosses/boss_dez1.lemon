@@ -148,7 +148,7 @@ function void fn07dec6()
 		D0.u16 >>= 1
 		D0.s16 = -D0.s16
 		--objA0.value39
-		if (s8[A0 + 0x39] < 0)
+		if (s8(objA0.value39) < 0)
 		{
 			fn07def6()
 		}

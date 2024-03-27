@@ -149,7 +149,7 @@ function void fn07071a()
 		objA0.flags38 &= ~0x01
 
 		--objA0.value39
-		if (s8[A0 + 0x39] < 0)
+		if (s8(objA0.value39) < 0)
 		{
 			objA0.base_state = 0x08
 			objA0.flags38 |= 0x04

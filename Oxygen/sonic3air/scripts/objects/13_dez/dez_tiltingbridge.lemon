@@ -79,7 +79,7 @@ function void fn046e4c()
 		D0.s16 = s8[0x046ed8 + offset] * 2
 	}
 
-	D1.u16 = u16[A1 + 0x32]
+	D1.u16 = objA1.value32
 	if (D1.u16 != 0)
 	{
 		s16 offset = u16[A0 + 0x38] + (D1.u16 * 8) - 9

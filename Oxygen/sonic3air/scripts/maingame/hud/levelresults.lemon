@@ -481,7 +481,7 @@ function void fn02ddc6()
 function bool fn02de04()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x48]
-	D0.u16 = u16[A1 + 0x32]
+	D0.u16 = objA1.value32
 	if (D0.u16 != 0)
 	{
 	#if STANDALONE

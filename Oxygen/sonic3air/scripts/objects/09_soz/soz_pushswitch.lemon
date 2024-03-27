@@ -225,7 +225,7 @@ function void fn041a6c()
 	else
 	{
 		--objA0.value3a
-		if (s8[A0 + 0x3a] < 0)
+		if (s8(objA0.value3a) < 0)
 		{
 			objA0.value3a = 3
 			playSound(0x90)

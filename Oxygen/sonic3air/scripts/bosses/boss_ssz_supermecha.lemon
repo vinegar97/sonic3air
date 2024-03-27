@@ -1726,7 +1726,7 @@ function void fn07d0a8()
 		fadePaletteToWhiteUniform()
 
 		--objA0.value39
-		if (s8[A0 + 0x39] < 0)
+		if (s8(objA0.value39) < 0)
 		{
 			objA0.update_address = 0x07d0e0
 			objA0.value39 = 0x02

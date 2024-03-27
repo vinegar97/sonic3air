@@ -387,7 +387,7 @@ function void fn05eadc()
 	fn085a5a()		// Match parent priority
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if ((u8[A1 + 0x38] & 0x04) == 0)
+	if ((objA1.flags38 & 0x04) == 0)
 	{
 		MoveAndFlipWithParent()
 	}

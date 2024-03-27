@@ -104,7 +104,7 @@ function void fn02d028()
 				objA1.mapping_offset = objA0.mapping_offset
 				objA1.animation.sprite = 2
 				u16[A1 + 0x30] = objA0.position.x.u16
-				u16[A1 + 0x32] = objA0.position.y.u16 - 0x14
+				objA1.value32 = objA0.position.y.u16 - 0x14
 				u16[A1 + 0x36] = 0x20
 				u16[A1 + 0x3e] = A0.u16
 
@@ -162,7 +162,7 @@ function void fn02d10a()
 		s16 dx = (s32(lookupCos(angle)) * 0xc00) >> 16
 		s16 dy = (s32(lookupSin(angle)) * 0xc00) >> 16
 		objA0.position.x.u16 = u16[A0 + 0x30] + dx
-		objA0.position.y.u16 = u16[A0 + 0x32] + dy
+		objA0.position.y.u16 = objA0.value32 + dy
 		objA0.value26 -= 0x10
 
 		DrawOrUnloadObject()
@@ -273,7 +273,7 @@ function void fn02d3c8()
 		objA1.velocity.y = 0
 		u8[A1 + 0x22] = 1
 		u16[A1 + 0x30] = objA1.position.x.u16
-		u16[A1 + 0x32] = objA1.position.y.u16
+		objA1.value32 = objA1.position.y.u16
 		u16[A1 + 0x34] = i * 0x40
 
 	#if STANDALONE

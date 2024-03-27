@@ -82,7 +82,7 @@ function void fn076ac8()
 		u16[A1 + 0x3a] = 0x03
 		u16[A1 + 0x3c] = 0x0f
 		u16[A1 + 0x30] = 0xfc20
-		u16[A1 + 0x32] = 0xfca0
+		objA1.value32 = 0xfca0
 	}
 }
 
@@ -776,7 +776,7 @@ function void fn07706c()
 function void fn0770c4()
 {
 	--objA0.flags2e
-	if (s8[A0 + 0x2e] < 0)
+	if (s8(objA0.flags2e) < 0)
 	{
 		objA0.update_address = 0x0770da
 		objA0.countdown_callback = addressof(Object.TriggerUnloading)

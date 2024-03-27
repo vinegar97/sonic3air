@@ -82,7 +82,7 @@ function void fn02c8b8()
 		objA0.mapping_offset = u32[0x02c876 + D0.s16 * 2]
 
 		A1 = 0x02c84a
-		u16[A0 + 0x32] = u16[A1 + D0.s16]			// Used in calculating horizontal velocity
+		objA0.value32 = u16[A1 + D0.s16]			// Used in calculating horizontal velocity
 		objA0.velocity.x = u16[A1 + D0.s16]
 		u16[A0 + 0x34] = u16[A1 + D0.s16 + 2]		// Used in calculating vertical velocity
 		objA0.velocity.y = u16[A1 + D0.s16 + 2]

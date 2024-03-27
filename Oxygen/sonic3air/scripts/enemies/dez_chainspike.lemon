@@ -145,7 +145,7 @@ function void fn091d20()
 function void fn091d36()
 {
 	--objA0.value39
-	if (s8[A0 + 0x39] < 0)
+	if (s8(objA0.value39) < 0)
 	{
 		objA0.base_state = objA0.value3a
 		objA0.countdown_value = u16[A0 + 0x26]

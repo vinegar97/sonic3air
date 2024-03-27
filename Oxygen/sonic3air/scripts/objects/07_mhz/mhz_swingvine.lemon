@@ -76,7 +76,7 @@ function void fn022656()
 function void fn02267e()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x40]
-	if (u16[A1 + 0x32] != 0)
+	if (objA1.value32 != 0)
 	{
 		if (s16[A1 + 0x32] < 0 || s8[A1 + 0x33] < 0)
 		{
@@ -120,7 +120,7 @@ function void fn0226b0()
 		camera.forced_target.y = objA0.position.y.u16
 	}
 
-	if (u16[A1 + 0x32] == 0)
+	if (objA1.value32 == 0)
 	{
 		D0.u8 = objA0.value26 + 8
 		if (D0.u8 < 0x10)
@@ -209,7 +209,7 @@ function void fn022748()
 	u16[A1 + 0x3a] = u16[A0 + 0x3a]
 
 	A1 = 0xffff0000 + u16[A0 + 0x40]
-	if (u16[A1 + 0x32] != 0)
+	if (objA1.value32 != 0)
 	{
 		if (s16[A1 + 0x32] < 0 || s8[A1 + 0x33] < 0)
 		{

@@ -123,7 +123,7 @@ function void fn0915f6()
 		spawnSimpleChildObjects(0x0917c0, 1)
 
 		--objA0.value39
-		if (s8[A0 + 0x39] < 0)
+		if (s8(objA0.value39) < 0)
 		{
 			objA0.update_address = 0x09164e
 
@@ -426,7 +426,7 @@ function void fn091930()
 	}
 	D0.u16 += D1.u16
 	objA0.position.x.u16 = D0.u16
-	D0.u16 = u16[A1 + 0x32]
+	D0.u16 = objA1.value32
 	if (D0.u16 == 0)
 	{
 		D0.u16 = objA1.position.y.u16

@@ -46,7 +46,7 @@ function void fn044b30()
 				u16[A1 + 0x2e] = A0.u16
 				objA1.position.x.u16 = objA0.position.x.u16 + u16[A2]
 				u16[A1 + 0x30] = u16[A2+2]
-				u16[A1 + 0x32] = u16[A2+4]
+				objA1.value32 = u16[A2+4]
 				u8[A1 + 0x22]  = u16[A2+6]
 				A2 += 8
 				++objA0.base_state
