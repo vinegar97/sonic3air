@@ -2088,7 +2088,7 @@ function void fn08648c()
 		u32[0xffffb000 + 0x0c] = 0x146816
 		super.active = -1
 	#if STANDALONE
-		super.active = (global.super_emeralds == 7) ? -1 : 1
+		super.active = (global.super_emeralds >= 7) ? -1 : 1
 	#endif
 		global.move.speedcap = 0xa00
 		global.move.acceleration = 0x30

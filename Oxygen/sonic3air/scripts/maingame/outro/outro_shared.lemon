@@ -977,7 +977,7 @@ function void fn05fe82()
 {
 	zeroMemory(0xfffffa82, 8)
 
-	outro.ending_type = (global.super_emeralds == 7) ? 2 : (global.chaos_emeralds == 7) ? 0 : -2
+	outro.ending_type = (global.super_emeralds >= 7) ? 2 : (global.chaos_emeralds >= 7) ? 0 : -2
 }
 
 

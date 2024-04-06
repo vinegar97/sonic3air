@@ -17,7 +17,7 @@ function bool DEZFinalBoss3.shouldEscapeWithMasterEmerald()
 
 function bool DEZFinalBoss3.canPlayerEnterDoomsday()
 {
-	return (isMainCharacter(CHARACTER_SONIC) && global.chaos_emeralds == 7)
+	return (isMainCharacter(CHARACTER_SONIC) && global.chaos_emeralds >= 7)
 }
 
 

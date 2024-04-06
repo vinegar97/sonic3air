@@ -2380,7 +2380,7 @@ function void fn07cff0()
 	objA0.position.y.u16 = u16[0x07d03e + objA0.subtype2c]
 
 	// Is the code at 0x07d042 ever used...?
-	objA0.update_address = (global.super_emeralds == 7) ? 0x07d042 : 0x07d050
+	objA0.update_address = (global.super_emeralds >= 7) ? 0x07d042 : 0x07d050
 }
 
 

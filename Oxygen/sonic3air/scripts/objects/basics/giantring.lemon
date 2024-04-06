@@ -56,15 +56,15 @@ function bool GiantRing.isSuperEmeraldStage()
 	if (!isSonicAndKnucklesZone())
 	{
 		// Sonic 3 zones: It's a super emerald stage after Chaos Emeralds got traded in (this can only happen after completing the game)
-		return (global.chaos_emeralds == 7 && global.traded_emeralds)
+		return (global.chaos_emeralds >= 7 && global.traded_emeralds)
 	}
 	else
 	{
 		// Sonic & Knuckles zones: All 7 Chaos Emeralds needed, then all giant rings lead to HPZ -- also see "fn0616e6()"
-		return (global.chaos_emeralds == 7)
+		return (global.chaos_emeralds >= 7)
 	}
 #else
-	return (global.lock_on_state == 0 && isSonicAndKnucklesZone() && global.chaos_emeralds == 7)
+	return (global.lock_on_state == 0 && isSonicAndKnucklesZone() && global.chaos_emeralds >= 7)
 #endif
 
 }
@@ -112,13 +112,13 @@ function void fn0616e6()
 		#endif
 
 			bool enterRing = true
-			if (global.super_emeralds == 7)
+			if (global.super_emeralds >= 7)
 			{
 				// All 14 Emeralds collected
 				//  -> Now Giant Rings always grant 50 rings and can't be entered any more
 				enterRing = false
 			}
-			else if (global.chaos_emeralds == 7)
+			else if (global.chaos_emeralds >= 7)
 			{
 				// All 7 Chaos Emeralds collected, but not all Super Emeralds yet
 				//  -> Giant Rings can only be entered in S&K half
