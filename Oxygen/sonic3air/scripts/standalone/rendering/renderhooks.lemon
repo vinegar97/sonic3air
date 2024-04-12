@@ -1128,7 +1128,7 @@ function bool Standalone.onDrawVdpSpriteCompound(s16 px, s16 py, u8 size, u16 in
 
 function u64 Standalone.renderWithStandardPacking(s16 px, s16 py, u32 patternRomAddress, u8 customAtex, u16 renderQueue)
 {
-	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
+	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes & sprite_attribute.PALETTE) >> 9)
 	u64 key = Renderer.setupCustomObjectSprite(u32[patternRomAddress], u32[patternRomAddress + 4], objA0.mapping_offset, objA0.animation.sprite, 0x00)
 	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 
@@ -1142,7 +1142,7 @@ function u64 Standalone.renderWithStandardPacking(s16 px, s16 py, u32 patternRom
 
 function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patternRomAddress, u8 customAtex, u16 renderQueue)
 {
-	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
+	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes & sprite_attribute.PALETTE) >> 9)
 	u64 key = Renderer.setupKosinskiCompressedSprite(patternRomAddress, objA0.mapping_offset, objA0.animation.sprite, 0x00)
 	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 
@@ -1159,7 +1159,7 @@ function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patter
 	// This second variant is needed if the mappings contain a base offset that needs to be removed
 	//  -> This is the case when in the original sprite attributes point to a different VRAM address than where the Kosinski data got decompressed to
 	//  -> An example is the CNZ balloons
-	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
+	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes & sprite_attribute.PALETTE) >> 9)
 	u64 key = Renderer.setupKosinskiCompressedSprite(patternRomAddress, objA0.mapping_offset, objA0.animation.sprite, 0x00, originalVramAddress / 0x20 - objA0.sprite_attributes)
 	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 

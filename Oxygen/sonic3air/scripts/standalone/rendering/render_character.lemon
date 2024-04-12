@@ -320,7 +320,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 	}
 
 	u16 renderQueue = 0xa000 - char.sprite_priority
-	u8 atex = (char.sprite_attributes >> 9) & 0x30
+	u8 atex = (char.sprite_attributes & sprite_attribute.PALETTE) >> 9
 	if (EXTENDED_CHARACTER_PALETTES)
 		atex = 0x40 + character * 0x20
 
