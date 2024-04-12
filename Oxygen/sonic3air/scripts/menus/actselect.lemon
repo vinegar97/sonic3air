@@ -169,7 +169,7 @@ function void ActSelect.Menu(u8 fadeInMethod)
 	u8 selectedEntry = 0
 	u8 selectedZone = 0			// Using the order of zones as shown to the player, not the internal zone IDs
 	u8 selectedAct = 0			// Starting at 0 for Act 1
-	levelselect.characters = 0
+	levelselect.characters = CHARS_SONIC_AND_TAILS
 
 	u8 previewImage = 0
 	float previewAnimationDelay = 0.0f
@@ -449,7 +449,7 @@ function void ActSelect.Menu(u8 fadeInMethod)
 		}
 		else if (Input.buttonPressed(BUTTON_B) || Input.buttonPressed(BUTTON_BACK))
 		{
-			result = 2
+			result = RESULT_GO_BACK
 		}
 	}
 
