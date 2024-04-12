@@ -85,50 +85,50 @@ function void fn05b36c()
 
 		// D1.u8 supposedly is the ASCII code of the character to write
 		u8 width = 0
-		if (D1.u8 == 0x20)		// Space
+		if (D1.u8 == getchar(" ", 0))		// Space
 		{
 			u16[(A2+=2)-2] = 0
 			u16[(A3+=2)-2] = 0
 			++D0.u16
 		}
-		else if (D1.u8 == 0x21)		// Exclamation mark '!'
+		else if (D1.u8 == getchar("!", 0))		// Exclamation mark
 		{
 			A4 = 0x05b64a
 			width = 1
 		}
-		else if (D1.u8 == 0x26)		// Ampersand '&'
+		else if (D1.u8 == getchar("&", 0))		// Ampersand
 		{
 			A4 = 0x05b642
 			width = 2
 		}
-		else if (D1.u8 == 0x28)		// Left bracket '('
+		else if (D1.u8 == getchar("(", 0))		// Left bracket
 		{
 			A4 = 0x05b63a
 			width = 1
 		}
-		else if (D1.u8 == 0x29)		// Right bracket ')'
+		else if (D1.u8 == getchar(")", 0))		// Right bracket
 		{
 			A4 = 0x05b63e
 			width = 1
 		}
-		else if (D1.u8 == 0x2e)		// Full stop/period '.'
+		else if (D1.u8 == getchar(".", 0))		// Full stop/period
 		{
 			A4 = 0x05b636
 			width = 1
 		}
-		else if (D1.u8 == 0x3f)		// Question mark '?'
+		else if (D1.u8 == getchar("?", 0))		// Question mark
 		{
 			A4 = 0x05b64e
 			width = 2
 		}
-		else if (D1.u8 == 0x49)		// Letter 'I' needs special handling as it is smaller
+		else if (D1.u8 == getchar("I", 0))		// Letter 'I' needs special handling as it is smaller
 		{
 			A4 = 0x05b5a6
 			width = 1
 		}
 		else						// All other letters
 		{
-			D1.u8 -= 0x41
+			D1.u8 -= getchar("A", 0)
 			A4 = 0x05b566 + D1.u16 * 8
 			width = 2
 		}
