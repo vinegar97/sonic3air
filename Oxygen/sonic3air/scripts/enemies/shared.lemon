@@ -201,7 +201,8 @@ function void fn085416()
 // Movement towards target position
 
 //# address-hook(0x085436) end(0x08548c)
-function void fn085436()
+//# alias(fn085436) deprecated
+function void Enemy.ChaseObject()
 {
 	D2.s16 = -D0.s16
 	D3.u16 = D1.u16
@@ -620,35 +621,31 @@ function void fn085ad2()
 	else
 	{
 		objA0.update_address = objA0.countdown_callback
+
+	#if STANDALONE
+		// Special handling for the snow tunnel after ICZ 2 boss, to prevent a frame where the object is not drawn
+		if (objA0.update_address == addressof(ICZSnow.Init2))
+		{
+			ICZSnow.Init2()
+			DrawObject()
+		}
+	#endif
 	}
 }
 
 
-
-//# address-hook(0x085c1a) end(0x085c26)
-function void fn085c1a()
-{
-	if (!level.results_done)
-		return
-
-	fn085da8()
-	UnloadObject()
-}
-
-
-//# address-hook(0x085da8) end(0x085de4)
+//# address-hook(0x085da8) end(0x085dd8)
 function void fn085da8()
 {
-	if (global.zone == 0x08)
+	if (global.zone == 0x08)	// Exception for SOZ, as it has its own transition to Act 2
 		return
 
 	A1 = 0x01bcce + (global.zone * 16)
-	screenmover_target.left = u16[(A1+=2)-2]
-	screenmover_target.right = u16[(A1+=2)-2]
-	screenmover_target.top = u16[(A1+=2)-2]
-	D1.u16 = u16[(A1+=2)-2]
-	screenmover_target.bottom = D1.u16
-	move_area.bottom.target = D1.u16
+	screenmover_target.left   = u16[A1]
+	screenmover_target.right  = u16[A1+2]
+	screenmover_target.top    = u16[A1+4]
+	screenmover_target.bottom = u16[A1+6]
+	move_area.bottom.target   = u16[A1+6]
 
 	// Don't call for Hydrocity, it's explicitly called there
 	if (global.zone != 0x01)
@@ -1542,7 +1539,8 @@ function void fn0848fe()
 
 
 //# address-hook(0x084920) end(0x08492e)
-function void fn084920()
+//# alias(fn084920) deprecated
+function void Child.DrawSprite()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
@@ -1557,7 +1555,8 @@ function void fn084920()
 
 
 //# address-hook(0x084934) end(0x084948)
-function void fn084934()
+//# alias(fn084934) deprecated
+function void Child.DrawSprite_DynObj()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
@@ -1573,7 +1572,8 @@ function void fn084934()
 
 
 //# address-hook(0x08494e) end(0x08495c)
-function void fn08494e()
+//# alias(fn08494e) deprecated
+function void Child.CheckParent()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
@@ -1584,7 +1584,8 @@ function void fn08494e()
 
 
 //# address-hook(0x08495e) end(0x08496c)
-function void fn08495e()
+//# alias(fn08495e) deprecated
+function void Child.CheckParent_DynObj()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
