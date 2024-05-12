@@ -1240,12 +1240,12 @@ function void fn052c0c()
 //# address-hook(0x052c2e) end(0x052c3c)
 function void fn052c2e()
 {
-	#if STANDALONE
-		// Immediately refresh the background with a blue sky, to avoid visual glitch in widescreen
-		//  -> TODO: Rather load the actual background content here
-		for (u16 address = 0xe000; address <= 0xf000; address += 2)
-			setVRAM(address, 0x6092)
-	#endif
+#if STANDALONE
+	// Immediately refresh the background with a blue sky, to avoid visual glitch in widescreen
+	//  -> TODO: Rather load the actual background content here
+	for (u16 address = 0xe000; address <= 0xf000; address += 2)
+		setVRAM(address, 0x6092)
+#endif
 
 	u8[0xffffeed6] = 0xff
 	D0 = 0x10

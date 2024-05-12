@@ -401,14 +401,14 @@ function void TitleScreen()
 	u32[0xffffb206] = 0x00496a		// "& Knuckles" logo append
 	titleintro.frames = 0
 
-	#if STANDALONE
-		global.whiteflash_timeout = 25
-		airHighlightAnimationTimer = 0
+#if STANDALONE
+	global.whiteflash_timeout = 25
+	airHighlightAnimationTimer = 0
 
-		// This is needed for the background to be shown in first frame at all (when VDP sprite rendering seems to be disabled)
-		Renderer.resetSprites()
-		Renderer.drawCustomSprite("bg_title_screen", getScreenExtend() - 40, 0, 0x00, 0, 0x1100)
-	#endif
+	// This is needed for the background to be shown in first frame at all (when VDP sprite rendering seems to be disabled)
+	Renderer.resetSprites()
+	Renderer.drawCustomSprite("bg_title_screen", getScreenExtend() - 40, 0, 0x00, 0, 0x1100)
+#endif
 
 	while (true)
 	{

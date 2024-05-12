@@ -191,11 +191,11 @@ function void fn055b70()
 {
 	// This is called during pyramid rise and boss fight
 
-	#if STANDALONE
-		// In boss area, mask out sprites below the ground (except for the sand pit)
-		Renderer.addSpriteMaskWorld(0x4220, 0x0a00, 0x230, 0x40, 0x9f00, 1)
-		Renderer.addSpriteMaskWorld(0x4200, 0x0a08,  0x20, 0x38, 0x9f00, 1)
-	#endif
+#if STANDALONE
+	// In boss area, mask out sprites below the ground (except for the sand pit)
+	Renderer.addSpriteMaskWorld(0x4220, 0x0a00, 0x230, 0x40, 0x9f00, 1)
+	Renderer.addSpriteMaskWorld(0x4200, 0x0a08,  0x20, 0x38, 0x9f00, 1)
+#endif
 
 	if (u16[0xffffeec6] == 0x55)
 	{
