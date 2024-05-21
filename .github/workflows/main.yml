@@ -103,12 +103,12 @@ jobs:
 
       - name: Build Sonic 3 A.I.R.
         run: |
-          msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+          msbuild ./Oxygen/sonic3air/build/_vstudio/sonic3air.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
 
       - name: Move artifacts
         run: |
           mkdir artifacts/Debug_x86d
-          move ./Oxygen/soncthrickles/bin/Debug_x86d/* ./artifacts/Debug_x86d
+          move ./Oxygen/sonic3air/bin/Debug_x86d/* ./artifacts/Debug_x86d
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v1.0.0
@@ -207,12 +207,12 @@ jobs:
 
       - name: Build Sonic 3 A.I.R.
         run: |
-          msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+          msbuild ./Oxygen/sonic3air/build/_vstudio/sonic3air.sln /p:Configuration=Release /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
 
       - name: Move artifacts
         run: |
           mkdir artifacts/Release_x86
-          move ./Oxygen/soncthrickles/bin/Release_x86/* ./artifacts/Release_x86
+          move ./Oxygen/sonic3air/bin/Release_x86/* ./artifacts/Release_x86
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v1.0.0
@@ -311,12 +311,12 @@ jobs:
 
       - name: Build Sonic 3 A.I.R.
         run: |
-          msbuild ./Oxygen/soncthrickles/build/_vstudio/sonic3air.sln /p:Configuration=Release-Enduser /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+          msbuild ./Oxygen/sonic3air/build/_vstudio/sonic3air.sln /p:Configuration=Release-Enduser /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
 
       - name: Move artifacts
         run: |
           mkdir artifacts/Release-Enduser_x86
-          move ./Oxygen/soncthrickles/bin/Release-Enduser_x86/* ./artifacts/Release-Enduser_x86
+          move ./Oxygen/sonic3air/bin/Release-Enduser_x86/* ./artifacts/Release-Enduser_x86
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v1.0.0
