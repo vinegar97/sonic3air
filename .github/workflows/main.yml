@@ -162,6 +162,25 @@ jobs:
           Copy-item -Path ./framework/external/zlib/lib/Debug_x86/zlib.lib -Destination ./framework/lib/x86d/zlib/
           Copy-item -Path ./framework/external/zlib/lib/Debug_x86/minizip.lib -Destination ./framework/lib/x86d/minizip/
 
+      - name: Build curl
+        run: |
+          msbuild ./framework/external/curl/curl-all.sln /target:libcurl /property:Configuration="LIB Release - DLL Windows SSPI" /property:Platform=Win32 /p:RuntimeLibrary=MT_StaticRelease -verbosity:minimal
+
+      - name: Creating output directories...
+        run: |
+          mkdir framework/include/curl
+          mkdir framework/lib/x86/curl
+          mkdir framework/lib/x86d/curl
+
+      - name: Copying includes...
+        run: |
+          Copy-item -Path ./framework/external/curl/curl/include/curl/* -Destination ./framework/include/curl/
+
+      - name: Copying LIBs...
+        run: |
+          Copy-item -Path ./framework/external/curl/curl/lib/build/Win32/VC14.30/LIB Release - DLL Windows SSPI/libcurl.lib -Destination ./framework/lib/x86/curl/
+          Copy-item -Path ./framework/external/curl/curl/lib/build/Win32/VC14.30/LIB Release - DLL Windows SSPI/libcurl.lib -Destination ./framework/lib/x86d/curl/
+
       - name: Build Sonic 3 A.I.R.
         run: |
           msbuild ./Oxygen/sonic3air/build/_vstudio/sonic3air.sln /p:Configuration=Debug /p:Platform=Win32 -verbosity:minimal
