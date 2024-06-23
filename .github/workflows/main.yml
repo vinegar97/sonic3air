@@ -164,7 +164,7 @@ jobs:
 
       - name: Build curl
         run: |
-          msbuild ./framework/external/curl/curl-all.sln /target:libcurl /property:Configuration="LIB Release - DLL Windows SSPI" /property:Platform=Win32 /p:RuntimeLibrary=MT_StaticRelease -verbosity:minimal
+          msbuild ./framework/external/curl/curl/projects/Windows/VC14.30/curl-all.sln /target:libcurl /property:Configuration="LIB Release - DLL Windows SSPI" /property:Platform=Win32 /p:RuntimeLibrary=MT_StaticRelease -verbosity:minimal
 
       - name: Creating output directories...
         run: |
