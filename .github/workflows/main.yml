@@ -158,10 +158,6 @@ jobs:
           Copy-item -Path ./framework/external/zlib/lib/Debug_x86/zlib.lib -Destination ./framework/lib/x86d/zlib/
           Copy-item -Path ./framework/external/zlib/lib/Debug_x86/minizip.lib -Destination ./framework/lib/x86d/minizip/
 
-      - name: Build librmx
-        run: |
-          msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
-
       - name: Build Sonic 3 A.I.R.
         run: |
           msbuild ./Oxygen/sonic3air/build/_vstudio/sonic3air.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
