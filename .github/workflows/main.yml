@@ -103,9 +103,9 @@ jobs:
 
       - name: Build libvorbis
         run: |
-          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /target:libvorbis_static /property:Configuration=Debug   /property:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
-          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /target:libvorbisfile    /property:Configuration=Debug   /property:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
-          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /target:vorbisdec        /property:Configuration=Debug   /property:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
+          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /target:libvorbis_static /p:Configuration=Debug   /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
+          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /target:libvorbisfile    /p:Configuration=Debug   /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
+          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /target:vorbisdec        /p:Configuration=Debug   /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
 
       - name: Creating output directories...
         run: |
@@ -123,8 +123,8 @@ jobs:
       - name: Build SDL
         continue-on-error: true
         run: |
-          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2     /property:Configuration=Debug   /property:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
-          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Debug   /property:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2     /p:Configuration=Debug   /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2main /p:Configuration=Debug   /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
 
       - name: Creating output directories...
         run: |
@@ -142,8 +142,8 @@ jobs:
 
       - name: Build zlib
         run: |
-          msbuild ./framework/external/zlib/_vstudio/zlib.sln /target:zlib    /property:Configuration=Debug   /property:Platform=x86 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
-          msbuild ./framework/external/zlib/_vstudio/zlib.sln /target:minizip /property:Configuration=Debug   /property:Platform=x86 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
+          msbuild ./framework/external/zlib/_vstudio/zlib.sln /target:zlib    /p:Configuration=Debug   /p:Platform=x86 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
+          msbuild ./framework/external/zlib/_vstudio/zlib.sln /target:minizip /p:Configuration=Debug   /p:Platform=x86 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
 
       - name: Creating output directories...
         run: |
@@ -164,7 +164,7 @@ jobs:
 
       - name: Build curl
         run: |
-          msbuild ./framework/external/curl/curl/projects/Windows/VC14.30/curl-all.sln /target:libcurl /property:Configuration="LIB Release - DLL Windows SSPI" /property:Platform=Win32 /p:RuntimeLibrary=MT_StaticRelease /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
+          msbuild ./framework/external/curl/curl/projects/Windows/VC14.30/curl-all.sln /target:libcurl /p:Configuration="LIB Release - DLL Windows SSPI" /p:Platform=Win32 /p:RuntimeLibrary=MT_StaticRelease /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props" -verbosity:minimal
 
       - name: Creating output directories...
         run: |
