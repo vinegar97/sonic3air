@@ -181,6 +181,10 @@ jobs:
           Copy-item -Path "./framework/external/curl/curl/build/Win32/VC14.30/LIB Release - DLL Windows SSPI/libcurl.lib" -Destination ./framework/lib/x86/curl/
           Copy-item -Path "./framework/external/curl/curl/build/Win32/VC14.30/LIB Release - DLL Windows SSPI/libcurl.lib" -Destination ./framework/lib/x86d/curl/
 
+      - name: Build librmx
+        run: |
+          msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Debug /p:Platform=Win32 -verbosity:minimal
+
       - name: Build Sonic 3 A.I.R.
         run: |
           msbuild ./Oxygen/sonic3air/build/_vstudio/sonic3air.sln /p:Configuration=Debug /p:Platform=Win32 -verbosity:minimal
