@@ -178,8 +178,8 @@ jobs:
 
       - name: Copying LIBs...
         run: |
-          Copy-item -Path ./framework/external/curl/curl/lib/build/Win32/VC14.30/LIB Release - DLL Windows SSPI/libcurl.lib -Destination ./framework/lib/x86/curl/
-          Copy-item -Path ./framework/external/curl/curl/lib/build/Win32/VC14.30/LIB Release - DLL Windows SSPI/libcurl.lib -Destination ./framework/lib/x86d/curl/
+          Copy-item -Path "./framework/external/curl/curl/lib/build/Win32/VC14.30/LIB Release - DLL Windows SSPI/libcurl.lib" -Destination ./framework/lib/x86/curl/
+          Copy-item -Path "./framework/external/curl/curl/lib/build/Win32/VC14.30/LIB Release - DLL Windows SSPI/libcurl.lib" -Destination ./framework/lib/x86d/curl/
 
       - name: Build Sonic 3 A.I.R.
         run: |
