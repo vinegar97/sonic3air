@@ -11,6 +11,67 @@ on:
   workflow_dispatch:
 
 jobs:
+  build-sdl2:
+    runs-on: windows-latest
+
+    env:
+      _CL_: /MT
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Build SDL2 Debug Win32
+        continue-on-error: true
+        run: |
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2 /property:Configuration=Debug /property:Platform=Win32 -verbosity:minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Debug /property:Platform=Win32 -verbosity:minimal
+
+      - name: Build SDL2 Release Win32
+        continue-on-error: true
+        run: |
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2 /property:Configuration=Release /property:Platform=Win32 -verbosity:minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Release /property:Platform=Win32 -verbosity:minimal
+
+      - name: Build SDL2 Debug x64
+        continue-on-error: true
+        run: |
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2 /property:Configuration=Debug /property:Platform=x64 -verbosity=minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Debug /property:Platform=x64 -verbosity=minimal
+
+      - name: Build SDL2 Release x64
+        continue-on-error: true
+        run: |
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2 /property:Configuration=Release /property:Platform=x64 -verbosity=minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Release /property:Platform=x64 -verbosity=minimal
+
+      - name: Create output directories
+        run: |
+          mkdir -p ./framework/include/sdl
+          mkdir -p ./framework/lib/x86/sdl
+          mkdir -p ./framework/lib/x86d/sdl
+          mkdir -p ./framework/lib/x64/sdl
+          mkdir -p ./framework/lib/x64d/sdl
+
+      - name: Copy includes
+        run: |
+          copy ./framework/external/sdl/SDL2/include/* ./framework/include/sdl
+
+      - name: Copy LIBs
+        run: |
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Debug/sdl2.lib -Destination ./framework/lib/x86d/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Release/sdl2.lib -Destination ./framework/lib/x86/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Debug/sdl2main.lib -Destination ./framework/lib/x86d/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Release/sdl2main.lib -Destination ./framework/lib/x86/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/x64/Debug/sdl2.lib -Destination ./framework/lib/x64d/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/x64/Release/sdl2.lib -Destination ./framework/lib/x64/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/x64/Debug/sdl2main.lib -Destination ./framework/lib/x64d/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/x64/Release/sdl2main.lib -Destination ./framework/lib/x64/sdl
+
+
 
   windows-air_debug_x86:
     runs-on: windows-latest
