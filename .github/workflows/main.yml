@@ -21,15 +21,6 @@ jobs:
     - name: Set up MSBuild
       uses: microsoft/setup-msbuild@v1
 
-    - name: Update msbuildPath in batch script
-      run: |
-        $vswherePath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-        $vsPath = & $vswherePath -latest -products * -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe
-        if (-not $vsPath) {
-          throw "MSBuild.exe not found"
-        }
-        (Get-Content -Path framework/external/build_externals_windows.bat) -replace 'set msbuildPath=.*', "set msbuildPath=$vsPath" | Set-Content -Path framework/external/build_externals_windows.bat
-
     - name: Build external libraries
       run: |
         cd framework/external
