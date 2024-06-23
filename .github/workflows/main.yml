@@ -50,26 +50,26 @@ jobs:
 
       - name: Create output directories
         run: |
-          mkdir -p ../../include/sdl
-          mkdir -p ../../lib/x86/sdl
-          mkdir -p ../../lib/x86d/sdl
-          mkdir -p ../../lib/x64/sdl
-          mkdir -p ../../lib/x64d/sdl
+          mkdir -p ./framework/include/sdl
+          mkdir -p ./framework/lib/x86/sdl
+          mkdir -p ./framework/lib/x86d/sdl
+          mkdir -p ./framework/lib/x64/sdl
+          mkdir -p ./framework/lib/x64d/sdl
 
       - name: Copy includes
         run: |
-          copy SDL2/include/* ../../include/sdl
+          copy ./framework/external/sdl/SDL2/include/* ./framework/include/sdl
 
       - name: Copy LIBs
         run: |
-          copy SDL2/VisualC/Win32/Debug/sdl2.lib ../../lib/x86d/sdl
-          copy SDL2/VisualC/Win32/Release/sdl2.lib ../../lib/x86/sdl
-          copy SDL2/VisualC/Win32/Debug/sdl2main.lib ../../lib/x86d/sdl
-          copy SDL2/VisualC/Win32/Release/sdl2main.lib ../../lib/x86/sdl
-          copy SDL2/VisualC/x64/Debug/sdl2.lib ../../lib/x64d/sdl
-          copy SDL2/VisualC/x64/Release/sdl2.lib ../../lib/x64/sdl
-          copy SDL2/VisualC/x64/Debug/sdl2main.lib ../../lib/x64d/sdl
-          copy SDL2/VisualC/x64/Release/sdl2main.lib ../../lib/x64/sdl
+          copy ./framework/external/sdl/SDL2/VisualC/Win32/Debug/sdl2.lib ./framework/lib/x86d/sdl
+          copy ./framework/external/sdl/SDL2/VisualC/Win32/Release/sdl2.lib ./framework/lib/x86/sdl
+          copy ./framework/external/sdl/SDL2/VisualC/Win32/Debug/sdl2main.lib ./framework/lib/x86d/sdl
+          copy ./framework/external/sdl/SDL2/VisualC/Win32/Release/sdl2main.lib ./framework/lib/x86/sdl
+          copy ./framework/external/sdl/SDL2/VisualC/x64/Debug/sdl2.lib ./framework/lib/x64d/sdl
+          copy ./framework/external/sdl/SDL2/VisualC/x64/Release/sdl2.lib ./framework/lib/x64/sdl
+          copy ./framework/external/sdl/SDL2/VisualC/x64/Debug/sdl2main.lib ./framework/lib/x64d/sdl
+          copy ./framework/external/sdl/SDL2/VisualC/x64/Release/sdl2main.lib ./framework/lib/x64/sdl
 
 
 
