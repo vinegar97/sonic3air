@@ -27,28 +27,28 @@ jobs:
       - name: Build SDL2 Debug Win32
         continue-on-error: true
         run: |
-          msbuild ./framework/externalsdl/SDL2/VisualC/SDL.sln /target:SDL2 /property:Configuration=Debug /property:Platform=Win32 -verbosity:minimal
-          msbuild ./framework/externalsdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Debug /property:Platform=Win32 -verbosity:minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2 /property:Configuration=Debug /property:Platform=Win32 -verbosity:minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Debug /property:Platform=Win32 -verbosity:minimal
 
       - name: Build SDL2 Release Win32
         continue-on-error: true
         run: |
-          msbuild ./framework/externalsdl/SDL2/VisualC/SDL.sln /target:SDL2 /property:Configuration=Release /property:Platform=Win32 -verbosity:minimal
-          msbuild ./framework/externalsdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Release /property:Platform=Win32 -verbosity:minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2 /property:Configuration=Release /property:Platform=Win32 -verbosity:minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Release /property:Platform=Win32 -verbosity:minimal
 
       - name: Build SDL2 Debug x64
         continue-on-error: true
         run: |
           pushd SDL2\VisualC
-          msbuild ./framework/externalsdl/SDL2/VisualC/SDL.sln /target:SDL2 /property:Configuration=Debug /property:Platform=x64 -verbosity=minimal
-          msbuild ./framework/externalsdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Debug /property:Platform=x64 -verbosity=minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2 /property:Configuration=Debug /property:Platform=x64 -verbosity=minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Debug /property:Platform=x64 -verbosity=minimal
 
       - name: Build SDL2 Release x64
         continue-on-error: true
         run: |
           pushd SDL2\VisualC
-          msbuild ./framework/externalsdl/SDL2/VisualC/SDL.sln /target:SDL2 /property:Configuration=Release /property:Platform=x64 -verbosity=minimal
-          msbuild ./framework/externalsdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Release /property:Platform=x64 -verbosity=minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2 /property:Configuration=Release /property:Platform=x64 -verbosity=minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Release /property:Platform=x64 -verbosity=minimal
 
       - name: Create output directories
         run: |
