@@ -85,7 +85,7 @@ jobs:
 
       - name: Build libogg
         run: |
-          msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+          msbuild ./framework/external/ogg-vorbis/libogg/win32/VS2015/libogg.sln /p:Configuration=Debug /p:Platform=Win32 -verbosity:minimal
 
       - name: Creating output directories...
         run: |
@@ -103,7 +103,9 @@ jobs:
 
       - name: Build libvorbis
         run: |
-          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /target:libvorbis_static /property:Configuration=Debug   /property:Platform=Win32 -verbosity:minimal
+          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /target:libvorbisfile    /property:Configuration=Debug   /property:Platform=Win32 -verbosity:minimal
+          msbuild ./framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbis_static.sln /target:vorbisdec        /property:Configuration=Debug   /property:Platform=Win32 -verbosity:minimal
 
       - name: Creating output directories...
         run: |
@@ -121,7 +123,8 @@ jobs:
       - name: Build SDL
         continue-on-error: true
         run: |
-          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2     /property:Configuration=Debug   /property:Platform=Win32 -verbosity:minimal
+          msbuild ./framework/external/sdl/SDL2/VisualC/SDL.sln /target:SDL2main /property:Configuration=Debug   /property:Platform=Win32 -verbosity:minimal
 
       - name: Creating output directories...
         run: |
@@ -139,7 +142,8 @@ jobs:
 
       - name: Build zlib
         run: |
-          msbuild ./framework/external/zlib/_vstudio/zlib.sln /p:Configuration=Debug /p:Platform=x86 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+          msbuild ./framework/external/zlib/_vstudio/zlib.sln /target:zlib    /property:Configuration=Debug   /property:Platform=x86 -verbosity:minimal
+          msbuild ./framework/external/zlib/_vstudio/zlib.sln /target:minizip /property:Configuration=Debug   /property:Platform=x86 -verbosity:minimal
 
       - name: Creating output directories...
         run: |
@@ -160,11 +164,11 @@ jobs:
 
       - name: Build librmx
         run: |
-          msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+          msbuild ./librmx/build/_vstudio/librmx.sln /p:Configuration=Debug /p:Platform=Win32 -verbosity:minimal
 
       - name: Build Sonic 3 A.I.R.
         run: |
-          msbuild ./Oxygen/sonic3air/build/_vstudio/sonic3air.sln /p:Configuration=Debug /p:Platform=Win32 /p:ForceImportBeforeCppTargets="$env:GITHUB_WORKSPACE/props/winactions.props"
+          msbuild ./Oxygen/sonic3air/build/_vstudio/sonic3air.sln /p:Configuration=Debug /p:Platform=Win32 -verbosity:minimal
 
       - name: Move artifacts
         run: |
