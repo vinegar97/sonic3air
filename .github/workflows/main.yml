@@ -62,14 +62,14 @@ jobs:
 
       - name: Copy LIBs
         run: |
-          copy ./framework/external/sdl/SDL2/VisualC/Win32/Debug/sdl2.lib ./framework/lib/x86d/sdl
-          copy ./framework/external/sdl/SDL2/VisualC/Win32/Release/sdl2.lib ./framework/lib/x86/sdl
-          copy ./framework/external/sdl/SDL2/VisualC/Win32/Debug/sdl2main.lib ./framework/lib/x86d/sdl
-          copy ./framework/external/sdl/SDL2/VisualC/Win32/Release/sdl2main.lib ./framework/lib/x86/sdl
-          copy ./framework/external/sdl/SDL2/VisualC/x64/Debug/sdl2.lib ./framework/lib/x64d/sdl
-          copy ./framework/external/sdl/SDL2/VisualC/x64/Release/sdl2.lib ./framework/lib/x64/sdl
-          copy ./framework/external/sdl/SDL2/VisualC/x64/Debug/sdl2main.lib ./framework/lib/x64d/sdl
-          copy ./framework/external/sdl/SDL2/VisualC/x64/Release/sdl2main.lib ./framework/lib/x64/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Debug/sdl2.lib -Destination ./framework/lib/x86d/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Release/sdl2.lib -Destination ./framework/lib/x86/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Debug/sdl2main.lib -Destination ./framework/lib/x86d/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/Win32/Release/sdl2main.lib -Destination ./framework/lib/x86/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/x64/Debug/sdl2.lib -Destination ./framework/lib/x64d/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/x64/Release/sdl2.lib -Destination ./framework/lib/x64/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/x64/Debug/sdl2main.lib -Destination ./framework/lib/x64d/sdl
+          Copy-item -Path ./framework/external/sdl/SDL2/VisualC/x64/Release/sdl2main.lib -Destination ./framework/lib/x64/sdl
 
 
 
