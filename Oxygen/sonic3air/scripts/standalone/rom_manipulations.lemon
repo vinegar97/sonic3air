@@ -89,6 +89,10 @@ function void ROMManipulation.RepairSpriteMappings()
 	u16[0x06080e] = 0x0008
 	u16[0x060810] = 0x1405
 	u16[0x060814] = 0xfff0
+
+	// Fix rockets on HCZ miniboss
+	u8[0x362a5c] = 0xf0
+	u8[0x362a67] = 0xf0
 }
 
 
