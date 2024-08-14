@@ -42,6 +42,10 @@ bin/
 *.tlog
 .vs
 
+# Winmerge comparison backup files
+*.bak
+*.tmp
+
 # SDL2 Visual Studio generated files
 /framework/external/sdl/SDL2/VisualC/x64
 /framework/external/sdl/SDL2/VisualC/Win32
@@ -59,6 +63,10 @@ bin/
 /framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbisdec/x64
 /framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbisenc/Win32
 /framework/external/ogg-vorbis/libvorbis/win32/VS2010/vorbisenc/x64
+/framework/external/ogg-vorbis/libogg/build
+
+# CURL Visual Studio generated files
+/framework/external/curl/curl/build
 
 # build includes
 /framework/include/
@@ -103,6 +111,15 @@ bin/
 /Oxygen/sonic3air/build/_xcode/data/font
 /Oxygen/sonic3air/build/_xcode/data/*.bin
 /Oxygen/sonic3air/build/_xcode/data/metadata.json
+/Oxygen/sonic3air/build/_xcode/build/XCBuildData
+/Oxygen/sonic3air/build/_xcode/build/sonic3air.build
+/framework/external/ogg-vorbis/libogg/xcode/libogg.xcodeproj/project.xcworkspace/xcuserdata
+/framework/external/ogg-vorbis/libogg/xcode/libogg.xcodeproj/xcuserdata
+/framework/external/ogg-vorbis/libvorbis/xcode/vorbis.xcodeproj/project.xcworkspace/xcuserdata
+/framework/external/ogg-vorbis/libvorbis/xcode/vorbis.xcodeproj/xcuserdata
+/framework/external/ogg-vorbis/libvorbis/xcode/build
+/framework/external/sdl/SDL2/Xcode/SDL/SDL.xcodeproj/xcuserdata
+/framework/external/sdl/SDL2/Xcode/SDL/build/SDL.build
 mac_dist
 
 # Web
@@ -120,13 +137,3 @@ mac_dist
 !/Oxygen/sonic3air/source/external/discord_game_sdk/lib/*/*.lib
 !/Oxygen/sonic3air/source/external/discord_game_sdk/lib/*/*.dylib
 !/Oxygen/sonic3air/source/external/discord_game_sdk/lib/*/*.so
-framework/external/ogg-vorbis/libogg/build
-framework/external/ogg-vorbis/libogg/xcode/libogg.xcodeproj/project.xcworkspace/xcuserdata
-framework/external/ogg-vorbis/libogg/xcode/libogg.xcodeproj/xcuserdata
-framework/external/sdl/SDL2/Xcode/SDL/SDL.xcodeproj/xcuserdata
-framework/external/ogg-vorbis/libvorbis/xcode/build
-framework/external/ogg-vorbis/libvorbis/xcode/vorbis.xcodeproj/project.xcworkspace/xcuserdata
-framework/external/ogg-vorbis/libvorbis/xcode/vorbis.xcodeproj/xcuserdata
-Oxygen/sonic3air/build/_xcode/build/XCBuildData
-Oxygen/sonic3air/build/_xcode/build/sonic3air.build
-framework/external/sdl/SDL2/Xcode/SDL/build/SDL.build
