@@ -75,7 +75,7 @@ function void fn08abb0()
 	fn08ac70()
 
 	D0 = u32[(A7+=4)-4]
-	D1 = 5
+	D1 = 5		// object.flag.P1_PUSHING
 	if (objA0.animation.sprite != 0x03 && objA0.subtype2c == 0)	// Only bottom-most block can be broken
 	{
 		A1 = 0xffffb000
@@ -84,7 +84,7 @@ function void fn08abb0()
 
 		A1 = 0xffffb04a
 		D0 = (D0 << 16) + (D0 >> 16)
-		++D1.u8
+		++D1.u8		// object.flag.P2_PUSHING
 		if (fn08ac80())
 			return
 	}

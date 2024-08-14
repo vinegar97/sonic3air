@@ -41,7 +41,7 @@ function void fn088e82()
 	objA0.hitbox_extends.y = 0x29
 
 	// "spawnChildObjects(0x088f9c)" replaced by:
-	spawnChildObject(0x088f50, 0x00, -9, -11)
+	spawnChildObject(0x088f50, 0x00, -9, -11)		// Antennae
 }
 
 
@@ -119,6 +119,8 @@ function void fn088f48()
 	objA0.base_state = 0x02
 }
 
+
+// Antennae
 
 //# address-hook(0x088f50) end(0x088f62)
 function void fn088f50()

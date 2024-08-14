@@ -230,8 +230,8 @@ function void fn04cca6()
 	// This seems to be a check for Sonic 1 lock-on
 	// Signatures:
 	//  - "GM MK-1079 -0" for Sonic 3
-	//  - "GM 00001009-0" for Sonic 1 (I guess) - accepted signature #1
-	//  - "GM 00004049-0" for Sonic 1 (I guess) - accepted signature #2
+	//  - "GM 00001009-0" for Sonic 1 (Revision 0) - accepted signature #1
+	//  - "GM 00004049-0" for Sonic 1 (Revision 1) - accepted signature #2
 	//  - There must be two more from 0x04cd18 on, but it looks much less like ASCII characters
 
 	// Skip in standalone, act as if it's Sonic 1

@@ -300,22 +300,24 @@ function void StartLoadingPatternsForZone()
 {
 	addPatternLoadingCue(0x083d6c)		// Small explosion sprites
 
+	// Load art for the two critters in the respective zones; VRAM offset is always 0xb000 and 0xb240 respectively
+
 	// Targets:
-	//  - 0x08602e	-> global.zone = 0x00	-> AIZ
-	//  - 0x08603c	-> global.zone = 0x01	-> HCZ
-	//  - 0x08604a	-> global.zone = 0x02	-> MGZ
-	//  - 0x086058	-> global.zone = 0x03	-> CNZ
-	//  - 0x086066	-> global.zone = 0x04	-> FBZ
-	//  - 0x086074	-> global.zone = 0x05	-> ICZ
-	//  - 0x086082	-> global.zone = 0x06	-> LBZ
-	//  - 0x086090	-> global.zone = 0x07	-> MHZ
-	//  - 0x08609e	-> global.zone = 0x08	-> SOZ
-	//  - 0x0860ac	-> global.zone = 0x09	-> LRZ
-	//  - 0x0860ba	-> global.zone = 0x0a	-> SSZ
-	//  - 0x0860c8	-> global.zone = 0x0b	-> DEZ
-	//  - 0x0860d6	-> global.zone = 0x0c	-> DDZ
-	//  - 0x0860e4	-> global.zone = 0x0d	-> Outro S/T
-	//  - 0x0860e4	-> global.zone = 0x16	-> LRZ Boss
+	//  - 0x08602e	-> Flicky, chicken		-> global.zone = 0x00	-> AIZ
+	//  - 0x08603c	-> Rabbit, seal			-> global.zone = 0x01	-> HCZ
+	//  - 0x08604a	-> Flicky, chicken		-> global.zone = 0x02	-> MGZ
+	//  - 0x086058	-> Rabbit, flicky		-> global.zone = 0x03	-> CNZ
+	//  - 0x086066	-> Squirrel, flicky		-> global.zone = 0x04	-> FBZ
+	//  - 0x086074	-> Penguin, seal		-> global.zone = 0x05	-> ICZ
+	//  - 0x086082	-> Flicky, chicken		-> global.zone = 0x06	-> LBZ
+	//  - 0x086090	-> Squirrel, chicken	-> global.zone = 0x07	-> MHZ
+	//  - 0x08609e	-> Rabbit, chicken		-> global.zone = 0x08	-> SOZ
+	//  - 0x0860ac	-> Flicky, chicken		-> global.zone = 0x09	-> LRZ
+	//  - 0x0860ba	-> Rabbit, chicken		-> global.zone = 0x0a	-> SSZ
+	//  - 0x0860c8	-> Squirrel, chicken	-> global.zone = 0x0b	-> DEZ
+	//  - 0x0860d6	-> Squirrel, chicken	-> global.zone = 0x0c	-> DDZ
+	//  - 0x0860e4	-> Flicky, chicken		-> global.zone = 0x0d	-> Outro S/T
+	//  - 0x0860e4	-> Flicky, chicken		-> global.zone = 0x16	-> LRZ Boss
 	//  - All succeeding entries use 0x0860e4
 	u32 address = tableLookupAddress(0x085ffe, global.zone * 2)
 	addPatternLoadingCue(address)
@@ -392,6 +394,7 @@ function void TitleCard.TextElement.Update()
 	D0 = u16[A1 + 0x32]
 	if (D0.u16 != 0)
 	{
+		// Disappearing
 		if (!(objA0.render_flags & render_flag.VISIBLE))
 		{
 			--u16[A1 + 0x30]

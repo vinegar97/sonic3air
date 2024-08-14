@@ -111,6 +111,8 @@ function void fn089064()
 }
 
 
+// Bouncy shell hitbox
+
 //# address-hook(0x08908c) end(0x0890a8)
 function void fn08908c()
 {

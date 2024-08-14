@@ -366,7 +366,7 @@ function void fn085732()
 //# address-hook(0x085760) end(0x0857aa)
 function void fn085760()
 {
-	objA0.flags2a |= 0x80
+	objA0.flags2a |= 0x80		// Mark as defeated
 	u8[A0 + 0x28] = 0
 
 	// Grant bonus points
@@ -601,6 +601,7 @@ function void fn0858c8()
 //# translated(0x085aae) end(0x085acc)
 function void Object.InitWithUpdateAddress(u32 updateAddress)
 {
+	// Initialize a placeholder object offscreen before the real object
 	objA0.mapping_offset = 0x085b08
 	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x20
@@ -1744,8 +1745,8 @@ function void CheckDistanceToPlayers()
 	//  - D3.u16: Distance-y to closest player (abs value)
 
 	// Check distance-x to both players
-	A1 = 0xffffb000
-	A2 = 0xffffb04a
+	A1 = 0xffffb000		// Player 1 object RAM address
+	A2 = 0xffffb04a		// Player 2 object RAM address
 	D2.s16 = objA0.position.x.u16 - objA1.position.x.u16
 	D3.s16 = objA0.position.x.u16 - u16[A2 + 0x10]
 
@@ -1757,6 +1758,7 @@ function void CheckDistanceToPlayers()
 	// Which one is closer?
 	if (D3.u16 < D2.u16)
 	{
+		// Player 2 is closer
 		A1 = A2
 		D0 = D1
 		D2.u16 = D3.u16

@@ -543,6 +543,8 @@ function void fn04fd62()
 }
 
 
+// Collision objects the character can stand on shortly during the transition to the burning part of AIZ 1
+
 //# address-hook(0x04fe38) end(0x04fe62)
 function void fn04fe38()
 {
@@ -554,6 +556,7 @@ function void fn04fe38()
 
 	objA0.box_size.y = 0x10
 	objA0.flags2a |= 0x80
+
 	D1.u16 = 0xa0
 	D2 = 0x10
 	D3 = 0x10

@@ -39,7 +39,7 @@ function void TailsTails.Update()
 	objA0.sprite_priority = u16[A2 + 0x08]
 	objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 
-	D0 = u8[A2 + 0x20]
+	D0 = u8[A2 + 0x20]		// Tails' animation state "char.state"
 	if ((u8[A2 + 0x2a] & char.flag.PUSHING) && level.HCZ_water_current_flags.tails == 0)
 	{
 		if (u8[A2 + 0x22] >= 0xa9 && u8[A2 + 0x22] <= 0xac)		// Range of Tails' pushing animation frames
@@ -49,8 +49,9 @@ function void TailsTails.Update()
 	}
 	if (u8[A0 + 0x34] != D0.u8)
 	{
+		// Only update the tail animation state if Tails' changed
 		u8[A0 + 0x34] = D0.u8
-		objA0.state = u8[0x016164 + D0.s16]
+		objA0.state = u8[0x016164 + D0.s16]			// This table is a list to match the tail's animation states with each of Tails' animations
 	}
 
 	A1 = 0x016196
@@ -104,9 +105,10 @@ function void CompetitionMode.TailsTails.Init()
 //# alias(fn016232) deprecated
 function void CompetitionMode.TailsTails.Update()
 {
+	// Update various properties from Tails main object
 	A2 = 0xffff0000 + u16[A0 + 0x30]
-	objA0.value26 = u8[A2 + 0x26]
-	objA0.flags2a = u8[A2 + 0x2a]
+	objA0.value26 = u8[A2 + 0x26]			// Rotation
+	objA0.flags2a = u8[A2 + 0x2a]			// Flags
 	objA0.position.x.u16 = u16[A2 + 0x10]
 	objA0.position.y.u16 = u16[A2 + 0x14]
 	objA0.sprite_priority = u16[A2 + 0x08]
@@ -119,6 +121,7 @@ function void CompetitionMode.TailsTails.Update()
 	}
 	if (D0.u8 != u8[A0 + 0x34])
 	{
+		// Only update the tail animation state if Tails' changed
 		u8[A0 + 0x34] = D0.u8
 		objA0.state = u8[0x0162a0 + D0.u16]
 	}

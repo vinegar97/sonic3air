@@ -735,7 +735,7 @@ function void fn00d1fa()
 	objA0.position.x.u16 = D2.u16
 
 	// Determine size of the cursor (large or small)
-	objA0.animation.sprite = (D2.u16 >= 0xf0 + getScreenExtend() && D2.u16 <= 0x148 + getScreenExtend()) ? 1 : 2
+	objA0.animation.sprite = (D2.u16 >= 0xf0 + getScreenExtend() && D2.u16 <= 0x148 + getScreenExtend()) ? 1 : 2		// File selection frames
 
 	if (level.framecounter.low & 0x04)
 	{
@@ -924,7 +924,7 @@ function bool fn00d458()
 	if (u8[A1] & 0x80)
 	{
 		// Empty save slot
-		objA0.compound.sprite1.animation.sprite = 0x0f
+		objA0.compound.sprite1.animation.sprite = 0x0f		// Character select arrows
 		objA0.animation.frame = 0
 		if (u16[0xffffb04a + 0x2e] != 0 || u16[0xffffeee4] != 0)
 		{
@@ -941,29 +941,29 @@ function bool fn00d458()
 		D1.u16 = u16[A0 + 0x36]
 		fn00d96a()
 
-		objA0.animation.frame = 0x17
+		objA0.animation.frame = 0x17		// Zone preview frame
 		D1.u16 = u16[A0 + 0x36]
 		if (D1.u8 == objA0.value3a && objA0.value3b != 0)
 		{
 			// This gets entered only for completed games
 			if (objA0.value3b == 1)
 			{
-				++objA0.animation.frame
+				++objA0.animation.frame		// Sonic
 			}
 			else if (objA0.value3b == 2)
 			{
-				objA0.animation.frame += 2
+				objA0.animation.frame += 2		// Super Sonic
 			}
 			else
 			{
-				objA0.animation.frame += 4
+				objA0.animation.frame += 4		// Group photo
 			}
 
 			if (objA0.value3b == 1 || objA0.value3b == 2)
 			{
 				if (u16[A0 + 0x34] >= CHARS_TAILS_ALONE)	// It feels strange that this is the same for Tails and Knuckles
 				{
-					objA0.animation.frame = 0x23
+					objA0.animation.frame = 0x23		// Tails/Knuckles and respective super form photos
 				}
 			}
 		}
@@ -1030,7 +1030,7 @@ function bool fn00d458()
 			}
 
 			u16[A0 + 0x36] = D1.u16
-			objA0.compound.sprite1.animation.sprite = (level.framecounter.low & 0x10) ? 0x1a : 0
+			objA0.compound.sprite1.animation.sprite = (level.framecounter.low & 0x10) ? 0x1a : 0		// Zone select arrows
 		}
 
 		objA0.compound.count = 2
@@ -1046,13 +1046,16 @@ function bool fn00d458()
 		level.giantrings_clear.u16 = u16[A1 + 0x04]
 		if (objA0.value3b == 0)
 		{
+			// Set current zone on saves in progress
 			D0.u8 = u8[A1 + 0x03]
 		}
 		else
 		{
+			// Zone selection on completed saves
 			D0.u16 = u16[A0 + 0x36]
 			if (D0.u8 >= objA0.value3a)
 			{
+				// Character photo is not selectable
 				return 2
 			}
 			level.giantrings_clear = 0
@@ -1281,7 +1284,7 @@ function void fn00d7a4()
 	objA0.render_flags = render_flag.COMPOUND
 	objA0.box_size.x = 0x30
 	objA0.compound.count = 0x01
-	objA0.compound.sprite1.animation.sprite = 0x08
+	objA0.compound.sprite1.animation.sprite = 0x08		// Robotnik's sign
 	objA0.base_state += 4
 	fn00d7c0()
 
@@ -1382,8 +1385,8 @@ function void fn00d854()
 	objA0.animation.frame = 0
 	u8[A0 + 0x25] = 0
 	u8[A0 + 0x28] = 0
-	objA0.animation.sprite = 0x0d
-	objA0.compound.sprite1.animation.sprite = 0x08
+	objA0.animation.sprite = 0x0d		// Robotnik
+	objA0.compound.sprite1.animation.sprite = 0x08		// Robotnik's sign
 
 	u16[A0 + 0x12] = u16[0xffffb04a + 0x10] + camera.foreground.x.u16
 	objA0.base_state += 4

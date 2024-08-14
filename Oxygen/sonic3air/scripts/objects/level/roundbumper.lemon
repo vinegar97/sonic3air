@@ -25,6 +25,7 @@ function void fn032df2()
 
 	if (global.zone == 0x14)
 	{
+		// Glowing Spheres bonus stage
 		objA0.mapping_offset = 0x0330a2
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x02cd)
 		objA0.update_address = 0x032ef0
@@ -34,6 +35,7 @@ function void fn032df2()
 
 	if (competition_mode.active)
 	{
+		// Balloon Park in Competition Mode
 		objA0.mapping_offset = 0x2322ee
 	#if STANDALONE
 		objA0.sprite_attributes = 0x0300	// Fix for wrong palette line usage, #contributed by Legobouwer
@@ -74,8 +76,8 @@ function void fn032e7e()
 	LookupSinCos()
 	D1.s16 >>= 2
 	D0.s16 >>= 2
-	D1.u16 += u16[A0 + 0x30]
-	D0.u16 += objA0.value32
+	D1.u16 += u16[A0 + 0x30]	// Horizontal reference point
+	D0.u16 += objA0.value32		// Vertical reference point
 	objA0.position.x.u16 = D1.u16
 	objA0.position.y.u16 = D0.u16
 	fn032eaa()

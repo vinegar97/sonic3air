@@ -35,12 +35,12 @@ function void fn060c56()
 
 	// "spawnChildObjects(0x0613f8)" replaced by:
 	spawnChildObject(0x060d58, 0x00, 0, 0)		// Floor platform for springs
-	spawnChildObject(0x060e4c, 0x02, 0, 36)
-	spawnChildObject(0x061044, 0x04, 0, 0)
-	spawnChildObject(0x060ffe, 0x06, -56, -44)
-	spawnChildObject(0x060ffe, 0x08, 0, -44)
-	spawnChildObject(0x060ffe, 0x0a, 56, -44)
-	spawnChildObject(0x060ffe, 0x0c, 0, -40)
+	spawnChildObject(0x060e4c, 0x02, 0, 36)		// Gumball dispenser
+	spawnChildObject(0x061044, 0x04, 0, 0)		// Bottomless pit stage exit
+	spawnChildObject(0x060ffe, 0x06, -56, -44)	// Glass dome
+	spawnChildObject(0x060ffe, 0x08, 0, -44)	// Glass dome
+	spawnChildObject(0x060ffe, 0x0a, 56, -44)	// Glass dome
+	spawnChildObject(0x060ffe, 0x0c, 0, -40)	// Gumballs in the glass dome
 
 	fn060cb8()
 }

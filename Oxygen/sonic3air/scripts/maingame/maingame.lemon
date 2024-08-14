@@ -814,6 +814,7 @@ function u32 MainGame.getLevelDataPointer()
 {
 	if (global.zone_act == 0x0000 && !isSonicIntro())
 	{
+		// Set ID for AIZ1 main stage data, skipping Sonic's intro scene
 		D0.u16 = 0x00d0		// The result of plugging in "global.zone_act == 0x0d00" below
 	}
 	else

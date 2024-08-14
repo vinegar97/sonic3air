@@ -186,20 +186,22 @@ function void fn01a31e()
 	{
 		if (u8[A1 + 0x29] != 0)
 		{
+			// Enemy has more than one hit point (e.g. bosses)
 			D0.u16 = 0xb04a
 			u8[A1 + 0x25] = u8[A1 + 0x28]
 			u8[A1 + 0x1c] = 0x4a
 			u8[A1 + 0x28] = 0
 
-			--u8[A1 + 0x29]
+			--u8[A1 + 0x29]		// Reduce hit points "boss.remaining_hits"
 			if (u8[A1 + 0x29] == 0)
 			{
+				// All hit points depleted; mark as defeated
 				u8[A1 + 0x2a] |= 0x80
 			}
 		}
 		else
 		{
-			// Damage or destroy enemy
+			// Object only has one hit point; Damage or destroy enemy
 			fn01052e()
 			return
 		}

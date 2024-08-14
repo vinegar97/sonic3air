@@ -1100,7 +1100,7 @@ function void fn01459e()
 	objA1.velocity.x = 0
 	objA1.velocity.y = 0
 	objA1.groundspeed = 0
-	u16[A1 + 0x26] = 0
+	u16[A1 + 0x26] = 0		// Reset "char.rotation.both"
 	objA1.position.x.u16 = char.position.x.u16
 	objA1.position.y.u16 = char.position.y.u16 + 0x1c
 	objA1.state = char.state.SONIC_HANGON
@@ -3645,7 +3645,7 @@ function void CollectRing_P2()
 function bool checkForExtraLifeByRings()
 {
 #if STANDALONE
-	// No extra lives in Time Attack or when infinite lives option is enables
+	// No extra lives in Time Attack or when infinite lives option is enabled
 	//  -> These checks ensure that the ring sound gets played when collecting the 100th / 200th / etc. ring
 	//  -> Fix #contributed by Thorn
 	if (Game.isTimeAttack())
@@ -5213,15 +5213,17 @@ function void Character.OnCollisionWithDynamicObject()
 
 		if (u8[A1 + 0x29] != 0)
 		{
+			// Enemy has more than one hit point (e.g. bosses)
 			char.velocity.x = -char.velocity.x
 			char.velocity.y = -char.velocity.y
 			char.groundspeed = -char.groundspeed
 			u8[A1 + 0x1c] = A0.u8
 			u8[A1 + 0x25] = u8[A1 + 0x28]
 			u8[A1 + 0x28] = 0
-			--u8[A1 + 0x29]
+			--u8[A1 + 0x29]		// Reduce hit points "boss.remaining_hits"
 			if (u8[A1 + 0x29] == 0)
 			{
+				// All hit points depleted; mark as defeated
 				u8[A1 + 0x2a] |= 0x80
 			}
 
@@ -5250,7 +5252,7 @@ function void Character.OnCollisionWithDynamicObject()
 				u8[A2] &= ~(1 << u8[A1 + 0x3b])
 			}
 
-			u8[A1 + 0x2a] |= 0x80
+			u8[A1 + 0x2a] |= 0x80		// Mark as defeated
 
 			// Grant bonus points
 			Enemy.addScore(A1, 0x010216)
@@ -5645,7 +5647,8 @@ function void fn0103ba()
 		D1.u16 = A0 - 0xffffb000
 		if (D1.u16 != 0)
 		{
-			++u8[A1 + 0x29]
+			// Player 2 collided with the object
+			++u8[A1 + 0x29]		// With the below line, this makes u8[A1 + 0x29] = 2
 		}
 		++u8[A1 + 0x29]
 	}
@@ -5933,6 +5936,7 @@ function void fn01050c()
 	{
 		if (u8[A1 + 0x29] == 0)
 		{
+			// Object only has one hit point; Damage or destroy enemy
 			fn01052e()
 		}
 	}
@@ -5956,7 +5960,7 @@ function void fn01052e()
 		A2 = 0xffff0000 + u16[A1 + 0x3c]
 		u8[A2] &= ~(1 << D0.u8)
 	}
-	u8[A1 + 0x2a] |= 0x80
+	u8[A1 + 0x2a] |= 0x80		// Mark as defeated
 
 	// Grant bonus points
 	Enemy.addScore(A1, 0x010586)
@@ -6250,7 +6254,7 @@ function void Character.LandingOnGroundStandUp()
 
 #if STANDALONE
 	// Correct position also if Knuckles just started gliding when hitting the ground in the same frame
-	//  -> Yes, this happend, and yes, this can otherwise kill you if there's a killing blocker object in the floor
+	//  -> Yes, this happens, and yes, this can otherwise kill you if there's a killing blocker object in the floor
 	if ((char.flags & char.flag.ROLLING) || (char.character == CHARACTER_KNUCKLES && knuckles.glideclimbstate == 0x02))
 #else
 	if (char.flags & char.flag.ROLLING)
@@ -6258,7 +6262,7 @@ function void Character.LandingOnGroundStandUp()
 	{
 		char.flags &= ~char.flag.ROLLING
 	#if STANDALONE
-		// Do not change the state while transformaing, as this would cause a soft-lock
+		// Do not change the state while transforming, as this would cause a soft-lock
 		if (char.state != char.state.TRANSFORMING)
 	#endif
 		{

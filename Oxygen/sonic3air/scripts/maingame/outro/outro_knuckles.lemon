@@ -17,7 +17,7 @@ function void fn05e6c0()
 	//  - 0x05e70e	-> objA0.base_state = 0x00  -> Initialization
 	//  - 0x05e80a	-> objA0.base_state = 0x02  -> Wait time until the Tornado gets visible
 	//  - 0x05e832	-> objA0.base_state = 0x04  -> Tornado gets into the screen from below
-	//  - 0x05e86a	-> objA0.base_state = 0x06  -> Hovering in place, Knuckles signalling his okay
+	//  - 0x05e86a	-> objA0.base_state = 0x06  -> Hovering in place, Knuckles signaling his okay
 	//  - 0x05e890	-> objA0.base_state = 0x08  -> Flying out of the screen to the right
 	//  - 0x05e916	-> objA0.base_state = 0x0a  -> Flying right to left, medium sized
 	//  - 0x05e98a	-> objA0.base_state = 0x0c  -> Flying behind the island, small sized
@@ -1094,8 +1094,9 @@ function void fn06001e()
 //# address-hook(0x086458) end(0x08648a)
 function void fn086458()
 {
-	A2 = A0 + 0x18
-	D0.u16 = u16[A0 + 0x16] - 1
+	// A1: address of compound sprites position array
+	A2 = A0 + 0x18		// Start of compound sprite data in object
+	D0.u16 = u16[A0 + 0x16] - 1		// Number of compound sprites
 	D2.u16 = objA0.position.x.u16
 	D3.u16 = objA0.position.y.u16
 
@@ -1108,8 +1109,8 @@ function void fn086458()
 		}
 		u16[A2]   = D2.u16 + D1.s16
 		u16[A2+2] = D3.u16 + s8[A1+1]
-		A1 += 2
-		A2 += 6
+		A1 += 2		// To next array entry
+		A2 += 6		// To next compound sprite
 
 		--D0.s16
 	}

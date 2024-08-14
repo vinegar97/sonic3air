@@ -15,12 +15,11 @@
 //# address-hook(0x01b690) end(0x01b696)
 function void DynamicObjectsLoading()
 {
-	// This usually calls "fn01b69e()"
 	// Targets:
-	// 0x01b69a -> dynobjects.routine = 0
-	// 0x01b69e -> dynobjects.routine = 4
-	// 0x01b6a2 -> dynobjects.routine = 8
-	// 0x01b6a6 -> dynobjects.routine = 12
+	// 0x01b69a -> dynobjects.routine = 0	// Calls "fn01b69a()"
+	// 0x01b69e -> dynobjects.routine = 4	// Calls "fn01b69e()"
+	// 0x01b6a2 -> dynobjects.routine = 8	// Calls "fn01b69e()"
+	// 0x01b6a6 -> dynobjects.routine = 12	// Calls "fn01b6a6()"
 	u32 address = 0x01b69a + dynobjects.routine
 	call address
 }

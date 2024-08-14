@@ -384,7 +384,7 @@ function void fn05ea74()
 //# address-hook(0x05eadc) end(0x05eb00)
 function void fn05eadc()
 {
-	fn085a5a()
+	fn085a5a()		// Match parent priority
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if ((u8[A1 + 0x38] & 0x04) == 0)
@@ -516,7 +516,7 @@ function void fn05ed6a()
 {
 	setupObjectAttributesBasic(0x0600f8)
 	objA0.update_address = 0x05ed7e
-	fn05ec00()
+	fn05ec00()		// Match parent world flag
 }
 
 
@@ -531,7 +531,7 @@ function void fn05ed7e()
 		return
 	}
 
-	objA0.animation.sprite = (global.framecounter.low & 0x02) ? 0x19 : 0x18
+	objA0.animation.sprite = (global.framecounter.low & 0x02) ? 0x19 : 0x18		// Exhaust flame on the smallest Tornado sprite
 	DrawObject()
 }
 
@@ -699,6 +699,7 @@ function void fn05f376()
 	Object.animationProgress(0x06025c)
 	if (u8[0xfffffab8] & 0x04)
 	{
+		// Sonic do a thumbs up
 		objA0.update_address = 0x05f39e
 		Object.ResetAnimationProgress(0x060260)
 	}
@@ -727,7 +728,7 @@ function void fn05f3aa()
 	fn05fefe()
 
 	// "spawnChildObjects(0x060204)" replaced by:
-	spawnChildObject(0x05f3ea, 0x00, -16, 8)
+	spawnChildObject(0x05f3ea, 0x00, -16, 8)		// Tails' tails
 }
 
 
@@ -1038,8 +1039,8 @@ function void fn060038()
 	if (D0.u8 >= 6)
 		D0 = 0
 	u8[A0 + 0x44] = D0.u8
-	u8[A0 + 0x1d] = u8[0x060072 + D0.s16]
-	objA0.animation.frame = (global.framecounter.low & 0x01) ? 7 : 6
+	u8[A0 + 0x1d] = u8[0x060072 + D0.s16]		// Tornado propeller frames
+	objA0.animation.frame = (global.framecounter.low & 0x01) ? 7 : 6		// Tornado rocket frames
 }
 
 

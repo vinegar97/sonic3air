@@ -102,7 +102,7 @@ function void LevelSelect.init()
 			--D2.s16
 		}
 
-		D2.u16 = 0x0d - D3.u16		// Maximum length of string - string length = remaining space length
+		D2.u16 = 0x0d - D3.u16		// Maximum length of string - string length = remaining spaces
 		while (D2.s16 >= 0)
 		{
 			// Add empty space after string

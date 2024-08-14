@@ -270,6 +270,7 @@ function bool fn0870ca()
 
 	if (D1.s16 >= -1 && D1.s16 < 12)
 	{
+		// On ground
 		objA0.position.y.u16 += D1.u16
 		return false
 	}

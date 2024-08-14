@@ -1589,7 +1589,7 @@ function void BlueSpheres.RenderSpheres()
 					A3 = tableLookupAddress(A3, D1.s16 * 2)
 
 					// A3 = Pointer to sprite data
-					D1.u16 = u16[A3] - 1
+					D1.u16 = u16[A3] - 1	// This is always 0, except for Super Emeralds
 					A3 += 2
 					if (D1.s16 >= 0)
 					{

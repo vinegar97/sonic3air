@@ -38,6 +38,7 @@ function void fn08c64e()
 {
 	setupObjectAttributesFull(0x08c6f2)
 
+	// Spawn orbiting spike balls
 	// "spawnChildObjects(0x08c704)" replaced by:
 	spawnChildObject(0x08c692, 0x00, 0, 16)
 	spawnChildObject(0x08c692, 0x02, 16, 0)
@@ -49,6 +50,8 @@ function void fn08c64e()
 //# address-hook(0x08c662) end(0x08c68c)
 function void fn08c662()
 {
+	// Follow the player
+
 	A1 = 0xffffb000
 	CheckDistanceToObjectA1()
 	objA0.render_flags &= ~render_flag.FLIP_X
@@ -74,8 +77,10 @@ function void fn08c6d4()
 	A2 = 0xffffb000
 	if ((u8[A2 + 0x2a] & char.flag.IN_AIR) == 0)
 	{
+		// Player is on the ground
 		if (u16[A2 + 0x18] != 0 || u16[A2 + 0x1a] != 0)
 		{
+			// Player is moving
 			_setZeroFlagByValue(1)
 			return
 		}

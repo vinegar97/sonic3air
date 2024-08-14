@@ -46,8 +46,8 @@ define char.render_flags		=  u8[A0 + 0x04]
 // Base state
 define char.base_state			=  u8[A0 + 0x05]
 
-	constant u8 base_state.INITIAL	=  0x00		// Shortly when getting visible after title card (?)
-	constant u8 base_state.NORMAL	=  0x02		// Normal state
+	constant u8 base_state.INITIAL	=  0x00		// Shortly after spawning
+	constant u8 base_state.NORMAL	=  0x02		// Normal update state
 	constant u8 base_state.HURT		=  0x04		// Character got hurt, is falling back
 	constant u8 base_state.DIED		=  0x06		// Character died
 	constant u8 base_state.INACTIVE	=  0x08		// Completely inactive (e.g. after died animation)

@@ -1081,7 +1081,7 @@ function void fn005d62()
 		D0.u16 = global.framecounter.u16 & 0x3f
 		A1 = 0x005e96 + D0.u16
 		u16[0xffffee6c] = u8[A1]		// Vertical scroll offset
-		u16[0xffffee68] = u8[A1+1]		// Horzontal scroll offset
+		u16[0xffffee68] = u8[A1+1]		// Horizontal scroll offset
 	}
 }
 

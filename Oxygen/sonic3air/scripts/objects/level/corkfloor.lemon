@@ -220,8 +220,8 @@ function void fn02a3d0()
 function void fn02a502()
 {
 	u16[A0 + 0x38] = score.bonus_counter
-	u8[A0 + 0x34] = u8[0xffffb000 + 0x20]
-	u8[A0 + 0x36] = u8[0xffffb04a + 0x20]
+	u8[A0 + 0x34] = u8[0xffffb000 + 0x20]		// Player 1 animation state backup
+	u8[A0 + 0x36] = u8[0xffffb04a + 0x20]		// Player 2 animation state backup
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
 	D3.u16 = D2.u16 + 1
@@ -321,8 +321,8 @@ function void fn02a58e()
 function void fn02a6d4()
 {
 	u16[A0 + 0x38] = score.bonus_counter
-	u8[A0 + 0x34] = u8[0xffffb000 + 0x20]
-	u8[A0 + 0x36] = u8[0xffffb04a + 0x20]
+	u8[A0 + 0x34] = u8[0xffffb000 + 0x20]		// Player 1 animation state backup
+	u8[A0 + 0x36] = u8[0xffffb04a + 0x20]		// Player 2 animation state backup
 
 	A2 = 0x02a894
 	D1 = objA0.box_size.x + 11
