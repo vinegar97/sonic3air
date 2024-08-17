@@ -125,9 +125,9 @@ function void CompetitionMode.MainMenu()
 
 		D0.u8 = control.pad1.pressed | control.pad2.pressed
 	#if STANDALONE
-		if (D0.u8 & CONTROL_B || Input.buttonPressed(BUTTON_BACK))
+		if (D0.u8 & DataSelect.CONTROLS_CANCEL || Input.buttonPressed(BUTTON_BACK))
 	#else
-		if (D0.u8 & CONTROL_B)
+		if (D0.u8 & DataSelect.CONTROLS_CANCEL)
 	#endif
 		{
 			global.game_mode = 0x04		// Title Screen
@@ -518,18 +518,18 @@ function void CompetitionMode.StageSelect()
 		D1.u8 = control.pad1.pressed
 		D2 = (competition_mode.multiplay) ? control.pad2.pressed : 0
 	#if STANDALONE
-		if (D1 & CONTROL_B || Input.buttonPressed(BUTTON_BACK))
+		if (D1 & DataSelect.CONTROLS_CANCEL || Input.buttonPressed(BUTTON_BACK))
 	#else
-		if (D1 & CONTROL_B)
+		if (D1 & DataSelect.CONTROLS_CANCEL)
 	#endif
 		{
 			u8[0xffffb094 + 0x2f] = 0
 			u8[0xffffeee2] = 0xff
 		}
 	#if STANDALONE
-		if (D2 & CONTROL_B || Input.buttonPressed(BUTTON_BACK | BUTTON_PAD2))
+		if (D2 & DataSelect.CONTROLS_CANCEL || Input.buttonPressed(BUTTON_BACK | BUTTON_PAD2))
 	#else
-		if (D2 & CONTROL_B)
+		if (D2 & DataSelect.CONTROLS_CANCEL)
 	#endif
 		{
 			u8[0xffffb206 + 0x2f] = 0
@@ -567,7 +567,7 @@ function void CompetitionMode.StageSelect()
 			}
 		}
 
-		if (D1.u16 & 0xe0)
+		if (D1.u16 & DataSelect.CONTROLS_ACCEPT)
 			break
 	}
 
@@ -960,7 +960,7 @@ function void fn00b538()
 	{
 		if (objA0.value2f != 0)
 		{
-			bool pressedB = (u8[A1] & CONTROL_B)
+			bool pressedB = (u8[A1] & DataSelect.CONTROLS_CANCEL)
 		#if STANDALONE
 			pressedB |= Input.buttonPressed(BUTTON_BACK | (A1 == 0xfffff605 ? 0 : BUTTON_PAD2))
 		#endif
@@ -975,9 +975,9 @@ function void fn00b538()
 			bool skip = false
 			if (u8[A0 + 0x30] == 0)
 			{
-				if ((u8[A1] & 0x0c) == 0)
+				if ((u8[A1] & (CONTROL_LEFT | CONTROL_RIGHT)) == 0)
 				{
-					bool pressedB = (u8[A1] & CONTROL_B)
+					bool pressedB = (u8[A1] & DataSelect.CONTROLS_CANCEL)
 				#if STANDALONE
 					pressedB |= Input.buttonPressed(BUTTON_BACK | (A1 == 0xfffff605 ? 0 : BUTTON_PAD2))
 				#endif
@@ -987,7 +987,7 @@ function void fn00b538()
 					}
 					else
 					{
-						D0.u16 = u8[A1] & 0xe0
+						D0.u16 = u8[A1] & DataSelect.CONTROLS_ACCEPT
 						if (D0.u16 != 0)
 						{
 							objA0.value2f = 0xff
@@ -1004,8 +1004,8 @@ function void fn00b538()
 
 					u8[A0 + 0x34] = 0
 					u8[A0 + 0x35] = objA0.flags2e
-					D0.u16 = u8[A1] & 0x0c
-					if ((D0 & 0x04) == 0)
+					D0.u16 = u8[A1] & (CONTROL_LEFT | CONTROL_RIGHT)
+					if ((D0 & CONTROL_LEFT) == 0)
 					{
 						u8[A0 + 0x30] = 0x01
 						D0.u8 = u8[A3] + 1
@@ -1395,7 +1395,7 @@ function void fn00b74e()
 			{
 				if (u16[0xffffe000] == endScreenOffset)
 				{
-					if (D0.u16 & 0xe0)
+					if (D0.u16 & DataSelect.CONTROLS_ACCEPT)
 					{
 						// Competition Mode menu
 						global.game_mode = 0x38
@@ -1409,7 +1409,7 @@ function void fn00b74e()
 			}
 			else
 			{
-				if (D0.u16 & 0xe0)
+				if (D0.u16 & DataSelect.CONTROLS_ACCEPT)
 				{
 					u16[0xffffe000] -= 8
 				}
