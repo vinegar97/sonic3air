@@ -158,8 +158,7 @@ function void fn08f842()
 //# address-hook(0x08f862) end(0x08f898)
 function void fn08f862()
 {
-	fn08486e()
-	if (_equal())
+	if (!Swing_upanddown_count())
 	{
 		UpdateMovementStraightSimple()
 		Object.AnimationProgressByLocalA1.DistinctTimer()

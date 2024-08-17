@@ -137,8 +137,7 @@ function void fn068afe()
 //# address-hook(0x068b1c) end(0x068b62)
 function void fn068b1c()
 {
-	fn08486e()
-	if (_equal() || D1.s16 >= 0)
+	if (!Swing_upanddown_count() || D1.s16 >= 0)
 	{
 		// Wait
 		UpdateMovementStraightSimple()
@@ -214,8 +213,7 @@ function void fn068b92()
 //# address-hook(0x068bbc) end(0x068bd6)
 function void fn068bbc()
 {
-	fn08486e()
-	if (_equal())
+	if (!Swing_upanddown_count())
 	{
 		// Wait
 		UpdateMovementStraightSimple()

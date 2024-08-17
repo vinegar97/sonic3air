@@ -126,8 +126,7 @@ function void fn0877d8()
 //# address-hook(0x087728) end(0x087756)
 function void fn087728()
 {
-	fn08486e()
-	if (_equal())
+	if (!Swing_upanddown_count())
 	{
 		UpdateMovementStraightSimple()
 		fn08783e()

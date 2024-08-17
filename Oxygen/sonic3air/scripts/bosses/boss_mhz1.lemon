@@ -130,8 +130,7 @@ function void fn075302()
 function void fn07531c()
 {
 	Object.AnimationProgressByLocalA1.DistinctTimer()
-	fn08486e()
-	if (_equal())
+	if (!Swing_upanddown_count())
 	{
 		UpdateMovementStraightSimple()
 	}

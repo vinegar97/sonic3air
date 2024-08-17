@@ -135,8 +135,7 @@ function void fn06c07e()
 {
 	if ((objA0.flags2a & 0x40) == 0)
 	{
-		fn08486e()
-		if (s8(objA0.value39) >= 0)
+		if (Swing_upanddown_count())
 		{
 			UpdateMovementStraightSimple()
 			return

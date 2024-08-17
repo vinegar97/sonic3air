@@ -1562,20 +1562,34 @@ function void fn08482a()
 
 
 //# address-hook(0x08486e) end(0x084888)
-function void fn08486e()
+//# alias(fn08486e) deprecated
+function void Swing_UpAndDown_Count()
 {
+	Swing_upanddown_count()
+}
+
+
+function bool Swing_upanddown_count()
+{
+	// Counts down how many times the object swings up and down
+	// D0: true if countdown is complete
+	// D2.u8: current count
+
 	fn0847e6()
 	if (D3.u16 != 0)
 	{
+		// Only count at max swinging speed
 		--objA0.value39
 		D2.u8 = objA0.value39
-		D0 = (s8[A0 + 0x39] < 0)
-		_setZeroFlagByValue(D0)
+
+		D0 = (s8(objA0.value39) < 0)
+		_setZeroFlagByValue(s8(objA0.value39) < 0)
+
+		return D0
 	}
-	else
-	{
-		_setZeroFlagByValue(0)
-	}
+
+	_setZeroFlagByValue(0)
+	return false
 }
 
 
