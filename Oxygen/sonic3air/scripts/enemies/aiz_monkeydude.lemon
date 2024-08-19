@@ -58,13 +58,6 @@ function void fn087172()
 }
 
 
-//# address-hook(0x086f3c) end(0x086f3c)
-function void fn086f3c()
-{
-	Object.AnimationProgressByLocalA1()
-}
-
-
 //# address-hook(0x0871bc) end(0x0871bc)
 function void fn0871bc()
 {
