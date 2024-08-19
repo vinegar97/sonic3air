@@ -1077,9 +1077,9 @@ function void fn01459e()
 	objA1.position.x.u16 = char.position.x.u16
 	objA1.position.y.u16 = char.position.y.u16 + 0x1c
 	objA1.state = char.state.SONIC_HANGON
-	u8[A1 + 0x21] = 0
-	u8[A1 + 0x24] = 0
-	u8[A1 + 0x23] = 0
+	objA1.state.former = 0
+	objA1.animation.timer = 0
+	objA1.animation.frame = 0
 	u8[A1 + 0x2e] = (control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 	objA1.flags2a &= ~(char.flag.FACING_LEFT | char.flag.CONTROL_LOCK)
 	objA1.flags2a |= char.flag.IN_AIR
@@ -5326,7 +5326,7 @@ function void Character.OnCollisionWithDynamicObject()
 			Enemy.addScore(A1, 0x010216)
 
 			objA1.update_address = addressof(SmallExplosion.BaseUpdate)
-			u8[A1 + 0x05] = 0
+			objA1.base_state = 0
 			if (char.velocity.y < 0)
 			{
 				char.velocity.y += 0x100

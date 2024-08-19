@@ -117,7 +117,7 @@ function void TitleCard.Wait()
 			u16[A1 + 0x46] = u16[A2+4]
 			objA1.position.x.u16 = u16[A2+6]
 			objA1.position.y.u16 = u16[A2+8]
-			u8[A1 + 0x22] = u8[A2+10]
+			objA1.animation.sprite = u8[A2+10]
 			objA1.box_size.x = u8[A2+11]
 			u8[A1 + 0x28] = u16[A2+12]
 			objA1.mapping_offset = 0x02ee10
