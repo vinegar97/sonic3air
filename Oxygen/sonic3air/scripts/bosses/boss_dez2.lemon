@@ -1312,9 +1312,7 @@ function void fn07fb4e()
 	if (u8[A1 + 0x2a] & 0x40)
 		return
 
-	A2 = 0x07fb8a
-	fn0858c8()
-	if (!_equal())
+	if (fn0858c8(0x07fb8a))
 	{
 		D0.u8 = (objA0.render_flags & render_flag.FLIP_Y) ? 0xff : 0x00
 		if (objA0.velocity.y < 0)

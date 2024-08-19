@@ -406,9 +406,7 @@ function void fn062e92()
 	if (u16[0xfffffaa4] != 0)
 	{
 		A1 = 0xffff0000 + u16[0xfffffaa4]
-		A2 = 0x065c48
-		fn0858c8()
-		if (!_equal())
+		if (fn0858c8(0x065c48))
 		{
 			objA0.update_address = 0x062ed0
 			objA0.countdown_value = 1

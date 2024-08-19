@@ -325,9 +325,7 @@ function void fn064692()
 	UpdateMovementSimple()
 
 	A1 = 0xffff0000 + u16[0xfffffaae]
-	A2 = 0x0646b0
-	fn085898()
-	if (!_equal())
+	if (fn085898(0x0646b0))
 	{
 		fn06471a()
 	}
@@ -425,9 +423,7 @@ function void fn0647c6()
 	UpdateMovementSimple()
 
 	A1 = 0xffff0000 + u16[0xfffffaba]
-	A2 = 0x0647e4
-	fn085898()
-	if (!_equal())
+	if (fn085898(0x0647e4))
 	{
 		fn06482a()
 	}

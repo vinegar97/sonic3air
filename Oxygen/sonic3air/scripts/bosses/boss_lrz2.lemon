@@ -582,9 +582,7 @@ function void fn079ec4()
 	if (u8[A1 + 0x2a] & 0x40)
 		return
 
-	A2 = 0x079f0c
-	fn085898()
-	if (_equal())
+	if (!fn085898(0x079f0c))
 		return
 
 	u8[A1 + 0x2a] |= 0x40

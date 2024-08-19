@@ -43,9 +43,7 @@ function void fn0821fc()
 	}
 
 	A1 = 0xffffb000
-	A2 = u32[A0 + 0x30]
-	fn0858c8()
-	if (_equal())
+	if (!fn0858c8(u32[A0 + 0x30]))
 	{
 		DrawOrUnloadObject()
 		return

@@ -487,9 +487,7 @@ function void fn082dce()
 	if (objA0.state == 0)
 	{
 		A1 = 0xffffb000
-		A2 = 0x082e92
-		fn0858c8()
-		if (_equal())
+		if (!fn0858c8(0x082e92))
 			return
 
 		--boss.remaining_hits
@@ -752,9 +750,7 @@ function void fn082c28()
 	// What is this for?
 	//compare.8(u8[A1 + 0x34], 0)
 
-	A2 = 0x082c62
-	fn0858c8()
-	if (!_equal())
+	if (fn0858c8(0x082c62))
 	{
 		A1 = 0xffffb000
 		u8[A1 + 0x34] = 0x59

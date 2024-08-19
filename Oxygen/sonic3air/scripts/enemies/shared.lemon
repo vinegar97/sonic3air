@@ -551,8 +551,16 @@ function void fn085870()
 }
 
 
+function bool fn085898(u8 a)		// Check_InTheirRange
+{
+	A2 = a
+	fn085898()
+	return D0
+}
+
+
 //# address-hook(0x085898) end(0x0858c6)
-function void fn085898()
+function void fn085898()		// Check_InTheirRange
 {
 	D0.u16 = objA0.position.x.u16
 	D1.u16 = objA1.position.x.u16 + u16[(A2+=2)-2]
@@ -580,8 +588,16 @@ function void fn085898()
 }
 
 
+function bool fn0858c8(u32 a)		// Check_InMyRange
+{
+	A2 = a
+	fn0858c8()
+	return D0
+}
+
+
 //# address-hook(0x0858c8) end(0x0858f6)
-function void fn0858c8()
+function void fn0858c8()		// Check_InMyRange
 {
 	// Checks if an object (whose RAM address is stored in A1) is positioned inside a certain range of another object (from values in table at A2)
 

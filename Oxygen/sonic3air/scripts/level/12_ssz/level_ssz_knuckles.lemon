@@ -947,9 +947,7 @@ function void fn07cb64()
 function void fn07cba4()
 {
 	A1 = 0xffff0000 + u16[0xfffffaa4]
-	A2 = 0x07cc16
-	fn0858c8()
-	if (!_equal())
+	if (fn0858c8(0x07cc16))
 	{
 		objA0.update_address = 0x07cbce
 		if (allocDynamicObjectStd())
@@ -970,9 +968,7 @@ function void fn07cbce()
 	UpdateMovementStraightSimple()
 
 	A1 = 0xffff0000 + u16[0xfffffaa4]
-	A2 = 0x07cc1e
-	fn0858c8()
-	if (!_equal())
+	if (fn0858c8(0x07cc1e))
 	{
 		objA0.update_address = 0x08565e
 		objA0.sprite_priority = 0x80

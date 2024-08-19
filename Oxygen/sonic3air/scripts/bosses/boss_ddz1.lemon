@@ -579,9 +579,7 @@ function void fn082be4()
 		if (u8[A1 + 0x34] != 0)
 			return
 
-		A2 = 0x082c20
-		fn0858c8()
-		if (_equal())
+		if (!fn0858c8(0x082c20))
 			return
 
 		u8[A1 + 0x34] = 0x3b

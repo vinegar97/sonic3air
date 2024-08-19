@@ -128,9 +128,7 @@ function void fn063b22()
 function void fn063b40()
 {
 	A1 = 0xffffb000
-	A2 = 0x063b94
-	fn0858c8()
-	if (_equal())
+	if (!fn0858c8(0x063b94))
 		return
 
 	objA0.update_address = 0x063b9c
@@ -369,9 +367,7 @@ function void fn065f84()
 	if (objA0.flags38 & bit)
 		return
 
-	A2 = 0x065fd6
-	fn0858c8()
-	if (!_equal())
+	if (fn0858c8(0x065fd6))
 	{
 		objA0.flags38 |= bit
 		u16 backupD3 = D3.u16

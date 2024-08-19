@@ -353,9 +353,7 @@ function bool fn079ffe()
 	if (u16[A1] == 0)
 		return false
 
-	A2 = 0x07a038
-	fn085898()
-	if (_equal())
+	if (!fn085898(0x07a038))
 		return false
 
 	// "spawnSimpleChildObjects(0x07a1bc)" replaced by:
