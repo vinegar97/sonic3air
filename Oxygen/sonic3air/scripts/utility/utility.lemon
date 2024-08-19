@@ -402,7 +402,7 @@ function u32 applyGlobalComponentTint_BGR32(u32 color)
 
 function u32 VDPHelper.getDirectWriteCode(u16 address, u16 mode)
 {
-	u32 higherBits = (address & 0x3fff) | mode
+	u32 higherBits = (address & ~0xc000) | mode
 	u32 lowerBits  = (address & 0xc000) >> 14
 	return (higherBits << 16) + lowerBits
 }
@@ -416,7 +416,7 @@ function u16 VDPHelper.getVRAMAddressFromWriteCode(u32 code)
 {
 	u32 higherBits = (code >> 16)
 	u32 lowerBits  = (code & 0xffff)
-	return (higherBits & 0x3fff) + ((lowerBits & 0x0003) << 14)
+	return (higherBits & ~0xc000) + ((lowerBits & 0x0003) << 14)
 }
 
 
@@ -441,7 +441,7 @@ function void VDP.setupVRAMWrite(u16 vramAddress)
 
 function void VDP.setupVSRAMWrite(u16 vsramAddress)
 {
-	u32[0xc00004] = 0x40000010 | ((vsramAddress & 0x3fff) << 16) | ((vsramAddress & 0xc000) >> 14)
+	u32[0xc00004] = 0x40000010 | ((vsramAddress & ~0xc000) << 16) | ((vsramAddress & 0xc000) >> 14)
 }
 
 function void VDP.setupCRAMWrite(u16 cramAddress)
@@ -502,10 +502,10 @@ function void VDP.copyByDMA(u32 sourceAddress, u16 vramAddress, u16 bytes, u16 m
 	// Encode source
 	u16 word3 = 0x9500 | ((sourceAddress >> 1) & 0xff)
 	u16 word4 = 0x9600 | ((sourceAddress >> 9) & 0xff)
-	u16 word5 = 0x9700 | ((sourceAddress >> 17) & 0x7f)
+	u16 word5 = 0x9700 | ((sourceAddress >> 17) & ~0x80)
 
 	// Encode destination + control flags
-	u16 word6 = (vramAddress & 0x3fff) | mode
+	u16 word6 = (vramAddress & ~0xc000) | mode
 	u16 word7 = ((vramAddress & 0xc000) >> 14) | 0x0080
 
 	u32[0xc00004] = word1 + (u32(word2) << 16)
@@ -534,7 +534,7 @@ function void VDP.fillVRAMbyDMA(u16 fillValue, u16 vramAddress, u16 bytes)
 	u16 word2 = 0x9400 | ((bytes >> 9) & 0xff)
 
 	// Encode destination + control flags
-	u16 word6 = (vramAddress & 0x3fff) | 0x4000
+	u16 word6 = (vramAddress & ~0xc000) | 0x4000
 	u16 word7 = ((vramAddress & 0xc000) >> 14) | 0x0080
 
 	u32[0xc00004] = word1 + (u32(word2) << 16)
@@ -565,7 +565,7 @@ function void VDP.Config.setActiveDisplay(bool enable)
 	}
 	else
 	{
-		value &= 0xffbf
+		value &= ~0x0040
 	}
 	u16[0xc00004] = value
 }

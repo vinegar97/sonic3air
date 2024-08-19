@@ -440,7 +440,7 @@ function void SaveGameOnLevelFinished()
 			else
 			{
 				// This is a weird case, supposedly needed for unlocking DDZ after collecting all Super Emeralds in an formerly complete game?
-				u8[A1] &= 0xfc
+				u8[A1] &= ~0x03
 			}
 		}
 
