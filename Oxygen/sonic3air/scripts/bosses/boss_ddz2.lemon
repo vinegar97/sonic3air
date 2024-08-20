@@ -747,8 +747,13 @@ function void fn082c28()
 #endif
 
 	A1 = 0xffffb000
+#if STANDALONE
+	if (u8[A1 + 0x34] != 0)
+		return
+#else
 	// What is this for?
 	//compare.8(u8[A1 + 0x34], 0)
+#endif
 
 	if (fn0858c8(0x082c62))
 	{

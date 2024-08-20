@@ -689,8 +689,7 @@ function void fn085fc4()
 	A0 = A1
 	if (objA0.update_address != 0)
 	{
-		D0 = u16(char.character) << 2
-		A1 = u32[0x085fb8 + D0.u16]
+		A1 = u32[0x085fb8 + char.character * 4]
 
 		// Targets:
 		//  - 0x012cb4	-> UpdateSonicSpritePatterns

@@ -83,9 +83,7 @@ function void fn08bc6c()
 //# address-hook(0x08bd88) end(0x08bd96)
 function void fn08bd88()
 {
-	D3.u16 = objA0.velocity.x
-	D3.s32 = D3.s16
-	D3 <<= 8
+	D3 = s16(objA0.velocity.x) << 8
 	D3 += objA0.position.x
 	D3 = (D3 << 16) + (D3 >> 16)
 	CheckGroundCollisionFixedX()

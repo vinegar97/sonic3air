@@ -482,7 +482,11 @@ function void LevelPaletteUpdate.LRZ1()
 
 		D0.u16 = level.palettefx.frame_2
 		level.palettefx.frame_2 += 4
+	#if STANDALONE
+		if (level.palettefx.frame_2 >= 0x24)		// Restore full palette cycle
+	#else
 		if (level.palettefx.frame_2 >= 0x1c)
+	#endif
 			level.palettefx.frame_2 = 0
 
 		A0 = 0x0032fe
@@ -523,7 +527,11 @@ function void LevelPaletteUpdate.LRZ2()
 
 		D0.u16 = level.palettefx.frame_2
 		level.palettefx.frame_2 += 4
+	#if STANDALONE
+		if (level.palettefx.frame_2 >= 36)		// Restore full palette cycle
+	#else
 		if (level.palettefx.frame_2 >= 28)
+	#endif
 			level.palettefx.frame_2 = 0
 
 		A0 = 0x0032fe

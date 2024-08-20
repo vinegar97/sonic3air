@@ -235,19 +235,7 @@ function void fn085668()
 function void fn08566a()
 {
 	// Same as above, but without music fade-out (used after Big Arms)
-	--objA0.countdown_value
-	if (objA0.countdown_value >= 0)
-	{
-		DrawObject()
-	}
-	else
-	{
-		objA0.render_flags &= ~render_flag.VISIBLE
-		objA0.countdown_value = 119
-
-		A1 = objA0.countdown_callback
-		call A1
-	}
+	fn085694()
 }
 
 #endif

@@ -169,17 +169,9 @@ function void fn06932c()
 function void fn069b2e()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if ((u8[A1 + 0x38] & 0x40) == 0)
-	{
-		objA0.flags38 &= ~0x40
-		u8[A0 + 0x0a] |= 0x80
-		if ((u8[A1 + 0x0a] & 0x80) == 0)
-			u8[A0 + 0x0a] &= ~0x80
-	}
-	else
-	{
-		objA0.flags38 |= 0x40
-	}
+	if ((objA1.flags38 & 0x40) == 0)
+		u8[A0 + 0x0a] = (u8[A0 + 0x0a] & ~0x80) | (u8[A1 + 0x0a] & 0x80)		// Match parent object (Egg Mobile)'s priority flag
+	objA0.flags38 = (objA0.flags38 & ~0x40) | (objA1.flags38 & 0x40)
 }
 
 
