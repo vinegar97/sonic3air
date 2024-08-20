@@ -186,10 +186,7 @@ function void fn0916a8()
 	setupObjectAttributesBasic(0x0919be)
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if ((objA1.render_flags & render_flag.WORLD) == 0)
-	{
-		objA0.render_flags &= ~render_flag.WORLD
-	}
+	objA0.render_flags = (objA0.render_flags & ~render_flag.WORLD) | (objA1.render_flags & render_flag.WORLD)
 	objA0.update_address = 0x0916cc
 }
 
@@ -210,10 +207,7 @@ function void fn0916ee()
 	setupObjectAttributesBasic(0x0919c4)
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if ((objA1.render_flags & render_flag.WORLD) == 0)
-	{
-		objA0.render_flags &= ~render_flag.WORLD
-	}
+	objA0.render_flags = (objA0.render_flags & ~render_flag.WORLD) | (objA1.render_flags & render_flag.WORLD)
 	objA0.update_address = 0x091712
 }
 

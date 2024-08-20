@@ -1102,11 +1102,7 @@ function void fn086458()
 
 	while (D0.s16 >= 0)
 	{
-		D1.s16 = s8[A1]
-		if (objA0.render_flags & render_flag.FLIP_X)
-		{
-			D1.s16 = -D1.s16
-		}
+		D1.s16 = (objA0.render_flags & render_flag.FLIP_X) ? -s8[A1] : s8[A1]
 		u16[A2]   = D2.u16 + D1.s16
 		u16[A2+2] = D3.u16 + s8[A1+1]
 		A1 += 2		// To next array entry

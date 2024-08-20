@@ -246,10 +246,7 @@ function void fn036612()
 	objA1.update_address = 0x03669c
 	u8[A1 + 0x20] = 0x04
 	u16[A1 + 0x46] = u16[A2 + 0x46]
-	if (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
-	{
-		objA1.sprite_attributes |= sprite_attribute.PRIORITY
-	}
+	objA1.sprite_attributes |= (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 }
 
 
@@ -521,13 +518,13 @@ function void fn0368aa()
 		if (u8[A0 + 0x29] & 0x01)
 		{
 			u8[A0 + 0x29] &= ~0x01
-			call 0x036906
+			fn036906()
 		}
 		A2 = 0xffffb04a
 		if (u8[A0 + 0x29] & 0x02)
 		{
 			u8[A0 + 0x29] &= ~0x02
-			call 0x036906
+			fn036906()
 		}
 		u8[A0 + 0x29] = 0
 	}

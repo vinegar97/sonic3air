@@ -126,16 +126,7 @@ function bool fn08b0b0()
 	objA0.update_address = 0x08aeba
 	u8[A2 + 0x38] |= 0x08
 	D3.s16 >>= 1
-	if (D3.s16 >= 0)
-	{
-		if (D3.s16 > 0x400)
-			D3.u16 = 0x400
-	}
-	else
-	{
-		if (D3.s16 < -0x400)
-			D3.u16 = -0x400
-	}
+	D3.u16 = clamp(D3.s16, -0x400, 0x400)
 	u16[A2 + 0x3e] = D3.u16
 	D3.s16 <<= 1
 	objA1.velocity.x = D3.u16

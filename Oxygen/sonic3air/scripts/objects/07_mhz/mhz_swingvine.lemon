@@ -107,11 +107,7 @@ function void fn0226b0()
 		playSound(0x7e)
 	}
 
-	objA0.sprite_priority = 0x0200
-	if (s16[A0 + 0x26] < 0)
-	{
-		objA0.sprite_priority = 0x0280
-	}
+	objA0.sprite_priority = (s16[A0 + 0x26] < 0) ? 0x0280 : 0x0200
 
 	if (u8[A1 + 0x32] != 0)
 	{

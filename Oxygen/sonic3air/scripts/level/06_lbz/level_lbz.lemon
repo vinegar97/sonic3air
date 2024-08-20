@@ -1063,16 +1063,9 @@ function void InitLevelScrolling.LBZ2()
 	D1 = 0
 	Level.InitialTilesFill()
 
-	D0 = 0x40
-	if (s16[0xffffeee2] <= 0x40)
-	{
-		D0.s16 = -0x40
-	}
-
-	if (s16[0xffffeee2] >= D0.s16)
-	{
-		s16[0xffffeee2] = D0.s16
-	}
+	D0 = 0
+	D0.s16 = (s16[0xffffeee2] > 0x40) ? 0x40 : -0x40
+	s16[0xffffeee2] = min(s16[0xffffeee2], D0.s16)
 
 	A4 = 0x23eee0
 	A5 = 0xffffa800

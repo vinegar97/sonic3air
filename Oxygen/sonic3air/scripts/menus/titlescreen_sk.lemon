@@ -135,54 +135,51 @@ function void TitleScreen_SK()
 		fn005d94()
 		Kosinski.ProcessModules()
 
-		if ((control.pad1.pressed & CONTROL_START) == 0)
+		if ((control.pad1.pressed & CONTROL_START) && (global.fade_timer == 0))
 		{
-			if (u32[0xffffb0de] != 0)
-				break
-		}
-		else
-		{
-			if (global.fade_timer == 0)
+			A0 = 0xffffb128
+			fn005972()
+
+			u32[0xffffb04a] = 0x005802
+			u16[0xffffb04a + 0x2e] = 0x0140 + getScreenExtend()		// Fix for the Death Egg not in the right position when skipping intro, #contributed by TheMushrunt
+			u16[0xffffb04a + 0x32] = 0x70
+			u16[0xffffeec0] = 0x03
+
+			camera.screenshake.state = 0
+			D0.u16 = 0x0100
+			scrolloffset.y.planeB = D0.u16
+			scrolloffset.y.planeB = D0.u16
+			camera.position.y.u16 = D0.u16
+			u16[0xffffee64] = D0.u16
+
+			A0 = 0x005608
+			A2 = 0xfffffc20
+			for (u8 i = 0; i < 8; ++i)
 			{
-				A0 = 0xffffb128
-				fn005972()
-
-				u32[0xffffb04a] = 0x005802
-				u16[0xffffb04a + 0x2e] = 0x0140 + getScreenExtend()		// Fix for the Death Egg not in the right position when skipping intro, #contributed by TheMushrunt
-				u16[0xffffb04a + 0x32] = 0x70
-				u16[0xffffeec0] = 0x03
-
-				camera.screenshake.state = 0
-				D0.u16 = 0x0100
-				scrolloffset.y.planeB = D0.u16
-				scrolloffset.y.planeB = D0.u16
-				camera.position.y.u16 = D0.u16
-				u16[0xffffee64] = D0.u16
-
-				A0 = 0x005608
-				A2 = 0xfffffc20
-				for (u8 i = 0; i < 8; ++i)
-				{
-					u32[A2] = u32[A0]
-					u32[A2 + 0x80] = u32[A0]
-					A0 += 4
-					A2 += 4
-				}
-
-				fn005d94()
-				global.frame_state = 0x1a
-				waitForNextFrame()
-
-			#if !STANDALONE
-				set_status_register(0x2700)
-			#endif
-
-				copyRectToVRAM(0xffff7cc0, 0xe000, 0x28, 0x1c)
-
-				A0 = 0xffffb000
-				fn00571e()
-				break
+				u32[A2] = u32[A0]
+				u32[A2 + 0x80] = u32[A0]
+				A0 += 4
+				A2 += 4
 			}
+
+			fn005d94()
+			global.frame_state = 0x1a
+			waitForNextFrame()
+
+		#if !STANDALONE
+			set_status_register(0x2700)
+		#endif
+
+			copyRectToVRAM(0xffff7cc0, 0xe000, 0x28, 0x1c)
+
+			A0 = 0xffffb000
+			fn00571e()
+			break
+		}
+		else if (u32[0xffffb0de] != 0)
+		{
+			// Logo didn't appear yet
+			break
 		}
 	}
 
