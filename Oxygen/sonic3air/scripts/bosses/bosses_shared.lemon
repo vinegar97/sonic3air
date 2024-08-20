@@ -48,7 +48,7 @@ function void fn085bda()
 
 
 //# address-hook(0x085c00) end(0x085c16)
-function void fn085c00()
+function void fn085c00()		// Obj_EndSignControlAwaitStart
 {
 	if (level.wait_for_results)
 		return
@@ -61,7 +61,7 @@ function void fn085c00()
 
 
 //# address-hook(0x085c1a) end(0x085c26)
-function void fn085c1a()
+function void fn085c1a()		// Obj_EndSignControlDoStart
 {
 	if (!level.results_done)
 		return

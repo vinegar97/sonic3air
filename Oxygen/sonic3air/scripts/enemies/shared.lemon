@@ -49,7 +49,7 @@ function void Enemy.UnloadDelayed()
 
 
 //# address-hook(0x085102) end(0x08513a)
-function void fn085102()
+function void fn085102()		// Obj_FlickerMove
 {
 	// Scattered boss giblets, Called after destruction
 
@@ -92,7 +92,7 @@ function void Enemy.DrawOrUnload()
 
 
 //# address-hook(0x0852ae) end(0x0852ba)
-function void fn0852ae()
+function void fn0852ae()		// Go_Delete_Sprite_2
 {
 	objA0.update_address = addressof(UnloadObject)
 	objA0.flags38 |= 0x10
@@ -100,7 +100,7 @@ function void fn0852ae()
 
 
 //# address-hook(0x0852bc) end(0x0852ce)
-function void fn0852bc()
+function void fn0852bc()		// Go_Delete_Sprite_3
 {
 	objA0.update_address = addressof(UnloadObject)
 	objA0.flags2a |= 0x80
@@ -109,7 +109,7 @@ function void fn0852bc()
 
 
 //# address-hook(0x0852d0) end(0x0852f2)
-function void fn0852d0()
+function void fn0852d0()		// Set_IndexedVelocity
 {
 	D1 = objA0.subtype2c * 2
 	D0.u16 += D1.u16
@@ -124,7 +124,7 @@ function void fn0852d0()
 
 
 //# address-hook(0x08538c) end(0x085414)
-function void fn08538c()
+function void fn08538c()		// Find_SonicTails8Way
 {
 	// Seems to be used only in FBZ 1 boss fight
 
@@ -181,7 +181,7 @@ function void fn085412()
 
 
 //# address-hook(0x085416) end(0x085434)
-function void fn085416()
+function void fn085416()		// Set_VelocityXTrackSonic
 {
 	A1 = 0xffffb000
 	CheckDistanceToObjectA1()
@@ -284,7 +284,7 @@ function void fn0854ba()
 
 
 //# address-hook(0x08562c) end(0x085632)
-function void fn08562c()
+function void fn08562c()		// MoveFall_AnimateRaw
 {
 	UpdateMovementSimple()
 	Object.AnimationProgressByLocalA1()
@@ -292,7 +292,7 @@ function void fn08562c()
 
 
 //# address-hook(0x085636) end(0x08563c)
-function void fn085636()
+function void fn085636()		// Move_AnimateRaw
 {
 	UpdateMovementStraightSimple()
 	Object.AnimationProgressByLocalA1()
@@ -300,7 +300,7 @@ function void fn085636()
 
 
 //# address-hook(0x085640) end(0x085644)
-function void fn085640()
+function void fn085640()		// MoveSlowFall_AnimateRaw
 {
 	MoveWithGravity20()
 	Object.AnimationProgressByLocalA1()
@@ -308,7 +308,7 @@ function void fn085640()
 
 
 //# address-hook(0x08564c) end(0x08564c)
-function void fn08564c()
+function void fn08564c()		// Move_AnimateRaw_Wait
 {
 	UpdateMovementStraightSimple()
 	Object.AnimationProgressByLocalA1()
@@ -317,7 +317,7 @@ function void fn08564c()
 
 
 //# address-hook(0x085652) end(0x085656)
-function void fn085652()
+function void fn085652()		// Animate_Wait
 {
 	Object.AnimationProgressByLocalA1()
 	Object.CountdownAndTrigger()
@@ -325,7 +325,7 @@ function void fn085652()
 
 
 //# address-hook(0x08565a) end(0x08565a)
-function void fn08565a()
+function void fn08565a()		// Refresh_ChildPosWait
 {
 	MoveWithParent()
 	Object.CountdownAndTrigger()
@@ -334,7 +334,7 @@ function void fn08565a()
 
 
 //# address-hook(0x08565e) end(0x085662)
-function void fn08565e()
+function void fn08565e()		// Wait_Draw
 {
 	Object.CountdownAndTrigger()
 	DrawObject()
@@ -343,7 +343,7 @@ function void fn08565e()
 
 
 //# address-hook(0x085732) end(0x08575e)
-function void fn085732()
+function void fn085732()		// EnemyDefeated
 {
 	fn085760()
 
@@ -364,7 +364,7 @@ function void fn085732()
 
 
 //# address-hook(0x085760) end(0x0857aa)
-function void fn085760()
+function void fn085760()		// EnemyDefeat_Score
 {
 	objA0.flags2a |= 0x80		// Mark as defeated
 	u8[A0 + 0x28] = 0
@@ -420,7 +420,7 @@ function void Enemy.DamageCharacter()
 
 
 //# address-hook(0x0857c2) end(0x0857e6)
-function void fn0857c2()
+function void fn0857c2()		// Check_PlayerAttack
 {
 	if (u8[A1 + 0x2b] & char.bonus.INVINCIBLE || u8[A1 + 0x20] == char.state.ROLLING || u8[A1 + 0x20] == char.state.SPINDASH)
 	{
@@ -447,7 +447,7 @@ function void fn0857c2()
 
 
 //# address-hook(0x0857f0) end(0x0857f2)
-function void fn0857f0()
+function void fn0857f0()		// Check_SonicAttack
 {
 	// No special conditions for Sonic, attacked
 	D0 = 0
@@ -456,7 +456,7 @@ function void fn0857f0()
 
 
 //# address-hook(0x0857f4) end(0x085824)
-function void fn0857f4()
+function void fn0857f4()		// Check_TailsAttack
 {
 	// Check for if the enemy is above Tails while flying and not underwater
 	if (u8[A1 + 0x2f] != 0 && (u8[A1 + 0x2a] & char.flag.UNDERWATER) == 0)
@@ -489,7 +489,7 @@ function void fn085822()
 
 
 //# address-hook(0x085826) end(0x085836)
-function void fn085826()
+function void fn085826()		// Check_KnuxAttack
 {
 	D0 = (u8[A1 + 0x2f] == 1 || u8[A1 + 0x2f] == 3) ? 1 : 0		// Check for Knuckles' gliding and ground slide states
 	_setZeroFlagByValue(D0)
@@ -497,7 +497,7 @@ function void fn085826()
 
 
 //# address-hook(0x085838) end(0x08586e)
-function void fn085838()
+function void fn085838()		// Check_LRControllerShake
 {
 	// This code is used by the HCZ Piranha ("Mega Chopper") and the LRZ Toxomister Cloud,
 	// and checks whether the character could get rid of the enemy by just moving left/right
@@ -529,7 +529,7 @@ function void fn085838()
 
 
 //# address-hook(0x085870) end(0x08588e)
-function void fn085870()
+function void fn085870()		// Check_PlayerCollision
 {
 	D0.u8 = u8[A0 + 0x29]
 	if (D0.u8 != 0)
@@ -652,7 +652,7 @@ function void fn085ad2()
 
 
 //# address-hook(0x085da8) end(0x085dd8)
-function void fn085da8()
+function void fn085da8()		// Change_Act2Sizes
 {
 	if (global.zone == 0x08)	// Exception for SOZ, as it has its own transition to Act 2
 		return
@@ -673,7 +673,7 @@ function void fn085da8()
 
 
 //# address-hook(0x085de0)
-function void fn085de0()
+function void fn085de0()		// Make_LevelSizeObj
 {
 	// "spawnChildObjects(0x085de8)" replaced by:
 	spawnChildObject(0x084a48, 0x00, 0, 0)		// Screen mover for the right border
@@ -1503,7 +1503,7 @@ function void Object.AnimationProgress.SlowDown(u32 address)
 
 
 //# address-hook(0x0847e6) end(0x084828)
-function void fn0847e6()
+function void fn0847e6()		// Swing_UpAndDown
 {
 	// Hovering motion, used for Robotnik's capsule, flying animal prison, the Tornado plane, some minibosses, etc.
 	s16 step = s16[A0 + 0x40]	// Acceleration
@@ -1541,7 +1541,7 @@ function void fn0847e6()
 
 
 //# address-hook(0x08482a) end(0x08486c)
-function void fn08482a()
+function void fn08482a()		// Swing_LeftAndRight
 {
 	s16 step = s16[A0 + 0x3c]		// Acceleration
 	s16 limit = s16[A0 + 0x3a]		// Maximum acceleration before "swaying"
@@ -1563,7 +1563,7 @@ function void fn08482a()
 
 	if (objA0.velocity.x + step < limit)
 	{
-		objA0.velocity.x += step
+		objA0.velocity.x += step			// Apply right acceleration
 	}
 	else
 	{
@@ -1659,7 +1659,7 @@ function void fn0848fe()
 
 //# address-hook(0x084920) end(0x08492e)
 //# alias(fn084920) deprecated
-function void Child.DrawSprite()
+function void Child.DrawSprite()		// Child_Draw_Sprite
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
@@ -1675,7 +1675,7 @@ function void Child.DrawSprite()
 
 //# address-hook(0x084934) end(0x084948)
 //# alias(fn084934) deprecated
-function void Child.DrawSprite_DynObj()
+function void Child.DrawSprite_DynObj()		// Child_DrawTouch_Sprite
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
@@ -1692,7 +1692,7 @@ function void Child.DrawSprite_DynObj()
 
 //# address-hook(0x08494e) end(0x08495c)
 //# alias(fn08494e) deprecated
-function void Child.CheckParent()
+function void Child.CheckParent()		// Child_CheckParent
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
@@ -1704,7 +1704,7 @@ function void Child.CheckParent()
 
 //# address-hook(0x08495e) end(0x08496c)
 //# alias(fn08495e) deprecated
-function void Child.CheckParent_DynObj()
+function void Child.CheckParent_DynObj()		// Child_AddToTouchList
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
@@ -1719,7 +1719,7 @@ function void Child.CheckParent_DynObj()
 
 
 //# address-hook(0x084972) end(0x084988)
-function void fn084972()
+function void fn084972()		// Child_Remember_Draw_Sprite
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
@@ -1735,7 +1735,7 @@ function void fn084972()
 
 
 //# address-hook(0x08498c) end(0x08499e)
-function void fn08498c()
+function void fn08498c()		// Child_Draw_Sprite2
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x10)
@@ -1750,7 +1750,7 @@ function void fn08498c()
 
 
 //# address-hook(0x0849a2) end(0x0849c2)
-function void fn0849a2()
+function void fn0849a2()		// Child_DrawTouch_Sprite2
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if ((u8[A1 + 0x38] & 0x10) == 0)
@@ -1770,7 +1770,7 @@ function void fn0849a2()
 
 
 //# address-hook(0x0849c6) end(0x0849d2)
-function void fn0849c6()
+function void fn0849c6()		// Child_Draw_Sprite_FlickerMove
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if ((u8[A1 + 0x2a] & 0x80) == 0)
@@ -1796,7 +1796,7 @@ function void fn0849d8()
 
 
 //# address-hook(0x0849f2) end(0x0849fe)
-function void fn0849f2()
+function void fn0849f2()		// Child_Draw_Sprite2_FlickerMove
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x10)
@@ -1811,7 +1811,7 @@ function void fn0849f2()
 
 
 //# address-hook(0x084a04) end(0x084a16)
-function void fn084a04()
+function void fn084a04()		// Child_DrawTouch_Sprite_FlickerMove
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
@@ -1827,7 +1827,7 @@ function void fn084a04()
 
 
 //# address-hook(0x084a1c) end(0x084a42)
-function void fn084a1c()
+function void fn084a1c()		// Child_DrawTouch_Sprite2_FlickerMove
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x10)
@@ -1910,7 +1910,7 @@ function void fn084b6e()
 
 
 //# address-hook(0x084b82) end(0x084b9a)
-function void fn084b82()
+function void fn084b82()		// Change_FlipXUseParent
 {
 	objA0.render_flags &= ~render_flag.FLIP_X
 	A1 = 0xffff0000 + u16[A0 + 0x46]
@@ -2046,7 +2046,7 @@ function void fn084cac()
 
 
 //# address-hook(0x084cf4) end(0x084d2e)
-function void fn084cf4()
+function void fn084cf4()		// MoveSprite_AtAngleLookup
 {
 	D0 = u8[A0 + 0x3c] & 0x3f
 	D1.u16 = (u8[A0 + 0x3c] >> 5) & 0x06
@@ -2071,7 +2071,7 @@ function void fn084cf4()
 
 
 //# address-hook(0x084d38) end(0x084d44)
-function void fn084d38()
+function void fn084d38()		// AtAngle_00_3F
 {
 	D5 = u8[A2 + D0.s16]
 	D6 = u8[A3 + D4.s16]
@@ -2079,7 +2079,7 @@ function void fn084d38()
 
 
 //# address-hook(0x084d46) end(0x084d54)
-function void fn084d46()
+function void fn084d46()		// AtAngle_40_7F
 {
 	D5 = u8[A3 + D4.s16]
 	D6 = u8[A2 + D0.s16]
@@ -2088,7 +2088,7 @@ function void fn084d46()
 
 
 //# address-hook(0x084d56) end(0x084d66)
-function void fn084d56()
+function void fn084d56()		// AtAngle_80_BF
 {
 	D5 = u8[A2 + D0.s16]
 	D5.s16 = -D5.s16
@@ -2098,7 +2098,7 @@ function void fn084d56()
 
 
 //# address-hook(0x084d68) end(0x084d76)
-function void fn084d68()
+function void fn084d68()		// AtAngle_C0_FF
 {
 	D5 = u8[A3 + D4.s16]
 	D5.s16 = -D5.s16
@@ -2108,7 +2108,7 @@ function void fn084d68()
 
 
 //# address-hook(0x084f5a) end(0x084f68)
-function void fn084f5a()
+function void fn084f5a()		// MoveDraw_SpriteTimed
 {
 	--objA0.countdown_value
 	if (objA0.countdown_value < 0)
@@ -2124,7 +2124,7 @@ function void fn084f5a()
 
 
 //# address-hook(0x084f6e) end(0x084f7c)
-function void fn084f6e()
+function void fn084f6e()		// MoveDraw_SpriteTimed2
 {
 	--objA0.countdown_value
 	if (objA0.countdown_value < 0)
@@ -2381,7 +2381,7 @@ function void fn0863ec()
 // Used at least by CNZ 2 boss and DEZ spikebonker
 
 //# address-hook(0x084e3a) end(0x084e4c)
-function void fn084e3a()
+function void fn084e3a()		// MoveSprite_AngleXLookupOffset
 {
 	D0 = u8[A0 + 0x3c]
 	D1.u16 = (D0.u8 >> 5) & 0x06

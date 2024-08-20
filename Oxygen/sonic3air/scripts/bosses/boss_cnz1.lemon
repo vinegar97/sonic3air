@@ -778,7 +778,7 @@ function void fn06e178()
 // Collision checks for spinning object
 
 //# address-hook(0x06e19a) end(0x06e212)
-function void fn06e19a()
+function void fn06e19a()		// CNZMinibossTop_CheckPlayerBounce
 {
 	A1 = 0xffffb000
 	D0 = fn06e1a8() ? 1 : 0
@@ -835,7 +835,7 @@ function bool fn06e1a8()
 
 
 //# address-hook(0x06e214) end(0x06e27e)
-function void fn06e214()
+function void fn06e214()		// CNZMinibossTop_CheckHitBase
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	A2 = 0x06e280

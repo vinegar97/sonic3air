@@ -1131,7 +1131,7 @@ function void fn04ee8e()
 
 
 //# address-hook(0x04ef56) end(0x04ef8e)
-function void fn04ef56()
+function void fn04ef56()		// Draw_PlaneVertBottomUp
 {
 	// This loads background patterns
 	//  -> s16[0xffffeeca] seems to tell us how many pattern lines are remaining

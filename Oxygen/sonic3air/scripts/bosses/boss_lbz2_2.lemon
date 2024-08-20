@@ -940,7 +940,7 @@ function void fn073682()
 
 
 //# address-hook(0x084f80) end(0x084f8e)
-function void fn084f80()
+function void fn084f80()		// TimedSprite_ScreenLock
 {
 	--objA0.countdown_value
 	if (objA0.countdown_value < 0)

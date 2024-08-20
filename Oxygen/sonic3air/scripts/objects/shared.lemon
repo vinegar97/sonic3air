@@ -420,7 +420,7 @@ function void Object.TriggerOnGroundHit()
 
 
 //# address-hook(0x01dc56) end(0x01dcb4)
-function void fn01dc56()
+function void fn01dc56()		// SolidObjectFull
 {
 	// Check player 1
 	A1 = 0xffffb000
@@ -498,7 +498,7 @@ function void CheckCharacterOnClimbableObject()
 
 
 //# address-hook(0x01dccc)
-function void fn01dccc()
+function void fn01dccc()		// SolidObjectFull2_1P
 {
 	if (fn01dcb6_internal(A1, D6.u8))
 	{
@@ -673,7 +673,7 @@ function void fn01dddc()
 // Used by LBZ tube transport and two FBZ platform objects
 
 //# address-hook(0x01de20) end(0x01deca)
-function void fn01de20()
+function void fn01de20()		// SolidObjectFull_Offset
 {
 	// Check player 1
 	A1 = 0xffffb000
@@ -795,7 +795,7 @@ function void fn01dece()
 // Small smoke cloud - used in CNZ cannon, LBZ booster tube, and fire shield
 
 //# address-hook(0x01e68e) end(0x01e6c0)
-function void fn01e68e()
+function void fn01e68e()		// Obj_FireShield_Dissipate
 {
 	objA0.mapping_offset = 0x01e758
 	objA0.sprite_attributes = 0x05a0
@@ -885,7 +885,7 @@ function void fn01e732()
 // Unknown
 
 //# address-hook(0x08598a) end(0x0859cc)
-function void fn08598a()
+function void fn08598a()		// Run_PalRotationScript
 {
 #if STANDALONE
 	// Fix for CNZ 1 miniboss altering ring palette, #contributed by TheMushrunt
@@ -1058,7 +1058,7 @@ function void Object.loadSpritePatternsForVDP(u32 address)
 
 
 //# address-hook(0x0850a2) end(0x0850d2)
-function void fn0850a2()
+function void fn0850a2()		// Sprite_CheckDelete2
 {
 	u16 dx = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
 	if (dx <= 0x0280)
@@ -1087,7 +1087,7 @@ function void fn0850ba()
 
 
 //# address-hook(0x0850d4) end(0x0850fc)
-function void fn0850d4()
+function void fn0850d4()		// Sprite_CheckDeleteXY
 {
 	u16 dx = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
 	u16 dy = objA0.position.y.u16 - camera.position.y.u16 + 0x80
@@ -1103,7 +1103,7 @@ function void fn0850d4()
 
 
 //# address-hook(0x08594e) end(0x085988)
-function void fn08594e()
+function void fn08594e()		// Displace_PlayerOffObject
 {
 	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
@@ -1124,7 +1124,7 @@ function void fn08594e()
 
 
 //# address-hook(0x085180) end(0x0851ae)
-function void fn085180()
+function void fn085180()		// Sprite_CheckDeleteTouchXY
 {
 	u16 dx = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
 	u16 dy = objA0.position.y.u16 - camera.position.y.u16 + 0x80
@@ -1141,7 +1141,7 @@ function void fn085180()
 
 
 //# address-hook(0x0851b4) end(0x0851c6)
-function void fn0851b4()
+function void fn0851b4()		// Sprite_CheckDeleteSlotted
 {
 	u16 dx = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
 	if (dx <= 0x0280)
@@ -1156,7 +1156,7 @@ function void fn0851b4()
 
 
 //# address-hook(0x0851cc) end(0x0851d4)
-function void fn0851cc()
+function void fn0851cc()		// Go_Delete_SpriteSlotted
 {
 	if (objA0.respawn_entry)
 	{
@@ -1168,7 +1168,7 @@ function void fn0851cc()
 
 
 //# address-hook(0x0851d8) end(0x0851ee)
-function void fn0851d8()
+function void fn0851d8()		// Go_Delete_SpriteSlotted2
 {
 	objA0.update_address = addressof(UnloadObject)
 	objA0.flags2a |= 0x80
@@ -1177,7 +1177,7 @@ function void fn0851d8()
 
 
 //# address-hook(0x0851e4) end(0x0851ee)
-function void fn0851e4()
+function void fn0851e4()		// Remove_From_TrackingSlot
 {
 	A1 = 0xffff0000 + u16[A0 + 0x3c]
 	u8[A1] &= ~(1 << objA0.value3b)
@@ -1185,7 +1185,7 @@ function void fn0851e4()
 
 
 //# address-hook(0x085208) end(0x085232)
-function void fn085208()
+function void fn085208()		// Sprite_CheckDeleteTouchSlotted
 {
 	if (s8[A0 + 0x2a] >= 0)
 	{
@@ -1208,7 +1208,7 @@ function void fn085208()
 
 
 //# address-hook(0x08522c)
-function void fn08522c()
+function void fn08522c()		// Go_Delete_SpriteSlotted3
 {
 	objA0.update_address = addressof(UnloadObject)
 	fn0851e4()
@@ -1216,7 +1216,7 @@ function void fn08522c()
 
 
 //# address-hook(0x085b0a) end(0x085b2a)
-function void fn085b0a()
+function void fn085b0a()		// Obj_Song_Fade_ToLevelMusic
 {
 	objA0.countdown_value = 120
 	playMusic(MUSIC_CTRL_FADEOUT)
@@ -1238,7 +1238,7 @@ function void fn085b1e()
 
 
 //# address-hook(0x085b30) end(0x085b3e)
-function void fn085b30()
+function void fn085b30()		// Obj_Song_Fade_Transition
 {
 	playMusic(MUSIC_CTRL_FADEOUT)
 
@@ -1537,7 +1537,7 @@ function void fn01df88()
 
 
 //# address-hook(0x01df90)
-function void fn01df90()
+function void fn01df90()		// SolidObject_cont
 {
 	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
 	D3.u16 = D1.u16 * 2
@@ -1813,7 +1813,7 @@ function void updateSonicPositionOnMovingObjectInternal(s8 sign)
 
 
 //# address-hook(0x01e21e) end(0x01e23e)
-function void fn01e21e()
+function void fn01e21e()		// SolidObjSloped
 {
 	if ((u8[A1 + 0x2a] & 0x08) == 0)
 		return
@@ -1832,7 +1832,7 @@ function void fn01e21e()
 
 
 //# address-hook(0x01e240) end(0x01e280)
-function void fn01e240()
+function void fn01e240()		// SolidObjSloped2
 {
 	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
 	{
@@ -1923,7 +1923,7 @@ function void PlatformCheckClimbOnForCharacterA1()
 //  -> Its surface "height map" is encoded from A2 on, each byte there representing 2 pixels
 
 //# address-hook(0x01e2fe) end(0x01e354)
-function void fn01e2fe()
+function void fn01e2fe()		// SolidObjectTopSloped2
 {
 	// Check player 1
 	A1 = 0xffffb000
@@ -1983,7 +1983,7 @@ function void fn01e314()
 
 
 //# address-hook(0x01e356) end(0x01e3ac)
-function void fn01e356()
+function void fn01e356()		// SolidObjectTopSloped
 {
 	push(D4)
 	push(D3)
@@ -2130,7 +2130,7 @@ function void LetSonicClimbOnObject()
 
 
 //# address-hook(0x01e50e) end(0x01e542)
-function void fn01e50e()
+function void fn01e50e()		// SolidObjCheckSloped2
 {
 	if (objA1.velocity.y < 0)
 		return
@@ -2152,7 +2152,7 @@ function void fn01e50e()
 
 
 //# address-hook(0x01e546) end(0x01e57c)
-function void fn01e546()
+function void fn01e546()		// SolidObjCheckSloped
 {
 	if (objA1.velocity.y < 0)
 		return
@@ -2173,7 +2173,7 @@ function void fn01e546()
 
 
 //# address-hook(0x01e580) end(0x01e5de)
-function void fn01e580()
+function void fn01e580()		// CheckPlayerReleaseFromObj
 {
 	A1 = 0xffffb000
 	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
@@ -2210,7 +2210,7 @@ function void fn01e580()
 // Check if one of the characters is inside a given box
 
 //# address-hook(0x0858f8) end(0x08593e)
-function void fn0858f8()
+function void fn0858f8()		// Check_PlayerInRange
 {
 	D3.u16 = objA0.position.x.u16 + u16[(A1+=2)-2]
 	D5.u16 = D3.u16 + u16[(A1+=2)-2]
@@ -2506,7 +2506,7 @@ function void fn0844ce()
 
 
 //# address-hook(0x01b662) end(0x01b662)
-function void fn01b662()
+function void fn01b662()		//  Sprite_CheckDeleteTouch3
 {
 	D0.u16 = objA0.position.x.u16
 	fn01b666()

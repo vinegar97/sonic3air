@@ -554,7 +554,7 @@ function void fn07279e()
 
 
 //# address-hook(0x084f92) end(0x084fa2)
-function void fn084f92()
+function void fn084f92()		// BossFlash
 {
 	// Boss damage palette effect
 #if STANDALONE

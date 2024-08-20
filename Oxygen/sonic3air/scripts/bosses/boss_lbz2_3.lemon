@@ -1486,7 +1486,7 @@ function void fn074fd2()
 
 
 //# address-hook(0x084d78) end(0x084dda)
-function void fn084d78()
+function void fn084d78()		// MoveSprite_CircularLookup
 {
 	D0 = u8[A0 + 0x3c]
 	D1.u16 = (D0.u16 >> 5) & 0x06

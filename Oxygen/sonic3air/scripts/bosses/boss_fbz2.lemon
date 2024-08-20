@@ -1071,7 +1071,7 @@ function void fn068044()
 
 
 //# address-hook(0x084ddc) end(0x084e0c)
-function void fn084ddc()
+function void fn084ddc()		// MoveSprite_AngleYLookup
 {
 	D0 = u8[A0 + 0x3c] & 0x3f
 	D1.u16 = (u8[A0 + 0x3c] >> 5) & 0x06

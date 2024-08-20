@@ -1079,7 +1079,7 @@ function void fn02ed2a()
 
 
 //# address-hook(0x085a1a) end(0x085a58)
-function void fn085a1a()
+function void fn085a1a()		// Run_PalRotationScript2
 {
 	// Palette effect with a unique timer value for each frame. mainly used for the Master Emerald glowing
 	// A1 -> Palette effect address
