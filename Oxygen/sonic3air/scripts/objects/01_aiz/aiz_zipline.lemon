@@ -572,8 +572,7 @@ function void fn02219e()
 	if (D0.u8 == u8[0x0221e2 + D1.u16])
 	{
 		++u8[A0 + 0x25]
-		D1.u8 = u8[0x0221e2 + D1.u16 + 1]
-		if (D1.u8 != 0)
+		if (u8[0x0221e2 + D1.u16 + 1] != 0)
 			return
 
 	#if STANDALONE

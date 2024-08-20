@@ -310,8 +310,7 @@ function void fn03e598()
 		if (D0.u8 == u8[0x03e5e8 + D1.u16])
 		{
 			++u8[A0 + 0x40]
-			D1.u8 = u8[0x03e5e8 + D1.u16 + 1]
-			if (D1.u8 != 0)
+			if (u8[0x03e5e8 + D1.u16 + 1] != 0)
 				return
 
 			D1 = 0xffe0
