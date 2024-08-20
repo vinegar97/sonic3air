@@ -126,6 +126,7 @@ function void fn08dc6e()
 		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 	}
 
+	// Check for collision with either character
 	fn085870()
 	if (!_equal())
 	{

@@ -1085,6 +1085,7 @@ function void fn07f8ca()
 //# address-hook(0x07f900) end(0x07f9a6)
 function void fn07f900()
 {
+	// Check for collision with either character
 	fn085870()
 	if (_equal())
 		return
@@ -1131,6 +1132,7 @@ function void fn07f900()
 //# address-hook(0x07f9a8) end(0x07f9f6)
 function void fn07f9a8()
 {
+	// Check for collision with either character
 	fn085870()
 	if (_equal())
 		return
@@ -1165,6 +1167,7 @@ function void fn07f9a8()
 //# address-hook(0x07f9f8) end(0x07fa5e)
 function void fn07f9f8()
 {
+	// Check for collision with either character
 	fn085870()
 	if (_equal())
 		return
@@ -1240,6 +1243,7 @@ function void fn07fa60()
 //# address-hook(0x07fa7e) end(0x07faca)
 function void fn07fa7e()
 {
+	// Check for collision with either character
 	fn085870()
 	if (!_equal())
 	{

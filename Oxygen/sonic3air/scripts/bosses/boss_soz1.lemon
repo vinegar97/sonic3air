@@ -673,6 +673,7 @@ function void fn076f88()
 //# address-hook(0x076fa6) end(0x076ff8)
 function void fn076fa6()
 {
+	// Check for collision with either character
 	fn085870()
 	if (_equal())
 		return

@@ -127,6 +127,7 @@ function void fn08908c()
 //# address-hook(0x0890aa) end(0x0890c4)
 function void fn0890aa()
 {
+	// Check for collision with either character
 	fn085870()
 	if (!_equal())
 	{

@@ -99,7 +99,7 @@ function void fn08f11e()
 		}
 		else
 		{
-			fn085870()
+			fn085870()		// Check for collision with either character
 			if (!_equal())
 			{
 				fn0857c2()
