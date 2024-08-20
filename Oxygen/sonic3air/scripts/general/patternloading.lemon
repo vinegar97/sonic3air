@@ -227,7 +227,8 @@ function void ClearPatternLoadingQueue()
 
 
 //# address-hook(0x0017d8) end(0x0017f2)
-function void fn0017d8()
+//# alias(fn0017d8) deprecated
+function void Nemesis.ProcessDecompressionQueue()
 {
 	if (u16[0xfffff6f8] == 0)
 		return
@@ -241,7 +242,8 @@ function void fn0017d8()
 
 
 //# address-hook(0x0017f4) end(0x001806)
-function void fn0017f4()
+//# alias(fn0017f4) deprecated
+function void Nemesis.ProcessDecompressionQueue2()
 {
 	if (u16[0xfffff6f8] == 0)
 		return

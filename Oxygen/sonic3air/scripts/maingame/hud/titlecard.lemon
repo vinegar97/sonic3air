@@ -421,7 +421,8 @@ function void TitleCard.TextElement.Update()
 
 
 //# address-hook(0x02d9a0) end(0x02d9c6)
-function void fn02d9a0()
+//# alias(fn02d9a0) deprecated
+function void TitleCard.ActNumberElement.Init()
 {
 	objA0.update_address = addressof(TitleCard.TextElement.Update)
 	if (global.zone == 0x0a || global.zone == 0x0c || global.zone_act == 0x1601)

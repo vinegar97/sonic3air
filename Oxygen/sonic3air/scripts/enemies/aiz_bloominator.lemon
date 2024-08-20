@@ -33,21 +33,23 @@ function void Bloominator.BaseUpdate()
 
 
 //# address-hook(0x086d8a) end(0x086da0)
-function void fn086d8a()
+//# alias(fn086d8a) deprecated
+function void Bloominator.UpdateState00.Init2()
 {
-	setupObjectAttributesFull(0x086e12)
-	objA0.countdown_value = 0x1f
+	setupObjectAttributesFull(0x086e12)			// objA0.base_state += 0x02
+	objA0.countdown_value = 31		// 1/2 second (plus one frame)
 	objA0.countdown_callback = 0x086dae
 }
 
 
 //# address-hook(0x086da2) end(0x086daa)
-function void fn086da2()
+//# alias(fn086da2) deprecated
+function void Bloominator.UpdateState02.Countdown()
 {
 	// Calls "fn086dae()" after wait time
 	if (objA0.render_flags & render_flag.VISIBLE)
 	{
-		Object.CountdownAndTrigger()
+		Object.CountdownAndTrigger(/* 0x086dae */)
 	}
 }
 
@@ -62,9 +64,10 @@ function void fn086dae()
 
 
 //# address-hook(0x086dc6) end(0x086dfa)
-function void fn086dc6()
+//# alias(fn086dc6) deprecated
+function void Bloominator.UpdateState04.FireSpikeBall()
 {
-	Object.AnimationProgressByLocalA1.DistinctTimer()			// Calls "fn086dfc()" after animation ends
+	Object.AnimationProgressByLocalA1.DistinctTimer(/* 0x086e42, 0x086dfc */)			// Calls "fn086dfc()" after animation ends
 
 	if (_equal())		// Only proceed on new frames
 		return

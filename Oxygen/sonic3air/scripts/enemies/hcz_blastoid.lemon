@@ -40,7 +40,7 @@ function void Blastoid.BaseUpdate()
 //# address-hook(0x08794a) end(0x08794e)
 function void fn08794a()
 {
-	setupObjectAttributesFull(0x0879e0)
+	setupObjectAttributesFull(0x0879e0)		// Call fn087952() on next update
 }
 
 
@@ -51,7 +51,7 @@ function void fn087952()
 	if (D2.u16 >= 0x80)
 		return
 
-	objA0.base_state = 0x04
+	objA0.base_state = 0x04		// Call fn087976() on next update
 	u32[A0 + 0x30] = 0x087a10
 	objA0.countdown_callback = 0x0879a0
 }
@@ -60,7 +60,7 @@ function void fn087952()
 //# address-hook(0x087976) end(0x08799c)
 function void fn087976()
 {
-	Object.AnimationProgressByLocalA1.DistinctTimer()
+	Object.AnimationProgressByLocalA1.DistinctTimer()		// Calls fn0879a0 on animation end
 	if (D2.s16 > 0 && objA0.animation.sprite == 1 && objA0.render_flags & render_flag.VISIBLE)
 	{
 		playSound(0x4d)
@@ -73,7 +73,7 @@ function void fn087976()
 //# address-hook(0x0879a0) end(0x0879a6)
 function void fn0879a0()
 {
-	objA0.base_state = 0x02
+	objA0.base_state = 0x02		// Call fn087952() on next update
 }
 
 
