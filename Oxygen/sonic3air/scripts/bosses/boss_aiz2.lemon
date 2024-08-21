@@ -955,7 +955,7 @@ function void fn06937e()
 	}
 	else
 	{
-		D0.u16 = isMainCharacter(CHARACTER_KNUCKLES) ? 0xff : 0xbf
+		D0.u16 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x00ff : 0xbf
 		objA0.countdown_value = D0.u16
 		objA0.countdown_callback = 0x0693c0
 	}

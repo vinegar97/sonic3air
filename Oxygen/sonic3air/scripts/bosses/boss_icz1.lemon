@@ -331,7 +331,7 @@ function void fn0713b2()
 function void fn0713d2()
 {
 	objA0.base_state = 0x04
-	objA0.countdown_value = 0xff
+	objA0.countdown_value = 0x00ff
 	objA0.countdown_callback = addressof(Boss.ICZ1.GotoState06)
 }
 

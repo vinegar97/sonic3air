@@ -398,7 +398,7 @@ function void fn06c646()
 function void fn06c658()
 {
 	objA0.base_state = 0x20
-	objA0.countdown_value = 0xff
+	objA0.countdown_value = 0x00ff
 	objA0.countdown_callback = 0x06c614
 	objA0.flags38 |= (0x04 | 0x08)
 

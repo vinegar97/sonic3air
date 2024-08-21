@@ -155,7 +155,7 @@ function void fn07071a()
 			objA0.flags38 |= 0x04
 			objA0.countdown_callback = 0x0707ec
 			u8[A0 + 0x40] = 2
-			objA0.countdown_value = isMainCharacter(CHARACTER_KNUCKLES) ? 0xff : 0x1ff
+			objA0.countdown_value = isMainCharacter(CHARACTER_KNUCKLES) ? 0x00ff : 0x01ff
 		}
 		else
 		{

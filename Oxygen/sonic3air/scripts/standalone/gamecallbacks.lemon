@@ -33,7 +33,7 @@ function void Standalone.onLevelStart()
 	if (!Game.isTimeAttack())
 	{
 		// Intentionally not using the (more deterministic) "getRandomNumber" here
-		global.level_random_base = 1 + (System.rand() % 0xff)		// Avoid the 0 value
+		global.level_random_base = 1 + (System.rand() % 0x000000ff)		// Avoid the 0 value
 	}
 
 	// Set controller LEDs (for game controllers that support it) depending on character selection

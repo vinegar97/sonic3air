@@ -166,7 +166,7 @@ function void fn06b008()
 function void fn06b01e()
 {
 	objA0.base_state = 0x0a
-	objA0.countdown_value = 0xff
+	objA0.countdown_value = 0x00ff
 	objA0.position.y.u16 = u16[A0 + 0x3a]
 	objA0.countdown_callback = 0x06b03a
 }

@@ -20,7 +20,7 @@ function void fn043698()
 //# address-hook(0x0436a8) end(0x043746)
 function void fn0436a8()
 {
-	D0.u16 = level.framecounter & 0xff
+	D0.u16 = level.framecounter & 0x00ff
 	if (D0.u16 >= u16[A0 + 0x30])
 	{
 		--objA0.animation.timer

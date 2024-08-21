@@ -42,8 +42,8 @@ function void fn044c76()
 		D2 = 0x10
 		D3.u16 = 0x0102
 		D4.u16 = objA0.position.x.u16
-		objA0.flags2e = (D4.u16 >= objA1.position.x.u16) ? 0xff : 0x00
-		if (objA0.flags2e)
+		objA0.flags2e = (D4.u16 >= objA1.position.x.u16) ? -1 : 0
+		if (objA0.flags2e != 0)
 		{
 			D1.s16 = -D1.s16
 			D2.s16 = -D2.s16
@@ -176,8 +176,8 @@ function void fn044d98()
 			D3.u16 = 0x0405
 			D6 = 0xfffffff8
 			D4.u16 = objA0.position.x.u16
-			objA0.flags2e = (D4.u16 >= objA1.position.x.u16) ? 0xff : 0x00
-			if (objA0.flags2e)
+			objA0.flags2e = (D4.u16 >= objA1.position.x.u16) ? -1 : 0
+			if (objA0.flags2e != 0)
 			{
 				D1.s16 = -D1.s16
 				D2.s16 = -D2.s16

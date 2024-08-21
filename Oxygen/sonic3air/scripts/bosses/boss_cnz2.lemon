@@ -214,7 +214,7 @@ function void fn06e62c()
 function void fn06e632()
 {
 	objA0.flags38 |= 0x04
-	objA0.countdown_value = 0xff
+	objA0.countdown_value = 0x00ff
 	objA0.countdown_callback = 0x06e650
 
 	// Spawn electric bolts hitting the dropped green orb
@@ -229,7 +229,7 @@ function void fn06e650()
 {
 	objA0.flags38 &= ~0x04
 	objA0.flags38 |= 0x80
-	objA0.countdown_value = 0xff
+	objA0.countdown_value = 0x00ff
 	objA0.countdown_callback = 0x06e66c
 }
 

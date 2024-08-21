@@ -219,7 +219,7 @@ function void fn08d450()
 	objA0.update_address = 0x08d36a
 	camera.screenshake.state.hi = -1
 	u8[0xffffeec6] = 0xff
-	objA0.countdown_value = 0xff
+	objA0.countdown_value = 0x00ff
 	objA0.countdown_callback = 0x08d46e
 }
 

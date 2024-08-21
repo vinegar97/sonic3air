@@ -900,7 +900,7 @@ function void fn06a710()
 	D0.u16 = water.height.current + 8
 	objA0.position.y.u16 = D0.u16
 	GetRandomNumber()
-	D0.u16 &= 0xff
+	D0.u16 &= 0x00ff
 	D1.u16 = D0.u16
 	D0.s16 = D0.s8
 	if (D0.s16 < 0)

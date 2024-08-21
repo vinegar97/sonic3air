@@ -742,7 +742,7 @@ function void fn08d082()
 function void fn08d0ae()
 {
 	objA0.update_address = addressof(Object.CountdownAndTrigger)
-	objA0.countdown_value = 0xff
+	objA0.countdown_value = 0x00ff
 	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	objA0.position.x.u16 = u16[0x08d0e0 + objA0.subtype2c]
 	objA0.position.y.u16 = 0x0a20

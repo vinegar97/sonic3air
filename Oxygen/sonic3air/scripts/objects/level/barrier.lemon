@@ -45,7 +45,7 @@ function void fn020630()
 	else if (global.zone == 0x06)
 	{
 		D0.u16 = u16(objA0.subtype2c & 0x3f) * 4 + 8
-		D0.u16 = min(D0.u16, 0xff)
+		D0.u16 = min(D0.u16, 0x00ff)
 
 		objA0.flags38 = D0.u8
 		if ((objA0.subtype2c & 0x40) == 0)

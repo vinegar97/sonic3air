@@ -112,6 +112,6 @@ function void waitForNextFrame()
 
 function void yieldInWhiteScreen()
 {
-	Renderer.setGlobalComponentTint(0, 0, 0, 0xff, 0xff, 0xff)	// Needed so the HUD won't briefly flash for one frame now
+	Renderer.setGlobalComponentTint(0, 0, 0, 0x00ff, 0x00ff, 0x00ff)	// Needed so the HUD won't briefly flash for one frame now
 	yieldExecution()
 }

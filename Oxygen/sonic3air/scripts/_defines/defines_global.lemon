@@ -708,7 +708,7 @@ define kosinski.decompr_words	= u16[0xffffff62]	// Half of the number of bytes o
 
 
 define levelselect.selection		= u16[0xffffff82]
-define levelselect.soundtest		= u16[0xffffff84]	// Selected piece in sound test (only up to 0xff)
+define levelselect.soundtest		= u16[0xffffff84]	// Selected piece in sound test (only up to 0x00ff)
 define titlescreen.selection		=  u8[0xffffff86]
 
 define results.total_bonus			= u16[0xffffff8e]

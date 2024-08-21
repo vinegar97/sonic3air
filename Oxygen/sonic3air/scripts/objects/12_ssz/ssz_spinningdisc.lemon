@@ -337,7 +337,7 @@ function void fn045f74()
 //# address-hook(0x0460a6) end(0x0460d2)
 function void fn0460a6()
 {
-	D0.u16 = (D0.u16 + 0x0a) & 0xff
+	D0.u16 = (D0.u16 + 0x0a) & 0x00ff
 	D1.u16 = D0.u16
 	D0.u16 *= 3
 	D0.u16 >>= 5

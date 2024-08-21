@@ -35,16 +35,16 @@ function void SHCSplash.setPalette(u16 opacity)
 	}
 
 	// Some variation on the non-uniform fade-out
-	s32 reductionR = clamp(s32(0x100 - opacity) * 2, 0, 0xff)
-	s32 reductionG = clamp(s32(0xc0 - opacity) * 2, 0, 0xff)
-	s32 reductionB = clamp(s32(0x80 - opacity) * 2, 0, 0xff)
+	s32 reductionR = clamp(s32(0x100 - opacity) * 2, 0, 0x000000ff)
+	s32 reductionG = clamp(s32(0xc0 - opacity) * 2, 0, 0x000000ff)
+	s32 reductionB = clamp(s32(0x80 - opacity) * 2, 0, 0x000000ff)
 
 	for (u8 i = 0; i < PALETTE.length(); ++i)
 	{
 		u32 color = PALETTE[i]
-		u32 r = color & 0xff
-		u32 g = (color >> 8) & 0xff
-		u32 b = (color >> 16) & 0xff
+		u32 r = color & 0x000000ff
+		u32 g = (color >> 8) & 0x000000ff
+		u32 b = (color >> 16) & 0x000000ff
 		r = max(r - reductionR, 0)
 		g = max(g - reductionG, 0)
 		b = max(b - reductionB, 0)
