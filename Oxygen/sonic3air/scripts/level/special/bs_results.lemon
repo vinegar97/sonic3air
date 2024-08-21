@@ -393,7 +393,7 @@ function void fn02e746()
 
 	if (s16[A0 + 0x30] > 0)
 	{
-		u8[A0 + 0x30] = 0xff
+		u8[A0 + 0x30] = -1
 		playSound(0x9c)
 	}
 
@@ -429,7 +429,7 @@ function void fn02e746()
 						u16[A1 + 0x2e] = D1.u16
 						u16[A1 + 0x30] = D2.u16
 						u16[A1 + 0x34] = A0.u16
-						u8[A1 + 0x36] = 0xff
+						u8[A1 + 0x36] = -1
 						D1.u16 += 0x10
 						++D2.u16
 						if (!allocDynamicObjectAfterA1())
@@ -1014,7 +1014,7 @@ function void fn02ed2a()
 	LookupSinCos()
 	D2.u16 = objA0.value32
 
-	D3.u8 = (D1.s16 < 0) ? 0xff : 0x00
+	D3.u8 = (D1.s16 < 0) ? -1 : 0
 	D1.u16 = abs(D1.s16)
 	D1 = u32(D1.u16) * D2.u16
 	D1 = (D1 << 16) + (D1 >> 16)
@@ -1023,7 +1023,7 @@ function void fn02ed2a()
 		D1.s16 = -D1.s16
 	}
 
-	D3.u8 = (D0.s16 < 0) ? 0xff : 0x00
+	D3.u8 = (D0.s16 < 0) ? -1 : 0
 	D0.u16 = abs(D0.s16)
 	D0 = u32(D0.u16) * D2.u16
 	D0 = (D0 << 16) + (D0 >> 16)
@@ -1059,7 +1059,7 @@ function void fn02ed2a()
 		}
 
 		A1 = 0xffff0000 + u16[A0 + 0x34]
-		u8[A1 + 0x31] = 0xff
+		u8[A1 + 0x31] = -1
 		u8[0xfffffac0] = 0
 	}
 	else

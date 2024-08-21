@@ -38,7 +38,7 @@ function void InitLevelTiles.BonusGM()
 
 	fn23a002()
 
-	D2.u16 = 0xffff		// Hacked in... I can't find where this gets actually set in original execution
+	D2.u16 = -1		// Hacked in... I can't find where this gets actually set in original execution
 	u16[0xffffa802] = D2.u16
 	u16[0xffffa80a] = D2.u16
 	u16[0xffffa806] = u16[0xffffa80e] & level.height.tilemask
@@ -503,7 +503,7 @@ function void fn239822()
 	}
 
 	D2.u16 &= 0x30
-	u8[0xffffeea4] = (D2.u16 != 0x10) ? 0xff : 0x00
+	u8[0xffffeea4] = (D2.u16 != 0x10) ? -1 : 0
 
 	push(D6.u16)
 	push(D1.u16)
@@ -662,7 +662,7 @@ function void fn23998e()
 	}
 
 	D2.u16 &= 0x30
-	u8[0xffffeea4] = (D2.u16 != 0x10) ? 0xff : 0x00
+	u8[0xffffeea4] = (D2.u16 != 0x10) ? -1 : 0
 
 	push(D6.u16)
 	push(D1.u16)

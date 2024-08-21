@@ -38,7 +38,7 @@ function void TitleCard.Init()
 	else if (global.zone >= 0x0e && global.zone <= 0x12)
 	{
 		// Competition mode stages
-		u8[A0 + 0x45] = 0xff
+		u8[A0 + 0x45] = -1
 		UnloadObject()
 		return
 	}
@@ -77,7 +77,7 @@ function void TitleCard.Init()
 
 	objA0.countdown_value = 0x5a
 	objA0.value32 = 0
-	u8[A0 + 0x48] = 0xff
+	u8[A0 + 0x48] = -1
 	objA0.base_state += 2
 }
 
@@ -350,7 +350,7 @@ function void TitleCard.RedBarElement.Update()
 		if (objA0.position.y.u16 != u16[A0 + 0x46])
 		{
 			objA0.position.y.u16 += 0x10
-			u8[A1 + 0x34] = 0xff
+			u8[A1 + 0x34] = -1
 		}
 	}
 
@@ -413,7 +413,7 @@ function void TitleCard.TextElement.Update()
 		if (objA0.position.x.u16 > u16[A0 + 0x46])
 		{
 			objA0.position.x.u16 = max(objA0.position.x.u16 - 0x10, u16[A0 + 0x46])
-			u8[A1 + 0x34] = 0xff
+			u8[A1 + 0x34] = -1
 		}
 	}
 	DrawObject()

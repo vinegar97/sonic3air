@@ -354,7 +354,7 @@ function void fn0512e8()
 	else
 	{
 		u16[0xffffeec4] = 0
-		u8[0xffffeee8] = 0xff
+		u8[0xffffeee8] = -1
 		camera.screenshake.state = 0x14
 		u16[0xffffeec0] += 4
 		fn05130c()
@@ -476,7 +476,7 @@ function void fn05134c()
 
 		camera.screenshake.state.hi = -1
 		u16[0xffffeed8] = 0
-		u8[0xffffeea2] = 0xff
+		u8[0xffffeea2] = -1
 		gfx.plane_update_routine = 0x04		// Enter vertical scroll mode
 	#if STANDALONE
 		verticalScrollOffsetBias = 0
@@ -547,7 +547,7 @@ function void fn0514aa()
 {
 	if (s16[0xffffeeb8] < 0 && u32[0xfffff680] == 0)
 	{
-		u16[0xffffeeb8] = 0xff
+		u16[0xffffeeb8] = -1
 	}
 
 	if (s16[0xffffeeb8] > 0)
@@ -671,7 +671,7 @@ function void fn051560()
 	if (camera.position.x.u16 >= D0.u16)
 	{
 		move_area.left = D0.u16
-		u8[0xffffeee4] = 0xff
+		u8[0xffffeee4] = -1
 		u16[0xffffeee2] += 0x0c
 
 		if (allocDynamicObjectStd())
@@ -681,7 +681,7 @@ function void fn051560()
 			objA1.position.x.u16 = 0x08e0
 			objA1.position.y.u16 = 0x0690
 			camera.screenshake.state.hi = -1
-			u8[0xffffeeb4] = 0xff
+			u8[0xffffeeb4] = -1
 		}
 	}
 }
@@ -701,14 +701,14 @@ function void fn0515a4()
 	if (D1.u16 == camera.position.y.u16 && D1.u16 != level.vertical_wrap)
 	{
 		level.vertical_wrap = D1.u16
-		u8[0xffffeeb9] = 0xff
+		u8[0xffffeeb9] = -1
 	}
 
 	D0.u16 = move_area.left
 	if (D0.u16 >= camera.position.x.u16)
 	{
 		move_area.right = D0.u16
-		u8[0xffffeee5] = 0xff
+		u8[0xffffeee5] = -1
 		u16[0xffffeee2] += 0x0c
 
 		if (allocDynamicObjectStd())
@@ -719,7 +719,7 @@ function void fn0515a4()
 			objA1.position.x.u16 = 0x2fa0
 			objA1.position.y.u16 = 0x02d0
 			camera.screenshake.state.hi = -1
-			u8[0xffffeeb4] = 0xff
+			u8[0xffffeeb4] = -1
 		}
 	}
 }
@@ -734,7 +734,7 @@ function void fn05160e()
 		if (D0.u16 >= camera.position.x.u16)
 		{
 			move_area.right = D0.u16 + getScreenExtend() * 2
-			u8[0xffffeee6] = 0xff
+			u8[0xffffeee6] = -1
 			u16[0xffffeee2] += 0x0c
 
 			if (allocDynamicObjectStd())
@@ -745,7 +745,7 @@ function void fn05160e()
 				objA1.position.x.u16 = 0x3300
 				objA1.position.y.u16 = 0x0790
 				camera.screenshake.state.hi = -1
-				u8[0xffffeeb4] = 0xff
+				u8[0xffffeeb4] = -1
 			}
 		}
 	}
@@ -1073,7 +1073,7 @@ function void InitLevelScrolling.MGZ2()
 		{
 			level.display_routine = 0x0c
 			u16[0xffffeed4] = 0x01d0
-			u8[0xffffeee0] = 0xff
+			u8[0xffffeee0] = -1
 			u32[0xffffa838] = 0
 		}
 	}
@@ -1303,7 +1303,7 @@ function void fn051a04()
 	{
 		if (D0.u16 >= 0x3900)
 		{
-			u8[0xffffeee0] = 0xff
+			u8[0xffffeee0] = -1
 			u32[0xffffa838] = 0
 			newLevelDisplayRoutine = 0x0c
 		}
@@ -1316,7 +1316,7 @@ function void fn051a04()
 		}
 	}
 
-	if (newLevelDisplayRoutine != 0xffff)
+	if (newLevelDisplayRoutine != -1)
 	{
 		level.display_routine = newLevelDisplayRoutine
 		D0 = -1
@@ -1421,7 +1421,7 @@ function void fn051ad0()
 	D2.u16 = 0x36d0
 	D3.u16 = 0x01d0
 	D4.u16 = 0x6000
-	objA0.flags38 = 0xff
+	objA0.flags38 = -1
 	fn051ae6()
 }
 
@@ -1475,14 +1475,14 @@ function void fn051b1c()
 		{
 			if (D3.u16 < 0x0200 && D2.u16 < 0x3cb0)
 			{
-				objA0.value39 = 0xff
+				objA0.value39 = -1
 			}
 		}
 		else
 		{
 			if (D2.u16 >= 0x3d50)
 			{
-				objA0.value39 = 0xff
+				objA0.value39 = -1
 			}
 		}
 

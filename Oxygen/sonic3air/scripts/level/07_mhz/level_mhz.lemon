@@ -91,7 +91,7 @@ function void UpdateLevelTiles.MHZ1()
 		{
 			level.vertical_wrap = 0x0710
 			level.special_scrolling = 0x08
-			u8[0xffffeed2] = 0xff
+			u8[0xffffeed2] = -1
 
 		#if STANDALONE
 			if (Game.isTimeAttack())
@@ -313,7 +313,7 @@ function void InitLevelTiles.MHZ2()
 {
 	u16[0xffffeec0] = 0x04
 	u16[0xffffeee8] = 0
-	u8[0xfffff7c1] = 0xff
+	u8[0xfffff7c1] = -1
 
 	if (u16[0xffffb000 + 0x10] < 0x09c0 && u16[0xffffb000 + 0x14] >= 0x0600)
 	{
@@ -323,7 +323,7 @@ function void InitLevelTiles.MHZ2()
 	}
 	else if (u16[0xffffb000 + 0x10] < 0x2940)
 	{
-		u8[0xffffeed6] = 0xff
+		u8[0xffffeed6] = -1
 		A1 = 0x0a94bc
 	}
 	else
@@ -638,8 +638,8 @@ function void fn055086()
 //# address-hook(0x055098) end(0x0550a6)
 function void fn055098()
 {
-	u8[0xffffeed6] = 0xff
-	u8[0xfffff7c1] = 0xff
+	u8[0xffffeed6] = -1
+	u8[0xfffff7c1] = -1
 	A1 = 0x0a94bc
 	fn0550c4()
 }
@@ -659,7 +659,7 @@ function void fn0550a8()
 function void fn0550b8()
 {
 	u16[0xffffeed6] = 0
-	u8[0xfffff7c1] = 0xff
+	u8[0xfffff7c1] = -1
 	A1 = 0x0550fe
 	fn0550c4()
 }
@@ -921,7 +921,7 @@ function void fn055312()
 		u16[0xffffa806] = camera.foreground.x.u16 & 0xfff0
 		u16[0xffffeec8] = 0x01a0
 		u16[0xffffeeca] = 0x02
-		u8[0xffffeed2] = 0xff
+		u8[0xffffeed2] = -1
 
 		A1 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x0558f8 : 0x0558e8
 		u8[0xffffeed9] = u8[A1]
@@ -954,7 +954,7 @@ function void fn055312()
 	{
 		u16[0xffffeec8] = 0x80
 		u16[0xffffeeca] = 0x02
-		u8[0xffffeed3] = 0xff
+		u8[0xffffeed3] = -1
 		level.scrolling_routine += 4
 
 		fn0553b6()
@@ -1000,7 +1000,7 @@ function void fn0553b6()
 
 					objA1.update_address = 0x05577c
 					u16[A1 + 0x2e] = D1.u16
-					u8[A1 + 0x30] = 0xff
+					u8[A1 + 0x30] = -1
 					u16[(A5+=2)-2] = A1.u16
 
 					--D1.s16
@@ -1314,7 +1314,7 @@ function void fn05560c()
 	{
 		if (u16[0xffffeec6] != 0)
 		{
-			u8[0xffffeec6] = 0xff
+			u8[0xffffeec6] = -1
 			u16 screenPosBeforeTree = 0x4420 - getScreenExtend() * 3/2
 			if (newCameraX < screenPosBeforeTree)
 			{
@@ -1351,7 +1351,7 @@ function void fn05560c()
 			u8[0xffffeed9] = u8[A1 + D1.s16]
 			if (u8[0xfffffaa9] != 0)
 			{
-				u8[0xffffeedc] = 0xff
+				u8[0xffffeedc] = -1
 				u8[0xfffffaa9] = 0
 			}
 

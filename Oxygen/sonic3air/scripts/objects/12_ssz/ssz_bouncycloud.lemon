@@ -147,7 +147,7 @@ function void fn045170()
 			u8[A1 + 0x05] = base_state.NORMAL
 			u8[A1 + 0x20] = 0
 
-			u8[A2] = 0xff
+			u8[A2] = -1
 			D0 = -0x1c
 			if ((u8[A1 + 0x2a] & char.flag.FACING_LEFT) == 0)
 			{

@@ -18,7 +18,7 @@ function void UpdateGlobalRingAnimation()
 	// Update for static rings
 	{
 		--static_rings.animtimer
-		if (static_rings.animtimer == 0xff)
+		if (static_rings.animtimer == -1)
 		{
 			static_rings.animtimer = 7
 			static_rings.animframe = (static_rings.animframe + 1) % 4
@@ -314,7 +314,7 @@ function void RenderStaticRings()
 		while (numRings > 0)
 		{
 			u16 ringAnimationState = u16[A4]
-			if (ringAnimationState != 0xffff)
+			if (ringAnimationState != -1)
 			{
 				D1.u16 = (u16[A0+2] - camera_y + 8) & level.height.bitmask
 				if (D1.u16 < D5.u16)

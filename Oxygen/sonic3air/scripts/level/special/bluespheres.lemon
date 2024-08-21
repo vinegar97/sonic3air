@@ -766,7 +766,7 @@ function void fn008faa()
 	u16[A0 + 0x38] = 0
 
 	fn00950c()
-	objA0.value3a = 0xff
+	objA0.value3a = -1
 
 	objA0.update_address = 0x00903e
 	fn00903e()
@@ -918,7 +918,7 @@ function void fn009212()
 	u16[A0 + 0x34] = 0
 	u16[A0 + 0x36] = 0xf800
 	u16[A0 + 0x38] = 0xffe0
-	objA0.value3a = 0xff
+	objA0.value3a = -1
 
 	fn0093e2()
 
@@ -1087,7 +1087,7 @@ function void fn009444()
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (SpecialStage.Tails_Tails.targetInVRAM >> 5))
 	u16[A0 + 0x30] = getScreenWidth() / 2
 	objA0.value32 = 0x70
-	objA0.value3a = 0xff
+	objA0.value3a = -1
 	objA0.animation.sprite = 1
 
 	objA0.update_address = 0x009488
@@ -2460,7 +2460,7 @@ function void fn02df64()
 	VDP.Config.enableHInt(false)
 	VDP.Config.setNameTableBasePlaneA(0xc000)
 	VDP.Config.setNameTableBasePlaneB(0xe000)
-	VDP.Config.setVerticalScrolling(false, 0xff)
+	VDP.Config.setVerticalScrolling(false, -1)
 	VDP.Config.setRenderingModeConfiguration(false)
 	VDP.Config.setPlayfieldSizeInPixels(512, 256)
 
@@ -2611,13 +2611,13 @@ function void fn02df64()
 		{
 			D0.u8 = u8[0xffffef6e] | 0x80
 			u8[0xfffffac0] = D0.u8
-			u8[0xfffffac1] = 0xff
+			u8[0xfffffac1] = -1
 		}
 	}
 
 	fn01aa6e()
 	u16[0xffffef68] = 0x98
-	u8[0xffffef6c] = 0xff
+	u8[0xffffef6c] = -1
 	u32[0xffffb940] = 0x02e3b8		// Special Stage results object
 
 	VDP.Config.setActiveDisplay(true)
@@ -2881,7 +2881,7 @@ function void BlueSpheres.renderCustomSpheres()
 
 		bool behindHorizon = (size < 0x1b00)
 		u16 renderQueue = (behindHorizon ? 0x2000 : 0x9000) + size / 0x100
-		u8 alpha = (sphereType == 0x0a) ? 0xa0 : 0xff
+		u8 alpha = (sphereType == 0x0a) ? 0xa0 : -1
 		u32 fog = clamp(s32(0x100000) / size - 0x68, 0, 0x80) * 0x010101
 
 		D0.u16 = u8(sphereType) * 8

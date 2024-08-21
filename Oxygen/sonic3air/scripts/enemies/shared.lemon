@@ -209,7 +209,7 @@ function void Enemy.ChaseObject()
 	D4.u16 = objA0.position.x.u16
 	if (D4.u16 == objA1.position.x.u16)
 	{
-		D5.u8 = 0xff
+		D5.u8 = -1
 	}
 	else
 	{
@@ -2231,7 +2231,7 @@ function bool SetupObjectAttributesSlotted()
 	objA0.animation.sprite = u8[(A1+=1)-1]
 	objA0.collision_attributes = u8[(A1+=1)-1]
 	objA0.flags2a |= 0x04
-	objA0.value3a = 0xff
+	objA0.value3a = -1
 	objA0.render_flags |= render_flag.WORLD
 	objA0.base_state += 2
 	return false

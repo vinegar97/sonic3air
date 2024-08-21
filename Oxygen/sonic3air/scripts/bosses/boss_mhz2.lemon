@@ -466,7 +466,7 @@ function void fn07654a()
 	{
 		// Spawn object to manage fading to white, and if to fade back after
 		objA1.update_address = 0x085e64
-		u8[A1 + 0x2c] = 0xff
+		u8[A1 + 0x2c] = -1
 		u16[A1 + 0x3a] = 3
 	}
 
@@ -650,7 +650,7 @@ function void fn076782()
 			objA0.update_address = 0x076164
 			objA0.flags38 &= ~0x40
 			objA0.velocity.x = isMainCharacter(CHARACTER_KNUCKLES) ? 0x0500 : 0x0400
-			u8[0xfffffaa9] = 0xff
+			u8[0xfffffaa9] = -1
 
 		#if STANDALONE
 			// Switch to Robotnik's defeated face now already
@@ -673,7 +673,7 @@ function void fn076782()
 		{
 			u8[A0 + 0x28] = u8[A0 + 0x25]
 			u8[A4 + 0x28] = u8[A4 + 0x25]
-			u8[A4 + 0x29] = 0xff
+			u8[A4 + 0x29] = -1
 		}
 	}
 }

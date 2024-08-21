@@ -55,7 +55,7 @@ function void fn055f6e()
 	if (objA0.countdown_value != 0)
 		return
 
-	u8[0xffffeed4] = 0xff
+	u8[0xffffeed4] = -1
 	objA0.base_state += 4
 	fn055f7c()
 }
@@ -103,7 +103,7 @@ function void fn055fbe()
 	}
 
 	objA0.position.x.u16 = camera.position.x.u16
-	u8[0xffffef3a] = 0xff
+	u8[0xffffef3a] = -1
 
 #if STANDALONE
 	// TODO: Add sprite mask below y = 0x0a00

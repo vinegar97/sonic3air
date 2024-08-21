@@ -307,7 +307,7 @@ function void fn04e82e()
 	//  - AIZ 1 fire wall
 	//  - LBZ 1 building collapse in Knuckles cutscene
 	//  - LRZ 2 boss
-	VDP.Config.setVerticalScrolling(true, 0xff)
+	VDP.Config.setVerticalScrolling(true, -1)
 	gfx.plane_update_routine += 4
 
 	fn04e838()
@@ -366,7 +366,7 @@ function void fn04e838()
 function void fn04e84e()
 {
 	// Switch back to horizontal scrolling mode
-	VDP.Config.setVerticalScrolling(false, 0xff)
+	VDP.Config.setVerticalScrolling(false, -1)
 	gfx.plane_update_routine = 0
 
 #if STANDALONE

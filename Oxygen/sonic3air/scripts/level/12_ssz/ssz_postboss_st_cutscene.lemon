@@ -239,7 +239,7 @@ function void fn05806e()
 	{
 		if (u16[A2] == 0x0910)
 		{
-			u8[A2 + 0x04] = 0xff
+			u8[A2 + 0x04] = -1
 
 			u16[A1 + 0x1c] = 0x0800
 			objA1.hitbox_extends.y = char.hitbox.y.ROLLING

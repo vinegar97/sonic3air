@@ -153,7 +153,7 @@ function void fn08852e()
 function void fn08855a()
 {
 	camera.screenshake.state = 0
-	level.trigger08 = 0xff
+	level.trigger08 = -1
 	Object.TriggerUnloading()
 
 #if STANDALONE

@@ -61,7 +61,7 @@ function void fn0326b6()
 	{
 		objA0.animation.timer = 7
 		--objA0.animation.sprite
-		if (objA0.animation.sprite == 0xff)
+		if (objA0.animation.sprite == -1)
 			objA0.animation.sprite = 2
 	}
 

@@ -62,7 +62,7 @@ function void fn063134()
 	level.bossarea.left = u16[0x0630dc]
 	fn065dd6()
 
-	u8[0xffffeee8] = 0xff
+	u8[0xffffeee8] = -1
 	CutsceneKnuckles.loadPalette()
 
 	// "spawnChildObjects(0x0665bc)" replaced by:
@@ -326,7 +326,7 @@ function void fn06338e()
 	objA1.state = char.state.LIFTED
 	objA1.render_flags &= ~render_flag.FLIP_Y
 	u8[A1 + 0x0a] |= 0x80
-	u8[0xffffee39] = 0xff
+	u8[0xffffee39] = -1
 }
 
 

@@ -736,7 +736,7 @@ function void fn085e64()
 {
 	objA0.value39 = 7
 	objA0.update_address = 0x085e74
-	u8[0xfffffabf] = 0xff
+	u8[0xfffffabf] = -1
 	fn085e74()
 }
 

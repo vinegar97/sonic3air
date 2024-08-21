@@ -54,7 +54,7 @@ function void fn047378()
 
 	u16[A0 + 0x26] = 0
 	objA0.value32 = 0
-	u8[A0 + 0x36] = 0xff
+	u8[A0 + 0x36] = -1
 	objA0.subtype2c &= 0xf0
 
 	objA0.update_address = 0x047440

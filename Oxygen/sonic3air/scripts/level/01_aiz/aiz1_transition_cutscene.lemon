@@ -76,7 +76,7 @@ function void fn06852c()
 	if (Game.isTimeAttack())
 	{
 		// Trigger fire wall immediately
-		u16[0xffffeec6] = 0xff
+		u16[0xffffeec6] = -1
 
 		addPatternLoadingCue(0x083d48)		// Monitor, small explosion, and critter sprites
 
@@ -223,7 +223,7 @@ function void fn068646()
 	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	// Trigger fire wall
-	u8[0xffffeec6] = 0xff
+	u8[0xffffeec6] = -1
 }
 
 

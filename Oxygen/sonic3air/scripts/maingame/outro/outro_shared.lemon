@@ -194,8 +194,8 @@ function void fn05b29e()
 {
 	u16[0xfffffa86] += 2
 	timer.alldata = 0
-	u8[0xffffeec4] = 0xff
-	u8[0xfffffacc] = 0xff
+	u8[0xffffeec4] = -1
+	u8[0xfffffacc] = -1
 
 	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{

@@ -140,7 +140,7 @@ function void fn02dbca()
 			u16[A1 + 0x46] = u16[A2+4]
 			objA1.position.x.u16 = u16[A2+6]
 			objA1.position.y.u16 = u16[A2+8]
-			u8[A1 + 0x05] = (s16[A1 + 0x10] >= 0) ? 0xff : 0x00
+			u8[A1 + 0x05] = (s16[A1 + 0x10] >= 0) ? -1 : 0
 			u8[A1 + 0x22] = u8[A2+10]
 			objA1.box_size.x = u8[A2+11]
 			u8[A1 + 0x28] = u16[A2+12]
@@ -169,7 +169,7 @@ function void fn02dbca()
 			// AIZ and ICZ have some special handling of apparent vs. current act 1
 			if (global.zone.apparent != 0x00 && global.zone.apparent != 0x05)
 			{
-				u8[0xffffeec6] = 0xff
+				u8[0xffffeec6] = -1
 			}
 		}
 	}
@@ -312,7 +312,7 @@ function void LevelResults.AdvanceToNextAct()
 	// Show title card for Act 2
 	objA0.update_address = addressof(TitleCard.Update)
 	objA0.base_state = 0
-	u8[A0 + 0x3e] = 0xff
+	u8[A0 + 0x3e] = -1
 
 #if STANDALONE
 	Standalone.onLevelStart()

@@ -286,7 +286,7 @@ function void fn065d46()
 
 	if (u8[0xfffffaa2] == 0)
 	{
-		u8[0xfffffaa2] = 0xff
+		u8[0xfffffaa2] = -1
 		water.height.target = 0x0958
 	}
 
@@ -335,7 +335,7 @@ function void fn065d8c()
 			if (allocDynamicObjectStd())
 			{
 				objA1.update_address = 0x062480
-				u8[A1 + 0x2c] = 0xff
+				u8[A1 + 0x2c] = -1
 			}
 		}
 	}

@@ -189,7 +189,7 @@ function void fn05ab6e()
 	u16[0xffffeec4] = 0
 	palette_fade.range = 0x003f
 	u16[0xffffeeda] = 0x15
-	u8[0xffffee50] = 0xff
+	u8[0xffffee50] = -1
 	level.palettefx.state = -1
 	u16[0xffffeec0] += 4
 
@@ -382,7 +382,7 @@ function void fn05ad56()
 	u16[0xffffeec4] = 0
 	palette_fade.range = 0x003f
 	u16[0xffffeeda] = 0x15
-	u8[0xffffee50] = 0xff
+	u8[0xffffee50] = -1
 	level.palettefx.state = -1
 	u16[0xffffeec0] += 4
 
@@ -996,7 +996,7 @@ function void fn058d3e()
 		A5 = 0xffffa8d0
 		A6 = A5
 		D0.u16 = level.display_routine
-		D6.u8 = (D0.s16 < 0) ? 0xff : 0x00
+		D6.u8 = (D0.s16 < 0) ? -1 : 0
 		D0.s16 = abs(D0.s16)
 		D0 = (D0 << 16)
 		D0.s32 >>= 7
@@ -1034,7 +1034,7 @@ function void fn058d3e()
 		A5 = 0xffffa960
 		A6 = A5
 		D0.u16 = level.display_routine
-		D6.u8 = (D0.s16 < 0) ? 0xff : 0x00
+		D6.u8 = (D0.s16 < 0) ? -1 : 0
 		D0.s16 = abs(D0.s16)
 		D0 = (D0 << 16)
 		D0.s32 >>= 3

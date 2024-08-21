@@ -357,7 +357,7 @@ function void fn01a434()
 		D0.u8 &= collision_attributes.flags
 		if (D0.u8 == 0 || D0.u8 == collision.flag.SPECIAL)
 		{
-			u8[A1 + 0x2d] = 0xff		// Could this be a flag like "attacked by a flicky"?
+			u8[A1 + 0x2d] = -1		// Could this be a flag like "attacked by a flicky"?
 			objA0.value42 = A1.u16
 			u8[A0 + 0x30] = 1
 			D1 = 1

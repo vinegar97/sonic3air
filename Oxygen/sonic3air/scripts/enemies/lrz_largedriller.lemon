@@ -32,7 +32,7 @@ function void fn0900f0()
 	setupObjectAttributesFull(0x090608)
 
 	objA0.base_state = 0
-	u8[A0 + 0x29] = 0xff
+	u8[A0 + 0x29] = -1
 	objA0.hitbox_extends.y = 0x40
 	if (objA0.subtype2c != 0)
 	{
@@ -250,7 +250,7 @@ function void fn09039a()
 
 	if (objA0.subtype2c >= 0x08)
 	{
-		u8[A0 + 0x29] = 0xff
+		u8[A0 + 0x29] = -1
 		fn0905a8()
 	}
 
@@ -404,7 +404,7 @@ function void fn090512()
 
 	if (objA0.subtype2c == 0)
 	{
-		u8[0xffffeede] = 0xff
+		u8[0xffffeede] = -1
 		camera.screenshake.state.hi = 0
 
 		if (allocDynamicObjectStd())
@@ -427,7 +427,7 @@ function void fn090512()
 	}
 	else
 	{
-		u8[0xffffeedf] = 0xff
+		u8[0xffffeedf] = -1
 
 		if (allocDynamicObjectStd())
 		{
@@ -460,7 +460,7 @@ function void fn0905a8()
 		{
 			objA0.state = 0x20
 			playSound(0x6e)
-			u8[A0 + 0x29] = 0xff
+			u8[A0 + 0x29] = -1
 		}
 
 		Boss.updateHitFlashing(3, 0x0905f6, 0x0905fc)

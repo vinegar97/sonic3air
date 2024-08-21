@@ -76,7 +76,7 @@ function void fn06c72a()
 {
 	setupObjectAttributesFull(0x06d770)
 
-	u8[A0 + 0x46] = 0xff
+	u8[A0 + 0x46] = -1
 	boss.remaining_hits = 8
 	objA0.hitbox_extends.y = 0x1c
 	u16[A0 + 0x26] = 0x0c

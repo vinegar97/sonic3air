@@ -291,7 +291,7 @@ function void fn0866f4()
 	D0.u16 = camera.position.x.u16 - 0x60
 	if (D0.u16 >= objA0.position.x.u16)
 	{
-		u8[0xfffffaa2] = 0xff
+		u8[0xfffffaa2] = -1
 	}
 	else
 	{

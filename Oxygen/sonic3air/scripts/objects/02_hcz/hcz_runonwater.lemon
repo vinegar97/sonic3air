@@ -28,7 +28,7 @@ function void RunOnWaterHandler.Init()
 		objA0.sprite_priority = 0x0300
 		objA0.box_size.x = 0xa0
 		objA0.box_size.y = 0x80
-		u8[A0 + 0x31] = 0xff
+		u8[A0 + 0x31] = -1
 		objA0.flags2a = 0
 		objA0.render_flags |= render_flag.COMPOUND
 
@@ -52,7 +52,7 @@ function void RunOnWaterHandler.Init()
 		objA0.sprite_priority = 0x0300
 		objA0.box_size.x = 0x28
 		objA0.box_size.y = 0x20
-		u8[A0 + 0x30] = 0xff
+		u8[A0 + 0x30] = -1
 
 		objA0.update_address = 0x038464
 		fn038464()

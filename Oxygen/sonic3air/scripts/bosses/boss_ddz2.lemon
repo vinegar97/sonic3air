@@ -254,7 +254,7 @@ function void fn081cc6()
 		--D1.s16
 	}
 
-	objA0.value3a = 0xff
+	objA0.value3a = -1
 	copyMemory(0xfffffade, 0x08141e, 0x10)
 	u16[0xfffffade+16] = 0
 }
@@ -562,7 +562,7 @@ function void fn082f1c()
 			u16[A1 + 0x46] = A0.u16
 			u16[A1 + 0x42] = u16[(A2+=2)-2]
 			u16[A1 + 0x44] = u16[(A2+=2)-2]
-			u8[A1 + 0x2c] = 0xff
+			u8[A1 + 0x2c] = -1
 		}
 
 		D1.u8 += 4

@@ -353,7 +353,7 @@ function void fn0779c0()
 		objA0.velocity.x = 0
 		objA0.velocity.y = 0
 		D0.u16 = D1.u16
-		u8[0xffffee39] = 0xff
+		u8[0xffffee39] = -1
 		objA0.countdown_value = 0x7f
 	}
 	objA1.position.x.u16 = D0.u16
@@ -528,7 +528,7 @@ function void fn077b7e()
 	setupObjectAttributesBasic(0x0782c0)
 	objA0.update_address = 0x077be0
 	u8[A0 + 0x0a] &= ~0x80
-	objA0.value3a = 0xff
+	objA0.value3a = -1
 }
 
 
@@ -758,7 +758,7 @@ function void fn077d6c()
 function void fn077d82()
 {
 	objA0.box_size.x = 0x20
-	objA0.box_size.y = 0xff
+	objA0.box_size.y = -1
 	objA0.update_address = 0x077d94
 	fn077d94()
 }
@@ -1030,7 +1030,7 @@ function void fn077fce()
 //# address-hook(0x077fec) end(0x077ff6)
 function void fn077fec()
 {
-	u8[0xffffef3a] = 0xff
+	u8[0xffffef3a] = -1
 	MoveWithParent()
 
 #if STANDALONE

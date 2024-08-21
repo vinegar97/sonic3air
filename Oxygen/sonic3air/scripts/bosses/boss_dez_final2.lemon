@@ -139,7 +139,7 @@ function void fn0805ae()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u8[A1 + 0x38] |= 0x04
-	u8[0xffffeec6] = 0xff
+	u8[0xffffeec6] = -1
 
 	if (allocDynamicObjectAfterA0())
 	{
@@ -189,7 +189,7 @@ function void fn080634()
 		objA0.update_address = 0x08067a
 		objA0.flags38 |= 0x04
 		u8[0xfffffaa9] = 0x80
-		u8[0xffffeec6] = 0xff
+		u8[0xffffeec6] = -1
 
 		if (allocDynamicObjectStd())
 		{
@@ -217,7 +217,7 @@ function void fn08067a()
 	objA0.update_address = 0x0806a6
 	objA0.countdown_value = 0x80
 	u8[0xfffffaa9] = 0x01
-	u8[0xffffeec6] = 0xff
+	u8[0xffffeec6] = -1
 	u8[0xfffffaa9] = 0x01
 
 	fn0806a6()
@@ -235,7 +235,7 @@ function void fn0806a6()
 		u8[A1 + 0x38] &= ~0x04
 		u16[A1 + 0x1c] = 0
 		u8[0xfffffaa9] = 0
-		u8[0xffffeec6] = 0xff
+		u8[0xffffeec6] = -1
 		Object.TriggerUnloading()
 	}
 

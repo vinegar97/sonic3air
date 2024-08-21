@@ -297,7 +297,7 @@ function void fn0142e2()
 		if (!skipPart)
 		{
 			// Fly towards Sonic
-			u8[0xfffffaac] = 0xff
+			u8[0xfffffaac] = -1
 
 			D1.u16 = abs(s16(objA1.position.y.u16 - objA0.position.y.u16)) >> 2
 			D1.u16 += D1.u16 >> 1

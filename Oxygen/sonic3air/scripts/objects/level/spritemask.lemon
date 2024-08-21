@@ -40,7 +40,7 @@ function void fn0862b4()
 //# address-hook(0x0862fe) end(0x086302)
 function void fn0862fe()
 {
-	u8[0xffffef3a] = 0xff
+	u8[0xffffef3a] = -1
 
 #if STANDALONE
 	s16 px = objA0.position.x.u16 - objA0.box_size.x - 0x80
@@ -59,7 +59,7 @@ function void fn0862fe()
 //# address-hook(0x086308) end(0x08631e)
 function void fn086308()
 {
-	u8[0xffffef3a] = 0xff
+	u8[0xffffef3a] = -1
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if ((u8[A1 + 0x38] & 0x20) == 0)
 	{

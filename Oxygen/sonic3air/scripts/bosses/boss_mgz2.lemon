@@ -102,7 +102,7 @@ function void fn06c354()
 	setupObjectAttributesFull(0x06d770)
 
 	u8[A0 + 0x0a] |= 0x80
-	u8[A0 + 0x46] = 0xff
+	u8[A0 + 0x46] = -1
 	boss.remaining_hits = 8
 	level.boss_encounter = 1
 	objA0.hitbox_extends.y = 0x1c
@@ -235,7 +235,7 @@ function void fn06c4be()
 	objA0.base_state = 0x0e
 	objA0.countdown_value = 0x3f
 	objA0.countdown_callback = 0x06c4f8
-	u8[0xffffeec4] = 0xff
+	u8[0xffffeec4] = -1
 	global.passing_floor = -1
 	playSound(0x61)
 

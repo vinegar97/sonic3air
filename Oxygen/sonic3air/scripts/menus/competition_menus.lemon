@@ -214,7 +214,7 @@ function void fn00aa36()
 {
 	competition_mode.game_mode = 0
 	competition_mode.item_flag = competition_mode.menu.items_toggle
-	competition_mode.multiplay = (control.pad2.pressed & (CONTROL_START | CONTROL_A | CONTROL_C)) ? 0xff : 0x00
+	competition_mode.multiplay = (control.pad2.pressed & (CONTROL_START | CONTROL_A | CONTROL_C)) ? -1 : 0
 	global.game_mode = 0x3c		// Competition Mode character select
 	fn00aa8e()
 }
@@ -225,7 +225,7 @@ function void fn00aa54()
 {
 	competition_mode.game_mode = 3
 	competition_mode.item_flag = competition_mode.menu.items_toggle
-	competition_mode.multiplay = (control.pad2.pressed & (CONTROL_START | CONTROL_A | CONTROL_C)) ? 0xff : 0x00
+	competition_mode.multiplay = (control.pad2.pressed & (CONTROL_START | CONTROL_A | CONTROL_C)) ? -1 : 0
 	global.game_mode = 0x40		// Competition Mode level select
 	fn00aa8e()
 }
@@ -354,7 +354,7 @@ function void CompetitionMode.StageSelect()
 	level.framecounter = 0
 	competition_mode.active = 0
 	global.level_started = 0
-	u16[0xffffeee2] = 0xffff
+	u16[0xffffeee2] = -1
 	u16[0xffffeee4] = 0
 	u16[0xffffeee6] = 0
 #if STANDALONE
@@ -524,7 +524,7 @@ function void CompetitionMode.StageSelect()
 	#endif
 		{
 			u8[0xffffb094 + 0x2f] = 0
-			u8[0xffffeee2] = 0xff
+			u8[0xffffeee2] = -1
 		}
 	#if STANDALONE
 		if (D2 & DataSelect.CONTROLS_CANCEL || Input.buttonPressed(BUTTON_BACK | BUTTON_PAD2))
@@ -533,7 +533,7 @@ function void CompetitionMode.StageSelect()
 	#endif
 		{
 			u8[0xffffb206 + 0x2f] = 0
-			u8[0xffffeee3] = 0xff
+			u8[0xffffeee3] = -1
 		}
 		D1.u8 |= D2.u8
 		D2.u16 = D1.u8 & (CONTROL_UP | CONTROL_DOWN)
@@ -714,7 +714,7 @@ function void fn00b066()
 	D0 = 0
 	fn00b0c2()
 
-	D0.u8 = 0xff
+	D0.u8 = -1
 	fn00b0c2()
 
 	D1 = 0x0a
@@ -747,7 +747,7 @@ function void fn00b0c2()
 	if (D1.u16 == 0 && D0.u16 == 0)
 	{
 		D1 = 0x0c
-		D0.u8 = 0xff
+		D0.u8 = -1
 	}
 	fn00b0d4()
 }
@@ -796,7 +796,7 @@ function void fn00b2cc()
 	u16[0xfffffb00] = 0
 	u32[0xfffffbfc] = 0xfffffb00
 	level.framecounter = 0
-	u16[0xffffeee2] = 0xffff
+	u16[0xffffeee2] = -1
 	u16[0xffffeee4] = 0
 
 	Enigma.decompress(0x39d2a2, 0xffff0000, (CompetitionMenu.Background.targetInVRAM >> 5))
@@ -935,7 +935,7 @@ function void fn00b508()
 	{
 		if (u16[0xffffeee6] == 0)
 		{
-			competition_mode.multiplay = (s8[A1] < 0) ? 0xff : 0x00
+			competition_mode.multiplay = (s8[A1] < 0) ? -1 : 0
 		}
 		D0 = 0
 		fn00b638()
@@ -967,7 +967,7 @@ function void fn00b538()
 			if (pressedB)
 			{
 				objA0.value2f = 0
-				u8[A2] = 0xff
+				u8[A2] = -1
 			}
 		}
 		else
@@ -990,7 +990,7 @@ function void fn00b538()
 						D0.u16 = u8[A1] & DataSelect.CONTROLS_ACCEPT
 						if (D0.u16 != 0)
 						{
-							objA0.value2f = 0xff
+							objA0.value2f = -1
 							u8[A2] = 0
 							playSound(0x63)
 						}
@@ -1020,7 +1020,7 @@ function void fn00b538()
 					}
 					else
 					{
-						u8[A0 + 0x30] = 0xff
+						u8[A0 + 0x30] = -1
 						D0.u8 = u8[A3] - 1
 						if (D0.s8 < CHARACTER_SONIC)
 							D0 = CHARACTER_KNUCKLES

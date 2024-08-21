@@ -412,7 +412,7 @@ function void fn062e92()
 			objA0.countdown_value = 1
 			objA0.animation.sprite = 1
 			objA0.flags38 |= 0x02
-			u8[0xfffffaa9] = 0xff
+			u8[0xfffffaa9] = -1
 
 			playSound(SFX_CLICK)
 		}
@@ -460,7 +460,7 @@ function void fn062f0a()
 		if ((objA0.flags38 & 0x04) == 0)
 		{
 			objA0.flags38 |= 0x02
-			u8[0xfffffaa9] ^= 0xff
+			u8[0xfffffaa9] ^= -1
 			playSound(SFX_CLICK)
 		}
 	}

@@ -199,7 +199,7 @@ function void fn08ad40()
 	D0.u16 = objA0.value3e - 0x10
 	objA0.value3e = D0.u16
 	D1.u16 = u16[A0 + 0x3c] + D0.u16
-	D2.u8 = (D1.s16 >= 0) ? 0xff : 0x00
+	D2.u8 = (D1.s16 >= 0) ? -1 : 0
 	if (D0.s16 < 0 && D1.s16 < 0)
 	{
 		fn08ad82()
@@ -257,7 +257,7 @@ function void fn08adca()
 	objA0.value3e = D0.u16
 
 	bool carryFlag = (u16[A0 + 0x3c] + D0.u16 < u16[A0 + 0x3c])
-	D2.u8 = (carryFlag) ? 0xff : 0x00
+	D2.u8 = (carryFlag) ? -1 : 0
 	D1.u16 = u16[A0 + 0x3c] + D0.u16
 
 	if (D0.s16 >= 0 && D2.u8 != 0)

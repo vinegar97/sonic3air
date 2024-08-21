@@ -703,7 +703,7 @@ function void fn06e0b0()
 				objA0.flags2a |= 0x80
 				objA0.countdown_callback = 0x06db86
 				u16[0xfffffc34] = 0x20
-				u8[0xffffeec6] = 0xff
+				u8[0xffffeec6] = -1
 
 				// "spawnChildObjects(0x06e302)" replaced by:
 				spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
@@ -875,7 +875,7 @@ function bool fn06e214_sub()
 				{
 					if (u8[A1 + 0x38] & 0x40)
 					{
-						u8[A1 + 0x44] = 0xff
+						u8[A1 + 0x44] = -1
 					}
 					return true
 				}

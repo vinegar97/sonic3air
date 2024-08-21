@@ -208,7 +208,7 @@ function void fn065c04()
 		{
 			objA0.update_address = 0x065c50
 			objA0.animation.sprite = 1
-			u8[0xfffffaa9] = 0xff
+			u8[0xfffffaa9] = -1
 			objA0.respawn_entry = 0
 
 			// Targets:
@@ -251,7 +251,7 @@ function void fn065c56()
 //# address-hook(0x065c72) end(0x065c76)
 function void fn065c72()
 {
-	level.trigger08 = 0xff
+	level.trigger08 = -1
 }
 
 
@@ -263,7 +263,7 @@ function void fn065c78()
 	camera.screenshake.state = 0x14
 	water.height.next = camera.position.y.u16 + 0x0100
 	water.height.target = 0x0350
-	u8[0xfffffaa3] = 0xff
+	u8[0xfffffaa3] = -1
 
 	playSound(0x57)
 

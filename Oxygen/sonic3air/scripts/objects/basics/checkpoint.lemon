@@ -453,7 +453,7 @@ function void fn01bb7e()
 		}
 
 		A1.s32 = D0.s16
-		u16[A1] = 0xffff
+		u16[A1] = -1
 		u16[A2-2] = 0
 		--u16[0xffffef80]
 		--D1.s16

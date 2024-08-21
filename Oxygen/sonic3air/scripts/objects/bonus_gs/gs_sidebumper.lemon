@@ -108,7 +108,7 @@ function void fn049b76()
 		u8[A1 + 0x27] = 1
 
 	u8[A1 + 0x20] = 0
-	u8[A1 + 0x30] = 0xff		// "char.rotation.x.count"
+	u8[A1 + 0x30] = -1		// "char.rotation.x.count"
 	u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 	if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 		objA1.groundspeed = -objA1.groundspeed

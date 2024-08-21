@@ -125,7 +125,7 @@ function void fn050390()
 	if (u16[0xffffee98] < 0x3cdc)
 	{
 		objA0.update_address = 0x0506be
-		u8[0xffffeec4] = 0xff
+		u8[0xffffeec4] = -1
 		if (allocDynamicObjectAfterA0())
 		{
 			// Spawn the tree spawner
@@ -513,7 +513,7 @@ function void fn050700()
 		if (camera.position.x.u16 < 0x4670 - getScreenExtend() * 2)
 			return
 
-		objA0.flags2e = 0xff
+		objA0.flags2e = -1
 	}
 
 #if STANDALONE
@@ -537,7 +537,7 @@ function void fn050700()
 	if (objA0.value2f == 0)
 	{
 		D1 -= 0x0e80
-		objA0.value2f = (D1.s32 <= -0x10000) ? 0xff : 0x00
+		objA0.value2f = (D1.s32 <= -0x10000) ? -1 : 0
 	}
 	else
 	{

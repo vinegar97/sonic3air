@@ -344,7 +344,7 @@ function void fn082b06()
 				if (fn085898(0x082bb4))
 				{
 					--u8[A1 + 0x29]
-					u8[A1 + 0x28] = 0xff
+					u8[A1 + 0x28] = -1
 					jumpLocation = 0x082b78
 				}
 			}

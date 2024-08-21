@@ -198,7 +198,7 @@ function void fn06c200()
 	loadPaletteLine1(0x0a8f5c)
 
 	level.vertical_wrap = 0x01df
-	u8[0xffffeeb8] = 0xff
+	u8[0xffffeeb8] = -1
 	if ((objA0.render_flags & render_flag.FLIP_X) == 0)
 	{
 		screenmover_target.right = 0x6000

@@ -22,7 +22,7 @@ function void InitLevelTiles.SSZ()
 			objA1.update_address = 0x057c1e
 			objA1.position.x.u16 = 0x0100
 			u8[A1 + 0x2d] = 0x6c
-			u8[0xffffeed7] = 0xff
+			u8[0xffffeed7] = -1
 			move_area.right = 0x0200
 			move_area.bottom.current = 0x0bc0
 			move_area.bottom.target  = 0x0bc0
@@ -198,7 +198,7 @@ function void fn057344()
 	D1.u16 = u16[0xffffeeea]
 	u16[0xffffeef2] = u16[0xffffeeea] & 0xfff0
 	u16[0xffffeef4] = u16[0xffffeeee] & level.height.tilemask
-	u8[0xffffee98] = 0xff
+	u8[0xffffee98] = -1
 	u32[0xffffeef6] = 0
 	u16[0xffffeefa] = 0
 
@@ -249,7 +249,7 @@ function void fn057344()
 		}
 	}
 
-	u8[0xffffeec4] = 0xff
+	u8[0xffffeec4] = -1
 	gfx.plane_update_routine = 0x0c
 	u16[0xffffeec0] += 4
 }
@@ -349,7 +349,7 @@ function void fn05750c()
 	objA1.position.y.u16 = D2.u16
 	if (D1.u16 == 0)
 	{
-		u8[0xffffeec5] = 0xff
+		u8[0xffffeec5] = -1
 		objA1.update_address = addressof(UnloadObject)
 	}
 
@@ -407,7 +407,7 @@ function void fn0575ea()
 		D0.u16 = 0x05c0
 		level.vertical_wrap = D0.u16
 		move_area.bottom.target = D0.u16
-		u8[0xffffeed8] = 0xff
+		u8[0xffffeed8] = -1
 		return
 	}
 
@@ -478,7 +478,7 @@ function void fn0575ea()
 				D0.u16 = 0x07c0
 				level.vertical_wrap = D0.u16
 				move_area.bottom.target = D0.u16
-				u8[0xffffeed3] = 0xff
+				u8[0xffffeed3] = -1
 			}
 
 			if (camera.position.y.u16 != 0x07c0)
@@ -487,7 +487,7 @@ function void fn0575ea()
 			if (allocDynamicObjectStd())
 			{
 				objA1.update_address = 0x07a20e
-				u8[0xffffeed7] = 0xff
+				u8[0xffffeed7] = -1
 				level.display_routine = 0x7f00
 			}
 		}
@@ -516,7 +516,7 @@ function void fn0575ea()
 				D0.u16 = 0x0380
 				level.vertical_wrap = D0.u16
 				move_area.bottom.target = D0.u16
-				u8[0xffffeed5] = 0xff
+				u8[0xffffeed5] = -1
 			}
 
 			if (camera.position.y.u16 != 0x0380)
@@ -525,7 +525,7 @@ function void fn0575ea()
 			if (allocDynamicObjectStd())
 			{
 				objA1.update_address = 0x07a6a6
-				u8[0xffffeed7] = 0xff
+				u8[0xffffeed7] = -1
 				u16[0xffffeed4] = 0x7f00
 			}
 		}
@@ -795,7 +795,7 @@ function void fn0579f0()
 	{
 		if (camera.position.x.u16 >= 0x1800)
 		{
-			u8[0xffffeee2] = 0xff
+			u8[0xffffeee2] = -1
 			fn0579f0()
 			camera.background.x.old = camera.background.x.u16 & 0xfff0
 		}

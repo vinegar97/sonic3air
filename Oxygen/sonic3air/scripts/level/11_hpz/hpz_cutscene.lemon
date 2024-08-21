@@ -44,7 +44,7 @@ function void fn0643c6()
 	spawnSimpleChildObjects(0x06563a, 1)
 	if (_equal())
 	{
-		u8[A1 + 0x2c] = 0xff
+		u8[A1 + 0x2c] = -1
 	}
 }
 
@@ -626,7 +626,7 @@ function void fn064964()
 	// Floor explodes below the characters
 	objA0.base_state = 0x46
 	objA0.animation.sprite = 0x02
-	u8[0xffffeec4] = 0xff
+	u8[0xffffeec4] = -1
 	camera.screenshake.state = 0x14
 
 	// "spawnSimpleChildObjects(0x06663e)" replaced by:
@@ -768,7 +768,7 @@ function void fn064a6e()
 	{
 		if (objA0.animation.frame == 6)
 		{
-			u8[0xfffffaa2] = 0xff
+			u8[0xfffffaa2] = -1
 			playSound(SFX_COLLAPSE)
 		}
 	}
@@ -1111,7 +1111,7 @@ function void fn064de0()
 
 	objA0.update_address = 0x064e28
 	objA0.countdown_value = 0x3f
-	u8[0xfffffaac] = 0xff
+	u8[0xfffffaac] = -1
 	control.player1 = 0
 	StopObjectA1()
 	UpdatePlayer1SpritePatterns()

@@ -31,7 +31,7 @@ function void fn053ad4()
 
 	objA1.update_address = 0x0459b4
 	objA1.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
-	u8[A1 + 0x05] = 0xff
+	u8[A1 + 0x05] = -1
 	objA1.box_size.y = 0x80
 	objA1.box_size.x = 0x18
 	objA1.sprite_priority = 0x80

@@ -478,7 +478,7 @@ function void fn056e2e()
 //# address-hook(0x056e40) end(0x056e62)
 function void fn056e40()
 {
-	u8[0xffffeed2] = 0xff
+	u8[0xffffeed2] = -1
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x056ea0
@@ -565,7 +565,7 @@ function void fn056ec2()
 		{
 			D0 = 0
 			D1 = 0xffff4000
-			u8[A0 + 0x36] = 0xff
+			u8[A0 + 0x36] = -1
 		}
 	}
 
@@ -683,7 +683,7 @@ function void fn057156()
 	if (objA0.countdown_value == 0)
 	{
 		Kosinski.addToDMAQueue(0x15a112, 0x73e0)		// Death Egg as part of the backgornd
-		objA0.flags2e = 0xff
+		objA0.flags2e = -1
 	}
 
 	DrawObject()

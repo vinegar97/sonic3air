@@ -582,7 +582,7 @@ define global.zone_act			= u16[0xfffffe10]
 define lives_counter			=  u8[0xfffffe12]
 define global.next_bluespheres	=  u8[0xfffffe16]	// Number of next Blue Spheres special stage (between 0 and 6)
 define continues_counter		=  u8[0xfffffe18]
-define super.active				=  u8[0xfffffe19]	// 0x01 for Super, 0xff for Hyper
+define super.active				=  u8[0xfffffe19]	// 0x01 for Super, -1 for Hyper
 
 define global.time_over			=  u8[0xfffffe1a]
 define extra_lives_granted		=  u8[0xfffffe1b]	// Bitmask for continue (bit 0), and extra lives at 100 and 200 rings (bits 1, 2); see "checkForExtraLifeByRings()" for details
@@ -735,7 +735,7 @@ define global.super_emeralds		=  u8[0xffffffb1]	// Number of Super Emeralds (0..
 //  - 2 = Chaos Emerald traded for an (inactive) Super Emerald
 //  - 3 = Super Emerald collected
 
-define global.traded_emeralds	=  u8[0xffffffba]	// If not zero (usually 0xff), Chaos Emeralds were exchanged for Super Emeralds already
+define global.traded_emeralds	=  u8[0xffffffba]	// If not zero (usually -1), Chaos Emeralds were exchanged for Super Emeralds already
 define global.sk_bluespheres	=  u8[0xffffffbb]	// If 1, play S&K special stages, otherwise S3 special stages
 define titleintro.buffer		=  u8[0xffffffbc]	// used to manage different locations in VRAM between loading title screen frames
 define titleintro.frames		=  u8[0xffffffbd]	// Frame countdown until next animation image is shown

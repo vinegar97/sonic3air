@@ -44,7 +44,7 @@ function void fn057c1e()
 		}
 	}
 
-	u8[0xffffeed6] = 0xff
+	u8[0xffffeed6] = -1
 	A1 = 0xffffb000
 	objA1.position.y.u16 = camera.position.y.u16 + 0x65
 	objA1.state = char.state.RUNNING
@@ -89,7 +89,7 @@ function void fn057cd2()
 
 		player1.camera_lock = 0
 		A1 = 0xffff0000 + u16[A0 + 0x3c]
-		u8[A1 + 0x05] = 0xff
+		u8[A1 + 0x05] = -1
 		objA0.update_address = 0x057d64
 	}
 	else
@@ -158,7 +158,7 @@ function void fn057dcc()
 			return
 
 		u16[A1 + 0x10] = objA0.position.x.u16
-		u16[A1 + 0x1a] = 0xffff
+		u16[A1 + 0x1a] = -1
 		objA1.state = char.state.ROLLING
 		objA1.flags2a |= char.flag.ROLLING
 		u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
@@ -265,7 +265,7 @@ function void fn065730()
 	if (Game.isTimeAttack() || isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		// Activate the bridge und unload cutscene Knuckles
-		u8[0xffffeeda] = 0xff
+		u8[0xffffeeda] = -1
 		UnloadObject()
 		return
 	}
@@ -450,7 +450,7 @@ function void fn0658f2()
 	objA0.animation.sprite = 0x01
 
 	// Trigger the bridge already
-	u8[0xffffeeda] = 0xff
+	u8[0xffffeeda] = -1
 	playSound(SFX_CLICK)
 
 	Object.ResetAnimationProgress(0x06671f)		// Cutscene Knuckles tired panting animation data
@@ -674,7 +674,7 @@ function void fn065b0e()
 //# address-hook(0x065b24) end(0x065b3c)
 function void fn065b24()
 {
-	u8[0xffffef3a] = 0xff
+	u8[0xffffef3a] = -1
 	if ((u8[0xfffffab8] & 0x04) == 0)
 	{
 		fn06602a()

@@ -242,7 +242,7 @@ function void fn0838c2()
 			return
 
 		objA0.base_state = 0x06
-		u8[0xfffffabe] = 0xff
+		u8[0xfffffabe] = -1
 		objA0.velocity.x = 0
 		objA0.velocity.y = 0
 		objA0.animation.sprite = u8[0x08390e + global.characters]

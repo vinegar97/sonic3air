@@ -22,7 +22,7 @@ function void fn07a6a6()
 	// Skip boss in Time Attack
 	if (Game.isTimeAttack())
 	{
-		u8[0xffffeed4] = 0xff
+		u8[0xffffeed4] = -1
 		UnloadObject()
 		return
 	}
@@ -321,7 +321,7 @@ function void fn07a98a()
 	}
 	else
 	{
-		objA0.value3b = 0xff
+		objA0.value3b = -1
 	}
 
 	if (objA0.flags38 >= 0x27)
@@ -582,7 +582,7 @@ function void fn07ac06()
 
 	if (u8[A0 + 0x1c] == 0x1f)
 	{
-		objA0.value39 = 0xff
+		objA0.value39 = -1
 		A1 = 0xfffffa82
 		u8[A1 + 0x02] &= 0xf0
 		u8[A1 + 0x02] |= 0x05
@@ -637,8 +637,8 @@ function void fn07ac92()
 
 	level.boss_encounter = 0
 	objA0.flags38 |= 0x10
-	u8[0xfffffa89] = 0xff
-	u8[0xffffeed4] = 0xff
+	u8[0xfffffa89] = -1
+	u8[0xffffeed4] = -1
 
 	copyMemory(0xfffffc20, 0xfffffca0, 0x20)
 	requestLoadingPatterns(0x32)		// SSZ object sprites
@@ -658,7 +658,7 @@ function void fn07acf2()
 		// Boss beaten
 		objA0.update_address = 0x085668
 		objA0.countdown_callback = 0x07ac7a
-		u8[0xfffffa88] = 0xff	// Make all of the decoys pop now
+		u8[0xfffffa88] = -1	// Make all of the decoys pop now
 		objA0.flags38 = 0
 
 		// "spawnChildObjects(0x083fee)" replaced by:
@@ -842,7 +842,7 @@ function void fn07aeb0()
 		return
 	}
 
-	if (u8[A1 + 0x3b] != 0xff)
+	if (u8[A1 + 0x3b] != -1)
 	{
 		if (u8[A1 + 0x3b] == 0x80)
 		{

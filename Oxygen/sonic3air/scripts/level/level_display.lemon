@@ -343,7 +343,7 @@ function void LoadTileContentInDirX()
 		diff = -diff
 		D0.u16 = oldOffset + (getScreenWidth() + 31) / 16 * 16
 	}
-	u8[0xffffeea4] = ((diff & 0x30) != 0x10) ? 0xff : 0x00
+	u8[0xffffeea4] = ((diff & 0x30) != 0x10) ? -1 : 0
 
 	//debugLog(stringformat("LoadTileContentInDirX (%d lines): posX=0x%04x, posY=0x%04x, lines=0x%02x", u8[0xffffeea4] ? 2 : 1, D0, D1, D6.u16))
 
@@ -496,7 +496,7 @@ function void LoadTileContentInDirY()
 		diff = -diff
 		D0.u16 = (oldOffset + 0xf0) & level.height.tilemask		// 0xf0 = 240 = screen height + 16
 	}
-	u8[0xffffeea4] = ((diff & 0x30) != 0x10) ? 0xff : 0x00
+	u8[0xffffeea4] = ((diff & 0x30) != 0x10) ? -1 : 0
 
 	//debugLog(stringformat("LoadTileContentInDirY (%d lines): posX=0x%04x, posY=0x%04x, rows=0x%02x", u8[0xffffeea4] ? 2 : 1, D0, D1, D6.u16))
 
@@ -541,7 +541,7 @@ function void fn04eb22()
 		D0.u16 = (oldOffset + 0xf0) & level.height.tilemask		// 0xf0 = 240 = screen height + 16
 		D1 = (D1 << 16) + (D1 >> 16)
 	}
-	u8[0xffffeea4] = ((diff & 0x30) != 0x10) ? 0xff : 0x00
+	u8[0xffffeea4] = ((diff & 0x30) != 0x10) ? -1 : 0
 
 	u16 backupD1 = D1.u16
 	u16 backupD6 = D6.u16

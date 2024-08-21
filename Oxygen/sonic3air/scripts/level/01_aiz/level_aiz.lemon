@@ -717,7 +717,7 @@ function void fn04ff74()
 
 		// Configure H-Int to set a different scroll-y offset in between
 		//  -> Namely the one in "camera.foreground.y.u16"
-		u8[0xffffeed6] = 0xff
+		u8[0xffffeed6] = -1
 		irq_table.lineupdate = 0x050056
 		level.water_present = 0
 		h_int.line = 0x40
@@ -915,7 +915,7 @@ function void fn05011e()
 		D0.u16 += 0x180
 		camera.background.y.u16 = D0.u16
 		camera.background.y.old = (D0.u16 & level.height.tilemask) - 0x10
-		u8[0xffffeed2] = 0xff
+		u8[0xffffeed2] = -1
 	}
 
 	A6 = addressof(camera.background.y)			// Address: 0xffffee90
@@ -1158,7 +1158,7 @@ function void fn01c4d0()
 			Kosinski.addToDecompressionQueue(0x3a458a, 0xffff9268)
 			Kosinski.addToDMAQueue(0x3a944e, 0x17c0)
 
-			u8[0xffffeec6] = 0xff
+			u8[0xffffeec6] = -1
 			u16[0xfffff7f0] = 0x500
 			u16[0xfffff7f2] = 0x500
 			u16[0xfffff7f4] = 0x500
@@ -1445,7 +1445,7 @@ function void fn01c6f6()
 
 			Level.loadPaletteData(0x30)		// AIZ 2 bombing scene palette
 
-			u8[0xffffeec6] = 0xff
+			u8[0xffffeec6] = -1
 			camera.update_routine += 2
 		}
 	}
@@ -1485,7 +1485,7 @@ function void fn01c77a()
 {
 	if (camera.position.x.u16 >= 0x4160)
 	{
-		u8[0xffffeec4] = 0xff
+		u8[0xffffeec4] = -1
 		camera.update_routine += 2
 	}
 }
@@ -1574,7 +1574,7 @@ function void fn01c81e()
 
 		move_area.left = 0x3b80
 		move_area.bottom.target = 0x05da
-		u8[0xffffeec6] = 0xff
+		u8[0xffffeec6] = -1
 		camera.update_routine += 2
 	}
 }
@@ -1781,7 +1781,7 @@ function void fn239f18()
 	while (true)
 	{
 		D3.u16 = u16[(A4+=2)-2]
-		D7.u8 = (D3.s16 < 0) ? 0xff : 0x00
+		D7.u8 = (D3.s16 < 0) ? -1 : 0
 		D3.u16 &= 0x7fff
 		D0.u16 -= D3.u16
 		if (D0.s16 < 0)
@@ -1845,7 +1845,7 @@ function void fn239f18()
 			break
 
 		D0.u16 = u16[(A4+=2)-2]
-		D7.u8 = (D0.s16 < 0) ? 0xff : 0x00
+		D7.u8 = (D0.s16 < 0) ? -1 : 0
 		D0.u16 &= 0x7fff
 
 		D5.u16 = D4.u16

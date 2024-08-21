@@ -200,8 +200,8 @@ function void fn05583e()
 	u16[0xffffee9c] = D0.u16 + u16[0xffffeea2] + 5
 	if (u8[0xfffffaa9] == 0 && s16[0xffffee98] <= -0x03e6)
 	{
-		u8[0xfffffaa9] = 0xff
-		u8[0xffffeec4] = 0xff
+		u8[0xfffffaa9] = -1
+		u8[0xffffeec4] = -1
 		player1.camera_lock = -1
 	}
 

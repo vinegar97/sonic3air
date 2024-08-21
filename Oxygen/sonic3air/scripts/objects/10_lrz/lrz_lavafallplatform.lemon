@@ -208,7 +208,7 @@ function void fn079d44()
 			if (visible && objA0.subtype2c == 0 && u8[0xfffffaa9] == 0 && objA0.position.y.u16 <= 0x0612)
 			{
 				objA0.update_address = 0x079dc2
-				u8[0xfffffaa9] = 0xff
+				u8[0xfffffaa9] = -1
 			}
 		}
 
@@ -256,7 +256,7 @@ function void fn079d6e()
 				if (visible && objA0.subtype2c == 0 && u8[0xfffffaa9] == 0 && objA0.position.y.u16 <= 0x0612)
 				{
 					objA0.update_address = 0x079dc2
-					u8[0xfffffaa9] = 0xff
+					u8[0xfffffaa9] = -1
 				}
 			}
 		}

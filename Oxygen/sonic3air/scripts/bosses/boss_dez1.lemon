@@ -264,7 +264,7 @@ function void fn07dfb8()
 	objA0.base_state = 0x02
 	objA0.countdown_value = 0x5f
 	objA0.countdown_callback = 0x07dfde
-	u8[0xffffeec4] = 0xff
+	u8[0xffffeec4] = -1
 
 	// Spawn phase 1 boss giblets
 	// "spawnChildObjects(0x07efa8)" replaced by:
@@ -632,7 +632,7 @@ function void fn07e342()
 	if (objA0.countdown_value < 0)
 	{
 		objA0.update_address = 0x07e384
-		u8[0xffffeec4] = 0xff
+		u8[0xffffeec4] = -1
 		screenmover_target.top = 0
 
 		if (allocDynamicObjectStd())
@@ -745,7 +745,7 @@ function void fn07e44c()
 			{
 				// Show title card for act 2
 				objA1.update_address = addressof(TitleCard.Update)
-				u8[A1 + 0x3e] = 0xff
+				u8[A1 + 0x3e] = -1
 			}
 		}
 	}
@@ -1231,7 +1231,7 @@ function void fn07e820()
 		D0 = (D0 << 16) + (D0 >> 16)
 		objA0.position.x.u16 = objA1.position.x.u16 + D0.u16
 		D1.u16 = D0.u16 + 0x20
-		D5.u8 = (D1.u16 < 0x40) ? 0xff : 0x00
+		D5.u8 = (D1.u16 < 0x40) ? -1 : 0
 		D0.u16 = objA1.position.y.u16 + s8[A1 + 0x3c]
 		objA0.position.y.u16 = D0.u16
 
@@ -1765,7 +1765,7 @@ function void fn07ed6c()
 	objA0.position.y.u16 = objA1.position.y.u16
 	D0.u16 = u16[0xffffb000 + 0x10] - objA1.position.x.u16
 	D1.u16 = objA1.position.x.u16
-	D2.u8 = (D0.s16 < 0) ? 0xff : 0x00
+	D2.u8 = (D0.s16 < 0) ? -1 : 0
 	D0.u16 = min(abs(D0.s16), 0xa0)
 	D0.u16 = (D0.u16 >> 3) & 0xfe
 

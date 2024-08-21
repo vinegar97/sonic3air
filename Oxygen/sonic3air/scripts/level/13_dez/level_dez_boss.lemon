@@ -12,7 +12,7 @@
 function void InitLevelTiles.DEZBossAct()
 {
 	u16[0xffffeee2] = 0
-	u8[0xffffeee4] = 0xff
+	u8[0xffffeee4] = -1
 	fn05a79e()
 
 	D0.u16 = u16[A3]
@@ -873,7 +873,7 @@ function void fn080dbe()
 	else
 	{
 		u8[0xfffffab8] |= 0x02
-		u8[0xffffeec6] = 0xff
+		u8[0xffffeec6] = -1
 		UnloadObject()
 	}
 }

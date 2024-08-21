@@ -97,7 +97,7 @@ function void fn0453e6()
 			return
 
 		playSound(SFX_GRAB)
-		u8[A2] = 0xff
+		u8[A2] = -1
 
 		objA1.position.y.u16 = objA0.position.y.u16 + D1.u16
 		objA1.velocity.x = 0

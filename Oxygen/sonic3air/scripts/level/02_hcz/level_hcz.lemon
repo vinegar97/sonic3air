@@ -139,7 +139,7 @@ function void fn050bce()
 		A2 = backupA2
 		A3 = backupA3
 
-		u8[0xffffeee8] = 0xff
+		u8[0xffffeee8] = -1
 		level.scrolling_routine += 4
 	}
 
@@ -811,7 +811,7 @@ function void fn01c908()
 {
 	if (camera.position.x.u16 >= 0x0c00)
 	{
-		u8[0xffffeec6] = 0xff
+		u8[0xffffeec6] = -1
 		camera.update_routine += 2
 	}
 }

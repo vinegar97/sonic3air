@@ -126,7 +126,7 @@ function void fn0597e4()
 function void fn059832()
 {
 	D0.u16 -= u16[A1]
-	D2.u8 = (D0.s16 < 0) ? 0xff : 0x00
+	D2.u8 = (D0.s16 < 0) ? -1 : 0
 	D0.u16 = abs(D0.s16)
 	D0.u16 = min(D0.u16, D1.u16)
 	if (D2.u8 != 0)
@@ -190,7 +190,7 @@ function void UpdateLevelScrolling.BonusSM()
 		{
 			u32[A6] += D1
 			u16[A6] += D0.u16
-			u8[A6 + 0x0a] = 0xff
+			u8[A6 + 0x0a] = -1
 		}
 		else
 		{
@@ -199,7 +199,7 @@ function void UpdateLevelScrolling.BonusSM()
 			if (D1.s16 >= 0)
 			{
 				u16[A6] = D1.u16
-				u8[A6 + 0x0a] = 0xff
+				u8[A6 + 0x0a] = -1
 			}
 		}
 
@@ -221,7 +221,7 @@ function void UpdateLevelScrolling.BonusSM()
 				}
 
 				u16[A6 + 0x0a] = 0
-				u8[0xffffeed6] = 0xff
+				u8[0xffffeed6] = -1
 				if (D5.u16 == 0)
 				{
 					u16[A6 + 0x08] += u16[A5]
@@ -725,7 +725,7 @@ function void fn04c026()
 		{
 			u8[0xffffe408] = 0x08
 			objA0.value32 = 0
-			u16[0xffffe406] = 0xffff
+			u16[0xffffe406] = -1
 			objA0.countdown_value = 0xffff
 		}
 	}
@@ -1070,7 +1070,7 @@ function void fn04c480()
 	//  -  15 out of 256	-> 3x Bar (enforced triple)
 	//  - 177 out of 256	-> Random individual wheel outcomes, see below
 
-	if (u8[A2] != 0xff)
+	if (u8[A2] != -1)
 	{
 		// Enforce three of a kind
 		u8[A4 + 0x04] = u8[A2 + 0x01]

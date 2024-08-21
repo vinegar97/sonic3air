@@ -355,8 +355,8 @@ function void fn07bcb0()
 
 	objA0.update_address = 0x07bcfc
 	objA0.countdown_value = 119
-	u8[0xfffffaa2] = 0xff
-	u8[0xffffeec5] = 0xff
+	u8[0xfffffaa2] = -1
+	u8[0xffffeec5] = -1
 
 	A1 = 0xffffb000
 	u8[A1 + 0x22] = 0
@@ -1813,7 +1813,7 @@ function void fn07d1b6()
 function void fn07d1ea()
 {
 	D0.u16 = u16[0xffffb000 + 0x10] - move_area.left
-	D3.u8 = (D0.u16 >= 0xf0) ? 0xff : 0x00
+	D3.u8 = (D0.u16 >= 0xf0) ? -1 : 0
 	D2 = (D0.u16 >= 0xf0) ? 4 : 1
 	if (D0.u16 >= 0x50)
 	{
@@ -1841,14 +1841,14 @@ function void fn0861c0()
 function void fn0861d0()
 {
 	D0.u16 -= objA0.position.x.u16
-	D2.u8 = (D0.s16 < 0) ? 0xff : 0x00
+	D2.u8 = (D0.s16 < 0) ? -1 : 0
 	D0.u16 = abs(D0.s16)
 
 	D1.u16 -= objA0.position.y.u16
-	D3.u8 = (D1.s16 < 0) ? 0xff : 0x00
+	D3.u8 = (D1.s16 < 0) ? -1 : 0
 	D1.u16 = abs(D1.s16)
 
-	D4.u8 = (D0.u16 < D1.u16) ? 0xff : 0x00
+	D4.u8 = (D0.u16 < D1.u16) ? -1 : 0
 	bool goto0861f2 = true
 	if (D0.u16 == D1.u16)
 	{

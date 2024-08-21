@@ -195,7 +195,7 @@ function void fn091d8c()
 		{
 			objA0.base_state = 0x04
 			objA0.collision_attributes = collision.size.4x4_2
-			u8[A0 + 0x29] = 0xff
+			u8[A0 + 0x29] = -1
 			objA0.velocity.y = (objA1.render_flags & render_flag.FLIP_Y) ? -8 : 8
 			u16[A0 + 0x3a] = objA0.position.y.u16
 			objA0.countdown_value = 0x17

@@ -98,7 +98,7 @@ function void fn076b2a()
 function void fn076b30()
 {
 	objA0.base_state = 0x04
-	u8[0xffffeed4] = 0xff
+	u8[0xffffeed4] = -1
 
 	// "spawnChildObjects(0x0773e6)" replaced by:
 	spawnChildObject(0x076f46, 0x00, -12, -28)
@@ -917,7 +917,7 @@ function void fn0855b2()
 {
 	objA0.update_address = 0x0855c2
 	objA0.value39 = 0x07
-	u8[0xfffffabf] = 0xff
+	u8[0xfffffabf] = -1
 	fn0855c2()
 }
 

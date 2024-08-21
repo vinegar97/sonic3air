@@ -366,11 +366,11 @@ function void fn08e9a4()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x44]
 	D0.u16 = u16[A1 + 0x3e] - objA0.position.x.u16
-	D2.u8 = (D0.s16 < 0) ? 0xff : 0x00
+	D2.u8 = (D0.s16 < 0) ? -1 : 0
 	D0.u16 = abs(D0.s16)
 
 	D1.u16 = u16[A1 + 0x40] - objA0.position.y.u16
-	D3.u8 = (D1.s16 < 0) ? 0xff : 0x00
+	D3.u8 = (D1.s16 < 0) ? -1 : 0
 	D1.u16 = abs(D1.s16)
 
 	// Targets:

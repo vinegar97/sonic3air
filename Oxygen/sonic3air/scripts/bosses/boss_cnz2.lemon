@@ -859,7 +859,7 @@ function void fn06ec3a()
 function void fn06ec50()
 {
 	D0.u16 = objA0.position.x.u16 - objA1.position.x.u16
-	D1.u8 = (D0.s16 >= 0) ? 0xff : 0x00
+	D1.u8 = (D0.s16 >= 0) ? -1 : 0
 	D0.u16 = abs(D0.s16) & 0xffc0
 	if (D0.u16 >= 0x01c0)
 		D0.u16 = 0x01c0

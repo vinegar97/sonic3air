@@ -41,7 +41,7 @@ function void fn03d448()
 		A1 = 0xffff0000 + D1.u16
 		if (u8[A1] & 0x01)
 		{
-			objA0.flags2e = 0xff
+			objA0.flags2e = -1
 			D0.u16 += 0x80
 		}
 	}
@@ -61,7 +61,7 @@ function void fn03d4c2()
 		if (D0.u16 != 0)
 		{
 			A1 = 0xffff0000 + D0.u16
-			u8[A1 + 0x05] = 0xff
+			u8[A1 + 0x05] = -1
 		}
 
 		D0.u16 = objA0.respawn_entry
@@ -321,7 +321,7 @@ function void fn03d78c()
 		if (D0.u16 != 0)
 		{
 			A1 = 0xffff0000 + D0.u16
-			u8[A1 + 0x05] = 0xff
+			u8[A1 + 0x05] = -1
 		}
 		UnloadObject()
 		return
@@ -462,9 +462,9 @@ function void fn03d78c()
 				{
 					D0.s16 = -D0.s16
 				}
-				u8[A1 + 0x2f] = 0xff
+				u8[A1 + 0x2f] = -1
 				u16[A1 + 0x30] = D0.u16
-				u8[A1 + 0x32] = 0xff
+				u8[A1 + 0x32] = -1
 				u8[A2 + 0x2e] = 0x01
 			}
 		}

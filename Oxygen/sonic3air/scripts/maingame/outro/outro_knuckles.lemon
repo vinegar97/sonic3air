@@ -241,7 +241,7 @@ function void fn05e98a()
 	{
 		objA0.base_state = 0x0e
 		objA0.animation.sprite = 0
-		u8[0xffffeec4] = 0xff
+		u8[0xffffeec4] = -1
 		if (outro.ending_type >= 0)
 		{
 			if (allocDynamicObjectStd())
@@ -1121,7 +1121,7 @@ function void fn08554e()
 {
 	objA0.update_address = 0x08555e
 	objA0.value39 = 0x07
-	u8[0xfffffabf] = 0xff
+	u8[0xfffffabf] = -1
 	fn08555e()
 }
 

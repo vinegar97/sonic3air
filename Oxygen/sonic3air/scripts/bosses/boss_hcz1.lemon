@@ -30,7 +30,7 @@ function void fn069ea0()
 
 	objA0.update_address = 0x069eda
 	level.boss_encounter = 1
-	u8[0xffffeee8] = 0xff
+	u8[0xffffeee8] = -1
 
 	requestLoadingPatterns(0x5b)		// Boss sprites
 	level.vertical_wrap = 0x0300
@@ -379,7 +379,7 @@ function void fn06a216()
 //# address-hook(0x06a22a) end(0x06a246)
 function void fn06a22a()
 {
-	u8[0xfffffaa2] = 0xff
+	u8[0xfffffaa2] = -1
 	SetupAsSignpostSpawner()
 
 	if (allocDynamicObjectStd())
@@ -905,7 +905,7 @@ function void fn06a710()
 	D0.s16 = D0.s8
 	if (D0.s16 < 0)
 	{
-		u8[A0 + 0x3c] = 0xff
+		u8[A0 + 0x3c] = -1
 	}
 	objA0.position.x.u16 += D0.u16
 	fn06a940()
@@ -994,7 +994,7 @@ function void fn06a7c4()
 	D0.u16 -= D1.u16
 	if (D0.s16 < 0)
 	{
-		u8[A0 + 0x3c] = 0xff
+		u8[A0 + 0x3c] = -1
 	}
 	fn06a940()
 	objA0.velocity.y = 0x0200
@@ -1075,7 +1075,7 @@ function void fn06a916()
 {
 	D0.u16 = objA0.position.x.u16
 	D1.u16 = objA0.velocity.x
-	D3.u8 = (D0.u16 < u16[A0 + 0x3a]) ? 0xff : 0x00
+	D3.u8 = (D0.u16 < u16[A0 + 0x3a]) ? -1 : 0
 	D2.u16 = (D3.u8 == 0) ? -0x100 : 0x100
 
 	D1.u16 += D2.u16
@@ -1209,7 +1209,7 @@ function void fn06aa30()
 	D0.u16 = u16[A2 + 0x10] - objA0.position.x.u16
 	D1.u16 = u16[A2 + 0x18]
 	D2.u16 = 0x40
-	D3.u8 = (D0.s16 < 0) ? 0xff : 0x00
+	D3.u8 = (D0.s16 < 0) ? -1 : 0
 	D0.u16 = abs(D0.s16)
 	if (D0.u16 <= 3)
 	{

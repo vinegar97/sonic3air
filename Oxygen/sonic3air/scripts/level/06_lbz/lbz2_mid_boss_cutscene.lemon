@@ -51,7 +51,7 @@ function void fn08d2b6()
 
 				playSound(0xd0)
 
-				u8[0xfffff7ff] = 0xff
+				u8[0xfffff7ff] = -1
 				screenmover_target.right = 0x6000
 
 				// "spawnSimpleChildObjects(0x084b00)" replaced by:
@@ -218,7 +218,7 @@ function void fn08d450()
 	// Launch of the Death Egg
 	objA0.update_address = 0x08d36a
 	camera.screenshake.state.hi = -1
-	u8[0xffffeec6] = 0xff
+	u8[0xffffeec6] = -1
 	objA0.countdown_value = 0x00ff
 	objA0.countdown_callback = 0x08d46e
 }
@@ -493,7 +493,7 @@ function void fn062a28()
 	objA0.position.y.u16 += D0.u16
 	D0.u16 = objA0.position.x.u16
 	D1.u16 = u16[A0 + 0x40]
-	D2.u8 = (D0.u16 < u16[A0 + 0x3a]) ? 0xff : 0x00
+	D2.u8 = (D0.u16 < u16[A0 + 0x3a]) ? -1 : 0
 	if (D2.u8 == 0)
 	{
 		D1.s16 = -D1.s16

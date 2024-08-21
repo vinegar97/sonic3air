@@ -950,7 +950,7 @@ function void fn06b804()
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x06b824
-		u8[A1 + 0x2c] = 0xff
+		u8[A1 + 0x2c] = -1
 		u16[A1 + 0x2e] = 0x04
 	}
 
@@ -1213,7 +1213,7 @@ function void fn06ba06()
 //# address-hook(0x06bada) end(0x06bb00)
 function void fn06bada()
 {
-	u8[A0 + D4.s16] = 0xff
+	u8[A0 + D4.s16] = -1
 	u8[A2 + 0x2a] |= 0x02
 	u8[A2 + 0x2e] = control_flag.DISABLE_UPDATE
 	u8[A2 + 0x20] = char.state.DIED

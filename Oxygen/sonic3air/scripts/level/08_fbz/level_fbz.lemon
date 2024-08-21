@@ -30,7 +30,7 @@ function void InitLevelTiles.FBZ1()
 	else
 	{
 		level.display_routine = 0x18
-		u8[0xffffeed4] = 0xff
+		u8[0xffffeed4] = -1
 	}
 
 	Level.GetCameraPosition()
@@ -161,7 +161,7 @@ function void fn052486()
 //# address-hook(0x0524d4) end(0x0524e4)
 function void fn0524d4()
 {
-	u8[0xffffeed4] = 0xff
+	u8[0xffffeed4] = -1
 	A5 = 0xffff0060 + u16[A3 + 0x18]
 	A6 = 0xffff0064 + u16[A3 + 0x14]
 	fn0524e8()
@@ -252,7 +252,7 @@ function void fn052522()
 //# address-hook(0x052574) end(0x052584)
 function void fn052574()
 {
-	u8[0xffffeed4] = 0xff
+	u8[0xffffeed4] = -1
 	A5 = 0xffff0000 + u16[A3 + 0x14] + 0x6c
 	A6 = 0xffff0000 + u16[A3 + 0x10] + 0x76
 	fn052588()
@@ -346,7 +346,7 @@ function void fn0525cc()
 //# address-hook(0x052622) end(0x052632)
 function void fn052622()
 {
-	u8[0xffffeed4] = 0xff
+	u8[0xffffeed4] = -1
 	A5 = 0xffff0060 + u16[A3 + 0x44]
 	A6 = 0xffff0066 + u16[A3 + 0x3c]
 	fn052636()
@@ -408,7 +408,7 @@ function void fn052672()
 			}
 		}
 
-		u8[0xffffeed4] = 0xff
+		u8[0xffffeed4] = -1
 		A5 = 0xffff006e + u16[A3 + 0x3c]
 		A6 = 0xffff0076 + u16[A3 + 0x3c]
 	}
@@ -497,7 +497,7 @@ function void fn05272a()
 //# address-hook(0x05276e) end(0x05277e)
 function void fn05276e()
 {
-	u8[0xffffeed4] = 0xff
+	u8[0xffffeed4] = -1
 	A5 = 0xffff006e + u16[A3 + 0x3c]
 	A6 = 0xffff0076 + u16[A3 + 0x3c]
 	fn052782()
@@ -570,7 +570,7 @@ function void fn0527c2()
 //# address-hook(0x0527ec) end(0x0527f0)
 function void fn0527ec()
 {
-	u8[0xffffeed4] = 0xff
+	u8[0xffffeed4] = -1
 	A5 = 0xffff0000 + u16[A3 + 0x54]
 	fn0527f4()
 }
@@ -615,7 +615,7 @@ function void InitLevelScrolling.FBZ1()
 
 	if (u16[0xffffb000 + 0x10] < 0x0180)
 	{
-		u8[0xffffeed6] = 0xff
+		u8[0xffffeed6] = -1
 		A1 = 0x052dd0
 		A5 = 0xfffffce4
 		copyMemory((A5+=16)-16, (A1+=16)-16, 16)
@@ -1057,7 +1057,7 @@ function void fn052ade()
 //# address-hook(0x052b22) end(0x052b2c)
 function void fn052b22()
 {
-	u8[0xffffeed6] = 0xff
+	u8[0xffffeed6] = -1
 	D0 = 8
 	D6.u16 = 0xf0
 	fn052cce()
@@ -1076,7 +1076,7 @@ function void fn052b30()
 		}
 		else
 		{
-			u8[0xffffeed6] = 0xff
+			u8[0xffffeed6] = -1
 			D0 = 4
 			D6.u16 = 0
 			fn052cce()
@@ -1153,7 +1153,7 @@ function void fn052b82()
 //# address-hook(0x052bc6) end(0x052bd0)
 function void fn052bc6()
 {
-	u8[0xffffeed6] = 0xff
+	u8[0xffffeed6] = -1
 	D0 = 8
 	D6.u16 = 0xf0
 	fn052cce()
@@ -1198,7 +1198,7 @@ function void fn052bd4()
 //# address-hook(0x052c00) end(0x052c08)
 function void fn052c00()
 {
-	u8[0xffffeed6] = 0xff
+	u8[0xffffeed6] = -1
 	D0 = 4
 	D6 = 0
 	fn052cce()
@@ -1247,7 +1247,7 @@ function void fn052c2e()
 		setVRAM(address, 0x6092)
 #endif
 
-	u8[0xffffeed6] = 0xff
+	u8[0xffffeed6] = -1
 	D0 = 0x10
 	D6.u16 = 0x03f0
 	A1 = 0x052dd0
@@ -1319,7 +1319,7 @@ function void fn052c74()
 //# address-hook(0x052c98) end(0x052ca0)
 function void fn052c98()
 {
-	u8[0xffffeed6] = 0xff
+	u8[0xffffeed6] = -1
 	D0 = 0x04
 	D6 = 0
 	fn052cce()
@@ -1360,7 +1360,7 @@ function void fn052ca2()
 //# address-hook(0x052cc4) end(0x052cca)
 function void fn052cc4()
 {
-	u8[0xffffeed6] = 0xff
+	u8[0xffffeed6] = -1
 	D0 = 8
 	D6.u16 = 0xf0
 	fn052cce()
@@ -1591,7 +1591,7 @@ function void fn052eae()
 //# address-hook(0x052ede) end(0x052ee6)
 function void fn052ede()
 {
-	u8[0xffffeed4] = 0xff
+	u8[0xffffeed4] = -1
 	A5 = 0xffff0070 + u16[A3 + 0x10]
 	fn052eea()
 }
@@ -2047,7 +2047,7 @@ function void fn053248()
 //# address-hook(0x05326a) end(0x053278)
 function void fn05326a()
 {
-	u8[0xffffeed6] = 0xff
+	u8[0xffffeed6] = -1
 	D0 = 0x0c
 	D6.u16 = 0xf0
 	A1 = 0x052dd0

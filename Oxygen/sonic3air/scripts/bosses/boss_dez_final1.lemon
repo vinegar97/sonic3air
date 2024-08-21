@@ -315,7 +315,7 @@ function void fn08000e()
 //# address-hook(0x08001c) end(0x080056)
 function void fn08001c()
 {
-	if (u16[0xfffffa82] != 0xffff)
+	if (u16[0xfffffa82] != -1)
 	{
 		if ((objA0.flags38 & 0x02) == 0)
 		{
@@ -457,7 +457,7 @@ function void fn0806da()
 		if (D1.s16 >= 0)
 			continue
 
-		objA0.value3a = 0xff
+		objA0.value3a = -1
 		copyMemory(0xfffffade, 0x0813aa, 0x10)
 		u16[0xfffffade+16] = 0
 	}
@@ -567,7 +567,7 @@ function void fn080b22()
 	}
 
 	A1 = (objA0.subtype2c == 0) ? 0xfffffa82 : 0xfffffa83
-	u8[A1] = 0xff
+	u8[A1] = -1
 
 	Object.TriggerUnloading()
 }
@@ -608,7 +608,7 @@ function void fn080b90()
 		if (D2.u8 & 0x01)
 			D1.u16 += (D2.u8 & 0x02) ? 0x20 : -0x20
 		D0.u16 -= D1.u16
-		D1.u8 = (D0.s16 < 0) ? 0xff : 0x00
+		D1.u8 = (D0.s16 < 0) ? -1 : 0
 		D0.u16 = abs(D0.s16)
 		if (D0.u16 > 0x04 && D0.u16 < 0x80)
 		{

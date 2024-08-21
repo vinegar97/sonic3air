@@ -48,7 +48,7 @@ function void fn07a20e()
 	// Skip boss in Time Attack
 	if (Game.isTimeAttack())
 	{
-		u8[0xffffeed2] = 0xff
+		u8[0xffffeed2] = -1
 		UnloadObject()
 		return
 	}
@@ -264,8 +264,8 @@ function void fn07a3e6()
 
 	level.boss_encounter = 0
 	objA0.flags38 |= 0x10
-	u8[0xfffffa89] = 0xff
-	u8[0xffffeed2] = 0xff
+	u8[0xfffffa89] = -1
+	u8[0xffffeed2] = -1
 
 	copyMemory(0xfffffc20, 0xfffffca0, 0x20)
 	requestLoadingPatterns(0x32)		// SSZ object sprites

@@ -64,7 +64,7 @@ function void fn025d9c()
 				D0.u8 = (u8[A1 + 0x2a] + objA0.flags2a) & 0x01
 				if (D0.u8 == 0)
 				{
-					u8[A0 + 0x32] = 0xff
+					u8[A0 + 0x32] = -1
 				}
 			#if STANDALONE
 				if (objA1.state.former == char.state.SONIC_DROPDASH)
@@ -88,7 +88,7 @@ function void fn025d9c()
 				D0.u8 = (u8[A1 + 0x2a] + objA0.flags2a) & 0x01
 				if (D0.u8 == 0)
 				{
-					u8[A0 + 0x32] = 0xff
+					u8[A0 + 0x32] = -1
 				}
 			#if STANDALONE
 				if (objA1.state.former == char.state.SONIC_DROPDASH)

@@ -238,7 +238,7 @@ function void fn061130()
 		return
 
 	objA1.update_address = 0x060d58
-	u8[0xffff2022] = 0xff
+	u8[0xffff2022] = -1
 }
 
 

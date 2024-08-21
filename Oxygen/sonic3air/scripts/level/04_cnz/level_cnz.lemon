@@ -972,6 +972,6 @@ function void fn0520cc()
 		return
 	}
 
-	u8[0xffffeec6] = 0xff
+	u8[0xffffeec6] = -1
 	UnloadObject()
 }

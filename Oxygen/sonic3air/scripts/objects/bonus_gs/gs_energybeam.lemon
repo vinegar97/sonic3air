@@ -141,7 +141,7 @@ function void fn049fe4()
 	{
 		objA0.subtype2c = 1
 		--objA0.animation.timer
-		if (objA0.animation.timer == 0xff)
+		if (objA0.animation.timer == -1)
 		{
 			global.zone_act = checkpoint.zone_act
 			global.zone_act.apparent = checkpoint.zone_act.apparent

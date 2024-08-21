@@ -532,7 +532,7 @@ function void initializeMainGame()
 
 	fn01aa6e()
 
-	VDP.Config.setVerticalScrolling(false, 0xff)	// Good old horizontal scrolling mode
+	VDP.Config.setVerticalScrolling(false, -1)	// Good old horizontal scrolling mode
 	VDP.Config.setNameTableBasePlaneA(0xc000)
 	VDP.Config.setNameTableBasePlaneB(0xe000)
 	VDP.Config.setSpriteAttributeTableBase(0xf800)
@@ -1704,13 +1704,13 @@ function void fn028c80()
 	else if (global.zone == 0x08)
 	{
 		// Sandopolis Zone
-		u8[0xfffff7f1] = 0xff
+		u8[0xfffff7f1] = -1
 	}
 	else if (global.zone_act == 0x0900)
 	{
 		// Lava Reef act 1
-		u8[0xfffff7f1] = 0xff
-		u8[0xfffff7f3] = 0xff
+		u8[0xfffff7f1] = -1
+		u8[0xfffff7f3] = -1
 	}
 	else if (global.zone_act == 0x1000)
 	{
@@ -1741,8 +1741,8 @@ function void fn028c80()
 	else if (global.zone_act == 0x1600)
 	{
 		// Lava Reef Boss
-		u8[0xfffff7f1] = 0xff
-		u8[0xfffff7f3] = 0xff
+		u8[0xfffff7f1] = -1
+		u8[0xfffff7f3] = -1
 	}
 }
 
@@ -2075,7 +2075,7 @@ function void InitializeGameCharacters()
 			u16[0xffffe406] = 0
 			u32[0xffffb000] = 0x04b958
 			fn04b6aa()
-			u8[0xffffee30] = 0xff
+			u8[0xffffee30] = -1
 			return
 		}
 	}

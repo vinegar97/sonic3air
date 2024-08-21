@@ -43,7 +43,7 @@ function void fn08b950()
 		D1.s16 = objA0.position.y.u16 - objA0.value32
 		D2.u16 = objA0.velocity.y
 		D3.u8 = objA0.value39
-		u8[A0 + 0x39] = (D1.s16 < 0) ? 0xff : 0x00
+		u8[A0 + 0x39] = (D1.s16 < 0) ? -1 : 0
 		if (D1.s16 >= 0)
 		{
 			D0.s16 = -D0.s16

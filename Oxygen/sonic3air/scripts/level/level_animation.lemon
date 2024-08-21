@@ -501,7 +501,7 @@ function void LevelTilesAnim.LBZ1()
 {
 	A3 = 0xfffff7f0
 	--u8[A3]
-	if (u8[A3] == 0xff)
+	if (u8[A3] == -1)
 	{
 		u8[A3] = 3
 		D0 = u8[A3 + 1]
@@ -590,7 +590,7 @@ function void LevelTilesAnim.LBZ2()
 	if (u8[A3+0x0f] == 0)
 	{
 		--u8[A3]
-		if (u8[A3] == 0xff)
+		if (u8[A3] == -1)
 		{
 			u8[A3] = 3
 			D0 = u8[A3+1]
@@ -690,7 +690,7 @@ function void fn027f66()
 
 			if (s16[A3+2] >= 0)
 			{
-				u16[A3+2] = 0xffff
+				u16[A3+2] = -1
 				fn028052()
 			}
 		}
@@ -1090,7 +1090,7 @@ function void fn0286ee()
 	while (D6.s16 >= 0)
 	{
 		--u8[A3]
-		if (u8[A3] == 0xff)
+		if (u8[A3] == -1)
 		{
 			D0 = u8[A3 + 1]
 			if (D0.u8 >= u8[A2 + 6])

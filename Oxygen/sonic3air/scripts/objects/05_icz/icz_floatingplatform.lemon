@@ -119,7 +119,7 @@ function void fn08a3c4()
 	{
 		if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 		{
-			u8[0xffffee39] = 0xff
+			u8[0xffffee39] = -1
 		}
 	}
 }

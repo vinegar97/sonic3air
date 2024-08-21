@@ -540,7 +540,7 @@ function void fn063846()
 			u16[A0 + 0x44] = A1.u16
 			objA1.update_address = 0x085e64
 			u16[A1 + 0x3a] = 7
-			u8[A1 + 0x2c] = 0xff
+			u8[A1 + 0x2c] = -1
 
 			// "spawnSimpleChildObjects(0x066650)" replaced by:
 			spawnSimpleChildObjects(0x06395c, 10)

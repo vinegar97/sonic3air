@@ -648,7 +648,7 @@ function void fn07585a()
 	D0.u16 -= objA0.position.x.u16
 	if (D0.u16 != 0)
 	{
-		D1.u8 = (D0.s16 < 0) ? 0xff : 0x00
+		D1.u8 = (D0.s16 < 0) ? -1 : 0
 		D0.u16 = abs(D0.s16)
 
 		D0.u16 = (D0 << 16) / 0x3800
@@ -747,7 +747,7 @@ function void fn07594c()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0 = 0
 	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 - 6
-	D1.u8 = (D0.s16 < 0) ? 0xff : 0x00
+	D1.u8 = (D0.s16 < 0) ? -1 : 0
 	D0.u16 = abs(D0.s16)
 	D0 = (D0 << 16) / 0x6100
 	if (D1.u8 != 0)
@@ -943,7 +943,7 @@ function void fn075ad4()
 	if ((D0 & 0x01) && D2.u8 != 0)
 	{
 		D1.u16 = -0x200
-		objA0.value3a = 0xff
+		objA0.value3a = -1
 	}
 	objA0.velocity.x = D1.u16
 	DrawObject()

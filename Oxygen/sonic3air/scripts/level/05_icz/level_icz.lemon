@@ -121,7 +121,7 @@ function void InitLevelScrolling.ICZ1()
 	else
 	{
 		level.scrolling_routine = 0x10
-		u8[0xffffeee8] = 0xff
+		u8[0xffffeee8] = -1
 		fn23dec6()
 		UpdateBackgroundScrolling.ICZ1.Indoors()
 		fn04f2f6()
@@ -303,7 +303,7 @@ function void fn05380e()
 	fn04ef56()
 	if (_negative())
 	{
-		u8[0xffffeee8] = 0xff
+		u8[0xffffeee8] = -1
 		fn23dec6()
 		level.scrolling_routine += 4
 	}
@@ -719,7 +719,7 @@ function void fn01c9e0()
 {
 	if (camera.position.x.u16 >= 0x3700 && camera.position.y.u16 >= 0x068c)
 	{
-		u8[0xffffeec6] = 0xff
+		u8[0xffffeec6] = -1
 		camera.update_routine += 2
 	}
 }
@@ -730,7 +730,7 @@ function void fn01c9fa()
 {
 	if (camera.position.x.u16 >= 0x3940)
 	{
-		u8[0xffffeec6] = 0xff
+		u8[0xffffeec6] = -1
 		camera.update_routine += 2
 	}
 }
@@ -818,7 +818,7 @@ function void InitLevelScrolling.ICZ2()
 		}
 	}
 
-	u16[0xffffeee8] = indoors * 0xff
+	u16[0xffffeee8] = indoors * -1
 	if (!indoors)
 	{
 		if (camera.position.x.u16 < 0x0720)
@@ -922,7 +922,7 @@ function void fn053d78()
 //# address-hook(0x053d96)
 function void fn053d96()
 {
-	u8[0xffffeee8] = 0xff
+	u8[0xffffeee8] = -1
 	fn23e1da()
 	UpdateBackgroundScrolling.ICZ2.Indoors()
 	fn04f2f6()

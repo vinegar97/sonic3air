@@ -622,7 +622,7 @@ function void fn079f58()
 			objA0.flags2a |= 0x80
 			u8[0xfffffaa3] = 0
 			u16[0xfffffa84] = 0
-			u8[0xffffeec6] = 0xff
+			u8[0xffffeec6] = -1
 
 			// "spawnSimpleChildObjects(0x083fee)" replaced by:
 			spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator

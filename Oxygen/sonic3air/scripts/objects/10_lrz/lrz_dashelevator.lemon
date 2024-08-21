@@ -92,7 +92,7 @@ function void fn042f78()
 		else
 		{
 			--objA0.animation.sprite
-			if (objA0.animation.sprite == 0xff)
+			if (objA0.animation.sprite == -1)
 			{
 				objA0.animation.sprite = 2
 			}

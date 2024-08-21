@@ -249,7 +249,7 @@ function void fn07f29a()
 	{
 		if (objA0.countdown_value == 0x30)
 		{
-			u8[0xffffeec4] = 0xff
+			u8[0xffffeec4] = -1
 		}
 		return
 	}
@@ -319,7 +319,7 @@ function void fn07f344()
 	if (u8[A1 + 0x38] & 0x08)
 	{
 		D1.u8 = D0.u8
-		D2.u8 = (D1.s8 < 0) ? 0xff : 0x00
+		D2.u8 = (D1.s8 < 0) ? -1 : 0
 		D1.u8 += 0x30
 		if (D1.u8 < 0x60)
 		{
@@ -450,7 +450,7 @@ function void fn07f45a()
 	objA0.position.y.u16 -= D1.u16
 	objA0.base_state = 0
 	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
-	objA0.value3a = 0xff
+	objA0.value3a = -1
 	fn07f486()
 }
 
@@ -621,7 +621,7 @@ function void fn07f56e()
 			return
 
 		objA0.position.y.u16 -= D1.u16
-		objA0.value3a = 0xff
+		objA0.value3a = -1
 		b = (objA0.render_flags & render_flag.FLIP_Y)
 	}
 	else
@@ -1268,7 +1268,7 @@ function void fn07fa7e()
 //# address-hook(0x07facc) end(0x07fb08)
 function void fn07facc()
 {
-	D2.u8 = (u8[A0 + 0x3c] & 0x80) ? 0xff : 0x00
+	D2.u8 = (u8[A0 + 0x3c] & 0x80) ? -1 : 0
 	D0 = u8[A0 + 0x3c] & ~0x80
 
 	D3 = 0x04
@@ -1325,7 +1325,7 @@ function void fn07fb4e()
 		}
 		if (D0.u8 != 0)
 		{
-			u8[A1 + 0x42] = 0xff
+			u8[A1 + 0x42] = -1
 			u8[A1 + 0x2a] |= 0x40
 		}
 		fn07f4b8()

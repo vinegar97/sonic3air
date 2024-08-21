@@ -45,7 +45,7 @@ function void fn0894b6()
 	if (objA0.render_flags & render_flag.FLIP_Y)
 	{
 		objA0.render_flags &= ~render_flag.FLIP_Y
-		u8[A0 + 0x3c] = 0xff
+		u8[A0 + 0x3c] = -1
 	}
 
 	objA0.hitbox_extends.y = 0x0e

@@ -25,7 +25,7 @@ function void fn062112()
 	// In time attack, skip this cutscene and trigger the bridge now
 	if (Game.isTimeAttack())
 	{
-		level.trigger08 = 0xff
+		level.trigger08 = -1
 		UnloadObject()
 		return
 	}

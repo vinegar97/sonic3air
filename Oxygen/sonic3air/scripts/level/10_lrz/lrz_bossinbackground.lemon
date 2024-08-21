@@ -123,7 +123,7 @@ function void fn079034()
 function void fn079054()
 {
 	objA0.update_address = 0x079072
-	u8[0xffffeec4] = 0xff
+	u8[0xffffeec4] = -1
 	objA0.countdown_value = 0
 	objA0.velocity.x = 0x0200
 

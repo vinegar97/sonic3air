@@ -493,7 +493,7 @@ function void fn04f15a()
 	while (true)
 	{
 		D2.u16 = u16[(A4+=2)-2]
-		D4.u8 = (D2.s16 < 0) ? 0xff : 0x00
+		D4.u8 = (D2.s16 < 0) ? -1 : 0
 		D2.u16 &= 0x7fff
 		D0.u16 -= D2.u16
 		if (D0.s16 < 0)
@@ -553,7 +553,7 @@ function void fn04f15a()
 			break
 
 		D0.u16 = u16[(A4+=2)-2]
-		D4.u8 = (D0.s16 < 0) ? 0xff : 0x00
+		D4.u8 = (D0.s16 < 0) ? -1 : 0
 		D0.u16 &= 0x7fff
 		D1.u16 = D2.u16
 		D2.u16 -= D0.u16
@@ -616,7 +616,7 @@ function void fn05908e()
 
 	if (objA0.flags38 == 0)
 	{
-		objA0.flags38 = 0xff
+		objA0.flags38 = -1
 		return
 	}
 
@@ -651,14 +651,14 @@ function void fn0590e4()
 		{
 			if (objA0.value39 == 0)
 			{
-				objA0.value39 = 0xff
-				u8[0xfffffaa9] = 0xff
+				objA0.value39 = -1
+				u8[0xfffffaa9] = -1
 			}
 		}
 
 		if (camera.position.y.u16 == 0x0600)
 		{
-			u8[0xffffeec5] = 0xff
+			u8[0xffffeec5] = -1
 			objA0.base_state += 4
 			fn059194()
 		}
@@ -679,14 +679,14 @@ function void fn0590e4()
 		{
 			if (objA0.value39 == 0)
 			{
-				objA0.value39 = 0xff
-				u8[0xfffffaa9] = 0xff
+				objA0.value39 = -1
+				u8[0xfffffaa9] = -1
 			}
 		}
 
 		if (camera.position.y.u16 == 0x02a0)
 		{
-			u8[0xffffeec5] = 0xff
+			u8[0xffffeec5] = -1
 			UnloadObject()
 		}
 	}

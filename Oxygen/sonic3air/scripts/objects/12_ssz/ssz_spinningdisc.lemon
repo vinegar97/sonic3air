@@ -46,7 +46,7 @@ function void fn045dfe()
 		if (objA0.value32 != 0)
 		{
 			A1 = 0xffff0000 + objA0.value32
-			u8[A1 + 0x05] = 0xff
+			u8[A1 + 0x05] = -1
 		}
 
 		if (objA0.respawn_entry)
@@ -112,7 +112,7 @@ function void fn045e6e()
 			return
 		}
 
-		u8[A3] = 0xff
+		u8[A3] = -1
 	#if STANDALONE
 		// Needed when releasing a drop dash here
 		s8 dy = s8(objA1.hitbox_extends.y - u8[A1 + 0x44])
@@ -259,7 +259,7 @@ function void fn045f74()
 		return
 	}
 
-	u8[A3] = 0xff
+	u8[A3] = -1
 #if STANDALONE
 	// Needed when releasing a drop dash here
 	s8 dy = s8(objA1.hitbox_extends.y - u8[A1 + 0x44])

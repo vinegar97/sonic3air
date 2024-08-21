@@ -50,7 +50,7 @@ function void fn04964a()
 			objA1.flags2a &= ~char.flag.CONTROL_LOCK
 			objA1.flags2a |= char.flag.IN_AIR
 			u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
-			u8[A1 + 0x30] = 0xff		// "char.rotation.x.count"
+			u8[A1 + 0x30] = -1		// "char.rotation.x.count"
 			u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 
 			u8[A1 + 0x40] = 0
@@ -271,7 +271,7 @@ function void fn049850()
 	if (u8[A1 + 0x27] == 0)
 		u8[A1 + 0x27] = 1
 	objA1.state = char.state.RUNNING
-	u8[A1 + 0x30] = 0xff		// "char.rotation.x.count"
+	u8[A1 + 0x30] = -1		// "char.rotation.x.count"
 	u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 	if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 	{

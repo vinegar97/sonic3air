@@ -664,7 +664,7 @@ function void fn07225c()
 	{
 		if (D0.u8 == 0x02)
 		{
-			objA0.value3b = 0xff
+			objA0.value3b = -1
 			objA0.base_state = 0x06
 			u16[A0 + 0x3c] = 0x7f
 		}

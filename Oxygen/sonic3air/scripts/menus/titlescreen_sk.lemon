@@ -662,7 +662,7 @@ function void fn0058f0()
 		}
 		else
 		{
-			u8[A0 + 0x34] = 0xff
+			u8[A0 + 0x34] = -1
 			D1.u16 = 0xffc0
 		}
 	}
@@ -827,7 +827,7 @@ function void fn005b42()
 			objA0.value26 -= 8
 			s8[A0 + 0x27] = -8
 			--D2.u8
-			if (D2.u8 == 0xff)
+			if (D2.u8 == -1)
 			{
 				D2.u8 = 1
 			}

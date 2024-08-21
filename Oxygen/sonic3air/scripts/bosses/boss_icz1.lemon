@@ -270,7 +270,7 @@ function void Boss.ICZ1.GotoState0e()
 	objA0.base_state = 0x0e
 	objA0.flags38 |= 0x02
 	D0.u16 = level.bossarea.left + getScreenWidth() / 2
-	u8[A0 + 0x43] = (D0.u16 >= objA0.position.x.u16) ? 0xff : 0x00
+	u8[A0 + 0x43] = (D0.u16 >= objA0.position.x.u16) ? -1 : 0
 }
 
 

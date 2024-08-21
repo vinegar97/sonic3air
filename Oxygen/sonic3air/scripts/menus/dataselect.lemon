@@ -981,7 +981,7 @@ function bool fn00d458()
 		{
 			if (u16[A0 + 0x38] == 0)
 			{
-				objA0.flags38 = 0xff
+				objA0.flags38 = -1
 			}
 
 			if (u16[0xffffb04a + 0x2e] != 0)
@@ -1306,7 +1306,7 @@ function void fn00d7c0()
 		if (control.pad1.pressed & DataSelect.CONTROLS_ACCEPT)
 		{
 			playSound(0x63)
-			u8[0xffffeee4] = 0xff
+			u8[0xffffeee4] = -1
 			objA0.base_state += 4
 		}
 	}
@@ -1315,7 +1315,7 @@ function void fn00d7c0()
 	if (Input.buttonPressed(BUTTON_Y) && dataselect.slot_selected >= 1)
 	{
 		playSound(0x63)
-		u8[0xffffeee4] = 0xff
+		u8[0xffffeee4] = -1
 		objA0.base_state += 4
 	}
 #endif
@@ -1364,7 +1364,7 @@ function void fn00d7ea()
 			}
 
 			playSound(0x63)
-			u8[0xffffeee2] = 0xff
+			u8[0xffffeee2] = -1
 			objA0.base_state += 8
 		}
 	}

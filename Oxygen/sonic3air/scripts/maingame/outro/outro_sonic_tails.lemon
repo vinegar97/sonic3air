@@ -133,7 +133,7 @@ function void fn05d8bc()
 	A1 = 0xffffb250
 	u16[A0 + 0x44] = A1.u16
 	objA1.update_address = 0x05ea52
-	u8[A1 + 0x2c] = 0xff
+	u8[A1 + 0x2c] = -1
 	u8[A1 + 0x38] |= 0x04
 	u16[A1 + 0x46] = A0.u16
 
@@ -305,7 +305,7 @@ function void fn05db76()
 
 		u8[0xfffffab9] = 0
 		outro.scrolling.y = -0x100
-		u8[0xffffeec6] = 0xff
+		u8[0xffffeec6] = -1
 
 		A2 = 0x05dbb6
 		D1 = 0x42
@@ -561,7 +561,7 @@ function void fn05dbf6()
 	{
 		objA0.base_state = 0x14
 		objA0.flags2a |= 0x80
-		u8[0xffffeec4] = 0xff
+		u8[0xffffeec4] = -1
 		u8[0xffffb000 + 0x20] = 0
 
 		objA0.countdown_value = 0x8f
@@ -692,7 +692,7 @@ function void fn05dd6a()
 	if (objA0.countdown_value < 0)
 	{
 		objA0.base_state = 0x1e
-		u8[0xffffeec4] = 0xff
+		u8[0xffffeec4] = -1
 		if (!isMainCharacter(CHARACTER_KNUCKLES) && outro.ending_type >= 0)
 		{
 			A2 = 0x05ddd2
@@ -750,7 +750,7 @@ function void fn05de36()
 	playMusic(MUSIC_CTRL_FADEOUT)
 	u8[0xfffffac1] = 0
 	u8[0xfffffab8] = 0
-	u8[0xffffeec4] = 0xff
+	u8[0xffffeec4] = -1
 	UnloadObject()
 }
 
@@ -800,7 +800,7 @@ function void fn05dfee()
 		u16[A1 + 0x46] = A0.u16
 		objA1.position.x.u16 = 0x0190 + getScreenExtend()
 		objA1.position.y.u16 = 0xdc
-		u8[A1 + 0x2c] = 0xff
+		u8[A1 + 0x2c] = -1
 	}
 
 	Kosinski.addToDMAQueue(0x162914, 0x4dc0)	// Smaller ending sprites + Sonic pilot head + chain
@@ -818,7 +818,7 @@ function void fn05e08a()
 	if (u16[0xfffffc02] == 0x0eee && (objA0.flags38 & 0x80) == 0)
 	{
 		objA0.flags38 |= 0x80
-		u8[0xfffffac1] = 0xff
+		u8[0xfffffac1] = -1
 		if (allocDynamicObjectStd())
 		{
 			objA1.update_address = 0x05df58
@@ -896,7 +896,7 @@ function void fn05e170()
 	if (objA0.countdown_value < 0)
 	{
 		objA0.base_state = 0x06
-		u8[0xffffeec4] = 0xff
+		u8[0xffffeec4] = -1
 		u8[0xfffffac1] = 0
 	}
 }

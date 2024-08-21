@@ -474,7 +474,7 @@ function void fn0486d0()
 //# address-hook(0x0486da) end(0x04872a)
 function void fn0486da()
 {
-	u8[A1 + 0x26] = 0xff
+	u8[A1 + 0x26] = -1
 	D0.u8 = u8[A4 + 0x03]
 	u8[A1 + 0x27] = D0.u8
 	LookupSinCos()
@@ -634,7 +634,7 @@ function void fn0487f0()
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 
-			if (objA0.value26 == 0xff)
+			if (objA0.value26 == -1)
 			{
 				// 3D spiral part: Rotated circle sprite
 				D1.u8 = u8[A0 + 0x27]
