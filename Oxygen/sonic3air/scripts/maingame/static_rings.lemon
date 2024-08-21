@@ -322,7 +322,7 @@ function void RenderStaticRings()
 					D1.u16 += 0x78
 					D0.u16 = u16[A0] - camera_x + 0x80
 
-					u8 animFrame = ringAnimationState & 0xff
+					u8 animFrame = ringAnimationState & 0x00ff
 					if (animFrame == 0)
 					{
 						// For non-collected rings, use rotating animation
@@ -336,7 +336,7 @@ function void RenderStaticRings()
 					u16 index = u16[src + 4]
 
 				#if STANDALONE
-					if ((ringAnimationState & 0xff) == 0)
+					if ((ringAnimationState & 0x00ff) == 0)
 					{
 						// Custom smoother ring animations
 						animFrame = ((static_rings.animframe * 8 + 7 - static_rings.animtimer) / 4) % 8

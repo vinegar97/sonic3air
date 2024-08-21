@@ -167,7 +167,7 @@ function void UpdateLevelScrolling.BonusSM()
 	}
 	u32[0xffffeed8] = D0
 	camera.background.y += D0
-	camera.background.y.u16 &= 0xff
+	camera.background.y.u16 &= 0x00ff
 
 #if STANDALONE
 	A0 = 0xffff1000

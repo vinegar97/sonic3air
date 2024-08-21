@@ -911,7 +911,7 @@ function void fn05f986()
 		if (outro.scrolling.x != 0 && (outro.scrolling.y == 0 || (objA0.value39 & 0x01) == 0))
 		{
 			objA1.position.x.u16 = (outro.scrolling.x < 0) ? (0x1f0 + getScreenExtend() * 2) : 0x50
-			objA1.position.y.u16 = (D0.u16 & 0xff) + 0x80
+			objA1.position.y.u16 = (D0.u16 & 0x00ff) + 0x80
 		}
 		else
 		{

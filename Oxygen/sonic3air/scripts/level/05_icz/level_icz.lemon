@@ -1031,7 +1031,7 @@ function void UpdateBackgroundScrolling.ICZ2.Outdoors()
 
 	// Parallax effect of moving ice
 	D0.u16 = camera.foreground.x.u16 + (level.framecounter >> 1)
-	D0 = (D0 & 0xff) << 15
+	D0 = (D0 & 0x000000ff) << 15
 	D1 = D0 >> 6
 	D2 = 0
 

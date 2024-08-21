@@ -2551,9 +2551,9 @@ function void fn02df64()
 	copyMemory(0xfffffc80, 0x02e318, 0x80)
 
 #if STANDALONE
-	globalComponentTintColorR = 0xff
-	globalComponentTintColorG = 0xff
-	globalComponentTintColorB = 0xff
+	globalComponentTintColorR = 0x00ff
+	globalComponentTintColorG = 0x00ff
+	globalComponentTintColorB = 0x00ff
 	globalComponentAddedColorR = 0
 	globalComponentAddedColorG = 0
 	globalComponentAddedColorB = 0
@@ -2900,7 +2900,7 @@ function void BlueSpheres.renderCustomSpheres()
 		{
 			if (Game.getSetting(SETTING_BS_VISUAL_STYLE) & 0x02)
 			{
-				Renderer.drawVdpSpriteWithTint(px + u16[A3+4], py + s8[A3], u8[A3+1], u16[A3+2] + D6.u16, renderQueue, (0xffffff - fog) + (u32(alpha) << 24), fog)
+				Renderer.drawVdpSpriteWithTint(px + u16[A3+4], py + s8[A3], u8[A3+1], u16[A3+2] + D6.u16, renderQueue, (0x00ffffff - fog) + (u32(alpha) << 24), fog)
 			}
 			else
 			{

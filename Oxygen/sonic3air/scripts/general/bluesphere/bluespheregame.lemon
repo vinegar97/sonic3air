@@ -124,9 +124,9 @@ function void fn04c97e()
 {
 #if STANDALONE
 	// Assuming a white screen here
-	globalComponentAddedColorR = 0xff
-	globalComponentAddedColorG = 0xff
-	globalComponentAddedColorB = 0xff
+	globalComponentAddedColorR = 0x00ff
+	globalComponentAddedColorG = 0x00ff
+	globalComponentAddedColorB = 0x00ff
 #endif
 
 	playMusic(MUSIC_CTRL_FADEOUT)
@@ -728,7 +728,7 @@ function void fn04d13a()
 function void fn04d1aa()
 {
 	// Update shown digits
-	D1 &= 0xff
+	D1 &= 0x000000ff
 	A1 = A0 + 0x4a
 	A2 = 0x04d238
 	D6 = 1

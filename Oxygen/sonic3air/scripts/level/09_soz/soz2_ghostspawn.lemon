@@ -504,7 +504,7 @@ function void fn08f514()
 function void fn08f538()
 {
 	GetRandomNumber()
-	D0.u16 = (D0.u16 & 0xff) - 0x7f
+	D0.u16 = (D0.u16 & 0x00ff) - 0x7f
 	objA0.position.x.u16 += D0.u16
 	D1 = u8[0xfffff7c3] * 2
 	D2.u16 = u16[0x08f582 + D1.s16]

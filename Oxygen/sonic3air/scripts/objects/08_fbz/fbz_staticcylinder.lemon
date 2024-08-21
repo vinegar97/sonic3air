@@ -257,7 +257,7 @@ function void fn03a480()
 	D0.s16 <<= 8
 	objA1.velocity.y = D0.u16
 
-	D0 = (u16[A2] >> 1) & 0xff
+	D0 = (u16[A2] >> 1) & 0x00ff
 	if (objA1.groundspeed < 0)
 	{
 		D0.s8 = -D0.s8

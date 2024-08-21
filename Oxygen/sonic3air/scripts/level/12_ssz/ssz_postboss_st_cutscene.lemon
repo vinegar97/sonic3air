@@ -310,7 +310,7 @@ function void fn05806e()
 			objA1.sprite_priority = (D2.s8 >= 0) ? 0x80 : 0x100
 		}
 
-		D0.u16 = (D2.u16 + 0x0a) & 0xff
+		D0.u16 = (D2.u16 + 0x0a) & 0x00ff
 		D2.u16 = (D0.u16 * 3) >> 6
 
 		// Set player characters' spiral run sprites

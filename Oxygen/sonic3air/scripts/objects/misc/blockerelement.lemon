@@ -328,7 +328,7 @@ function void BlockerElement.checkForUnloadAndDebugRender(u32 color)
 
 	#if STANDALONE
 		debugDrawOutlineRect(objA0.position.x.u16 - objA0.box_size.x, objA0.position.y.u16 - objA0.box_size.y, s16(objA0.box_size.x) * 2, s16(objA0.box_size.y) * 2, color)
-		debugDrawRect(objA0.position.x.u16 - objA0.box_size.x, objA0.position.y.u16 - objA0.box_size.y, s16(objA0.box_size.x) * 2, s16(objA0.box_size.y) * 2, (color & 0xffffff) + (((color >> 24) / 2) << 24))
+		debugDrawRect(objA0.position.x.u16 - objA0.box_size.x, objA0.position.y.u16 - objA0.box_size.y, s16(objA0.box_size.x) * 2, s16(objA0.box_size.y) * 2, (color & 0x00ffffff) + (((color >> 24) / 2) << 24))
 	#endif
 	}
 }

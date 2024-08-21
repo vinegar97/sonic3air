@@ -243,7 +243,7 @@ function void Level.UpdateHyperKnucklesScreenShake()
 		else
 		{
 			--camera.hyper_knux_shake
-			s16 shakeOffset = s8[0x04f424 + (camera.hyper_knux_shake & 0xff)] * 2/3
+			s16 shakeOffset = s8[0x04f424 + (camera.hyper_knux_shake & 0x00ff)] * 2/3
 
 			// Reduce screen shake intensity on highest anti-flicker setting
 			if (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2)

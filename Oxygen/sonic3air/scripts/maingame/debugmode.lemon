@@ -256,7 +256,7 @@ function void DebugMode.ResetSonic()
 function bool updateDebugModeRegular()
 {
 	// Debug mode: free moving around and placement
-	if ((debug_mode.state & 0xff) == 1)
+	if ((debug_mode.state & 0x00ff) == 1)
 	{
 		DebugMode.BaseUpdate()
 		return false

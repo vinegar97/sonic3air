@@ -183,7 +183,7 @@ function void fn0423d0()
 	D0.u16 -= D2.u16
 	D0.s16 <<= 8
 	objA1.velocity.y = D0.u16
-	D0 = (u16[A2] >> 1) & 0xff
+	D0 = (u16[A2] >> 1) & 0x00ff
 	D0.u16 = D0 / 0x16
 	objA1.animation.sprite = u8[0x04247e + D0.u16]		// Player characters' spiral running sprites
 

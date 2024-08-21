@@ -204,9 +204,9 @@ function void ActSelect.Menu(u8 fadeInMethod)
 			for (u32 i = 0; i < 0x20; ++i)
 			{
 				u32 color = unpackColor(u16[0xfffffc00 + i * 2])
-				u32 r = (( color        & 0xff) * blendFactorR) >> 8
-				u32 g = (((color >> 8)  & 0xff) * blendFactorG) >> 8
-				u32 b = (((color >> 16) & 0xff) * blendFactorB) >> 8
+				u32 r = (( color        & 0x000000ff) * blendFactorR) >> 8
+				u32 g = (((color >> 8)  & 0x000000ff) * blendFactorG) >> 8
+				u32 b = (((color >> 16) & 0x000000ff) * blendFactorB) >> 8
 				color = r + (g << 8) + (b << 16)
 
 				u16[0xfffffc80 + i * 2] = packColor(color)

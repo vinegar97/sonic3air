@@ -72,13 +72,13 @@ function void UpdateSpritePattern()
 		if (ptr != 0xfffffbfc)
 		{
 			// D3 is number of words to copy
-			u16[ptr]   = 0x9300 + (D3 & 0xff)
-			u16[ptr+2] = 0x9400 + ((D3 >> 8) & 0xff)
+			u16[ptr]   = 0x9300 + (D3 & 0x00ff)
+			u16[ptr+2] = 0x9400 + ((D3 >> 8) & 0x00ff)
 
 			// D1 is source address in ROM
-			u16[ptr+4] = 0x9500 + ((D1 >> 1) & 0xff)
-			u16[ptr+6] = 0x9600 + ((D1 >> 9) & 0xff)
-			u16[ptr+8] = 0x9700 + ((D1 >> 17) & 0x7f)
+			u16[ptr+4] = 0x9500 + ((D1 >> 1) & 0x00ff)
+			u16[ptr+6] = 0x9600 + ((D1 >> 9) & 0x00ff)
+			u16[ptr+8] = 0x9700 + ((D1 >> 17) & 0x007f)
 
 			// D2 is target address in VRAM
 			u32[ptr+10] = VDPHelper.getDirectVRAMWriteCode(D2) | 0x0080

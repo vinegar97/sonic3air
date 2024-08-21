@@ -23,7 +23,7 @@
 function u32 Game.getSetting(u32 settingId)
 {
 	// Regard all settings as default
-	return (settingId & 0xff)
+	return (settingId & 0x000000ff)
 }
 
 function bool Game.isSecretUnlocked(u32 secretId)

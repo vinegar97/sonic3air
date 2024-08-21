@@ -554,11 +554,11 @@ function void fn007e64()
 		}
 		if (control.pad1.pressed & CONTROL_RIGHT)
 		{
-			levelselect.soundtest = (levelselect.soundtest + 1) & 0xff
+			levelselect.soundtest = (levelselect.soundtest + 1) & 0x00ff
 		}
 		if (control.pad1.pressed & CONTROL_A)
 		{
-			levelselect.soundtest = (levelselect.soundtest + 0x10) & 0xff
+			levelselect.soundtest = (levelselect.soundtest + 0x10) & 0x00ff
 		}
 
 		if (control.pad1.pressed & CONTROL_C)

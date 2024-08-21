@@ -74,7 +74,7 @@ function void MainMenuBG.Run()
 	// Write vertical scroll offsets to VSRAM
 	VDP.setupVSRAMWrite(0)
 	VDP.writeData16(0x4c)								// Foreground vertical scroll offset (Angel Island)
-	VDP.writeData16(camera.background.y.u16 & 0xff)		// Background vertical scroll offset (sky & ocean)
+	VDP.writeData16(camera.background.y.u16 & 0x00ff)		// Background vertical scroll offset (sky & ocean)
 
 	// Setup palette
 	copyPaletteDataFromTable(0x03, 0xfc00)

@@ -1146,7 +1146,7 @@ function void fn005d94()
 		#if STANDALONE
 			D3.u16 = 0x23f	// Clear 0x900 bytes
 		#else
-			D3.u16 = 0xff	// Clear 0x400 bytes
+			D3.u16 = 0x00ff	// Clear 0x400 bytes
 		#endif
 			fn005d4e()
 		#if !STANDALONE

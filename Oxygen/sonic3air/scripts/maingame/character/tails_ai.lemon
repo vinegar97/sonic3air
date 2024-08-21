@@ -620,7 +620,7 @@ function void fn013d4a()
 				tails.ai_jumping = 0
 			}
 
-			if ((level.framecounter & 0xff) == 0 || abs(relativeTargetPosX) < 0x40)
+			if ((level.framecounter & 0x00ff) == 0 || abs(relativeTargetPosX) < 0x40)
 			{
 				s16 relativeTargetPosY = targetPosY - char.position.y.u16
 				if (relativeTargetPosY <= -0x20)

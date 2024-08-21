@@ -47,10 +47,10 @@ function void UpdateWater()
 	{
 	#if STANDALONE
 		if (waterScreenPositionY >= getScreenHeight())
-			waterScreenPositionY = 0xff
+			waterScreenPositionY = 0x00ff
 	#else
 		if (waterScreenPositionY >= getScreenHeight() - 1)
-			waterScreenPositionY = 0xff
+			waterScreenPositionY = 0x00ff
 	#endif
 
 		h_int.line = waterScreenPositionY

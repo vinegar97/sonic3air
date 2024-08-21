@@ -32,7 +32,7 @@ function void fn00c006()
 	A3 = A1
 	Kosinski.decompress(A0, A1)
 
-	D1 = A3 & 0xffffff
+	D1 = A3 & 0x00ffffff
 	D3 = (A1 - A3) >> 1
 	D2.u16 = A2.u16
 
@@ -761,7 +761,7 @@ function void DataSelect.sharedNewGameStartup()
 	if (!Game.isTimeAttack())
 	{
 		// Intentionally not using the (more deterministic) "getRandomNumber" here
-		global.game_random_base = 1 + (System.rand() % 0xff)		// Avoid the 0 value
+		global.game_random_base = 1 + (System.rand() % 0x000000ff)		// Avoid the 0 value
 	}
 #endif
 }
@@ -1077,7 +1077,7 @@ function bool fn00d458()
 		if (global.game_random_base == 0)
 		{
 			// Intentionally not using the (more deterministic) "getRandomNumber" here
-			global.game_random_base = 1 + (System.rand() % 0xff)		// Avoid the 0 value
+			global.game_random_base = 1 + (System.rand() % 0x000000ff)		// Avoid the 0 value
 		}
 	#endif
 

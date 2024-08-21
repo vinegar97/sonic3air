@@ -397,7 +397,7 @@ function void fn06d42e()
 {
 	// Determine movement from the ceiling down
 	GetRandomNumber()
-	D0.u16 &= 0xff
+	D0.u16 &= 0x00ff
 	D1.u16 = D0.u16 & 0x01
 	objA0.render_flags &= ~render_flag.FLIP_X
 	D0.u16 -= 0x80

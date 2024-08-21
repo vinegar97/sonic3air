@@ -578,15 +578,15 @@ function void fn0007ba()
 		for (u8 i = 0; i < 0x40; ++i)
 		{
 			u32 originalColor = unpackColor(u16[paletteAddress + i * 2])
-			u32 color = blendColors_BGR32(originalColor, 0xffffff, blendFactor)
+			u32 color = blendColors_BGR32(originalColor, 0x00ffffff, blendFactor)
 			if (i & 0x0f)
 				color |= 0xff000000
 			Renderer.setPaletteEntry(i, color)
 		}
 
-		globalComponentTintColorR = 0xff - blendFactor
-		globalComponentTintColorG = 0xff - blendFactor
-		globalComponentTintColorB = 0xff - blendFactor
+		globalComponentTintColorR = 0x00ff - blendFactor
+		globalComponentTintColorG = 0x00ff - blendFactor
+		globalComponentTintColorB = 0x00ff - blendFactor
 		globalComponentAddedColorR = blendFactor
 		globalComponentAddedColorG = blendFactor
 		globalComponentAddedColorB = blendFactor

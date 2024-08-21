@@ -124,12 +124,12 @@ function void FadeInPalette()
 		}
 	}
 
-	if (globalComponentTintColorB < 0xff)
-		globalComponentTintColorB = min(globalComponentTintColorB + 0x25, 0xff)
-	else if (globalComponentTintColorG < 0xff)
-		globalComponentTintColorG = min(globalComponentTintColorG + 0x25, 0xff)
-	else if (globalComponentTintColorR < 0xff)
-		globalComponentTintColorR = min(globalComponentTintColorR + 0x25, 0xff)
+	if (globalComponentTintColorB < 0x00ff)
+		globalComponentTintColorB = min(globalComponentTintColorB + 0x25, 0x00ff)
+	else if (globalComponentTintColorG < 0x00ff)
+		globalComponentTintColorG = min(globalComponentTintColorG + 0x25, 0x00ff)
+	else if (globalComponentTintColorR < 0x00ff)
+		globalComponentTintColorR = min(globalComponentTintColorR + 0x25, 0x00ff)
 #endif
 }
 
@@ -295,9 +295,9 @@ function void SetPaletteToWhite()
 	globalComponentTintColorR = 0
 	globalComponentTintColorG = 0
 	globalComponentTintColorB = 0
-	globalComponentAddedColorR = 0xff
-	globalComponentAddedColorG = 0xff
-	globalComponentAddedColorB = 0xff
+	globalComponentAddedColorR = 0x00ff
+	globalComponentAddedColorG = 0x00ff
+	globalComponentAddedColorB = 0x00ff
 #endif
 }
 
@@ -339,9 +339,9 @@ function void FadeInFromWhite()
 		}
 	}
 
-	globalComponentTintColorB = min(globalComponentTintColorB + 0x25, 0xff)
-	globalComponentTintColorG = min(globalComponentTintColorG + 0x25, 0xff)
-	globalComponentTintColorR = min(globalComponentTintColorR + 0x25, 0xff)
+	globalComponentTintColorB = min(globalComponentTintColorB + 0x25, 0x00ff)
+	globalComponentTintColorG = min(globalComponentTintColorG + 0x25, 0x00ff)
+	globalComponentTintColorR = min(globalComponentTintColorR + 0x25, 0x00ff)
 	globalComponentAddedColorR = max(globalComponentAddedColorR - 0x25, 0)
 	globalComponentAddedColorG = max(globalComponentAddedColorG - 0x25, 0)
 	globalComponentAddedColorB = max(globalComponentAddedColorB - 0x25, 0)
@@ -431,12 +431,12 @@ function void FadePaletteToWhite()
 	else if (globalComponentTintColorB > 0)
 		globalComponentTintColorB = max(globalComponentTintColorB - 0x25, 0)
 
-	if (globalComponentAddedColorR < 0xff)
-		globalComponentAddedColorR = min(globalComponentAddedColorR + 0x25, 0xff)
-	else if (globalComponentAddedColorG < 0xff)
-		globalComponentAddedColorG = min(globalComponentAddedColorG + 0x25, 0xff)
-	else if (globalComponentAddedColorB < 0xff)
-		globalComponentAddedColorB = min(globalComponentAddedColorB + 0x25, 0xff)
+	if (globalComponentAddedColorR < 0x00ff)
+		globalComponentAddedColorR = min(globalComponentAddedColorR + 0x25, 0x00ff)
+	else if (globalComponentAddedColorG < 0x00ff)
+		globalComponentAddedColorG = min(globalComponentAddedColorG + 0x25, 0x00ff)
+	else if (globalComponentAddedColorB < 0x00ff)
+		globalComponentAddedColorB = min(globalComponentAddedColorB + 0x25, 0x00ff)
 #endif
 }
 

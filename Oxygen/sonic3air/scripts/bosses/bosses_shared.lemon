@@ -870,9 +870,9 @@ function void fadePaletteTowardsTargetUniform()
 		fadeColorsTowardsTargetUniform(0x802000, 0x802180, 0xc0)
 	}
 
-	globalComponentTintColorB = min(globalComponentTintColorB + 0x25, 0xff)
-	globalComponentTintColorG = min(globalComponentTintColorG + 0x25, 0xff)
-	globalComponentTintColorR = min(globalComponentTintColorR + 0x25, 0xff)
+	globalComponentTintColorB = min(globalComponentTintColorB + 0x25, 0x00ff)
+	globalComponentTintColorG = min(globalComponentTintColorG + 0x25, 0x00ff)
+	globalComponentTintColorR = min(globalComponentTintColorR + 0x25, 0x00ff)
 	globalComponentAddedColorR = max(globalComponentAddedColorR - 0x25, 0)
 	globalComponentAddedColorG = max(globalComponentAddedColorG - 0x25, 0)
 	globalComponentAddedColorB = max(globalComponentAddedColorB - 0x25, 0)

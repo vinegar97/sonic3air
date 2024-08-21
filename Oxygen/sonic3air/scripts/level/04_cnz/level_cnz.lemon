@@ -891,7 +891,7 @@ function void fn052020()
 //# address-hook(0x05204a) end(0x052062)
 function void fn05204a()
 {
-	D0.u16 = u16[0xffffeeda] & 0xff
+	D0.u16 = u16[0xffffeeda] & 0x00ff
 	if (D0.u16 >= 4)
 	{
 		D0 = u32[0xffffeede]
@@ -924,7 +924,7 @@ function void fn052066()
 //# address-hook(0x052086) end(0x0520c8)
 function void fn052086()
 {
-	D0.u16 = u16[0xffffeeda] & 0xff
+	D0.u16 = u16[0xffffeeda] & 0x00ff
 	if (D0.u16 >= 4)
 	{
 		u32[0xffffeeda] += u32[0xffffeede]

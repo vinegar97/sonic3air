@@ -56,7 +56,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			if (gameMode != 0x34 || drawCharacterVariant == 2 || (objA0.update_address != 0x010a94 && objA0.update_address != 0x01365c && objA0.update_address != 0x016444))
 				drawCharacterVariant = -1
 		}
-		if ((debug_mode.state & 0xff) == 1)		// Not when in object placement mode
+		if ((debug_mode.state & 0x00ff) == 1)		// Not when in object placement mode
 		{
 			drawCharacterVariant = -1
 		}

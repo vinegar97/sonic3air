@@ -37,9 +37,9 @@ function void Init()
 	// Initialization of global variables
 	{
 	#if STANDALONE
-		globalComponentTintColorR = 0xff
-		globalComponentTintColorG = 0xff
-		globalComponentTintColorB = 0xff
+		globalComponentTintColorR = 0x00ff
+		globalComponentTintColorG = 0x00ff
+		globalComponentTintColorB = 0x00ff
 		globalComponentAddedColorR = 0
 		globalComponentAddedColorG = 0
 		globalComponentAddedColorB = 0

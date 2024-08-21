@@ -310,9 +310,9 @@ function u32 unpackColor(u16 color)
 	if (color & 0x8000)
 	{
 		// Extended 15-bit color format (Standalone only)
-		u32 r = min(((color)       & 0x1f) * 0x09, 0xff)
-		u32 g = min(((color >> 5)  & 0x1f) * 0x09, 0xff)
-		u32 b = min(((color >> 10) & 0x1f) * 0x09, 0xff)
+		u32 r = min(((color)       & 0x1f) * 0x09, 0x00ff)
+		u32 g = min(((color >> 5)  & 0x1f) * 0x09, 0x00ff)
+		u32 b = min(((color >> 10) & 0x1f) * 0x09, 0x00ff)
 		return r + (g << 8) + (b << 16)
 	}
 	else
@@ -328,18 +328,18 @@ function u32 unpackColor(u16 color)
 
 function u16 packColor(u32 color)
 {
-	u16 r = (((color)       & 0xff) + 0x12) / 0x24
-	u16 g = (((color >> 8)  & 0xff) + 0x12) / 0x24
-	u16 b = (((color >> 16) & 0xff) + 0x12) / 0x24
+	u16 r = (((color)       & 0x00ff) + 0x12) / 0x24
+	u16 g = (((color >> 8)  & 0x00ff) + 0x12) / 0x24
+	u16 b = (((color >> 16) & 0x00ff) + 0x12) / 0x24
 	return (r << 1) + (g << 5) + (b << 9)
 }
 
 #if STANDALONE
 function u16 packColorExt(u32 color)
 {
-	u16 r = (((color)       & 0xff) + 0x04) / 0x09
-	u16 g = (((color >> 8)  & 0xff) + 0x04) / 0x09
-	u16 b = (((color >> 16) & 0xff) + 0x04) / 0x09
+	u16 r = (((color)       & 0x00ff) + 0x04) / 0x09
+	u16 g = (((color >> 8)  & 0x00ff) + 0x04) / 0x09
+	u16 b = (((color >> 16) & 0x00ff) + 0x04) / 0x09
 	return (r) + (g << 5) + (b << 10) + 0x8000
 }
 #endif
@@ -363,18 +363,18 @@ function u32 blendColors(u32 colorA, u32 colorB, u16 blendFactor)	// Deprecated 
 
 function u32 blendColors_BGR32(u32 colorA, u32 colorB, u16 blendFactor)
 {
-	u32 r = ( (colorA        & 0xff) * (0x100 - blendFactor) + ( colorB        & 0xff) * blendFactor + 0x80) >> 8
-	u32 g = (((colorA >> 8)  & 0xff) * (0x100 - blendFactor) + ((colorB >> 8)  & 0xff) * blendFactor + 0x80) >> 8
-	u32 b = (((colorA >> 16) & 0xff) * (0x100 - blendFactor) + ((colorB >> 16) & 0xff) * blendFactor + 0x80) >> 8
+	u32 r = ( (colorA        & 0x000000ff) * (0x100 - blendFactor) + ( colorB        & 0x000000ff) * blendFactor + 0x00000080) >> 8
+	u32 g = (((colorA >> 8)  & 0x000000ff) * (0x100 - blendFactor) + ((colorB >> 8)  & 0x000000ff) * blendFactor + 0x00000080) >> 8
+	u32 b = (((colorA >> 16) & 0x000000ff) * (0x100 - blendFactor) + ((colorB >> 16) & 0x000000ff) * blendFactor + 0x00000080) >> 8
 	return r + (g << 8) + (b << 16)
 }
 
 function u32 blendColors_RGBA32(u32 colorA, u32 colorB, u16 blendFactor)
 {
-	u32 r = (((colorA >> 24) & 0xff) * (0x100 - blendFactor) + ((colorB >> 24) & 0xff) * blendFactor + 0x80) >> 8
-	u32 g = (((colorA >> 16) & 0xff) * (0x100 - blendFactor) + ((colorB >> 16) & 0xff) * blendFactor + 0x80) >> 8
-	u32 b = (((colorA >> 8)  & 0xff) * (0x100 - blendFactor) + ((colorB >> 8)  & 0xff) * blendFactor + 0x80) >> 8
-	u32 a = ( (colorA        & 0xff) * (0x100 - blendFactor) + ( colorB        & 0xff) * blendFactor + 0x80) >> 8
+	u32 r = (((colorA >> 24) & 0x000000ff) * (0x100 - blendFactor) + ((colorB >> 24) & 0x000000ff) * blendFactor + 0x00000080) >> 8
+	u32 g = (((colorA >> 16) & 0x000000ff) * (0x100 - blendFactor) + ((colorB >> 16) & 0x000000ff) * blendFactor + 0x00000080) >> 8
+	u32 b = (((colorA >> 8)  & 0x000000ff) * (0x100 - blendFactor) + ((colorB >> 8)  & 0x000000ff) * blendFactor + 0x00000080) >> 8
+	u32 a = ( (colorA        & 0x000000ff) * (0x100 - blendFactor) + ( colorB        & 0x000000ff) * blendFactor + 0x00000080) >> 8
 	return (r << 24) + (g << 16) + (b << 8) + a
 }
 
@@ -387,9 +387,9 @@ function u32 convertColors32(u32 color)
 #if STANDALONE
 function u32 applyGlobalComponentTint_BGR32(u32 color)
 {
-	u32 r = clamp((( color        & 0xff) * globalComponentTintColorR) / 0xff + globalComponentAddedColorR, 0, 0xff)
-	u32 g = clamp((((color >> 8)  & 0xff) * globalComponentTintColorG) / 0xff + globalComponentAddedColorG, 0, 0xff)
-	u32 b = clamp((((color >> 16) & 0xff) * globalComponentTintColorB) / 0xff + globalComponentAddedColorB, 0, 0xff)
+	u32 r = clamp((( color        & 0x000000ff) * globalComponentTintColorR) / 0x000000ff + globalComponentAddedColorR, 0, 0x000000ff)
+	u32 g = clamp((((color >> 8)  & 0x000000ff) * globalComponentTintColorG) / 0x000000ff + globalComponentAddedColorG, 0, 0x000000ff)
+	u32 b = clamp((((color >> 16) & 0x000000ff) * globalComponentTintColorB) / 0x000000ff + globalComponentAddedColorB, 0, 0x000000ff)
 	return r + (g << 8) + (b << 16)
 }
 #endif
@@ -415,7 +415,7 @@ function u32 VDPHelper.getDirectVRAMWriteCode(u16 vramAddress)
 function u16 VDPHelper.getVRAMAddressFromWriteCode(u32 code)
 {
 	u32 higherBits = (code >> 16)
-	u32 lowerBits  = (code & 0xffff)
+	u32 lowerBits  = (code & 0x0000ffff)
 	return (higherBits & ~0xc000) + ((lowerBits & 0x0003) << 14)
 }
 
@@ -496,13 +496,13 @@ function void VDP.zeroVRAM(u16 bytes)
 function void VDP.copyByDMA(u32 sourceAddress, u16 vramAddress, u16 bytes, u16 mode)
 {
 	// Encode length
-	u16 word1 = 0x9300 | ((bytes >> 1) & 0xff)
-	u16 word2 = 0x9400 | ((bytes >> 9) & 0xff)
+	u16 word1 = 0x9300 | ((bytes >> 1) & 0x00ff)
+	u16 word2 = 0x9400 | ((bytes >> 9) & 0x00ff)
 
 	// Encode source
-	u16 word3 = 0x9500 | ((sourceAddress >> 1) & 0xff)
-	u16 word4 = 0x9600 | ((sourceAddress >> 9) & 0xff)
-	u16 word5 = 0x9700 | ((sourceAddress >> 17) & ~0x80)
+	u16 word3 = 0x9500 | ((sourceAddress >> 1) & 0x00ff)
+	u16 word4 = 0x9600 | ((sourceAddress >> 9) & 0x00ff)
+	u16 word5 = 0x9700 | ((sourceAddress >> 17) & ~0x0080)
 
 	// Encode destination + control flags
 	u16 word6 = (vramAddress & ~0xc000) | mode
@@ -530,8 +530,8 @@ function void VDP.fillVRAMbyDMA(u16 fillValue, u16 vramAddress, u16 bytes)
 	bytes -= 2	// Because first word gets written immediately, others by DMA
 
 	// Encode length
-	u16 word1 = 0x9300 | ((bytes >> 1) & 0xff)
-	u16 word2 = 0x9400 | ((bytes >> 9) & 0xff)
+	u16 word1 = 0x9300 | ((bytes >> 1) & 0x00ff)
+	u16 word2 = 0x9400 | ((bytes >> 9) & 0x00ff)
 
 	// Encode destination + control flags
 	u16 word6 = (vramAddress & ~0xc000) | 0x4000
