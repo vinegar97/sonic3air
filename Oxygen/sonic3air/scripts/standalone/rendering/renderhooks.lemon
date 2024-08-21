@@ -487,14 +487,14 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			// Giant Ring
 			if (objA0.update_address == 0x061682)
 			{
-				Standalone.renderWithStandardPacking(px, py, 0x0619b2, 0xff, renderQueue)
+				Standalone.renderWithStandardPacking(px, py, 0x0619b2, -1, renderQueue)
 				return true
 			}
 
 			// Signpost
 			if (objA0.update_address == 0x0837b2)
 			{
-				u8 customAtex = (objA0.animation.sprite == 2) ? 0x80 : 0xff		// Use Knuckles' palette when needed
+				u8 customAtex = (objA0.animation.sprite == 2) ? 0x80 : -1		// Use Knuckles' palette when needed
 				Standalone.renderWithStandardPacking(px, py, 0x083b42, customAtex, renderQueue)
 				return true
 			}
@@ -502,28 +502,28 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			// AIZ Rhinobot
 			if (objA0.update_address == 0x086e5c)
 			{
-				Standalone.renderWithStandardPacking(px, py, 0x087132, 0xff, renderQueue)
+				Standalone.renderWithStandardPacking(px, py, 0x087132, -1, renderQueue)
 				return true
 			}
 
 			// HCZ Pointdexter
 			if (objA0.update_address == 0x088282)
 			{
-				Standalone.renderWithKosinskiCompression(px, py, 0x36ad8a, 0xff, renderQueue)
+				Standalone.renderWithKosinskiCompression(px, py, 0x36ad8a, -1, renderQueue)
 				return true
 			}
 
 			// HCZ Turbospiker (and subobjects); fixed addresses #contributed by Legobouwer
 			if (objA0.update_address == 0x087bca || objA0.update_address == 0x087da4 || objA0.update_address == 0x087dc0 || objA0.update_address == 0x087e3e)
 			{
-				Standalone.renderWithKosinskiCompression(px, py, 0x36a968, 0xff, renderQueue)
+				Standalone.renderWithKosinskiCompression(px, py, 0x36a968, -1, renderQueue)
 				return true
 			}
 
 			// HCZ Piranha
 			if (objA0.update_address == 0x087f5c)
 			{
-				Standalone.renderWithKosinskiCompression(px, py, 0x36a6c4, 0xff, renderQueue)
+				Standalone.renderWithKosinskiCompression(px, py, 0x36a6c4, -1, renderQueue)
 				return true
 			}
 
@@ -531,7 +531,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			if (objA0.update_address == 0x031754 && objA0.subtype2c == 0x04)
 			{
 				// This only works for the red balloon; its cord and other colors use a copy of the art that's Nemesis-compressed
-				Standalone.renderWithKosinskiCompression(px, py, 0x37060e, 0xff, renderQueue, 0xae80)		// Draw the balloon sprite
+				Standalone.renderWithKosinskiCompression(px, py, 0x37060e, -1, renderQueue, 0xae80)		// Draw the balloon sprite
 
 				// Directly drawing the cord sprites
 				if (objA0.animation.sprite == 0x14)
@@ -1128,7 +1128,7 @@ function bool Standalone.onDrawVdpSpriteCompound(s16 px, s16 py, u8 size, u16 in
 
 function u64 Standalone.renderWithStandardPacking(s16 px, s16 py, u32 patternRomAddress, u8 customAtex, u16 renderQueue)
 {
-	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes & sprite_attribute.PALETTE) >> 9)
+	u8 atex = (customAtex != -1) ? customAtex : ((objA0.sprite_attributes & sprite_attribute.PALETTE) >> 9)
 	u64 key = Renderer.setupCustomObjectSprite(u32[patternRomAddress], u32[patternRomAddress + 4], objA0.mapping_offset, objA0.animation.sprite, 0x00)
 	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 
@@ -1142,7 +1142,7 @@ function u64 Standalone.renderWithStandardPacking(s16 px, s16 py, u32 patternRom
 
 function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patternRomAddress, u8 customAtex, u16 renderQueue)
 {
-	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes & sprite_attribute.PALETTE) >> 9)
+	u8 atex = (customAtex != -1) ? customAtex : ((objA0.sprite_attributes & sprite_attribute.PALETTE) >> 9)
 	u64 key = Renderer.setupKosinskiCompressedSprite(patternRomAddress, objA0.mapping_offset, objA0.animation.sprite, 0x00)
 	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 
@@ -1159,7 +1159,7 @@ function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patter
 	// This second variant is needed if the mappings contain a base offset that needs to be removed
 	//  -> This is the case when in the original sprite attributes point to a different VRAM address than where the Kosinski data got decompressed to
 	//  -> An example is the CNZ balloons
-	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes & sprite_attribute.PALETTE) >> 9)
+	u8 atex = (customAtex != -1) ? customAtex : ((objA0.sprite_attributes & sprite_attribute.PALETTE) >> 9)
 	u64 key = Renderer.setupKosinskiCompressedSprite(patternRomAddress, objA0.mapping_offset, objA0.animation.sprite, 0x00, originalVramAddress / 0x20 - objA0.sprite_attributes)
 	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 

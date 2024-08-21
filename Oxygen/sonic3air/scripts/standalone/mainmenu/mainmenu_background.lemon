@@ -154,7 +154,7 @@ function void MainMenuBG.Update(u16 cameraForegroundX, u16 cameraBackgroundX)
 			// while (true)
 			// {
 				// D2.u16 = u16[(A4+=2)-2]
-				// D4.u8 = (D2.s16 < 0) ? 0xff : 0x00
+				// D4.u8 = (D2.s16 < 0) ? -1 : 0
 				// D2.u16 &= ~0x8000
 				// D0.u16 -= D2.u16
 				// if (D0.s16 < 0)
@@ -214,7 +214,7 @@ function void MainMenuBG.Update(u16 cameraForegroundX, u16 cameraBackgroundX)
 					// break
 
 				// D0.u16 = u16[(A4+=2)-2]
-				// D4.u8 = (D0.s16 < 0) ? 0xff : 0x00
+				// D4.u8 = (D0.s16 < 0) ? -1 : 0
 				// D0.u16 &= ~0x8000
 				// D1.u16 = D2.u16
 				// D2.u16 -= D0.u16

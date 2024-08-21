@@ -710,7 +710,7 @@ function void RenderSprites_CompetitionMode()
 		A6 += 8
 		--D7.s16
 	}
-	u8[0xffffef3e] = 0xff
+	u8[0xffffef3e] = -1
 }
 
 
