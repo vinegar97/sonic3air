@@ -44,13 +44,9 @@ function void Standalone.drawCharacterSpriteDirect(u8 character, s16 px, s16 py,
 	{
 		// Custom added sprites for Sonic's Drop Dash & Super Peel-Out
 		if (animationSpriteEx >= CHAR_ANIMSPRITE_SONIC_PEELOUT)
-		{
 			key = stringformat("sonic_peelout_%d", animationSpriteEx - CHAR_ANIMSPRITE_SONIC_PEELOUT)
-		}
 		else
-		{
 			key = stringformat("sonic_dropdash_%d", animationSpriteEx - CHAR_ANIMSPRITE_SONIC_DROPDASH)
-		}
 	}
 
 	if (key == 0)

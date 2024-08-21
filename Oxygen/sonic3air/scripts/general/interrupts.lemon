@@ -593,7 +593,9 @@ function void fn000c50()
 //# translated(0x000d10) end(0x000dd6)
 function void HInt_000d10()
 {
-	if (u16[0xfffff644] != 0)
+	if (u16[0xfffff644] == 0)
+		return
+
 	{
 		u16[0xfffff644] = 0
 
@@ -666,7 +668,9 @@ function void HInt_000d10()
 //# translated(0x000dd8) end(0x000e56)
 function void HInt_000dd8()
 {
-	if (u16[0xfffff644] != 0)
+	if (u16[0xfffff644] == 0)
+		return
+
 	{
 		u16[0xfffff644] = 0
 

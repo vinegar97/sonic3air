@@ -545,12 +545,9 @@ function void fn05134c()
 //# address-hook(0x0514aa) end(0x0514e4)
 function void fn0514aa()
 {
-	if (s16[0xffffeeb8] < 0)
+	if (s16[0xffffeeb8] < 0 && u32[0xfffff680] == 0)
 	{
-		if (u32[0xfffff680] == 0)
-		{
-			u16[0xffffeeb8] = 0xff
-		}
+		u16[0xffffeeb8] = 0xff
 	}
 
 	if (s16[0xffffeeb8] > 0)

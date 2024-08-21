@@ -395,12 +395,9 @@ function void UpdateTimeAndHud()
 			}
 		}
 	}
-	else
+	else if (debug_mode.enabled)
 	{
-		if (debug_mode.enabled)
-		{
-			DebugModePositionDisplay()
-		}
+		DebugModePositionDisplay()
 	}
 }
 

@@ -233,10 +233,8 @@ function void fn02a502()
 	if (D0.u16 == 0)
 	{
 		DrawOrUnloadObject()
-		return
 	}
-
-	if (D0.u8 == (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
+	else if (D0.u8 == (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 	{
 		if (u8[A0 + 0x34] != 2 && u8[A0 + 0x36] != 2)
 		{
