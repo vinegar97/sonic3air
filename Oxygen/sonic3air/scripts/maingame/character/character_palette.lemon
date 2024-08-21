@@ -10,18 +10,39 @@
 
 #if STANDALONE
 
+function string getCharacterPaletteKey()
+{
+	return getCharacterPaletteKey(-1)
+}
+
 function string getCharacterPaletteKey(u8 character)
 {
+	if (character == -1)
+		character = getPlayerCharacter((A0 == 0xffffb000) ? 0 : 1)
 	return (character == CHARACTER_SONIC) ? "character_palette_sonic" : (character == CHARACTER_TAILS) ? "character_palette_tails" : "character_palette_knuckles"
+}
+
+function string getCharacterBluespherePaletteKey()
+{
+	return getCharacterBluespherePaletteKey(-1)
 }
 
 function string getCharacterBluespherePaletteKey(u8 character)
 {
+	if (character == -1)
+		character = getPlayerCharacter((A0 == 0xffffb000) ? 0 : 1)
 	return (character == CHARACTER_SONIC) ? "bluesphere_palette_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_palette_tails" : "bluesphere_palette_knuckles"
+}
+
+function string getCharacterEndPosePaletteKey()
+{
+	return getCharacterEndPosePaletteKey(-1)
 }
 
 function string getCharacterEndPosePaletteKey(u8 character)
 {
+	if (character == -1)
+		character = getPlayerCharacter((A0 == 0xffffb000) ? 0 : 1)
 	return (character == CHARACTER_SONIC) ? "endpose_palette_sonic" : (character == CHARACTER_TAILS) ? "endpose_palette_tails" : "endpose_palette_knuckles"
 }
 
