@@ -54,11 +54,7 @@ function void fn08e6b8()
 	A1 = 0xffffb000
 	CheckDistanceToObjectA1()
 
-	D4.u8 = (objA0.render_flags & render_flag.FLIP_X) ? 0xff : 0x00
-	if (D0.u16 != 0)
-	{
-		D4.u8 ^= 0xff
-	}
+	D4.u8 = ((objA0.render_flags & render_flag.FLIP_X) ^ (D0.u16 != 0)) ? -1 : 0		// This works as an exclusive OR conditional
 	if (D4.u8 == 0)
 	{
 		if (D2.u16 >= 0x20 && D2.u16 < 0x80 && D3.u16 < 0x28)

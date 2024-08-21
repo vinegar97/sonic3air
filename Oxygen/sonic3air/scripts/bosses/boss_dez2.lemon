@@ -1060,11 +1060,7 @@ function void fn07f8a0()
 //# address-hook(0x07f8ca) end(0x07f8fe)
 function void fn07f8ca()
 {
-	D0.u8 = (objA0.value3a != 0) ? 0xff : 0x00
-	if (global.inv_gravity)
-	{
-		D0.u8 ^= 0xff
-	}
+	D0.u8 = ((objA0.value3a != 0) ^ (global.inv_gravity)) ? -1 : 0		// This works as an exclusive OR conditional
 	if (D0.u8 != 0)
 	{
 		objA0.base_state = 0x04
@@ -1197,11 +1193,7 @@ function void fn07f9f8()
 		return
 	}
 
-	D2.u8 = (objA0.render_flags & render_flag.FLIP_Y) ? 0xff : 0x00
-	if (D1.u16 == 0)
-	{
-		D2.u8 ^= 0xff
-	}
+	D2.u8 = ((objA0.render_flags & render_flag.FLIP_Y) ^ (D1.u16 == 0)) ? -1 : 0		// This works as an exclusive OR conditional
 	if (D2.u8 != 0)
 	{
 		if (u8[A1 + 0x34] == 0 && (u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
@@ -1318,11 +1310,7 @@ function void fn07fb4e()
 
 	if (fn0858c8(0x07fb8a))
 	{
-		D0.u8 = (objA0.render_flags & render_flag.FLIP_Y) ? 0xff : 0x00
-		if (objA0.velocity.y < 0)
-		{
-			D0.u8 ^= 0xff
-		}
+		D0.u8 = ((objA0.render_flags & render_flag.FLIP_Y) ^ (objA0.velocity.y < 0)) ? -1 : 0		// This works as an exclusive OR conditional
 		if (D0.u8 != 0)
 		{
 			u8[A1 + 0x42] = -1

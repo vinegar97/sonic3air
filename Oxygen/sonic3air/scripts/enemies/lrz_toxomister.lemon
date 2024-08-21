@@ -212,11 +212,7 @@ function void fn08fedc()
 		MoveWithParent()
 		Object.AnimationProgressByLocalA1()
 
-		D0.u8 = (global.framecounter.low & 0x01) ? 0xff : 0x00
-		if (objA0.subtype2c & 0x01)
-		{
-			D0.u8 ^= 0xff
-		}
+		D0.u8 = ((global.framecounter.low & 0x01) ^ (objA0.subtype2c & 0x01)) ? -1 : 0		// This works as an exclusive OR conditional
 		if (D0.u8 == 0)
 		{
 			Child.DrawSprite()

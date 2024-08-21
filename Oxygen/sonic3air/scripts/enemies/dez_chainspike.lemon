@@ -96,10 +96,7 @@ function void fn091cc2()
 	u16[A0 + 0x40] = D1.u16
 	D0.u16 += D1.u16
 
-	D2.u8 = (D0.s16 < 0) ? 0xff : 0x00
-	if (s16[A0 + 0x3e] < 0)
-		D2.u8 ^= 0xff
-
+	D2.u8 = ((D0.s16 < 0) ^ (s16[A0 + 0x3e] < 0)) ? -1 : 0		// This works as an exclusive OR conditional
 	if (D2.u8 == 0)
 	{
 		objA0.velocity.x = D0.u16
@@ -187,10 +184,7 @@ function void fn091d8c()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x02)
 	{
-		D0.u8 = (objA1.render_flags & render_flag.FLIP_Y) ? 0xff : 0x00
-		if (objA0.subtype2c != 0)
-			D0.u8 ^= 0xff
-
+		D0.u8 = ((objA1.render_flags & render_flag.FLIP_Y) ^ (objA0.subtype2c != 0)) ? -1 : 0		// This works as an exclusive OR conditional
 		if (D0.u8 == 0)
 		{
 			objA0.base_state = 0x04
@@ -212,10 +206,7 @@ function void fn091de2()
 
 	if (objA0.position.y.u16 != u16[A0 + 0x3a])
 	{
-		D0.u8 = (objA0.render_flags & render_flag.FLIP_Y) ? 0xff : 0x00
-		if (objA0.velocity.y >= 0)
-			D0.u8 ^= 0xff
-
+		D0.u8 = ((objA0.render_flags & render_flag.FLIP_Y) ^ (objA0.velocity.y >= 0)) ? -1 : 0		// This works as an exclusive OR conditional
 		if (D0.u8 != 0)
 		{
 			CheckGroundCollision()

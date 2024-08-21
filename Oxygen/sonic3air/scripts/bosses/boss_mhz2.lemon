@@ -542,12 +542,7 @@ function void fn076674()
 	{
 		objA0.collision_attributes = (u8[A1 + 0x2a] & 0x40) ? 0 : (collision.flag.THREAT | collision.size.8x8)
 
-		D0.u8 = (global.framecounter & 0x01) ? 0xff : 0x00
-		if (objA0.subtype2c != 0)
-		{
-			D0.u8 ^= 0xff
-		}
-
+		D0.u8 = ((global.framecounter & 0x01) ^ (objA0.subtype2c != 0)) ? -1 : 0		// This works as an exclusive OR conditional
 		if (D0.u8 != 0 || (u8[A1 + 0x38] & 0x40) == 0)
 			return
 
