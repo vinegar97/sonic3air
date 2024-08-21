@@ -995,7 +995,7 @@ function void fn05e1c2()
 //# address-hook(0x05e288) end(0x05e2bc)
 function void fn05e288()
 {
-	u8[0xffffcc0a + 0x04] &= ~0x04
+	u8[0xffffcc0a + 0x04] &= ~render_flag.WORLD
 	fn0847e6()
 
 	UpdateMovementStraightSimple()

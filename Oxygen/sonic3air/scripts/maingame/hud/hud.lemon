@@ -8,6 +8,13 @@
 
 
 
+constant u16 HUD.RingsCounter.targetInVRAM = 0xdf40
+constant u16 HUD.ScoreCounter.targetInVRAM = 0xdc40
+constant u16 HUD.TimeCounter.Minutes.targetInVRAM = 0xde40
+constant u16 HUD.TimeCounter.Seconds.targetInVRAM = 0xdec0
+
+
+
 //-------------------------------------------------------//
 // HUD display                                           //
 //-------------------------------------------------------//
@@ -240,7 +247,7 @@ function void UpdateTimeAndHud()
 			if (hud.dirty.score)
 			{
 				hud.dirty.score = 0
-				D0 = VDPHelper.getDirectVRAMWriteCode(0xdc80)
+				D0 = VDPHelper.getDirectVRAMWriteCode(HUD.ScoreCounter.targetInVRAM+0x40)
 				D1 = player.score
 				RefreshScoreHudDisplay()
 			}
@@ -253,7 +260,7 @@ function void UpdateTimeAndHud()
 					ResetRingsDisplay()
 				}
 				hud.dirty.rings = 0
-				D0 = VDPHelper.getDirectVRAMWriteCode(0xdf40)
+				D0 = VDPHelper.getDirectVRAMWriteCode(HUD.RingsCounter.targetInVRAM)
 				D1 = ring_counter
 				RefreshRingsHudDisplay()
 			}
@@ -318,11 +325,11 @@ function void UpdateTimeAndHud()
 
 			if (updateTimerHUD)
 			{
-				D0 = VDPHelper.getDirectVRAMWriteCode(0xde40)
+				D0 = VDPHelper.getDirectVRAMWriteCode(HUD.TimeCounter.Minutes.targetInVRAM)
 				D1 = min(timer.minutes, 9)
 				RefreshTimeMinutesHudDisplay()
 
-				D0 = VDPHelper.getDirectVRAMWriteCode(0xdec0)
+				D0 = VDPHelper.getDirectVRAMWriteCode(HUD.TimeCounter.Seconds.targetInVRAM)
 				D1 = timer.seconds
 				RefreshTimeSecondsHudDisplay()
 			}
@@ -349,18 +356,18 @@ function void UpdateTimeAndHud()
 					ResetRingsDisplay()
 				}
 				hud.dirty.rings = 0
-				D0 = VDPHelper.getDirectVRAMWriteCode(0xdf40)
+				D0 = VDPHelper.getDirectVRAMWriteCode(HUD.RingsCounter.targetInVRAM)
 				D1 = ring_counter
 				RefreshRingsHudDisplay()
 			}
 
 			// Draw lag frame count over timer minutes
-			D0 = VDPHelper.getDirectVRAMWriteCode(0xde40)
+			D0 = VDPHelper.getDirectVRAMWriteCode(HUD.TimeCounter.Minutes.targetInVRAM)
 			D1 = global.lag_frames
 			RefreshTimeMinutesHudDisplay()
 
 			// Draw sprite count over timer seconds
-			D0 = VDPHelper.getDirectVRAMWriteCode(0xdec0)
+			D0 = VDPHelper.getDirectVRAMWriteCode(HUD.TimeCounter.Seconds.targetInVRAM)
 			D1 = u8[0xfffff62c]
 			RefreshTimeSecondsHudDisplay()
 
@@ -406,7 +413,7 @@ function void UpdateTimeAndHud()
 function void ResetRingsDisplay()
 {
 	// Initialize direct VRAM write
-	VDP.setupVRAMWrite(0xdf40)
+	VDP.setupVRAMWrite(HUD.RingsCounter.targetInVRAM)
 	A2 = 0x00def8
 	D2.u16 = 2
 	fn00debe()
@@ -421,7 +428,7 @@ function void ResetScoreDisplay()
 		return
 
 	// Initialize direct VRAM write
-	VDP.setupVRAMWrite(0xdc40)
+	VDP.setupVRAMWrite(HUD.ScoreCounter.targetInVRAM)
 	A2 = 0x00deec
 	D2.u16 = 14
 	fn00debe()
@@ -455,7 +462,7 @@ function void fn00debe()
 function void DebugModePositionDisplay()
 {
 	// Initialize direct VRAM write
-	VDP.setupVRAMWrite(0xdc40)
+	VDP.setupVRAMWrite(HUD.ScoreCounter.targetInVRAM)
 
 	D1 = (u32(camera.position.x.u16) << 16) + u16[0xffffb000 + 0x10]
 	fn00df1c()

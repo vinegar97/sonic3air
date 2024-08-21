@@ -170,7 +170,7 @@ function void SpecialStage()
 	else
 #endif
 	{
-		playMusic(0x1c)
+		playMusic(MUSIC_SPECIALSTAGE)
 	}
 
 	VDP.Config.setActiveDisplay(true)

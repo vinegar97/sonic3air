@@ -101,7 +101,7 @@ function void fn06852c()
 function void fn068556()
 {
 	objA0.base_state = 0x04
-	objA0.countdown_value = 0xb4
+	objA0.countdown_value = 180
 	move_area.left = D5.u16
 	move_area.right = D5.u16 + (getScreenWidth() - 320)
 	playMusic(MUSIC_CTRL_FADEOUT)

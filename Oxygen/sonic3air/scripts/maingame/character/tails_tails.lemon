@@ -44,7 +44,7 @@ function void TailsTails.Update()
 	{
 		if (u8[A2 + 0x22] >= 0xa9 && u8[A2 + 0x22] <= 0xac)		// Range of Tails' pushing animation frames
 		{
-			D0 = 4	// Set appropriate tail animation manually, because char.state isn't actually set for character pushing animation
+			D0 = char.state.PUSHING	// Set appropriate tail animation manually, because char.state isn't actually set for character pushing animation
 		}
 	}
 	if (u8[A0 + 0x34] != D0.u8)
@@ -114,10 +114,10 @@ function void CompetitionMode.TailsTails.Update()
 	objA0.sprite_priority = u16[A2 + 0x08]
 	objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 
-	D0 = u8[A2 + 0x20]
-	if ((u8[A2 + 0x2a] & 0x20) && D0.u8 != 0x05)
+	D0 = u8[A2 + 0x20]		// Tails' animation state "char.state"
+	if ((u8[A2 + 0x2a] & char.flag.PUSHING) && D0.u8 != char.state.STANDING)
 	{
-		D0 = 0x04
+		D0 = char.state.PUSHING
 	}
 	if (D0.u8 != u8[A0 + 0x34])
 	{

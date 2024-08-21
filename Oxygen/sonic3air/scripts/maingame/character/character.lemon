@@ -5234,7 +5234,7 @@ function void Character.OnCollisionWithDynamicObject()
 	//  - 0xd8		 = Thrown mushroom, stars over starpost
 
 	D1.u8 = (objA1.collision_attributes & collision_attributes.flags)
-	if (D1.u8 == 0)
+	if (D1.u8 == collision.flag.DESTRUCTIBLE)
 	{
 		// Collision is an enemy, i.e. is harmful, but can be attacked
 		bool attacking = false
@@ -6007,7 +6007,7 @@ function void fn01050c()
 		return
 
 	D0.u8 &= collision_attributes.flags
-	if (D0.u8 == 0)
+	if (D0.u8 == collision.flag.DESTRUCTIBLE)
 	{
 		if (u8[A1 + 0x29] == 0)
 		{
