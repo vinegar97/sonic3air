@@ -124,11 +124,7 @@ function void fn0692a0()
 
 	fn069c94()
 
-	objA0.render_flags &= ~render_flag.FLIP_X
-	if (u16[A0 + 0x26] < 0x08)
-	{
-		objA0.render_flags |= render_flag.FLIP_X
-	}
+	objA0.render_flags = (objA0.render_flags & ~render_flag.FLIP_X) | ((u16[A0 + 0x26] < 0x08) ? render_flag.FLIP_X : 0)
 
 	// "spawnChildObjects(0x069d2e)" replaced by:
 	spawnChildObject(0x0699c0, 0x00, 0, 0)		// Waterfall splash
@@ -149,11 +145,7 @@ function void fn069c94()
 function void fn0692e2()
 {
 	Object.AnimationProgress.DistinctTimer(0x069d98)
-	objA0.flags38 &= ~0x40
-	if (objA0.animation.sprite == 0x2b)
-	{
-		objA0.flags38 |= 0x40
-	}
+	objA0.flags38 = (objA0.flags38 & ~0x40) | ((objA0.animation.sprite == 0x2b) ? 0x40 : 0)
 }
 
 
@@ -1206,13 +1198,9 @@ function void fn069a66()
 	objA0.velocity.y = D3.u16
 
 	objA0.countdown_value = 0x7f
+
 	if (D2.u16 != 0)
-	{
-		if (D2.s16 >= 0)
-			objA0.render_flags |= render_flag.FLIP_X
-		else
-			objA0.render_flags &= ~render_flag.FLIP_X
-	}
+		objA0.render_flags = (objA0.render_flags & ~render_flag.FLIP_X) | ((D2.s16 >= 0) ? render_flag.FLIP_X : 0)
 }
 
 

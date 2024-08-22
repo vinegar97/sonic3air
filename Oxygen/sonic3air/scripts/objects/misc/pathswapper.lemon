@@ -194,11 +194,7 @@ function void PathSwapperUpdateVertical()
 		}
 	}
 
-	// Affect priority flag (rendering on foreground)
-	if (objA0.subtype2c & (0x40 >> onPositiveSide))
-		objA1.sprite_attributes |= sprite_attribute.PRIORITY
-	else
-		objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
+	objA1.sprite_attributes = (objA1.sprite_attributes & ~sprite_attribute.PRIORITY) | ((objA0.subtype2c & (0x40 >> onPositiveSide)) ? sprite_attribute.PRIORITY : 0)		// Affect priority flag (rendering on foreground)
 }
 
 
@@ -303,9 +299,5 @@ function void PathSwapperUpdateHorizontal()
 		}
 	}
 
-	// Affect priority flag (rendering on foreground)
-	if (objA0.subtype2c & (0x40 >> onPositiveSide))
-		objA1.sprite_attributes |= sprite_attribute.PRIORITY
-	else
-		objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
+	objA1.sprite_attributes = (objA1.sprite_attributes & ~sprite_attribute.PRIORITY) | ((objA0.subtype2c & (0x40 >> onPositiveSide)) ? sprite_attribute.PRIORITY : 0)		// Affect priority flag (rendering on foreground)
 }

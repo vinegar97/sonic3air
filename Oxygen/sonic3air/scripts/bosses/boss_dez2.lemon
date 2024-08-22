@@ -1280,12 +1280,7 @@ function void fn07facc()
 	}
 
 	objA0.animation.sprite = D3.u8
-	D0.u8 = objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)
-	if (D2.u8 != 0)
-	{
-		D0.u8 |= (render_flag.FLIP_X | render_flag.FLIP_Y)
-	}
-	objA0.render_flags = D0.u8
+	objA0.render_flags = (objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | ((D2.u8 != 0) ? (render_flag.FLIP_X | render_flag.FLIP_Y) : 0)
 }
 
 

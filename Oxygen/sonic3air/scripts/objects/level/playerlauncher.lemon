@@ -86,10 +86,9 @@ function void fn03b9d8()
 	{
 		D0 = 4
 		D1.u16 = 0x0100
-		u8[A1 + 0x2a] &= ~0x01
+		u8[A1 + 0x2a] = (u8[A1 + 0x2a] & ~0x01) | (objA0.flags2a & 0x01)
 		if (objA0.flags2a & 0x01)
 		{
-			u8[A1 + 0x2a] |= 0x01
 			D0.s16 = -D0.s16
 			D1.s16 = -D1.s16
 		}

@@ -416,10 +416,7 @@ function void fn05c5d0()
 		objA0.animation.frame = D0.u8
 		A2 = 0x05c622 + D0.s16
 		objA0.animation.sprite = u8[(A2+=1)-1]
-		if (u8[A2] != 0)
-			objA0.render_flags |= render_flag.FLIP_X
-		else
-			objA0.render_flags &= ~render_flag.FLIP_X
+		objA0.render_flags = (objA0.render_flags & ~render_flag.FLIP_X) | ((u8[A2] != 0) ? render_flag.FLIP_X : 0)
 	}
 }
 

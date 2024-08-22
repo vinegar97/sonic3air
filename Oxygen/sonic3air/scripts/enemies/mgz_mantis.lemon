@@ -49,10 +49,7 @@ function void fn088e82()
 function void fn088e98()
 {
 	CheckDistanceToPlayers()
-	if (D0.u16 != 0)
-		objA0.render_flags |= render_flag.FLIP_X
-	else
-		objA0.render_flags &= ~render_flag.FLIP_X
+	objA0.render_flags = (objA0.render_flags & ~render_flag.FLIP_X) | ((D0.u16 != 0) ? render_flag.FLIP_X : 0)
 
 	if (D2.u16 < 0x40)
 	{

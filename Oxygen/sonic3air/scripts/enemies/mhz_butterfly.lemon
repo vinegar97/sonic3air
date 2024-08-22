@@ -47,10 +47,7 @@ function void fn08e0da()
 {
 	CheckDistanceToPlayers()
 
-	if (D0.u16 != 0)
-		objA0.render_flags |= render_flag.FLIP_X
-	else
-		objA0.render_flags &= ~render_flag.FLIP_X
+	objA0.render_flags = (objA0.render_flags & ~render_flag.FLIP_X) | ((D0.u16 != 0) ? render_flag.FLIP_X : 0)
 
 	D0.u16 = 0x0100
 	D1.u16 = 4

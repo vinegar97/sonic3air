@@ -90,15 +90,8 @@ function bool InitBoss(u32 returnAddress, bool useScreenExtend)
 
 	if (D0.u16 >= minY && D0.u16 <= maxY && D1.u16 >= minX && D1.u16 <= maxX)
 	{
-		if (D0.u16 > u16[A1])
-			u8[A0 + 0x27] |= 0x80
-		else
-			u8[A0 + 0x27] &= ~0x80
-
-		if (D1.u16 > u16[A1 + 0x04])
-			u8[A0 + 0x27] |= 0x40
-		else
-			u8[A0 + 0x27] &= ~0x40
+		u8[A0 + 0x27] = (u8[A0 + 0x27] & ~0x80) | ((D0.u16 > u16[A1]) ? 0x80 : 0)
+		u8[A0 + 0x27] = (u8[A0 + 0x27] & ~0x40) | ((D1.u16 > u16[A1 + 0x04]) ? 0x40 : 0)
 
 		// Originally this is "objA0.update_address = u32[A7]"
 		//  -> But this wouldn't work in script, as the system stack is not used the same way

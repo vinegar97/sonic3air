@@ -167,10 +167,7 @@ function void fn01d1e2()
 			}
 		}
 
-		if (D0 & 0x20)
-			objA1.sprite_attributes |= sprite_attribute.PRIORITY
-		else
-			objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
+		objA1.sprite_attributes = (objA1.sprite_attributes & ~sprite_attribute.PRIORITY) | ((D0 & 0x20) ? sprite_attribute.PRIORITY : 0)
 	}
 	else
 	{

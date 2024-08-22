@@ -163,11 +163,7 @@ function void fn076b44()
 #endif
 
 	objA0.base_state = 0x06
-	if (D0.u16 != 0)
-		objA0.render_flags |= render_flag.FLIP_X
-	else
-		objA0.render_flags &= ~render_flag.FLIP_X
-
+	objA0.render_flags = (objA0.render_flags & ~render_flag.FLIP_X) | ((D0.u16 != 0) ? render_flag.FLIP_X : 0)
 	objA0.countdown_value = 0x3e
 	objA0.countdown_callback = 0x076b86
 

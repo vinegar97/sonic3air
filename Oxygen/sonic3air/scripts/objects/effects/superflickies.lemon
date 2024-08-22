@@ -81,17 +81,10 @@ function void fn01a228()
 	u8[A0 + 0x34] += 2
 	if (objA0.velocity.x != 0)
 	{
-		if (objA0.velocity.x < 0)
-			objA0.render_flags |= render_flag.FLIP_X
-		else
-			objA0.render_flags &= ~render_flag.FLIP_X
+		objA0.render_flags = (objA0.render_flags & ~render_flag.FLIP_X) | ((objA0.velocity.x < 0) ? render_flag.FLIP_X : 0)
 	}
 
-	objA0.render_flags &= ~render_flag.FLIP_Y
-	if (global.inv_gravity)
-	{
-		objA0.render_flags |= render_flag.FLIP_Y
-	}
+	objA0.render_flags = (objA0.render_flags & ~render_flag.FLIP_Y) | ((global.inv_gravity) ? render_flag.FLIP_Y : 0)
 
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
