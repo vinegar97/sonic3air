@@ -131,7 +131,7 @@ function void LevelSelect.init()
 	fn007f62()
 
 	global.characters = CHARS_SONIC_AND_TAILS
-	u16[0xffffff02] = 0
+	unused.VSResultsScreen = 0	// 0 = act, 1 = zone, 2 = game, 3 = SS, 4 = SS all
 	global.level_started = 0
 	u16[0xfffff7f0] = 0
 

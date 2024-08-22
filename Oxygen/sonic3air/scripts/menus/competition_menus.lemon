@@ -403,7 +403,7 @@ function void CompetitionMode.StageSelect()
 	copyMemory(0xfffffca0, 0x20a55e, 0x60)
 
 	A0 = 0xffffb000
-	A1 = (u8[0xfffff600] & 0x80) ? 0x00b282 : 0x00b1f0
+	A1 = (global.game_mode & 0x80) ? 0x00b282 : 0x00b1f0
 	D0.u16 = u16[(A1+=2)-2]
 	while (D0.s16 >= 0)
 	{
