@@ -508,9 +508,8 @@ function void fn06f2a8()
 
 		objA0.base_state = 0x0c
 		objA0.flags38 &= ~0x04
-		u8[A1 + 0x38] |= 0x02
+		u8[A1 + 0x38] |= (0x02 | 0x80)
 		objA0.flags38 |= 0x02
-		u8[A1 + 0x38] |= 0x80
 	}
 	else
 	{
@@ -527,9 +526,8 @@ function void fn06f2a8()
 
 		objA0.base_state = 0x12
 		objA0.flags38 &= ~0x04
-		u8[A1 + 0x38] |= 0x40
+		u8[A1 + 0x38] |= (0x40 | 0x80)
 		objA0.flags38 |= 0x40
-		u8[A1 + 0x38] |= 0x80
 	}
 }
 
@@ -726,9 +724,7 @@ function void fn06f504()
 {
 	objA0.base_state = 0x08
 	objA0.flags38 |= 0x04
-	objA0.flags38 &= ~0x08
-	objA0.flags38 &= ~0x40
-	objA0.flags38 &= ~0x02
+	objA0.flags38 &= ~(0x08 | 0x40 | 0x02)
 	u8[A0 + 0x3c] = u8[A1 + 0x3c]
 	u8[A0 + 0x40] = u8[A1 + 0x40]
 

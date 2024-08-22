@@ -139,11 +139,7 @@ function void fn087ae6()
 		}
 	}
 
-	objA0.render_flags &= ~render_flag.FLIP_X
-	if (objA1.render_flags & render_flag.FLIP_X)
-	{
-		objA0.render_flags |= render_flag.FLIP_X
-	}
+	objA0.render_flags = (objA0.render_flags & ~render_flag.FLIP_X) | (objA1.render_flags & render_flag.FLIP_X)
 
 	D0.u16 = 0x0200
 	D1 = 0x20
