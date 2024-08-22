@@ -176,7 +176,6 @@ function void fn08538c()		// Find_SonicTails8Way
 function void fn085412()
 {
 	D4 = 0x07
-	return
 }
 
 
@@ -419,6 +418,13 @@ function void Enemy.DamageCharacter()
 }
 
 
+function bool fn0857c2()		// Check_PlayerAttack
+{
+	fn0857c2()
+	return D0
+}
+
+
 //# address-hook(0x0857c2) end(0x0857e6)
 function void fn0857c2()		// Check_PlayerAttack
 {
@@ -531,6 +537,12 @@ function void fn085838()		// Check_LRControllerShake
 //# address-hook(0x085870) end(0x08588e)
 function void fn085870()		// Check_PlayerCollision
 {
+	fn085870_()
+}
+
+
+function bool fn085870_()
+{
 	D0.u8 = u8[A0 + 0x29]
 	if (D0.u8 != 0)
 	{
@@ -543,10 +555,12 @@ function void fn085870()		// Check_PlayerCollision
 		u16[A0 + 0x44] = A1.u16
 		D1 = 1
 		_setZeroFlagByValue(1)
+		return true
 	}
 	else
 	{
 		_setZeroFlagByValue(0)
+		return false
 	}
 }
 
@@ -683,7 +697,8 @@ function void fn085de0()		// Make_LevelSizeObj
 
 
 //# address-hook(0x085fc4) end(0x085fdc)
-function void fn085fc4()
+//# alias(fn085fc4) deprecated
+function void UpdatePlayerSpritePatterns()
 {
 	u32 backupA0 = A0
 	A0 = A1
@@ -1609,7 +1624,8 @@ function bool Swing_upanddown_count()
 
 
 //# address-hook(0x0848b6) end(0x0848e6)
-function void fn0848b6()
+//# alias(fn0848b6) deprecated
+function void Object.TriggerOnGroundMiss()		// ObjHitFloor2_DoRoutine
 {
 	D3 = s16(objA0.velocity.x) << 8
 	D3 += objA0.position.x
@@ -1618,6 +1634,7 @@ function void fn0848b6()
 
 	if (D1.s16 >= -1 && D1.s16 < 12)
 	{
+		// On ground
 		objA0.position.y.u16 += D1.u16
 		_setZeroFlagByValue(0)
 	}
@@ -1631,7 +1648,8 @@ function void fn0848b6()
 
 
 //# address-hook(0x0848e8) end(0x0848fc)
-function void fn0848e8()
+//# alias(fn0848e8) deprecated
+function void Object.TriggerOnRightWallHit()		// ObjHitWall_DoRoutine
 {
 	CheckRightWallCollision()
 	if (D1.s16 >= 0)
@@ -1644,7 +1662,8 @@ function void fn0848e8()
 
 
 //# address-hook(0x0848fe) end(0x084912)
-function void fn0848fe()
+//# alias(fn0848fe) deprecated
+function void Object.TriggerOnLeftWallHit()		// ObjHitWall2_DoRoutine
 {
 	CheckLeftWallCollision()
 	if (D1.s16 >= 0)
@@ -1889,7 +1908,8 @@ function void CheckDistanceToPlayers()
 
 
 //# address-hook(0x084b5c) end(0x084b6c)
-function void fn084b5c()
+//# alias(fn084b5c) deprecated
+function void flipXWithDistance()		// Change_FlipX
 {
 	if (D0.u16 != 0)
 		objA0.render_flags |= render_flag.FLIP_X
@@ -1899,7 +1919,8 @@ function void fn084b5c()
 
 
 //# address-hook(0x084b6e) end(0x084b80)
-function void fn084b6e()
+//# alias(fn084b6e) deprecated
+function void flipXWithVelocity()		// Change_FlipXWithVelocity
 {
 	if (objA0.velocity.x >= 0)
 		objA0.render_flags |= render_flag.FLIP_X
@@ -1923,10 +1944,19 @@ function void fn084b82()		// Change_FlipXUseParent
 //# address-hook(0x084b9c) end(0x084bbe)
 function void CheckDistanceToObjectA1()
 {
+	// Outputs:
+	//  - A1:     RAM address of the object
+	//  - D0:     Relative position-x of the object: 0 = left, 2 = right
+	//  - D1:     Relative position-y of the object: 0 = above, 2 = below
+	//  - D2.u16: Distance-x between objects (abs value)
+	//  - D3.u16: Distance-y between objects (abs value)
+
+	// Check distance-x
 	D2.u16 = objA0.position.x.u16 - objA1.position.x.u16
 	D0 = (D2.s16 < 0) ? 2 : 0
 	D2.u16 = abs(D2.s16)
 
+	// Check distance-y
 	D3.u16 = objA0.position.y.u16 - objA1.position.y.u16
 	D1 = (D3.s16 < 0) ? 2 : 0
 	D3.u16 = abs(D3.s16)
@@ -1934,7 +1964,8 @@ function void CheckDistanceToObjectA1()
 
 
 //# address-hook(0x084be0) end(0x084bfe)
-function void fn084be0()
+//# alias(fn084be0) deprecated
+function void Character.UpdateMovementSimpleAtA1()
 {
 	objA1.position.x += s32(objA1.velocity.x) << 8
 	objA1.position.y += s32(objA1.velocity.y) << 8
@@ -1964,15 +1995,22 @@ function void moveWithGravity(u16 gravity)
 
 
 //# address-hook(0x084c00) end(0x084c40)
-function void fn084c00()
+//# alias(fn084c00) deprecated
+function void UpdatePositionCircleRadius()		// MoveSprite_Circular
 {
+	// This functions handles radius values more granularly, better used for orbits that change in size
+
+	// s16[A0 + 0x3a] -> Radius
+	// s16[A0 + 0x42] -> X offset
+	// s16[A0 + 0x43] -> Y offset
+
 	D0.u8 = u8[A0 + 0x3c]
 	LookupSinCos()
-	D2.u16 = u16[A0 + 0x3a]
-	D3.u16 = D2.u16
-	D2.s32 = s32(D2.s16) * D0.s16
+
+	D2.s32 = s32(s16[A0 + 0x3a]) * D0.s16
 	D2 = (D2 << 16) + (D2 >> 16)
-	D3.s32 = s32(D3.s16) * D1.s16
+
+	D3.s32 = s32(s16[A0 + 0x3a]) * D1.s16
 	D3 = (D3 << 16) + (D3 >> 16)
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
@@ -1984,13 +2022,14 @@ function void fn084c00()
 
 
 //# address-hook(0x084c42) end(0x084c70)
-function void fn084c42()
+//# alias(fn084c42) deprecated
+function void UpdatePositionCircle()		// MoveSprite_CircularSimple
 {
+	// D2 -> Radius
+
 	u8 angle = u8[A0 + 0x3c]
-	D0.s32 = s32(lookupSin(angle)) << 16
-	D1.s32 = s32(lookupCos(angle)) << 16
-	D0.s32 >>= D2
-	D1.s32 >>= D2
+	D0.s32 = (s32(lookupSin(angle)) << 16) >> D2
+	D1.s32 = (s32(lookupCos(angle)) << 16) >> D2
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D2 = objA1.position.x + D0
@@ -2001,44 +2040,38 @@ function void fn084c42()
 
 
 //# address-hook(0x084c72) end(0x084caa)
-function void fn084c72()
+//# alias(fn084c72) deprecated
+function void UpdatePositionCircleXFlipWithParent()		// MoveSprite_CircularSimpleCheckFlip
 {
-	D0.u8 = u8[A0 + 0x3c]
-	LookupSinCos()
-	D0 = s32(D0 << 16) >> D2
-	D1 = s32(D1 << 16) >> D2
+	// D2 -> Radius
+
+	u8 angle = u8[A0 + 0x3c]
+	D0.s32 = (s32(lookupSin(angle)) << 16) >> D2
+	D1.s32 = (s32(lookupCos(angle)) << 16) >> D2
+
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	D2 = objA1.position.x
-	D3 = objA1.position.y
-	if (objA1.render_flags & render_flag.FLIP_X)
-	{
-		D0.s32 = -D0.s32
-	}
-	D2 += D0
-	D3 += D1
+	D2 = objA1.position.x + ((objA1.render_flags & render_flag.FLIP_X) ? -D0.s32 : D0.s32)
+	D3 = objA1.position.y + D1
 	objA0.position.x = D2
 	objA0.position.y = D3
 }
 
 
 //# address-hook(0x084cac) end(0x084cf2)
-function void fn084cac()
+//# alias(fn084cac) deprecated
+function void UpdatePositionCircleOffset()		// MoveSprite_CircularSimpleOffset
 {
-	D0.u8 = u8[A0 + 0x3c]
-	LookupSinCos()
-	D0 = s32(D0 << 16) >> D2
-	D1 = s32(D1 << 16) >> D2
+	// D2 -> Radius
+	// s16[A0 + 0x42] -> X offset
+	// s16[A0 + 0x43] -> Y offset
+
+	u8 angle = u8[A0 + 0x3c]
+	D0.s32 = (s32(lookupSin(angle)) << 16) >> D2
+	D1.s32 = (s32(lookupCos(angle)) << 16) >> D2
+
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	D2 = objA1.position.x
-	D3 = objA1.position.y
-	D4.s16 = s8[A0 + 0x42]
-	D4 = (D4 << 16)
-	D2 += D4
-	D4.s16 = s8[A0 + 0x43]
-	D4 = (D4 << 16)
-	D3 += D4
-	D2 += D0
-	D3 += D1
+	D2 = objA1.position.x + (s8[A0 + 0x42] << 16) + D0
+	D3 = objA1.position.y + (s8[A0 + 0x43] << 16) + D1
 	objA0.position.x = D2
 	objA0.position.y = D3
 }
@@ -2194,22 +2227,25 @@ function bool SetupObjectAttributesSlotted(u32 sourceAddress)
 function bool SetupObjectAttributesSlotted()
 {
 	D0 = 0
-	D1.u16 = u16[A1]
-	D2.u16 = u16[A1]
-	D3.u16 = u16[A1+2]
-	D4.u16 = u16[A1+4]
-	A2 = 0xfffffa9a + u16[A1+6]
+	D1.u16 = u16[A1]		// Number of tries
+	D2.u16 = u16[A1]		// ?dup
+	D3.u16 = u16[A1+2]		// Base sprite attribute data
+	D4.u16 = u16[A1+4]		// Offset of target in VRAM
+	A2 = 0xfffffa9a + u16[A1+6]		// Address of object slots to test
 	A1 += 8
 
 	D5 = u8[A2]
 	while (D5.u8 & 1)
 	{
-		D5.u8 >>= 1
-		++D0.u16
+		// Slot bit is reserved; move onto next slot
+		D5.u8 >>= 1		// Shift to test next bit
+		++D0.u16		// Slot bit number
 		D3.u16 += D4.u16
+
 		--D1.s16
 		if (D1.s16 < 0)
 		{
+			// Ran out of tries, stop loading the object
 			objA0.update_address = 0
 			objA0.position.x = 0
 			objA0.position.y = 0
@@ -2434,6 +2470,9 @@ function void fn084e7c()
 //# address-hook(0x084e8c) end(0x084ebc)
 function void fn084e8c()
 {
+	// s8[A0 + 0x42] -> X offset
+	// s8[A0 + 0x43] -> Y offset
+
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D2.u16 = objA1.position.x.u16 + s8[A0 + 0x42]
 	if (objA1.render_flags & render_flag.FLIP_X)

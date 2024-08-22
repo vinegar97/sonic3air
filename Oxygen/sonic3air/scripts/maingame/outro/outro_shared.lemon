@@ -338,11 +338,14 @@ function void fn05ea52()
 	//  - 0x05eb16	-> objA0.base_state = 0x06  -> Before catching main character
 	//  - 0x05eb2e	-> objA0.base_state = 0x08  -> Just hovering...
 	call tableLookupAddress(0x05ea6a, objA0.base_state)
+	debugLog(objA0.base_state)
 
 	fn060038()
 	Child.DrawSprite()
 }
 
+
+// Initialization
 
 //# address-hook(0x05ea74) end(0x05ead6)
 function void fn05ea74()
@@ -381,6 +384,8 @@ function void fn05ea74()
 }
 
 
+// With main character on the plane (also used during credits)
+
 //# address-hook(0x05eadc) end(0x05eb00)
 function void fn05eadc()
 {
@@ -399,6 +404,8 @@ function void fn05eadc()
 }
 
 
+// Waiting until it gets visible
+
 //# address-hook(0x05eb02) end(0x05eb14)
 function void fn05eb02()
 {
@@ -409,6 +416,8 @@ function void fn05eb02()
 	}
 }
 
+
+// Before catching main character
 
 //# address-hook(0x05eb16) end(0x05eb2c)
 function void fn05eb16()
@@ -424,6 +433,8 @@ function void fn05eb16()
 	}
 }
 
+
+// Just hovering...
 
 //# address-hook(0x05eb2e) end(0x05eb2e)
 function void fn05eb2e()
@@ -1032,8 +1043,7 @@ function void fn060000()
 //# address-hook(0x060038) end(0x06006c)
 function void fn060038()
 {
-	A1 = 0x06006e
-	fn086458()
+	fn086458(0x06006e)
 
 	D0 = u8[A0 + 0x44] + 1
 	if (D0.u8 >= 6)

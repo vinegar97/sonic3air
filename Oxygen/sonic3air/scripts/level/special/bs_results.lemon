@@ -931,6 +931,8 @@ function void fn02ec7a()
 //# address-hook(0x02ec80) end(0x02eca6)
 function void fn02ec80()
 {
+	// D0 : offset
+	// D1 : length
 	if (isMainCharacter(CHARACTER_SONIC))
 	{
 		D0 = 0

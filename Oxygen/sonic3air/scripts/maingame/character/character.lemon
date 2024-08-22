@@ -5401,49 +5401,9 @@ function void Character.OnCollisionWithDynamicObject()
 					char.velocity.y = -char.velocity.y
 				}
 				else
-				{
-					// Improved code to prevent crushing and allow bouncing on ground, #contributed by GFX32
-
-					// If the player is below the monitor, it should bounce.
-					bool isBelow = (char.position.y.u16 > (objA1.position.y.u16 + objA1.hitbox_extends.y))
-
-					if (objA1.render_flags & render_flag.FLIP_Y)
-						isBelow = (char.position.y.u16 < (objA1.position.y.u16 - objA1.hitbox_extends.y))
-
-					// Not when spindashing!
-					if (char.state == char.state.SPINDASH)
-						isBelow = false
-
-					if (isBelow)
-					{
-						// Hit monitor from below, make it fall
-						u8[A1 + 0x3c] = 1
-
-						char.velocity.y = -char.velocity.y
-						objA1.velocity.y = -0x180
-
-						// Calculate how far the monitor is inside the player, then separate them; this attempts to prevent crushing collision on subsequent frames.
-						s16 dy = (objA1.position.y.u16 + objA1.hitbox_extends.y) - (char.position.y.u16 - char.hitbox_extends.y)
-
-						if (objA1.render_flags & render_flag.FLIP_Y)
-							dy = (objA1.position.y.u16 - objA1.hitbox_extends.y) - (char.position.y.u16 + char.hitbox_extends.y)
-
-						// Only push the player when in midair
-						if (char.flags & char.flag.IN_AIR)
-						{
-							dy /= 2
-							char.position.y.u16 += dy
-						}
-						objA1.position.y.u16 -= dy
-
-						if (u8[A1 + 0x3c] == 0)
-							u8[A1 + 0x3c] = 4
-
-						return
-					}
-				}
 			#else
 				if (objA1.flags2a & char.flag.IN_AIR)
+			#endif
 				{
 					// This block is a bit broken due to the above check, and falling monitors can crush the player, and is this really what we want?
 
@@ -5465,7 +5425,6 @@ function void Character.OnCollisionWithDynamicObject()
 
 					return
 				}
-			#endif
 			}
 
 			if (A0 != 0xffffb000 && competition_mode.active == 0)

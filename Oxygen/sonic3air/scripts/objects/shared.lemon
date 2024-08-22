@@ -412,6 +412,11 @@ function void Object.TriggerOnGroundHit()
 //# address-hook(0x01dc56) end(0x01dcb4)
 function void fn01dc56()		// SolidObjectFull
 {
+	// D1: 0x13
+	// D2: 0x0c
+	// D3: 0x08
+	// D4.u16: px
+
 	// Check player 1
 	A1 = 0xffffb000
 	D6 = 3		// object.flag.P1_ON_OBJECT
@@ -456,6 +461,7 @@ function void fn01dc74()
 function void CheckCharacterOnClimbableObject()
 {
 	//debugDrawRect(objA0.position.x.u16 - D1.u16 + 11, objA0.position.y.u16 - D2.u16, (D1.u16 - 11) * 2, D2.u16 * 2, 0xc08080ff)
+	//Renderer.drawText("oxyfont_tiny_narrow", objA0.position.x.u16, objA0.position.y.u16 - D2.u16, "climb", 0x000000ff, 2, 0, 0x2000, true)
 	D6 = 0
 
 	// Check player 1
@@ -571,16 +577,19 @@ function void fn01dd24()
 	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
+		// Character is colliding with the solid object, but not standing on top of it (e.g. pushing, head bonk, etc.)
 		fn01dece()
 		return
 	}
 
-	D2.u16 = D1.u16 * 2
+	D2.u16 = D1.u16 * 2		// Width
 	if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 	{
-		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+		// Still on the object
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
 		if (D0.s16 >= 0 && D0.u16 < D2.u16)
 		{
+			// Correct height
 			D2.u16 = D4.u16
 			fn01e240()
 			D4.u16 = D6.u16 + 0x11
@@ -590,6 +599,7 @@ function void fn01dd24()
 		}
 	}
 
+	// Not on the object anymore (either in air, or outside the object's width)
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
@@ -634,16 +644,19 @@ function void fn01dddc()
 	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
+		// Character is colliding with the solid object, but not standing on top of it (e.g. pushing, head bonk, etc.)
 		fn01dece()
 	}
 	else
 	{
-		D2.u16 = D1.u16 * 2
+		D2.u16 = D1.u16 * 2		// Width
 		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
-			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 +  D1.u16
+			// Still on the object
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
 			if (D0.s16 >= 0 && D0.u16 < D2.u16)
 			{
+				// Correct height
 				D2.u16 = D4.u16
 				fn01e240()
 				D4.u16 = D6.u16
@@ -653,7 +666,10 @@ function void fn01dddc()
 				return
 			}
 		}
-		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+
+		// Not on the object anymore (either in air, or outside the object's width)
+		objA1.flags2a &= ~char.flag.ON_OBJECT
+		objA1.flags2a |= char.flag.IN_AIR
 		objA0.flags2a &= ~bit
 		D4 = 0
 	}
@@ -699,9 +715,11 @@ function void fn01de36()
 	{
 		if ((objA1.flags2a & char.flag.IN_AIR) == 0)
 		{
-			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+			// Still on the object
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
 			if (D0.s16 >= 0 && D0.u16 < D1.u16 * 2)
 			{
+				// Correct height
 				D0.u16 = objA0.position.y.u16 - D2.u16 + D3.u16
 				D1 = u8[A1 + 0x1e]
 				D0.u16 -= D1.u16
@@ -712,15 +730,16 @@ function void fn01de36()
 			}
 		}
 
+		// Not on the object anymore (either in air, or outside the object's width)
 		objA1.flags2a &= ~char.flag.ON_OBJECT
 		objA1.flags2a |= char.flag.IN_AIR
-
 		objA0.flags2a &= ~bit
 		D4 = 0
 	}
 	else
 	{
-		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+		// Character is colliding with the solid object, but not standing on top of it (e.g. pushing, head bonk, etc.)
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
 		if (D0.s16 >= 0 && D0.u16 <= D1.u16 * 2)
 		{
 			D5.u16 = objA0.position.y.u16 + D3.u16
@@ -750,8 +769,8 @@ function void fn01de36()
 //# address-hook(0x01dece) end(0x01df24)
 function void fn01dece()
 {
-	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
-	D3.u16 = D1.u16 * 2
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
+	D3.u16 = D1.u16 * 2		// Width
 	if (D0.s16 < 0 || D0.u16 > D3.u16)
 	{
 		fn01e0a2()
@@ -769,7 +788,7 @@ function void fn01dece()
 	D5.u16 = objA0.position.y.u16 - D3.s8
 	D2.u16 += s8[A1 + 0x1e]
 	D3.u16 = objA1.position.y.u16 - D5.u16 + D2.u16 + 4
-	D4.u16 = D2.u16 * 2
+	D4.u16 = D2.u16 * 2		// Width
 	if (D3.s16 < 0 || D3.u16 >= D4.u16)
 	{
 		fn01e0a2()
@@ -1326,6 +1345,7 @@ function void PlayMusicAfterLevelResults()
 	}
 	else
 #endif
+
 	if (u8[0xffffb000 + 0x2b] & char.bonus.INVINCIBLE)
 	{
 		playMusic(MUSIC_INVINCIBLE)
@@ -1450,6 +1470,8 @@ function void Object.AlternativeAnimationUpdate(u32 address)
 //# address-hook(0x01ac88) end(0x01ad1e)
 function void Object.AlternativeAnimationUpdate()
 {
+	// Gives each animation frame its own timer value
+
 	if (objA0.state != objA0.state.former)
 	{
 		objA0.state.former = objA0.state
@@ -1499,7 +1521,7 @@ function void Object.AlternativeAnimationUpdate()
 		}
 
 		// Advance to next frame
-		objA0.animation.timer = u8[A1 + D1.u16 + 1]
+		objA0.animation.timer = u8[A1 + D1.u16 + 1]		// Set unique timer value for new frame
 		objA0.animation.sprite = D0.u8
 		objA0.render_flags = (objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (objA0.flags2a & 0x03)
 		++objA0.animation.frame
@@ -1529,13 +1551,14 @@ function void fn01df88()
 //# address-hook(0x01df90)
 function void fn01df90()		// SolidObject_cont
 {
-	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
-	D3.u16 = D1.u16 * 2
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
+	D3.u16 = D1.u16 * 2		// Width
+	//debugDrawRect(objA1.position.x.u16, objA1.position.y.u16, D0.u16, 0x100, 0xff00ff00)
 	if (D0.u16 <= D3.u16)
 	{
 		D4.u16 = D2.u16 + s8[A1 + 0x44]		// "char.hitbox.default.y"
 		D2.u16 = D2.u16 + s8[A1 + 0x1e]		// "char.hitbox_extends.y"
-		D3.s16 = objA1.position.y.u16 - objA0.position.y.u16
+		D3.s16 = objA1.position.y.u16 - objA0.position.y.u16		// Vertical distance
 		if (global.inv_gravity)
 			D3.s16 = -D3.s16
 
@@ -1808,7 +1831,7 @@ function void fn01e21e()		// SolidObjSloped
 	if ((u8[A1 + 0x2a] & 0x08) == 0)
 		return
 
-	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
 	if (objA0.render_flags & render_flag.FLIP_X)
 	{
 		D0.u16 = D1.u16 * 2 - D0.u16 - 1
@@ -1886,6 +1909,7 @@ function void PlatformCheckClimbOnForCharacterA1()
 	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
+		// Character is colliding with the solid object, but not standing on top of it (e.g. pushing, head bonk, etc.)
 		CheckCharacterClimbOnObject()
 		return
 	}
@@ -1947,16 +1971,19 @@ function void fn01e314()
 	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
+		// Character is colliding with the solid object, but not standing on top of it (e.g. pushing, head bonk, etc.)
 		fn01e50e()
 	}
 	else
 	{
-		D2.u16 = D1.u16 * 2
+		D2.u16 = D1.u16 * 2		// Width
 		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
-			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+			// Still on the object
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
 			if (D0.s16 >= 0 && D0.u16 < D2.u16)
 			{
+				// Correct height
 				D2.u16 = D4.u16
 				fn01e240()
 				D4 = 0
@@ -1964,6 +1991,7 @@ function void fn01e314()
 			}
 		}
 
+		// Not on the object anymore (either in air, or outside the object's width)
 		objA1.flags2a &= ~char.flag.ON_OBJECT
 		objA1.flags2a |= char.flag.IN_AIR
 		objA0.flags2a &= ~bit
@@ -2000,16 +2028,19 @@ function void fn01e36c()
 	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
+		// Character is colliding with the solid object, but not standing on top of it (e.g. pushing, head bonk, etc.)
 		fn01e546()
 		return
 	}
 
-	D2.u16 = D1.u16 * 2
-	if ((u8[A1 + 0x2a] & 0x02) == 0)
+	D2.u16 = D1.u16 * 2		// Width
+	if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 	{
-		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+		// Still on the object
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
 		if (D0.s16 >= 0 && D0.u16 < D2.u16)
 		{
+			// Correct height
 			D2.u16 = D4.u16
 			fn01e21e()
 			D4 = 0
@@ -2017,6 +2048,7 @@ function void fn01e36c()
 		}
 	}
 
+	// Not on the object anymore (either in air, or outside the object's width)
 	objA1.flags2a &= ~char.flag.ON_OBJECT
 	objA1.flags2a |= char.flag.IN_AIR
 	objA0.flags2a &= ~bit
@@ -2030,7 +2062,7 @@ function void fn01e410()
 	if (objA1.velocity.y < 0)
 		return
 
-	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
 	if (D0.s16 >= 0 && D0.u16 < D2.u16)
 	{
 		CheckCharacterClimbOnObjectInner()
@@ -2043,7 +2075,7 @@ function void CheckCharacterClimbOnObject()
 {
 	if (objA1.velocity.y >= 0)
 	{
-		D0.s16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+		D0.s16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
 		if (D0.s16 >= 0 && D0.s16 < D1.s16 * 2)
 		{
 			CheckCharacterClimbOnObjectInner()
@@ -2125,7 +2157,7 @@ function void fn01e50e()		// SolidObjCheckSloped2
 	if (objA1.velocity.y < 0)
 		return
 
-	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
 	D1.u16 *= 2
 	if (D0.s16 >= 0 && D0.u16 < D1.u16)
 	{
@@ -2147,7 +2179,7 @@ function void fn01e546()		// SolidObjCheckSloped
 	if (objA1.velocity.y < 0)
 		return
 
-	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
 	D1.u16 *= 2
 	if (D0.s16 >= 0 && D0.u16 < D1.u16)
 	{
@@ -2466,7 +2498,8 @@ function void Object.AnimationProgress.CheckFlipY(u32 address)
 
 
 //# address-hook(0x0844ce) end(0x08450c)
-function void fn0844ce()
+//# alias(fn0844ce) deprecated
+function void UpdateCharacterAnimationProgress.CheckFlipX()		// "Animate_ExternalPlayerSprite" in skdisasm
 {
 	--objA1.animation.timer
 	if (s8(objA1.animation.timer) < 0)

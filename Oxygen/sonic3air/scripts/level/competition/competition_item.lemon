@@ -27,7 +27,7 @@ function void fn036364()
 
 	u8[A0 + 0x27] = (objA0.flags2a & 0x01) ? -1 : 1
 	objA0.flags2a &= ~0x01
-	objA0.state = 0x07
+	objA0.state = 0x07		// Item starts off empty
 	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.6x6)
 
 	objA0.update_address = 0x0363d0
@@ -67,9 +67,11 @@ function void fn03643c()
 {
 	if (u8[A0 + 0x29] != 0)
 	{
+		// Character collected an item
 		A2 = 0xffffb000
 		if (u8[A0 + 0x29] & 0x01)
 		{
+			// Collected by P1
 			u8[A0 + 0x29] &= ~0x01	// Needed for verification
 			fn036464()
 		}
@@ -77,6 +79,7 @@ function void fn03643c()
 		A2 = 0xffffb04a
 		if (u8[A0 + 0x29] & 0x02)
 		{
+			// Collected by P2
 			u8[A0 + 0x29] &= ~0x02	// Needed for verification
 			fn036464()
 		}
@@ -236,7 +239,8 @@ function void fn0365e8()
 //# address-hook(0x036612) end(0x036650)
 function void fn036612()
 {
-	objA0.state = 0x07
+	// Bomb
+	objA0.state = 0x07		// make it empty
 	u8[A0 + 0x28] = 0
 	u8[A0 + 0x29] = 0
 
@@ -253,7 +257,8 @@ function void fn036612()
 //# address-hook(0x036652) end(0x036674)
 function void fn036652()
 {
-	objA0.state = 0x07
+	// Banana
+	objA0.state = 0x07		// make it empty
 	u8[A0 + 0x28] = 0
 	u8[A0 + 0x29] = 0
 
@@ -270,7 +275,8 @@ function void fn036652()
 //# address-hook(0x036676) end(0x036698)
 function void fn036676()
 {
-	objA0.state = 0x07
+	// Spring
+	objA0.state = 0x07		// make it empty
 	u8[A0 + 0x28] = 0
 	u8[A0 + 0x29] = 0
 
@@ -287,6 +293,7 @@ function void fn036676()
 //# address-hook(0x03669a) end(0x03669a)
 function void fn03669a()
 {
+	// Just empty...
 }
 
 

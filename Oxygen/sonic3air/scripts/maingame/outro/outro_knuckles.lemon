@@ -1091,6 +1091,14 @@ function void fn06001e()
 
 
 
+function void fn086458(u32 address)
+{
+	A1 = address
+	fn086458()
+}
+
+
+
 //# address-hook(0x086458) end(0x08648a)
 function void fn086458()
 {

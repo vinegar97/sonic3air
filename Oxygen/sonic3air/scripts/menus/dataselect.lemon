@@ -122,9 +122,9 @@ function void fn00c890()
 
 				// Render zone number
 				D0.u16 = u16[A3 + 0x36] * 2
+				D1 = u8[0x00c95e + D0.s16]
 
 				// Second digit (10, 20, etc)
-				D1 = u8[0x00c95e + D0.s16]
 				if (D1.s8 < 0)
 				{
 					D1.u16 = (sprite_attribute.PRIORITY | 0)

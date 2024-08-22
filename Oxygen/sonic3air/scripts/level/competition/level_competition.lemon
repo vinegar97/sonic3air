@@ -83,14 +83,14 @@ function void InitLevelTiles.CompetitonModeLevel_shared()
 	u16[0xffffeeba] = D0.u16
 
 	A1 = 0x23a928 + global.zone * 0x10
-	level.width.bitmask = u16[(A1+=2)-2]
-	level.height.bitmask = u16[(A1+=2)-2]
-	level.height.tilemask = u16[(A1+=2)-2]
-	level.chunksize.bitmask = u16[(A1+=2)-2]
-	u16[0xffffeeb0] = u16[(A1+=2)-2]
-	D0.u16 = u16[(A1+=2)-2]
-	D2.u16 = u16[(A1+=2)-2]
-	D6.u16 = u16[(A1+=2)-2]
+	level.width.bitmask = u16[A1]
+	level.height.bitmask = u16[A1 + 2]
+	level.height.tilemask = u16[A1 + 4]
+	level.chunksize.bitmask = u16[A1 + 6]
+	u16[0xffffeeb0] = u16[A1 + 8]
+	D0.u16 = u16[A1 + 10]
+	D2.u16 = u16[A1 + 12]
+	D6.u16 = u16[A1 + 14]
 	D1 = 0
 	D7.u16 = 0x8000
 	fn239bd6()
@@ -143,7 +143,7 @@ function void UpdateLevelTiles.CGZ()
 function void InitLevelScrolling.ALZ()
 {
 	UpdateLevelScrolling.ALZ()
-	fn23a71a()
+	InitLevelScrolling.shared()
 }
 
 
@@ -152,7 +152,7 @@ function void InitLevelScrolling.ALZ()
 function void InitLevelScrolling.BPZ()
 {
 	UpdateLevelScrolling.BPZ()
-	fn23a71a()
+	InitLevelScrolling.shared()
 }
 
 
@@ -161,7 +161,7 @@ function void InitLevelScrolling.BPZ()
 function void InitLevelScrolling.DPZ()
 {
 	UpdateLevelScrolling.DPZ()
-	fn23a71a()
+	InitLevelScrolling.shared()
 }
 
 
@@ -181,7 +181,7 @@ function void InitLevelScrolling.CGZ()
 	u16[0xffffeeda] = u32(0x900000) / D0.u16
 
 	UpdateLevelScrolling.CGZ()
-	fn23a71a()
+	InitLevelScrolling.shared()
 }
 
 
@@ -190,12 +190,13 @@ function void InitLevelScrolling.CGZ()
 function void InitLevelScrolling.EMZ()
 {
 	UpdateLevelScrolling.EMZ()
-	fn23a71a()
+	InitLevelScrolling.shared()
 }
 
 
 //# address-hook(0x23a71a) end(0x23a73a)
-function void fn23a71a()
+//# alias(fn23a71a) deprecated
+function void InitLevelScrolling.shared()
 {
 	u32[0xffffee3a] = u32[0xfffff61e]
 	A1 = 0x23a934 + global.zone * 0x10

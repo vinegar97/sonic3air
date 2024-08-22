@@ -86,13 +86,14 @@ function void fn0465d6()
 	if (u8[A0 + 0x36] != 0)
 	{
 		D1.s32 = -D1.s32
-		u32[A0 + 0x32] += D2
+		u32[A0 + 0x32] += D2			// Moving up and then down. Reset speed/direction when center point is reached going down
 		if (s32[A0 + 0x32] < 0)
 		{
-			u32[A0 + 0x2e] -= D1
+			u32[A0 + 0x2e] -= D1		// Apply speed
 		}
 		else
 		{
+			// Reset initial speed (positive) to move downwards
 			u32[A0 + 0x2e] = D0
 			u32[A0 + 0x32] = 0
 			u8[A0 + 0x36] = 0
@@ -100,19 +101,20 @@ function void fn0465d6()
 	}
 	else
 	{
-		u32[A0 + 0x32] += D2
+		u32[A0 + 0x32] += D2			// Moving down and then up. Reset speed/direction when center point is reached going up
 		if (s32[A0 + 0x32] > 0)
 		{
-			u32[A0 + 0x2e] -= D1
+			u32[A0 + 0x2e] -= D1		// Apply speed
 		}
 		else
 		{
-			D0.s32 = -D0.s32
+			// Reset initial speed (negative)
+			D0.s32 = -D0.s32			// Reverse direction to move upwards when speed has reached
 			u32[A0 + 0x2e] = D0
 			u32[A0 + 0x32] = 0
 			u8[A0 + 0x36] = -1
 		}
 	}
 
-	D0.u16 = objA0.value32
+	D0.u16 = objA0.value32				// Get final offset for us by calling object
 }

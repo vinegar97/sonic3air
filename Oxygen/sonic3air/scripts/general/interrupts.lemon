@@ -140,8 +140,10 @@ function void VInt.InnerUpdate()
 	//  - 0x000606	-> global.frame_state = 0x00	-> Default state, does nothing
 	//  - 0x00076e	-> global.frame_state = 0x02	-> Used in SEGA logo
 	//  - 0x0007ba	-> global.frame_state = 0x04	-> Used in title screen
+	//  - 0x0007da	-> global.frame_state = 0x06	-> Used in ?
 	//  - 0x0007ea	-> global.frame_state = 0x08	-> Used in main game
 	//  - 0x000978	-> global.frame_state = 0x0a, 0x0c	-> Used during level loading
+	//  - 0x000a88	-> global.frame_state = 0x0e	-> Used during ?
 	//  - 0x0007e0	-> global.frame_state = 0x10	-> Used during game pause
 	//  - 0x000a94	-> global.frame_state = 0x12	-> Used during screen fades
 	//  - 0x000780	-> global.frame_state = 0x14	-> Used in SEGA logo
@@ -346,6 +348,7 @@ function void VInt.Update.LevelLoading()
 
 	Renderer.configureHInt()
 
+	// Update scroll offsets in VRAM
 	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, 0x380)
 
 	if (competition_mode.active)
@@ -357,6 +360,7 @@ function void VInt.Update.LevelLoading()
 		}
 	}
 
+	// Update sprite attribute data in VRAM
 	if (competition_mode.active && u16[0xffffef3c] == 0)
 	{
 		VDP.copyToVRAMbyDMA(0xffff7880, 0xf800, 0x280)
@@ -405,9 +409,11 @@ function void VInt.Update.LevelSelect()
 	VDP.copyToCRAMbyDMA(0xfffffc00, 0, 0x80)
 	u16[0xfffff640] = 0x80
 
+	// Update sprite attribute data in VRAM
 	VDP.copyToVRAMbyDMA(0xfffff800, 0xf800, 0x280)
 	u16[0xfffff640] = 0x83
 
+	// Update scroll offsets in VRAM
 	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, 0x380)
 	u16[0xfffff640] = 0x83
 
@@ -576,9 +582,11 @@ function void fn000c50()
 	}
 #endif
 
+	// Update sprite attribute data in VRAM
 	VDP.copyToVRAMbyDMA(0xfffff800, 0xf800, 0x280)
 	u16[0xfffff640] = 0x83
 
+	// Update scroll offsets in VRAM
 	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, 0x380)
 	u16[0xfffff640] = 0x83
 
@@ -628,6 +636,7 @@ function void HInt_000d10()
 			Renderer.setScrollOffsetV(2, 0, u16[0xffffee3c])
 			Renderer.setScrollOffsetV(3, 0, u16[0xffffee3a])
 
+			// Update sprite attribute data in VRAM
 			// TODO: Rewrite this
 			VDP.copyToVRAMbyDMA((u16[0xffffef3c] != 0) ? 0xffff7b00 : 0xffff7d80, 0xf800, 0x0280)
 			u16[0xfffff640] = 0x83
@@ -646,6 +655,7 @@ function void HInt_000d10()
 
 		syncZ80_variantA()
 
+		// Update sprite attribute data in VRAM
 		VDP.copyToVRAMbyDMA((u16[0xffffef3c] != 0) ? 0xffff7b00 : 0xffff7d80, 0xf800, 0x0280)
 		u16[0xfffff640] = 0x83
 
@@ -733,6 +743,7 @@ function void HInt_000dd8()
 				// Also update additional palettes
 				for (u16 i = 0; i < 0xc0; ++i)
 				{
+					// Renderer.setSecondaryPaletteEntryPacked(i + 0x40, u16[0x802300 + i * 2])
 					Renderer.setSecondaryPaletteEntryPacked(i + 0x40, blendColorsPacked(u16[0x802300 + i * 2], 0x0eee, blendFactor))
 				}
 			}
@@ -775,6 +786,148 @@ function void HInt_000dd8()
 
 				// Waste some time
 				D0 = 0x24
+				while (D0.s16 >= 0)
+					--D0.s16
+
+				--D1.s16
+			}
+
+			u16[0xa11100] = 0
+		}
+		#endif
+
+		D0 = pop()
+		D1 = pop()
+		A0 = pop()
+		A1 = pop()
+		A2 = pop()
+
+		#if !STANDALONE
+		{
+			if (u8[0xfffff64f] != 0)
+			{
+				u8[0xfffff64f] = 0
+				pushAll()
+				fn00095a()
+				popAll()
+			}
+		}
+		#endif
+	}
+}
+
+
+//# translated(0x000f00) end(0x000f7c)
+function void HInt_000f00()
+{
+	if (u16[0xfffff644] == 0)
+		return
+
+	{
+		u16[0xfffff644] = 0
+
+		push(A2)
+		push(A1)
+		push(A0)
+		push(D1)
+		push(D0)
+
+		#if STANDALONE
+		{
+			Renderer.enableSecondaryPalette(h_int.line + 2)
+
+			A2 = water.palette.source
+			D1.u16 = u16[A2]
+			A2 += 2
+
+			while (D1.s16 >= 0)
+			{
+				D0.u16 = u16[A2]
+				A2 += 2
+
+				// Our source is the secondary palette in RAM
+				A0 = 0xfffff080 + D0.u16
+				u16 color0 = u16[A0]
+				u16 color1 = u16[A0 + 2]
+				u16 color2 = u16[A0 + 4]
+
+				// Consider Hyper Dash screen flash
+				//  -> Note that this will not work in the flash's last frame
+				if (global.whiteflash_timeout > 0)
+				{
+					// Use blending instead of showing the full white flash
+					u16 blendFactor = VInt.getBlendFactorForScreenFlash()
+					color0 = blendColorsPacked(color0, 0x0eee, blendFactor)
+					color1 = blendColorsPacked(color1, 0x0eee, blendFactor)
+					color2 = blendColorsPacked(color2, 0x0eee, blendFactor)
+				}
+
+				// Each loop cycle will write 3 palette entries from offset D0.u16 on
+				u8 index = D0.u16 / 2
+				Renderer.setSecondaryPaletteEntryPacked(index,     color0)
+				Renderer.setSecondaryPaletteEntryPacked(index + 1, color1)
+				Renderer.setSecondaryPaletteEntryPacked(index + 2, color2)
+
+				--D1.s16
+			}
+
+			if (EXTENDED_CHARACTER_PALETTES)
+			{
+				// Consider Hyper Dash screen flash
+				//  -> Note that this will not work in the flash's last frame
+				u16 blendFactor = 0
+				if (global.whiteflash_timeout > 0)
+				{
+					// Use blending instead of showing the full white flash
+					blendFactor = VInt.getBlendFactorForScreenFlash()
+				}
+
+				// Also update additional palettes
+				for (u16 i = 0; i < 0xc0; ++i)
+				{
+					// Renderer.setSecondaryPaletteEntryPacked(i + 0x40, u16[0x802300 + i * 2])
+					Renderer.setSecondaryPaletteEntryPacked(i + 0x40, blendColorsPacked(u16[0x802300 + i * 2], 0x0eee, blendFactor))
+				}
+			}
+		}
+		#else
+		{
+			// Clear H-Int configuration for now
+			A1 = 0xc00000
+			u16[0xc00004] = 0x8aff
+
+			syncZ80_variantA()
+
+			// Waste some time
+			D0 = 0x1b
+			while (D0.s16 >= 0)
+				--D0.s16
+
+			A2 = water.palette.source
+			D1.u16 = u16[A2]
+			A2 += 2
+
+			// Limit palette data transfer to VDP towards end of frame
+			if (h_int.line >= 200)
+			{
+				D1.u16 -= (h_int.line - 200)
+			}
+
+			while (D1.s16 >= 0)
+			{
+				D0.u16 = u16[A2]
+				A2 += 2
+
+				// Our source is the secondary palette in RAM
+				A0 = 0xfffff080 + D0.u16
+
+				// Each loop cycle will write 3 palette entries from offset D0.u16 on
+				u32[0xc00004] = 0xc0000000 + (D0 << 16)
+				u32[0xc00000] = u32[A0]
+				u16[0xc00000] = u16[A0+4]
+
+				// Waste some time
+				D0 = 0x33
 				while (D0.s16 >= 0)
 					--D0.s16
 

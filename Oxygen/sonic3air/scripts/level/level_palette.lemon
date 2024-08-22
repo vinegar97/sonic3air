@@ -106,12 +106,14 @@ function void LevelPaletteUpdate.AIZ1()
 		--level.palettefx.timer_1
 		if (s16(level.palettefx.timer_1) < 0)
 		{
+			// Waterfall Palette effect
 			level.palettefx.timer_1 = 7
 			D0.u16 = level.palettefx.frame_1 & 0x18
 			level.palettefx.frame_1 += 8
 
 			copyMemory(0xfffffc56, 0x002af6 + D0.u16, 8)
 
+			// Background ocean waves effect
 			if (level.palettefx.state == 0)
 			{
 				D0.u16 = level.palettefx.frame_2
@@ -126,6 +128,7 @@ function void LevelPaletteUpdate.AIZ1()
 	}
 	else
 	{
+		// Sonic's intro scene
 		--level.palettefx.timer_1
 		if (s16(level.palettefx.timer_1) < 0)
 		{
@@ -266,7 +269,7 @@ function void LevelPaletteUpdate.CNZ()
 			level.palettefx.frame_3 = 0
 
 		u32[0xfffffc4e] = u32[A0 + D0.u16]
-		A0 = 0x002e42
+		A0 = 0x002f96
 		u32[0xfffff0ce] = u32[A0 + D0.u16]
 	}
 }
