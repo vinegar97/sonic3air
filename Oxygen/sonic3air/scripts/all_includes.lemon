@@ -18,7 +18,6 @@ include menus/?
 
 // General stuff
 include general/?
-include general/bluesphere/?
 
 // Main game
 include maingame/?
@@ -74,9 +73,37 @@ include objects/bonus_gm/?
 
 // Enemies
 include enemies/?
+include enemies/01_aiz/?
+include enemies/02_hcz/?
+include enemies/03_mgz/?
+include enemies/04_cnz/?
+include enemies/05_icz/?
+include enemies/06_lbz/?
+include enemies/07_mhz/?
+include enemies/08_fbz/?
+include enemies/09_soz/?
+include enemies/10_lrz/?
+include enemies/11_hpz/?
+include enemies/12_ssz/?
+include enemies/13_dez/?
+include enemies/14_ddz/?
 
 // Bosses
 include bosses/?
+include bosses/01_aiz/?
+include bosses/02_hcz/?
+include bosses/03_mgz/?
+include bosses/04_cnz/?
+include bosses/05_icz/?
+include bosses/06_lbz/?
+include bosses/07_mhz/?
+include bosses/08_fbz/?
+include bosses/09_soz/?
+include bosses/10_lrz/?
+include bosses/11_hpz/?
+include bosses/12_ssz/?
+include bosses/13_dez/?
+include bosses/14_ddz/?
 
 #if STANDALONE
 include standalone/?
