@@ -660,17 +660,6 @@ function void fn083f06()
 }
 
 
-//# address-hook(0x083f22) end(0x083f46)
-function void fn083f22()
-{
-	objA0.countdown_value = 2
-	objA0.position.x.u16 = camera.position.x.u16 + getScreenWidth() / 2
-	objA0.position.y.u16 = camera.position.y.u16 + 0x70
-	objA0.subtype2c = 2
-	fn083d84()
-}
-
-
 //# address-hook(0x083f4a) end(0x083f4e)
 function void fn083f4a()
 {

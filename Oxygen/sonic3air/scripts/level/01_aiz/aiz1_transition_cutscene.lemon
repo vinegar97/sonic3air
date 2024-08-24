@@ -18,7 +18,7 @@ function void AIZ1.Transition.Update()
 	// Called addresses:
 	//  - 0x068508	-> objA0.base_state = 0x00	-> Initialization
 	//  - 0x06852c	-> objA0.base_state = 0x02	-> Waiting until character reaches the right position
-	//  - 0x068574	-> objA0.base_state = 0x04	-> Short wait time
+	//  - 0x068574	-> objA0.base_state = 0x04	-> Short wait time before spawning subobjects
 	//  - 0x0685b8	-> objA0.base_state = 0x06	-> Flying in
 	//  - 0x0685fc	-> objA0.base_state = 0x08	-> Firing its rockets
 	call tableLookupAddress(0x0684fe, objA0.base_state)
@@ -33,6 +33,8 @@ function void AIZ1.Transition.Update()
 }
 
 
+// objA0.base_state = 0x00	-> Initialization
+
 //# address-hook(0x068508) end(0x068526)
 function void fn068508()
 {
@@ -43,13 +45,15 @@ function void fn068508()
 
 	setupObjectAttributesFull(0x068ffe)
 
-	u8[A0 + 0x29] = 0x60
+	boss.remaining_hits = 0x60
 	screenmover_target.right = move_area.right
 	level.boss_encounter = 1
 
 	requestLoadingPatterns(0x5a)		// Boss sprites
 }
 
+
+// objA0.base_state = 0x02	-> Waiting until character reaches the right position
 
 //# address-hook(0x06852c) end(0x068550)
 function void fn06852c()
@@ -101,18 +105,22 @@ function void fn06852c()
 function void fn068556()
 {
 	objA0.base_state = 0x04
-	objA0.countdown_value = 180
+	objA0.countdown_value = 180		// 3 seconds
 	move_area.left = D5.u16
 	move_area.right = D5.u16 + (getScreenWidth() - 320)
 	playMusic(MUSIC_CTRL_FADEOUT)
 }
 
 
+// objA0.base_state = 0x0a, 0x0c  -> Inactive (empty function)
+
 //# address-hook(0x068572) end(0x068572)
 function void fn068572()
 {
 }
 
+
+// objA0.base_state = 0x04	-> Short wait time before spawning subobjects
 
 //# address-hook(0x068574) end(0x068574)
 function void fn068574()
@@ -131,10 +139,11 @@ function void fn06857a()
 	spawnChildObject(0x0686be, 0x00, 0, 32)		// Exhaust flames
 	spawnChildObject(0x06870a, 0x02, -36, 8)	// Flamethrower nozzle
 
+	// Spawn rocket launchers
 	// "spawnChildObjects(0x069072)" replaced by:
-	spawnChildObject(0x06872c, 0x00, 0, -32)	// Rocket launcher
-	spawnChildObject(0x06872c, 0x02, 9, -28)	// Rocket launcher
-	spawnChildObject(0x06872c, 0x04, 18, -24)	// Rocket launcher
+	spawnChildObject(0x06872c, 0x00, 0, -32)	// Front
+	spawnChildObject(0x06872c, 0x02, 9, -28)	// Middle
+	spawnChildObject(0x06872c, 0x04, 18, -24)	// Back
 
 	fn06859c()
 }
@@ -144,11 +153,13 @@ function void fn06857a()
 function void fn06859c()
 {
 	objA0.velocity.y = 0x100
-	objA0.countdown_value = 0xaf
+	objA0.countdown_value = 175		// 3 seconds minus 5 frames
 	playMusic(MUSIC_MINIBOSS_2)
 	level.default_music.u8 = MUSIC_MINIBOSS_2
 }
 
+
+// objA0.base_state = 0x06	-> Flying in
 
 //# address-hook(0x0685b8) end(0x0685b8)
 function void fn0685b8()
@@ -188,6 +199,8 @@ function void fn0685e2()
 }
 
 
+// objA0.base_state = 0x08	-> Flamethrower and/or rockets
+
 //# address-hook(0x0685fc) end(0x068602)
 function void fn0685fc()
 {
@@ -204,7 +217,7 @@ function void fn06862e()
 	objA0.countdown_callback = 0x068646
 
 	// "spawnChildObjects(0x069104)" replaced by:
-	spawnChildObject(0x083f22, 0x00, 0, 0)		// Random explosions during the mid-stage fire transition
+	spawnChildObject(0x083f22, 0x00, 0, 0)		// Random explosions before the fire transition
 }
 
 
@@ -227,6 +240,293 @@ function void fn068646()
 }
 
 
+//# address-hook(0x068690) end(0x0686b8)
+function void fn068690()
+{
+	UpdateMovementStraightSimple()
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		DrawObject()
+	}
+	else
+	{
+		level.boss_encounter = 0
+		PlayMusicAfterLevelResults()
+
+		addPatternLoadingCue(0x083d48)		// Monitor, small explosion, and critter sprites
+		fn0852ae()
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Rocket launchers                                      //
+//-------------------------------------------------------//
+
+//# address-hook(0x06872c) end(0x068740)
+function void fn06872c()
+{
+	MoveAndFlipWithParent()
+
+	// Targets:
+	//  - 0x068754	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x06875e	-> objA0.base_state = 0x02  -> Waiting while blimp flies in from above
+	//  - 0x06877e	-> objA0.base_state = 0x04  -> Closed
+	//  - 0x06879c	-> objA0.base_state = 0x06  -> Opening / Opened the lid
+	//  - 0x0687dc	-> objA0.base_state = 0x08  -> Shooting rockets
+	//  - 0x06879c	-> objA0.base_state = 0x0a  -> Closing again (same function as state 0x06!)
+	//  - 0x068572	-> objA0.base_state = 0x0c  -> Inactive (empty function)
+	call tableLookupAddress(0x068746, objA0.base_state)
+
+	fn08498c()
+}
+
+
+// objA0.base_state = 0x00  -> Initialization
+
+//# address-hook(0x068754) end(0x068758)
+function void fn068754()
+{
+	setupObjectAttributesMost(0x06901a)
+}
+
+
+// objA0.base_state = 0x02  -> Waiting while blimp flies in from above
+
+//# address-hook(0x06875e) end(0x06877a)
+function void fn06875e()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x38] & 0x02) == 0)
+		return
+
+	objA0.base_state = 0x04
+	objA0.countdown_callback = 0x068784
+	fn068ec0()
+}
+
+
+// objA0.base_state = 0x04  -> Closed
+
+//# address-hook(0x06877e) end(0x06877e)
+function void fn06877e()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x068784) end(0x068784)
+function void fn068784()
+{
+	objA0.countdown_callback = 0x0687a2
+	fn06878c()
+}
+
+
+//# address-hook(0x06878c) end(0x06879a)
+function void fn06878c()
+{
+	objA0.base_state = 0x06
+	u32[A0 + 0x30] = 0x06912f
+}
+
+
+// objA0.base_state = 0x06, 0x0a  -> Opening and closing the lid
+
+//# address-hook(0x06879c) end(0x06879c)
+function void fn06879c()
+{
+	Object.AnimationProgressByLocalA1.DistinctTimer()
+}
+
+
+//# address-hook(0x0687a2) end(0x0687d6)
+function void fn0687a2()
+{
+	objA0.base_state = 0x08
+	objA0.value39 = 3
+	objA0.countdown_callback = 0x0687b6
+	fn0687b6()
+}
+
+
+//# address-hook(0x0687b6)
+function void fn0687b6()
+{
+	objA0.countdown_value = 28
+	--objA0.value39
+
+	// Spawn rockets
+	if (objA0.value39 == 1)
+	{
+		// "spawnChildObjects(0x0690a8)" replaced by:
+		spawnChildObject(0x06880a, 0x00, 0, 4)		// Rocket launcher smoke
+		spawnChildObject(0x068c96, 0x02, 0, 4)		// Rocket (explodes on ground)
+	}
+	else
+	{
+		// "spawnChildObjects(0x06909a)" replaced by:
+		spawnChildObject(0x06880a, 0x00, 0, 4)		// Rocket launcher smoke
+		spawnChildObject(0x068844, 0x02, 0, 4)		// Rocket (passes through ground)
+	}
+}
+
+
+// objA0.base_state = 0x08  -> Shooting rockets
+
+//# address-hook(0x0687dc) end(0x068800)
+function void fn0687dc()
+{
+	Object.CountdownAndTrigger()
+	if (s8(objA0.value39) >= 0)
+		return
+
+	objA0.base_state = 0x0a
+	u32[A0 + 0x30] = 0x069136
+	objA0.countdown_callback = 0x068802
+}
+
+
+//# address-hook(0x068802) end(0x068808)
+function void fn068802()
+{
+	objA0.base_state = 0x0c
+}
+
+
+
+//-------------------------------------------------------//
+// Additional rockets in transition cutscene             //
+//-------------------------------------------------------//
+
+//# address-hook(0x068844) end(0x06884e)
+function void fn068844()
+{
+	// Targets:
+	//  - 0x06885a	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x06888e	-> objA0.base_state = 0x02	-> Flying up
+	//  - 0x068574	-> objA0.base_state = 0x04	-> Short wait time before flying down
+	//  - 0x06888e	-> objA0.base_state = 0x06	-> Flying down
+	call tableLookupAddress(0x068852, objA0.base_state)
+}
+
+
+// objA0.base_state = 0x00  -> Initialization
+
+//# address-hook(0x06885a) end(0x068888)
+function void fn06885a()
+{
+	setupObjectAttributesMost(0x06902a)
+	playSound(0x4d)
+
+	u32[A0 + 0x30] = 0x06914c
+	objA0.countdown_callback = 0x06889a
+	objA0.velocity.y = -0x400
+	objA0.countdown_value = 0x60
+	DrawObject()
+}
+
+
+// objA0.base_state = 0x02, 0x06	-> Flying rockets
+
+//# address-hook(0x06888e) end(0x068894)
+function void fn06888e()
+{
+	fn08564c()
+	DrawObject()
+}
+
+
+//# address-hook(0x06889a) end(0x0688ae)
+function void fn06889a()
+{
+	objA0.base_state = 0x04
+	objA0.countdown_value = 8
+	objA0.countdown_callback = 0x0688b0
+}
+
+
+//# address-hook(0x0688b0) end(0x0688f2)
+function void fn0688b0()
+{
+	objA0.base_state = 0x06
+	playSound(SFX_BOMBFALL)
+	objA0.sprite_priority = 0x80
+	objA0.render_flags |= render_flag.FLIP_Y
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
+	objA0.countdown_value = 0x60
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0 = u8[A1 + 0x2c]
+	fn068ee4()
+
+	objA0.position.y.u16 = camera.position.y.u16 - 0x20
+}
+
+
+
+//-------------------------------------------------------//
+// Passing miniboss drones in the background             //
+//-------------------------------------------------------//
+
+//# address-hook(0x068dfa) end(0x068e46)
+function void fn068dfa()
+{
+	setupObjectAttributesFull(0x06904a)
+	objA0.update_address = 0x068e7e
+	objA0.countdown_callback = 0x068e84
+
+	D0 = objA0.subtype2c
+	D1.u16 = camera.position.y.u16		// Not used here?
+	objA0.position.x.u16 = camera.position.x.u16 + u16[0x068e48 + D0.u16]
+	objA0.position.y.u16 = u16[0x068e54 + D0.u16]
+	objA0.velocity.x = u16[0x068e60 + D0.u16]
+	objA0.countdown_value = u16[0x068e60 + D0.u16]
+	D0.u16 >>= 1
+	objA0.animation.sprite = u8[0x068e78 + D0.u16]
+}
+
+
+//# address-hook(0x068e7e) end(0x068e7e)
+function void fn068e7e()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x068e84) end(0x068e8a)
+function void fn068e84()
+{
+	objA0.update_address = 0x068e8c
+}
+
+
+//# address-hook(0x068e8c) end(0x068e92)
+function void fn068e8c()
+{
+	UpdateMovementStraightSimple()
+	fn08498c()
+}
+
+
+
+//-------------------------------------------------------//
+// Random explosions before the fire transition          //
+//-------------------------------------------------------//
+
+//# address-hook(0x083f22) end(0x083f46)
+function void fn083f22()
+{
+	objA0.countdown_value = 2
+	objA0.position.x.u16 = camera.position.x.u16 + getScreenWidth() / 2
+	objA0.position.y.u16 = camera.position.y.u16 + 0x70
+	objA0.subtype2c = 2
+	fn083d84()
+}
+
+
 
 // This object draws a part of the palmtree that should be rendered on top of the blimps in BG
 
@@ -241,6 +541,7 @@ function void fn01e78a()
 	objA0.update_address = 0x01e7b0
 	fn01e7b0()
 }
+
 
 //# address-hook(0x01e7b0)
 function void fn01e7b0()
