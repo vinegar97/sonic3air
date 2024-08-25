@@ -305,16 +305,7 @@ function void fn085640()		// MoveSlowFall_AnimateRaw
 	Object.AnimationProgressByLocalA1()
 }
 
-
-//# address-hook(0x08564c) end(0x08564c)
-function void fn08564c()		// Move_AnimateRaw_Wait
-{
-	UpdateMovementStraightSimple()
-	Object.AnimationProgressByLocalA1()
-	Object.CountdownAndTrigger()
-}
-
-
+/* 
 //# address-hook(0x085652) end(0x085656)
 function void fn085652()		// Animate_Wait
 {
@@ -330,7 +321,7 @@ function void fn08565a()		// Refresh_ChildPosWait
 	Object.CountdownAndTrigger()
 	DrawObject()
 }
-
+ */
 
 //# address-hook(0x08565e) end(0x085662)
 function void fn08565e()		// Wait_Draw

@@ -61,7 +61,9 @@ function void fn087172()
 //# address-hook(0x0871bc) end(0x0871bc)
 function void fn0871bc()
 {
-	fn085652()
+	// fn085652()
+	Object.AnimationProgressByLocalA1()
+	Object.CountdownAndTrigger()
 }
 
 

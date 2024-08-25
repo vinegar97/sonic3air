@@ -254,15 +254,6 @@ function void fn085694()
 }
 
 
-//# address-hook(0x0856b2) end(0x0856bc)
-function void fn0856b2()
-{
-	UpdateMovementStraightSimple()
-	Object.CountdownAndTrigger()
-	Enemy.DrawDynamicObject()
-}
-
-
 //# address-hook(0x0856c4) end(0x0856c8)
 function void fn0856c4()
 {
@@ -294,7 +285,7 @@ function void fn0856de()
 	fn085180()
 }
 
-
+/* 
 //# address-hook(0x0856e8) end(0x0856ee)
 function void fn0856e8()
 {
@@ -310,7 +301,7 @@ function void fn0856f2()
 	UpdateMovementStraightSimple()
 	Object.CountdownAndTrigger()
 }
-
+ */
 
 
 //# address-hook(0x085940) end(0x08594c)
@@ -956,7 +947,8 @@ function void fn067e62()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x20)
 	{
-		fn067e8c()
+		// fn067e8c()
+		fn0852ae()
 	}
 	else
 	{
@@ -964,13 +956,13 @@ function void fn067e62()
 	}
 }
 
-
+/* 
 //# address-hook(0x067e8c) end(0x067e8c)
 function void fn067e8c()
 {
 	fn0852ae()
 }
-
+ */
 
 //# address-hook(0x067e92) end(0x067eae)
 function void fn067e92()

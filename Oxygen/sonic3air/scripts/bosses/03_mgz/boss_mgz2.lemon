@@ -267,7 +267,9 @@ function void fn06c4f8()
 //# address-hook(0x06c514) end(0x06c514)
 function void fn06c514()
 {
-	fn0856e8()
+	// fn0856e8()
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
 }
 
 

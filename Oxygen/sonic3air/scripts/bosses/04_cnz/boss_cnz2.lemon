@@ -141,7 +141,10 @@ function void fn06e574()
 		objA0.velocity.x = D1.u16
 	}
 
-	fn0856f2()
+	// fn0856f2()
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
 }
 
 

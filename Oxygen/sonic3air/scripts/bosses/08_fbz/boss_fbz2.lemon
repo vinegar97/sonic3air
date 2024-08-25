@@ -614,7 +614,11 @@ function void fn070b18()
 function void fn070b74()
 {
 	fn085a5a()
-	fn08565a()
+
+	// fn08565a()
+	MoveWithParent()
+	Object.CountdownAndTrigger()
+	DrawObject()
 }
 
 

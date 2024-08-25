@@ -156,7 +156,9 @@ function void fn06c1d4()
 	CheckCeilingCollision()
 	if (D1.s16 >= 0)
 	{
-		fn0856e8()
+		// fn0856e8()
+		UpdateMovementStraightSimple()
+		Object.CountdownAndTrigger()
 	}
 	else
 	{

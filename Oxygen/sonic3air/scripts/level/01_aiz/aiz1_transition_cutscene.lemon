@@ -164,9 +164,21 @@ function void fn06859c()
 //# address-hook(0x0685b8) end(0x0685b8)
 function void fn0685b8()
 {
-	fn0856b2()
+	// fn0856b2()
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+	Enemy.DrawDynamicObject()
 }
 
+/* 
+//# address-hook(0x0856b2) end(0x0856bc)
+function void fn0856b2()
+{
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+	Enemy.DrawDynamicObject()
+}
+ */
 
 //# address-hook(0x0685be) end(0x0685fa)
 function void fn0685be()
@@ -205,7 +217,11 @@ function void fn0685e2()
 function void fn0685fc()
 {
 	fn0847e6()
-	fn0856b2()
+
+	// fn0856b2()
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+	Enemy.DrawDynamicObject()
 }
 
 
@@ -434,7 +450,11 @@ function void fn06885a()
 //# address-hook(0x06888e) end(0x068894)
 function void fn06888e()
 {
-	fn08564c()
+	// fn08564c()
+	UpdateMovementStraightSimple()
+	Object.AnimationProgressByLocalA1()
+	Object.CountdownAndTrigger()
+
 	DrawObject()
 }
 
@@ -526,6 +546,15 @@ function void fn083f22()
 	fn083d84()
 }
 
+/* 
+//# address-hook(0x08564c) end(0x08564c)
+function void fn08564c()		// Move_AnimateRaw_Wait
+{
+	UpdateMovementStraightSimple()
+	Object.AnimationProgressByLocalA1()
+	Object.CountdownAndTrigger()
+}
+ */
 
 
 // This object draws a part of the palmtree that should be rendered on top of the blimps in BG
