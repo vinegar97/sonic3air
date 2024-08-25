@@ -1058,7 +1058,12 @@ function void fn07ccb0()
 	A1 = 0xffffb000
 	objA1.position.y.u16 += D1.u16
 	u8[A1 + 0x2e] = 0
-	StopObjectA1()
+
+	// StopObjectA1()
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	objA1.groundspeed = 0
+
 	UnloadObject()
 }
 

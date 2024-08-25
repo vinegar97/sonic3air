@@ -93,7 +93,10 @@ function void fn07ba28()
 	player1.control_override = -1
 
 	A1 = 0xffffb000
-	StopObjectA1()
+	// StopObjectA1()
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	objA1.groundspeed = 0
 
 	// Move area extension when Mecha slides to the Master Emerald
 	move_area.right += getScreenWidth()

@@ -601,7 +601,12 @@ function void fn07e298()
 
 	objA1.position.x.u16 = D0.u16
 	objA0.update_address = 0x07e342
-	StopObjectA1()
+
+	// StopObjectA1()
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	objA1.groundspeed = 0
+
 	control.player1 = 0
 	objA0.countdown_value = 0x1f
 
@@ -661,7 +666,11 @@ function void fn07e384()
 		objA0.update_address = 0x07e3ca
 		u8[A1 + 0x2e] = (control_flag.DISABLE_INTERACTION | control_flag.DISABLE_ANIMATION | control_flag.DISABLE_UPDATE)
 		objA1.state = char.state.RUNNING
-		StopObjectA1()
+
+		// StopObjectA1()
+		objA1.velocity.x = 0
+		objA1.velocity.y = 0
+		objA1.groundspeed = 0
 
 		objA1.render_flags &= ~render_flag.FLIP_X
 		objA1.flags2a |= char.flag.IN_AIR

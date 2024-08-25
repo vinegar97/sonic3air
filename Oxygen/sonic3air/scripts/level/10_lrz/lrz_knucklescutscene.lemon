@@ -165,7 +165,12 @@ function void fn063b9c()
 
 	objA0.update_address = 0x063bbe
 	player1.control_override = -1
-	StopObjectA1()
+
+	// StopObjectA1()
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	objA1.groundspeed = 0
+
 	control.player1 = 0
 }
 

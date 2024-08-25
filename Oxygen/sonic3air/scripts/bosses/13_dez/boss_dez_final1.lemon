@@ -132,11 +132,21 @@ function void fn07fe74()
 		objA0.base_state = 0x06
 
 		A1 = 0xffffb000
-		StopObjectA1()
+
+		// StopObjectA1()
+		objA1.velocity.x = 0
+		objA1.velocity.y = 0
+		objA1.groundspeed = 0
+
 		objA1.state = char.state.STANDING
 
 		A1 = 0xffffb04a
-		StopObjectA1()
+
+		// StopObjectA1()
+		objA1.velocity.x = 0
+		objA1.velocity.y = 0
+		objA1.groundspeed = 0
+
 		objA1.state = char.state.STANDING
 	}
 }

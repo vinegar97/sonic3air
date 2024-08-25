@@ -975,7 +975,12 @@ function void fn064c70()
 #endif
 
 	objA0.update_address = 0x064ca6
-	StopObjectA1()
+
+	// StopObjectA1()
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	objA1.groundspeed = 0
+
 	player1.control_override = -1
 	control.player1 = 0
 
@@ -1015,7 +1020,12 @@ function void fn064ca6()
 	objA1.animation.sprite = (u8[A1 + 0x38] == CHARACTER_TAILS) ? 0xb0 : 0xc4		// Set Sonic/Tails' looking up sprite
 	objA1.state = char.state.LOOKING_UP
 	control.player1 = 0
-	StopObjectA1()
+
+	// StopObjectA1()
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	objA1.groundspeed = 0
+
 	UpdatePlayer1SpritePatterns()
 }
 
@@ -1113,7 +1123,12 @@ function void fn064de0()
 	objA0.countdown_value = 0x3f
 	u8[0xfffffaac] = -1
 	control.player1 = 0
-	StopObjectA1()
+
+	// StopObjectA1()
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	objA1.groundspeed = 0
+
 	UpdatePlayer1SpritePatterns()
 }
 

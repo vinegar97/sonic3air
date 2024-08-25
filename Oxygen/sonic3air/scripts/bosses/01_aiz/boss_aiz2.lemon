@@ -381,7 +381,10 @@ function void fn069526()
 		return
 	}
 
-	StopObjectA1()
+	// StopObjectA1()
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	objA1.groundspeed = 0
 
 	if (!isMainCharacter(CHARACTER_KNUCKLES))
 	{

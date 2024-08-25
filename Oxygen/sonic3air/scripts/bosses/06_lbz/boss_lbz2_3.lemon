@@ -590,7 +590,11 @@ function void fn074768()
 	control.player1 = 0
 	objA1.render_flags |= render_flag.FLIP_X
 	objA1.flags2a |= char.flag.FACING_LEFT
-	StopObjectA1()
+
+	// StopObjectA1()
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	objA1.groundspeed = 0
 
 	requestLoadingPatterns(0x71)		// Boss sprites
 

@@ -730,7 +730,12 @@ function void fn0768fe()
 		return
 
 	objA1.position.x.u16 = 0x4600
-	StopObjectA1()
+
+	// StopObjectA1()
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	objA1.groundspeed = 0
+
 	control.player1 = 0
 	UnloadObject()
 }

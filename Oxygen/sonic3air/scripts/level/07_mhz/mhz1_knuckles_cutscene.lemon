@@ -233,7 +233,11 @@ function void fn062cf8()
 	u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 	player1.control_override = -1
 	control.player1 = 0
-	StopObjectA1()
+
+	// StopObjectA1()
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	objA1.groundspeed = 0
 
 	fn065dd6()
 }
@@ -323,7 +327,12 @@ function void fn062dac()
 	objA0.update_address = 0x062ddc
 	player2.control_override = -1
 	control.tails = 0
-	StopObjectA1()
+
+	// StopObjectA1()
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	objA1.groundspeed = 0
+
 	fn062ddc()
 }
 
@@ -342,7 +351,11 @@ function void fn062ddc()
 				return
 
 			objA1.state = char.state.COWERING
-			StopObjectA1()
+
+			// StopObjectA1()
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			objA1.groundspeed = 0
 		}
 		else if (s8[A1 + 0x04] >= 0)
 		{
