@@ -158,7 +158,7 @@ function void fn08ebac()
 	setupObjectAttributesBasic(0x08ed60)
 
 	u32[A0 + 0x30] = 0x08ed90
-	fn084b82()
+	flipXWithParent()
 
 	objA0.countdown_value = (objA0.subtype2c * 3) + 5
 	objA0.countdown_callback = 0x08eaaa

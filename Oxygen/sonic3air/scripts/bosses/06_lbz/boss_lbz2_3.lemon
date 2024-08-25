@@ -876,7 +876,7 @@ function void fn074a3e()
 		}
 	}
 
-	fn084b82()
+	flipXWithParent()
 	A2 = 0x360b08
 	fn084d78()
 }
@@ -911,7 +911,7 @@ function void fn074aca()
 //# address-hook(0x074ad0) end(0x074af4)
 function void fn074ad0()
 {
-	fn084b82()
+	flipXWithParent()
 
 	A1 = 0xffff0000 + u16[A0 + 0x44]
 	D0.u8 = u8[A1 + 0x3c] + 0x14

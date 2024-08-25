@@ -1921,7 +1921,8 @@ function void flipXWithVelocity()		// Change_FlipXWithVelocity
 
 
 //# address-hook(0x084b82) end(0x084b9a)
-function void fn084b82()		// Change_FlipXUseParent
+//# alias(fn084b82) deprecated
+function void flipXWithParent()			// Change_FlipXUseParent
 {
 	objA0.render_flags &= ~render_flag.FLIP_X
 	A1 = 0xffff0000 + u16[A0 + 0x46]
