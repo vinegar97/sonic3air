@@ -14,15 +14,15 @@
 function void fn05e6c0()
 {
 	// Targets:
-	//  - 0x05e70e	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x05e80a	-> objA0.base_state = 0x02  -> Wait time until the Tornado gets visible
-	//  - 0x05e832	-> objA0.base_state = 0x04  -> Tornado gets into the screen from below
-	//  - 0x05e86a	-> objA0.base_state = 0x06  -> Hovering in place, Knuckles signaling his okay
-	//  - 0x05e890	-> objA0.base_state = 0x08  -> Flying out of the screen to the right
-	//  - 0x05e916	-> objA0.base_state = 0x0a  -> Flying right to left, medium sized
-	//  - 0x05e98a	-> objA0.base_state = 0x0c  -> Flying behind the island, small sized
-	//  - 0x05e9c2	-> objA0.base_state = 0x0e  -> Angel Island gets repowered and starts rising
-	//  - 0x05e9e2	-> objA0.base_state = 0x10  -> Flying away to the right
+	//  - 0x05e70e	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x05e80a	-> objA0.base_state = 0x02	-> Wait time until the Tornado gets visible
+	//  - 0x05e832	-> objA0.base_state = 0x04	-> Tornado gets into the screen from below
+	//  - 0x05e86a	-> objA0.base_state = 0x06	-> Hovering in place, Knuckles signaling his okay
+	//  - 0x05e890	-> objA0.base_state = 0x08	-> Flying out of the screen to the right
+	//  - 0x05e916	-> objA0.base_state = 0x0a	-> Flying right to left, medium sized
+	//  - 0x05e98a	-> objA0.base_state = 0x0c	-> Flying behind the island, small sized
+	//  - 0x05e9c2	-> objA0.base_state = 0x0e	-> Angel Island gets repowered and starts rising
+	//  - 0x05e9e2	-> objA0.base_state = 0x10	-> Flying away to the right
 	call tableLookupAddress(0x05e6fc, objA0.base_state)
 
 	if (outro.ending_type > 0)

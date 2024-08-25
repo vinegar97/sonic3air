@@ -14,22 +14,22 @@
 function void fn05d86a()
 {
 	// Targets:
-	//  - 0x05d8bc	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x05d9ee	-> objA0.base_state = 0x02  -> Player falling down in space
-	//  - 0x05da50	-> objA0.base_state = 0x04  -> Clouds appearing
-	//  - 0x05da74	-> objA0.base_state = 0x06  -> Tornado flying in
-	//  - 0x05db2c	-> objA0.base_state = 0x08  -> Tornado caught the player
+	//  - 0x05d8bc	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x05d9ee	-> objA0.base_state = 0x02	-> Player falling down in space
+	//  - 0x05da50	-> objA0.base_state = 0x04	-> Clouds appearing
+	//  - 0x05da74	-> objA0.base_state = 0x06	-> Tornado flying in
+	//  - 0x05db2c	-> objA0.base_state = 0x08	-> Tornado caught the player
 	//  - 0x05db60	-> objA0.base_state = 0x0a	-> ?
-	//  - 0x05db76	-> objA0.base_state = 0x0c  -> Riding the descending Tornado
-	//  - 0x05dbbe	-> objA0.base_state = 0x0e  -> Tornado approaching ocean level
-	//  - 0x05dbdc	-> objA0.base_state = 0x10  -> Tornado flying towards Angel Island
-	//  - 0x05dbf6	-> objA0.base_state = 0x12  -> Camera moving ahead to the island
-	//  - 0x05dc2c	-> objA0.base_state = 0x14  -> Island gets visible on screen
-	//  - 0x05dc98	-> objA0.base_state = 0x16  -> Camera centered on the island
-	//  - 0x05dca6	-> objA0.base_state = 0x18  -> Smaller Tornado flying left to right
-	//  - 0x05dd34	-> objA0.base_state = 0x1a  -> Even smaller Tornado flying behind the island
-	//  - 0x05dd6a	-> objA0.base_state = 0x1c  -> Tornado stopping there briefly
-	//  - 0x05de1a	-> objA0.base_state = 0x1e  -> Tornado flying on to the left
+	//  - 0x05db76	-> objA0.base_state = 0x0c	-> Riding the descending Tornado
+	//  - 0x05dbbe	-> objA0.base_state = 0x0e	-> Tornado approaching ocean level
+	//  - 0x05dbdc	-> objA0.base_state = 0x10	-> Tornado flying towards Angel Island
+	//  - 0x05dbf6	-> objA0.base_state = 0x12	-> Camera moving ahead to the island
+	//  - 0x05dc2c	-> objA0.base_state = 0x14	-> Island gets visible on screen
+	//  - 0x05dc98	-> objA0.base_state = 0x16	-> Camera centered on the island
+	//  - 0x05dca6	-> objA0.base_state = 0x18	-> Smaller Tornado flying left to right
+	//  - 0x05dd34	-> objA0.base_state = 0x1a	-> Even smaller Tornado flying behind the island
+	//  - 0x05dd6a	-> objA0.base_state = 0x1c	-> Tornado stopping there briefly
+	//  - 0x05de1a	-> objA0.base_state = 0x1e	-> Tornado flying on to the left
 	call tableLookupAddress(0x05d89c, objA0.base_state)
 
 	if (isMainCharacter(CHARACTER_TAILS))
@@ -354,10 +354,10 @@ function void fn05dbdc()
 function void fn05de60()
 {
 	// Targets:
-	//  - 0x05de80	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x05ded4	-> objA0.base_state = 0x02  -> Falling down
-	//  - 0x05def0	-> objA0.base_state = 0x04  -> Falling towards Tornado's hook
-	//  - 0x05df12	-> objA0.base_state = 0x06  -> Attached to the Tornado
+	//  - 0x05de80	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x05ded4	-> objA0.base_state = 0x02	-> Falling down
+	//  - 0x05def0	-> objA0.base_state = 0x04	-> Falling towards Tornado's hook
+	//  - 0x05df12	-> objA0.base_state = 0x06	-> Attached to the Tornado
 	//  - 0x05df34	-> objA0.base_state = 0x08
 	//  - 0x05df48	-> objA0.base_state = 0x0a
 	call tableLookupAddress(0x05de74, objA0.base_state)
@@ -915,15 +915,15 @@ function void fn05e188()
 function void fn05e18a()
 {
 	// Targets:
-	//  - 0x05e1c2	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x05e288	-> objA0.base_state = 0x02  -> While credits roll
-	//  - 0x05e2c2	-> objA0.base_state = 0x04  -> Sonic looking at the camera just after credits ended
-	//  - 0x05e334	-> objA0.base_state = 0x06  -> Jumping off the tornado
-	//  - 0x05e412	-> objA0.base_state = 0x0a  -> Super transformation
-	//  - 0x05e45a	-> objA0.base_state = 0x0c  -> Flying out of the screen to the right
-	//  - 0x05e474	-> objA0.base_state = 0x0e  -> Brief wait time
-	//  - 0x05e4b6	-> objA0.base_state = 0x10  -> Flying in again in large
-	//  - 0x05e4e2	-> objA0.base_state = 0x12  -> Reached final position, S3&K logo appearing
+	//  - 0x05e1c2	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x05e288	-> objA0.base_state = 0x02	-> While credits roll
+	//  - 0x05e2c2	-> objA0.base_state = 0x04	-> Sonic looking at the camera just after credits ended
+	//  - 0x05e334	-> objA0.base_state = 0x06	-> Jumping off the tornado
+	//  - 0x05e412	-> objA0.base_state = 0x0a	-> Super transformation
+	//  - 0x05e45a	-> objA0.base_state = 0x0c	-> Flying out of the screen to the right
+	//  - 0x05e474	-> objA0.base_state = 0x0e	-> Brief wait time
+	//  - 0x05e4b6	-> objA0.base_state = 0x10	-> Flying in again in large
+	//  - 0x05e4e2	-> objA0.base_state = 0x12	-> Reached final position, S3&K logo appearing
 	call tableLookupAddress(0x05e1ae, objA0.base_state)
 
 	u16[0xffffee98] -= 2
@@ -1732,10 +1732,10 @@ function void fn05f5b4()
 function void fn05f5c2()
 {
 	// Targets:
-	//  - 0x05f5de	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x05f654	-> objA0.base_state = 0x02  -> ?
-	//  - 0x05f66a	-> objA0.base_state = 0x04  -> ?
-	//  - 0x05f682	-> objA0.base_state = 0x06  -> ?
+	//  - 0x05f5de	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x05f654	-> objA0.base_state = 0x02	-> ?
+	//  - 0x05f66a	-> objA0.base_state = 0x04	-> ?
+	//  - 0x05f682	-> objA0.base_state = 0x06	-> ?
 	call tableLookupAddress(0x05f5d6, objA0.base_state)
 
 	DrawObject()

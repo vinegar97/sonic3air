@@ -16,27 +16,27 @@
 function void fn074262()
 {
 	// Targets:
-	//  - 0x0742a8	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x07430e	-> objA0.base_state = 0x02  -> Short wait time
-	//  - 0x07432a	-> objA0.base_state = 0x06  -> Falling down once in background
-	//  - 0x07430e	-> objA0.base_state = 0x08  -> Short wait time (same as 0x02)
-	//  - 0x0743ce	-> objA0.base_state = 0x0a  -> Main attack from left or right
-	//  - 0x074412	-> objA0.base_state = 0x0c  -> Moving back and forth at the top of the screen
-	//  - 0x074442	-> objA0.base_state = 0x0e  -> Waiting before going down
-	//  - 0x074456	-> objA0.base_state = 0x10  -> Going down
-	//  - 0x07447a	-> objA0.base_state = 0x12  -> Swinging up at the bottom of the screen
-	//  - 0x0744a4	-> objA0.base_state = 0x14  -> Swinging down the bottom of the screen
-	//  - 0x0744e4	-> objA0.base_state = 0x16  -> Waiting briefly there
-	//  - 0x0744fc	-> objA0.base_state = 0x18  -> Moving back and forth at the bottom of the screen
-	//  - 0x074528	-> objA0.base_state = 0x1a  -> Waiting briefly, again
-	//  - 0x074542	-> objA0.base_state = 0x1c  -> Moving diagonally up, out of the screen
-	//  - 0x07455c	-> objA0.base_state = 0x1e  -> Caught the player
-	//  - 0x074576	-> objA0.base_state = 0x20  -> Moving diagonally up with the player, out of the screen
-	//  - 0x0745a2	-> objA0.base_state = 0x22  -> Short wait time
-	//  - 0x0745e2	-> objA0.base_state = 0x24  -> Ramming onto the ground
-	//  - 0x074618	-> objA0.base_state = 0x26  -> Hit the ground (part 1)
-	//  - 0x07463a	-> objA0.base_state = 0x28  -> Hit the ground (part 2)
-	//  - 0x0746c8	-> objA0.base_state = 0x2a  -> Letting go, and moving away diagonally
+	//  - 0x0742a8	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x07430e	-> objA0.base_state = 0x02	-> Short wait time
+	//  - 0x07432a	-> objA0.base_state = 0x06	-> Falling down once in background
+	//  - 0x07430e	-> objA0.base_state = 0x08	-> Short wait time (same as 0x02)
+	//  - 0x0743ce	-> objA0.base_state = 0x0a	-> Main attack from left or right
+	//  - 0x074412	-> objA0.base_state = 0x0c	-> Moving back and forth at the top of the screen
+	//  - 0x074442	-> objA0.base_state = 0x0e	-> Waiting before going down
+	//  - 0x074456	-> objA0.base_state = 0x10	-> Going down
+	//  - 0x07447a	-> objA0.base_state = 0x12	-> Swinging up at the bottom of the screen
+	//  - 0x0744a4	-> objA0.base_state = 0x14	-> Swinging down the bottom of the screen
+	//  - 0x0744e4	-> objA0.base_state = 0x16	-> Waiting briefly there
+	//  - 0x0744fc	-> objA0.base_state = 0x18	-> Moving back and forth at the bottom of the screen
+	//  - 0x074528	-> objA0.base_state = 0x1a	-> Waiting briefly, again
+	//  - 0x074542	-> objA0.base_state = 0x1c	-> Moving diagonally up, out of the screen
+	//  - 0x07455c	-> objA0.base_state = 0x1e	-> Caught the player
+	//  - 0x074576	-> objA0.base_state = 0x20	-> Moving diagonally up with the player, out of the screen
+	//  - 0x0745a2	-> objA0.base_state = 0x22	-> Short wait time
+	//  - 0x0745e2	-> objA0.base_state = 0x24	-> Ramming onto the ground
+	//  - 0x074618	-> objA0.base_state = 0x26	-> Hit the ground (part 1)
+	//  - 0x07463a	-> objA0.base_state = 0x28	-> Hit the ground (part 2)
+	//  - 0x0746c8	-> objA0.base_state = 0x2a	-> Letting go, and moving away diagonally
 	call tableLookupAddress(0x07427c, objA0.base_state)
 
 	fn074fd2()
@@ -152,10 +152,10 @@ function void fn074376()
 function void fn0743ce()
 {
 	// Targets:
-	//  - 0x0743f4	-> s16[A0 + 0x3a] = 0x00  -> Moving sideways, straight
-	//  - 0x0743f0	-> s16[A0 + 0x3a] = 0x02  -> Moving sideways and down, accelerating up
-	//  - 0x0743f6	-> s16[A0 + 0x3a] = 0x04  -> Moving sideways and up, accelerating down
-	//  - 0x0743f4	-> s16[A0 + 0x3a] = 0x06  -> Moving sideways, straight
+	//  - 0x0743f4	-> s16[A0 + 0x3a] = 0x00	-> Moving sideways, straight
+	//  - 0x0743f0	-> s16[A0 + 0x3a] = 0x02	-> Moving sideways and down, accelerating up
+	//  - 0x0743f6	-> s16[A0 + 0x3a] = 0x04	-> Moving sideways and up, accelerating down
+	//  - 0x0743f4	-> s16[A0 + 0x3a] = 0x06	-> Moving sideways, straight
 	//  - 0x07440c	-> s16[A0 + 0x3a] = 0x08
 	call tableLookupAddress(0x0743e6, s16[A0 + 0x3a])
 

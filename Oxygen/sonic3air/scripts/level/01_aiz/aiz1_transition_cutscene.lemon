@@ -112,7 +112,7 @@ function void fn068556()
 }
 
 
-// objA0.base_state = 0x0a, 0x0c  -> Inactive (empty function)
+// objA0.base_state = 0x0a, 0x0c	-> Inactive (empty function)
 
 //# address-hook(0x068572) end(0x068572)
 function void fn068572()
@@ -287,20 +287,20 @@ function void fn06872c()
 	MoveAndFlipWithParent()
 
 	// Targets:
-	//  - 0x068754	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x06875e	-> objA0.base_state = 0x02  -> Waiting while blimp flies in from above
-	//  - 0x06877e	-> objA0.base_state = 0x04  -> Closed
-	//  - 0x06879c	-> objA0.base_state = 0x06  -> Opening / Opened the lid
-	//  - 0x0687dc	-> objA0.base_state = 0x08  -> Shooting rockets
-	//  - 0x06879c	-> objA0.base_state = 0x0a  -> Closing again (same function as state 0x06!)
-	//  - 0x068572	-> objA0.base_state = 0x0c  -> Inactive (empty function)
+	//  - 0x068754	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x06875e	-> objA0.base_state = 0x02	-> Waiting while blimp flies in from above
+	//  - 0x06877e	-> objA0.base_state = 0x04	-> Closed
+	//  - 0x06879c	-> objA0.base_state = 0x06	-> Opening / Opened the lid
+	//  - 0x0687dc	-> objA0.base_state = 0x08	-> Shooting rockets
+	//  - 0x06879c	-> objA0.base_state = 0x0a	-> Closing again (same function as state 0x06!)
+	//  - 0x068572	-> objA0.base_state = 0x0c	-> Inactive (empty function)
 	call tableLookupAddress(0x068746, objA0.base_state)
 
 	fn08498c()
 }
 
 
-// objA0.base_state = 0x00  -> Initialization
+// objA0.base_state = 0x00	-> Initialization
 
 //# address-hook(0x068754) end(0x068758)
 function void fn068754()
@@ -309,7 +309,7 @@ function void fn068754()
 }
 
 
-// objA0.base_state = 0x02  -> Waiting while blimp flies in from above
+// objA0.base_state = 0x02	-> Waiting while blimp flies in from above
 
 //# address-hook(0x06875e) end(0x06877a)
 function void fn06875e()
@@ -324,7 +324,7 @@ function void fn06875e()
 }
 
 
-// objA0.base_state = 0x04  -> Closed
+// objA0.base_state = 0x04	-> Closed
 
 //# address-hook(0x06877e) end(0x06877e)
 function void fn06877e()
@@ -349,7 +349,7 @@ function void fn06878c()
 }
 
 
-// objA0.base_state = 0x06, 0x0a  -> Opening and closing the lid
+// objA0.base_state = 0x06, 0x0a	-> Opening and closing the lid
 
 //# address-hook(0x06879c) end(0x06879c)
 function void fn06879c()
@@ -390,7 +390,7 @@ function void fn0687b6()
 }
 
 
-// objA0.base_state = 0x08  -> Shooting rockets
+// objA0.base_state = 0x08	-> Shooting rockets
 
 //# address-hook(0x0687dc) end(0x068800)
 function void fn0687dc()
@@ -429,7 +429,7 @@ function void fn068844()
 }
 
 
-// objA0.base_state = 0x00  -> Initialization
+// objA0.base_state = 0x00	-> Initialization
 
 //# address-hook(0x06885a) end(0x068888)
 function void fn06885a()

@@ -133,10 +133,10 @@ function void loadCharacterPalette(u8 character, u32 targetAddress, u8 paletteVa
 		if (character == CHARACTER_KNUCKLES)
 		{
 			// Copying in Knuckles' colors into underwater palette; these are in fact mostly different:
-			//  - paletteVariant == 1  -> AIZ:		0x0a6a, 0x0a2a, 0x0624
-			//  - paletteVariant == 2  -> ICZ:		0x0a4c, 0x0a28, 0x0428
-			//  - paletteVariant == 3  -> HCZ:		0x0e2a, 0x0c0a, 0x0a06
-			//  - paletteVariant == 4  -> CNZ/LBZ:	0x064c, 0x0628, 0x0624
+			//  - paletteVariant == 1	-> AIZ:		0x0a6a, 0x0a2a, 0x0624
+			//  - paletteVariant == 2	-> ICZ:		0x0a4c, 0x0a28, 0x0428
+			//  - paletteVariant == 3	-> HCZ:		0x0e2a, 0x0c0a, 0x0a06
+			//  - paletteVariant == 4	-> CNZ/LBZ:	0x064c, 0x0628, 0x0624
 			if (paletteVariant == 1)
 			{
 				A1 = 0x007a4a

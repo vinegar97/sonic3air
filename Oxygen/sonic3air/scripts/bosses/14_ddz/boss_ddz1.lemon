@@ -100,14 +100,14 @@ function void fn0817da()
 	D0 = objA0.base_state	// Unfortunately, this is needed for verify
 
 	// Targets:
-	//  - 0x08180e	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x081856	-> objA0.base_state = 0x02  -> First phase preparation until first missiles launch
-	//  - 0x0818b4	-> objA0.base_state = 0x04  -> First phase main update, shooting missiles when needed
-	//  - 0x081914	-> objA0.base_state = 0x06  -> First phase exploding (start)
-	//  - 0x081958	-> objA0.base_state = 0x08  -> First phase exploding (going down)
-	//  - 0x081a00	-> objA0.base_state = 0x0a  -> First phase exploding (white screen flash)
-	//  - 0x081a74	-> objA0.base_state = 0x0c  -> Second phase starting
-	//  - 0x081b26	-> objA0.base_state = 0x0e  -> Second phase main update
+	//  - 0x08180e	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x081856	-> objA0.base_state = 0x02	-> First phase preparation until first missiles launch
+	//  - 0x0818b4	-> objA0.base_state = 0x04	-> First phase main update, shooting missiles when needed
+	//  - 0x081914	-> objA0.base_state = 0x06	-> First phase exploding (start)
+	//  - 0x081958	-> objA0.base_state = 0x08	-> First phase exploding (going down)
+	//  - 0x081a00	-> objA0.base_state = 0x0a	-> First phase exploding (white screen flash)
+	//  - 0x081a74	-> objA0.base_state = 0x0c	-> Second phase starting
+	//  - 0x081b26	-> objA0.base_state = 0x0e	-> Second phase main update
 	call tableLookupAddress(0x0817fe, objA0.base_state)
 
 	u16[0xffffeed4] = objA0.position.x.u16

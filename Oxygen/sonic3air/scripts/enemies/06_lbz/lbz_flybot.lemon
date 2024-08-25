@@ -25,12 +25,12 @@ function void FlyBot.Init()
 function void FlyBot.BaseUpdate()
 {
 	// Targets:
-	//  - 0x08c994	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x08c9b2	-> objA0.base_state = 0x02  -> Flying
-	//  - 0x08ca16	-> objA0.base_state = 0x04  -> Beginning attack
-	//  - 0x08ca60	-> objA0.base_state = 0x06  -> Attacking (flying down)
-	//  - 0x08ca96	-> objA0.base_state = 0x08  -> Flying up
-	//  - 0x08cada	-> objA0.base_state = 0x0a  -> Turning around and flying back again
+	//  - 0x08c994	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x08c9b2	-> objA0.base_state = 0x02	-> Flying
+	//  - 0x08ca16	-> objA0.base_state = 0x04	-> Beginning attack
+	//  - 0x08ca60	-> objA0.base_state = 0x06	-> Attacking (flying down)
+	//  - 0x08ca96	-> objA0.base_state = 0x08	-> Flying up
+	//  - 0x08cada	-> objA0.base_state = 0x0a	-> Turning around and flying back again
 	call tableLookupAddress(0x08c988, objA0.base_state)
 	if (checkForMultiReturn())
 		return

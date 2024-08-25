@@ -284,19 +284,19 @@ function void fn068c12()
 	MoveAndFlipWithParent()
 
 	// Targets:
-	//  - 0x068754	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x068c38	-> objA0.base_state = 0x02  -> Waiting while blimp flies in from above
-	//  - 0x068574	-> objA0.base_state = 0x04  -> Short wait time before firing rockets
-	//  - 0x06879c	-> objA0.base_state = 0x06  -> Firing rockets
-	//  - 0x06879c	-> objA0.base_state = 0x08  -> Closing again (same function as state 0x06!)
-	//  - 0x068572	-> objA0.base_state = 0x0a  -> Inactive (empty function)
+	//  - 0x068754	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x068c38	-> objA0.base_state = 0x02	-> Waiting while blimp flies in from above
+	//  - 0x068574	-> objA0.base_state = 0x04	-> Short wait time before firing rockets
+	//  - 0x06879c	-> objA0.base_state = 0x06	-> Firing rockets
+	//  - 0x06879c	-> objA0.base_state = 0x08	-> Closing again (same function as state 0x06!)
+	//  - 0x068572	-> objA0.base_state = 0x0a	-> Inactive (empty function)
 	call tableLookupAddress(0x068c2c, objA0.base_state)
 
 	fn08498c()
 }
 
 
-// objA0.base_state = 0x02  -> Waiting while blimp flies in from above
+// objA0.base_state = 0x02	-> Waiting while blimp flies in from above
 
 //# address-hook(0x068c38) end(0x068c54)
 function void fn068c38()
@@ -372,7 +372,7 @@ function void fn068c96()
 }
 
 
-// objA0.base_state = 0x00  -> Initialization
+// objA0.base_state = 0x00	-> Initialization
 
 //# address-hook(0x068cd0) end(0x068cf2)
 function void fn068cd0()
@@ -487,7 +487,7 @@ function void fn068d88()
 }
 
 
-// objA0.base_state = 0x00  -> Initialization
+// objA0.base_state = 0x00	-> Initialization
 
 //# address-hook(0x068d9c) end(0x068dd4)
 function void fn068d9c()
@@ -720,15 +720,15 @@ function void fn06880a()
 	MoveAndFlipWithParent()
 
 	// Targets:
-	//  - 0x068828	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x06879c	-> objA0.base_state = 0x02  -> Update animation
+	//  - 0x068828	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x06879c	-> objA0.base_state = 0x02	-> Update animation
 	call tableLookupAddress(0x068824, objA0.base_state)
 
 	DrawObject()
 }
 
 
-// objA0.base_state = 0x00  -> Initialization
+// objA0.base_state = 0x00	-> Initialization
 
 //# address-hook(0x068828) end(0x068842)
 function void fn068828()
@@ -750,14 +750,14 @@ function void fn0688f4()
 	MoveAndFlipWithParent()
 
 	// Targets:
-	//  - 0x06890e	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x068574	-> objA0.base_state = 0x02  -> Short wait time
-	//  - 0x068956	-> objA0.base_state = 0x04  -> Animation update
+	//  - 0x06890e	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x068574	-> objA0.base_state = 0x02	-> Short wait time
+	//  - 0x068956	-> objA0.base_state = 0x04	-> Animation update
 	call tableLookupAddress(0x068908, objA0.base_state)
 }
 
 
-// objA0.base_state = 0x00  -> Initialization
+// objA0.base_state = 0x00	-> Initialization
 
 //# address-hook(0x06890e) end(0x068936)
 function void fn06890e()
@@ -786,7 +786,7 @@ function void fn06893e()
 }
 
 
-// objA0.base_state = 0x04  -> Animation update
+// objA0.base_state = 0x04	-> Animation update
 
 //# address-hook(0x068956) end(0x06895c)
 function void fn068956()
@@ -820,15 +820,15 @@ function void fn068962()
 function void fn068994()
 {
 	// Targets:
-	//  - 0x0689ac	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x0689f8	-> objA0.base_state = 0x02  -> Update
+	//  - 0x0689ac	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x0689f8	-> objA0.base_state = 0x02	-> Update
 	call tableLookupAddress(0x0689a8, objA0.base_state)
 
 	Enemy.DrawDynamicObject()
 }
 
 
-// objA0.base_state = 0x00  -> Initialization
+// objA0.base_state = 0x00	-> Initialization
 
 //# address-hook(0x0689ac) end(0x0689f6)
 function void fn0689ac()
@@ -852,7 +852,7 @@ function void fn0689ac()
 }
 
 
-// objA0.base_state = 0x02  -> Update
+// objA0.base_state = 0x02	-> Update
 
 //# address-hook(0x0689f8) end(0x068a16)
 function void fn0689f8()

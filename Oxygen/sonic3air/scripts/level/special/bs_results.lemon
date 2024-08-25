@@ -16,16 +16,16 @@
 function void fn02e3b8()
 {
 	// Targets:
-	//  - 0x02e3da	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x02e410	-> objA0.base_state = 0x02  -> Texts flying in, waiting, then counting
-	//  - 0x02e4d6	-> objA0.base_state = 0x04  -> Check for continue
-	//  - 0x02e512	-> objA0.base_state = 0x06  -> Waiting for fade out
-	//  - 0x02e5c0	-> objA0.base_state = 0x08  -> "now ... can be Super ..." text, Initialization
-	//  - 0x02e5e0	-> objA0.base_state = 0x0a  -> Countdown to begin fade out
-	//  - 0x02e5f4	-> objA0.base_state = 0x0c  -> "... can go to Hidden Palace" text, Initialization
-	//  - 0x02e616	-> objA0.base_state = 0x0e  -> Hidden Palace scene for getting a Super Emerald
-	//  - 0x02e746	-> objA0.base_state = 0x10  -> End of Hidden Palace scene after getting all Super Emeralds
-	//  - 0x02e7da	-> objA0.base_state = 0x12  -> "now ... can be Hyper ..." text, Initialization
+	//  - 0x02e3da	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x02e410	-> objA0.base_state = 0x02	-> Texts flying in, waiting, then counting
+	//  - 0x02e4d6	-> objA0.base_state = 0x04	-> Check for continue
+	//  - 0x02e512	-> objA0.base_state = 0x06	-> Waiting for fade out
+	//  - 0x02e5c0	-> objA0.base_state = 0x08	-> "now ... can be Super ..." text, Initialization
+	//  - 0x02e5e0	-> objA0.base_state = 0x0a	-> Countdown to begin fade out
+	//  - 0x02e5f4	-> objA0.base_state = 0x0c	-> "... can go to Hidden Palace" text, Initialization
+	//  - 0x02e616	-> objA0.base_state = 0x0e	-> Hidden Palace scene for getting a Super Emerald
+	//  - 0x02e746	-> objA0.base_state = 0x10	-> End of Hidden Palace scene after getting all Super Emeralds
+	//  - 0x02e7da	-> objA0.base_state = 0x12	-> "now ... can be Hyper ..." text, Initialization
 	call tableLookupAddress(0x02e3c6, objA0.base_state)
 }
 

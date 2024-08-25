@@ -39,11 +39,11 @@ function void fn0630e0()
 function void fn0630fc()
 {
 	// Targets:
-	//  - 0x063134	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x063170	-> objA0.base_state = 0x02  -> Waiting for Sonic/Tails to come closer
-	//  - 0x0631a4	-> objA0.base_state = 0x04  -> Starting (one frame)
-	//  - 0x063220	-> objA0.base_state = 0x06  -> Animation (using the lever etc.) and wind blowing
-	//  - 0x0632ae	-> objA0.base_state = 0x08  -> Blowing Sonic/Tails up; you know, not blowing them up, but blowing them up
+	//  - 0x063134	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x063170	-> objA0.base_state = 0x02	-> Waiting for Sonic/Tails to come closer
+	//  - 0x0631a4	-> objA0.base_state = 0x04	-> Starting (one frame)
+	//  - 0x063220	-> objA0.base_state = 0x06	-> Animation (using the lever etc.) and wind blowing
+	//  - 0x0632ae	-> objA0.base_state = 0x08	-> Blowing Sonic/Tails up; you know, not blowing them up, but blowing them up
 	call tableLookupAddress(0x06312a, objA0.base_state)
 
 	Object.loadSpritePatterns(0x066672)

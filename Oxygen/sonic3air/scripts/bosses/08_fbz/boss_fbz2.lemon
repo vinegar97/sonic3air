@@ -41,11 +41,11 @@ function void fn070632()
 function void fn07063a()
 {
 	// Targets:
-	//  - 0x07065c	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x0706ac	-> objA0.base_state = 0x02  -> Falling down
-	//  - 0x0706e2	-> objA0.base_state = 0x04  -> Swinging
-	//  - 0x07071a	-> objA0.base_state = 0x06  -> Crawling towards player
-	//  - 0x0707bc	-> objA0.base_state = 0x08  -> Swinging
+	//  - 0x07065c	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x0706ac	-> objA0.base_state = 0x02	-> Falling down
+	//  - 0x0706e2	-> objA0.base_state = 0x04	-> Swinging
+	//  - 0x07071a	-> objA0.base_state = 0x06	-> Crawling towards player
+	//  - 0x0707bc	-> objA0.base_state = 0x08	-> Swinging
 	call tableLookupAddress(0x070652, objA0.base_state)
 
 	fn070e10()
@@ -922,9 +922,9 @@ function void fn067b96()
 	MoveAndFlipWithParent()
 
 	// Targets:
-	//  - 0x067bbc	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x067be6	-> objA0.base_state = 0x02  -> Regular update
-	//  - 0x067b64	-> objA0.base_state = 0x04  -> Defeated
+	//  - 0x067bbc	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x067be6	-> objA0.base_state = 0x02	-> Regular update
+	//  - 0x067b64	-> objA0.base_state = 0x04	-> Defeated
 	call tableLookupAddress(0x067bb6, objA0.base_state)
 
 	fn085a5a()

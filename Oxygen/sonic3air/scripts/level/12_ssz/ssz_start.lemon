@@ -227,17 +227,17 @@ function void fn057e34()
 function void fn0656da()
 {
 	// Targets:
-	//  - 0x065730	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x06575e	-> objA0.base_state = 0x02  -> Getting teleported
-	//  - 0x065794	-> objA0.base_state = 0x04  -> Falling down to the teleporter
-	//  - 0x0657ce	-> objA0.base_state = 0x06  -> Briefly standing there
-	//  - 0x0657fe	-> objA0.base_state = 0x08  -> Knuckles exhausted, Death Egg rising
-	//  - 0x065826	-> objA0.base_state = 0x0a  -> Standing up again
-	//  - 0x06584c	-> objA0.base_state = 0x0c  -> Standing briefly
-	//  - 0x065876	-> objA0.base_state = 0x0e  -> Jumping off
-	//  - 0x0658ba	-> objA0.base_state = 0x10  -> Running to the right
-	//  - 0x0658f2	-> objA0.base_state = 0x12  -> Jumping to the right
-	//  - 0x06594a	-> objA0.base_state = 0x14  -> Laying on the button, extending the bridge
+	//  - 0x065730	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x06575e	-> objA0.base_state = 0x02	-> Getting teleported
+	//  - 0x065794	-> objA0.base_state = 0x04	-> Falling down to the teleporter
+	//  - 0x0657ce	-> objA0.base_state = 0x06	-> Briefly standing there
+	//  - 0x0657fe	-> objA0.base_state = 0x08	-> Knuckles exhausted, Death Egg rising
+	//  - 0x065826	-> objA0.base_state = 0x0a	-> Standing up again
+	//  - 0x06584c	-> objA0.base_state = 0x0c	-> Standing briefly
+	//  - 0x065876	-> objA0.base_state = 0x0e	-> Jumping off
+	//  - 0x0658ba	-> objA0.base_state = 0x10	-> Running to the right
+	//  - 0x0658f2	-> objA0.base_state = 0x12	-> Jumping to the right
+	//  - 0x06594a	-> objA0.base_state = 0x14	-> Laying on the button, extending the bridge
 	call tableLookupAddress(0x06571a, objA0.base_state)
 
 	if ((objA0.flags38 & 0x40) == 0)

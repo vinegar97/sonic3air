@@ -16,7 +16,7 @@
 function void fn0729ba()
 {
 	// Targets:
-	//  - 0x0729de	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x0729de	-> objA0.base_state = 0x00	-> Initialization
 	//  - 0x072a54	-> objA0.base_state = 0x02	-> Small wait time
 	//  - 0x072a70	-> objA0.base_state = 0x04	-> Moving up or down on one side
 	//  - 0x072aec	-> objA0.base_state = 0x06	-> Reaction to getting hit

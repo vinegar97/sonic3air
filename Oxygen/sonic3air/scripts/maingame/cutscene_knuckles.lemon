@@ -212,10 +212,10 @@ function void fn065c04()
 			objA0.respawn_entry = 0
 
 			// Targets:
-			//  - 0x065c56	-> objA0.subtype2c = 0x00  -> In AIZ 2 cutscene
-			//  - 0x065c72	-> objA0.subtype2c = 0x02  -> In HCZ 2 cutscene
-			//  - 0x065c78	-> objA0.subtype2c = 0x04  -> In CNZ 2 lights-off cutscene
-			//  - 0x065cac	-> objA0.subtype2c = 0x06  -> In CNZ 2 pre-boss cutscene
+			//  - 0x065c56	-> objA0.subtype2c = 0x00	-> In AIZ 2 cutscene
+			//  - 0x065c72	-> objA0.subtype2c = 0x02	-> In HCZ 2 cutscene
+			//  - 0x065c78	-> objA0.subtype2c = 0x04	-> In CNZ 2 lights-off cutscene
+			//  - 0x065cac	-> objA0.subtype2c = 0x06	-> In CNZ 2 pre-boss cutscene
 			call tableLookupAddress(0x065c40, objA0.subtype2c)
 		}
 	}

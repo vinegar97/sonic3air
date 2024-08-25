@@ -442,7 +442,7 @@ define camera.forced_target.x		= u16[0xfffff678]
 define camera.forced_target.y		= u16[0xfffff67c]
 
 
-// 0xfffff680 ... 0xfffff6df  -> Pattern loading request table
+// 0xfffff680 ... 0xfffff6df	-> Pattern loading request table
 
 
 // u16[0xfffff702] = the RAM address of an object that AI Tails is standing on
@@ -456,7 +456,7 @@ define tails.ai_jumping			=  u8[0xfffff70f]
 
 define rings.update_routine		=  u8[0xfffff710]
 define global.level_started		=  s8[0xfffff711]	// Can be negative, which causes the HUD to fly in at the start
-// 0xfffff712 ... ?  -> Some kind of respawn entries for e.g. Glowing Spheres
+// 0xfffff712 ... ?	-> Some kind of respawn entries for e.g. Glowing Spheres
 
 define level.palettefx.aiz_intro		=  u8[0xfffff72e]
 
@@ -562,7 +562,7 @@ define level.capsule_opened		=  u8[0xfffffacd]
 //  - 0xfffffc80 ... 0xfffffcff   -> Palette with no fading applied
 
 
-// 0xfffffd00 ... 0xfffffdff  -> Reserved for system stack
+// 0xfffffd00 ... 0xfffffdff	-> Reserved for system stack
 
 
 
@@ -661,7 +661,7 @@ define level.backup.camera_routine			=  u8[0xfffffe64]
 // There might be more backup stuff from here
 
 define oscillating_number_flags = u16[0xfffffe6e]
-// 0xfffffe70 ... 0xfffffeaf  -> 16 oscillating numbers, each consisting of two u16
+// 0xfffffe70 ... 0xfffffeaf	-> 16 oscillating numbers, each consisting of two u16
 
 define emerald.animframe	= u16[0xffffe666]	// Animation frame 0..2, flickers on frame 0
 

@@ -65,10 +65,10 @@ function void fn05928c()
 function void fn05b18e()
 {
 	// Targets:
-	//  - 0x05b1a2	-> u16[0xfffffa86] = 0x00  -> Initialization
-	//  - 0x05b1f4	-> u16[0xfffffa86] = 0x02  -> Wait time until credits start
-	//  - 0x05b204	-> u16[0xfffffa86] = 0x04  -> Rolling credits
-	//  - 0x05b2d4	-> u16[0xfffffa86] = 0x06  -> Do nothing any more (when character jumps to the camera, final pose, and final screen)
+	//  - 0x05b1a2	-> u16[0xfffffa86] = 0x00	-> Initialization
+	//  - 0x05b1f4	-> u16[0xfffffa86] = 0x02	-> Wait time until credits start
+	//  - 0x05b204	-> u16[0xfffffa86] = 0x04	-> Rolling credits
+	//  - 0x05b2d4	-> u16[0xfffffa86] = 0x06	-> Do nothing any more (when character jumps to the camera, final pose, and final screen)
 	call tableLookupAddress(0x05b19a, u16[0xfffffa86])
 }
 
@@ -332,11 +332,11 @@ function void fn05b514()
 function void fn05ea52()
 {
 	// Targets:
-	//  - 0x05ea74	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x05eadc	-> objA0.base_state = 0x02  -> With main character on the plane (also used during credits)
-	//  - 0x05eb02	-> objA0.base_state = 0x04  -> Waiting until it gets visible
-	//  - 0x05eb16	-> objA0.base_state = 0x06  -> Before catching main character
-	//  - 0x05eb2e	-> objA0.base_state = 0x08  -> Just hovering...
+	//  - 0x05ea74	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x05eadc	-> objA0.base_state = 0x02	-> With main character on the plane (also used during credits)
+	//  - 0x05eb02	-> objA0.base_state = 0x04	-> Waiting until it gets visible
+	//  - 0x05eb16	-> objA0.base_state = 0x06	-> Before catching main character
+	//  - 0x05eb2e	-> objA0.base_state = 0x08	-> Just hovering...
 	call tableLookupAddress(0x05ea6a, objA0.base_state)
 	debugLog(objA0.base_state)
 

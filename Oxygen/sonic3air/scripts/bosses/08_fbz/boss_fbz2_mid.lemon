@@ -23,11 +23,11 @@ function void fn06fd0c()
 function void fn06fd16()
 {
 	// Targets:
-	//  - 0x06fd38	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x06fdc0	-> objA0.base_state = 0x02  -> Waiting for player to reach the boss area
-	//  - 0x06fe00	-> objA0.base_state = 0x04  -> Deploying laser
-	//  - 0x06fe22	-> objA0.base_state = 0x06  -> Short wait time (used in various places, incl. during laser shots)
-	//  - 0x06feb2	-> objA0.base_state = 0x08  -> Charging laser, and wall movement if needed
+	//  - 0x06fd38	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x06fdc0	-> objA0.base_state = 0x02	-> Waiting for player to reach the boss area
+	//  - 0x06fe00	-> objA0.base_state = 0x04	-> Deploying laser
+	//  - 0x06fe22	-> objA0.base_state = 0x06	-> Short wait time (used in various places, incl. during laser shots)
+	//  - 0x06feb2	-> objA0.base_state = 0x08	-> Charging laser, and wall movement if needed
 	call tableLookupAddress(0x06fd2e, objA0.base_state)
 
 #if STANDALONE

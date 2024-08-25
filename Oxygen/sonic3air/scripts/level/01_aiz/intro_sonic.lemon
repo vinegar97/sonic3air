@@ -23,20 +23,20 @@
 function void fn067472()
 {
 	// Targets:
-	//  - 0x0674ac	-> objA0.base_state = 0x00  -> Initialization (one frame)
-	//  - 0x067514	-> objA0.base_state = 0x02  -> Fade-in and short wait time before Tornado appears
-	//  - 0x067536	-> objA0.base_state = 0x04  -> Tornado flies in
-	//  - 0x067560	-> objA0.base_state = 0x06  -> Tornado hovers, Sonic waits shortly
-	//  - 0x067594	-> objA0.base_state = 0x08  -> Sonic jumps off
-	//  - 0x0675c0	-> objA0.base_state = 0x0a  -> Sonic goes offscreen to the left
-	//  - 0x067614	-> objA0.base_state = 0x0c  -> Offscreen transformation to Super Sonic
-	//  - 0x067624	-> objA0.base_state = 0x0e  -> Super Sonic overtakes the Tornado
-	//  - 0x06764e	-> objA0.base_state = 0x10  -> Super Sonic offscreen to the right
-	//  - 0x067674	-> objA0.base_state = 0x12  -> Camera catching up, Super Sonic gets visible again
-	//  - 0x0676ac	-> objA0.base_state = 0x14  -> The coast gets visible
-	//  - 0x0676c6	-> objA0.base_state = 0x16  -> Entering the beach
-	//  - 0x0676e8	-> objA0.base_state = 0x18  -> Over the beach and into the jungle
-	//  - 0x067704	-> objA0.base_state = 0x1a  -> Reaching the playable area and the place where Knuckles waits
+	//  - 0x0674ac	-> objA0.base_state = 0x00	-> Initialization (one frame)
+	//  - 0x067514	-> objA0.base_state = 0x02	-> Fade-in and short wait time before Tornado appears
+	//  - 0x067536	-> objA0.base_state = 0x04	-> Tornado flies in
+	//  - 0x067560	-> objA0.base_state = 0x06	-> Tornado hovers, Sonic waits shortly
+	//  - 0x067594	-> objA0.base_state = 0x08	-> Sonic jumps off
+	//  - 0x0675c0	-> objA0.base_state = 0x0a	-> Sonic goes offscreen to the left
+	//  - 0x067614	-> objA0.base_state = 0x0c	-> Offscreen transformation to Super Sonic
+	//  - 0x067624	-> objA0.base_state = 0x0e	-> Super Sonic overtakes the Tornado
+	//  - 0x06764e	-> objA0.base_state = 0x10	-> Super Sonic offscreen to the right
+	//  - 0x067674	-> objA0.base_state = 0x12	-> Camera catching up, Super Sonic gets visible again
+	//  - 0x0676ac	-> objA0.base_state = 0x14	-> The coast gets visible
+	//  - 0x0676c6	-> objA0.base_state = 0x16	-> Entering the beach
+	//  - 0x0676e8	-> objA0.base_state = 0x18	-> Over the beach and into the jungle
+	//  - 0x067704	-> objA0.base_state = 0x1a	-> Reaching the playable area and the place where Knuckles waits
 	call tableLookupAddress(0x067490, objA0.base_state)
 
 	UpdateSonicSpritePatterns()
@@ -627,13 +627,13 @@ function void fn067a20()
 function void fn061d92()
 {
 	// Targets:
-	//  - 0x061dbe	-> objA0.base_state = 0x00  -> Initialization (gets called relatively early already)
-	//  - 0x061df4	-> objA0.base_state = 0x02  -> Waiting for Sonic to arrive
-	//  - 0x061e24	-> objA0.base_state = 0x04  -> Jumping out of the ground
-	//  - 0x061e64	-> objA0.base_state = 0x06  -> Short wait time
-	//  - 0x061e96	-> objA0.base_state = 0x08  -> Collecting the Chaos Emeralds
-	//  - 0x061ee0	-> objA0.base_state = 0x0a  -> Knuckles chuckles!
-	//  - 0x061f10	-> objA0.base_state = 0x0c  -> Running away
+	//  - 0x061dbe	-> objA0.base_state = 0x00	-> Initialization (gets called relatively early already)
+	//  - 0x061df4	-> objA0.base_state = 0x02	-> Waiting for Sonic to arrive
+	//  - 0x061e24	-> objA0.base_state = 0x04	-> Jumping out of the ground
+	//  - 0x061e64	-> objA0.base_state = 0x06	-> Short wait time
+	//  - 0x061e96	-> objA0.base_state = 0x08	-> Collecting the Chaos Emeralds
+	//  - 0x061ee0	-> objA0.base_state = 0x0a	-> Knuckles chuckles!
+	//  - 0x061f10	-> objA0.base_state = 0x0c	-> Running away
 	call tableLookupAddress(0x061db0, objA0.base_state)
 
 	Object.loadSpritePatternsForVDP(0x06666a)

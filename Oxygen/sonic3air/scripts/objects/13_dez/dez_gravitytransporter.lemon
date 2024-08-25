@@ -27,10 +27,10 @@ function void fn048c16()
 function void fn048c30()
 {
 	// Targets:
-	//  - 0x048c44	-> u8[A4] = 0x00  -> Waiting for player
-	//  - 0x048d2c	-> u8[A4] = 0x02  -> Starting the teleport (spinning the player)
-	//  - 0x048dca	-> u8[A4] = 0x04  -> Teleporting
-	//  - 0x048e94	-> u8[A4] = 0x06  -> Stopping, waiting for player to leave
+	//  - 0x048c44	-> u8[A4] = 0x00	-> Waiting for player
+	//  - 0x048d2c	-> u8[A4] = 0x02	-> Starting the teleport (spinning the player)
+	//  - 0x048dca	-> u8[A4] = 0x04	-> Teleporting
+	//  - 0x048e94	-> u8[A4] = 0x06	-> Stopping, waiting for player to leave
 	call tableLookupAddress(0x048c3c, u8[A4])
 }
 

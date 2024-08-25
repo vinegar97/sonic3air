@@ -24,8 +24,8 @@ constant u16 DustCloud.Tails.targetInVRAM		= 0xfe00
 function void fn018b3e()
 {
 	// Targets:
-	//  - 0x018b54	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x018baa	-> objA0.base_state = 0x02  -> Regular update
+	//  - 0x018b54	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x018baa	-> objA0.base_state = 0x02	-> Regular update
 	//  - 0x018cb2	-> objA0.base_state = 0x04	-> Unloading
 	//  - 0x018cb6	-> objA0.base_state = 0x06	-> Used in Knuckles glide landing skidding dust
 	call tableLookupAddress(0x018b4c, objA0.base_state)
@@ -66,11 +66,11 @@ function void fn018baa()
 	A2 = 0xffff0000 + objA0.dustcloud.character_address
 
 	// Targets:
-	//  - 0x018c94	-> objA0.state = 0x00  -> Inactive (though the target function still does stuff)
-	//  - 0x018bc8	-> objA0.state = 0x01  -> Water splash update
-	//  - 0x018c20	-> objA0.state = 0x02  -> Spindash dust cloud
-	//  - 0x018c84	-> objA0.state = 0x03  -> Braking dust cloud
-	//  - 0x018bec	-> objA0.state = 0x04  -> Snow splash effect (start of LBZ 1)
+	//  - 0x018c94	-> objA0.state = 0x00	-> Inactive (though the target function still does stuff)
+	//  - 0x018bc8	-> objA0.state = 0x01	-> Water splash update
+	//  - 0x018c20	-> objA0.state = 0x02	-> Spindash dust cloud
+	//  - 0x018c84	-> objA0.state = 0x03	-> Braking dust cloud
+	//  - 0x018bec	-> objA0.state = 0x04	-> Snow splash effect (start of LBZ 1)
 	call tableLookupAddress(0x018bbe, objA0.state * 2)
 }
 
@@ -290,8 +290,8 @@ function void fn018d70()
 function void fn018f86()
 {
 	// Targets:
-	//  - 0x018f9c	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x018fd2	-> objA0.base_state = 0x02  -> Regular update
+	//  - 0x018f9c	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x018fd2	-> objA0.base_state = 0x02	-> Regular update
 	//  - 0x019060	-> objA0.base_state = 0x04	-> Unloading
 	//  - 0x019064	-> objA0.base_state = 0x06
 	call tableLookupAddress(0x018f94, objA0.base_state)
@@ -323,9 +323,9 @@ function void fn018fd2()
 	A2 = 0xffff0000 + objA0.dustcloud.character_address
 
 	// Targets:
-	//  - 0x018fee	-> objA0.state = 0x00, 0x01  -> Inactive (though the target function still does stuff)
-	//  - 0x018ff6	-> objA0.state = 0x02  -> Spindash dust cloud
-	//  - 0x01903e	-> objA0.state = 0x03  -> Braking dust cloud
+	//  - 0x018fee	-> objA0.state = 0x00, 0x01	-> Inactive (though the target function still does stuff)
+	//  - 0x018ff6	-> objA0.state = 0x02	-> Spindash dust cloud
+	//  - 0x01903e	-> objA0.state = 0x03	-> Braking dust cloud
 	call tableLookupAddress(0x018fe6, objA0.state * 2)
 }
 

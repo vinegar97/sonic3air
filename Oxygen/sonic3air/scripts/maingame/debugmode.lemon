@@ -18,8 +18,8 @@ function void DebugMode.BaseUpdate()
 	D0 = debug_mode.state >> 8
 
 	// Targets:
-	//  - 0x092a20	-> D0 = 0x00  -> Initialization
-	//  - 0x092ab0	-> D0 = 0x02  -> Regular update in object placement mode
+	//  - 0x092a20	-> D0 = 0x00	-> Initialization
+	//  - 0x092ab0	-> D0 = 0x02	-> Regular update in object placement mode
 	call tableLookupAddress(0x092a1c, D0)
 }
 

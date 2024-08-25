@@ -27,8 +27,8 @@ function void fn0738d6()
 function void fn0738e0()
 {
 	// Targets:
-	//  - 0x073906	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x07395a	-> objA0.base_state = 0x02  -> Waiting for player
+	//  - 0x073906	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x07395a	-> objA0.base_state = 0x02	-> Waiting for player
 	//  - 0x07397a	-> objA0.base_state = 0x04
 	//  - 0x07399e	-> objA0.base_state = 0x06
 	//  - 0x0739e6	-> objA0.base_state = 0x08

@@ -56,14 +56,14 @@ function void fn06c6fa()
 function void fn06c702()
 {
 	// Targets:
-	//  - 0x06c72a	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x06c782	-> objA0.base_state = 0x02  -> Short wait time
-	//  - 0x06c796	-> objA0.base_state = 0x04  -> Shooting his drillers
-	//  - 0x06c814	-> objA0.base_state = 0x06  -> Short wait time
-	//  - 0x06c7d8	-> objA0.base_state = 0x08  -> Going along the driller lines, part 1
-	//  - 0x06c814	-> objA0.base_state = 0x0a  -> Short wait time
-	//  - 0x06c83c	-> objA0.base_state = 0x0c  -> Going along the driller lines, part 2
-	//  - 0x06c88a	-> objA0.base_state = 0x0e  -> Wait time before starting the cycle again in state 0x04
+	//  - 0x06c72a	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x06c782	-> objA0.base_state = 0x02	-> Short wait time
+	//  - 0x06c796	-> objA0.base_state = 0x04	-> Shooting his drillers
+	//  - 0x06c814	-> objA0.base_state = 0x06	-> Short wait time
+	//  - 0x06c7d8	-> objA0.base_state = 0x08	-> Going along the driller lines, part 1
+	//  - 0x06c814	-> objA0.base_state = 0x0a	-> Short wait time
+	//  - 0x06c83c	-> objA0.base_state = 0x0c	-> Going along the driller lines, part 2
+	//  - 0x06c88a	-> objA0.base_state = 0x0e	-> Wait time before starting the cycle again in state 0x04
 	call tableLookupAddress(0x06c71a, objA0.base_state)
 
 	fn06d61e()

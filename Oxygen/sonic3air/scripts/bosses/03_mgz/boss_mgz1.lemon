@@ -391,11 +391,11 @@ function void fn08894c()
 function void fn088976()
 {
 	// Targets:
-	//  - 0x08898e	-> objA0.base_state = 0x00  -> Moving out of the ground
-	//  - 0x0889a8	-> objA0.base_state = 0x02  -> Standing in place
-	//  - 0x0889e8	-> objA0.base_state = 0x04  -> Moving left/right
-	//  - 0x088a08	-> objA0.base_state = 0x06  -> Standing in place
-	//  - 0x088a18	-> objA0.base_state = 0x08  -> Disappearing into the ground again
+	//  - 0x08898e	-> objA0.base_state = 0x00	-> Moving out of the ground
+	//  - 0x0889a8	-> objA0.base_state = 0x02	-> Standing in place
+	//  - 0x0889e8	-> objA0.base_state = 0x04	-> Moving left/right
+	//  - 0x088a08	-> objA0.base_state = 0x06	-> Standing in place
+	//  - 0x088a18	-> objA0.base_state = 0x08	-> Disappearing into the ground again
 	call tableLookupAddress(0x088984, objA0.base_state)
 }
 

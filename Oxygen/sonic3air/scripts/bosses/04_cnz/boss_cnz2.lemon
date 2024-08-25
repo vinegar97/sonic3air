@@ -444,12 +444,12 @@ function void fn06e80c()
 function void fn06e82c()
 {
 	// Targets:
-	//  - 0x06e850	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x06e86a	-> objA0.base_state = 0x02  -> Held by Robotnik
-	//  - 0x06e8a2	-> objA0.base_state = 0x04  -> Falling & bouncing
-	//  - 0x06e8e8	-> objA0.base_state = 0x06  -> Standing still
-	//  - 0x06e8fe	-> objA0.base_state = 0x08  -> Flickering while charging
-	//  - 0x06e920	-> objA0.base_state = 0x0a  -> Waiting while Robotnik descends
+	//  - 0x06e850	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x06e86a	-> objA0.base_state = 0x02	-> Held by Robotnik
+	//  - 0x06e8a2	-> objA0.base_state = 0x04	-> Falling & bouncing
+	//  - 0x06e8e8	-> objA0.base_state = 0x06	-> Standing still
+	//  - 0x06e8fe	-> objA0.base_state = 0x08	-> Flickering while charging
+	//  - 0x06e920	-> objA0.base_state = 0x0a	-> Waiting while Robotnik descends
 	call tableLookupAddress(0x06e844, objA0.base_state)
 
 	fn06ed22()

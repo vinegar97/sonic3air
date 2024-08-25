@@ -28,9 +28,9 @@ function void fn067aca()
 	MoveAndFlipWithParent()
 
 	// Targets:
-	//  - 0x067aea	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x067b34	-> objA0.base_state = 0x02  -> Regular update
-	//  - 0x067b64	-> objA0.base_state = 0x04  -> Defeated
+	//  - 0x067aea	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x067b34	-> objA0.base_state = 0x02	-> Regular update
+	//  - 0x067b64	-> objA0.base_state = 0x04	-> Defeated
 	call tableLookupAddress(0x067ae4, objA0.base_state)
 
 	fn08498c()
@@ -109,9 +109,9 @@ function void fn067b66()
 	fn069b2e()
 
 	// Targets:
-	//  - 0x067aea	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x067b34	-> objA0.base_state = 0x02  -> Regular update
-	//  - 0x067b64	-> objA0.base_state = 0x04  -> Defeated
+	//  - 0x067aea	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x067b34	-> objA0.base_state = 0x02	-> Regular update
+	//  - 0x067b64	-> objA0.base_state = 0x04	-> Defeated
 	call tableLookupAddress(0x067b90, objA0.base_state)
 
 	if ((objA0.flags38 & 0x40) == 0)
@@ -127,9 +127,9 @@ function void fn067c38()
 	MoveAndFlipWithParent()
 
 	// Targets:
-	//  - 0x067c58	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x067c8a	-> objA0.base_state = 0x02  -> Regular update
-	//  - 0x067cba	-> objA0.base_state = 0x04  -> Defeated
+	//  - 0x067c58	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x067c8a	-> objA0.base_state = 0x02	-> Regular update
+	//  - 0x067cba	-> objA0.base_state = 0x04	-> Defeated
 	call tableLookupAddress(0x067c52, objA0.base_state)
 	fn08498c()
 }
@@ -201,9 +201,9 @@ function void fn067cd2()
 	fn085a5a()
 
 	// Targets:
-	//  - 0x067c58	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x067c8a	-> objA0.base_state = 0x02  -> Regular update
-	//  - 0x067cba	-> objA0.base_state = 0x04  -> Defeated
+	//  - 0x067c58	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x067c8a	-> objA0.base_state = 0x02	-> Regular update
+	//  - 0x067cba	-> objA0.base_state = 0x04	-> Defeated
 	call tableLookupAddress(0x067d04, objA0.base_state)
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]

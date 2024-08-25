@@ -27,11 +27,11 @@ function bool DEZFinalBoss3.canPlayerEnterDoomsday()
 function void fn080160()
 {
 	// Targets:
-	//  - 0x080184	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x0801d2	-> objA0.base_state = 0x02  -> Rising
-	//  - 0x080208	-> objA0.base_state = 0x04  -> Moving right at the start
-	//  - 0x08023e	-> objA0.base_state = 0x06  -> Waiting briefly
-	//  - 0x080264	-> objA0.base_state = 0x08  -> Main update: Speeding forward, then falling back, repeat on hit
+	//  - 0x080184	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x0801d2	-> objA0.base_state = 0x02	-> Rising
+	//  - 0x080208	-> objA0.base_state = 0x04	-> Moving right at the start
+	//  - 0x08023e	-> objA0.base_state = 0x06	-> Waiting briefly
+	//  - 0x080264	-> objA0.base_state = 0x08	-> Main update: Speeding forward, then falling back, repeat on hit
 	call tableLookupAddress(0x08017a, objA0.base_state)
 
 	fn080e2c()
@@ -324,8 +324,8 @@ function void fn0803d6()
 function void fn0804b0()
 {
 	// Targets:
-	//  - 0x0804c8	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x0804d2	-> objA0.base_state = 0x02  -> Update
+	//  - 0x0804c8	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x0804d2	-> objA0.base_state = 0x02	-> Update
 	call tableLookupAddress(0x0804c4, objA0.base_state)
 	DrawObject()
 }

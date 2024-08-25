@@ -41,9 +41,9 @@ function void GiantRing.Init()
 function void GiantRing.BaseUpdate()
 {
 	// Targets:
-	//  - 0x06169a	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x0616e6	-> objA0.base_state = 0x02  -> Regular update
-	//  - 0x0617b8	-> objA0.base_state = 0x04  -> Character jumped in
+	//  - 0x06169a	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x0616e6	-> objA0.base_state = 0x02	-> Regular update
+	//  - 0x0617b8	-> objA0.base_state = 0x04	-> Character jumped in
 	call tableLookupAddress(0x061694, objA0.base_state)
 
 	fn0618fc()

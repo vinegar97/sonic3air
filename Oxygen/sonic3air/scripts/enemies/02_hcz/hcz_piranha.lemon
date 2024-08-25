@@ -25,10 +25,10 @@ function void Piranha.Init()
 function void Piranha.BaseUpdate()
 {
 	// Targets:
-	//  - 0x087f88	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x087fac	-> objA0.base_state = 0x02  -> Swimming towards the player
-	//  - 0x088024	-> objA0.base_state = 0x04  -> Jumping through the air
-	//  - 0x088062	-> objA0.base_state = 0x06  -> Holding on to the player
+	//  - 0x087f88	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x087fac	-> objA0.base_state = 0x02	-> Swimming towards the player
+	//  - 0x088024	-> objA0.base_state = 0x04	-> Jumping through the air
+	//  - 0x088062	-> objA0.base_state = 0x06	-> Holding on to the player
 	call tableLookupAddress(0x087f80, objA0.base_state)
 
 	if ((objA0.flags2a & 0x80) == 0)

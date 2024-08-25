@@ -1530,13 +1530,13 @@ function void fn04c838()
 function void fn04c88e()
 {
 	// Determine the reward (you only get it if there's three of a kind)
-	//  - 100	when D0.u16 == 0x00  -> Jackpot
-	//  -  30	when D0.u16 == 0x01  -> Sonic
-	//  -  20	when D0.u16 == 0x02  -> Tails
-	//  -  25	when D0.u16 == 0x03  -> Knuckles
-	//  -  -1	when D0.u16 == 0x04  -> Robotnik
-	//  -  10	when D0.u16 == 0x05  -> Ring
-	//  -   8	when D0.u16 == 0x06  -> Bar
+	//  - 100	when D0.u16 == 0x00	-> Jackpot
+	//  -  30	when D0.u16 == 0x01	-> Sonic
+	//  -  20	when D0.u16 == 0x02	-> Tails
+	//  -  25	when D0.u16 == 0x03	-> Knuckles
+	//  -  -1	when D0.u16 == 0x04	-> Robotnik
+	//  -  10	when D0.u16 == 0x05	-> Ring
+	//  -   8	when D0.u16 == 0x06	-> Bar
 	D0.u16 = u16[0x04c8a4 + D0.u16 * 2]
 }
 

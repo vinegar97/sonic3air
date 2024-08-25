@@ -137,11 +137,11 @@ function void fn083708()
 function void SignPost.BaseUpdate()
 {
 	// Targets:
-	//  - 0x0837d8	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x083832	-> objA0.base_state = 0x02  -> In air, turning
-	//  - 0x0838c2	-> objA0.base_state = 0x04  -> On ground, still turning
-	//  - 0x083912	-> objA0.base_state = 0x06  -> On ground, standing still (one frame only)
-	//  - 0x083938	-> objA0.base_state = 0x08  -> Done
+	//  - 0x0837d8	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x083832	-> objA0.base_state = 0x02	-> In air, turning
+	//  - 0x0838c2	-> objA0.base_state = 0x04	-> On ground, still turning
+	//  - 0x083912	-> objA0.base_state = 0x06	-> On ground, standing still (one frame only)
+	//  - 0x083938	-> objA0.base_state = 0x08	-> Done
 	call tableLookupAddress(0x0837ce, objA0.base_state)
 
 	Object.loadSpritePatterns(0x083b42)

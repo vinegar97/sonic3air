@@ -65,10 +65,10 @@ function void fn071c0e()
 function void fn071c16()
 {
 	// Targets:
-	//  - 0x071c36	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x071c78	-> objA0.base_state = 0x02  -> Flying in
-	//  - 0x071caa	-> objA0.base_state = 0x04  -> Lowering the platform, then moving around
-	//  - 0x071d64	-> objA0.base_state = 0x06  -> ?
+	//  - 0x071c36	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x071c78	-> objA0.base_state = 0x02	-> Flying in
+	//  - 0x071caa	-> objA0.base_state = 0x04	-> Lowering the platform, then moving around
+	//  - 0x071d64	-> objA0.base_state = 0x06	-> ?
 	call tableLookupAddress(0x071c2e, objA0.base_state)
 
 	fn07225c()

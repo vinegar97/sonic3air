@@ -35,14 +35,14 @@ function void fn08cb56()
 function void fn08cb66()
 {
 	// Targets:
-	//  - 0x08cb9e	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x08cbf2	-> objA0.base_state = 0x02  -> Robotnik waiting for characters
-	//  - 0x08cc2e	-> objA0.base_state = 0x04  -> Robotnik moving up
-	//  - 0x08cc5a	-> objA0.base_state = 0x06  -> Waiting for the building collapse to start
-	//  - 0x08cc84	-> objA0.base_state = 0x08  -> Building collapse
-	//  - 0x08ccb4	-> objA0.base_state = 0x0a  -> Robotnik waiting
-	//  - 0x08cce8	-> objA0.base_state = 0x0c  -> Robotnik moving up to place the box
-	//  - 0x08cd30	-> objA0.base_state = 0x0e  -> Robotnik fleeing before the mini-boss fight starts
+	//  - 0x08cb9e	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x08cbf2	-> objA0.base_state = 0x02	-> Robotnik waiting for characters
+	//  - 0x08cc2e	-> objA0.base_state = 0x04	-> Robotnik moving up
+	//  - 0x08cc5a	-> objA0.base_state = 0x06	-> Waiting for the building collapse to start
+	//  - 0x08cc84	-> objA0.base_state = 0x08	-> Building collapse
+	//  - 0x08ccb4	-> objA0.base_state = 0x0a	-> Robotnik waiting
+	//  - 0x08cce8	-> objA0.base_state = 0x0c	-> Robotnik moving up to place the box
+	//  - 0x08cd30	-> objA0.base_state = 0x0e	-> Robotnik fleeing before the mini-boss fight starts
 	call tableLookupAddress(0x08cb80, objA0.base_state)
 
 	fn08d1fc()
@@ -439,14 +439,14 @@ function void fn062640()
 	}
 
 	// Targets:
-	//  - 0x062678	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x0626b2	-> objA0.base_state = 0x02  -> Waiting for character in the cup elevator
-	//  - 0x062014	-> objA0.base_state = 0x04  -> Short wait time, just standing there
-	//  - 0x0626ee	-> objA0.base_state = 0x06  -> Throwing
-	//  - 0x062014	-> objA0.base_state = 0x08  -> Ending throw animation
-	//  - 0x062354	-> objA0.base_state = 0x0a  -> Waiting and then laughing while bomb is in the air
-	//  - 0x062354	-> objA0.base_state = 0x0c  -> Bomb explosions, still laughing
-	//  - 0x062778	-> objA0.base_state = 0x0e  -> Running away
+	//  - 0x062678	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x0626b2	-> objA0.base_state = 0x02	-> Waiting for character in the cup elevator
+	//  - 0x062014	-> objA0.base_state = 0x04	-> Short wait time, just standing there
+	//  - 0x0626ee	-> objA0.base_state = 0x06	-> Throwing
+	//  - 0x062014	-> objA0.base_state = 0x08	-> Ending throw animation
+	//  - 0x062354	-> objA0.base_state = 0x0a	-> Waiting and then laughing while bomb is in the air
+	//  - 0x062354	-> objA0.base_state = 0x0c	-> Bomb explosions, still laughing
+	//  - 0x062778	-> objA0.base_state = 0x0e	-> Running away
 	call tableLookupAddress(0x062668, objA0.base_state)
 
 	Object.loadSpritePatternsForVDP(0x06666a)
