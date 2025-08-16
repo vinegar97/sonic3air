@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -104,7 +104,6 @@ private:
 
 	std::vector<OptionEntry> mOptionEntries;
 	std::vector<GameMenuEntry*> mUnlockedSecretsEntries[2];
-	GameMenuEntry* mGamepadAssignmentEntries[2] = { nullptr };
 	SoundtrackDownloadMenuEntry* mSoundtrackDownloadMenuEntry = nullptr;
 
 	uint32 mLastGamepadsChangeCounter = 0;
@@ -112,7 +111,6 @@ private:
 	const AudioCollection::AudioDefinition* mPlayingSoundTest = nullptr;
 
 	State mState = State::INACTIVE;
-	float mVisibility = 0.0f;
 	float mDeltaSecondsForRendering = 0.0f;
 	GameMenuScrolling mScrolling;
 	GameMenuControlsDisplay mGameMenuControlsDisplay;

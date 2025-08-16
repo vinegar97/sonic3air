@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -21,9 +21,9 @@ public:
 		std::string mInitials;
 		std::string mShortName;
 		std::string mDisplayName;
-		uint8 mInternalIndex;
-		int mActsNormal;
-		int mActsTimeAttack;
+		uint8 mInternalIndex = 0;
+		int mActsNormal = 0;
+		int mActsTimeAttack = 0;
 
 		inline Zone(const std::string& initials, const std::string& shortName, const std::string& displayName, uint8 index, int actsNormal, int actsTimeAttack) :
 			mInitials(initials), mShortName(shortName), mDisplayName(displayName), mInternalIndex(index), mActsNormal(actsNormal), mActsTimeAttack(actsTimeAttack) {}
@@ -46,6 +46,7 @@ public:
 			SETTING_SHIELD_TYPES				= 0x00001401,
 
 			SETTING_AIZ_BLIMPSEQUENCE			= 0x00010101,
+			SETTING_AIZ_INTRO_KNUCKLES			= 0x00010301,
 			SETTING_HCZ_WATERPIPE				= 0x00020101,
 			SETTING_LBZ_TUBETRANSPORT			= 0x00060101,
 			SETTING_LBZ_CUPELEVATOR				= 0x00060201,
@@ -123,7 +124,6 @@ public:
 
 		Type mSettingId;
 		std::string mIdentifier;
-		mutable uint32 mCurrentValue = 0;
 		uint32 mDefaultValue = 0;
 		bool mPurelyVisual = false;
 		bool mAllowInTimeAttack = false;
@@ -159,7 +159,7 @@ public:
 		std::string mDescription;
 		std::string mHint;
 		std::string mImage;
-		int32 mValue = 0;	// Temporary value used by scripts for whetever they need to store
+		int32 mValue = 0;	// Temporary value used by scripts for whatever they need to store
 	};
 
 	struct Secret
@@ -185,11 +185,11 @@ public:
 		std::string mName;
 		std::string mDescription;
 		std::string mImage;
-		uint32 mRequiredAchievements;
-		bool mUnlockedByAchievements;
-		bool mShownInMenu;
-		bool mHiddenUntilUnlocked;
-		bool mSerialized;
+		uint32 mRequiredAchievements = 0;
+		bool mUnlockedByAchievements = false;
+		bool mShownInMenu = false;
+		bool mHiddenUntilUnlocked = false;
+		bool mSerialized = false;
 	};
 
 public:
@@ -218,11 +218,11 @@ private:
 	static void setupSettings();
 
 private:
-	static bool mIsInitialized;
-	static std::vector<Zone> mAllZones;
-	static std::vector<Zone> mAvailableZones;
-	static std::unordered_map<uint32, Setting> mSettings;
-	static std::vector<Achievement> mAchievements;
-	static std::map<uint32, Achievement*> mAchievementMap;
-	static std::vector<Secret> mSecrets;
+	static inline bool mIsInitialized;
+	static inline std::vector<Zone> mAllZones;
+	static inline std::vector<Zone> mAvailableZones;
+	static inline std::unordered_map<uint32, Setting> mSettings;
+	static inline std::vector<Achievement> mAchievements;
+	static inline std::map<uint32, Achievement*> mAchievementMap;
+	static inline std::vector<Secret> mSecrets;
 };

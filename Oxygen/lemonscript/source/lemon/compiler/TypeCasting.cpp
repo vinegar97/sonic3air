@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -18,6 +18,21 @@ namespace lemon
 
 	const std::vector<TypeCasting::BinaryOperatorSignature>& TypeCasting::getBinarySignaturesForOperator(Operator op)
 	{
+		static const std::vector<BinaryOperatorSignature> signaturesAssignment =
+		{
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8),
+			BinaryOperatorSignature(&PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT),
+			BinaryOperatorSignature(&PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE),
+			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING),
+			BinaryOperatorSignature(&PredefinedDataTypes::ANY,	   &PredefinedDataTypes::ANY,	  &PredefinedDataTypes::ANY)
+		};
 		static const std::vector<BinaryOperatorSignature> signaturesSymmetric =
 		{
 			// TODO: This is oversimplified, there are cases like multiply and left-shift (and probably also add / subtract) that require different handling
@@ -31,7 +46,7 @@ namespace lemon
 			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8),
 			BinaryOperatorSignature(&PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT),
 			BinaryOperatorSignature(&PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE),
-			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING)	// TODO: Strings need their own binary operations (and only few of them make actual sense...)
+			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING)		// TODO: Strings need their own binary operations (and only few of them make actual sense...)
 		};
 		static const std::vector<BinaryOperatorSignature> signaturesComparison =
 		{
@@ -46,7 +61,7 @@ namespace lemon
 			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::BOOL),
 			BinaryOperatorSignature(&PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::BOOL),
 			BinaryOperatorSignature(&PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::BOOL),
-			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::BOOL)	// TODO: Strings need their own comparison operations
+			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::BOOL)		// TODO: Strings need their own comparison operations
 		};
 		static const std::vector<BinaryOperatorSignature> signaturesTrinary =
 		{
@@ -66,6 +81,8 @@ namespace lemon
 		switch (OperatorHelper::getOperatorType(op))
 		{
 			case OperatorHelper::OperatorType::ASSIGNMENT:
+				return signaturesAssignment;
+
 			case OperatorHelper::OperatorType::SYMMETRIC:
 				return signaturesSymmetric;
 
@@ -198,7 +215,7 @@ namespace lemon
 						const IntegerDataType& targetInt = target->as<IntegerDataType>();
 						uint8 castTypeBits = 0x30 + targetInt.mSizeBits;
 						castTypeBits += targetInt.mIsSigned ? 0x04 : 0;
-						castTypeBits += (original->getBytes() == 8) ? 0x08 : 0;
+						castTypeBits += (original->getBytes() == 8) ? 0x18 : 0;
 						return CastHandling((BaseCastType)castTypeBits, 0x54 - targetInt.mSizeBits);
 					}
 				}
@@ -218,6 +235,88 @@ namespace lemon
 		}
 
 		return CastHandling(CastHandling::Result::INVALID, 0xff);
+	}
+
+	TypeCasting::CastHandling TypeCasting::castBaseValue(const AnyBaseValue& originalValue, const DataTypeDefinition* originalType, AnyBaseValue& outTargetValue, const DataTypeDefinition* targetType, bool explicitCast) const
+	{
+		outTargetValue = originalValue;
+
+		const CastHandling castHandling = getCastHandling(originalType, targetType, explicitCast);
+		if (castHandling.mResult == CastHandling::Result::BASE_CAST)
+		{
+			switch (castHandling.mBaseCastType)
+			{
+				// Cast down (signed or unsigned makes no difference here)
+				case BaseCastType::INT_16_TO_8:  outTargetValue.cast<uint16, uint8 >();  break;
+				case BaseCastType::INT_32_TO_8:  outTargetValue.cast<uint32, uint8 >();  break;
+				case BaseCastType::INT_64_TO_8:  outTargetValue.cast<uint64, uint8 >();  break;
+				case BaseCastType::INT_32_TO_16: outTargetValue.cast<uint32, uint16>();  break;
+				case BaseCastType::INT_64_TO_16: outTargetValue.cast<uint64, uint16>();  break;
+				case BaseCastType::INT_64_TO_32: outTargetValue.cast<uint64, uint32>();  break;
+
+				// Cast up (value is unsigned -> adding zeroes)
+				case BaseCastType::UINT_8_TO_16:  outTargetValue.cast<uint8,  uint16>();  break;
+				case BaseCastType::UINT_8_TO_32:  outTargetValue.cast<uint8,  uint32>();  break;
+				case BaseCastType::UINT_8_TO_64:  outTargetValue.cast<uint8,  uint64>();  break;
+				case BaseCastType::UINT_16_TO_32: outTargetValue.cast<uint16, uint32>();  break;
+				case BaseCastType::UINT_16_TO_64: outTargetValue.cast<uint16, uint64>();  break;
+				case BaseCastType::UINT_32_TO_64: outTargetValue.cast<uint32, uint64>();  break;
+
+				// Cast up (value is signed -> adding highest bit)
+				case BaseCastType::SINT_8_TO_16:  outTargetValue.cast<int8,  int16>();  break;
+				case BaseCastType::SINT_8_TO_32:  outTargetValue.cast<int8,  int32>();  break;
+				case BaseCastType::SINT_8_TO_64:  outTargetValue.cast<int8,  int64>();  break;
+				case BaseCastType::SINT_16_TO_32: outTargetValue.cast<int16, int32>();  break;
+				case BaseCastType::SINT_16_TO_64: outTargetValue.cast<int16, int64>();  break;
+				case BaseCastType::SINT_32_TO_64: outTargetValue.cast<int32, int64>();  break;
+
+				// Integer cast to float
+				case BaseCastType::UINT_8_TO_FLOAT:   outTargetValue.cast<uint8,  float>();  break;
+				case BaseCastType::UINT_16_TO_FLOAT:  outTargetValue.cast<uint16, float>();  break;
+				case BaseCastType::UINT_32_TO_FLOAT:  outTargetValue.cast<uint32, float>();  break;
+				case BaseCastType::UINT_64_TO_FLOAT:  outTargetValue.cast<uint64, float>();  break;
+				case BaseCastType::SINT_8_TO_FLOAT:   outTargetValue.cast<int8,   float>();  break;
+				case BaseCastType::SINT_16_TO_FLOAT:  outTargetValue.cast<int16,  float>();  break;
+				case BaseCastType::SINT_32_TO_FLOAT:  outTargetValue.cast<int32,  float>();  break;
+				case BaseCastType::SINT_64_TO_FLOAT:  outTargetValue.cast<int64,  float>();  break;
+
+				case BaseCastType::UINT_8_TO_DOUBLE:  outTargetValue.cast<uint8,  double>();  break;
+				case BaseCastType::UINT_16_TO_DOUBLE: outTargetValue.cast<uint16, double>();  break;
+				case BaseCastType::UINT_32_TO_DOUBLE: outTargetValue.cast<uint32, double>();  break;
+				case BaseCastType::UINT_64_TO_DOUBLE: outTargetValue.cast<uint64, double>();  break;
+				case BaseCastType::SINT_8_TO_DOUBLE:  outTargetValue.cast<int8,   double>();  break;
+				case BaseCastType::SINT_16_TO_DOUBLE: outTargetValue.cast<int16,  double>();  break;
+				case BaseCastType::SINT_32_TO_DOUBLE: outTargetValue.cast<int32,  double>();  break;
+				case BaseCastType::SINT_64_TO_DOUBLE: outTargetValue.cast<int64,  double>();  break;
+
+				// Float cast to integer
+				case BaseCastType::FLOAT_TO_UINT_8:   outTargetValue.cast<float, uint8 >();  break;
+				case BaseCastType::FLOAT_TO_UINT_16:  outTargetValue.cast<float, uint16>();  break;
+				case BaseCastType::FLOAT_TO_UINT_32:  outTargetValue.cast<float, uint32>();  break;
+				case BaseCastType::FLOAT_TO_UINT_64:  outTargetValue.cast<float, uint64>();  break;
+				case BaseCastType::FLOAT_TO_SINT_8:   outTargetValue.cast<float, int8  >();  break;
+				case BaseCastType::FLOAT_TO_SINT_16:  outTargetValue.cast<float, int16 >();  break;
+				case BaseCastType::FLOAT_TO_SINT_32:  outTargetValue.cast<float, int32 >();  break;
+				case BaseCastType::FLOAT_TO_SINT_64:  outTargetValue.cast<float, int64 >();  break;
+
+				case BaseCastType::DOUBLE_TO_UINT_8:  outTargetValue.cast<double, uint8 >();  break;
+				case BaseCastType::DOUBLE_TO_UINT_16: outTargetValue.cast<double, uint16>();  break;
+				case BaseCastType::DOUBLE_TO_UINT_32: outTargetValue.cast<double, uint32>();  break;
+				case BaseCastType::DOUBLE_TO_UINT_64: outTargetValue.cast<double, uint64>();  break;
+				case BaseCastType::DOUBLE_TO_SINT_8:  outTargetValue.cast<double, int8  >();  break;
+				case BaseCastType::DOUBLE_TO_SINT_16: outTargetValue.cast<double, int16 >();  break;
+				case BaseCastType::DOUBLE_TO_SINT_32: outTargetValue.cast<double, int32 >();  break;
+				case BaseCastType::DOUBLE_TO_SINT_64: outTargetValue.cast<double, int64 >();  break;
+
+				// Float cast
+				case BaseCastType::FLOAT_TO_DOUBLE:   outTargetValue.cast<float, double>();  break;
+				case BaseCastType::DOUBLE_TO_FLOAT:   outTargetValue.cast<double, float>();  break;
+
+				default:
+					throw std::runtime_error("Unrecognized cast type");
+			}
+		}
+		return castHandling;
 	}
 
 	bool TypeCasting::canMatchSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target, size_t* outFailedIndex) const

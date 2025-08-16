@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -48,6 +48,7 @@ public:
 	Vec2<TYPE> getPos() const    { return Vec2<TYPE>(x, y); }
 	Vec2<TYPE> getSize() const   { return Vec2<TYPE>(width, height); }
 	Vec2<TYPE> getCenter() const { return Vec2<TYPE>(x + width / TYPE(2), y + height / TYPE(2)); }
+	Vec2<TYPE> getEndPos() const { return Vec2<TYPE>(x + width, y + height); }
 
 	void set(TYPE px, TYPE py, TYPE w, TYPE h)  { x = px;  y = py;  width = w;  height = h; }
 	void set(Vec2<TYPE> pos, Vec2<TYPE> size)	{ x = pos.x;  y = pos.y;  width = size.x;  height = size.y; }
@@ -114,6 +115,14 @@ public:
 
 	bool contains(const Vec2<TYPE>& vec) const	{ return contains(vec.x, vec.y); }
 
+	void extendToInclude(const Vec2<TYPE>& vec)
+	{
+		if (vec.x < x)			 { width  += (x - vec.x);  x = vec.x; }
+		if (vec.y < y)			 { height += (y - vec.y);  y = vec.y; }
+		if (vec.x >= x + width)	 { width  = vec.x - x + 1; }
+		if (vec.y >= y + height) { height = vec.y - y + 1; }
+	}
+
 	Vec2<TYPE> getClosestPoint(const Vec2<TYPE>& vec) const
 	{
 		Vec2<TYPE> result;
@@ -130,6 +139,26 @@ public:
 	void intersect(const TRect& other1, const TRect& other2)
 	{
 		*this = getIntersection(other1, other2);
+	}
+
+	void addBorder(TYPE border)
+	{
+		set(x - border, y - border, width + border * 2, height + border * 2);
+	}
+
+	void addBorder(const Vec2<TYPE>& border)
+	{
+		set(x - border.x, y - border.y, width + border.x * 2, height + border.y * 2);
+	}
+
+	TRect withBorder(TYPE border) const
+	{
+		return TRect(x - border, y - border, width + border * 2, height + border * 2);
+	}
+
+	TRect withBorder(const Vec2<TYPE>& border) const
+	{
+		return TRect(x - border.x, y - border.y, width + border.x * 2, height + border.y * 2);
 	}
 
 	TYPE& operator[](size_t index)				{ return mData[index]; }

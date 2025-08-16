@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -36,9 +36,10 @@ public:
 	Vec2(const Vec2& source) : x(source.x), y(source.y) {}
 	Vec2(TYPE x_, TYPE y_) : x(x_), y(y_) {}
 
-	template<typename T> Vec2(const Vec2<T>& source)
+	template<typename T> explicit Vec2(const Vec2<T>& source)
 	{
-		FORi(data[i] = TYPE(source.data[i]));
+		for (int i = 0; i < 2; ++i)
+			data[i] = rmx::convertType<T, TYPE>(source.data[i]);
 	}
 
 	void clear()	{ FORi(data[i] = 0); }
@@ -93,17 +94,35 @@ public:
 		return sum;
 	}
 
-	float distance(const Vec2& other) const
+	static float distance(const Vec2& source1, const Vec2& source2)
 	{
 		TYPE sum = 0;
-		FORi(sum += (data[i] - other.data[i]) * (data[i] - other.data[i]));
+		FORi(sum += (source1.data[i] - source2.data[i]) * (source1.data[i] - source2.data[i]));
 		return sqrtf((float)sum);
+	}
+
+	float distance(const Vec2& other) const
+	{
+		return distance(*this, other);
+	}
+
+	static TYPE sqrDist(const Vec2& source1, const Vec2& source2)
+	{
+		TYPE sum = 0;
+		FORi(sum += (source1.data[i] - source2.data[i]) * (source1.data[i] - source2.data[i]));
+		return sum;
 	}
 
 	TYPE sqrDist(const Vec2& other) const
 	{
+		return sqrDist(*this, other);
+	}
+
+	static TYPE dot(const Vec2& source1, const Vec2& source2)
+	{
+		// Dot product
 		TYPE sum = 0;
-		FORi(sum += (data[i] - other.data[i]) * (data[i] - other.data[i]));
+		FORi(sum += (source1.data[i] * source2.data[i]));
 		return sum;
 	}
 
@@ -123,14 +142,11 @@ public:
 		set(_cos * x - _sin * y, _sin * x + _cos * y);
 	}
 
-	void interpolate(const Vec2& other, float factor)
+	static Vec2 interpolate(const Vec2& source1, const Vec2& source2, TYPE factor)
 	{
-		interpolate(*this, other, factor);
-	}
-
-	void interpolate(const Vec2& source1, const Vec2& source2, float factor)
-	{
-		FORi(data[i] = roundForInt<TYPE>((float)source1.data[i] * (1.0f - factor) + (float)source2.data[i] * factor));
+		Vec2 result(Uninitialized);
+		FORi(result.data[i] = source1.data[i] * (1 - factor) + source2.data[i] * factor);
+		return result;
 	}
 
 	bool operator==(const Vec2& vec) const	{ FORi( if (data[i] != vec.data[i]) return false; ); return true;  }

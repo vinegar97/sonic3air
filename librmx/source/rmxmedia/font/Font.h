@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -70,7 +70,7 @@ public:
 	{
 		uint32 mUnicode = 0;
 		const Bitmap* mBitmap = nullptr;
-		Vec2f mPosition;
+		Vec2i mPosition;
 	};
 
 	struct ExtendedTypeInfo
@@ -111,9 +111,9 @@ public:
 	int getWidth(const StringReader& text, int pos = 0, int len = -1);
 	int getLineHeight();
 
-	Vec2f alignText(const Rectf& rect, const StringReader& text, int alignment);
+	Vec2i alignText(const Recti& rect, const StringReader& text, int alignment);
 	void wordWrapText(std::vector<std::wstring>& output, int lineWidth, const StringReader& text, int spacing = 0);
-	void getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringReader& text, int spacing = 0);
+	void getTypeInfos(std::vector<TypeInfo>& output, Vec2i pos, const StringReader& text, int spacing = 0);
 
 	void applyToTypeInfos(std::vector<ExtendedTypeInfo>& outTypeInfos, const std::vector<Font::TypeInfo>& inTypeInfos);
 	CharacterInfo& applyEffects(const Font::TypeInfo& typeInfo);
@@ -137,21 +137,13 @@ private:
 	float mAdvance = 0.0f;
 	std::map<uint32, CharacterInfo> mCharacterMap;
 	uint32 mChangeCounter = 0;			// This is meant for classes like OpenGLFontOutput, so that it knows when to invalidate its caching
-
-public:
-	struct API_EXPORT CodecList
-	{
-		std::vector<class IFontSourceFactory*> mList;
-		template<class CLASS> void add() { mList.push_back(new CLASS()); }
-	};
-	static CodecList mCodecs;
 };
-
 
 
 class IFontSourceFactory
 {
 public:
+	virtual ~IFontSourceFactory() {}
 	virtual FontSource* construct(const FontSourceKey& key) = 0;
 };
 
@@ -166,3 +158,26 @@ class FontSourceBitmapFactory : public IFontSourceFactory
 public:
 	virtual FontSource* construct(const FontSourceKey& key) override;
 };
+
+
+namespace rmx
+{
+	class API_EXPORT FontCodecList
+	{
+	public:
+		std::vector<IFontSourceFactory*> mList;
+
+	public:
+		~FontCodecList()
+		{
+			for (IFontSourceFactory* codec : mList)
+				delete codec;
+			mList.clear();
+		}
+
+		template<class CLASS> void add()  { mList.push_back(new CLASS()); }
+
+	public:
+		static FontCodecList mCodecs;
+	};
+}

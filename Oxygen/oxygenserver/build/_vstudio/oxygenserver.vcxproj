@@ -29,26 +29,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -185,6 +185,7 @@
     <ClInclude Include="..\..\source\oxygenserver\server\Server.h" />
     <ClInclude Include="..\..\source\oxygenserver\server\ServerNetConnection.h" />
     <ClInclude Include="..\..\source\oxygenserver\subsystems\Channels.h" />
+    <ClInclude Include="..\..\source\oxygenserver\subsystems\NetplaySetup.h" />
     <ClInclude Include="..\..\source\oxygenserver\subsystems\UpdateCheck.h" />
     <ClInclude Include="..\..\source\oxygenserver\subsystems\VirtualDirectory.h" />
     <ClInclude Include="..\..\source\PrivatePackets.h" />
@@ -203,6 +204,7 @@
     <ClCompile Include="..\..\source\oxygenserver\server\Server.cpp" />
     <ClCompile Include="..\..\source\oxygenserver\server\ServerNetConnection.cpp" />
     <ClCompile Include="..\..\source\oxygenserver\subsystems\Channels.cpp" />
+    <ClCompile Include="..\..\source\oxygenserver\subsystems\NetplaySetup.cpp" />
     <ClCompile Include="..\..\source\oxygenserver\subsystems\UpdateCheck.cpp" />
     <ClCompile Include="..\..\source\oxygenserver\subsystems\VirtualDirectory.cpp" />
   </ItemGroup>

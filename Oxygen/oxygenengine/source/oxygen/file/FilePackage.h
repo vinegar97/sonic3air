@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -36,9 +36,10 @@ public:
 	};
 
 public:
-	static bool loadPackage(std::wstring_view packageFilename, std::map<std::wstring, PackedFile>& outPackedFiles, InputStream*& inputStream, bool forceLoadAll, bool showErrors = true);
+	static bool loadPackage(std::wstring_view packageFilename, std::map<std::wstring, PackedFile>& outPackedFiles, bool forceLoadAll, bool showErrors = true);
 	static void createFilePackage(const std::wstring& packageFilename, const std::vector<std::wstring>& includedPaths, const std::vector<std::wstring>& excludedPaths, const std::wstring& comparisonPath, uint32 contentVersion, bool forceReplace = false);
 
 private:
+	static bool loadPackageInternal(InputStream& inputStream, std::wstring_view packageFilename, std::map<std::wstring, PackedFile>& outPackedFiles, bool showErrors = true);
 	static bool readPackageHeader(PackageHeader& outHeader, VectorBinarySerializer& serializer);
 };

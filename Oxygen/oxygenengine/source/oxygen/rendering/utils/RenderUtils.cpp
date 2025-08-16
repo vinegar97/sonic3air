@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -20,43 +20,43 @@ namespace
 
 
 
-Rectf RenderUtils::getLetterBoxRect(const Rectf& frameRect, float aspectRatio)
+Recti RenderUtils::getLetterBoxRect(const Recti& frameRect, float aspectRatio)
 {
-	Rectf rect = frameRect;
+	Recti rect = frameRect;
 	const float frameRatio = frameRect.getAspectRatio();
 
 	if (frameRatio < aspectRatio)
 	{
-		const int newHeight = (int)((float)rect.height * frameRatio / aspectRatio + 0.5f);
+		const int newHeight = roundToInt((float)rect.height * frameRatio / aspectRatio);
 		rect.y += (rect.height - newHeight) / 2;
-		rect.height = (float)newHeight;
+		rect.height = newHeight;
 	}
 	else
 	{
-		const int newWidth = (int)((float)rect.width * aspectRatio / frameRatio + 0.5f);
+		const int newWidth = roundToInt((float)rect.width * aspectRatio / frameRatio);
 		rect.x += (rect.width - newWidth) / 2;
-		rect.width = (float)newWidth;
+		rect.width = newWidth;
 	}
 	return rect;
 }
 
 
-Rectf RenderUtils::getScaleToFillRect(const Rectf& frameRect, float aspectRatio)
+Recti RenderUtils::getScaleToFillRect(const Recti& frameRect, float aspectRatio)
 {
-	Rectf rect = frameRect;
+	Recti rect = frameRect;
 	const float frameRatio = frameRect.getAspectRatio();
 
 	if (frameRatio > aspectRatio)
 	{
-		const int newHeight = (int)((float)rect.height * frameRatio / aspectRatio + 0.5f);
+		const int newHeight = roundToInt((float)rect.height * frameRatio / aspectRatio);
 		rect.y += (rect.height - newHeight) / 2;
-		rect.height = (float)newHeight;
+		rect.height = newHeight;
 	}
 	else
 	{
-		const int newWidth = (int)((float)rect.width * aspectRatio / frameRatio + 0.5f);
+		const int newWidth = roundToInt((float)rect.width * aspectRatio / frameRatio);
 		rect.x += (rect.width - newWidth) / 2;
-		rect.width = (float)newWidth;
+		rect.width = newWidth;
 	}
 	return rect;
 }
@@ -145,15 +145,15 @@ void RenderUtils::fillPatternsFromSpriteData(std::vector<RenderUtils::SinglePatt
 void RenderUtils::blitSpritePattern(PaletteBitmap& output, int px, int py, const PatternData& patternData, bool flipX, bool flipY)
 {
 	const int32 minX = std::max<int32>(0, -px);
-	const int32 maxX = std::min<int32>(8, output.mWidth - px);
+	const int32 maxX = std::min<int32>(8, output.getWidth() - px);
 	const int32 minY = std::max<int32>(0, -py);
-	const int32 maxY = std::min<int32>(8, output.mHeight - py);
+	const int32 maxY = std::min<int32>(8, output.getHeight() - py);
 
 	for (int32 iy = minY; iy < maxY; ++iy)
 	{
 		const int32 srcY = flipY ? (7 - iy) : iy;
 		const uint8* src = &patternData.mPixels[minX + srcY * 8];
-		uint8* dst = &output.mData[(px + minX) + (py + iy) * output.mWidth];
+		uint8* dst = output.getPixelPointer(px + minX, py + iy);
 
 		if (flipX)
 		{
@@ -188,8 +188,10 @@ void RenderUtils::blitSpritePattern(PaletteBitmap& output, int px, int py, const
 
 void RenderUtils::blitSpritePatterns(PaletteBitmap& output, int px, int py, const std::vector<SinglePattern>& patterns)
 {
-	for (const SinglePattern& pattern : patterns)
+	// Blit the patterns in reverse order (which is relevant in case they're overlapping, like with Tails' run sprites)
+	for (int k = (int)patterns.size() - 1; k >= 0; --k)
 	{
+		const SinglePattern& pattern = patterns[k];
 		RenderUtils::blitSpritePattern(output, px + pattern.mOffsetX, py + pattern.mOffsetY, pattern.mPatternData, pattern.mFlipX, pattern.mFlipY);
 	}
 }

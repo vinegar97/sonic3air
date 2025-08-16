@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -28,14 +28,18 @@ public:
 	void create(GLenum type = GL_TEXTURE_2D);
 	void create(GLint format = rmx::OpenGLHelper::FORMAT_RGBA);
 	void create(int width, int height, GLint format = rmx::OpenGLHelper::FORMAT_RGBA);
+	void create(const Vec2i& size, GLint format = rmx::OpenGLHelper::FORMAT_RGBA);
 	void createCubemap(GLint format = rmx::OpenGLHelper::FORMAT_RGBA);
 	void createCubemap(int width, int height, GLint format = rmx::OpenGLHelper::FORMAT_RGBA);
+	void createCubemap(const Vec2i& size, GLint format = rmx::OpenGLHelper::FORMAT_RGBA);
 
 	void load(const void* data, int width, int height);
+	void load(const void* data, const Vec2i& size);
 	void load(const Bitmap& bitmap);
 	void load(const String& filename);
 	void loadCubemap(const String& filename);
 
+	void updateAll(const void* data);
 	void updateRect(const void* data, const Recti& rect);
 	void updateRect(const Bitmap& bitmap, int px, int py);
 
@@ -49,6 +53,7 @@ public:
 	inline GLint getFormat() const	{ return mFormat; }
 	inline int getWidth() const		{ return mWidth; }
 	inline int getHeight() const	{ return mHeight; }
+	inline Vec2i getSize() const	{ return Vec2i(mWidth, mHeight); }
 	inline Recti getRect() const	{ return Recti(0, 0, mWidth, mHeight); }
 	inline float getAspectRatio() const  { return (float)mWidth / (float)mHeight; }
 
@@ -63,7 +68,7 @@ public:
 
 	inline GLuint operator*() const  { return mHandle; }
 
-	static GLenum getDefaultDataFormat(GLenum internalFormat);
+	static GLenum getDefaultDataFormat(GLint internalFormat);
 
 private:
 	void initialize();

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -11,9 +11,9 @@
 
 // Only some platforms support Discord integration
 //  - Windows
-//  - Linux, except if it's ARM architecture (like when building on a RasPi)
+//  - Linux, if USE_DISCORD is set (usually by CMake, for x86 architecture, but not for ARM)
 //  - Mac. Sorry about having 3 checks. Command line build has issues finding the discord dylib since it can't be embedded. And temporarily ignore discord for ARM64 until they add support.
-#if (defined(PLATFORM_WINDOWS) && !defined(__GNUC__)) || (defined(PLATFORM_LINUX) && !defined(__arm__)) || (defined(PLATFORM_MAC) && !defined(NO_DISCORD))
+#if (defined(PLATFORM_WINDOWS) && !defined(__GNUC__)) || (defined(PLATFORM_LINUX) && defined(USE_DISCORD)) || (defined(PLATFORM_MAC) && !defined(NO_DISCORD))
 	#define SUPPORT_DISCORD
 #endif
 

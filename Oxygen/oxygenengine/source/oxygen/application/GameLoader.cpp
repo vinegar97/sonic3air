@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -139,7 +139,7 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 
 			// Load sprites
 			RMX_LOG_INFO("Loading sprites");
-			VideoOut::instance().getRenderResources().loadSpriteCache();
+			VideoOut::instance().getRenderResources().loadSprites();
 
 			// Load resources
 			RMX_LOG_INFO("Resource cache loading...");
@@ -151,7 +151,7 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 
 			// Load persistent data
 			RMX_LOG_INFO("Persistent data loading...");
-			PersistentData::instance().loadFromFile(Configuration::instance().mPersistentDataFilename);
+			PersistentData::instance().loadFromBasePath(Configuration::instance().mPersistentDataBasePath);
 
 			// Load audio definitions
 			EngineMain::instance().getAudioOut().handleGameLoaded();

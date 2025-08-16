@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -182,15 +182,15 @@ public:
 		}
 		else if (axis == 1)
 		{
-			data[0]       = _cos;
-			data[2]       = +_sin;
+			data[0]     = _cos;
+			data[2]     = +_sin;
 			data[3*2]   = -_sin;
 			data[3*2+2] = _cos;
 		}
 		else
 		{
-			data[0]     = _cos;
-			data[1]     = -_sin;
+			data[0]   = _cos;
+			data[1]   = -_sin;
 			data[3]   = +_sin;
 			data[3+1] = _cos;
 		}
@@ -212,7 +212,7 @@ public:
 		setIdentity();
 		for (int i = 0; i < 3; ++i)
 		{
-			data[i]       = dir0.data[i];
+			data[i]     = dir0.data[i];
 			data[3+i]   = dir1.data[i];
 			data[2*3+i] = dir2.data[i];
 		}
@@ -232,20 +232,19 @@ public:
 		Vec3<TYPE> out0(dir0);
 		out0.normalize();
 		Vec3<TYPE> out1(dir1);
-		Vec3<TYPE> out2;
-		out2.cross(out0, out1);
+		Vec3<TYPE> out2 = Vec3<TYPE>::crossProduct(out0, out1);
 		if (out2.sqrLen() == 0)
 		{
 			out1 = Vec3<TYPE>::UNIT_Z;
-			out2.cross(out0, out1);
+			out2 = Vec3<TYPE>::crossProduct(out0, out1);
 			if (out2.sqrLen() == 0)
 			{
 				out1 = Vec3<TYPE>::UNIT_Y;
-				out2.cross(out0, out1);
+				out2 = Vec3<TYPE>::crossProduct(out0, out1);
 			}
 		}
 		out2.normalize();
-		out1.cross(out2, out0);
+		out1 = Vec3<TYPE>::crossProduct(out2, out0);
 		for (int i = 0; i < 3; ++i)
 		{
 			data[i*3+0] = out0.data[i];
@@ -297,8 +296,7 @@ public:
 		TYPE dot = gam0.dot(in1);
 		dot = (dot < -1) ? -1 : ((dot > +1) ? +1 : dot);
 		gamma = rad2deg(acos(dot));
-		Vec3<TYPE> tmp;
-		tmp.cross(gam0, in1);
+		Vec3<TYPE> tmp = Vec3<TYPE>::crossProduct(gam0, in1);
 		if (tmp.dot(in2) < 0)
 			gamma = -gamma;
 	}

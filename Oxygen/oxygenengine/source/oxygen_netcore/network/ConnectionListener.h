@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -20,6 +20,19 @@ namespace highlevel
 //  - They combine multiple parameters into one struct, which makes it easier to later add or modify which parameters are passed on
 //     -> They could also be used to return more information (than just the bool return value) from the listener to the caller
 //  - They also feature some easy-of-use functions to simplify the code in the listener implementation
+
+
+struct ConnectionlessPacketEvaluation
+{
+	ConnectionManager& mConnectionManager;
+	SocketAddress mSenderAddress;
+	uint16 mLowLevelSignature = 0;
+	VectorBinarySerializer& mSerializer;
+
+	inline ConnectionlessPacketEvaluation(ConnectionManager& connectionManager, const SocketAddress& senderAddress, uint16 lowLevelSignature, VectorBinarySerializer& serializer) :
+		mConnectionManager(connectionManager), mSenderAddress(senderAddress), mLowLevelSignature(lowLevelSignature), mSerializer(serializer)
+	{}
+};
 
 
 struct ReceivedPacketEvaluation
@@ -77,8 +90,12 @@ struct ReceivedRequestEvaluation
 
 struct ConnectionListenerInterface
 {
-	virtual bool onReceivedPacket(ReceivedPacketEvaluation& evaluation)			  { return false; }
-	virtual bool onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)	  { return false; }
-	virtual void onReceivedRequestResponse(ReceivedRequestEvaluation& evaluation) {}
-	virtual void onReceivedRequestError(ReceivedRequestEvaluation& evaluation)	  {}
+	virtual NetConnection* createNetConnection(ConnectionManager& connectionManager, const SocketAddress& senderAddress) = 0;
+	virtual void destroyNetConnection(NetConnection& connection) = 0;
+
+	virtual bool onReceivedConnectionlessPacket(ConnectionlessPacketEvaluation& evaluation)	{ return false; }
+	virtual bool onReceivedPacket(ReceivedPacketEvaluation& evaluation)						{ return false; }
+	virtual bool onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)				{ return false; }
+	virtual void onReceivedRequestResponse(ReceivedRequestEvaluation& evaluation)			{}
+	virtual void onReceivedRequestError(ReceivedRequestEvaluation& evaluation)				{}
 };

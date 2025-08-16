@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -30,6 +30,7 @@ public:
 	float getAspectRatio() const	{ return (float)(mMax.x - mMin.x) / (float)(mMax.y - mMin.y); }
 
 	bool empty() const		{ return (mMax.x <= mMin.x) || (mMax.y <= mMin.y); }
+	bool isEmpty() const	{ return (mMax.x <= mMin.x) || (mMax.y <= mMin.y); }
 	bool nonEmpty() const	{ return !empty(); }
 
 	bool equal(const TBox2& other) const	{ return (mMin == other.mMin) && (mMax == other.mMax); }

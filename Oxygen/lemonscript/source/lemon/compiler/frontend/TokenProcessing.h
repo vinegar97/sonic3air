@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -17,11 +17,12 @@
 
 namespace lemon
 {
-	class Function;
 	class ConstantArray;
 	class ConstantToken;
+	class Function;
 	class GlobalsLookup;
 	class LocalVariable;
+	class Module;
 	class ScriptFunction;
 	class StatementToken;
 
@@ -45,7 +46,7 @@ namespace lemon
 		Context mContext;
 
 	public:
-		TokenProcessing(GlobalsLookup& globalsLookup, const CompileOptions& compileOptions);
+		TokenProcessing(GlobalsLookup& globalsLookup, Module& module, const CompileOptions& compileOptions);
 
 		void processTokens(TokenList& tokensRoot, uint32 lineNumber, const DataTypeDefinition* resultType = nullptr);
 		void processForPreprocessor(TokenList& tokensRoot, uint32 lineNumber);
@@ -96,6 +97,7 @@ namespace lemon
 		void evaluateCompileTimeConstants(TokenList& tokens);
 		bool evaluateCompileTimeConstantsRecursive(Token& inputToken, TokenPtr<StatementToken>& outTokenPtr);
 
+		void resolveMakeCallable(TokenList& tokens);
 		void resolveAddressOfFunctions(TokenList& tokens);
 		void resolveAddressOfMemoryAccesses(TokenList& tokens);
 
@@ -110,6 +112,7 @@ namespace lemon
 
 	private:
 		GlobalsLookup& mGlobalsLookup;
+		Module& mModule;
 		const CompileOptions& mCompileOptions;
 		TypeCasting mTypeCasting;
 		uint32 mLineNumber = 0;

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "oxygen/rendering/utils/PaletteBitmap.h"
+#include <rmxbase.h>
 
 
 class RenderUtils
@@ -35,8 +35,8 @@ public:
 	};
 
 public:
-	static Rectf getLetterBoxRect(const Rectf& frameRect, float aspectRatio);
-	static Rectf getScaleToFillRect(const Rectf& frameRect, float aspectRatio);
+	static Recti getLetterBoxRect(const Recti& frameRect, float aspectRatio);
+	static Recti getScaleToFillRect(const Recti& frameRect, float aspectRatio);
 
 	static void expandPatternDataFromVRAM(uint8* dst, const void* src_);
 	static void expandPatternDataFromROM(uint8* dst, const void* src_);

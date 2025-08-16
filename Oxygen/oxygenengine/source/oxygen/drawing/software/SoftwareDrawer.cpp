@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -15,7 +15,8 @@
 #include "oxygen/drawing/DrawCommand.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/Logging.h"
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/PaletteCollection.h"
+#include "oxygen/resources/SpriteCollection.h"
 
 
 namespace softwaredrawer
@@ -90,7 +91,7 @@ namespace softwaredrawer
 
 	void mirrorBitmapX(Bitmap& destBitmap, int& destReservedSize, const Bitmap& sourceBitmap)
 	{
-		destBitmap.createReusingMemory(sourceBitmap.getWidth(), sourceBitmap.getHeight(), destReservedSize);
+		destBitmap.createReusingMemory(sourceBitmap.getSize(), destReservedSize);
 		for (int y = 0; y < sourceBitmap.getHeight(); ++y)
 		{
 			const uint32* src = sourceBitmap.getPixelPointer(sourceBitmap.getWidth() - 1, y);
@@ -189,7 +190,7 @@ namespace softwaredrawer
 			else
 			{
 				mOutputWrapper = BitmapViewMutable<uint32>(mCurrentRenderTarget->accessBitmap());
-				mScissorRect.set(0, 0, mCurrentRenderTarget->getWidth(), mCurrentRenderTarget->getHeight());
+				mScissorRect.set(Vec2i(), mCurrentRenderTarget->getSize());
 			}
 		}
 
@@ -232,12 +233,14 @@ namespace softwaredrawer
 			int k = 0;
 			if constexpr (sizeof(void*) == 8)
 			{
+			#if !defined(PLATFORM_VITA)
 				// On 64-bit architectures: Process 2 pixels at once
 				for (; k < numPixels; k += 2)
 				{
 					const uint64 colors = *(uint64*)&src[k];
 					*(uint64*)&dst[k] = ((colors & 0x00ff000000ff0000ull) >> 16) | (colors & 0xff00ff00ff00ff00ull) | ((colors & 0x000000ff000000ffull) << 16);
 				}
+			#endif
 			}
 			// Process single pixels
 			for (; k < numPixels; ++k)
@@ -306,8 +309,8 @@ namespace softwaredrawer
 
 				BitmapViewMutable<uint32> inputWrapper(*inputBitmap);
 
-				const Vec2f orginalUVStart = uv0;
-				const Vec2f orginalUVRange = uv1 - uv0;
+				const Vec2f originalUVStart = uv0;
+				const Vec2f originalUVRange = uv1 - uv0;
 				Recti inputRect;
 				bool useUVs = false;
 				{
@@ -316,8 +319,8 @@ namespace softwaredrawer
 					{
 						const Vec2f relativeStart = Vec2f(targetRect.getPos() - uncroppedRect.getPos()) / Vec2f(uncroppedRect.getSize());
 						const Vec2f relativeEnd   = Vec2f(targetRect.getPos() - uncroppedRect.getPos() + targetRect.getSize()) / Vec2f(uncroppedRect.getSize());
-						uv0 = orginalUVStart + relativeStart * orginalUVRange;
-						uv1 = orginalUVStart + relativeEnd * orginalUVRange;
+						uv0 = originalUVStart + relativeStart * originalUVRange;
+						uv1 = originalUVStart + relativeEnd * originalUVRange;
 					}
 
 					useUVs = (uv0.x < 0.0f || uv0.x > uv1.x || uv1.x > 1.0f || uv0.y < 0.0f || uv0.y > uv1.y || uv1.y > 1.0f);
@@ -355,8 +358,8 @@ namespace softwaredrawer
 				{
 					// Get the part from the input that will get drawn
 					//  -> Calculated here again, as we need to use the original UVs in this case
-					const Vec2f inputStart = orginalUVStart * Vec2f(inputWrapper.getSize());
-					const Vec2f inputEnd = (orginalUVStart + orginalUVRange) * Vec2f(inputWrapper.getSize());
+					const Vec2f inputStart = originalUVStart * Vec2f(inputWrapper.getSize());
+					const Vec2f inputEnd = (originalUVStart + originalUVRange) * Vec2f(inputWrapper.getSize());
 					inputRect.x = roundToInt(inputStart.x);
 					inputRect.y = roundToInt(inputStart.y);
 					inputRect.width = roundToInt(inputEnd.x) - inputRect.x;
@@ -378,6 +381,20 @@ namespace softwaredrawer
 				const BitmapViewMutable<uint32> outputView(getOutputWrapper(), targetRect);
 				mBlitter.blitColor(outputView, color, useAlphaBlending() ? BlendMode::ALPHA : BlendMode::OPAQUE);
 			}
+		}
+
+		void drawIndexed(Vec2i position, PaletteBitmap& inputBitmap, const PaletteBase& palette, Color color)
+		{
+			const Blitter::OutputWrapper outputWrapper(getOutputWrapper(), getScissorRect());
+			const Blitter::IndexedSpriteWrapper inputWrapper(inputBitmap.getData(), inputBitmap.getSize(), Vec2i());
+			const Blitter::PaletteWrapper paletteWrapper(palette.getRawColors(), palette.getSize());
+
+			Blitter::Options blitterOptions;
+			blitterOptions.mBlendMode = useAlphaBlending() ? BlendMode::ALPHA : BlendMode::OPAQUE;
+			blitterOptions.mTintColor = (color != Color::WHITE) ? &color : nullptr;
+			blitterOptions.mSwapRedBlueChannels = needSwapRedBlueChannels();
+
+			mBlitter.blitIndexed(outputWrapper, inputWrapper, paletteWrapper, position, blitterOptions);
 		}
 
 		void printText(Font& font, const StringReader& text, const Recti& rect, const DrawerPrintOptions& printOptions)
@@ -508,34 +525,52 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 			case DrawCommand::Type::SPRITE:
 			{
 				SpriteDrawCommand& sc = drawCommand->as<SpriteDrawCommand>();
-				const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(sc.mSpriteKey);
+				const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(sc.mSpriteKey);
 				if (nullptr == item)
 					break;
-				if (!item->mUsesComponentSprite)
-					break;
 
-				ComponentSprite& sprite = *static_cast<ComponentSprite*>(item->mSprite);
-				Vec2i offset = sprite.mOffset;
-				Vec2i size = sprite.getBitmap().getSize();
-				if (sc.mScale.x != 1.0f || sc.mScale.y != 1.0f)
+				const PaletteBase* palette = nullptr;
+				if (!item->mUsesComponentSprite)
 				{
-					offset.x = roundToInt((float)offset.x * sc.mScale.x);
-					offset.y = roundToInt((float)offset.y * sc.mScale.y);
-					size.x = roundToInt((float)size.x * sc.mScale.x);
-					size.y = roundToInt((float)size.y * sc.mScale.y);
+					palette = PaletteCollection::instance().getPalette(sc.mPaletteKey, 0);
+					if (nullptr == palette)
+						break;
 				}
-				const Recti targetRect(sc.mPosition + offset, size);
+
+				SpriteBase& sprite = *item->mSprite;
+				Vec2i offset = sprite.mOffset;
 
 				// TODO: No support for bilinear sampling here...
 
-				mInternal.drawRect(targetRect, &sprite.accessBitmap(), sc.mTintColor);
+				if (item->mUsesComponentSprite)
+				{
+					Vec2i size = sprite.getSize();
+					if (sc.mScale.x != 1.0f || sc.mScale.y != 1.0f)
+					{
+						offset.x = roundToInt((float)offset.x * sc.mScale.x);
+						offset.y = roundToInt((float)offset.y * sc.mScale.y);
+						size.x = roundToInt((float)size.x * sc.mScale.x);
+						size.y = roundToInt((float)size.y * sc.mScale.y);
+					}
+					const Recti targetRect(sc.mPosition + offset, size);
+
+					ComponentSprite& componentSprite = static_cast<ComponentSprite&>(sprite);
+					mInternal.drawRect(targetRect, &componentSprite.accessBitmap(), sc.mTintColor);
+				}
+				else
+				{
+					// TODO: Support scaling here as well
+
+					PaletteSprite& paletteSprite = static_cast<PaletteSprite&>(sprite);
+					mInternal.drawIndexed(sc.mPosition + offset, paletteSprite.accessBitmap(), *palette, sc.mTintColor);
+				}
 				break;
 			}
 
 			case DrawCommand::Type::SPRITE_RECT:
 			{
 				SpriteRectDrawCommand& sc = drawCommand->as<SpriteRectDrawCommand>();
-				const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(sc.mSpriteKey);
+				const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(sc.mSpriteKey);
 				if (nullptr == item)
 					break;
 				if (!item->mUsesComponentSprite)

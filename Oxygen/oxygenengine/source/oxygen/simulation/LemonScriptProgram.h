@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -13,6 +13,7 @@
 #include <lemon/utility/FlyweightString.h>
 
 
+class Mod;
 namespace lemon
 {
 	class Function;
@@ -21,12 +22,20 @@ namespace lemon
 	class RuntimeFunction;
 	class ScriptFunction;
 	class Variable;
+	struct SourceFileInfo;
 }
 
 
 class LemonScriptProgram
 {
 public:
+	struct ResolvedLocation
+	{
+		const lemon::SourceFileInfo* mSourceFileInfo = nullptr;
+		std::string mScriptFilename;
+		uint32 mLineNumber = 0;
+	};
+
 	struct LoadOptions
 	{
 		enum class ModuleSelection
@@ -39,6 +48,13 @@ public:
 		bool mEnforceFullReload = false;
 		ModuleSelection mModuleSelection = ModuleSelection::ALL_MODS;
 		uint32 mAppVersion = 0;
+	};
+
+	enum class LoadScriptsResult
+	{
+		NO_CHANGE,
+		PROGRAM_CHANGED,
+		FAILED
 	};
 
 	struct GlobalDefine
@@ -65,13 +81,6 @@ public:
 		const lemon::ScriptFunction* mFunction = nullptr;	// Only really used for update hooks
 	};
 
-	enum class LoadScriptsResult
-	{
-		NO_CHANGE,
-		PROGRAM_CHANGED,
-		FAILED
-	};
-
 public:
 	LemonScriptProgram();
 	~LemonScriptProgram();
@@ -80,7 +89,7 @@ public:
 	lemon::Program& getInternalLemonProgram();
 
 	bool hasValidProgram() const;
-	LoadScriptsResult loadScripts(const std::string& filename, const LoadOptions& loadOptions);
+	LoadScriptsResult loadScripts(std::string_view baseScriptFilename, const LoadOptions& loadOptions);
 
 	const Hook* checkForUpdateHook(bool post);
 	const Hook* checkForAddressHook(uint32 address);
@@ -90,13 +99,25 @@ public:
 	lemon::Variable* getGlobalVariableByHash(uint64 hash) const;
 	const std::vector<GlobalDefine>& getGlobalDefines() const  { return mGlobalDefines; }
 
-	void resolveLocation(uint32 functionId, uint32 programCounter, std::string& scriptFilename, uint32& lineNumber) const;
+	const Mod* getModByModule(const lemon::Module& module) const;
+	const std::vector<const lemon::Module*>& getModules() const;
+
+	void resolveLocation(ResolvedLocation& outResolvedLocation, uint32 functionId, uint32 programCounter) const;
 
 public:
-	static void resolveLocation(const lemon::Function& function, uint32 programCounter, std::string& scriptFilename, uint32& lineNumber);
+	static void resolveLocation(ResolvedLocation& outResolvedLocation, const lemon::Function& function, uint32 programCounter);
 
 private:
-	bool loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename);
+	enum class LoadingResult
+	{
+		SUCCESS,
+		FAILED_CONTINUE,
+		FAILED_RETRY
+	};
+
+private:
+	LoadingResult loadAllScriptModules(const LoadOptions& loadOptions, std::string_view baseScriptFilename, const std::vector<const Mod*>& modsToLoad);
+	LoadingResult loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename);
 	void evaluateFunctionPragmas();
 	void evaluateDefines();
 

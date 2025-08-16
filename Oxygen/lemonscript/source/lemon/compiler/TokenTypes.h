@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -192,6 +192,20 @@ namespace lemon
 		const Function* mFunction = nullptr;
 		bool mIsBaseCall = false;
 		std::vector<TokenPtr<StatementToken>> mParameters;
+	};
+
+
+	class BracketAccessToken : public StatementToken
+	{
+	public:
+		static const Type TYPE = Type::BRACKET_ACCESS;
+
+	public:
+		inline BracketAccessToken() : StatementToken(TYPE) {}
+
+	public:
+		const Variable* mVariable = nullptr;
+		TokenPtr<StatementToken> mParameter;
 	};
 
 

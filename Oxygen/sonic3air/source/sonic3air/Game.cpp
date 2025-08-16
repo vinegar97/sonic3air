@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -20,9 +20,9 @@
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/Configuration.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/application/input/InputManager.h"
-#include "oxygen/application/mainview/GameView.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/drawing/software/Blitter.h"
@@ -184,6 +184,8 @@ void Game::registerScriptBindings(lemon::Module& module)
 			.setParameterInfo(0, "playerIndex");
 
 		module.addNativeFunction("Game.returnToMainMenu", lemon::wrap(*this, &Game::returnToMainMenu), defaultFlags);
+		module.addNativeFunction("Game.openOptionsMenu", lemon::wrap(*this, &Game::openOptionsMenu), defaultFlags);
+
 		module.addNativeFunction("Game.isNormalGame", lemon::wrap(*this, &Game::isNormalGame), defaultFlags);
 		module.addNativeFunction("Game.isTimeAttack", lemon::wrap(*this, &Game::isTimeAttack), defaultFlags);
 		module.addNativeFunction("Game.onTimeAttackFinish", lemon::wrap(*this, &Game::onTimeAttackFinish), defaultFlags);
@@ -220,6 +222,7 @@ void Game::registerScriptBindings(lemon::Module& module)
 
 		module.addNativeFunction("Game.startSkippableCutscene", lemon::wrap(*this, &Game::startSkippableCutscene), defaultFlags);
 		module.addNativeFunction("Game.endSkippableCutscene", lemon::wrap(*this, &Game::endSkippableCutscene), defaultFlags);
+		module.addNativeFunction("Game.isInSkippableCutscene", lemon::wrap(*this, &Game::isInSkippableCutscene), defaultFlags);
 	}
 
 	// Discord
@@ -273,16 +276,18 @@ uint32 Game::getSetting(uint32 settingId, bool ignoreGameMode) const
 
 	if (nullptr != setting)
 	{
+		const uint32 value = ConfigurationImpl::instance().mActiveGameSettings->getValue(settingId);
+
 		// Special handling for Debug Mode setting in dev mode
 		if (settingId == SharedDatabase::Setting::SETTING_DEBUG_MODE)
 		{
-			if (!setting->mCurrentValue)
+			if (value == 0)
 			{
 				if (EngineMain::getDelegate().useDeveloperFeatures() && ConfigurationImpl::instance().mDevModeImpl.mEnforceDebugMode)
 					return true;
 			}
 		}
-		return setting->mCurrentValue;
+		return value;
 	}
 	else
 	{
@@ -293,9 +298,8 @@ uint32 Game::getSetting(uint32 settingId, bool ignoreGameMode) const
 
 void Game::setSetting(uint32 settingId, uint32 value)
 {
-	const SharedDatabase::Setting* setting = SharedDatabase::getSetting(settingId);
-	RMX_CHECK(nullptr != setting, "Setting not found", return);
-	setting->mCurrentValue = value;
+	RMX_CHECK(nullptr != SharedDatabase::getSetting(settingId), "Setting not found", return);
+	ConfigurationImpl::instance().mActiveGameSettings->setValue(settingId, value);
 }
 
 void Game::checkForUnlockedSecrets()
@@ -304,7 +308,7 @@ void Game::checkForUnlockedSecrets()
 	uint32 achievementsCompleted = 0;
 	for (const SharedDatabase::Achievement& achievement : SharedDatabase::getAchievements())
 	{
-		if (mPlayerProgress.getAchievementState(achievement.mType) > 0)
+		if (mPlayerProgress.mAchievements.getAchievementState(achievement.mType) > 0)
 		{
 			++achievementsCompleted;
 		}
@@ -312,10 +316,10 @@ void Game::checkForUnlockedSecrets()
 
 	for (const SharedDatabase::Secret& secret : SharedDatabase::getSecrets())
 	{
-		if (secret.mUnlockedByAchievements && !mPlayerProgress.isSecretUnlocked(secret.mType) && achievementsCompleted >= secret.mRequiredAchievements)
+		if (secret.mUnlockedByAchievements && !mPlayerProgress.mUnlocks.isSecretUnlocked(secret.mType) && achievementsCompleted >= secret.mRequiredAchievements)
 		{
 			// Unlock secret now
-			mPlayerProgress.setSecretUnlocked(secret.mType);
+			mPlayerProgress.mUnlocks.setSecretUnlocked(secret.mType);
 			GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::SECRET, "Secret unlocked!", secret.mName);
 		}
 	}
@@ -560,11 +564,10 @@ void Game::onUpdateControls()
 	if (mSkippableCutsceneFrames > 0 || mButtonYPressedDuringSkippableCutscene)	// Last check makes sure we'll ignore the press until it gets released
 	{
 		// Block input to the game
-		mButtonYPressedDuringSkippableCutscene = (ControlsIn::instance().getInputPad(0) & (int)ControlsIn::Button::Y);
+		mButtonYPressedDuringSkippableCutscene = ControlsIn::instance().getGamepad(0).isPressed(ControlsIn::Button::Y);
 		if (mButtonYPressedDuringSkippableCutscene)
 		{
-			ControlsIn::instance().injectInput(0, 0);
-			ControlsIn::instance().injectInput(1, 0);
+			ControlsIn::instance().injectEmptyInputs();
 		}
 	}
 }
@@ -800,6 +803,9 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 
 void Game::onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer)
 {
+	// Switch to using the alternative set of settings
+	ConfigurationImpl::instance().mActiveGameSettings = &ConfigurationImpl::instance().mAlternativeGameSettings;
+
 	const std::unordered_map<uint32, SharedDatabase::Setting>& settings = SharedDatabase::getSettings();
 	VectorBinarySerializer serializer(true, buffer);
 	const size_t numSettings = serializer.read<uint32>();
@@ -807,11 +813,7 @@ void Game::onGameRecordingHeaderLoaded(const std::string& buildString, const std
 	{
 		const uint32 settingId = serializer.read<uint32>();
 		const uint32 value = serializer.read<uint32>();
-		const auto it = settings.find(settingId);
-		if (it != settings.end())
-		{
-			it->second.mCurrentValue = value;
-		}
+		ConfigurationImpl::instance().mActiveGameSettings->setValue(settingId, value);
 	}
 }
 
@@ -833,16 +835,21 @@ void Game::onGameRecordingHeaderSave(std::vector<uint8>& buffer)
 	serializer.writeAs<uint32>(relevantSettings.size());
 	for (const SharedDatabase::Setting* setting : relevantSettings)
 	{
+		const uint32 value = ConfigurationImpl::instance().mLocalGameSettings.getValue(setting->mSettingId);
 		serializer.writeAs<uint32>(setting->mSettingId);
-		serializer.write(setting->mCurrentValue);
+		serializer.write(value);
 	}
 }
 
 void Game::checkActiveModsUsedFeatures()
 {
+	// Update number of players depending on the three / four player mod feature
+	const bool usesThreePlayers = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("ThreePlayers"));
+	const bool usesFourPlayers = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("FourPlayers"));
+	Configuration::instance().mNumPlayers = usesFourPlayers ? 4 : usesThreePlayers ? 3 : 2;
+
 	// Check mods for usage of Crowd Control
-	static const uint64 CC_FEATURE_NAME_HASH = rmx::getMurmur2_64("CrowdControl");
-	const bool usesCrowdControl = ModManager::instance().anyActiveModUsesFeature(CC_FEATURE_NAME_HASH);
+	const bool usesCrowdControl = ModManager::instance().anyActiveModUsesFeature(rmx::constMurmur2_64("CrowdControl"));
 	if (usesCrowdControl)
 		mCrowdControlClient.startConnection();
 	else
@@ -906,7 +913,7 @@ void Game::setAchievementValue(uint32 achievementId, int32 value)
 
 bool Game::isAchievementComplete(uint32 achievementId)
 {
-	return (mPlayerProgress.getAchievementState(achievementId) != 0);
+	return (mPlayerProgress.mAchievements.getAchievementState(achievementId) != 0);
 }
 
 void Game::setAchievementComplete(uint32 achievementId)
@@ -916,9 +923,9 @@ void Game::setAchievementComplete(uint32 achievementId)
 	if (hasDebugModeActive && !EngineMain::getDelegate().useDeveloperFeatures())
 		return;
 
-	if (mPlayerProgress.getAchievementState(achievementId) == 0)
+	if (mPlayerProgress.mAchievements.getAchievementState(achievementId) == 0)
 	{
-		mPlayerProgress.mAchievementStates[achievementId] = 1;
+		mPlayerProgress.mAchievements.mAchievementStates[achievementId] = 1;
 		SharedDatabase::Achievement* achievement = SharedDatabase::getAchievement(achievementId);
 		if (nullptr != achievement)
 		{
@@ -936,7 +943,7 @@ void Game::setAchievementComplete(uint32 achievementId)
 
 bool Game::isSecretUnlocked(uint32 secretId)
 {
-	return mPlayerProgress.isSecretUnlocked(secretId);
+	return mPlayerProgress.mUnlocks.isSecretUnlocked(secretId);
 }
 
 void Game::setSecretUnlocked(uint32 secretId)
@@ -944,9 +951,9 @@ void Game::setSecretUnlocked(uint32 secretId)
 	SharedDatabase::Secret* secret = SharedDatabase::getSecret(secretId);
 	RMX_CHECK(nullptr != secret, "Secret with ID " << secretId << " not found", return);
 
-	if (!mPlayerProgress.isSecretUnlocked(secretId))
+	if (!mPlayerProgress.mUnlocks.isSecretUnlocked(secretId))
 	{
-		mPlayerProgress.setSecretUnlocked(secretId);
+		mPlayerProgress.mUnlocks.setSecretUnlocked(secretId);
 		const char* text = (secret->mType == SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE) ? "Unlocked in Act Select" : "Found hidden secret!";
 		GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::SECRET, text, secret->mName);
 		mPlayerProgress.save();
@@ -960,7 +967,6 @@ void Game::triggerRestart()
 
 void Game::onGamePause(uint8 canRestart)
 {
-	GameApp::instance().showSkippableCutsceneWindow(false);
 	GameApp::instance().onGamePaused(canRestart != 0);
 }
 
@@ -980,8 +986,8 @@ void Game::onZoneActCompleted(uint16 zoneAndAct)
 	const uint32 bitValue = (1 << bitNumber);
 	const uint8 character = clamp(mLastCharacters, 1, 3) - 1;
 
-	mPlayerProgress.mFinishedZoneAct |= bitValue;
-	mPlayerProgress.mFinishedZoneActByCharacter[character] |= bitValue;
+	mPlayerProgress.mUnlocks.mFinishedZoneAct |= bitValue;
+	mPlayerProgress.mUnlocks.mFinishedZoneActByCharacter[character] |= bitValue;
 	mPlayerProgress.save();
 }
 
@@ -1029,6 +1035,11 @@ void Game::returnToMainMenu()
 	mTimeoutUntilDiscordRefresh = 0.0f;
 }
 
+void Game::openOptionsMenu()
+{
+	GameApp::instance().openOptionsMenuInGame();
+}
+
 bool Game::onTimeAttackFinish()
 {
 	if (!isInTimeAttackMode() || mReceivedTimeAttackFinished)
@@ -1069,4 +1080,9 @@ void Game::endSkippableCutscene()
 		simulation.setSpeed(simulation.getDefaultSpeed());
 
 	GameApp::instance().showSkippableCutsceneWindow(false);
+}
+
+bool Game::isInSkippableCutscene()
+{
+	return mSkippableCutsceneFrames > 0;
 }

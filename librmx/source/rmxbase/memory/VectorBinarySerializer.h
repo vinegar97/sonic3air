@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -54,6 +54,8 @@ public:
 
 	// Warning: the "bytesLimit" value must stay consistent between serialization and deserialization
 	void serializeData(std::vector<uint8>& data, size_t bytesLimit = 0xffffffff);
+	void readData(std::vector<uint8>& data, size_t bytesLimit = 0xffffffff);
+	void writeData(const std::vector<uint8>& data, size_t bytesLimit = 0xffffffff);
 
 	template <typename T>
 	void serializeArraySize(std::vector<T>& value, uint32 arraySizeLimit = 0xffff)

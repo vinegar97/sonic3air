@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "lemon/compiler/Errors.h"
 #include "lemon/program/Constant.h"
 #include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
@@ -24,17 +25,26 @@ namespace lemon
 
 	class API_EXPORT Module
 	{
-	friend class Program;
+	friend class Compiler;
 	friend class GlobalsLookup;
-	friend class ScriptFunction;
 	friend class ModuleSerializer;
+	friend class Program;
+	friend class ScriptFunction;
 
 	public:
-		explicit Module(const std::string& name);
+		struct AppendedInfo
+		{
+			virtual ~AppendedInfo() {}
+		};
+
+	public:
+		explicit Module(const std::string& name, AppendedInfo* appendedInfo = nullptr);
 		~Module();
 
-		inline const std::string& getModuleName() const { return mModuleName; }
-		inline uint64 getModuleId() const { return mModuleId; }
+		inline const std::string& getModuleName() const  { return mModuleName; }
+		inline uint64 getModuleId() const  { return mModuleId; }
+
+		inline AppendedInfo* getAppendedInfo() const  { return mAppendedInfo; }
 
 		void clear();
 
@@ -42,19 +52,24 @@ namespace lemon
 
 		void dumpDefinitionsToScriptFile(const std::wstring& filename, bool append = false);
 
-		const SourceFileInfo& addSourceFileInfo(const std::wstring& basepath, const std::wstring& filename);
+		inline const std::wstring& getScriptBasePath() const	{ return mScriptBasePath; }
+		inline void setScriptBasePath(std::wstring_view path)	{ mScriptBasePath = path; }
+		const SourceFileInfo& addSourceFileInfo(const std::wstring& localPath, const std::wstring& filename);
 
 		// Preprocessor definitions
 		void registerNewPreprocessorDefinitions(PreprocessorDefinitionMap& preprocessorDefinitions);
 		Constant& addPreprocessorDefinition(FlyweightString name, int64 value);
 
 		// Functions
+		inline const std::vector<Function*>& getAllFunctions() const		  { return mFunctions; }
 		inline const std::vector<ScriptFunction*>& getScriptFunctions() const { return mScriptFunctions; }
 		const Function* getFunctionByUniqueId(uint64 uniqueId) const;
 
-		ScriptFunction& addScriptFunction(FlyweightString name, const DataTypeDefinition* returnType, const Function::ParameterList& parameters, std::vector<FlyweightString>* aliasNames = nullptr);
+		ScriptFunction& addScriptFunction(FlyweightString name, const DataTypeDefinition* returnType, const Function::ParameterList& parameters, std::vector<Function::AliasName>* aliasNames = nullptr);
 		NativeFunction& addNativeFunction(FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, BitFlagSet<Function::Flag> flags = BitFlagSet<Function::Flag>());
 		NativeFunction& addNativeMethod(FlyweightString context, FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, BitFlagSet<Function::Flag> flags = BitFlagSet<Function::Flag>());
+
+		uint32 addOrFindCallableFunctionAddress(const Function& function);
 
 		// Variables
 		inline const std::vector<Variable*>& getGlobalVariables() const  { return mGlobalVariables; }
@@ -66,7 +81,7 @@ namespace lemon
 		Constant& addConstant(FlyweightString name, const DataTypeDefinition* dataType, AnyBaseValue value);
 
 		// Constant arrays
-		ConstantArray& addConstantArray(FlyweightString name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size, bool isGlobalDefinition);
+		ConstantArray& addConstantArray(FlyweightString name, const DataTypeDefinition* elementDataType, const AnyBaseValue* values, size_t size, bool isGlobalDefinition);
 
 		// Defines
 		const std::vector<Define*>& getDefines() const { return mDefines; }
@@ -87,6 +102,8 @@ namespace lemon
 		inline uint64 getCompiledCodeHash() const     { return mCompiledCodeHash; }
 		inline void setCompiledCodeHash(uint64 hash)  { mCompiledCodeHash = hash; }
 
+		inline const std::vector<CompilerWarning>& getWarnings() const  { return mWarnings; }
+
 	private:
 		void addFunctionInternal(Function& func);
 		void addGlobalVariable(Variable& variable, FlyweightString name, const DataTypeDefinition* dataType);
@@ -97,6 +114,8 @@ namespace lemon
 		std::string mModuleName;
 		uint64 mModuleId = 0;
 
+		AppendedInfo* mAppendedInfo = nullptr;
+
 		// Preprocessor definitions
 		std::vector<Constant*> mPreprocessorDefinitions;	// Re-using the Constant class here, and also mConstantPool
 
@@ -106,6 +125,9 @@ namespace lemon
 		std::vector<ScriptFunction*> mScriptFunctions;
 		ObjectPool<ScriptFunction, 64> mScriptFunctionPool;
 		ObjectPool<NativeFunction, 32> mNativeFunctionPool;
+
+		// Callable function addresses
+		std::unordered_map<uint32, uint64> mCallableFunctions;
 
 		// Variables
 		uint32 mFirstVariableID = 0;
@@ -135,8 +157,10 @@ namespace lemon
 
 		// Misc
 		uint64 mCompiledCodeHash = 0;
+		std::wstring mScriptBasePath;
 		ObjectPool<SourceFileInfo> mSourceFileInfoPool;
 		std::vector<SourceFileInfo*> mAllSourceFiles;
+		std::vector<CompilerWarning> mWarnings;
 	};
 
 }

@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -97,8 +97,8 @@ function void fn0400f0()
 					u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 					objA0.flags2a &= ~bit
 					objA1.velocity.y = (u8[A1 + 0x38] == CHARACTER_KNUCKLES) ? -0x600 : -0x680
-					objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 					objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+					objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 					objA1.state = char.state.ROLLING
 					objA1.flags2a |= char.flag.ROLLING
 					objA1.flags2a &= ~char.flag.CONTROL_LOCK

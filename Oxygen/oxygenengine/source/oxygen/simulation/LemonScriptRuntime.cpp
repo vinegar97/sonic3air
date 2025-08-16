@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -19,6 +19,7 @@
 #include "oxygen/helper/Utils.h"
 
 #include <lemon/compiler/TokenManager.h>
+#include <lemon/compiler/TypeCasting.h>
 #include <lemon/program/GlobalsLookup.h>
 #include <lemon/program/Module.h>
 #include <lemon/program/Program.h>
@@ -67,7 +68,7 @@ bool LemonScriptRuntime::getCurrentScriptFunction(std::string_view* outFunctionN
 		return false;
 
 	lemon::ControlFlow::Location location;
-	controlFlow->getLastStepLocation(location);
+	controlFlow->getCurrentExecutionLocation(location);
 	if (nullptr == location.mFunction)
 		return false;
 
@@ -165,33 +166,83 @@ bool LemonScriptRuntime::callUpdateHook(bool postUpdate)
 
 bool LemonScriptRuntime::callAddressHook(uint32 address)
 {
-	const lemon::RuntimeFunction** runtimeFunctionPtr = mInternal.mAddressHookLookup.find(address);
-	if (nullptr != runtimeFunctionPtr)
+	switch (address >> 28)
 	{
-		mInternal.mRuntime.callRuntimeFunction(**runtimeFunctionPtr);
-	}
-	else
-	{
-		// Get the hook from the program first
-		const LemonScriptProgram::Hook* hook = mProgram.checkForAddressHook(address);
-		if (nullptr == hook)
-			return false;
+		case 0:
+		{
+			// Address hook
+			const lemon::RuntimeFunction** runtimeFunctionPtr = mInternal.mAddressHookLookup.find(address);
+			if (nullptr != runtimeFunctionPtr)
+			{
+				mInternal.mRuntime.callRuntimeFunction(**runtimeFunctionPtr);
+			}
+			else
+			{
+				// Get the hook from the program first
+				const LemonScriptProgram::Hook* hook = mProgram.checkForAddressHook(address);
+				if (nullptr == hook)
+					return false;
 
-		// Try to get the respective runtime function
-		RMX_ASSERT(nullptr != hook->mFunction, "Invalid address hook function");
-		const lemon::RuntimeFunction* runtimeFunction = mInternal.mRuntime.getRuntimeFunction(*hook->mFunction);
-		if (nullptr != runtimeFunction)
-		{
-			mInternal.mAddressHookLookup.add(address, runtimeFunction);
-			mInternal.mRuntime.callRuntimeFunction(*runtimeFunction);
+				// Try to get the respective runtime function
+				RMX_ASSERT(nullptr != hook->mFunction, "Invalid address hook function");
+				const lemon::RuntimeFunction* runtimeFunction = mInternal.mRuntime.getRuntimeFunction(*hook->mFunction);
+				if (nullptr != runtimeFunction)
+				{
+					mInternal.mAddressHookLookup.add(address, runtimeFunction);
+					mInternal.mRuntime.callRuntimeFunction(*runtimeFunction);
+				}
+				else
+				{
+					RMX_ASSERT(false, "Unable to get runtime function for address hook at " << rmx::hexString(hook->mAddress, 8));
+					mInternal.mRuntime.callFunction(*hook->mFunction);
+				}
+			}
+			return true;
 		}
-		else
+
+		case 1:
 		{
-			RMX_ASSERT(false, "Unable to get runtime function for address hook at " << rmx::hexString(hook->mAddress, 8));
-			mInternal.mRuntime.callFunction(*hook->mFunction);
+			// Callable function address (via "makeCallable")
+			// TODO: Optimize this by using a direct lookup from address to RuntimeFunction
+			const lemon::Function* function = mInternal.mRuntime.getProgram().resolveCallableFunctionAddress(address);
+			if (nullptr == function)
+				return false;
+
+			switch (function->getType())
+			{
+				case lemon::Function::Type::SCRIPT:
+				{
+					const lemon::RuntimeFunction* runtimeFunction = mInternal.mRuntime.getRuntimeFunction(*static_cast<const lemon::ScriptFunction*>(function));
+					if (nullptr != runtimeFunction)
+					{
+						mInternal.mRuntime.callRuntimeFunction(*runtimeFunction);
+						return true;
+					}
+					else
+					{
+						RMX_ASSERT(false, "Unable to get runtime function for callable address " << rmx::hexString(address, 8));
+						mInternal.mRuntime.callFunction(*function);
+					}
+					break;
+				}
+
+				case lemon::Function::Type::NATIVE:
+				{
+					mInternal.mRuntime.callFunction(*function);
+					return true;
+				}
+			}
+			break;
+		}
+
+		default:
+		{
+			// All others are invalid
+			RMX_ASSERT(false, "Invalid function address in call: " << rmx::hexString(address, 8));
+			break;
 		}
 	}
-	return true;
+	return false;
 }
 
 void LemonScriptRuntime::callFunction(const lemon::ScriptFunction& function)
@@ -258,29 +309,41 @@ const lemon::Function* LemonScriptRuntime::getCurrentFunction() const
 	return (nullptr == runtimeFunction) ? nullptr : runtimeFunction->mFunction;
 }
 
-int64 LemonScriptRuntime::getGlobalVariableValue_int64(lemon::FlyweightString variableName)
+lemon::AnyBaseValue LemonScriptRuntime::getGlobalVariableValue(lemon::FlyweightString variableName, const lemon::DataTypeDefinition* dataType)
+{
+	lemon::AnyBaseValue outValue;
+	lemon::Variable* variable = mProgram.getGlobalVariableByHash(variableName.getHash());
+	if (nullptr != variable)
+	{
+		const lemon::AnyBaseValue inValue = mInternal.mRuntime.getGlobalVariableValue(*variable);
+		lemon::CompileOptions compileOptions;
+		compileOptions.mScriptFeatureLevel = 2;
+		const lemon::TypeCasting::CastHandling castHandling = lemon::TypeCasting(compileOptions).castBaseValue(inValue, variable->getDataType(), outValue, dataType, true);
+		if (castHandling.mResult == lemon::TypeCasting::CastHandling::Result::INVALID)
+			outValue.reset();
+	}
+	return outValue;
+}
+
+void LemonScriptRuntime::setGlobalVariableValue(lemon::FlyweightString variableName, lemon::AnyBaseValue value, const lemon::DataTypeDefinition* dataType)
 {
 	lemon::Variable* variable = mProgram.getGlobalVariableByHash(variableName.getHash());
 	if (nullptr != variable)
 	{
-		return mInternal.mRuntime.getGlobalVariableValue_int64(*variable);
-	}
-	return 0;
-}
-
-void LemonScriptRuntime::setGlobalVariableValue_int64(lemon::FlyweightString variableName, int64 value)
-{
-	lemon::Variable* variable = mProgram.getGlobalVariableByHash(variableName.getHash());
-	if (nullptr != variable)
-	{
-		mInternal.mRuntime.setGlobalVariableValue_int64(*variable, value);
+		lemon::AnyBaseValue valueToSet;
+		lemon::CompileOptions compileOptions;
+		compileOptions.mScriptFeatureLevel = 2;
+		const lemon::TypeCasting::CastHandling castHandling = lemon::TypeCasting(compileOptions).castBaseValue(value, dataType, valueToSet, variable->getDataType(), true);
+		if (castHandling.mResult == lemon::TypeCasting::CastHandling::Result::INVALID)
+			valueToSet.reset();
+		mInternal.mRuntime.setGlobalVariableValue(*variable, valueToSet);
 	}
 }
 
-void LemonScriptRuntime::getLastStepLocation(const lemon::ScriptFunction*& outFunction, size_t& outProgramCounter) const
+void LemonScriptRuntime::getCurrentExecutionLocation(const lemon::ScriptFunction*& outFunction, size_t& outProgramCounter) const
 {
 	lemon::ControlFlow::Location location;
-	mInternal.mRuntime.getSelectedControlFlow().getLastStepLocation(location);
+	mInternal.mRuntime.getSelectedControlFlow().getCurrentExecutionLocation(location);
 	outFunction = location.mFunction;
 	outProgramCounter = location.mProgramCounter;
 }
@@ -293,7 +356,7 @@ std::string LemonScriptRuntime::getOwnCurrentScriptLocationString() const
 std::string LemonScriptRuntime::buildScriptLocationString(const lemon::ControlFlow& controlFlow)
 {
 	lemon::ControlFlow::Location location;
-	controlFlow.getLastStepLocation(location);
+	controlFlow.getCurrentExecutionLocation(location);
 	if (nullptr == location.mFunction)
 		return "";
 
@@ -307,6 +370,9 @@ std::string LemonScriptRuntime::buildScriptLocationString(const lemon::ControlFl
 uint32 LemonScriptRuntime::getLineNumberInFile(const lemon::ScriptFunction& function, size_t programCounter)
 {
 	const auto& opcodes = function.mOpcodes;
+	if (opcodes.empty())
+		return 0;
+
 	const uint32 lineNumber = (programCounter < opcodes.size()) ? opcodes[programCounter].mLineNumber : opcodes.back().mLineNumber;
-	return (lineNumber < function.mSourceBaseLineOffset) ? 0 : (lineNumber - function.mSourceBaseLineOffset);
+	return (lineNumber < function.mSourceBaseLineOffset) ? 0 : (lineNumber - function.mSourceBaseLineOffset + 1);
 }

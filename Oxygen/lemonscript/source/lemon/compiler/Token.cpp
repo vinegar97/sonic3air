@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -33,6 +33,7 @@ namespace lemon
 				case Token::Type::BINARY_OPERATION:	token = &genericmanager::Manager<Token>::template create<BinaryOperationToken>();	 break;
 				case Token::Type::VARIABLE:			token = &genericmanager::Manager<Token>::template create<VariableToken>();			 break;
 				case Token::Type::FUNCTION:			token = &genericmanager::Manager<Token>::template create<FunctionToken>();			 break;
+				case Token::Type::BRACKET_ACCESS:	token = &genericmanager::Manager<Token>::template create<BracketAccessToken>();		 break;
 				case Token::Type::MEMORY_ACCESS:	token = &genericmanager::Manager<Token>::template create<MemoryAccessToken>();		 break;
 				case Token::Type::VALUE_CAST:		token = &genericmanager::Manager<Token>::template create<ValueCastToken>();			 break;
 
@@ -189,6 +190,14 @@ namespace lemon
 				globalsLookup.serializeDataType(serializer, token.mDataType);
 				// TODO: Serialize the other members
 			*/
+				break;
+			}
+
+			case Token::Type::BRACKET_ACCESS:
+			{
+				BracketAccessToken& token = token_.as<BracketAccessToken>();
+				globalsLookup.serializeDataType(serializer, token.mDataType);
+				serializeToken(serializer, token.mParameter, globalsLookup);
 				break;
 			}
 

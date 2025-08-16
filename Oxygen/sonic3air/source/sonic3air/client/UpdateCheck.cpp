@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -13,6 +13,8 @@
 #include "sonic3air/version.inc"
 
 #include "oxygen_netcore/network/NetConnection.h"
+
+#include "oxygen/network/EngineServerClient.h"
 
 
 namespace
@@ -41,7 +43,7 @@ namespace
 	const char* getReleaseChannelName()
 	{
 		const char* RELEASE_CHANNEL_NAMES[3] = { "stable", "preview", "test" };
-		int& releaseChannel = ConfigurationImpl::instance().mGameServer.mUpdateCheck.mReleaseChannel;
+		int& releaseChannel = ConfigurationImpl::instance().mGameServerImpl.mUpdateCheck.mReleaseChannel;
 		releaseChannel = clamp(releaseChannel, 0, 2);
 		return RELEASE_CHANNEL_NAMES[releaseChannel];
 	}
@@ -75,10 +77,11 @@ const network::AppUpdateCheckRequest::Response* UpdateCheck::getResponse() const
 
 void UpdateCheck::startUpdateCheck()
 {
-	if (!mGameClient.isConnected())
+	EngineServerClient& engineServerClient = EngineServerClient::instance();
+	if (!engineServerClient.isConnected())
 	{
 		// Start connecting, the rest is done later in "performUpdate"
-		mGameClient.connectToServer();
+		engineServerClient.connectToServer();
 		mState = State::CONNECTING;
 	}
 	mUpdateRequested = true;
@@ -86,7 +89,8 @@ void UpdateCheck::startUpdateCheck()
 
 void UpdateCheck::performUpdate()
 {
-	if (!mGameClient.isConnected())
+	EngineServerClient& engineServerClient = EngineServerClient::instance();
+	if (!engineServerClient.isConnected())
 	{
 		// TODO: Start a connection if needed
 		return;
@@ -100,7 +104,7 @@ void UpdateCheck::performUpdate()
 		case State::CONNECTING:
 		{
 			// Wait for "evaluateServerFeaturesResponse" to be called, and only check for errors here
-			if (mGameClient.getConnectionState() == GameClient::ConnectionState::FAILED)
+			if (engineServerClient.getConnectionState() == EngineServerClient::ConnectionState::FAILED)
 			{
 				mState = State::FAILED;
 			}
@@ -115,7 +119,7 @@ void UpdateCheck::performUpdate()
 			mUpdateRequested = false;
 
 			// Don't start a new update check if the last one was in the last 20 seconds (for the same update channel)
-			if (mLastUpdateCheckTimestamp != 0 && mGameClient.getCurrentTimestamp() < mLastUpdateCheckTimestamp + 20 * 1000)
+			if (mLastUpdateCheckTimestamp != 0 && ConnectionManager::getCurrentTimestamp() < mLastUpdateCheckTimestamp + 20 * 1000)
 				break;
 
 			mState = State::SEND_QUERY;
@@ -129,9 +133,9 @@ void UpdateCheck::performUpdate()
 			mAppUpdateCheckRequest.mQuery.mReleaseChannel = ::getReleaseChannelName();
 			mAppUpdateCheckRequest.mQuery.mInstalledAppVersion = BUILD_NUMBER;
 			mAppUpdateCheckRequest.mQuery.mInstalledContentVersion = BUILD_NUMBER;
-			mGameClient.getServerConnection().sendRequest(mAppUpdateCheckRequest);
+			engineServerClient.getServerConnection().sendRequest(mAppUpdateCheckRequest);
 
-			mLastUpdateCheckTimestamp = mGameClient.getCurrentTimestamp();
+			mLastUpdateCheckTimestamp = ConnectionManager::getCurrentTimestamp();
 			mState = State::WAITING_FOR_RESPONSE;
 			break;
 		}
@@ -158,10 +162,10 @@ void UpdateCheck::performUpdate()
 	}
 }
 
-void UpdateCheck::evaluateServerFeaturesResponse(const network::GetServerFeaturesRequest& request)
+void UpdateCheck::evaluateServerFeaturesResponse(const network::GetServerFeaturesRequest::Response& response)
 {
 	bool supportsUpdate = false;
-	for (const network::GetServerFeaturesRequest::Response::Feature& feature : request.mResponse.mFeatures)
+	for (const network::GetServerFeaturesRequest::Response::Feature& feature : response.mFeatures)
 	{
 		if (feature.mIdentifier == "app-update-check" && feature.mVersions.contains(1))
 		{

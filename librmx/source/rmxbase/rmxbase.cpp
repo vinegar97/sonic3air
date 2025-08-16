@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -32,10 +32,10 @@ void rmxbase::initialize()
 	FTX::FileSystem.createDefault();
 
 	// Initialize bitmap codecs
-	Bitmap::mCodecs.add<BitmapCodecBMP>();
-	Bitmap::mCodecs.add<BitmapCodecPNG>();
-	Bitmap::mCodecs.add<BitmapCodecJPG>();
-	Bitmap::mCodecs.add<BitmapCodecICO>();
+	rmx::BitmapCodecList::mCodecs.add<rmx::BitmapCodecBMP>();
+	rmx::BitmapCodecList::mCodecs.add<rmx::BitmapCodecPNG>();
+	rmx::BitmapCodecList::mCodecs.add<rmx::BitmapCodecJPG>();
+	rmx::BitmapCodecList::mCodecs.add<rmx::BitmapCodecICO>();
 }
 
 void rmxbase::getBuildInfo(String& info)

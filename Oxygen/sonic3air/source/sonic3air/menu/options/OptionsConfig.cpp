@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -73,6 +73,7 @@ void OptionsConfig::buildSystem()
 {
 	ConfigBuilder configBuilder(mSystemOptions);
 
+#if !defined(PLATFORM_VITA)
 	CATEGORY("Update")
 	{
 		configBuilder.addSetting("Check for updates", option::_CHECK_FOR_UPDATE)
@@ -92,6 +93,7 @@ void OptionsConfig::buildSystem()
 			.addOption("Semi-transparent", 2)
 			.addOption("Ghost Style", 3);
 	}
+#endif
 
 	CATEGORY("More Info")
 	{
@@ -123,11 +125,16 @@ void OptionsConfig::buildDisplay()
 		configBuilder.addSetting("Renderer:", option::RENDERER);
 		const Configuration::RenderMethod highest = Configuration::getHighestSupportedRenderMethod();
 
+	#if !defined(PLATFORM_VITA)
 		configBuilder.addOption("Fail-Safe / Software", (uint32)Configuration::RenderMethod::SOFTWARE);
 		if (highest >= Configuration::RenderMethod::OPENGL_SOFT)
 			configBuilder.addOption("OpenGL Software", (uint32)Configuration::RenderMethod::OPENGL_SOFT);
 		if (highest >= Configuration::RenderMethod::OPENGL_FULL)
 			configBuilder.addOption("OpenGL Hardware", (uint32)Configuration::RenderMethod::OPENGL_FULL);
+	#else
+		// OpenGL Hardware does not work correctly on PSVita
+		configBuilder.addOption("OpenGL Software", (uint32)Configuration::RenderMethod::OPENGL_SOFT);
+	#endif
 
 		configBuilder.addSetting("Frame Sync:", option::FRAME_SYNC)
 			.addOption("V-Sync Off", 0)
@@ -147,6 +154,7 @@ void OptionsConfig::buildDisplay()
 			.addOption("Classic Box 2", 2)
 			.addOption("Classic Box 3", 3);
 
+	#if !defined(PLATFORM_VITA)
 		configBuilder.addSetting("Screen Filter:", option::FILTERING)
 			.addOption("Sharp", 0)
 			.addOption("Soft 1", 1)
@@ -155,6 +163,13 @@ void OptionsConfig::buildDisplay()
 			.addOption("HQ2x", 4)
 			.addOption("HQ3x", 5)
 			.addOption("HQ4x", 6);
+	#else
+		// High quality filters on the PSVITA is playing in slowmotion...
+		configBuilder.addSetting("Screen Filter:", option::FILTERING)
+			.addOption("Sharp", 0)
+			.addOption("Soft 1", 1)
+			.addOption("Soft 2", 2);
+	#endif
 
 		configBuilder.addSetting("Scanlines:", option::SCANLINES)
 			.addOption("Off", 0)
@@ -173,6 +188,7 @@ void OptionsConfig::buildDisplay()
 
 	CATEGORY("Window Mode")
 	{
+	#if !defined(PLATFORM_VITA)
 		configBuilder.addSetting("Current Screen:", option::WINDOW_MODE)
 			.addOption("Windowed", 0)
 			.addOption("Fullscreen", 1)
@@ -182,6 +198,14 @@ void OptionsConfig::buildDisplay()
 			.addOption("Windowed", 0)
 			.addOption("Fullscreen", 1)
 			.addOption("Exclusive Fullscreen", 2);
+	#else
+		// These aren't supposed to show up on the Vita
+		configBuilder.addSetting("Current Screen:", option::WINDOW_MODE)
+			.addOption("Exclusive Fullscreen", 0);
+
+		configBuilder.addSetting("Startup Screen:", option::WINDOW_MODE_STARTUP)
+			.addOption("Exclusive Fullscreen", 0);
+	#endif
 	}
 
 	CATEGORY("Performance Output")
@@ -464,7 +488,7 @@ void OptionsConfig::buildControls()
 	{
 		configBuilder.addSetting("Setup Keyboard & Game Controllers...", option::CONTROLLER_SETUP);		// This text here won't be used, see rendering
 
-		for (int k = 0; k < 2; ++k)
+		for (int k = 0; k < InputManager::NUM_PLAYERS; ++k)
 		{
 			configBuilder.addSetting(*String(0, "Controller Player %d", k+1), (option::Option)(option::CONTROLLER_PLAYER_1 + k));
 			if (Application::instance().hasVirtualGamepad())
@@ -477,7 +501,9 @@ void OptionsConfig::buildControls()
 		configBuilder.addSetting("Other controllers", option::CONTROLLER_AUTOASSIGN)
 			.addOption("Not used", -1)
 			.addOption("Assign to Player 1", 0)
-			.addOption("Assign to Player 2", 1);
+			.addOption("Assign to Player 2", 1)
+			.addOption("Assign to Player 3", 2)
+			.addOption("Assign to Player 4", 3);
 	}
 
 	if (Application::instance().hasVirtualGamepad())
@@ -493,7 +519,7 @@ void OptionsConfig::buildControls()
 
 	CATEGORY("Controller Rumble")
 	{
-		for (int k = 0; k < 2; ++k)
+		for (int k = 0; k < InputManager::NUM_PLAYERS; ++k)
 		{
 			configBuilder.addSetting(*String(0, "Rumble Player %d", k+1), (option::Option)(option::CONTROLLER_RUMBLE_P1 + k));
 			configBuilder.addOption("Off", 0);
@@ -598,6 +624,10 @@ void OptionsConfig::buildTweaks()
 		configBuilder.addSetting("Monitor Behavior:", option::MONITOR_BEHAVIOR)
 			.addOption("Default", 0)
 			.addOption("Fall down when hit", 1);
+
+		configBuilder.addSetting("Hidden Monitors:", option::HIDDEN_MONITOR_HINT)
+			.addOption("No hint", 0)
+			.addOption("Sparkle near signpost", 1);
 	}
 
 	CATEGORY("Special Stages")
@@ -624,6 +654,45 @@ void OptionsConfig::buildTweaks()
 			.addOption("No glitch fixes", 0)
 			.addOption("Only basic fixes", 1)
 			.addOption("All (recommended)", 2);
+	}
+
+	CATEGORY("Other Enhancements")
+	{
+		configBuilder.addSetting("Object Pushing Speed:", option::FASTER_PUSH)
+			.addOption("Original", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("Score Tally Speed-Up:", option::LEVELRESULT_SCORE)
+			.addOption("Off", 0)
+			.addOption("On", 1);
+
+		configBuilder.addSetting("LBZ Tube Transport:", option::LBZ_TUBETRANSPORT)
+			.addOption("Original Speed", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("MHZ Elevator:", option::MHZ_ELEVATOR)
+			.addOption("Original Speed", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("FBZ Door Opening:", option::FBZ_SCREWDOORS)
+			.addOption("Original Speed", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("SOZ Pyramid Rising:", option::SOZ_PYRAMID)
+			.addOption("Original Speed", 0)
+			.addOption("Faster", 1);
+
+		configBuilder.addSetting("AIZ Knuckles Intro:", option::AIZ_INTRO_KNUCKLES)
+			.addOption("Off", 0)
+			.addOption("On", 1);
+
+		configBuilder.addSetting("FBZ Cylinder Behavior:", option::FBZ_ENTERCYLINDER)
+			.addOption("Original", 0)
+			.addOption("Can enter from top", 1);
+
+		configBuilder.addSetting("Offscreen Player 2:", option::PLAYER2_OFFSCREEN)
+			.addOption("Not shown", 0)
+			.addOption("Show at border", 1);
 	}
 }
 

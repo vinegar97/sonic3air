@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -36,6 +36,10 @@ protected:
 
 class InputManager : public SingleInstance<InputManager>
 {
+public:
+	static const constexpr size_t NUM_PLAYERS = 4;
+	static const std::string KEYBOARD_DEVICE_NAMES[NUM_PLAYERS];
+
 public:
 	struct RealDevice;
 
@@ -208,7 +212,6 @@ private:
 	void stopControllerRumbleForDevice(RealDevice& device);
 
 private:
-	static const constexpr size_t NUM_PLAYERS = 2;
 	Player mPlayers[NUM_PLAYERS];
 
 	std::vector<Control*> mAllControls;

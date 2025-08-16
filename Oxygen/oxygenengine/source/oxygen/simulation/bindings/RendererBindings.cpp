@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -15,9 +15,7 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/RuntimeEnvironment.h"
 
-#include <lemon/program/DataType.h>
-#include <lemon/program/FunctionWrapper.h>
-#include <lemon/program/Module.h>
+#include <lemon/program/ModuleBindingsBuilder.h>
 
 
 namespace
@@ -36,6 +34,16 @@ namespace
 	uint16 getScreenHeight()
 	{
 		return (uint16)VideoOut::instance().getScreenHeight();
+	}
+
+	uint16 getScreenCenterX()
+	{
+		return (uint16)VideoOut::instance().getScreenWidth() / 2;
+	}
+
+	uint16 getScreenCenterY()
+	{
+		return (uint16)VideoOut::instance().getScreenHeight() / 2;
 	}
 
 	uint16 getScreenExtend()
@@ -327,6 +335,9 @@ namespace
 
 	void setVRAM(uint16 vramAddress, uint16 value)
 	{
+		if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
+			LemonScriptBindings::mDebugNotificationInterface->onVRAMWrite(vramAddress, 2);
+
 		getEmulatorInterface().writeVRam16(vramAddress, value);
 	}
 
@@ -341,7 +352,7 @@ namespace
 		RenderParts::instance().getPaletteManager().writePaletteEntryPacked(0, index, color);
 	}
 
-	void Renderer_enableSecondaryPalette(uint8 line)
+	void Renderer_enableSecondaryPalette(uint16 line)
 	{
 		RenderParts::instance().getPaletteManager().setPaletteSplitPositionY(line);
 	}
@@ -384,11 +395,24 @@ namespace
 	void Renderer_resetCustomPlaneConfigurations()
 	{
 		RenderParts::instance().getPlaneManager().resetCustomPlanes();
+		RenderParts::instance().getScrollOffsetsManager().resetOverwriteFlags();
 	}
 
 	void Renderer_resetSprites()
 	{
-		RenderParts::instance().getSpriteManager().setResetRenderItems(true);
+		RenderParts::instance().getSpriteManager().setResetRenderItems(0x07);	// All of first three bits
+	}
+
+	void Renderer_resetLifetimeContext(uint8 lifetimeContext)
+	{
+		RMX_CHECK(lifetimeContext <= 2, "Lifetime context must be between 0 and 2", return);
+		RenderParts::instance().getSpriteManager().setResetRenderItems(1 << lifetimeContext);
+	}
+
+	void Renderer_setLifetimeContext(uint8 lifetimeContext)
+	{
+		RMX_CHECK(lifetimeContext <= 2, "Lifetime context must be between 0 and 2", return);
+		RenderParts::instance().getSpriteManager().setCurrentLifetimeContext((RenderItem::LifetimeContext)lifetimeContext);
 	}
 
 	void Renderer_drawVdpSprite(int16 px, int16 py, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue)
@@ -408,52 +432,52 @@ namespace
 
 	bool Renderer_hasCustomSprite(uint64 key)
 	{
-		return SpriteCache::instance().hasSprite(key);
+		return SpriteCollection::instance().hasSprite(key);
 	}
 
 	uint64 Renderer_setupCustomUncompressedSprite(uint32 sourceBase, uint16 words, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		SpriteCache::ROMSpriteData romSpriteData;
+		SpriteCollection::ROMSpriteData romSpriteData;
 		romSpriteData.mPatternsBaseAddress = sourceBase;
 		romSpriteData.mTableAddress = words / 0x10;
 		romSpriteData.mMappingOffset = mappingOffset;
 		romSpriteData.mAnimationSprite = animationSprite;
-		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::NONE;
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
+		romSpriteData.mEncoding = SpriteCollection::ROMSpriteEncoding::NONE;
+		return SpriteCollection::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
 	}
 
 	uint64 Renderer_setupCustomCharacterSprite(uint32 sourceBase, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		SpriteCache::ROMSpriteData romSpriteData;
+		SpriteCollection::ROMSpriteData romSpriteData;
 		romSpriteData.mPatternsBaseAddress = sourceBase;
 		romSpriteData.mTableAddress = tableAddress;
 		romSpriteData.mMappingOffset = mappingOffset;
 		romSpriteData.mAnimationSprite = animationSprite;
-		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::CHARACTER;
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
+		romSpriteData.mEncoding = SpriteCollection::ROMSpriteEncoding::CHARACTER;
+		return SpriteCollection::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
 	}
 
 	uint64 Renderer_setupCustomObjectSprite(uint32 sourceBase, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		SpriteCache::ROMSpriteData romSpriteData;
+		SpriteCollection::ROMSpriteData romSpriteData;
 		romSpriteData.mPatternsBaseAddress = sourceBase;
 		romSpriteData.mTableAddress = tableAddress;
 		romSpriteData.mMappingOffset = mappingOffset;
 		romSpriteData.mAnimationSprite = animationSprite;
-		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::OBJECT;
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
+		romSpriteData.mEncoding = SpriteCollection::ROMSpriteEncoding::OBJECT;
+		return SpriteCollection::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
 	}
 
 	uint64 Renderer_setupKosinskiCompressedSprite2(uint32 sourceAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, int16 indexOffset)
 	{
-		SpriteCache::ROMSpriteData romSpriteData;
+		SpriteCollection::ROMSpriteData romSpriteData;
 		romSpriteData.mPatternsBaseAddress = sourceAddress;
 		romSpriteData.mTableAddress = 0;
 		romSpriteData.mMappingOffset = mappingOffset;
 		romSpriteData.mAnimationSprite = animationSprite;
-		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::KOSINSKI;
+		romSpriteData.mEncoding = SpriteCollection::ROMSpriteEncoding::KOSINSKI;
 		romSpriteData.mIndexOffset = indexOffset;
-		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
+		return SpriteCollection::instance().setupSpriteFromROM(getEmulatorInterface(), romSpriteData, atex).mKey;
 	}
 
 	uint64 Renderer_setupKosinskiCompressedSprite1(uint32 sourceAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
@@ -511,7 +535,7 @@ namespace
 		{
 			if (categoryName.isValid())
 			{
-				SpriteCache::instance().dumpSprite(key, categoryName.getString(), spriteNumber, atex);
+				SpriteCollection::instance().dumpSprite(key, categoryName.getString(), spriteNumber, atex);
 			}
 		}
 	}
@@ -551,12 +575,12 @@ namespace
 
 	void Renderer_resetViewport(uint16 renderQueue)
 	{
-		RenderParts::instance().addViewport(Recti(0, 0, VideoOut::instance().getScreenWidth(), VideoOut::instance().getScreenHeight()), renderQueue);
+		RenderParts::instance().getSpriteManager().addViewport(Recti(Vec2i(), VideoOut::instance().getScreenSize()), renderQueue);
 	}
 
 	void Renderer_setViewport(int16 px, int16 py, int16 width, int16 height, uint16 renderQueue)
 	{
-		RenderParts::instance().addViewport(Recti(px, py, width, height), renderQueue);
+		RenderParts::instance().getSpriteManager().addViewport(Recti(px, py, width, height), renderQueue);
 	}
 
 	void Renderer_setGlobalComponentTint(int16 tintR, int16 tintG, int16 tintB, int16 addedR, int16 addedG, int16 addedB)
@@ -770,6 +794,35 @@ namespace
 		}
 	}
 
+	void SpriteHandle_setPalette(SpriteHandleWrapper spriteHandle, lemon::StringRef key, uint8 line)
+	{
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			const uint64 paletteKey = key.getHash() + line;
+			spriteHandleData->mPrimaryPaletteKey = paletteKey;
+			spriteHandleData->mSecondaryPaletteKey = paletteKey;
+		}
+	}
+
+	void SpriteHandle_setPrimaryPalette(SpriteHandleWrapper spriteHandle, lemon::StringRef key, uint8 line)
+	{
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mPrimaryPaletteKey = key.getHash() + line;
+		}
+	}
+
+	void SpriteHandle_setSecondaryPalette(SpriteHandleWrapper spriteHandle, lemon::StringRef key, uint8 line)
+	{
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mSecondaryPaletteKey = key.getHash() + line;
+		}
+	}
+
 	void SpriteHandle_setPaletteOffset(SpriteHandleWrapper spriteHandle, uint16 paletteOffset)
 	{
 		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
@@ -874,582 +927,373 @@ namespace lemon
 
 void RendererBindings::registerBindings(lemon::Module& module)
 {
+	lemon::ModuleBindingsBuilder builder(module);
+
 	// Data type
 	SpriteHandleWrapper::mDataType = module.addDataType("SpriteHandle", lemon::BaseType::UINT_32);
 
+	// Constants
+	{
+		builder.addConstant<uint8>("BlendMode.OPAQUE",		   BlendMode::OPAQUE);
+		builder.addConstant<uint8>("BlendMode.ALPHA",		   BlendMode::ALPHA);
+		builder.addConstant<uint8>("BlendMode.ADDITIVE",	   BlendMode::ADDITIVE);
+		builder.addConstant<uint8>("BlendMode.SUBTRACTIVE",	   BlendMode::SUBTRACTIVE);
+		builder.addConstant<uint8>("BlendMode.MULTIPLICATIVE", BlendMode::MULTIPLICATIVE);
+		builder.addConstant<uint8>("BlendMode.MINIMUM",		   BlendMode::MINIMUM);
+		builder.addConstant<uint8>("BlendMode.MAXIMUM",		   BlendMode::MAXIMUM);
+	}
 
-	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
-	const BitFlagSet<lemon::Function::Flag> compileTimeConstant(lemon::Function::Flag::ALLOW_INLINE_EXECUTION, lemon::Function::Flag::COMPILE_TIME_CONSTANT);
+	// Functions
+	{
+		const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
+		const BitFlagSet<lemon::Function::Flag> compileTimeConstant(lemon::Function::Flag::ALLOW_INLINE_EXECUTION, lemon::Function::Flag::COMPILE_TIME_CONSTANT);
 
 
-	// Screen size query
-	module.addNativeFunction("getScreenWidth", lemon::wrap(&getScreenWidth), defaultFlags);
-	module.addNativeFunction("getScreenHeight", lemon::wrap(&getScreenHeight), defaultFlags);
-	module.addNativeFunction("getScreenExtend", lemon::wrap(&getScreenExtend), defaultFlags);
+		// Screen size query
+		builder.addNativeFunction("getScreenWidth", lemon::wrap(&getScreenWidth), defaultFlags);
+		builder.addNativeFunction("getScreenHeight", lemon::wrap(&getScreenHeight), defaultFlags);
+		builder.addNativeFunction("getScreenCenterX", lemon::wrap(&getScreenCenterX), defaultFlags);
+		builder.addNativeFunction("getScreenCenterY", lemon::wrap(&getScreenCenterY), defaultFlags);
+		builder.addNativeFunction("getScreenExtend", lemon::wrap(&getScreenExtend), defaultFlags);
 
 
-	// Color
-	module.addNativeFunction("Color.fromHSV", lemon::wrap(&Color_fromHSV), compileTimeConstant)
-		.setParameterInfo(0, "hue")
-		.setParameterInfo(1, "saturation")
-		.setParameterInfo(2, "value");
+		// Color
+		builder.addNativeFunction("Color.fromHSV", lemon::wrap(&Color_fromHSV), compileTimeConstant)
+			.setParameters("hue", "saturation", "value");
 
-	module.addNativeFunction("Color.fromHSV", lemon::wrap(&Color_fromHSVA), compileTimeConstant)
-		.setParameterInfo(0, "hue")
-		.setParameterInfo(1, "saturation")
-		.setParameterInfo(2, "value")
-		.setParameterInfo(3, "alpha");
+		builder.addNativeFunction("Color.fromHSV", lemon::wrap(&Color_fromHSVA), compileTimeConstant)
+			.setParameters("hue", "saturation", "value", "alpha");
 
-	module.addNativeFunction("Color.HSV.getHue", lemon::wrap(&Color_HSV_getHue), compileTimeConstant)
-		.setParameterInfo(0, "color");
+		builder.addNativeFunction("Color.HSV.getHue", lemon::wrap(&Color_HSV_getHue), compileTimeConstant)
+			.setParameters("color");
 
-	module.addNativeFunction("Color.HSV.getSaturation", lemon::wrap(&Color_HSV_getSaturation), compileTimeConstant)
-		.setParameterInfo(0, "color");
+		builder.addNativeFunction("Color.HSV.getSaturation", lemon::wrap(&Color_HSV_getSaturation), compileTimeConstant)
+			.setParameters("color");
 
-	module.addNativeFunction("Color.HSV.getValue", lemon::wrap(&Color_HSV_getValue), compileTimeConstant)
-		.setParameterInfo(0, "color");
+		builder.addNativeFunction("Color.HSV.getValue", lemon::wrap(&Color_HSV_getValue), compileTimeConstant)
+			.setParameters("color");
 
-	module.addNativeFunction("Color.lerp", lemon::wrap(&Color_lerp), compileTimeConstant)
-		.setParameterInfo(0, "colorA")
-		.setParameterInfo(1, "colorB")
-		.setParameterInfo(2, "factor");
+		builder.addNativeFunction("Color.lerp", lemon::wrap(&Color_lerp), compileTimeConstant)
+			.setParameters("colorA", "colorB", "factor");
 
 
-	// VDP emulation
-	module.addNativeFunction("VDP.setupVRAMWrite", lemon::wrap(&VDP_setupVRAMWrite), defaultFlags)
-		.setParameterInfo(0, "vramAddress");
+		// VDP emulation
+		builder.addNativeFunction("VDP.setupVRAMWrite", lemon::wrap(&VDP_setupVRAMWrite), defaultFlags)
+			.setParameters("vramAddress");
 
-	module.addNativeFunction("VDP.setupVSRAMWrite", lemon::wrap(&VDP_setupVSRAMWrite), defaultFlags)
-		.setParameterInfo(0, "vsramAddress");
+		builder.addNativeFunction("VDP.setupVSRAMWrite", lemon::wrap(&VDP_setupVSRAMWrite), defaultFlags)
+			.setParameters("vsramAddress");
 
-	module.addNativeFunction("VDP.setupCRAMWrite", lemon::wrap(&VDP_setupCRAMWrite), defaultFlags)
-		.setParameterInfo(0, "cramAddress");
+		builder.addNativeFunction("VDP.setupCRAMWrite", lemon::wrap(&VDP_setupCRAMWrite), defaultFlags)
+			.setParameters("cramAddress");
 
-	module.addNativeFunction("VDP.setWriteIncrement", lemon::wrap(&VDP_setWriteIncrement), defaultFlags)
-		.setParameterInfo(0, "increment");
+		builder.addNativeFunction("VDP.setWriteIncrement", lemon::wrap(&VDP_setWriteIncrement), defaultFlags)
+			.setParameters("increment");
 
-	module.addNativeFunction("VDP.readData16", lemon::wrap(&VDP_readData16), defaultFlags);
+		builder.addNativeFunction("VDP.readData16", lemon::wrap(&VDP_readData16), defaultFlags);
 
-	module.addNativeFunction("VDP.readData32", lemon::wrap(&VDP_readData32), defaultFlags);
+		builder.addNativeFunction("VDP.readData32", lemon::wrap(&VDP_readData32), defaultFlags);
 
-	module.addNativeFunction("VDP.writeData16", lemon::wrap(&VDP_writeData16), defaultFlags)
-		.setParameterInfo(0, "value");
+		builder.addNativeFunction("VDP.writeData16", lemon::wrap(&VDP_writeData16), defaultFlags)
+			.setParameters("value");
 
-	module.addNativeFunction("VDP.writeData32", lemon::wrap(&VDP_writeData32), defaultFlags)
-		.setParameterInfo(0, "value");
+		builder.addNativeFunction("VDP.writeData32", lemon::wrap(&VDP_writeData32), defaultFlags)
+			.setParameters("value");
 
-	module.addNativeFunction("VDP.copyToVRAM", lemon::wrap(&VDP_copyToVRAM), defaultFlags)
-		.setParameterInfo(0, "address")
-		.setParameterInfo(1, "bytes");
+		builder.addNativeFunction("VDP.copyToVRAM", lemon::wrap(&VDP_copyToVRAM), defaultFlags)
+			.setParameters("address", "bytes");
 
-	module.addNativeFunction("VDP.fillVRAMbyDMA", lemon::wrap(&VDP_fillVRAMbyDMA), defaultFlags)
-		.setParameterInfo(0, "fillValue")
-		.setParameterInfo(1, "vramAddress")
-		.setParameterInfo(2, "bytes");
+		builder.addNativeFunction("VDP.fillVRAMbyDMA", lemon::wrap(&VDP_fillVRAMbyDMA), defaultFlags)
+			.setParameters("fillValue", "vramAddress", "bytes");
 
-	module.addNativeFunction("VDP.zeroVRAM", lemon::wrap(&VDP_zeroVRAM), defaultFlags)
-		.setParameterInfo(0, "bytes");
+		builder.addNativeFunction("VDP.zeroVRAM", lemon::wrap(&VDP_zeroVRAM), defaultFlags)
+			.setParameters("bytes");
 
-	module.addNativeFunction("VDP.copyToVRAMbyDMA", lemon::wrap(&VDP_copyToVRAMbyDMA), defaultFlags)
-		.setParameterInfo(0, "sourceAddress")
-		.setParameterInfo(1, "vramAddress")
-		.setParameterInfo(2, "bytes");
+		builder.addNativeFunction("VDP.copyToVRAMbyDMA", lemon::wrap(&VDP_copyToVRAMbyDMA), defaultFlags)
+			.setParameters("sourceAddress", "vramAddress", "bytes");
 
-	module.addNativeFunction("VDP.copyToCRAMbyDMA", lemon::wrap(&VDP_copyToCRAMbyDMA), defaultFlags)
-		.setParameterInfo(0, "sourceAddress")
-		.setParameterInfo(1, "vramAddress")
-		.setParameterInfo(2, "bytes");
+		builder.addNativeFunction("VDP.copyToCRAMbyDMA", lemon::wrap(&VDP_copyToCRAMbyDMA), defaultFlags)
+			.setParameters("sourceAddress", "vramAddress", "bytes");
 
 
-	// VDP config
-	module.addNativeFunction("VDP.Config.setActiveDisplay", lemon::wrap(&VDP_Config_setActiveDisplay), defaultFlags)
-		.setParameterInfo(0, "enable");
+		// VDP config
+		builder.addNativeFunction("VDP.Config.setActiveDisplay", lemon::wrap(&VDP_Config_setActiveDisplay), defaultFlags)
+			.setParameters("enable");
 
-	module.addNativeFunction("VDP.Config.setNameTableBasePlaneB", lemon::wrap(&VDP_Config_setNameTableBasePlaneB), defaultFlags)
-		.setParameterInfo(0, "vramAddress");
+		builder.addNativeFunction("VDP.Config.setNameTableBasePlaneB", lemon::wrap(&VDP_Config_setNameTableBasePlaneB), defaultFlags)
+			.setParameters("vramAddress");
 
-	module.addNativeFunction("VDP.Config.setNameTableBasePlaneA", lemon::wrap(&VDP_Config_setNameTableBasePlaneA), defaultFlags)
-		.setParameterInfo(0, "vramAddress");
+		builder.addNativeFunction("VDP.Config.setNameTableBasePlaneA", lemon::wrap(&VDP_Config_setNameTableBasePlaneA), defaultFlags)
+			.setParameters("vramAddress");
 
-	module.addNativeFunction("VDP.Config.setNameTableBasePlaneW", lemon::wrap(&VDP_Config_setNameTableBasePlaneW), defaultFlags)
-		.setParameterInfo(0, "vramAddress");
+		builder.addNativeFunction("VDP.Config.setNameTableBasePlaneW", lemon::wrap(&VDP_Config_setNameTableBasePlaneW), defaultFlags)
+			.setParameters("vramAddress");
 
-	module.addNativeFunction("VDP.Config.setBackdropColor", lemon::wrap(&VDP_Config_setBackdropColor), defaultFlags)
-		.setParameterInfo(0, "paletteIndex");
+		builder.addNativeFunction("VDP.Config.setBackdropColor", lemon::wrap(&VDP_Config_setBackdropColor), defaultFlags)
+			.setParameters("paletteIndex");
 
-	module.addNativeFunction("VDP.Config.setVerticalScrolling", lemon::wrap(&VDP_Config_setVerticalScrolling), defaultFlags)
-		.setParameterInfo(0, "verticalScrolling")
-		.setParameterInfo(1, "horizontalScrollMask");
-
-	module.addNativeFunction("VDP.Config.setRenderingModeConfiguration", lemon::wrap(&VDP_Config_setRenderingModeConfiguration), defaultFlags)
-		.setParameterInfo(0, "shadowHighlightPalette");
-
-	module.addNativeFunction("VDP.Config.setHorizontalScrollTableBase", lemon::wrap(&VDP_Config_setHorizontalScrollTableBase), defaultFlags)
-		.setParameterInfo(0, "vramAddress");
-
-	module.addNativeFunction("VDP.Config.setPlayfieldSizeInPatterns", lemon::wrap(&VDP_Config_setPlayfieldSizeInPatterns), defaultFlags)
-		.setParameterInfo(0, "width")
-		.setParameterInfo(1, "height");
-
-	module.addNativeFunction("VDP.Config.setPlayfieldSizeInPixels", lemon::wrap(&VDP_Config_setPlayfieldSizeInPixels), defaultFlags)
-		.setParameterInfo(0, "width")
-		.setParameterInfo(1, "height");
-
-	module.addNativeFunction("VDP.Config.setupWindowPlane", lemon::wrap(&VDP_Config_setupWindowPlane), defaultFlags)
-		.setParameterInfo(0, "useWindowPlane")
-		.setParameterInfo(1, "splitY");
-
-	module.addNativeFunction("VDP.Config.setPlaneWScrollOffset", lemon::wrap(&VDP_Config_setPlaneWScrollOffset), defaultFlags)
-		.setParameterInfo(0, "x")
-		.setParameterInfo(1, "y");
-
-	module.addNativeFunction("VDP.Config.setSpriteAttributeTableBase", lemon::wrap(&VDP_Config_setSpriteAttributeTableBase), defaultFlags)
-		.setParameterInfo(0, "vramAddress");
-
-
-	// Direct VRAM access
-	module.addNativeFunction("getVRAM", lemon::wrap(&getVRAM), defaultFlags)
-		.setParameterInfo(0, "vramAddress");
-
-	module.addNativeFunction("setVRAM", lemon::wrap(&setVRAM), defaultFlags)
-		.setParameterInfo(0, "vramAddress")
-		.setParameterInfo(1, "value");
-
-
-	// Renderer functions
-	module.addNativeFunction("Renderer.setPaletteColor", lemon::wrap(&Renderer_setPaletteColor), defaultFlags)
-		.setParameterInfo(0, "index")
-		.setParameterInfo(1, "color");
-
-	module.addNativeFunction("Renderer.setPaletteColorPacked", lemon::wrap(&Renderer_setPaletteColorPacked), defaultFlags)
-		.setParameterInfo(0, "index")
-		.setParameterInfo(1, "color");
-
-	module.addNativeFunction("Renderer.enableSecondaryPalette", lemon::wrap(&Renderer_enableSecondaryPalette), defaultFlags)
-		.setParameterInfo(0, "line");
-
-	module.addNativeFunction("Renderer.setSecondaryPaletteColorPacked", lemon::wrap(&Renderer_setSecondaryPaletteColorPacked), defaultFlags)
-		.setParameterInfo(0, "index")
-		.setParameterInfo(1, "color");
-
-	module.addNativeFunction("Renderer.setScrollOffsetH", lemon::wrap(&Renderer_setScrollOffsetH), defaultFlags)
-		.setParameterInfo(0, "setIndex")
-		.setParameterInfo(1, "lineNumber")
-		.setParameterInfo(2, "value");
-
-	module.addNativeFunction("Renderer.setScrollOffsetV", lemon::wrap(&Renderer_setScrollOffsetV), defaultFlags)
-		.setParameterInfo(0, "setIndex")
-		.setParameterInfo(1, "rowNumber")
-		.setParameterInfo(2, "value");
-
-	module.addNativeFunction("Renderer.setHorizontalScrollNoRepeat", lemon::wrap(&Renderer_setHorizontalScrollNoRepeat), defaultFlags)
-		.setParameterInfo(0, "setIndex")
-		.setParameterInfo(1, "enable");
-
-	module.addNativeFunction("Renderer.setVerticalScrollOffsetBias", lemon::wrap(&Renderer_setVerticalScrollOffsetBias), defaultFlags)
-		.setParameterInfo(0, "bias");
-
-	module.addNativeFunction("Renderer.enableDefaultPlane", lemon::wrap(&Renderer_enableDefaultPlane), defaultFlags)
-		.setParameterInfo(0, "planeIndex")
-		.setParameterInfo(1, "enabled");
-
-	module.addNativeFunction("Renderer.setupPlane", lemon::wrap(&Renderer_setupPlane), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py")
-		.setParameterInfo(2, "width")
-		.setParameterInfo(3, "height")
-		.setParameterInfo(4, "planeIndex")
-		.setParameterInfo(5, "scrollOffsets")
-		.setParameterInfo(6, "renderQueue");
-
-	module.addNativeFunction("Renderer.resetCustomPlaneConfigurations", lemon::wrap(&Renderer_resetCustomPlaneConfigurations), defaultFlags);
-
-	module.addNativeFunction("Renderer.resetSprites", lemon::wrap(&Renderer_resetSprites), defaultFlags);
-
-	module.addNativeFunction("Renderer.drawVdpSprite", lemon::wrap(&Renderer_drawVdpSprite), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py")
-		.setParameterInfo(2, "encodedSize")
-		.setParameterInfo(3, "patternIndex")
-		.setParameterInfo(4, "renderQueue");
-
-	module.addNativeFunction("Renderer.drawVdpSpriteWithAlpha", lemon::wrap(&Renderer_drawVdpSpriteWithAlpha), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py")
-		.setParameterInfo(2, "encodedSize")
-		.setParameterInfo(3, "patternIndex")
-		.setParameterInfo(4, "renderQueue")
-		.setParameterInfo(5, "alpha");
-
-	module.addNativeFunction("Renderer.drawVdpSpriteTinted", lemon::wrap(&Renderer_drawVdpSpriteTinted), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py")
-		.setParameterInfo(2, "encodedSize")
-		.setParameterInfo(3, "patternIndex")
-		.setParameterInfo(4, "renderQueue")
-		.setParameterInfo(5, "tintColor")
-		.setParameterInfo(6, "addedColor");
-
-	module.addNativeFunction("Renderer.hasCustomSprite", lemon::wrap(&Renderer_hasCustomSprite), defaultFlags)
-		.setParameterInfo(0, "key");
-
-	module.addNativeFunction("Renderer.setupCustomUncompressedSprite", lemon::wrap(&Renderer_setupCustomUncompressedSprite), defaultFlags)
-		.setParameterInfo(0, "sourceBase")
-		.setParameterInfo(1, "word")
-		.setParameterInfo(2, "mappingOffset")
-		.setParameterInfo(3, "animationSprite")
-		.setParameterInfo(4, "atex");
-
-	module.addNativeFunction("Renderer.setupCustomCharacterSprite", lemon::wrap(&Renderer_setupCustomCharacterSprite), defaultFlags)
-		.setParameterInfo(0, "sourceBase")
-		.setParameterInfo(1, "tableAddress")
-		.setParameterInfo(2, "mappingOffset")
-		.setParameterInfo(3, "animationSprite")
-		.setParameterInfo(4, "atex");
-
-	module.addNativeFunction("Renderer.setupCustomObjectSprite", lemon::wrap(&Renderer_setupCustomObjectSprite), defaultFlags)
-		.setParameterInfo(0, "sourceBase")
-		.setParameterInfo(1, "tableAddress")
-		.setParameterInfo(2, "mappingOffset")
-		.setParameterInfo(3, "animationSprite")
-		.setParameterInfo(4, "atex");
-
-	module.addNativeFunction("Renderer.setupKosinskiCompressedSprite", lemon::wrap(&Renderer_setupKosinskiCompressedSprite1), defaultFlags)
-		.setParameterInfo(0, "sourceBase")
-		.setParameterInfo(1, "mappingOffset")
-		.setParameterInfo(2, "animationSprite")
-		.setParameterInfo(3, "atex");
-
-	module.addNativeFunction("Renderer.setupKosinskiCompressedSprite", lemon::wrap(&Renderer_setupKosinskiCompressedSprite2), defaultFlags)
-		.setParameterInfo(0, "sourceBase")
-		.setParameterInfo(1, "mappingOffset")
-		.setParameterInfo(2, "animationSprite")
-		.setParameterInfo(3, "atex")
-		.setParameterInfo(4, "indexOffset");
-
-	module.addNativeFunction("Renderer.drawSprite", lemon::wrap(&Renderer_drawSprite1), defaultFlags)
-		.setParameterInfo(0, "key")
-		.setParameterInfo(1, "px")
-		.setParameterInfo(2, "py")
-		.setParameterInfo(3, "atex")
-		.setParameterInfo(4, "flags")
-		.setParameterInfo(5, "renderQueue");
-
-	module.addNativeFunction("Renderer.drawSprite", lemon::wrap(&Renderer_drawSprite2), defaultFlags)
-		.setParameterInfo(0, "key")
-		.setParameterInfo(1, "px")
-		.setParameterInfo(2, "py")
-		.setParameterInfo(3, "atex")
-		.setParameterInfo(4, "flags")
-		.setParameterInfo(5, "renderQueue")
-		.setParameterInfo(6, "angle")
-		.setParameterInfo(7, "alpha");
-
-	module.addNativeFunction("Renderer.drawSpriteTinted", lemon::wrap(&Renderer_drawSpriteTinted), defaultFlags)
-		.setParameterInfo(0, "key")
-		.setParameterInfo(1, "px")
-		.setParameterInfo(2, "py")
-		.setParameterInfo(3, "atex")
-		.setParameterInfo(4, "flags")
-		.setParameterInfo(5, "renderQueue")
-		.setParameterInfo(6, "angle")
-		.setParameterInfo(7, "tintColor")
-		.setParameterInfo(8, "scale");
-
-	module.addNativeFunction("Renderer.drawSpriteTinted", lemon::wrap(&Renderer_drawSpriteTinted2), defaultFlags)
-		.setParameterInfo(0, "key")
-		.setParameterInfo(1, "px")
-		.setParameterInfo(2, "py")
-		.setParameterInfo(3, "atex")
-		.setParameterInfo(4, "flags")
-		.setParameterInfo(5, "renderQueue")
-		.setParameterInfo(6, "angle")
-		.setParameterInfo(7, "tintColor")
-		.setParameterInfo(8, "scale");
-
-	module.addNativeFunction("Renderer.drawSpriteTinted", lemon::wrap(&Renderer_drawSpriteTinted3), defaultFlags)
-		.setParameterInfo(0, "key")
-		.setParameterInfo(1, "px")
-		.setParameterInfo(2, "py")
-		.setParameterInfo(3, "atex")
-		.setParameterInfo(4, "flags")
-		.setParameterInfo(5, "renderQueue")
-		.setParameterInfo(6, "angle")
-		.setParameterInfo(7, "tintColor")
-		.setParameterInfo(8, "scaleX")
-		.setParameterInfo(9, "scaleY");
-
-	module.addNativeFunction("Renderer.drawSpriteTinted", lemon::wrap(&Renderer_drawSpriteTinted4), defaultFlags)
-		.setParameterInfo(0, "key")
-		.setParameterInfo(1, "px")
-		.setParameterInfo(2, "py")
-		.setParameterInfo(3, "atex")
-		.setParameterInfo(4, "flags")
-		.setParameterInfo(5, "renderQueue")
-		.setParameterInfo(6, "angle")
-		.setParameterInfo(7, "tintColor")
-		.setParameterInfo(8, "scaleX")
-		.setParameterInfo(9, "scaleY");
-
-	module.addNativeFunction("Renderer.drawSpriteTransformed", lemon::wrap(&Renderer_drawSpriteTransformed), defaultFlags)
-		.setParameterInfo(0, "key")
-		.setParameterInfo(1, "px")
-		.setParameterInfo(2, "py")
-		.setParameterInfo(3, "atex")
-		.setParameterInfo(4, "flags")
-		.setParameterInfo(5, "renderQueue")
-		.setParameterInfo(6, "tintColor")
-		.setParameterInfo(7, "transform11")
-		.setParameterInfo(8, "transform12")
-		.setParameterInfo(9, "transform21")
-		.setParameterInfo(10, "transform22");
-
-	module.addNativeFunction("Renderer.drawSpriteTransformed", lemon::wrap(&Renderer_drawSpriteTransformed2), defaultFlags)
-		.setParameterInfo(0, "key")
-		.setParameterInfo(1, "px")
-		.setParameterInfo(2, "py")
-		.setParameterInfo(3, "atex")
-		.setParameterInfo(4, "flags")
-		.setParameterInfo(5, "renderQueue")
-		.setParameterInfo(6, "tintColor")
-		.setParameterInfo(7, "transform11")
-		.setParameterInfo(8, "transform12")
-		.setParameterInfo(9, "transform21")
-		.setParameterInfo(10, "transform22");
-
-	module.addNativeFunction("Renderer.extractCustomSprite", lemon::wrap(&Renderer_extractCustomSprite), defaultFlags)
-		.setParameterInfo(0, "key")
-		.setParameterInfo(1, "categoryName")
-		.setParameterInfo(2, "spriteNumber")
-		.setParameterInfo(3, "atex");
-
-	module.addNativeFunction("Renderer.addSpriteMask", lemon::wrap(&Renderer_addSpriteMask), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py")
-		.setParameterInfo(2, "width")
-		.setParameterInfo(3, "height")
-		.setParameterInfo(4, "renderQueue")
-		.setParameterInfo(5, "priorityFlag");
-
-	module.addNativeFunction("Renderer.addSpriteMaskWorld", lemon::wrap(&Renderer_addSpriteMaskWorld), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py")
-		.setParameterInfo(2, "width")
-		.setParameterInfo(3, "height")
-		.setParameterInfo(4, "renderQueue")
-		.setParameterInfo(5, "priorityFlag");
-
-	module.addNativeFunction("Renderer.setLogicalSpriteSpace", lemon::wrap(&Renderer_setLogicalSpriteSpace), defaultFlags)
-		.setParameterInfo(0, "space");
-
-	module.addNativeFunction("Renderer.clearSpriteTag", lemon::wrap(&Renderer_clearSpriteTag), defaultFlags);
-
-	module.addNativeFunction("Renderer.setSpriteTagWithPosition", lemon::wrap(&Renderer_setSpriteTagWithPosition), defaultFlags)
-		.setParameterInfo(0, "spriteTag")
-		.setParameterInfo(1, "px")
-		.setParameterInfo(2, "py");
-
-	module.addNativeFunction("Renderer.drawRect", lemon::wrap(&Renderer_drawRect), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py")
-		.setParameterInfo(2, "width")
-		.setParameterInfo(3, "height")
-		.setParameterInfo(4, "color")
-		.setParameterInfo(5, "renderQueue")
-		.setParameterInfo(6, "useWorldSpace");
-
-	module.addNativeFunction("Renderer.drawRect", lemon::wrap(&Renderer_drawRect2), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py")
-		.setParameterInfo(2, "width")
-		.setParameterInfo(3, "height")
-		.setParameterInfo(4, "color")
-		.setParameterInfo(5, "renderQueue")
-		.setParameterInfo(6, "useWorldSpace")
-		.setParameterInfo(7, "useGlobalComponentTint");
-
-	module.addNativeFunction("Renderer.setScreenSize", lemon::wrap(&Renderer_setScreenSize), defaultFlags)
-		.setParameterInfo(0, "width")
-		.setParameterInfo(1, "height");
-
-	module.addNativeFunction("Renderer.resetViewport", lemon::wrap(&Renderer_resetViewport), defaultFlags)
-		.setParameterInfo(0, "renderQueue");
-
-	module.addNativeFunction("Renderer.setViewport", lemon::wrap(&Renderer_setViewport), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py")
-		.setParameterInfo(2, "width")
-		.setParameterInfo(3, "height")
-		.setParameterInfo(4, "renderQueue");
-
-	module.addNativeFunction("Renderer.setGlobalComponentTint", lemon::wrap(&Renderer_setGlobalComponentTint), defaultFlags)
-		.setParameterInfo(0, "tintR")
-		.setParameterInfo(1, "tintG")
-		.setParameterInfo(2, "tintB")
-		.setParameterInfo(3, "addedR")
-		.setParameterInfo(4, "addedG")
-		.setParameterInfo(5, "addedB");
-
-	module.addNativeFunction("Renderer.drawText", lemon::wrap(&Renderer_drawText2), defaultFlags)
-		.setParameterInfo(0, "fontKey")
-		.setParameterInfo(1, "px")
-		.setParameterInfo(2, "py")
-		.setParameterInfo(3, "text")
-		.setParameterInfo(4, "tintColor")
-		.setParameterInfo(5, "alignment")
-		.setParameterInfo(6, "spacing")
-		.setParameterInfo(7, "renderQueue")
-		.setParameterInfo(8, "useWorldSpace");
-
-	module.addNativeFunction("Renderer.drawText", lemon::wrap(&Renderer_drawText), defaultFlags)
-		.setParameterInfo(0, "fontKey")
-		.setParameterInfo(1, "px")
-		.setParameterInfo(2, "py")
-		.setParameterInfo(3, "text")
-		.setParameterInfo(4, "tintColor")
-		.setParameterInfo(5, "alignment")
-		.setParameterInfo(6, "spacing")
-		.setParameterInfo(7, "renderQueue")
-		.setParameterInfo(8, "useWorldSpace")
-		.setParameterInfo(9, "useGlobalComponentTint");
-
-	module.addNativeFunction("Renderer.getTextWidth", lemon::wrap(&Renderer_getTextWidth), defaultFlags)
-		.setParameterInfo(0, "fontKey")
-		.setParameterInfo(1, "text");
-
-	module.addNativeFunction("setWorldSpaceOffset", lemon::wrap(&setWorldSpaceOffset), defaultFlags)
-		.setParameterInfo(0, "px")
-		.setParameterInfo(1, "py");
-
-
-	// Sprite handle
-	module.addNativeFunction("Renderer.addSpriteHandle", lemon::wrap(&Renderer_addSpriteHandle), defaultFlags)
-		.setParameterInfo(0, "spriteKey")
-		.setParameterInfo(1, "px")
-		.setParameterInfo(2, "py")
-		.setParameterInfo(3, "renderQueue");
-
-	module.addNativeMethod("SpriteHandle", "setFlags", lemon::wrap(&SpriteHandle_setFlags), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "flags");
-
-	module.addNativeMethod("SpriteHandle", "setFlipX", lemon::wrap(&SpriteHandle_setFlipX), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "flipX");
-
-	module.addNativeMethod("SpriteHandle", "setFlipY", lemon::wrap(&SpriteHandle_setFlipY), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "flipY");
-
-	module.addNativeMethod("SpriteHandle", "setRotation", lemon::wrap(&SpriteHandle_setRotation), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "degrees");
-
-	module.addNativeMethod("SpriteHandle", "setRotationRadians", lemon::wrap(&SpriteHandle_setRotationRadians), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "radians");
-
-	module.addNativeMethod("SpriteHandle", "setRotation_u8", lemon::wrap(&SpriteHandle_setRotation_u8), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "angle");
-
-	module.addNativeMethod("SpriteHandle", "setScale", lemon::wrap(&SpriteHandle_setScaleUniform), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "scale");
-
-	module.addNativeMethod("SpriteHandle", "setScale", lemon::wrap(&SpriteHandle_setScaleXY), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "scaleX")
-		.setParameterInfo(2, "scaleY");
-
-	module.addNativeMethod("SpriteHandle", "setScale_s32", lemon::wrap(&SpriteHandle_setScaleUniform_s32), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "scale");
-
-	module.addNativeMethod("SpriteHandle", "setScale_s32", lemon::wrap(&SpriteHandle_setScaleXY_s32), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "scaleX")
-		.setParameterInfo(2, "scaleY");
-
-	module.addNativeMethod("SpriteHandle", "setRotationScale", lemon::wrap(&SpriteHandle_setRotationScale1), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "degrees")
-		.setParameterInfo(2, "scale");
-
-	module.addNativeMethod("SpriteHandle", "setRotationScale", lemon::wrap(&SpriteHandle_setRotationScale2), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "degrees")
-		.setParameterInfo(2, "scaleX")
-		.setParameterInfo(3, "scaleY");
-
-	module.addNativeMethod("SpriteHandle", "setTransform", lemon::wrap(&SpriteHandle_setTransform), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "transform11")
-		.setParameterInfo(2, "transform12")
-		.setParameterInfo(3, "transform21")
-		.setParameterInfo(4, "transform22");
-
-	module.addNativeMethod("SpriteHandle", "setPriorityFlag", lemon::wrap(&SpriteHandle_setPriorityFlag), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "priorityFlag");
-
-	module.addNativeMethod("SpriteHandle", "setCoordinateSpace", lemon::wrap(&SpriteHandle_setCoordinateSpace), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "space");
-
-	module.addNativeMethod("SpriteHandle", "setUseGlobalComponentTint", lemon::wrap(&SpriteHandle_setUseGlobalComponentTint), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "enable");
-
-	module.addNativeMethod("SpriteHandle", "setBlendMode", lemon::wrap(&SpriteHandle_setBlendMode), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "blendMode");
-
-	module.addNativeMethod("SpriteHandle", "setPaletteOffset", lemon::wrap(&SpriteHandle_setPaletteOffset), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "paletteOffset");
-
-	module.addNativeMethod("SpriteHandle", "setTintColor", lemon::wrap(&SpriteHandle_setTintColor), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "red")
-		.setParameterInfo(2, "green")
-		.setParameterInfo(3, "blue")
-		.setParameterInfo(4, "alpha");
-
-	module.addNativeMethod("SpriteHandle", "setTintColor_u8", lemon::wrap(&SpriteHandle_setTintColor_u8), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "red")
-		.setParameterInfo(2, "green")
-		.setParameterInfo(3, "blue")
-		.setParameterInfo(4, "alpha");
-
-	module.addNativeMethod("SpriteHandle", "setTintColorRGBA", lemon::wrap(&SpriteHandle_setTintColorRGBA), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "rgba");
-
-	module.addNativeMethod("SpriteHandle", "setOpacity", lemon::wrap(&SpriteHandle_setOpacity), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "opacity");
-
-	module.addNativeMethod("SpriteHandle", "setAddedColor", lemon::wrap(&SpriteHandle_setAddedColor), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "red")
-		.setParameterInfo(2, "green")
-		.setParameterInfo(3, "blue");
-
-	module.addNativeMethod("SpriteHandle", "setAddedColor_u8", lemon::wrap(&SpriteHandle_setAddedColor_u8), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "red")
-		.setParameterInfo(2, "green")
-		.setParameterInfo(3, "blue");
-
-	module.addNativeMethod("SpriteHandle", "setAddedColorRGB", lemon::wrap(&SpriteHandle_setAddedColorRGB), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "rgb");
-
-	module.addNativeMethod("SpriteHandle", "setSpriteTag", lemon::wrap(&SpriteHandle_setSpriteTag), defaultFlags)
-		.setParameterInfo(0, "this")
-		.setParameterInfo(1, "spriteTag")
-		.setParameterInfo(2, "px")
-		.setParameterInfo(3, "py");
+		builder.addNativeFunction("VDP.Config.setVerticalScrolling", lemon::wrap(&VDP_Config_setVerticalScrolling), defaultFlags)
+			.setParameters("verticalScrolling", "horizontalScrollMask");
+
+		builder.addNativeFunction("VDP.Config.setRenderingModeConfiguration", lemon::wrap(&VDP_Config_setRenderingModeConfiguration), defaultFlags)
+			.setParameters("shadowHighlightPalette");
+
+		builder.addNativeFunction("VDP.Config.setHorizontalScrollTableBase", lemon::wrap(&VDP_Config_setHorizontalScrollTableBase), defaultFlags)
+			.setParameters("vramAddress");
+
+		builder.addNativeFunction("VDP.Config.setPlayfieldSizeInPatterns", lemon::wrap(&VDP_Config_setPlayfieldSizeInPatterns), defaultFlags)
+			.setParameters("width", "height");
+
+		builder.addNativeFunction("VDP.Config.setPlayfieldSizeInPixels", lemon::wrap(&VDP_Config_setPlayfieldSizeInPixels), defaultFlags)
+			.setParameters("width", "height");
+
+		builder.addNativeFunction("VDP.Config.setupWindowPlane", lemon::wrap(&VDP_Config_setupWindowPlane), defaultFlags)
+			.setParameters("useWindowPlane", "splitY");
+
+		builder.addNativeFunction("VDP.Config.setPlaneWScrollOffset", lemon::wrap(&VDP_Config_setPlaneWScrollOffset), defaultFlags)
+			.setParameters("x", "y");
+
+		builder.addNativeFunction("VDP.Config.setSpriteAttributeTableBase", lemon::wrap(&VDP_Config_setSpriteAttributeTableBase), defaultFlags)
+			.setParameters("vramAddress");
+
+
+		// Direct VRAM access
+		builder.addNativeFunction("getVRAM", lemon::wrap(&getVRAM), defaultFlags)
+			.setParameters("vramAddress");
+
+		builder.addNativeFunction("setVRAM", lemon::wrap(&setVRAM), defaultFlags)
+			.setParameters("vramAddress", "value");
+
+
+		// Renderer functions
+		builder.addNativeFunction("Renderer.setPaletteColor", lemon::wrap(&Renderer_setPaletteColor), defaultFlags)
+			.setParameters("index", "color");
+
+		builder.addNativeFunction("Renderer.setPaletteColorPacked", lemon::wrap(&Renderer_setPaletteColorPacked), defaultFlags)
+			.setParameters("index", "color");
+
+		builder.addNativeFunction("Renderer.enableSecondaryPalette", lemon::wrap(&Renderer_enableSecondaryPalette), defaultFlags)
+			.setParameters("line");
+
+		builder.addNativeFunction("Renderer.setSecondaryPaletteColorPacked", lemon::wrap(&Renderer_setSecondaryPaletteColorPacked), defaultFlags)
+			.setParameters("index", "color");
+
+		builder.addNativeFunction("Renderer.setScrollOffsetH", lemon::wrap(&Renderer_setScrollOffsetH), defaultFlags)
+			.setParameters("setIndex", "lineNumber", "value");
+
+		builder.addNativeFunction("Renderer.setScrollOffsetV", lemon::wrap(&Renderer_setScrollOffsetV), defaultFlags)
+			.setParameters("setIndex", "rowNumber", "value");
+
+		builder.addNativeFunction("Renderer.setHorizontalScrollNoRepeat", lemon::wrap(&Renderer_setHorizontalScrollNoRepeat), defaultFlags)
+			.setParameters("setIndex", "enable");
+
+		builder.addNativeFunction("Renderer.setVerticalScrollOffsetBias", lemon::wrap(&Renderer_setVerticalScrollOffsetBias), defaultFlags)
+			.setParameters("bias");
+
+		builder.addNativeFunction("Renderer.enableDefaultPlane", lemon::wrap(&Renderer_enableDefaultPlane), defaultFlags)
+			.setParameters("planeIndex", "enabled");
+
+		builder.addNativeFunction("Renderer.setupPlane", lemon::wrap(&Renderer_setupPlane), defaultFlags)
+			.setParameters("px", "py", "width", "height", "planeIndex", "scrollOffsets", "renderQueue");
+
+		builder.addNativeFunction("Renderer.resetCustomPlaneConfigurations", lemon::wrap(&Renderer_resetCustomPlaneConfigurations), defaultFlags);
+
+		builder.addNativeFunction("Renderer.resetSprites", lemon::wrap(&Renderer_resetSprites), defaultFlags);
+
+		builder.addNativeFunction("Renderer.resetLifetimeContext", lemon::wrap(&Renderer_resetLifetimeContext), defaultFlags)
+			.setParameters("lifetimeContext");
+
+		builder.addNativeFunction("Renderer.setLifetimeContext", lemon::wrap(&Renderer_setLifetimeContext), defaultFlags)
+			.setParameters("lifetimeContext");
+
+		builder.addNativeFunction("Renderer.drawVdpSprite", lemon::wrap(&Renderer_drawVdpSprite), defaultFlags)
+			.setParameters("px", "py", "encodedSize", "patternIndex", "renderQueue");
+
+		builder.addNativeFunction("Renderer.drawVdpSpriteWithAlpha", lemon::wrap(&Renderer_drawVdpSpriteWithAlpha), defaultFlags)
+			.setParameters("px", "py", "encodedSize", "patternIndex", "renderQueue", "alpha");
+
+		builder.addNativeFunction("Renderer.drawVdpSpriteTinted", lemon::wrap(&Renderer_drawVdpSpriteTinted), defaultFlags)
+			.setParameters("px", "py", "encodedSize", "patternIndex", "renderQueue", "tintColor", "addedColor");
+
+		builder.addNativeFunction("Renderer.hasCustomSprite", lemon::wrap(&Renderer_hasCustomSprite), defaultFlags)
+			.setParameters("key");
+
+		builder.addNativeFunction("Renderer.setupCustomUncompressedSprite", lemon::wrap(&Renderer_setupCustomUncompressedSprite), defaultFlags)
+			.setParameters("sourceBase", "word", "mappingOffset", "animationSprite", "atex");
+
+		builder.addNativeFunction("Renderer.setupCustomCharacterSprite", lemon::wrap(&Renderer_setupCustomCharacterSprite), defaultFlags)
+			.setParameters("sourceBase", "tableAddress", "mappingOffset", "animationSprite", "atex");
+
+		builder.addNativeFunction("Renderer.setupCustomObjectSprite", lemon::wrap(&Renderer_setupCustomObjectSprite), defaultFlags)
+			.setParameters("sourceBase", "tableAddress", "mappingOffset", "animationSprite", "atex");
+
+		builder.addNativeFunction("Renderer.setupKosinskiCompressedSprite", lemon::wrap(&Renderer_setupKosinskiCompressedSprite1), defaultFlags)
+			.setParameters("sourceBase", "mappingOffset", "animationSprite", "atex");
+
+		builder.addNativeFunction("Renderer.setupKosinskiCompressedSprite", lemon::wrap(&Renderer_setupKosinskiCompressedSprite2), defaultFlags)
+			.setParameters("sourceBase", "mappingOffset", "animationSprite", "atex", "indexOffset");
+
+		builder.addNativeFunction("Renderer.drawSprite", lemon::wrap(&Renderer_drawSprite1), defaultFlags)
+			.setParameters("key", "px", "py", "atex", "flags", "renderQueue");
+
+		builder.addNativeFunction("Renderer.drawSprite", lemon::wrap(&Renderer_drawSprite2), defaultFlags)
+			.setParameters("key", "px", "py", "atex", "flags", "renderQueue", "angle", "alpha");
+
+		builder.addNativeFunction("Renderer.drawSpriteTinted", lemon::wrap(&Renderer_drawSpriteTinted), defaultFlags)
+			.setParameters("key", "px", "py", "atex", "flags", "renderQueue", "angle", "tintColor", "scale");
+
+		builder.addNativeFunction("Renderer.drawSpriteTinted", lemon::wrap(&Renderer_drawSpriteTinted2), defaultFlags)
+			.setParameters("key", "px", "py", "atex", "flags", "renderQueue", "angle", "tintColor", "scale");
+
+		builder.addNativeFunction("Renderer.drawSpriteTinted", lemon::wrap(&Renderer_drawSpriteTinted3), defaultFlags)
+			.setParameters("key", "px", "py", "atex", "flags", "renderQueue", "angle", "tintColor", "scaleX", "scaleY");
+
+		builder.addNativeFunction("Renderer.drawSpriteTinted", lemon::wrap(&Renderer_drawSpriteTinted4), defaultFlags)
+			.setParameters("key", "px", "py", "atex", "flags", "renderQueue", "angle", "tintColor", "scaleX", "scaleY");
+
+		builder.addNativeFunction("Renderer.drawSpriteTransformed", lemon::wrap(&Renderer_drawSpriteTransformed), defaultFlags)
+			.setParameters("key", "px", "py", "atex", "flags", "renderQueue", "tintColor", "transform11", "transform12", "transform21", "transform22");
+
+		builder.addNativeFunction("Renderer.drawSpriteTransformed", lemon::wrap(&Renderer_drawSpriteTransformed2), defaultFlags)
+			.setParameters("key", "px", "py", "atex", "flags", "renderQueue", "tintColor", "transform11", "transform12", "transform21", "transform22");
+
+		builder.addNativeFunction("Renderer.extractCustomSprite", lemon::wrap(&Renderer_extractCustomSprite), defaultFlags)
+			.setParameters("key", "categoryName", "spriteNumber", "atex");
+
+		builder.addNativeFunction("Renderer.addSpriteMask", lemon::wrap(&Renderer_addSpriteMask), defaultFlags)
+			.setParameters("px", "py", "width", "height", "renderQueue", "priorityFlag");
+
+		builder.addNativeFunction("Renderer.addSpriteMaskWorld", lemon::wrap(&Renderer_addSpriteMaskWorld), defaultFlags)
+			.setParameters("px", "py", "width", "height", "renderQueue", "priorityFlag");
+
+		builder.addNativeFunction("Renderer.setLogicalSpriteSpace", lemon::wrap(&Renderer_setLogicalSpriteSpace), defaultFlags)
+			.setParameters("space");
+
+		builder.addNativeFunction("Renderer.clearSpriteTag", lemon::wrap(&Renderer_clearSpriteTag), defaultFlags);
+
+		builder.addNativeFunction("Renderer.setSpriteTagWithPosition", lemon::wrap(&Renderer_setSpriteTagWithPosition), defaultFlags)
+			.setParameters("spriteTag", "px", "py");
+
+		builder.addNativeFunction("Renderer.drawRect", lemon::wrap(&Renderer_drawRect), defaultFlags)
+			.setParameters("px", "py", "width", "height", "color", "renderQueue", "useWorldSpace");
+
+		builder.addNativeFunction("Renderer.drawRect", lemon::wrap(&Renderer_drawRect2), defaultFlags)
+			.setParameters("px", "py", "width", "height", "color", "renderQueue", "useWorldSpace", "useGlobalComponentTint");
+
+		builder.addNativeFunction("Renderer.setScreenSize", lemon::wrap(&Renderer_setScreenSize), defaultFlags)
+			.setParameters("width", "height");
+
+		builder.addNativeFunction("Renderer.resetViewport", lemon::wrap(&Renderer_resetViewport), defaultFlags)
+			.setParameters("renderQueue");
+
+		builder.addNativeFunction("Renderer.setViewport", lemon::wrap(&Renderer_setViewport), defaultFlags)
+			.setParameters("px", "py", "width", "height", "renderQueue");
+
+		builder.addNativeFunction("Renderer.setGlobalComponentTint", lemon::wrap(&Renderer_setGlobalComponentTint), defaultFlags)
+			.setParameters("tintR", "tintG", "tintB", "addedR", "addedG", "addedB");
+
+		builder.addNativeFunction("Renderer.drawText", lemon::wrap(&Renderer_drawText2), defaultFlags)
+			.setParameters("fontKey", "px", "py", "text", "tintColor", "alignment", "spacing", "renderQueue", "useWorldSpace");
+
+		builder.addNativeFunction("Renderer.drawText", lemon::wrap(&Renderer_drawText), defaultFlags)
+			.setParameters("fontKey", "px", "py", "text", "tintColor", "alignment", "spacing", "renderQueue", "useWorldSpace", "useGlobalComponentTint");
+
+		builder.addNativeFunction("Renderer.getTextWidth", lemon::wrap(&Renderer_getTextWidth), defaultFlags)
+			.setParameters("fontKey", "text");
+
+		builder.addNativeFunction("setWorldSpaceOffset", lemon::wrap(&setWorldSpaceOffset), defaultFlags)
+			.setParameters("px", "py");
+
+
+		// Sprite handle
+		builder.addNativeFunction("Renderer.addSpriteHandle", lemon::wrap(&Renderer_addSpriteHandle), defaultFlags)
+			.setParameters("spriteKey", "px", "py", "renderQueue");
+
+		builder.addNativeMethod("SpriteHandle", "setFlags", lemon::wrap(&SpriteHandle_setFlags), defaultFlags)
+			.setParameters("this", "flags");
+
+		builder.addNativeMethod("SpriteHandle", "setFlipX", lemon::wrap(&SpriteHandle_setFlipX), defaultFlags)
+			.setParameters("this", "flipX");
+
+		builder.addNativeMethod("SpriteHandle", "setFlipY", lemon::wrap(&SpriteHandle_setFlipY), defaultFlags)
+			.setParameters("this", "flipY");
+
+		builder.addNativeMethod("SpriteHandle", "setRotation", lemon::wrap(&SpriteHandle_setRotation), defaultFlags)
+			.setParameters("this", "degrees");
+
+		builder.addNativeMethod("SpriteHandle", "setRotationRadians", lemon::wrap(&SpriteHandle_setRotationRadians), defaultFlags)
+			.setParameters("this", "radians");
+
+		builder.addNativeMethod("SpriteHandle", "setRotation_u8", lemon::wrap(&SpriteHandle_setRotation_u8), defaultFlags)
+			.setParameters("this", "angle");
+
+		builder.addNativeMethod("SpriteHandle", "setScale", lemon::wrap(&SpriteHandle_setScaleUniform), defaultFlags)
+			.setParameters("this", "scale");
+
+		builder.addNativeMethod("SpriteHandle", "setScale", lemon::wrap(&SpriteHandle_setScaleXY), defaultFlags)
+			.setParameters("this", "scaleX", "scaleY");
+
+		builder.addNativeMethod("SpriteHandle", "setScale_s32", lemon::wrap(&SpriteHandle_setScaleUniform_s32), defaultFlags)
+			.setParameters("this", "scale");
+
+		builder.addNativeMethod("SpriteHandle", "setScale_s32", lemon::wrap(&SpriteHandle_setScaleXY_s32), defaultFlags)
+			.setParameters("this", "scaleX", "scaleY");
+
+		builder.addNativeMethod("SpriteHandle", "setRotationScale", lemon::wrap(&SpriteHandle_setRotationScale1), defaultFlags)
+			.setParameters("this", "degrees", "scale");
+
+		builder.addNativeMethod("SpriteHandle", "setRotationScale", lemon::wrap(&SpriteHandle_setRotationScale2), defaultFlags)
+			.setParameters("this", "degrees", "scaleX", "scaleY");
+
+		builder.addNativeMethod("SpriteHandle", "setTransform", lemon::wrap(&SpriteHandle_setTransform), defaultFlags)
+			.setParameters("this", "transform11", "transform12", "transform21", "transform22");
+
+		builder.addNativeMethod("SpriteHandle", "setPriorityFlag", lemon::wrap(&SpriteHandle_setPriorityFlag), defaultFlags)
+			.setParameters("this", "priorityFlag");
+
+		builder.addNativeMethod("SpriteHandle", "setCoordinateSpace", lemon::wrap(&SpriteHandle_setCoordinateSpace), defaultFlags)
+			.setParameters("this", "space");
+
+		builder.addNativeMethod("SpriteHandle", "setUseGlobalComponentTint", lemon::wrap(&SpriteHandle_setUseGlobalComponentTint), defaultFlags)
+			.setParameters("this", "enable");
+
+		builder.addNativeMethod("SpriteHandle", "setBlendMode", lemon::wrap(&SpriteHandle_setBlendMode), defaultFlags)
+			.setParameters("this", "blendMode");
+
+		builder.addNativeMethod("SpriteHandle", "setPalette", lemon::wrap(&SpriteHandle_setPalette), defaultFlags)
+			.setParameters("this", "key", "line");
+
+		builder.addNativeMethod("SpriteHandle", "setPrimaryPalette", lemon::wrap(&SpriteHandle_setPrimaryPalette), defaultFlags)
+			.setParameters("this", "key", "line");
+
+		builder.addNativeMethod("SpriteHandle", "setSecondaryPalette", lemon::wrap(&SpriteHandle_setSecondaryPalette), defaultFlags)
+			.setParameters("this", "key", "line");
+
+		builder.addNativeMethod("SpriteHandle", "setPaletteOffset", lemon::wrap(&SpriteHandle_setPaletteOffset), defaultFlags)
+			.setParameters("this", "paletteOffset");
+
+		builder.addNativeMethod("SpriteHandle", "setTintColor", lemon::wrap(&SpriteHandle_setTintColor), defaultFlags)
+			.setParameters("this", "red", "green", "blue", "alpha");
+
+		builder.addNativeMethod("SpriteHandle", "setTintColor_u8", lemon::wrap(&SpriteHandle_setTintColor_u8), defaultFlags)
+			.setParameters("this", "red", "green", "blue", "alpha");
+
+		builder.addNativeMethod("SpriteHandle", "setTintColorRGBA", lemon::wrap(&SpriteHandle_setTintColorRGBA), defaultFlags)
+			.setParameters("this", "rgba");
+
+		builder.addNativeMethod("SpriteHandle", "setOpacity", lemon::wrap(&SpriteHandle_setOpacity), defaultFlags)
+			.setParameters("this", "opacity");
+
+		builder.addNativeMethod("SpriteHandle", "setAddedColor", lemon::wrap(&SpriteHandle_setAddedColor), defaultFlags)
+			.setParameters("this", "red", "green", "blue");
+
+		builder.addNativeMethod("SpriteHandle", "setAddedColor_u8", lemon::wrap(&SpriteHandle_setAddedColor_u8), defaultFlags)
+			.setParameters("this", "red", "green", "blue");
+
+		builder.addNativeMethod("SpriteHandle", "setAddedColorRGB", lemon::wrap(&SpriteHandle_setAddedColorRGB), defaultFlags)
+			.setParameters("this", "rgb");
+
+		builder.addNativeMethod("SpriteHandle", "setSpriteTag", lemon::wrap(&SpriteHandle_setSpriteTag), defaultFlags)
+			.setParameters("this", "spriteTag", "px", "py");
+	}
 }

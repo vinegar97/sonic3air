@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -27,7 +27,7 @@
 		LEMON_DEBUG_BREAK(errorMessage); \
 		std::ostringstream stream; \
 		stream << errorMessage; \
-		throw CompilerException(stream.str().c_str()); \
+		throw CompilerException(stream.str()); \
 	} \
 }
 
@@ -38,7 +38,7 @@
 		LEMON_DEBUG_BREAK(errorMessage); \
 		std::ostringstream stream; \
 		stream << errorMessage; \
-		throw CompilerException(stream.str().c_str(), lineNumber); \
+		throw CompilerException(stream.str(), lineNumber); \
 	} \
 }
 
@@ -47,8 +47,16 @@
 	LEMON_DEBUG_BREAK(errorMessage); \
 	std::ostringstream stream; \
 	stream << errorMessage; \
-	throw CompilerException(stream.str().c_str(), errorCode, data1, data2); \
+	throw CompilerException(stream.str(), errorCode, data1, data2); \
 }
+
+#define ADD_WARNING(warningType, warningMessage, lineNumber) \
+{ \
+	std::ostringstream stream; \
+	stream << warningMessage; \
+	Compiler::getActiveInstance()->addWarning(warningType, stream.str(), lineNumber); \
+}
+
 
 
 namespace lemon

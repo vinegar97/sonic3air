@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -120,10 +120,10 @@ namespace s3air
 				key = rmx::getMurmur2_64(String(0, "character_knuckles_0x%02x", animationSprite));
 			}
 
-			if (!SpriteCache::instance().hasSprite(key))
+			if (!SpriteCollection::instance().hasSprite(key))
 			{
 				key = SharedDatabase::setupCharacterSprite(emulatorInterface, characterIndex, animationSprite, false);
-				if (!SpriteCache::instance().hasSprite(key))
+				if (!SpriteCollection::instance().hasSprite(key))
 					key = 0;
 			}
 		}
@@ -151,10 +151,10 @@ namespace s3air
 			}
 
 			uint64 key = rmx::getMurmur2_64(String(0, "character_tails_tails_0x%02x", tailsAnimSprite));
-			if (!SpriteCache::instance().hasSprite(key))
+			if (!SpriteCollection::instance().hasSprite(key))
 			{
 				key = SharedDatabase::setupTailsTailsSprite(emulatorInterface, tailsAnimSprite);
-				if (!SpriteCache::instance().hasSprite(key))
+				if (!SpriteCollection::instance().hasSprite(key))
 					key = 0;
 			}
 

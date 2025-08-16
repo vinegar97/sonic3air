@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -21,8 +21,8 @@ public:
 		const float* mInvTransform = nullptr;	// Must be set if mTransform is set, and be the inverse 2x2 matrix
 		SamplingMode mSamplingMode = SamplingMode::POINT;
 		BlendMode mBlendMode = BlendMode::OPAQUE;
-		const Color* mTintColor = nullptr;
-		const Color* mAddedColor = nullptr;
+		const Vec4f* mTintColor = nullptr;
+		const Vec4f* mAddedColor = nullptr;
 		bool mSwapRedBlueChannels = false;
 		const BitmapViewMutable<uint8>* mDepthBuffer = nullptr;
 		uint8 mDepthTestValue = 0;				// Blitter will never do a depth write, only depth test if mDepthBuffer is set
@@ -48,8 +48,8 @@ public:
 
 		inline SpriteWrapper(const Bitmap& bitmap, Vec2i pivot) : mBitmapView(bitmap), mPivot(pivot) {}
 		inline SpriteWrapper(const Bitmap& bitmap, Vec2i pivot, Recti innerRect) : mBitmapView(bitmap, innerRect), mPivot(pivot - innerRect.getPos()) {}
-		inline SpriteWrapper(uint32* data, Vec2i size, Vec2i pivot) : mBitmapView(data, size), mPivot(pivot) {}
-		inline SpriteWrapper(uint32* data, Vec2i size, Vec2i pivot, Recti innerRect) : mBitmapView(data, size, innerRect), mPivot(pivot - innerRect.getPos()) {}
+		inline SpriteWrapper(const uint32* data, Vec2i size, Vec2i pivot) : mBitmapView(data, size), mPivot(pivot) {}
+		inline SpriteWrapper(const uint32* data, Vec2i size, Vec2i pivot, Recti innerRect) : mBitmapView(data, size, innerRect), mPivot(pivot - innerRect.getPos()) {}
 	};
 
 	struct IndexedSpriteWrapper

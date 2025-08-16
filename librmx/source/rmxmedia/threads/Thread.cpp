@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -67,7 +67,11 @@ namespace rmx
 	{
 		if (!mIsThreadRunning)
 		{
+		#if !defined(PLATFORM_VITA)
 			mSDLThread = SDL_CreateThread(ThreadBase::runThreadStatic, mName.c_str(), this);
+		#else
+			mSDLThread = SDL_CreateThreadWithStackSize(ThreadBase::runThreadStatic, mName.c_str(), 4 * 1024 * 1024, this);
+		#endif
 		}
 	}
 

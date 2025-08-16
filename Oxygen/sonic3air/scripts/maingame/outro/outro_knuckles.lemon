@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -269,7 +269,7 @@ function void fn05e9c2()
 function void fn05e9e2()
 {
 	UpdateMovementStraightSimple()
-	if (s8[A0 + 0x04] >= 0)
+	if (!(objA0.render_flags & render_flag.VISIBLE))
 	{
 		objA0.update_address = 0x05ea1a
 		objA0.countdown_value = 0x0167
@@ -739,10 +739,9 @@ function void fn05f74e()
 		u8[A1 + 0x2c] = 0x80
 	}
 
-	A1 = 0x07d842
 	A2 = 0xfffffade
-	copyMemory((A2+=8)-8, (A1+=8)-8, 8)
-	u16[A2] = 0
+	copyMemory(A2, 0x07d842, 8)
+	u16[A2+8] = 0
 
 	Kosinski.addToDMAQueue(0x17f738, 0x8380)		// Mecha Sonic effects sprites
 }

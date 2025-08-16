@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -54,9 +54,23 @@ void SentPacketCache::addPacket(SentPacket& sentPacket, uint64 currentTimestamp,
 	++mNextUniquePacketID;
 }
 
+bool SentPacketCache::wasPacketReceiveConfirmed(uint32 uniquePacketID) const
+{
+	// If the ID is not part of the queue any more, it counts as received
+	if (uniquePacketID < mQueueStartUniquePacketID)
+		return true;
+
+	// If the ID is invalid, it's not received, obviously
+	const size_t index = uniquePacketID - mQueueStartUniquePacketID;
+	if (index >= mQueue.size())
+		return false;
+
+	return (nullptr == mQueue[index]);
+}
+
 void SentPacketCache::onPacketReceiveConfirmed(uint32 uniquePacketID)
 {
-	// If the ID part is not part of the queue, ignore it
+	// If the ID is not part of the queue, ignore it
 	if (uniquePacketID < mQueueStartUniquePacketID)
 		return;
 	const size_t index = uniquePacketID - mQueueStartUniquePacketID;
@@ -87,9 +101,9 @@ void SentPacketCache::updateResend(std::vector<SentPacket*>& outPacketsToResend,
 	if (mQueue.empty())
 		return;
 
-	const uint64 minimumInitialTimestamp = currentTimestamp - 500;	// Start resending packets after 500 ms
-	int timeBetweenResends = 500;
-	size_t remainingPacketsToConsider = 3;
+	const uint64 minimumInitialTimestamp = currentTimestamp - 200;	// Start resending packets after 200 ms
+	int timeBetweenResends = 200;
+	size_t remainingPacketsToConsider = 5;
 
 	// Check the first packet in the queue, i.e. the one that's waiting for the longest time
 	//  -> That one determines how many packets in the queue are even considered for resending, and how long to wait between resends
@@ -100,15 +114,15 @@ void SentPacketCache::updateResend(std::vector<SentPacket*>& outPacketsToResend,
 
 		if (sentPacket.mResendCounter < 5)
 		{
-			// Until 5th resend (2.5 seconds gone): Send with a high frequency
-			timeBetweenResends = 500;
-			remainingPacketsToConsider = 3;
+			// Until 5th resend (1 second gone): Send with a high frequency
+			timeBetweenResends = 200;
+			remainingPacketsToConsider = 5;
 		}
 		else if (sentPacket.mResendCounter < 10)
 		{
-			// Until 10th resend (10 seconds gone): The connection seems to have some issues, reduce resending
-			timeBetweenResends = 1500;
-			remainingPacketsToConsider = 2;
+			// Until 10th resend (6 seconds gone): The connection seems to have some issues, reduce resending
+			timeBetweenResends = 1000;
+			remainingPacketsToConsider = 3;
 		}
 		else
 		{

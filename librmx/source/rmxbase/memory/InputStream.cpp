@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -35,8 +35,8 @@ MemInputStream::MemInputStream(InputStream& input)
 		mBuffer = mCursor = new uint8[size];
 		mBufferEnd = mBuffer + size;
 		mAutoDelete = true;
-		const size_t read = input.read(const_cast<uint8*>(mBuffer), size);
-		assert(read == size);
+		const size_t bytesRead = input.read(const_cast<uint8*>(mBuffer), size);
+		assert(bytesRead == size);
 	}
 }
 
@@ -56,9 +56,9 @@ size_t MemInputStream::read(void* dst, size_t len)
 {
 	if (mCursor + len > mBufferEnd)
 	{
-		len = (size_t)(mBufferEnd - mCursor);
-		if (len <= 0)
+		if (mCursor >= mBufferEnd)
 			return 0;
+		len = (size_t)(mBufferEnd - mCursor);
 	}
 	memcpy(dst, mCursor, len);
 	mCursor += len;

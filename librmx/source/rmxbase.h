@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -52,6 +52,7 @@
 #include "rmxbase/data/SinglePtr.h"
 #include "rmxbase/data/SmartPtr.h"
 #include "rmxbase/data/GlobalObjectPtr.h"
+#include "rmxbase/data/WeakPtr.h"
 #include "rmxbase/memory/RC4Encryption.h"
 #include "rmxbase/memory/String.h"
 #include "rmxbase/memory/UTF8Conversion.h"
@@ -71,6 +72,7 @@
 #include "rmxbase/memory/ZlibDeflate.h"
 #include "rmxbase/bitmap/Color.h"
 #include "rmxbase/bitmap/BitmapCodecs.h"
+#include "rmxbase/bitmap/PaletteBitmap.h"
 #include "rmxbase/bitmap/BitmapView.h"
 #include "rmxbase/tools/Logging.h"
 

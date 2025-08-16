@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -28,6 +28,14 @@ namespace lemon
 			CUSTOM
 		};
 
+		struct BracketOperator
+		{
+			uint64 mGetterNameAndSignatureHash = 0;		// Function signature: (uint32 variableID, parameterType parameter) -> valueType
+			uint64 mSetterNameAndSignatureHash = 0;		// Function signature: (uint32 variableID, parameterType parameter, valueType value) -> void
+			const DataTypeDefinition* mValueType = nullptr;
+			const DataTypeDefinition* mParameterType = nullptr;
+		};
+
 	public:
 		inline DataTypeDefinition(const char* name, uint16 id, Class class_, size_t bytes, BaseType baseType) :
 			mNameString(name),
@@ -41,13 +49,19 @@ namespace lemon
 		template<typename T> const T& as() const  { return static_cast<const T&>(*this); }
 
 		FlyweightString getName() const;
-		inline uint16 getID() const			{ return mID; }
-		inline size_t getBytes() const		{ return mBytes; }
-		inline Class getClass() const		{ return mClass; }
-		inline BaseType getBaseType() const	{ return mBaseType; }
-		inline bool isPredefined() const	{ return mClass > Class::STRING; }
+		inline uint16 getID() const			 { return mID; }
+		inline size_t getBytes() const		 { return mBytes; }
+		inline size_t getSizeOnStack() const { return (mBytes + 7) / 8; }
+		inline Class getClass() const		 { return mClass; }
+		inline BaseType getBaseType() const	 { return mBaseType; }
+		inline bool isPredefined() const	 { return mClass > Class::STRING; }
 
 		virtual uint16 getDataTypeHash() const  { return mID; }
+
+		inline const BracketOperator& getBracketOperator() const	{ return mBracketOperator; }
+
+	protected:
+		BracketOperator mBracketOperator;
 
 	private:
 		const char* mNameString;
@@ -73,7 +87,7 @@ namespace lemon
 	{
 	public:
 		inline AnyDataType() :
-			DataTypeDefinition("any", 1, Class::ANY, 0, BaseType::UINT_64)
+			DataTypeDefinition("any", 1, Class::ANY, 16, BaseType::UINT_64)
 		{}
 	};
 
@@ -146,10 +160,10 @@ namespace lemon
 		inline static const IntegerDataType INT_64	  = IntegerDataType("s64",  9, 8, IntegerDataType::Semantics::DEFAULT, true,  BaseType::INT_64);
 		inline static const IntegerDataType CONST_INT = IntegerDataType("const_int", 10, 8, IntegerDataType::Semantics::CONSTANT, true, BaseType::INT_CONST);
 
-		inline static const FloatDataType& FLOAT	  = FloatDataType("float", 11, 4);
-		inline static const FloatDataType& DOUBLE	  = FloatDataType("double", 12, 8);
+		inline static const FloatDataType FLOAT		  = FloatDataType("float", 11, 4);
+		inline static const FloatDataType DOUBLE	  = FloatDataType("double", 12, 8);
 
-		inline static const StringDataType STRING     = StringDataType(13);
+		inline static const StringDataType STRING	  = StringDataType(13);
 
 		static void collectPredefinedDataTypes(std::vector<const DataTypeDefinition*>& outDataTypes);
 	};

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -15,6 +15,11 @@
 // Other platforms than Windows with Visual C++ need to the zlib library dependency into their build separately
 #if defined(PLATFORM_WINDOWS) && defined(_MSC_VER)
 	#pragma comment(lib, "minizip.lib")
+#endif
+
+#if defined(PLATFORM_VITA)
+	#include <zlib.h>
+	#include <mz_compat.h>
 #endif
 
 #include "unzip.h"
@@ -352,6 +357,12 @@ bool ZipFileProvider::scanZipFile(const std::wstring& zipFilename)
 			std::wstring name;
 			std::wstring extension;
 			rmx::FileIO::splitPath(localPath, &localBasePath, &name, &extension);
+			rmx::FileIO::normalizePath(localBasePath, false);	// Using parameter isDirectory = false so that no slash gets added here
+			if (rmx::startsWith(localBasePath, L".."))
+			{
+				RMX_ERROR("Local path '" << WString(localPath).toStdString() << "' inside zip file '" << WString(zipFilename).toStdString() << "' contains a path pointing outside of the zip directory", );
+				continue;
+			}
 			localName = extension.empty() ? name : (name + L'.' + extension);
 		}
 
@@ -402,7 +413,11 @@ const ZipFileProvider::ContainedFile* ZipFileProvider::readFile(const std::wstri
 		return containedFile;
 	}
 
+#if defined(PLATFORM_VITA)
+	int result = unzLocateFile(mInternal.mZipFile, *WString(fileEntry.mPath + fileEntry.mFilename).toString(), (unzFileNameComparer)1);
+#else
 	int result = unzLocateFile(mInternal.mZipFile, *WString(fileEntry.mPath + fileEntry.mFilename).toString(), 1);
+#endif
 	if (result != UNZ_OK)
 		return nullptr;
 

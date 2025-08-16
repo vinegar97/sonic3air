@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -173,7 +173,7 @@ namespace lemon
 		setupGlobalVariables();
 	}
 
-    void Runtime::setMemoryAccessHandler(MemoryAccessHandler* handler)
+	void Runtime::setMemoryAccessHandler(MemoryAccessHandler* handler)
 	{
 		mMemoryAccessHandler = handler;
 		for (ControlFlow* controlFlow : mControlFlows)
@@ -185,6 +185,12 @@ namespace lemon
 	void Runtime::setRuntimeDetailHandler(RuntimeDetailHandler* handler)
 	{
 		mRuntimeDetailHandler = handler;
+	}
+
+	void Runtime::resetRuntimeState()
+	{
+		// Reset global variables back to defaults
+		setupGlobalVariables();
 	}
 
 	void Runtime::buildAllRuntimeFunctions()
@@ -240,18 +246,21 @@ namespace lemon
 		return hash;
 	}
 
-	int64 Runtime::getGlobalVariableValue_int64(const Variable& variable)
+	AnyBaseValue Runtime::getGlobalVariableValue(const Variable& variable)
 	{
+		AnyBaseValue result;
 		const int64* valuePtr = accessGlobalVariableValue(variable);
-		return (nullptr == valuePtr) ? 0 : *valuePtr;
+		if (nullptr != valuePtr)
+			result.set<int64>(*valuePtr);
+		return result;
 	}
 
-	void Runtime::setGlobalVariableValue_int64(const Variable& variable, int64 value)
+	void Runtime::setGlobalVariableValue(const Variable& variable, AnyBaseValue value)
 	{
 		int64* valuePtr = accessGlobalVariableValue(variable);
 		if (nullptr != valuePtr)
 		{
-			*valuePtr = value;
+			*valuePtr = value.get<int64>();
 		}
 	}
 
@@ -277,6 +286,7 @@ namespace lemon
 		state.mBaseCallIndex = baseCallIndex;
 		state.mProgramCounter = runtimeFunction.getFirstRuntimeOpcode();
 		state.mLocalVariablesStart = mSelectedControlFlow->mLocalVariablesSize;
+		RMX_ASSERT(nullptr != state.mProgramCounter, "Invalid program counter in function " << runtimeFunction.mFunction->getName());
 	}
 
 	void Runtime::callFunction(const Function& function, size_t baseCallIndex)
@@ -406,6 +416,7 @@ namespace lemon
 		RuntimeOpcodeContext context;
 		context.mControlFlow = mSelectedControlFlow;
 		mActiveControlFlow = mSelectedControlFlow;
+		mCurrentOpcodePtr = &context.mOpcode;
 
 		// Outer loop
 		//  -> Gets restarted whenever the currently running function changes
@@ -597,15 +608,17 @@ namespace lemon
 
 						if (result.handleExternalJump(targetAddress))
 						{
-							// Restart the outer loop now that the running function has changed
-							stayInsideInnerLoop = false;
-							break;
+							// Check stop conditions
+							if (mSelectedControlFlow->mCallStack.count > minimumCallStackSize && result.mStepsExecuted < stepsLimit)
+							{
+								// Restart the outer loop now that the running function has changed
+								stayInsideInnerLoop = false;
+								break;
+							}
 						}
-						else
-						{
-							mActiveControlFlow = nullptr;
-							return;
-						}
+
+						mActiveControlFlow = nullptr;
+						return;
 					}
 
 					default:
@@ -826,7 +839,8 @@ namespace lemon
 						const size_t index = variable->getID() & 0x0fffffff;
 						RMX_CHECK(index < numGlobals, "Invalid global variable index", continue);
 						const size_t offset = mProgram->getGlobalVariables()[index]->getStaticMemoryOffset();
-						memcpy(&mStaticMemory[offset], &value, sizeof(int64));
+						if (offset < mStaticMemory.size())
+							memcpy(&mStaticMemory[offset], &value, sizeof(int64));
 					}
 				}
 			}
@@ -838,7 +852,10 @@ namespace lemon
 					Variable* variable = mProgram->getGlobalVariables()[i];
 					serializer.write(variable->getName().getString());
 					const size_t offset = variable->getStaticMemoryOffset();
-					serializer.write(&mStaticMemory[offset], sizeof(int64));
+					if (offset < mStaticMemory.size())
+						serializer.write(&mStaticMemory[offset], sizeof(int64));
+					else
+						serializer.write<int64>(0);
 				}
 			}
 		}
@@ -873,6 +890,9 @@ namespace lemon
 
 	void Runtime::setupGlobalVariables()
 	{
+		if (nullptr == mProgram)
+			return;
+
 		// Setup memory offsets and sizes
 		size_t totalSize = 0;
 		for (size_t index = 0; index < mProgram->getGlobalVariables().size(); ++index)
@@ -895,7 +915,7 @@ namespace lemon
 			Variable& variable = *mProgram->getGlobalVariables()[index];
 			if (variable.getStaticMemorySize() > 0)
 			{
-				const int64 value = (variable.getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable&>(variable).mInitialValue : 0;
+				const int64 value = (variable.getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable&>(variable).mInitialValue.get<int64>() : 0;
 				*(int64*)&mStaticMemory[variable.getStaticMemoryOffset()] = value;
 			}
 		}

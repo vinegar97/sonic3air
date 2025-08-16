@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -74,7 +74,7 @@ namespace rmx
 		const uint64* data64 = (const uint64_t*)data;
 		const uint64* end = data64 + (bytes / 8);
 
-	#if defined(__arm__)
+	#if defined(__arm__) || defined(__vita__)
 		const bool isAligned64 = ((size_t)data & 7) == 0;
 		if (!isAligned64)
 		{
@@ -317,6 +317,29 @@ namespace rmx
 	bool endsWith(std::wstring_view fullString, std::wstring_view prefix)
 	{
 		return stringEndsWith<std::wstring_view>(fullString, prefix);
+	}
+
+	bool containsCaseInsensitive(std::string_view fullString, std::string_view substring)
+	{
+		const auto it = std::search(fullString.begin(), fullString.end(), substring.begin(), substring.end(),
+			[](char a, char b) { return std::toupper(a) == std::toupper(b); }
+		);
+		return (it != fullString.end());
+	}
+
+	std::string getTimestampStringForFilename()
+	{
+		time_t now = time(0);
+		struct tm tstruct;
+		char buf[80];
+	#if defined(PLATFORM_WINDOWS)
+		localtime_s(&tstruct, &now);
+	#else
+		tstruct = *localtime(&now);
+	#endif
+		// Format example: "2022-06-29_11-42-48"
+		std::strftime(buf, sizeof(buf), "%Y-%m-%d_%H-%M-%S", &tstruct);
+		return buf;
 	}
 
 }

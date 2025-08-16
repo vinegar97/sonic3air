@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -43,6 +43,9 @@ namespace lemon
 		const Function* getFunctionBySignature(uint64 nameAndSignatureHash, size_t index = 0) const;
 		const std::vector<Function*>& getFunctionsByName(uint64 nameHash) const;
 
+		// Callable function addresses
+		const Function* resolveCallableFunctionAddress(uint32 address) const;
+
 		// Variables
 		inline const std::vector<Variable*>& getGlobalVariables() const  { return mGlobalVariables; }
 		Variable& getGlobalVariableByID(uint32 id) const;
@@ -75,6 +78,9 @@ namespace lemon
 		std::vector<ScriptFunction*> mScriptFunctions;
 		std::unordered_map<uint64, std::vector<Function*>> mFunctionsBySignature;	// Key is the hashed function name + signature hash
 		std::unordered_map<uint64, std::vector<Function*>> mFunctionsByName;		// Key is the hashed function name
+
+		// Callable function addresses
+		std::unordered_map<uint32, const Function*> mCallableFunctionsByAddress;
 
 		// Variables
 		std::vector<Variable*> mGlobalVariables;

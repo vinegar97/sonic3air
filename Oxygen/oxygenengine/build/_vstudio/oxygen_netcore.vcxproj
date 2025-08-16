@@ -34,12 +34,12 @@
     <ClInclude Include="..\..\source\oxygen_netcore\network\NetConnection.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\ConnectionListener.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\RequestBase.h" />
-    <ClInclude Include="..\..\source\oxygen_netcore\network\ServerClientBase.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\Sockets.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\VersionRange.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\pch.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\serverclient\ChannelBroadcastPackets.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\serverclient\FileTransferPackets.h" />
+    <ClInclude Include="..\..\source\oxygen_netcore\serverclient\NetplaySetupPackets.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\serverclient\Packets.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\serverclient\ProtocolVersion.h" />
   </ItemGroup>
@@ -52,7 +52,6 @@
     <ClCompile Include="..\..\source\oxygen_netcore\network\internal\WebSocketWrapper.cpp" />
     <ClCompile Include="..\..\source\oxygen_netcore\network\NetConnection.cpp" />
     <ClCompile Include="..\..\source\oxygen_netcore\network\RequestBase.cpp" />
-    <ClCompile Include="..\..\source\oxygen_netcore\network\ServerClientBase.cpp" />
     <ClCompile Include="..\..\source\oxygen_netcore\network\Sockets.cpp" />
     <ClCompile Include="..\..\source\oxygen_netcore\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -68,26 +67,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>

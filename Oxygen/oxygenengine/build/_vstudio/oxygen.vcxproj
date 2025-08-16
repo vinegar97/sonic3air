@@ -31,12 +31,12 @@
     <ClCompile Include="..\..\source\oxygen\application\EngineMain.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\GameLoader.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\GameProfile.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\gameview\GameView.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\ControlsIn.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputConfig.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputRecorder.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\RumbleEffectQueue.cpp" />
-    <ClCompile Include="..\..\source\oxygen\application\mainview\GameView.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\GameSetupScreen.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\MenuItems.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\OxygenMenu.cpp" />
@@ -52,6 +52,27 @@
     <ClCompile Include="..\..\source\oxygen\application\overlays\SaveStateMenu.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\overlays\TouchControlsOverlay.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\video\VideoOut.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\DevModeMainWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\DevModeWindowBase.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\ImGuiHelpers.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\ImGuiIntegration.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\AudioBrowserWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\CallFramesWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\CustomSidePanelWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\DebugLogWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\GameSimWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\GameVisualizationsWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\NetworkingWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\PaletteBrowserWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\PersistentDataWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\RenderedGeometryWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\ScriptBuildWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\SettingsWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\SpriteBrowserWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\VRAMWritesWindow.cpp" />
+    <ClCompile Include="..\..\source\oxygen\devmode\windows\WatchesWindow.cpp" />
     <ClCompile Include="..\..\source\oxygen\download\Downloader.cpp" />
     <ClCompile Include="..\..\source\oxygen\download\DownloadManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\DrawCollection.cpp" />
@@ -73,9 +94,16 @@
     <ClCompile Include="..\..\source\oxygen\file\PackedFileProvider.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\ZipFileProvider.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\HighResolutionTimer.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\JsonSerializer.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Profiling.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\RandomNumberGenerator.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\TextInputHandler.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Transform2D.cpp" />
+    <ClCompile Include="..\..\source\oxygen\network\EngineServerClient.cpp" />
+    <ClCompile Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.cpp" />
+    <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayClient.cpp" />
+    <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayHost.cpp" />
+    <ClCompile Include="..\..\source\oxygen\network\netplay\NetplayManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -92,17 +120,27 @@
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderResources.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\DebugDrawPlaneShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\OpenGLShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\PostFXBlurShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderComponentSpriteShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPaletteSpriteShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPlaneShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderVdpSpriteShader.cpp" />
-    <ClCompile Include="..\..\source\oxygen\rendering\parts\PaletteManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleCopyScreenShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectColoredShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectIndexedShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectOverdrawShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectTexturedShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectTexturedUVShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectVertexColorShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\palette\Palette.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\palette\PaletteManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\PatternManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\PlaneManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\RenderItem.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\RenderParts.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\ScrollOffsetsManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\parts\SpriteManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\Renderer.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\RenderResources.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\software\SoftwareRenderer.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\sprite\ComponentSprite.cpp" />
@@ -110,12 +148,13 @@
     <ClCompile Include="..\..\source\oxygen\rendering\sprite\SpriteDump.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\BufferTexture.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\Kosinski.cpp" />
-    <ClCompile Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\RenderUtils.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\FontCollection.cpp" />
+    <ClCompile Include="..\..\source\oxygen\resources\PaletteCollection.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\PrintedTextCache.cpp" />
+    <ClCompile Include="..\..\source\oxygen\resources\RawDataCollection.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\ResourcesCache.cpp" />
-    <ClCompile Include="..\..\source\oxygen\resources\SpriteCache.cpp" />
+    <ClCompile Include="..\..\source\oxygen\resources\SpriteCollection.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\bindings\LemonScriptBindings.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\bindings\RendererBindings.cpp" />
@@ -129,6 +168,7 @@
     <ClCompile Include="..\..\source\oxygen\simulation\PersistentData.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\SaveStateSerializer.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\Simulation.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\SimulationState.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\sound\blip_buf.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\sound\sn76489.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\sound\SoundDriver.cpp" />
@@ -137,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\application\Application.h" />
+    <ClInclude Include="..\..\source\oxygen\application\ArgumentsReader.h" />
     <ClInclude Include="..\..\source\oxygen\application\audio\AudioCollection.h" />
     <ClInclude Include="..\..\source\oxygen\application\audio\AudioOutBase.h" />
     <ClInclude Include="..\..\source\oxygen\application\audio\AudioPlayer.h" />
@@ -148,12 +189,12 @@
     <ClInclude Include="..\..\source\oxygen\application\EngineMain.h" />
     <ClInclude Include="..\..\source\oxygen\application\GameLoader.h" />
     <ClInclude Include="..\..\source\oxygen\application\GameProfile.h" />
+    <ClInclude Include="..\..\source\oxygen\application\gameview\GameView.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\ControlsIn.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputConfig.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputManager.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputRecorder.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\RumbleEffectQueue.h" />
-    <ClInclude Include="..\..\source\oxygen\application\mainview\GameView.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\GameSetupScreen.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\MenuItems.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\OxygenMenu.h" />
@@ -169,6 +210,28 @@
     <ClInclude Include="..\..\source\oxygen\application\overlays\SaveStateMenu.h" />
     <ClInclude Include="..\..\source\oxygen\application\overlays\TouchControlsOverlay.h" />
     <ClInclude Include="..\..\source\oxygen\application\video\VideoOut.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\DevModeMainWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\DevModeWindowBase.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiDefinitions.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiHelpers.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\ImGuiIntegration.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\AudioBrowserWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\CallFramesWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\CustomSidePanelWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\DebugLogWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\GameSimWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\GameVisualizationsWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\MemoryHexViewWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\NetworkingWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\PaletteBrowserWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\PaletteViewWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\PersistentDataWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\RenderedGeometryWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\ScriptBuildWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\SettingsWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\SpriteBrowserWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\VRAMWritesWindow.h" />
+    <ClInclude Include="..\..\source\oxygen\devmode\windows\WatchesWindow.h" />
     <ClInclude Include="..\..\source\oxygen\download\Downloader.h" />
     <ClInclude Include="..\..\source\oxygen\download\DownloadManager.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\DrawCollection.h" />
@@ -193,9 +256,17 @@
     <ClInclude Include="..\..\source\oxygen\file\ZipFileProvider.h" />
     <ClInclude Include="..\..\source\oxygen\helper\DrawerHelper.h" />
     <ClInclude Include="..\..\source\oxygen\helper\HighResolutionTimer.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\JsonSerializer.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Profiling.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\RandomNumberGenerator.h" />
     <ClInclude Include="..\..\source\oxygen\helper\TextInputHandler.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Transform2D.h" />
+    <ClInclude Include="..\..\source\oxygen\network\EngineServerClient.h" />
+    <ClInclude Include="..\..\source\oxygen\network\netplay\ExternalAddressQuery.h" />
+    <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayClient.h" />
+    <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayHost.h" />
+    <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayManager.h" />
+    <ClInclude Include="..\..\source\oxygen\network\netplay\NetplayPackets.h" />
     <ClInclude Include="..\..\source\oxygen\pch.h" />
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h" />
     <ClInclude Include="..\..\source\oxygen\helper\FileHelper.h" />
@@ -210,11 +281,20 @@
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderResources.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\DebugDrawPlaneShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\OpenGLShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\PostFXBlurShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderComponentSpriteShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPaletteSpriteShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPlaneShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderVdpSpriteShader.h" />
-    <ClInclude Include="..\..\source\oxygen\rendering\parts\PaletteManager.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleCopyScreenShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectColoredShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectIndexedShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectOverdrawShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectTexturedShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectTexturedUVShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\SimpleRectVertexColorShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\palette\Palette.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\palette\PaletteManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\PatternManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\PlaneManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderItem.h" />
@@ -234,12 +314,13 @@
     <ClInclude Include="..\..\source\oxygen\rendering\sprite\SpriteDump.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\utils\BufferTexture.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\utils\Kosinski.h" />
-    <ClInclude Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\utils\RenderUtils.h" />
     <ClInclude Include="..\..\source\oxygen\resources\FontCollection.h" />
+    <ClInclude Include="..\..\source\oxygen\resources\PaletteCollection.h" />
     <ClInclude Include="..\..\source\oxygen\resources\PrintedTextCache.h" />
+    <ClInclude Include="..\..\source\oxygen\resources\RawDataCollection.h" />
     <ClInclude Include="..\..\source\oxygen\resources\ResourcesCache.h" />
-    <ClInclude Include="..\..\source\oxygen\resources\SpriteCache.h" />
+    <ClInclude Include="..\..\source\oxygen\resources\SpriteCollection.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\bindings\LemonScriptBindings.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\bindings\RendererBindings.h" />
@@ -255,6 +336,7 @@
     <ClInclude Include="..\..\source\oxygen\simulation\RuntimeEnvironment.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\SaveStateSerializer.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\Simulation.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\SimulationState.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\sound\blip_buf.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\sound\sn76489.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\sound\SoundChipWrite.h" />
@@ -271,7 +353,7 @@
     <None Include="..\..\data\shader\render_sprite_vdp.shader" />
     <None Include="..\..\data\shader\simple_copy_screen.shader" />
     <None Include="..\..\data\shader\simple_rect_colored.shader" />
-    <None Include="..\..\data\shader\simple_rect_depthwrite.shader" />
+    <None Include="..\..\data\shader\simple_rect_indexed.shader" />
     <None Include="..\..\data\shader\simple_rect_overdraw.shader" />
     <None Include="..\..\data\shader\simple_rect_textured.shader" />
     <None Include="..\..\data\shader\simple_rect_textured_uv.shader" />
@@ -294,26 +376,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>

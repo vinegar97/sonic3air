@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,7 +8,6 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/input/ControlsIn.h"
-#include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/Configuration.h"
 
 
@@ -40,57 +39,88 @@ ControlsIn::ControlsIn()
 	}
 }
 
-void ControlsIn::startup()
+void ControlsIn::beginInputUpdate()
 {
-}
-
-void ControlsIn::shutdown()
-{
-}
-
-void ControlsIn::update(bool readControllers)
-{
-	if (!readControllers)
-		return;
-
-	const bool switchLeftRight = Configuration::instance().mMirrorMode;
-
-	// Update controllers
-	for (int controllerIndex = 0; controllerIndex < NUM_GAMEPADS; ++controllerIndex)
+	// Backup input
+	for (int padIndex = 0; padIndex < NUM_GAMEPADS; ++padIndex)
 	{
-		const uint32 padIndex = (mGamepadsSwitched && controllerIndex < 2) ? (1 - controllerIndex) : controllerIndex;
 		mGamepad[padIndex].mPreviousInput = mGamepad[padIndex].mCurrentInput;
+		mGamepad[padIndex].mInputWasInjected = false;
+	}
+}
 
-		// Calculate new input flags
-		uint16 inputFlags = 0;
-		for (const auto& pair : inputFlagsLookup[controllerIndex])
+void ControlsIn::endInputUpdate()
+{
+	for (int padIndex = 0; padIndex < NUM_GAMEPADS; ++padIndex)
+	{
+		if (!mGamepad[padIndex].mInputWasInjected)
 		{
-			if (pair.first->isPressed())
-			{
-				inputFlags |= pair.second;
-			}
+			// Update from actual local controllers
+			mGamepad[padIndex].mCurrentInput = getInputFromController(padIndex);
 		}
-		if (switchLeftRight)
+
+		// Remove all flags from our list of ignored inputs that are currently not pressed
+		mGamepad[padIndex].mIgnoreInput &= mGamepad[padIndex].mCurrentInput;
+
+		// Remove all flags from actual inputs that are still ignored
+		mGamepad[padIndex].mCurrentInput &= ~mGamepad[padIndex].mIgnoreInput;
+	}
+}
+
+uint16 ControlsIn::getInputFromController(uint32 padIndex) const
+{
+	uint16 inputFlags = 0;
+
+	const uint32 controllerIndex = mGamepadsSwitched ? (padIndex ^ 1) : padIndex;	// Swap gamepads 0 and 1, as well as 2 and 3
+	for (const auto& pair : inputFlagsLookup[controllerIndex])
+	{
+		if (pair.first->isPressed())
 		{
-			inputFlags = (inputFlags & 0xfff3) | ((inputFlags & (uint16)Button::LEFT) << 1) | ((inputFlags & (uint16)Button::RIGHT) >> 1);
+			inputFlags |= pair.second;
 		}
+	}
 
-		// Remove all inputs from our list of ignored input that are currently not pressed
-		mGamepad[padIndex].mIgnoreInput &= inputFlags;
+	// In mirror mode, exchange left and right
+	if (Configuration::instance().mMirrorMode)
+	{
+		inputFlags = (inputFlags & 0xfff3) | ((inputFlags & (uint16)Button::LEFT) << 1) | ((inputFlags & (uint16)Button::RIGHT) >> 1);
+	}
 
-		// Remove all inputs from actual output that are still ignored
-		inputFlags &= ~mGamepad[padIndex].mIgnoreInput;
+	return inputFlags;
+}
 
-		// Assign to emulator input flags
-		mGamepad[padIndex].mCurrentInput = inputFlags;
+void ControlsIn::injectInput(uint32 padIndex, uint16 inputFlags)
+{
+	RMX_ASSERT(padIndex < (uint32)NUM_GAMEPADS, "Invalid pad index " << padIndex);
+
+	mGamepad[padIndex].mPreviousInput = mGamepad[padIndex].mCurrentInput;
+	mGamepad[padIndex].mCurrentInput = inputFlags;
+	mGamepad[padIndex].mInputWasInjected = true;
+}
+
+void ControlsIn::injectInputs(const uint16* inputFlags, size_t numInputs)
+{
+	RMX_ASSERT(numInputs <= InputManager::NUM_PLAYERS, "Invalid number of inputs: " << numInputs);
+	for (size_t k = 0; k < numInputs; ++k)
+	{
+		injectInput((uint32)k, inputFlags[k]);
+	}
+}
+
+void ControlsIn::injectEmptyInputs(size_t numInputs)
+{
+	RMX_ASSERT(numInputs <= InputManager::NUM_PLAYERS, "Invalid number of inputs: " << numInputs);
+	for (size_t k = 0; k < numInputs; ++k)
+	{
+		injectInput((uint32)k, 0);
 	}
 }
 
 void ControlsIn::setIgnores(uint16 bitmask)
 {
-	for (int controllerIndex = 0; controllerIndex < NUM_GAMEPADS; ++controllerIndex)
+	for (int padIndex = 0; padIndex < NUM_GAMEPADS; ++padIndex)
 	{
-		mGamepad[controllerIndex].mIgnoreInput = bitmask;
+		mGamepad[padIndex].mIgnoreInput = bitmask;
 	}
 }
 
@@ -99,7 +129,7 @@ void ControlsIn::setAllIgnores()
 	setIgnores(0x0fff);
 }
 
-const ControlsIn::Gamepad& ControlsIn::getGamepad(size_t index) const
+ControlsIn::Gamepad& ControlsIn::getGamepad(size_t index)
 {
 	if (index < NUM_GAMEPADS)
 	{
@@ -112,12 +142,18 @@ const ControlsIn::Gamepad& ControlsIn::getGamepad(size_t index) const
 	}
 }
 
-void ControlsIn::injectInput(uint32 padIndex, uint16 inputFlags)
+const ControlsIn::Gamepad& ControlsIn::getGamepad(size_t index) const
 {
-	RMX_CHECK(padIndex < (uint32)NUM_GAMEPADS, "Invalid controller index", return);
+	return const_cast<ControlsIn*>(this)->getGamepad(index);
+}
 
-	mGamepad[padIndex].mPreviousInput = mGamepad[padIndex].mCurrentInput;
-	mGamepad[padIndex].mCurrentInput = inputFlags;
+void ControlsIn::writeCurrentState(uint16* outInputFlags, size_t numInputs) const
+{
+	RMX_ASSERT(numInputs <= InputManager::NUM_PLAYERS, "Invalid number of inputs: " << numInputs);
+	for (size_t k = 0; k < numInputs; ++k)
+	{
+		outInputFlags[k] = mGamepad[k].mCurrentInput;
+	}
 }
 
 bool ControlsIn::switchGamepads()

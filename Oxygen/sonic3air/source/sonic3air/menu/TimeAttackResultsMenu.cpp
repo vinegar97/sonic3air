@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -117,7 +117,7 @@ void TimeAttackResultsMenu::render()
 			GameApp::instance().enableStillImageBlur(true, 0.5f);
 		}
 
-		Recti rect(roundToInt(mRect.width) - global::mTimeAttackResultsBG.getWidth(), 0, global::mTimeAttackResultsBG.getWidth(), global::mTimeAttackResultsBG.getHeight());
+		Recti rect(mRect.width - global::mTimeAttackResultsBG.getWidth(), 0, global::mTimeAttackResultsBG.getWidth(), global::mTimeAttackResultsBG.getHeight());
 		drawer.drawRect(rect, global::mTimeAttackResultsBG);
 
 		const String text = String("Your time:   ") + formatTime(mYourTime, true);

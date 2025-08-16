@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -143,6 +143,8 @@ namespace lemon
 		inline RuntimeDetailHandler* getRuntimeDetailHandler() const  { return mRuntimeDetailHandler; }
 		void setRuntimeDetailHandler(RuntimeDetailHandler* handler);
 
+		void resetRuntimeState();
+
 		void buildAllRuntimeFunctions();
 
 		RuntimeFunction* getRuntimeFunction(const ScriptFunction& scriptFunction);
@@ -152,8 +154,8 @@ namespace lemon
 		const FlyweightString* resolveStringByKey(uint64 key) const;
 		uint64 addString(std::string_view str);
 
-		int64 getGlobalVariableValue_int64(const Variable& variable);
-		void setGlobalVariableValue_int64(const Variable& variable, int64 value);
+		AnyBaseValue getGlobalVariableValue(const Variable& variable);
+		void setGlobalVariableValue(const Variable& variable, AnyBaseValue value);
 		int64* accessGlobalVariableValue(const Variable& variable);
 
 		inline const ControlFlow& getMainControlFlow() const  { return *mControlFlows[0]; }
@@ -169,6 +171,8 @@ namespace lemon
 
 		void executeSteps(ExecuteConnector& result, size_t stepsLimit, size_t minimumCallStackSize);
 		const Function* handleResultCall(const RuntimeOpcode& runtimeOpcode);
+
+		inline const RuntimeOpcode* getCurrentOpcode() const  { return *mCurrentOpcodePtr; }		// Warning: This is only valid during actual code execution
 
 		inline void triggerStopSignal()  { mReceivedStopSignal = true; }
 
@@ -201,6 +205,7 @@ namespace lemon
 		ControlFlow* mSelectedControlFlow = nullptr;	// The currently selected control flow used by methods like "executeSteps" and "callFunction"; this must always be a valid pointer
 
 		bool mReceivedStopSignal = false;
+		const RuntimeOpcode*const* mCurrentOpcodePtr = nullptr;
 	};
 
 }

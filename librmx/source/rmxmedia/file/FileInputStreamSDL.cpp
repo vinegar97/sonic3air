@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -102,8 +102,8 @@ namespace rmx
 		return false;
 	}
 
-    InputStream::StreamingState FileInputStreamSDL::getStreamingState()
-    {
+	InputStream::StreamingState FileInputStreamSDL::getStreamingState()
+	{
 		StreamingState result = StreamingState::BLOCKED;
 		if (mLastStreamingState == StreamingState::BLOCKED)
 		{
@@ -127,6 +127,6 @@ namespace rmx
 		}
 		mLastStreamingState = StreamingState::BLOCKED;
 		return result;
-    }
+	}
 
 }

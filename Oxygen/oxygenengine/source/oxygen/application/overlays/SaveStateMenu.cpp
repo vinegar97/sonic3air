@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -109,7 +109,7 @@ void SaveStateMenu::deinitialize()
 
 void SaveStateMenu::keyboard(const rmx::KeyboardEvent& ev)
 {
-	if (ev.state)
+	if (ev.state && !FTX::System->wasEventConsumed())
 	{
 		switch (ev.key)
 		{
@@ -123,7 +123,7 @@ void SaveStateMenu::keyboard(const rmx::KeyboardEvent& ev)
 
 			case SDLK_ESCAPE:
 			{
-				((Application*)mParent)->childClosed(*this);
+				static_cast<Application*>(getParent())->childClosed(*this);
 				break;
 			}
 
@@ -198,7 +198,7 @@ void SaveStateMenu::update(float timeElapsed)
 		}
 		else if (controller.B.justPressed() || controller.Back.justPressed())
 		{
-			((Application*)mParent)->childClosed(*this);
+			static_cast<Application*>(getParent())->childClosed(*this);
 		}
 	}
 }
@@ -352,5 +352,5 @@ void SaveStateMenu::onAccept(bool loadingAllowed, bool savingAllowed)
 		}
 	}
 
-	((Application*)mParent)->childClosed(*this);
+	static_cast<Application*>(getParent())->childClosed(*this);
 }

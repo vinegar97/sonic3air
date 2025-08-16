@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -269,7 +269,7 @@ function void fn053faa()
 function void fn053fc8()
 {
 	A5 = 0xffff0000 + u16[A3]
-	A5 +=  0x98
+	A5 += 0x98
 	fn23e4ec()
 }
 
@@ -727,15 +727,12 @@ function void fn23e4d0()
 {
 	A1 = 0xffff0000 + u16[A3]
 	A1 += 0x7a
-	D0.u16 = u16[A3 - 0x08] - 6
-	D1 = 5
-
-	while (D1.s16 >= 0)
+	D0.u16 = u16[A3 - 0x08]
+	for (u8 k = 0; k < 6; ++k)
 	{
-		copyMemory((A1+=6)-6, (A5+=6)-6, 6)
+		copyMemory(A1, A5, 6)
 		A5.u16 += D0.u16
 		A1.u16 += D0.u16
-		--D1.s16
 	}
 }
 
@@ -745,15 +742,12 @@ function void fn23e4ec()
 {
 	A1 = 0xffff0000 + u16[A3]
 	A1 += 0x74
-	D0.u16 = u16[A3 - 0x08] - 4
-	D1 = 0x0b
-
-	while (D1.s16 >= 0)
+	D0.u16 = u16[A3 - 0x08]
+	for (u8 k = 0; k < 12; ++k)
 	{
-		u32[(A1+=4)-4] = u32[(A5+=4)-4]
+		copyMemory(A1, A5, 4)
 		A5.u16 += D0.u16
 		A1.u16 += D0.u16
-		--D1.s16
 	}
 }
 
@@ -763,15 +757,12 @@ function void fn23e506()
 {
 	A1 = 0xffff0000 + u16[A3]
 	A1 += 0x42
-	D0.u16 = u16[A3 - 0x08] - 10
-	D1 = 0x0d
-
-	while (D1.s16 >= 0)
+	D0.u16 = u16[A3 - 0x08]
+	for (u8 k = 0; k < 14; ++k)
 	{
-		copyMemory((A1+=10)-10, (A5+=10)-10, 10)
+		copyMemory(A1, A5, 10)
 		A5.u16 += D0.u16
 		A1.u16 += D0.u16
-		--D1.s16
 	}
 }
 
@@ -781,15 +772,12 @@ function void fn23e526()
 {
 	A1 = 0xffff0000 + u16[A3 + 0x08]
 	A1 += 0x26
-	D0.u16 = u16[A3 - 0x08] - 8
-	D1 = 8
-
-	while (D1.s16 >= 0)
+	D0.u16 = u16[A3 - 0x08]
+	for (u8 k = 0; k < 9; ++k)
 	{
-		copyMemory((A1+=8)-8, (A5+=8)-8, 8)
+		copyMemory(A1, A5, 8)
 		A5.u16 += D0.u16
 		A1.u16 += D0.u16
-		--D1.s16
 	}
 }
 

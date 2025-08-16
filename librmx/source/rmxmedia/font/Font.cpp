@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,7 +9,7 @@
 #include "rmxmedia.h"
 
 
-Font::CodecList Font::mCodecs;
+rmx::FontCodecList rmx::FontCodecList::mCodecs;
 
 
 int FontKey::compare(const FontKey& other) const
@@ -36,7 +36,9 @@ FontSource* FontSourceBitmapFactory::construct(const FontSourceKey& key)
 {
 	if (key.mName.endsWith(".json"))
 	{
-		return new FontSourceBitmap(key.mName);
+		WString name;
+		name.fromUTF8(key.mName);
+		return new FontSourceBitmap(*name);
 	}
 	return nullptr;
 }
@@ -155,9 +157,9 @@ int Font::getLineHeight()
 	return (nullptr == fontSource) ? 0 : fontSource->getLineHeight();
 }
 
-Vec2f Font::alignText(const Rectf& rect, const StringReader& text, int alignment)
+Vec2i Font::alignText(const Recti& rect, const StringReader& text, int alignment)
 {
-	Vec2f result(rect.x, rect.y);
+	Vec2i result(rect.x, rect.y);
 	FontSource* fontSource = getFontSource();
 	if (nullptr == fontSource)
 		return result;
@@ -169,10 +171,10 @@ Vec2f Font::alignText(const Rectf& rect, const StringReader& text, int alignment
 		int align_y = alignment / 3;
 
 		if (align_x > 0)
-			result.x += ((int)rect.width - getWidth(text)) * align_x / 2;
+			result.x += (rect.width - getWidth(text)) * align_x / 2;
 
 		if (align_y > 0)
-			result.y += ((int)rect.height - fontSource->getHeight()) * align_y / 2;
+			result.y += (rect.height - fontSource->getHeight()) * align_y / 2;
 	}
 
 	return result;
@@ -280,13 +282,13 @@ void Font::wordWrapText(std::vector<std::wstring>& output, int maxLineWidth, con
 	}
 }
 
-void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringReader& text, int spacing)
+void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2i pos, const StringReader& text, int spacing)
 {
 	FontSource* fontSource = getFontSource();
 	if (nullptr == fontSource)
 		return;
 
-	const Vec2f originalPosition = pos;
+	const Vec2i originalPosition = pos;
 	output.resize(text.mLength);
 
 	for (size_t k = 0; k < text.mLength; ++k)
@@ -379,7 +381,7 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 
 	std::vector<TypeInfo> typeInfos;
 	std::vector<ExtendedTypeInfo> extendedTypeInfos;
-	getTypeInfos(typeInfos, Vec2f(0.0f, 0.0f), text, spacing);
+	getTypeInfos(typeInfos, Vec2i(), text, spacing);
 
 	applyToTypeInfos(extendedTypeInfos, typeInfos);
 	if (extendedTypeInfos.empty())
@@ -470,7 +472,7 @@ FontSource* Font::getFontSource()
 	{
 		mFontSourceDirty = false;
 		RMX_ASSERT(nullptr == mFontSource, "Font source is expected to be a null pointer");
-		for (IFontSourceFactory* factory : Font::mCodecs.mList)
+		for (IFontSourceFactory* factory : rmx::FontCodecList::mCodecs.mList)
 		{
 			mFontSource = factory->construct(mKey);
 			if (nullptr != mFontSource)

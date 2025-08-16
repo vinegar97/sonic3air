@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -497,7 +497,7 @@ function void fn063790()
 function void fn0637ec()
 {
 	UpdateMovementSimple()
-	if (s8[A0 + 0x04] < 0 && objA0.velocity.y >= 0)
+	if ((objA0.render_flags & render_flag.VISIBLE) && objA0.velocity.y >= 0)
 	{
 		CheckGroundCollision()
 		if (D1.s16 < 0)

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -113,7 +113,9 @@ namespace lemon
 			addOpcode(Opcode::Type::SET_VARIABLE_VALUE, variable->getDataType(), variable->getID());
 
 			// Pop value from stack (as SET_VARIABLE_VALUE opcode does not consume it)
-			addOpcode(Opcode::Type::MOVE_STACK, -1);
+			const int sizeOnStack = (int)variable->getDataType()->getSizeOnStack();
+			RMX_ASSERT(sizeOnStack != 0, "Invalid stack size of type " << variable->getDataType()->getName().getString());
+			addOpcode(Opcode::Type::MOVE_STACK, -sizeOnStack);
 		}
 	}
 
@@ -145,7 +147,7 @@ namespace lemon
 		else
 		{
 			// There could be jumps leading to the position after the return, correct them
-			//  -> E.g. when the function ends with and if-block that itself ends with a return
+			//  -> E.g. when the function ends with an if-block that itself ends with a return
 			for (Opcode& opcode : mOpcodes)
 			{
 				if (opcode.mType == Opcode::Type::JUMP || opcode.mType == Opcode::Type::JUMP_CONDITIONAL)
@@ -550,12 +552,7 @@ namespace lemon
 					case Operator::UNARY_DECREMENT:
 					case Operator::UNARY_INCREMENT:
 					{
-						// TODO: Differentiate between pre- and post-fix!
-
-						compileTokenTreeToOpcodes(*uot.mArgument);
-						addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, (uot.mOperator == Operator::UNARY_DECREMENT) ? -1 : 1);
-						addOpcode(Opcode::Type::ARITHM_ADD, uot.mDataType);
-						compileTokenTreeToOpcodes(*uot.mArgument, false, true);
+						compileUnaryDecIncToOpcodes(uot);
 						break;
 					}
 
@@ -763,6 +760,36 @@ namespace lemon
 				break;
 			}
 
+			case Token::Type::BRACKET_ACCESS:
+			{
+				const BracketAccessToken& bat = token.as<BracketAccessToken>();
+				const DataTypeDefinition::BracketOperator& bracket = bat.mVariable->getDataType()->getBracketOperator();
+
+				// First parameter is the parameter inside the brackets
+				compileTokenTreeToOpcodes(*bat.mParameter);
+				addCastOpcodeIfNecessary(bat.mParameter->mDataType, bracket.mParameterType);
+
+				// Second parameter is the variable ID
+				addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, bat.mVariable->getID());
+
+				// Choose the right function depending on isLValue
+				if (isLValue)
+				{
+					addOpcode(Opcode::Type::CALL, 0, bracket.mSetterNameAndSignatureHash);
+
+					// TODO: We actually need the value to assign to as third parameter here already
+					//  -> It's not sufficient to just add it afterwards as for memory access
+					//  -> See "case Operator::ASSIGN:" above for the place where to add that
+
+					// TODO: Also this probably requires a special case inside "compileBinaryAssignmentToOpcodes" as well
+				}
+				else
+				{
+					addOpcode(Opcode::Type::CALL, 0, bracket.mGetterNameAndSignatureHash);
+				}
+				break;
+			}
+
 			case Token::Type::VALUE_CAST:
 			{
 				CHECK_ERROR(!isLValue, "Cannot assign value to a type cast", mLineNumber);
@@ -779,7 +806,47 @@ namespace lemon
 
 		if (consumeResult && token.mDataType->getClass() != DataTypeDefinition::Class::VOID)
 		{
-			addOpcode(Opcode::Type::MOVE_STACK, -1);	// Pop result of statement
+			const int sizeOnStack = (int)token.mDataType->getSizeOnStack();
+			RMX_ASSERT(sizeOnStack != 0, "Invalid stack size of type " << token.mDataType->getName().getString());
+			addOpcode(Opcode::Type::MOVE_STACK, -sizeOnStack);	// Pop result of statement
+		}
+	}
+
+	void FunctionCompiler::compileUnaryDecIncToOpcodes(const UnaryOperationToken& uot)
+	{
+		// TODO: Differentiate between pre- and post-fix!
+
+		// Special handling for memory access on left side
+		//  -> Memory address calculation must only be done once, especially if it has side effects (e.g. "u8[A0++] += 8")
+		if (uot.mArgument->isA<MemoryAccessToken>())
+		{
+			// Compile memory read
+			const MemoryAccessToken& mat = uot.mArgument->as<MemoryAccessToken>();
+			compileTokenTreeToOpcodes(*mat.mAddress);
+
+			// Output READ_MEMORY opcode with parameter that tells it to *not* consume its input
+			//  -> It would usually do, but in our case here the value is needed again as input for the WRITE_MEMORY below
+			addOpcode(Opcode::Type::READ_MEMORY, mat.mDataType, 1);
+
+			// Add arithmetic add opcode with constant -1 or +1
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, (uot.mOperator == Operator::UNARY_DECREMENT) ? -1 : 1);
+			addOpcode(Opcode::Type::ARITHM_ADD, uot.mDataType);
+
+			// Output WRITE_MEMORY opcode with parameter that tells it to exchange its inputs
+			//  -> Top of stack is value, next is address - but in other cases it's the other way round
+			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType, 1);
+		}
+		else
+		{
+			// Compile argument
+			compileTokenTreeToOpcodes(*uot.mArgument);
+
+			// Add arithmetic add opcode with constant -1 or +1
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, (uot.mOperator == Operator::UNARY_DECREMENT) ? -1 : 1);
+			addOpcode(Opcode::Type::ARITHM_ADD, uot.mDataType);
+
+			// Compile argument again for assignment
+			compileTokenTreeToOpcodes(*uot.mArgument, false, true);
 		}
 	}
 
@@ -795,7 +862,6 @@ namespace lemon
 
 			// Output READ_MEMORY opcode with parameter that tells it to *not* consume its input
 			//  -> It would usually do, but in our case here the value is needed again as input for the WRITE_MEMORY below
-			//  -> This is an optimization compared to the older approach of having a DUPLICATE opcode (that only existed for this very use-case in the first place)
 			addOpcode(Opcode::Type::READ_MEMORY, mat.mDataType, 1);
 
 			// Compile right
@@ -806,7 +872,6 @@ namespace lemon
 
 			// Output WRITE_MEMORY opcode with parameter that tells it to exchange its inputs
 			//  -> Top of stack is value, next is address - but in other cases it's the other way round
-			//  -> This is an optimization compared to the older approach of having an EXCHANGE opcode (that only existed for this very use-case in the first place)
 			addOpcode(Opcode::Type::WRITE_MEMORY, mat.mDataType, 1);
 		}
 		else

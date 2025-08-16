@@ -1,12 +1,25 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
 #include "rmxbase.h"
+
+#if defined(PLATFORM_VITA)
+	#include <locale>
+	#include <codecvt>
+
+	std::string wstr_to_str(std::wstring string_to_convert)
+	{
+		using convert_type = std::codecvt_utf8<wchar_t>;
+		std::wstring_convert<convert_type, wchar_t> converter;
+		std::string converted_str = converter.to_bytes( string_to_convert );
+		return converted_str;
+	}
+#endif
 
 
 namespace rmx
@@ -15,7 +28,11 @@ namespace rmx
 	FileSystem::FileSystem()
 	{
 		// By default, add a real file provider with mounted at root
+	#if !defined(PLATFORM_VITA)
 		addMountPoint(mDefaultRealFileProvider, L"", L"", 0);
+	#else
+		addMountPoint(mDefaultRealFileProvider, L"ux0:data/sonic3air/", L"ux0:data/sonic3air/", 0);
+	#endif
 	}
 
 	FileSystem::~FileSystem()
@@ -39,13 +56,43 @@ namespace rmx
 
 	bool FileSystem::exists(std::wstring_view path)
 	{
-		mTempPath2 = normalizePath(path, mTempPath2, false);
+		mTempPath2 = normalizePath(path, mTempPath2, FileIO::isDirectoryPath(path));
 		for (MountPoint& mountPoint : mMountPoints)
 		{
 			const std::wstring* localPath = applyMountPoint(mountPoint, mTempPath2, mTempPath);
 			if (nullptr != localPath)
 			{
 				if (mountPoint.mFileProvider->exists(*localPath))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	bool FileSystem::isFile(std::wstring_view path)
+	{
+		mTempPath2 = normalizePath(path, mTempPath2, FileIO::isDirectoryPath(path));
+		for (MountPoint& mountPoint : mMountPoints)
+		{
+			const std::wstring* localPath = applyMountPoint(mountPoint, mTempPath2, mTempPath);
+			if (nullptr != localPath)
+			{
+				if (mountPoint.mFileProvider->isFile(*localPath))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	bool FileSystem::isDirectory(std::wstring_view path)
+	{
+		mTempPath2 = normalizePath(path, mTempPath2, FileIO::isDirectoryPath(path));
+		for (MountPoint& mountPoint : mMountPoints)
+		{
+			const std::wstring* localPath = applyMountPoint(mountPoint, mTempPath2, mTempPath);
+			if (nullptr != localPath)
+			{
+				if (mountPoint.mFileProvider->isDirectory(*localPath))
 					return true;
 			}
 		}
@@ -350,7 +397,19 @@ namespace rmx
 	{
 		// Check if path starts with the mount point
 		if (!mountPoint.mMountPoint.empty() && !startsWith(inPath, mountPoint.mMountPoint))
+		{
+		#if !defined(PLATFORM_VITA)
 			return nullptr;
+		#else
+			if (wstr_to_str(mountPoint.mMountPoint) == "ux0:data/sonic3air/")
+			{
+				tempPath = mountPoint.mMountPoint;
+				tempPath.append(inPath);
+				return &tempPath;
+			}
+			return nullptr;
+		#endif
+		}
 
 		if (mountPoint.mNeedsPrefixConversion)
 		{

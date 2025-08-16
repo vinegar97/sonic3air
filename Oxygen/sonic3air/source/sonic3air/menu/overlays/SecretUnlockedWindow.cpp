@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -55,7 +55,7 @@ void SecretUnlockedWindow::update(float timeElapsed)
 			mPhase = Phase::NONE;
 			if (mEnqueuedEntries.empty())
 			{
-				getParent()->removeChild(this);
+				removeFromParent();
 			}
 			else
 			{
@@ -115,7 +115,7 @@ void SecretUnlockedWindow::render()
 	const int px = roundToInt(mRect.width - 240.0f * titleVisibility);
 	const int py = roundToInt(mRect.height - interpolate(19.0f, 22.0f + numTextLines * lineHeight, contentVisibility));
 
-	static const uint64 spriteKey = rmx::getMurmur2_64(std::string_view("unlock_window_bg"));
+	constexpr uint64 spriteKey = rmx::constMurmur2_64("unlock_window_bg");
 	drawer.drawSprite(Vec2i(px, py), spriteKey);
 
 	const Color titleColor = (mShownEntry.mEntryType == EntryType::ACHIEVEMENT) ? Color(0.6f, 0.8f, 1.0f) : Color(1.0f, 0.7f, 0.6f);

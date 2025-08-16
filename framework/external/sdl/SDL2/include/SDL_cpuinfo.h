@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2022 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -53,9 +53,11 @@ _m_prefetch(void *__P)
 #ifndef __MMX__
 #define __MMX__
 #endif
+/*
 #ifndef __3dNOW__
 #define __3dNOW__
 #endif
+*/
 #endif
 #ifndef __SSE__
 #define __SSE__
@@ -90,6 +92,7 @@ _m_prefetch(void *__P)
 #      include <arm64intr.h>
 #      include <arm64_neon.h>
 #      define __ARM_NEON 1 /* Set __ARM_NEON so that it can be used elsewhere, at compile time */
+#      define __ARM_ARCH 8
 #    endif
 #  endif
 #endif

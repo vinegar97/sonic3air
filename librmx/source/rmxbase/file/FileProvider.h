@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -22,6 +22,9 @@ namespace rmx
 		virtual ~FileProvider();
 
 		virtual bool exists(const std::wstring& path)  { return false; }
+		virtual bool isFile(const std::wstring& path)  { return false; }
+		virtual bool isDirectory(const std::wstring& path)  { return false; }
+
 		virtual bool getFileSize(const std::wstring& filename, uint64& outFileSize)  { return false; }
 		virtual bool getFileTime(const std::wstring& filename, time_t& outFileTime)  { return false; }
 		virtual bool readFile(const std::wstring& filename, std::vector<uint8>& outData)  { return false; }

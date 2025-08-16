@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -12,7 +12,9 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/rendering/utils/RenderUtils.h"
-#include "oxygen/resources/SpriteCache.h"
+#include "oxygen/resources/SpriteCollection.h"
+#include "oxygen/simulation/GameRecorder.h"
+#include "oxygen/simulation/Simulation.h"
 
 
 namespace
@@ -203,7 +205,6 @@ void TouchControlsOverlay::render()
 		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 0.8f));
 
 		Color color = (mConfigMode.mState == ConfigMode::State::DONE_BUTTON_DOWN) ? Color::YELLOW : Color::WHITE;
-		color.a = mAlpha;
 		drawer.drawRect(getScreenFromNormalizedTouchRect(DONE_BUTTON_RECT), mDoneText, color);
 	}
 
@@ -213,26 +214,24 @@ void TouchControlsOverlay::render()
 		drawer.setSamplingMode(SamplingMode::BILINEAR);
 		for (VisualElement& visualElement : mVisualElements)
 		{
-			// Skip game rec button is game recording is disabled
-			if (visualElement.mReactToState == ConfigMode::State::MOVING_GAMEREC && !Configuration::instance().mGameRecorder.mIsRecording)
+			// Skip game rec button if game recording is disabled
+			if (visualElement.mReactToState == ConfigMode::State::MOVING_GAMEREC && !Application::instance().getSimulation().getGameRecorder().isRecording())
 				continue;
 
 			const bool pressed = (nullptr == visualElement.mControl) ? false : visualElement.mControl->isPressed();
 			const uint64 spriteKey = visualElement.mSpriteKeys[pressed ? 1 : 0];
-			const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(spriteKey);
+			const SpriteCollection::Item* item = SpriteCollection::instance().getSprite(spriteKey);
 			if (nullptr == item)
 				continue;
-
-			Rectf rect;
-			rect.setPos(visualElement.mCenter - visualElement.mHalfExtend);
-			rect.setSize(visualElement.mHalfExtend * 2.0f);
 
 			Color color = (mConfigMode.mEnabled && visualElement.mReactToState == mConfigMode.mState) ? Color::CYAN : Color::WHITE;
 			color.a = alpha;
 
+			Rectf rect(visualElement.mCenter - visualElement.mHalfExtend, visualElement.mHalfExtend * 2.0f);
 			rect = getScreenFromNormalizedTouchRect(rect);
 			const Vec2f scale = rect.getSize() / Vec2f(item->mSprite->getSize());
-			drawer.drawSprite(rect.getPos() + rect.getSize() / 2, spriteKey, color, scale);
+
+			drawer.drawSprite(Vec2i(rect.getCenter()), spriteKey, color, scale);
 		}
 		drawer.setSamplingMode(SamplingMode::POINT);
 	}

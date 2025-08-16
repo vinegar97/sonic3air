@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -230,13 +230,16 @@ function void SpillRings()
 		objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 		objA1.base_state += 2
 		objA1.box_size.x = 8
+	#if STANDALONE
+		objA1.box_size.y = 8
+	#endif
 		objA1.sprite_priority = 0x180
 		objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
 		objA1.mapping_offset = 0x01a99a
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		objA1.hitbox_extends.y = 8
 		objA1.hitbox_extends.x = 8
+		objA1.hitbox_extends.y = 8
 		objA1.collision_attributes = (collision.flag.ITEM | collision.size.6x6)
 
 		spilled_rings.speed = 0xff
@@ -299,8 +302,10 @@ function void fn01a75c()
 	objA0.velocity.y += 0x18
 	if (objA0.velocity.y >= 0)
 	{
-		D0.u8 = (global.framecounter + D7.u8) & 0x07
-		if (D0.u8 == 0)
+		// For standalone, perform these checks in each frame, not just every 8th frame (which probably was originally done for performance)
+	#if !STANDALONE
+		if (((global.framecounter + D7.u8) & 7) == 0)
+	#endif
 		{
 			if (objA0.render_flags & render_flag.VISIBLE)
 			{
@@ -361,8 +366,10 @@ function void fn01a7e8()
 	objA0.velocity.y += 0x18
 	if (objA0.velocity.y >= 0)
 	{
-		D0.u8 = (global.framecounter + D7.u8) & 0x07
-		if (D0.u8 == 0)
+		// For standalone, perform these checks in each frame, not just every 8th frame (which probably was originally done for performance)
+	#if !STANDALONE
+		if (((global.framecounter + D7.u8) & 7) == 0)
+	#endif
 		{
 			if (objA0.render_flags & render_flag.VISIBLE)
 			{

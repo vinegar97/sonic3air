@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -58,6 +58,12 @@ namespace lemon
 			const void* mPointer = nullptr;
 		};
 
+		struct FunctionReference
+		{
+			Function* mFunction = nullptr;
+			bool mIsDeprecated = false;
+		};
+
 	public:
 		GlobalsLookup();
 
@@ -68,8 +74,9 @@ namespace lemon
 		const Identifier* resolveIdentifierByHash(uint64 nameHash) const;
 
 		// Functions
-		const std::vector<Function*>& getFunctionsByName(uint64 nameHash) const;
-		const std::vector<Function*>& getMethodsByName(uint64 contextNameHash) const;
+		const std::vector<FunctionReference>& getFunctionsByName(uint64 nameHash) const;
+		const FunctionReference* getFunctionByNameAndSignature(uint64 nameHash, uint32 signatureHash, bool* outAnyFound = nullptr) const;
+		const std::vector<FunctionReference>& getMethodsByName(uint64 contextNameHash) const;
 		void registerFunction(Function& function);
 
 		// Global variables
@@ -98,8 +105,8 @@ namespace lemon
 		std::unordered_map<uint64, Identifier> mAllIdentifiers;
 
 		// Functions
-		std::unordered_map<uint64, std::vector<Function*>> mFunctionsByName;	// Key is the hashed function name
-		std::unordered_map<uint64, std::vector<Function*>> mMethodsByName;		// Key is the sum of hashed context name + hashed function name
+		std::unordered_map<uint64, std::vector<FunctionReference>> mFunctionsByName;	// Key is the hashed function name
+		std::unordered_map<uint64, std::vector<FunctionReference>> mMethodsByName;		// Key is the sum of hashed context name + hashed function name
 		uint32 mNextFunctionID = 0;
 
 		// Global variables

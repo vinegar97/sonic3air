@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -34,12 +34,21 @@ public:
 		std::vector<Font*> mManagedFonts;
 	};
 
+	struct ManagedFont
+	{
+		Font* mFont = nullptr;
+		std::string mKey;
+	};
+
 public:
+	~FontCollection();
+
 	Font* getFontByKey(uint64 keyHash);
 	Font* createFontByKey(std::string_view key);
 
 	bool registerManagedFont(Font& font, std::string_view key);
 
+	void clear();
 	void reloadAll();
 	void collectFromMods();
 
@@ -52,4 +61,5 @@ private:
 	std::unordered_map<uint64, CollectedFont> mCollectedFonts;	// Includes all the fonts that were loaded from files; using "mKeyHash" as map key
 	std::unordered_map<uint64, Font*> mFontsByKeyHash;			// Includes unmodified collected fonts and run-time created fonts (though not the managed fonts); using the font's key hash as map key
 	ObjectPool<Font> mFontPool;
+	std::vector<ManagedFont> mAllManagedFonts;
 };

@@ -8,26 +8,30 @@
 
 #pragma once
 
-#include "oxygen_netcore/network/ServerClientBase.h"
+#include "oxygen_netcore/network/ConnectionListener.h"
 #include "oxygen_netcore/serverclient/Packets.h"
 
 #include "oxygenserver/server/ServerNetConnection.h"
 #include "oxygenserver/subsystems/Channels.h"
+#include "oxygenserver/subsystems/NetplaySetup.h"
 #include "oxygenserver/subsystems/UpdateCheck.h"
 #include "oxygenserver/subsystems/VirtualDirectory.h"
 
 
-class Server : public ServerClientBase
+class Server : public ConnectionListenerInterface
 {
+public:
+	static inline bool mReceivedCloseEvent = false;
+
 public:
 	void runServer();
 
 protected:
-	// From ServerClientBase
+	// From ConnectionListenerInterface
 	virtual NetConnection* createNetConnection(ConnectionManager& connectionManager, const SocketAddress& senderAddress) override;
 	virtual void destroyNetConnection(NetConnection& connection) override;
 
-	// From ConnectionListenerInterface
+	virtual bool onReceivedConnectionlessPacket(ConnectionlessPacketEvaluation& evaluation) override;
 	virtual bool onReceivedPacket(ReceivedPacketEvaluation& evaluation) override;
 	virtual bool onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation) override;
 
@@ -42,6 +46,7 @@ private:
 
 	// Sub-systems
 	Channels mChannels;
+	NetplaySetup mNetplaySetup;
 	UpdateCheck mUpdateCheck;
 	VirtualDirectory mVirtualDirectory;
 

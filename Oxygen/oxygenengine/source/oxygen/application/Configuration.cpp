@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,6 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/helper/JsonHelper.h"
+#include "oxygen/helper/JsonSerializer.h"
 #include "oxygen/platform/PlatformFunctions.h"
 
 #include <lemon/translator/SourceCodeWriter.h>
@@ -16,17 +17,6 @@
 
 namespace
 {
-	void tryParseWindowSize(String string, Vec2i& result)
-	{
-		std::vector<String> resolution;
-		string.split(resolution, 'x');
-		if (resolution.size() >= 2)
-		{
-			result.x = resolution[0].parseInt();
-			result.y = resolution[1].parseInt();
-		}
-	}
-
 	void readInputDevices(const Json::Value& rootJson, std::vector<InputConfig::DeviceDefinition>& inputDeviceDefinitions)
 	{
 		// Input devices
@@ -63,13 +53,16 @@ namespace
 			{
 				for (Json::ArrayIndex i = 0; i < deviceNames.size(); ++i)
 				{
-					const std::string name = deviceNames[i].asString();
-					if (!name.empty())
+					if (deviceNames[i].isString())
 					{
-						String str(name);
-						str.lowerCase();
-						const uint64 hash = rmx::getMurmur2_64(str);
-						inputDeviceDefinition->mDeviceNames[hash] = *str;
+						const std::string name = deviceNames[i].asString();
+						if (!name.empty())
+						{
+							String str(name);
+							str.lowerCase();
+							const uint64 hash = rmx::getMurmur2_64(str);
+							inputDeviceDefinition->mDeviceNames[hash] = *str;
+						}
 					}
 				}
 			}
@@ -84,10 +77,13 @@ namespace
 				{
 					for (Json::ArrayIndex k = 0; k < mappingJson.size(); ++k)
 					{
-						InputConfig::Assignment assignment;
-						if (InputConfig::Assignment::setFromMappingString(assignment, mappingJson[k].asString(), inputDeviceDefinition->mDeviceType))
+						if (mappingJson[k].isString())
 						{
-							newAssignments.push_back(assignment);
+							InputConfig::Assignment assignment;
+							if (InputConfig::Assignment::setFromMappingString(assignment, mappingJson[k].asString(), inputDeviceDefinition->mDeviceType))
+							{
+								newAssignments.push_back(assignment);
+							}
 						}
 					}
 				}
@@ -123,12 +119,12 @@ namespace
 		}
 	}
 
-	void tryReadRenderMethod(JsonHelper& rootHelper, bool failSafeMode, Configuration::RenderMethod& outRenderMethod, bool& outAutoDetect)
+	void tryReadRenderMethod(JsonSerializer& serializer, bool failSafeMode, Configuration::RenderMethod& outRenderMethod, bool& outAutoDetect)
 	{
 		String renderMethodString;
 		{
 			std::string renderMethodStdString;
-			if (rootHelper.tryReadString("RenderMethod", renderMethodStdString))
+			if (serializer.serialize("RenderMethod", renderMethodStdString))
 			{
 				renderMethodString = renderMethodStdString;
 				renderMethodString.lowerCase();
@@ -136,7 +132,7 @@ namespace
 				outAutoDetect = (renderMethodString == "auto");
 				if (outAutoDetect)
 				{
-					outRenderMethod = Configuration::RenderMethod::OPENGL_FULL;
+					outRenderMethod = Configuration::getHighestSupportedRenderMethod();
 				}
 			}
 		}
@@ -149,7 +145,7 @@ namespace
 		{
 			if (renderMethodString.startsWith("opengl"))
 			{
-				outRenderMethod = (renderMethodString.endsWith("soft") | renderMethodString.endsWith("software")) ? Configuration::RenderMethod::OPENGL_SOFT : Configuration::RenderMethod::OPENGL_FULL;
+				outRenderMethod = (renderMethodString.endsWith("soft") || renderMethodString.endsWith("software")) ? Configuration::RenderMethod::OPENGL_SOFT : Configuration::RenderMethod::OPENGL_FULL;
 			}
 			else if (renderMethodString == "software")
 			{
@@ -159,7 +155,7 @@ namespace
 			if (outRenderMethod == Configuration::RenderMethod::UNDEFINED)
 			{
 				bool useSoftwareRenderer = false;
-				if (rootHelper.tryReadBool("UseSoftwareRenderer", useSoftwareRenderer))
+				if (serializer.serialize("UseSoftwareRenderer", useSoftwareRenderer))
 				{
 					outRenderMethod = useSoftwareRenderer ? Configuration::RenderMethod::OPENGL_SOFT : Configuration::RenderMethod::OPENGL_FULL;
 				}
@@ -228,11 +224,9 @@ namespace
 
 
 
-Configuration* Configuration::mSingleInstance = nullptr;
-
 Configuration::RenderMethod Configuration::getHighestSupportedRenderMethod()
 {
-#if defined(PLATFORM_WEB) || (defined(PLATFORM_MAC) && defined(__arm64__))
+#if defined(PLATFORM_WEB) || (defined(PLATFORM_MAC) && defined(__arm64__)) || defined(PLATFORM_VITA)
 	return RenderMethod::OPENGL_SOFT;
 #else
 	// Default is OpenGL Hardware render method (as it's the highest one), but this can be lowered as needed, e.g. for individual platforms or depending on the execution environment
@@ -252,6 +246,10 @@ Configuration::Configuration()
 	mUseAudioThreading = false;
 #endif
 
+#if defined(PLATFORM_ANDROID)
+	// Use a much larger default UI scale on Android, otherwise it's too finicky to interact with ImGui at all
+	mDevMode.mUIScale = 2.0f;
+#endif
 }
 
 void Configuration::initialization()
@@ -266,14 +264,14 @@ void Configuration::initialization()
 bool Configuration::loadConfiguration(const std::wstring& filename)
 {
 	// Open file
-	const Json::Value root = JsonHelper::loadFile(filename);
+	Json::Value root = JsonHelper::loadFile(filename);
 	const bool loaded = !root.isNull();		// If the config.json was not found, just silently ignore that for now, and return false in the end
-	JsonHelper rootHelper(root);
+	JsonSerializer serializer(true, root);
 
 #ifdef PLATFORM_WINDOWS
 	// Just for debugging
 	bool wait = false;
-	if (loaded && rootHelper.tryReadBool("WaitForDebugger", wait) && wait)
+	if (loaded && serializer.serialize("WaitForDebugger", wait) && wait)
 	{
 		PlatformFunctions::showMessageBox("Waiting for debugger", "Attach debugger now, or don't...");
 	}
@@ -293,16 +291,16 @@ bool Configuration::loadConfiguration(const std::wstring& filename)
 	mPreprocessorDefinitions.setDefinition("STANDALONE");
 
 	// Load project path
-	if (rootHelper.tryReadString("LoadProject", mProjectPath))
+	if (serializer.serialize("LoadProject", mProjectPath))
 	{
 		mProjectPath += L"/";
 	}
 
 	// Load everything shared with settings_global
-	loadConfigurationProperties(rootHelper);
+	loadConfigurationProperties(serializer);
 
 	// Call subclass implementation
-	const bool success = loadConfigurationInternal(rootHelper);
+	const bool success = loadConfigurationInternal(serializer);
 	return loaded && success;
 }
 
@@ -315,11 +313,11 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 	Json::Value root = JsonHelper::loadFile(filename);
 	if (root.isNull())
 		return false;
-	JsonHelper rootHelper(root);
+	JsonSerializer serializer(true, root);
 
 	if (settingsType == SettingsType::GLOBAL)
 	{
-		loadConfigurationProperties(rootHelper);
+		loadConfigurationProperties(serializer);
 	}
 
 	if (settingsType == SettingsType::INPUT)
@@ -329,72 +327,18 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 	}
 	else
 	{
-		// Paths
-		rootHelper.tryReadString("RomPath", mLastRomPath);
+		// All kinds of stuff
+		serializeStandardSettings(serializer);
 
-		// General
-		if (rootHelper.tryReadBool("FailSafeMode", mFailSafeMode))
-		{
-			if (mFailSafeMode)
-				mUseAudioThreading = false;
-		}
-
-		// Graphics
-		tryReadRenderMethod(rootHelper, mFailSafeMode, mRenderMethod, mAutoDetectRenderMethod);
-
-		rootHelper.tryReadAsInt("Fullscreen", mWindowMode);
-		rootHelper.tryReadInt("DisplayIndex", mDisplayIndex);
-		rootHelper.tryReadAsInt("FrameSync", mFrameSync);
-		rootHelper.tryReadInt("Upscaling", mUpscaling);
-		rootHelper.tryReadInt("Backdrop", mBackdrop);
-		rootHelper.tryReadInt("Filtering", mFiltering);
-		rootHelper.tryReadInt("Scanlines", mScanlines);
-		rootHelper.tryReadInt("BackgroundBlur", mBackgroundBlur);
-		rootHelper.tryReadInt("PerformanceDisplay", mPerformanceDisplay);
-
-		// Audio
-		rootHelper.tryReadFloat("Volume", mAudioVolume);
-
-		// Input
-		rootHelper.tryReadString("PreferredGamepadPlayer1", mPreferredGamepad[0]);
-		rootHelper.tryReadString("PreferredGamepadPlayer2", mPreferredGamepad[1]);
-		rootHelper.tryReadFloat("ControllerRumblePlayer1", mControllerRumbleIntensity[0]);
-		rootHelper.tryReadFloat("ControllerRumblePlayer2", mControllerRumbleIntensity[1]);
-		rootHelper.tryReadInt("AutoAssignGamepadPlayerIndex", mAutoAssignGamepadPlayerIndex);
-
-		// Virtual gamepad
-		if (!root["VirtualGamepad"].isNull())
-		{
-			JsonHelper vgHelper(root["VirtualGamepad"]);
-			const auto tryReadVec2i = [&](const std::string& key, Vec2i& outValue)
-			{
-				vgHelper.tryReadInt(key + "X", outValue.x);
-				vgHelper.tryReadInt(key + "Y", outValue.y);
-			};
-
-			vgHelper.tryReadFloat("Opacity", mVirtualGamepad.mOpacity);
-			tryReadVec2i("DPadPos", mVirtualGamepad.mDirectionalPadCenter);
-			vgHelper.tryReadInt("DPadSize", mVirtualGamepad.mDirectionalPadSize);
-			tryReadVec2i("ButtonsPos", mVirtualGamepad.mFaceButtonsCenter);
-			vgHelper.tryReadInt("ButtonsSize", mVirtualGamepad.mFaceButtonsSize);
-			tryReadVec2i("StartPos", mVirtualGamepad.mStartButtonCenter);
-			tryReadVec2i("GameRecPos", mVirtualGamepad.mGameRecButtonCenter);
-			tryReadVec2i("ShoulderLPos", mVirtualGamepad.mShoulderLButtonCenter);
-			tryReadVec2i("ShoulderRPos", mVirtualGamepad.mShoulderRButtonCenter);
-		}
-
-		// Game recorder
-		rootHelper.tryReadInt("GameRecordingMode", mGameRecorder.mRecordingMode);
-
-		// Script
-		rootHelper.tryReadInt("ScriptOptimizationLevel", mScriptOptimizationLevel);
+		// Dev mode
+		serializeDevMode(serializer);
 
 		// Mod settings
 		loadModSettings(root, mModSettings);
 	}
 
 	// Call subclass implementation
-	const bool success = loadSettingsInternal(rootHelper, settingsType);
+	const bool success = loadSettingsInternal(serializer, settingsType);
 
 	// Cleanup?
 	{
@@ -404,7 +348,7 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 			case SettingsType::STANDARD:
 			{
 				bool performCleanup = false;
-				if (rootHelper.tryReadBool("CleanupSettings", performCleanup))
+				if (serializer.serialize("CleanupSettings", performCleanup))
 				{
 					retainOldEntries = !performCleanup;
 				}
@@ -452,69 +396,17 @@ void Configuration::saveSettings()
 		Json::Value root = mSettingsJsons[settingsIndex];
 		root["CleanupSettings"] = 0;
 
-		// Paths
-		root["RomPath"] = WString(mLastRomPath).toStdString();
+		JsonSerializer serializer(false, root);
+		serializeStandardSettings(serializer);
 
-		// General
-		root["RenderMethod"] = mAutoDetectRenderMethod ? "auto" :
-							   (mRenderMethod == RenderMethod::OPENGL_FULL) ? "opengl-full" :
-							   (mRenderMethod == RenderMethod::OPENGL_SOFT) ? "opengl-soft" : "software";
-		root["FailSafeMode"] = mFailSafeMode;
-		root["PlatformFlags"] = mPlatformFlags;
-
-		// Graphics
-		root["Fullscreen"] = (int)mWindowMode;
-		root["DisplayIndex"] = mDisplayIndex;
-		root["FrameSync"] = (int)mFrameSync;
-		root["Upscaling"] = mUpscaling;
-		root["Backdrop"] = mBackdrop;
-		root["Filtering"] = mFiltering;
-		root["Scanlines"] = mScanlines;
-		root["BackgroundBlur"] = mBackgroundBlur;
-		root["PerformanceDisplay"] = mPerformanceDisplay;
-
-		// Audio
-		root["Volume"] = mAudioVolume;
-
-		// Input
-		root["PreferredGamepadPlayer1"] = mPreferredGamepad[0];
-		root["PreferredGamepadPlayer2"] = mPreferredGamepad[1];
-		root["AutoAssignGamepadPlayerIndex"] = mAutoAssignGamepadPlayerIndex;
-		root["ControllerRumblePlayer1"] = mControllerRumbleIntensity[0];
-		root["ControllerRumblePlayer2"] = mControllerRumbleIntensity[1];
-
-		// Virtual gamepad
-		{
-			Json::Value vg = root["VirtualGamepad"];
-			const auto saveVec2i = [&](const std::string& key, Vec2i value)
-			{
-				vg[key + "X"] = value.x;
-				vg[key + "Y"] = value.y;
-			};
-
-			vg["Opacity"] = mVirtualGamepad.mOpacity;
-			saveVec2i("DPadPos", mVirtualGamepad.mDirectionalPadCenter);
-			vg["DPadSize"] = mVirtualGamepad.mDirectionalPadSize;
-			saveVec2i("ButtonsPos", mVirtualGamepad.mFaceButtonsCenter);
-			vg["ButtonsSize"] = mVirtualGamepad.mFaceButtonsSize;
-			saveVec2i("StartPos", mVirtualGamepad.mStartButtonCenter);
-			saveVec2i("GameRecPos", mVirtualGamepad.mGameRecButtonCenter);
-			saveVec2i("ShoulderLPos", mVirtualGamepad.mShoulderLButtonCenter);
-			saveVec2i("ShoulderRPos", mVirtualGamepad.mShoulderRButtonCenter);
-			root["VirtualGamepad"] = vg;
-		}
-
-		// Game recorder
-		root["GameRecordingMode"] = mGameRecorder.mRecordingMode;
-
-		// Script
-		root["ScriptOptimizationLevel"] = mScriptOptimizationLevel;
+		// Dev mode
+		serializeDevMode(serializer);
 
 		// Mod settings
 		saveModSettings(root, mModSettings);
 
 		// Call subclass implementation
-		saveSettingsInternal(root, SettingsType::STANDARD);
+		saveSettingsInternal(serializer, SettingsType::STANDARD);
 
 		// Save file
 		JsonHelper::saveFile(mSettingsFilenames[settingsIndex], root);
@@ -527,14 +419,17 @@ void Configuration::saveSettings()
 		Json::Value root = mSettingsJsons[settingsIndex];
 		if (!root.isNull())		// Only overwrite if it existed before already
 		{
+			JsonSerializer serializer(false, root);
+
 			// Overwrite only certain properties, namely those that can be defined by the mod manager AND changed by the game
-			root["RenderMethod"] = mAutoDetectRenderMethod ? "auto" :
-								   (mRenderMethod == RenderMethod::OPENGL_FULL) ? "opengl-full" :
-								   (mRenderMethod == RenderMethod::OPENGL_SOFT) ? "opengl-soft" : "software";
-			root["Fullscreen"] = (int)mWindowMode;
+			std::string renderMethod = mAutoDetectRenderMethod ? "auto" :
+										(mRenderMethod == RenderMethod::OPENGL_FULL) ? "opengl-full" :
+										(mRenderMethod == RenderMethod::OPENGL_SOFT) ? "opengl-soft" : "software";
+			serializer.serialize("RenderMethod", renderMethod);
+			serializer.serializeAs<int>("Fullscreen", mWindowMode);
 
 			// Call subclass implementation
-			saveSettingsInternal(root, SettingsType::GLOBAL);
+			saveSettingsInternal(serializer, SettingsType::GLOBAL);
 
 			// Save file
 			JsonHelper::saveFile(mSettingsFilenames[settingsIndex], root);
@@ -549,122 +444,213 @@ void Configuration::saveSettings()
 	}
 }
 
-void Configuration::evaluateGameRecording()
-{
-	if (mGameRecorder.mRecordingMode == 0 || mGameRecorder.mIsPlayback)
-	{
-		mGameRecorder.mIsRecording = false;
-	}
-	else if (mGameRecorder.mRecordingMode == 1)
-	{
-		mGameRecorder.mIsRecording = true;
-	}
-	else
-	{
-		#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WEB)
-			// Disable game recording unless explicitly enabled, as it can be really slow on mobile devices
-			mGameRecorder.mIsRecording = false;
-		#else
-			mGameRecorder.mIsRecording = !mFailSafeMode;
-		#endif
-	}
-}
-
-void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
+void Configuration::loadConfigurationProperties(JsonSerializer& serializer)
 {
 	// Read dev mode setting first, as other settings rely on it
-	if (!mDevMode.mEnabled)	// If either config or settings set this to true, then it stays true
-	{
-		Json::Value devModeJson = rootHelper.mJson["DevMode"];
-		if (devModeJson.isObject())
-		{
-			JsonHelper devModeHelper(devModeJson);
-			devModeHelper.tryReadBool("Enabled", mDevMode.mEnabled);
-
-			devModeHelper.tryReadString("LoadSaveState", mLoadSaveState);
-			devModeHelper.tryReadInt("LoadLevel", mLoadLevel);
-			devModeHelper.tryReadInt("UseCharacters", mUseCharacters);
-			mUseCharacters = clamp(mUseCharacters, 0, 4);
-
-			devModeHelper.tryReadBool("EnableROMDataAnalyser", mEnableROMDataAnalyser);
-		}
-	}
+	serializeDevMode(serializer);
 
 	// Paths
 	if (mRomPath.empty())
 	{
-		if (rootHelper.tryReadString("RomPath", mRomPath))
+		if (serializer.serialize("RomPath", mRomPath))
 		{
 			FTX::FileSystem->normalizePath(mRomPath, false);
 		}
 	}
-	if (rootHelper.tryReadString("ScriptsDir", mScriptsDir))
+	if (serializer.serialize("ScriptsDir", mScriptsDir))
 	{
 		FTX::FileSystem->normalizePath(mScriptsDir, true);
 	}
-	rootHelper.tryReadString("MainScriptName", mMainScriptName);
+	serializer.serialize("MainScriptName", mMainScriptName);
 
 	if (mDevMode.mEnabled)
 	{
-		if (rootHelper.tryReadString("SaveStatesDir", mSaveStatesDir))
+		if (serializer.serialize("SaveStatesDir", mSaveStatesDir))
 		{
 			FTX::FileSystem->normalizePath(mSaveStatesDir, true);
 		}
 	}
 
 	// Platform
-	rootHelper.tryReadInt("PlatformFlags", mPlatformFlags);
+	serializer.serialize("PlatformFlags", mPlatformFlags);
 
 	// Game
-	rootHelper.tryReadInt("StartPhase", mStartPhase);
+	serializer.serialize("StartPhase", mStartPhase);
 
 	// Game recorder
-	Json::Value gamerecJson = rootHelper.mJson["GameRecording"];
-	if (gamerecJson.isObject())
+	if (serializer.beginObject("GameRecording"))
 	{
-		JsonHelper gamerecHelper(gamerecJson);
-		gamerecHelper.tryReadBool("EnablePlayback", mGameRecorder.mIsPlayback);
-		if (mGameRecorder.mIsPlayback)
+		serializer.serialize("EnablePlayback", mGameRecorder.mEnablePlayback);
+		if (mGameRecorder.mEnablePlayback)
 		{
-			gamerecHelper.tryReadInt("PlaybackStartFrame", mGameRecorder.mPlaybackStartFrame);
-			gamerecHelper.tryReadBool("PlaybackIgnoreKeys", mGameRecorder.mPlaybackIgnoreKeys);
+			serializer.serialize("PlaybackStartFrame", mGameRecorder.mPlaybackStartFrame);
+			serializer.serialize("PlaybackIgnoreKeys", mGameRecorder.mPlaybackIgnoreKeys);
 		}
+		serializer.endObject();
 	}
 
-	if (mLoadLevel != -1 || mGameRecorder.mIsPlayback)
+	if (mLoadLevel != -1 || mGameRecorder.mEnablePlayback)
 	{
 		// Enforce start phase 3 (in-game) when a level to load directly is defined, and in game recording playback mode
 		mStartPhase = 3;
 	}
 
 	// Video
-	tryParseWindowSize(rootHelper.mJson["WindowSize"].asString(), mWindowSize);
+	serializer.serializeVectorAsSizeString("WindowSize", mWindowSize);
 	if (mDevMode.mEnabled)
 	{
-		tryParseWindowSize(rootHelper.mJson["GameScreen"].asString(), mGameScreen);
+		serializer.serializeVectorAsSizeString("GameScreen", mGameScreen);
 	}
-	rootHelper.tryReadInt("Upscaling", mUpscaling);
-	rootHelper.tryReadInt("Filtering", mFiltering);
-	rootHelper.tryReadInt("Scanlines", mScanlines);
-	rootHelper.tryReadInt("BackgroundBlur", mBackgroundBlur);
-	rootHelper.tryReadInt("PerformanceDisplay", mPerformanceDisplay);
-	tryReadRenderMethod(rootHelper, mFailSafeMode, mRenderMethod, mAutoDetectRenderMethod);
+	serializer.serialize("Upscaling", mUpscaling);
+	serializer.serialize("Filtering", mFiltering);
+	serializer.serialize("Scanlines", mScanlines);
+	serializer.serialize("BackgroundBlur", mBackgroundBlur);
+	serializer.serialize("PerformanceDisplay", mPerformanceDisplay);
+	tryReadRenderMethod(serializer, mFailSafeMode, mRenderMethod, mAutoDetectRenderMethod);
 
 	// Audio
-	rootHelper.tryReadInt("AudioSampleRate", mAudioSampleRate);
+	serializer.serialize("AudioSampleRate", mAudioSampleRate);
 
 	// Input recorder
 	if (mDevMode.mEnabled)
 	{
-		JsonHelper jsonHelper(rootHelper.mJson["InputRecorder"]);
-		jsonHelper.tryReadString("Playback", mInputRecorderInput);
-		jsonHelper.tryReadString("Record", mInputRecorderOutput);
+		if (serializer.beginObject("InputRecorder"))
+		{
+			serializer.serialize("Playback", mInputRecorderInput);
+			serializer.serialize("Record", mInputRecorderOutput);
+			serializer.endObject();
+		}
 	}
 
 #if DEBUG
 	// Script
-	rootHelper.tryReadBool("CompileScripts", mForceCompileScripts);
+	serializer.serialize("CompileScripts", mForceCompileScripts);
 #endif
+}
+
+void Configuration::serializeStandardSettings(JsonSerializer& serializer)
+{
+	// Paths
+	serializer.serialize("RomPath", mLastRomPath);
+
+	// General
+	serializer.serialize("FailSafeMode", mFailSafeMode);
+
+	if (serializer.isReading() && mFailSafeMode)
+		mUseAudioThreading = false;
+
+	// Graphics
+	if (serializer.isReading())
+	{
+		tryReadRenderMethod(serializer, mFailSafeMode, mRenderMethod, mAutoDetectRenderMethod);
+	}
+	else
+	{
+		std::string renderMethod = mAutoDetectRenderMethod ? "auto" :
+									(mRenderMethod == RenderMethod::OPENGL_FULL) ? "opengl-full" :
+									(mRenderMethod == RenderMethod::OPENGL_SOFT) ? "opengl-soft" : "software";
+		serializer.serialize("RenderMethod", renderMethod);
+
+		serializer.serialize("FailSafeMode", mFailSafeMode);
+		serializer.serialize("PlatformFlags", mPlatformFlags);
+	}
+
+	serializer.serializeAs<int>("Fullscreen", mWindowMode);
+	serializer.serialize("DisplayIndex", mDisplayIndex);
+	serializer.serializeAs<int>("FrameSync", mFrameSync);
+	serializer.serialize("Upscaling", mUpscaling);
+	serializer.serialize("Backdrop", mBackdrop);
+	serializer.serialize("Filtering", mFiltering);
+	serializer.serialize("Scanlines", mScanlines);
+	serializer.serialize("BackgroundBlur", mBackgroundBlur);
+	serializer.serialize("PerformanceDisplay", mPerformanceDisplay);
+
+	// Audio
+	serializer.serialize("Volume", mAudioVolume);
+
+	// Input
+	serializer.serialize("PreferredGamepadPlayer1", mPreferredGamepad[0]);
+	serializer.serialize("PreferredGamepadPlayer2", mPreferredGamepad[1]);
+	serializer.serialize("PreferredGamepadPlayer3", mPreferredGamepad[2]);
+	serializer.serialize("PreferredGamepadPlayer4", mPreferredGamepad[3]);
+	serializer.serialize("ControllerRumblePlayer1", mControllerRumbleIntensity[0]);
+	serializer.serialize("ControllerRumblePlayer2", mControllerRumbleIntensity[1]);
+	serializer.serialize("ControllerRumblePlayer3", mControllerRumbleIntensity[2]);
+	serializer.serialize("ControllerRumblePlayer4", mControllerRumbleIntensity[3]);
+	serializer.serialize("AutoAssignGamepadPlayerIndex", mAutoAssignGamepadPlayerIndex);
+
+	// Virtual gamepad
+	if (serializer.beginObject("VirtualGamepad"))
+	{
+		serializer.serialize("Opacity", mVirtualGamepad.mOpacity);
+		serializer.serializeComponents("DPadPos", mVirtualGamepad.mDirectionalPadCenter);
+		serializer.serialize("DPadSize", mVirtualGamepad.mDirectionalPadSize);
+		serializer.serializeComponents("ButtonsPos", mVirtualGamepad.mFaceButtonsCenter);
+		serializer.serialize("ButtonsSize", mVirtualGamepad.mFaceButtonsSize);
+		serializer.serializeComponents("StartPos", mVirtualGamepad.mStartButtonCenter);
+		serializer.serializeComponents("GameRecPos", mVirtualGamepad.mGameRecButtonCenter);
+		serializer.serializeComponents("ShoulderLPos", mVirtualGamepad.mShoulderLButtonCenter);
+		serializer.serializeComponents("ShoulderRPos", mVirtualGamepad.mShoulderRButtonCenter);
+		serializer.endObject();
+	}
+
+	// Game recorder
+	serializer.serialize("GameRecordingMode", mGameRecorder.mRecordingMode);
+
+	// Script
+	serializer.serialize("ScriptOptimizationLevel", mScriptOptimizationLevel);
+
+	// Game server
+	if (serializer.beginObject("GameServer"))
+	{
+		serializer.serialize("ServerAddress", mGameServerBase.mServerHostName);
+		serializer.serialize("ServerPortUDP", mGameServerBase.mServerPortUDP);
+		serializer.serialize("ServerPortTCP", mGameServerBase.mServerPortTCP);
+		serializer.serialize("ServerPortWSS", mGameServerBase.mServerPortWSS);
+		serializer.endObject();
+	}
+}
+
+void Configuration::serializeDevMode(JsonSerializer& serializer)
+{
+	if (serializer.beginObject("DevMode"))
+	{
+		serializer.serialize("Enabled", mDevMode.mEnabled);
+
+		serializer.serialize("LoadSaveState", mLoadSaveState);
+		serializer.serialize("LoadLevel", mLoadLevel);
+		if (serializer.serialize("UseCharacters", mUseCharacters))
+		{
+			if (serializer.isReading())
+				mUseCharacters = clamp(mUseCharacters, 0, 4);
+		}
+
+		serializer.serialize("EnableROMDataAnalyser", mEnableROMDataAnalyser);
+
+		if (serializer.beginObject("DevModeUI"))
+		{
+			serializer.serialize("Scale", mDevMode.mUIScale);
+			serializer.serializeHexColorRGB("AccentColor", mDevMode.mUIAccentColor);
+			serializer.serializeArray("OpenWindows", mDevMode.mOpenUIWindows);
+			serializer.serialize("MainWindowOpen", mDevMode.mMainWindowOpen);
+			serializer.serialize("UseTabsInMainWindow", mDevMode.mUseTabsInMainWindow);
+			serializer.serialize("ActiveMainWindowTab", mDevMode.mActiveMainWindowTab);
+			serializer.serialize("ApplyModSettingsAfterLoadState", mDevMode.mApplyModSettingsAfterLoadState);
+			serializer.endObject();
+		}
+
+		if (serializer.beginObject("ExternalCodeEditor"))
+		{
+			serializer.serialize("Type", mDevMode.mExternalCodeEditor.mActiveType);
+			serializer.serialize("VSCodePath", mDevMode.mExternalCodeEditor.mVisualStudioCodePath);
+			serializer.serialize("NppPath", mDevMode.mExternalCodeEditor.mNotepadPlusPlusPath);
+			serializer.serialize("CustomEditorPath", mDevMode.mExternalCodeEditor.mCustomEditorPath);
+			serializer.serialize("CustomEditorArgs", mDevMode.mExternalCodeEditor.mCustomEditorArgs);
+			serializer.endObject();
+		}
+
+		serializer.endObject();
+	}
 }
 
 void Configuration::saveSettingsInput(const std::wstring& filename) const
@@ -684,14 +670,7 @@ void Configuration::saveSettingsInput(const std::wstring& filename) const
 			{
 				const bool keyboard_a = String(a->mIdentifier).startsWith("Keyboard");
 				const bool keyboard_b = String(b->mIdentifier).startsWith("Keyboard");
-				if (keyboard_a != keyboard_b)
-				{
-					return keyboard_a;
-				}
-				else
-				{
-					return a->mIdentifier < b->mIdentifier;
-				}
+				return (keyboard_a != keyboard_b) ? keyboard_a : (a->mIdentifier < b->mIdentifier);
 			});
 	}
 

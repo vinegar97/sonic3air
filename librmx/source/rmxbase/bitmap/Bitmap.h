@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -47,7 +47,7 @@ public:
 	// Create as copy
 	void copy(const Bitmap& source);
 	void copy(const Bitmap& source, const Recti& rect);
-	void copy(void* source, int wid, int hgt);
+	void copy(const void* source, int wid, int hgt);
 
 	// Create a bitmap
 	void create(int wid, int hgt);
@@ -68,6 +68,9 @@ public:
 	void clearAlpha(uint8 alpha);
 
 	inline bool empty() const				{ return (nullptr == mData); }
+	inline bool isEmpty() const				{ return (nullptr == mData); }
+	inline bool nonEmpty() const			{ return (nullptr != mData); }
+
 	inline int getWidth() const				{ return mWidth; }
 	inline int getHeight() const			{ return mHeight; }
 	inline Vec2i getSize() const			{ return Vec2i(mWidth, mHeight); }
@@ -76,6 +79,8 @@ public:
 
 	inline uint32* getData()				{ return mData; }
 	inline const uint32* getData() const	{ return mData; }
+
+	inline bool isValidPosition(int x, int y) const  { return (uint32)x < (uint32)mWidth && (uint32)y < (uint32)mHeight; }	// Unsigned comparison essentially implies that x and y are >= 0
 
 	// Pixel access
 	inline uint32 getPixel(int x, int y) const				 { return mData[x + y * mWidth]; }
@@ -98,8 +103,8 @@ public:
 
 	void setPixel(int x, int y, uint32 color);
 	void setPixel(int x, int y, float red, float green, float blue, float alpha = 1.0f);
-	inline void setPixel(Vec2i pos, uint32 color)											{ return setPixel(pos.x, pos.y, color); }
-	inline void setPixel(Vec2i pos, float red, float green, float blue, float alpha = 1.0f)	{ return setPixel(pos.x, pos.y, red, green, blue, alpha); }
+	inline void setPixel(Vec2i pos, uint32 color)											{ setPixel(pos.x, pos.y, color); }
+	inline void setPixel(Vec2i pos, float red, float green, float blue, float alpha = 1.0f)	{ setPixel(pos.x, pos.y, red, green, blue, alpha); }
 
 	bool decode(InputStream& stream, LoadResult& outResult, const char* format = nullptr);
 	bool encode(OutputStream& stream, const char* format) const;
@@ -135,20 +140,45 @@ public:
 	inline Bitmap& operator=(const Bitmap& bmp)			{ copy(bmp); return *this; }
 
 private:
-	void memcpyRect(uint32* dst, int dwid, uint32* src, int swid, int wid, int hgt);
-	void memcpyBlend(uint32* dst, int dwid, uint32* src, int swid, int wid, int hgt);
+	void memcpyRect(uint32* dst, int dwid, const uint32* src, int swid, int wid, int hgt);
+	void memcpyBlend(uint32* dst, int dwid, const uint32* src, int swid, int wid, int hgt);
 	void convert2palette(uint8* output, int colors, uint32* palette);
 
 private:
-	uint32* mData = nullptr;
+	uint32* mData = nullptr;	// Pixels in ABGR32 format, i.e. each pixel is encoded as 0xAABBGGRR
 	int mWidth = 0;
 	int mHeight = 0;
-
-public:
-	struct API_EXPORT CodecList
-	{
-		std::vector<class IBitmapCodec*> mList;
-		template<class CLASS> void add()  { mList.push_back(new CLASS()); }
-	};
-	static CodecList mCodecs;
 };
+
+
+namespace rmx
+{
+	class API_EXPORT IBitmapCodec
+	{
+	public:
+		virtual ~IBitmapCodec() {}
+		virtual bool canDecode(const String& format) const  { return false; }
+		virtual bool canEncode(const String& format) const  { return false; }
+		virtual bool decode(Bitmap& bitmap, InputStream& stream, Bitmap::LoadResult& outResult)  { return false; }
+		virtual bool encode(const Bitmap& bitmap, OutputStream& stream)  { return false; }
+	};
+
+	class API_EXPORT BitmapCodecList
+	{
+	public:
+		std::vector<IBitmapCodec*> mList;
+
+	public:
+		~BitmapCodecList()
+		{
+			for (IBitmapCodec* codec : mList)
+				delete codec;
+			mList.clear();
+		}
+
+		template<class CLASS> void add()  { mList.push_back(new CLASS()); }
+
+	public:
+		static BitmapCodecList mCodecs;
+	};
+}

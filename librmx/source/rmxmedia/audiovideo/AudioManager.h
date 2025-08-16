@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -52,6 +52,7 @@ namespace rmx
 			float mPosition = 0.0f;
 			bool mLoop = false;
 			bool mStreaming = false;
+			bool mStartPaused = false;
 		};
 
 	public:
@@ -69,7 +70,7 @@ namespace rmx
 		void lockAudio();
 		void unlockAudio();
 
-		void regularUpdate(float timeElapsed);	// Should best be called once every frame
+		void regularUpdate(float deltaSeconds);	// Should best be called once every frame
 
 		void setGlobalVolume(float volume);
 

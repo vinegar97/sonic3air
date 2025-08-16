@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -30,9 +30,9 @@ void GameMenuManager::updateMenus()
 	while (!mMenusToBeRemoved.empty())
 	{
 		GameMenuBase* menu = mMenusToBeRemoved.back();
-		if (nullptr != menu && nullptr != menu->getParent())
+		if (nullptr != menu)
 		{
-			menu->getParent()->removeChild(menu);
+			menu->removeFromParent();
 		}
 		mActiveMenus.erase(menu);
 		mMenusToBeRemoved.pop_back();
@@ -43,7 +43,7 @@ void GameMenuManager::addMenu(GameMenuBase& menu)
 {
 	if (nullptr == menu.getParent())
 	{
-		mRoot->addChild(&menu);
+		mRoot->addChild(menu);
 	}
 	mActiveMenus.insert(&menu);
 
@@ -60,9 +60,9 @@ void GameMenuManager::forceRemoveAll()
 	while (!mMenusToBeRemoved.empty())
 	{
 		GameMenuBase* menu = mMenusToBeRemoved.back();
-		if (nullptr != menu && nullptr != menu->getParent())
+		if (nullptr != menu)
 		{
-			menu->getParent()->removeChild(menu);
+			menu->removeFromParent();
 		}
 		mActiveMenus.erase(menu);
 		mMenusToBeRemoved.pop_back();

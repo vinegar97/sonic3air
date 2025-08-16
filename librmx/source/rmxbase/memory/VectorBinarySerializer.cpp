@@ -1,12 +1,16 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
 #include "rmxbase.h"
+
+#if defined(PLATFORM_VITA)
+	#include <psp2/kernel/clib.h>
+#endif
 
 
 namespace
@@ -26,7 +30,12 @@ namespace
 		{
 			const size_t oldSize = buffer.size();
 			buffer.resize(oldSize + sizeof(T));
+		#if !defined(PLATFORM_VITA)
 			*(T*)&buffer[oldSize] = value;
+		#else
+			// Use memcpy to avoid issues with unaligned memory access
+			sceClibMemcpy(&buffer[oldSize], &value, sizeof(T));
+		#endif
 		}
 		return true;
 	}
@@ -39,7 +48,12 @@ namespace
 			if (readPosition >= buffer.size())
 				return false;
 
+		#if !defined(PLATFORM_VITA)
 			value = *(bool*)&buffer[readPosition];
+		#else
+			// Use memcpy to avoid issues with unaligned memory access
+			sceClibMemcpy(&value, &buffer[readPosition], sizeof(bool));
+		#endif
 			++readPosition;
 		}
 		else
@@ -225,26 +239,36 @@ void VectorBinarySerializer::serialize(WString& value)
 
 void VectorBinarySerializer::serializeData(std::vector<uint8>& data, size_t bytesLimit)
 {
-	if (isReading())
+	if (mReading)
 	{
-		const size_t numBytes = readSize(bytesLimit);
-		if (numBytes == 0)
-		{
-			data.clear();
-		}
-		else
-		{
-			data.resize(numBytes);
-			serialize(&data[0], data.size());
-		}
+		readData(data, bytesLimit);
 	}
 	else
 	{
-		writeSize(data.size(), bytesLimit);
-		if (!data.empty())
-		{
-			serialize(&data[0], data.size());
-		}
+		writeData(data, bytesLimit);
+	}
+}
+
+void VectorBinarySerializer::readData(std::vector<uint8>& data, size_t bytesLimit)
+{
+	const size_t numBytes = readSize(bytesLimit);
+	if (numBytes == 0)
+	{
+		data.clear();
+	}
+	else
+	{
+		data.resize(numBytes);
+		read(&data[0], data.size());
+	}
+}
+
+void VectorBinarySerializer::writeData(const std::vector<uint8>& data, size_t bytesLimit)
+{
+	writeSize(data.size(), bytesLimit);
+	if (!data.empty())
+	{
+		write(&data[0], data.size());
 	}
 }
 
@@ -305,13 +329,13 @@ void VectorBinarySerializer::write(std::wstring_view value, size_t stringLengthL
 	else
 	{
 		// Write as UTF-8 string
-		const size_t encodedLength = rmx::UTF8Conversion::getLengthAsUTF8(value);
+		size_t encodedLength = rmx::UTF8Conversion::getLengthAsUTF8(value);
 		writeSize(encodedLength, stringLengthLimit);
 
 		char* pointer = (char*)writeAccess(encodedLength);
 		for (wchar_t ch : value)
 		{
-			const size_t encodedLength = rmx::UTF8Conversion::writeCharacterAsUTF8((uint32)ch, pointer);
+			encodedLength = rmx::UTF8Conversion::writeCharacterAsUTF8((uint32)ch, pointer);
 			pointer += encodedLength;
 		}
 	}

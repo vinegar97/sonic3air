@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -721,8 +721,8 @@ function void fn07c678()
 {
 	// For some reason, this leads to the sparks effect on defeated Mecha Sonic
 	A2 = 0xfffffade
-	copyMemory((A2+=8)-8, (A1+=8)-8, 8)
-	u16[A2] = 0
+	copyMemory(A2, A1, 8)
+	u16[A2+8] = 0
 }
 
 

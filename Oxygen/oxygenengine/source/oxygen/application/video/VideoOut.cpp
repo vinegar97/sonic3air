@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -334,13 +334,13 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 		}
 	}
 
-	// Add sprite geometries
+	// Add render item geometries (sprites, texts, etc.)
 	{
 		SpriteManager& spriteManager = mRenderParts->getSpriteManager();
 		const Vec2i worldSpaceOffset = mRenderParts->getSpacesManager().getWorldSpaceOffset();
 		FontCollection& fontCollection = FontCollection::instance();
 
-		for (int index = 0; index < RenderItem::NUM_CONTEXTS; ++index)
+		for (int index = 0; index < RenderItem::NUM_LIFETIME_CONTEXTS; ++index)
 		{
 			const RenderItem::LifetimeContext lifetimeContext = (RenderItem::LifetimeContext)index;
 			const std::vector<RenderItem*>& renderItems = spriteManager.getRenderItems(lifetimeContext);
@@ -461,6 +461,16 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 						break;
 					}
 
+					case RenderItem::Type::VIEWPORT:
+					{
+						const renderitems::Viewport& viewport = static_cast<const renderitems::Viewport&>(*renderItem);
+
+						Geometry& geometry = mGeometryFactory.createViewportGeometry(Recti(viewport.mPosition, viewport.mSize));
+						geometry.mRenderQueue = viewport.mRenderQueue;
+						geometries.push_back(&geometry);
+						break;
+					}
+
 					default:
 						break;
 				}
@@ -491,14 +501,6 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 			geometry.mRenderQueue = BLUR_RENDER_QUEUE - 1;
 			geometries.push_back(&geometry);
 		}
-	}
-
-	// Insert viewports
-	for (const RenderParts::Viewport& viewport : mRenderParts->getViewports())
-	{
-		Geometry& geometry = mGeometryFactory.createViewportGeometry(viewport.mRect);
-		geometry.mRenderQueue = viewport.mRenderQueue;
-		geometries.push_back(&geometry);
 	}
 
 	// Sort everything by render queue

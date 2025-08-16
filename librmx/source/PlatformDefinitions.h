@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -17,6 +17,7 @@
 //  - PLATFORM_IOS		-> iOS
 //  - PLATFORM_WEB		-> Web version (via emscripten)
 //  - PLATFORM_SWITCH	-> Nintendo Switch (homebrew)
+//  - PLATFORM_VITA		-> Playstation Vita (homebrew)
 
 
 // Platform specific
@@ -49,6 +50,10 @@
 
 #elif __SWITCH__
 	#define PLATFORM_SWITCH
+	#define USE_UTF8_PATHS
+
+#elif __vita__
+	#define PLATFORM_VITA
 	#define USE_UTF8_PATHS
 
 #else

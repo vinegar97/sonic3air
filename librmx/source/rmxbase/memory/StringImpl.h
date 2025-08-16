@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -540,6 +540,21 @@ TEMPLATE int STRING::compare(const STRING& str) const
 			return -1;
 		if (mData[i] > str.mData[i])
 			return +1;
+	}
+	return 0;
+}
+
+TEMPLATE int STRING::compare(const CHAR* str) const
+{
+	// Compare two strings
+	for (size_t i = 0; i <= mLength; ++i)
+	{
+		if (mData[i] < str[i])
+			return -1;
+		if (mData[i] > str[i])
+			return +1;
+		if (mData[i] == 0)	// Just in case there's a \0 somewhere inside the string
+			return 0;
 	}
 	return 0;
 }

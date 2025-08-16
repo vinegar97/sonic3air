@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -18,8 +18,6 @@ public:
 	typedef bool(*LoadCallbackType)(AudioBuffer*, const String&, const String&);
 	typedef std::list<LoadCallbackType> LoadCallbackList;
 	static LoadCallbackList mStaticLoadCallbacks;
-
-	static const constexpr int MAX_FRAME_LENGTH = 4096;		// Maximum length of an audio frame in samples -- this is the length of all audio frames, except the last
 
 public:
 	AudioBuffer();
@@ -54,11 +52,16 @@ public:
 	void unlock();
 
 private:
+	static const constexpr int MAX_FRAME_LENGTH = 4096;		// Maximum length of an audio frame in samples -- this is the length of all audio frames, except the last
+
 	struct AudioFrame
 	{
 		short* mBuffer = nullptr;				// Holds all audio data
 		short* mData[2] = { nullptr, nullptr };	// Pointers into the buffer, one for each channel
 		int mLength = 0;						// Length in samples
+
+		explicit AudioFrame(int channels);
+		~AudioFrame();
 	};
 
 private:

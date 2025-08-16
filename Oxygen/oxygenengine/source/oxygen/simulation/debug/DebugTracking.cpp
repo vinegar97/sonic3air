@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -14,7 +14,7 @@
 #include "oxygen/simulation/LemonScriptRuntime.h"
 #include "oxygen/simulation/Simulation.h"
 #include "oxygen/application/Application.h"
-#include "oxygen/rendering/parts/PaletteManager.h"
+#include "oxygen/rendering/parts/palette/PaletteManager.h"
 
 #include <lemon/program/Function.h>
 #include <lemon/runtime/RuntimeFunction.h>
@@ -30,17 +30,9 @@ const std::string& DebugTracking::Location::toString(CodeExec& codeExec) const
 		}
 		else
 		{
-			std::string scriptFilename;
-			uint32 lineNumber;
-			if (mProgramCounter.has_value())
-			{
-				codeExec.getLemonScriptProgram().resolveLocation(*mFunction, (uint32)*mProgramCounter, scriptFilename, lineNumber);
-				mLineNumber = lineNumber;
-			}
-			else
-			{
-				codeExec.getLemonScriptProgram().resolveLocation(*mFunction, 0, scriptFilename, lineNumber);
-			}
+			LemonScriptProgram::ResolvedLocation location;
+			codeExec.getLemonScriptProgram().resolveLocation(location, *mFunction, mProgramCounter.has_value() ? (uint32)*mProgramCounter : 0);
+			mLineNumber = location.mLineNumber;
 			mResolvedString = mFunction->getName().getString();
 		}
 	}
@@ -154,7 +146,27 @@ void DebugTracking::addColorLogEntry(std::string_view name, uint32 startAddress,
 	}
 	addColorLogEntry(entry);
 
-	Application::instance().getSimulation().stopSingleStepContinue();
+	Application::instance().getSimulation().sendBreakSignal(Simulation::BreakCondition::DEBUG_LOG);
+}
+
+bool DebugTracking::hasWatch(uint32 address, uint16 bytes) const
+{
+	return (getExistingWatchIndex(address, bytes) >= 0);
+}
+
+int DebugTracking::getExistingWatchIndex(uint32 address, uint16 bytes) const
+{
+	address &= 0x00ffffff;
+
+	int index = -1;
+	for (int i = 0; i < (int)mWatches.size(); ++i)
+	{
+		if (mWatches[i]->mAddress == address && mWatches[i]->mBytes == bytes)
+		{
+			return i;
+		}
+	}
+	return -1;
 }
 
 void DebugTracking::updateWatches()
@@ -198,16 +210,13 @@ void DebugTracking::clearWatches(bool clearPersistent)
 	}
 }
 
-void DebugTracking::addWatch(uint32 address, uint16 bytes, bool persistent)
+void DebugTracking::addWatch(uint32 address, uint16 bytes, bool persistent, std::string_view name)
 {
 	address &= 0x00ffffff;
 
 	// Check if already exists
-	for (const Watch* watch : mWatches)
-	{
-		if (watch->mAddress == address && watch->mBytes == bytes)
-			return;
-	}
+	if (hasWatch(address, bytes))
+		return;
 
 	// Add a new watch in EmulatorInterface
 	EmulatorInterface::Watch& internalWatch = vectorAdd(mEmulatorInterface.getWatches());
@@ -216,6 +225,7 @@ void DebugTracking::addWatch(uint32 address, uint16 bytes, bool persistent)
 
 	// Add a new watch here
 	Watch& watch = mWatchPool.rentObject();
+	watch.mName = name;
 	watch.mAddress = address;
 	watch.mBytes = bytes;
 	watch.mPersistent = persistent;
@@ -230,15 +240,7 @@ void DebugTracking::removeWatch(uint32 address, uint16 bytes)
 	address &= 0x00ffffff;
 
 	// Try to find the watch
-	int index = -1;
-	for (int i = 0; i < (int)mWatches.size(); ++i)
-	{
-		if (mWatches[i]->mAddress == address && mWatches[i]->mBytes == bytes)
-		{
-			index = i;
-			break;
-		}
-	}
+	const int index = getExistingWatchIndex(address, bytes);
 	if (index == -1)
 		return;
 
@@ -326,10 +328,10 @@ void DebugTracking::onScriptLog(std::string_view key, std::string_view value)
 	scriptLogSingleEntry.mCallFrameIndex = getCurrentCallFrameIndex();
 
 	size_t pc;
-	mLemonScriptRuntime.getLastStepLocation(scriptLogSingleEntry.mLocation.mFunction, pc);
+	mLemonScriptRuntime.getCurrentExecutionLocation(scriptLogSingleEntry.mLocation.mFunction, pc);
 	scriptLogSingleEntry.mLocation.mProgramCounter = pc;
 
-	Application::instance().getSimulation().stopSingleStepContinue();
+	Application::instance().getSimulation().sendBreakSignal(Simulation::BreakCondition::DEBUG_LOG);
 }
 
 void DebugTracking::onWatchTriggered(size_t watchIndex, uint32 address, uint16 bytes)
@@ -339,7 +341,7 @@ void DebugTracking::onWatchTriggered(size_t watchIndex, uint32 address, uint16 b
 
 	Location location;
 	size_t pc;
-	mLemonScriptRuntime.getLastStepLocation(location.mFunction, pc);
+	mLemonScriptRuntime.getCurrentExecutionLocation(location.mFunction, pc);
 	location.mProgramCounter = pc;
 
 	Watch& watch = *mWatches[watchIndex];
@@ -358,7 +360,7 @@ void DebugTracking::onWatchTriggered(size_t watchIndex, uint32 address, uint16 b
 	}
 	watch.mLastHitLocation = location;
 
-	Application::instance().getSimulation().stopSingleStepContinue();
+	Application::instance().getSimulation().sendBreakSignal(Simulation::BreakCondition::WATCH_HIT);
 }
 
 void DebugTracking::onVRAMWrite(uint16 address, uint16 bytes)
@@ -369,7 +371,7 @@ void DebugTracking::onVRAMWrite(uint16 address, uint16 bytes)
 
 	Location location;
 	size_t pc;
-	mLemonScriptRuntime.getLastStepLocation(location.mFunction, pc);
+	mLemonScriptRuntime.getCurrentExecutionLocation(location.mFunction, pc);
 	location.mProgramCounter = pc;
 
 	// Check if this can be merged with the VRAM write just before

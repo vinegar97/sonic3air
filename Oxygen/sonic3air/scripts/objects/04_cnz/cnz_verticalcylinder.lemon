@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -213,8 +213,8 @@ function void fn0338c4()
 
 	u8[A1 + 0x26] = 0
 	u8[A1 + 0x2a] &= ~char.flag.ROLLING
-	objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
 	objA1.hitbox_extends.x = char.hitbox.x.UPRIGHT
+	objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
 	objA1.state.both = char.state.RUNNING2
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
@@ -283,8 +283,8 @@ function void fn033ade()
 
 	u8[A1 + 0x26] = 0
 	u8[A1 + 0x2a] &= ~char.flag.ROLLING
-	objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
 	objA1.hitbox_extends.x = char.hitbox.x.UPRIGHT
+	objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
 	objA1.state.both = char.state.RUNNING2
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit

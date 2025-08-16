@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -17,9 +17,8 @@ class ConnectionManager;
 
 
 // UDP-based virtual connection
-class NetConnection
+class NetConnection : public rmx::WeakPtrTarget
 {
-friend class ServerClientBase;
 friend class ConnectionManager;
 friend class WebSocketClient;
 friend class highlevel::RequestBase;
@@ -33,16 +32,18 @@ public:
 		EMPTY,					// Not connected in any way
 		TCP_READY,				// Has a valid TCP socket, but not further setup yet
 		REQUESTED_CONNECTION,	// Sent a StartConnectionPacket, no response yet (only used on client side)
+		ACCEPTED,				// Accepted connection, but no further packet was received yet (only used on server side)
 		CONNECTED,				// Fully connected
 		DISCONNECTED			// Connection was lost or intentionally disconnected (see DisconnectReason)
 	};
 
 	enum class DisconnectReason
 	{
-		UNKNOWN,	// No reason given
-		MANUAL,		// Manually disconnected
-		TIMEOUT,	// Automatic disconnect after timeout (because a reliably sent packet was not confirmed for too long)
-		STALE,		// Automatic disconnect after connection was not used for a while
+		UNKNOWN,			// No reason given
+		MANUAL_LOCAL,		// Manually disconnected locally
+		MANUAL_REMOTE,		// Manually disconnected by remote
+		TIMEOUT,			// Automatic disconnect after timeout (because a reliably sent packet was not confirmed for too long)
+		STALE,				// Automatic disconnect after connection was not used for a while
 	};
 
 	struct SendFlags
@@ -82,25 +83,28 @@ public:
 	uint8 getHighLevelProtocolVersion() const	{ return mHighLevelProtocolVersion; }
 	void setProtocolVersions(uint8 lowLevelProtocolVersion, uint8 highLevelProtocolVersion);
 
-	void setupWithTCPSocket(ConnectionManager& connectionManager, TCPSocket& socketToMove, uint64 currentTimestamp);
-	bool startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress, uint64 currentTimestamp);
+	void setupWithTCPSocket(ConnectionManager& connectionManager, TCPSocket& socketToMove);
+	bool startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress);
 	bool isConnectedTo(uint16 localConnectionID, uint16 remoteConnectionID, uint64 senderKey) const;
-	void disconnect(DisconnectReason disconnectReason = DisconnectReason::MANUAL);
+	void disconnect(DisconnectReason disconnectReason);
+	bool receivedAnyUniquePacketIDs() const;
 
-	bool sendPacket(highlevel::PacketBase& packet, SendFlags::Flags flags = SendFlags::NONE);
+	bool sendPacket(highlevel::PacketBase& packet, SendFlags::Flags flags = SendFlags::NONE, uint32* outUniquePacketID = nullptr);
 	bool sendRequest(highlevel::RequestBase& request);
 	bool respondToRequest(highlevel::RequestBase& request, uint32 uniqueRequestID);
+
+	bool wasPacketReceived(uint32 uniquePacketID) const;
 
 	bool readPacket(highlevel::PacketBase& packet, VectorBinarySerializer& serializer) const;
 
 	void updateConnection(uint64 currentTimestamp);
 
 private:
-	// Called by ServerClientBase
-	void acceptIncomingConnectionUDP(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey, uint64 currentTimestamp);
-	void acceptIncomingConnectionTCP(ConnectionManager& connectionManager, uint16 remoteConnectionID, uint64 currentTimestamp);
+	// Called by ConnectionManager
+	void acceptIncomingConnectionUDP(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey);
+	void acceptIncomingConnectionTCP(ConnectionManager& connectionManager, uint16 remoteConnectionID);
 	void sendAcceptConnectionPacket();
-	void handleLowLevelPacket(ReceivedPacket& receivedPacket);
+	void handleLowLevelPacket(const ReceivedPacket& receivedPacket);
 
 	// Called by RequestBsae
 	void unregisterRequest(highlevel::RequestBase& request);
@@ -116,7 +120,7 @@ private:
 	bool sendHighLevelPacket(highlevel::PacketBase& packet, SendFlags::Flags flags, uint32& outUniquePacketID);
 	bool sendHighLevelPacket(lowlevel::HighLevelPacket& lowLevelPacket, highlevel::PacketBase& highLevelPacket, SendFlags::Flags flags, uint32& outUniquePacketID);
 
-	void handleHighLevelPacket(ReceivedPacket& receivedPacket, const lowlevel::HighLevelPacket& highLevelPacket, VectorBinarySerializer& serializer, uint32 uniqueResponseID);
+	void handleHighLevelPacket(const ReceivedPacket& receivedPacket, const lowlevel::HighLevelPacket& highLevelPacket, VectorBinarySerializer& serializer, uint32 uniqueResponseID);
 	void processExtractedHighLevelPacket(const ReceivedPacketCache::CacheItem& extracted);
 
 private:

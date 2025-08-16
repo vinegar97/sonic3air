@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,7 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/helper/Utils.h"
 #include "oxygen/helper/Logging.h"
-#include "oxygen/rendering/utils/PaletteBitmap.h"
+
 #include <rmxmedia.h>
 
 
@@ -277,7 +277,7 @@ namespace utils
 
 		std::vector<PaletteBitmap> bitmaps;
 		bitmaps.reserve(fc.size());
-		Color palette[0x100];
+		std::vector<uint32> palette;
 
 		std::vector<uint8> buffer;
 		Vec2i imgSize;
@@ -289,10 +289,10 @@ namespace utils
 
 			bitmaps.emplace_back();
 			PaletteBitmap& bitmap = bitmaps.back();
-			if ((bitmaps.size() == 1) ? bitmap.loadBMP(buffer, palette) : bitmap.loadBMP(buffer))
+			if ((bitmaps.size() == 1) ? bitmap.loadBMP(buffer, &palette) : bitmap.loadBMP(buffer))
 			{
-				imgSize.x = std::max<int>(imgSize.x, bitmap.mWidth);
-				imgSize.y = std::max<int>(imgSize.y, bitmap.mHeight);
+				imgSize.x = std::max<int>(imgSize.x, bitmap.getWidth());
+				imgSize.y = std::max<int>(imgSize.y, bitmap.getHeight());
 			}
 			else
 			{
@@ -303,16 +303,19 @@ namespace utils
 		PaletteBitmap output;
 		output.create(imgSize.x * 16, imgSize.y * (((int)bitmaps.size() + 15) / 16));
 		output.clear(0xff);
-		palette[0xff] = Color(0.15f, 0.15f, 0.15f);
+		palette.resize(0x100);
+		palette[0xff] = 0xff262626;
 		for (size_t i = 0; i < bitmaps.size(); ++i)
 		{
-			output.copyRect(bitmaps[i], Recti(0, 0, bitmaps[i].mWidth, bitmaps[i].mHeight), Vec2i(imgSize.x * ((int)i % 16) + (imgSize.x - bitmaps[i].mWidth) / 2, imgSize.y * ((int)i / 16) + (imgSize.y - bitmaps[i].mHeight) / 2));
+			const int destX = imgSize.x * ((int)i % 16) + (imgSize.x - bitmaps[i].getWidth()) / 2;
+			const int destY = imgSize.y * ((int)i / 16) + (imgSize.y - bitmaps[i].getHeight()) / 2;
+			output.copyRect(bitmaps[i], Recti(Vec2i(), bitmaps[i].getSize()), Vec2i(destX, destY));
 		}
 
 		buffer.clear();
-		if (output.saveBMP(buffer, palette))
+		if (output.saveBMP(buffer, &palette[0]))
 		{
-			FTX::FileSystem->saveFile(outputFilename, (uint8*)& buffer[0], buffer.size());
+			FTX::FileSystem->saveFile(outputFilename, (uint8*)&buffer[0], buffer.size());
 		}
 	}
 }

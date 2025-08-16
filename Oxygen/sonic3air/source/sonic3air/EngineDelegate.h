@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -43,6 +43,10 @@ public:
 	bool allowModdedData() override;
 	bool useDeveloperFeatures() override;
 	void onActiveModsChanged() override;
+
+	void onStartNetplayGame(bool isHost) override;
+	void onStopNetplayGame(bool isHost) override;
+	void serializeGameSettings(VectorBinarySerializer& serializer) override;
 
 	void onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer) override;
 	void onGameRecordingHeaderSave(std::vector<uint8>& buffer) override;

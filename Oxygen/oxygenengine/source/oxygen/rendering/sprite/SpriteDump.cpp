@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,11 +8,17 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/rendering/sprite/SpriteDump.h"
-#include "oxygen/rendering/parts/PaletteManager.h"
+#include "oxygen/rendering/parts/palette/PaletteManager.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/helper/JsonHelper.h"
+
+
+namespace
+{
+	static const uint32 UNUSED_PALETTE_COLOR = 0x00660145;
+}
 
 
 void SpriteDump::load()
@@ -80,27 +86,29 @@ void SpriteDump::save()
 
 void SpriteDump::addSprite(const PaletteSprite& paletteSprite, std::string_view categoryName, uint8 spriteNumber, uint8 atex)
 {
+	bool changed = false;
 	String filename(0, *(WString(Configuration::instance().mAnalysisDir).toString() + "/spritedump/%s/%02x.bmp"), categoryName.data(), spriteNumber);
 	if (!FTX::FileSystem->exists(*filename))
 	{
-		Color palette[0x100];
-		VideoOut::instance().getRenderParts().getPaletteManager().getPalette(0).dumpColors(palette, 0x100);
+		uint32 palette[0x100];
+		VideoOut::instance().getRenderParts().getPaletteManager().getMainPalette(0).dumpColors(palette, 0x100);
 		if (atex != 0)
 		{
 			for (int i = 0; i < 0x10; ++i)
 				palette[i] = palette[atex + i];
 		}
 
-		PaletteSprite copy = paletteSprite;
-		copy.accessBitmap().overwriteUnusedPaletteEntries(palette);
+		PaletteBitmap copy = paletteSprite.getBitmap();
+		copy.overwriteUnusedPaletteEntries(palette, UNUSED_PALETTE_COLOR);
 
 		std::vector<uint8> content;
-		copy.accessBitmap().saveBMP(content, palette);
+		copy.saveBMP(content, palette);
 		FTX::FileSystem->saveFile(filename.toStdWString(), content);
+		changed = true;
 	}
 
 	Category& category = getOrCreateCategory(categoryName);
-	if (category.mEntries.count(spriteNumber) == 0)
+	if (changed || category.mEntries.count(spriteNumber) == 0)
 	{
 		Entry& entry = category.mEntries[spriteNumber];
 		entry.mSpriteNumber = spriteNumber;
@@ -169,27 +177,42 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 
 	std::vector<std::pair<PaletteBitmap, const Entry*>> bitmaps;
 	bitmaps.reserve(category.mEntries.size());
-	Color palette[0x100];
+
+	uint32 outputPalette[0x100];
+	for (int k = 0; k < 0xff; ++k)
+		outputPalette[k] = UNUSED_PALETTE_COLOR;
+	outputPalette[0xff] = 0xff262626;
 
 	std::vector<uint8> buffer;
 	Vec2i imgSize;
-	for (const auto& pair : category.mEntries)
 	{
-		const Entry& entry = pair.second;
-		String filename(0, "%s/%02x.bmp", *path, entry.mSpriteNumber);
-		buffer.clear();
-		if (FTX::FileSystem->readFile(*filename, buffer))
+		std::vector<uint32> palette;
+		for (const auto& pair : category.mEntries)
 		{
-			bitmaps.emplace_back(PaletteBitmap(), &entry);
-			PaletteBitmap& bitmap = bitmaps.back().first;
-			if ((bitmaps.size() == 1) ? bitmap.loadBMP(buffer, palette) : bitmap.loadBMP(buffer))
+			const Entry& entry = pair.second;
+			String filename(0, "%s/%02x.bmp", *path, entry.mSpriteNumber);
+			buffer.clear();
+			if (FTX::FileSystem->readFile(*filename, buffer))
 			{
-				imgSize.x = std::max<int>(imgSize.x, bitmap.mWidth);
-				imgSize.y = std::max<int>(imgSize.y, bitmap.mHeight);
-			}
-			else
-			{
-				bitmaps.pop_back();
+				// Add bitmap
+				bitmaps.emplace_back(PaletteBitmap(), &entry);
+				PaletteBitmap& bitmap = bitmaps.back().first;
+				if (bitmap.loadBMP(buffer, &palette))
+				{
+					imgSize.x = std::max<int>(imgSize.x, bitmap.getWidth());
+					imgSize.y = std::max<int>(imgSize.y, bitmap.getHeight());
+				}
+				else
+				{
+					bitmaps.pop_back();
+				}
+
+				// Add new colors to palette
+				for (size_t k = 0; k < palette.size(); ++k)
+				{
+					if ((outputPalette[k] & 0x00ffffff) == (UNUSED_PALETTE_COLOR & 0x00ffffff))
+						outputPalette[k] = palette[k];
+				}
 			}
 		}
 	}
@@ -197,17 +220,17 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 	PaletteBitmap output;
 	output.create(imgSize.x * 16, imgSize.y * ((int)(bitmaps.size() + 15) / 16));
 	output.clear(0xff);
-	palette[0xff] = Color(0.15f, 0.15f, 0.15f);		// Use a dark gray background
 
+	const char* atlasOutputName = "_atlas";
 	String json = "{";
 	for (size_t i = 0; i < bitmaps.size(); ++i)
 	{
 		const PaletteBitmap& bitmap = bitmaps[i].first;
 		const Entry& entry = *bitmaps[i].second;
 
-		const Vec2i destPosition(imgSize.x * (int)(i % 16) + (imgSize.x - bitmap.mWidth) / 2,
-								 imgSize.y * (int)(i / 16) + (imgSize.y - bitmap.mHeight) / 2);
-		output.copyRect(bitmap, Recti(0, 0, bitmap.mWidth, bitmap.mHeight), destPosition);
+		const Vec2i destPosition(imgSize.x * (int)(i % 16) + (imgSize.x - bitmap.getWidth()) / 2,
+								 imgSize.y * (int)(i / 16) + (imgSize.y - bitmap.getHeight()) / 2);
+		output.copyRect(bitmap, Recti(0, 0, bitmap.getWidth(), bitmap.getHeight()), destPosition);
 
 		// Example:   "title_screen_air": { "File": "title_screen.png", "Rect": "0,0,152,18", "Center": "76,9" },
 
@@ -216,16 +239,16 @@ void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 			json << ",";
 		}
 		json << "\r\n\t\"" << categoryName << "_" << rmx::hexString(entry.mSpriteNumber, 2) << "\": ";
-		json << "{ \"File\": \"" << categoryName << ".bmp\", ";
-		json << "\"Rect\": \"" << destPosition.x << "," << destPosition.y << "," << bitmap.mWidth << "," << bitmap.mHeight << "\", ";
+		json << "{ \"File\": \"" << atlasOutputName << ".bmp\", ";
+		json << "\"Rect\": \"" << destPosition.x << "," << destPosition.y << "," << bitmap.getWidth() << "," << bitmap.getHeight() << "\", ";
 		json << "\"Center\": \"" << (-entry.mOffset.x) << "," << (-entry.mOffset.y) << "\" }";
 	}
 	json << "\r\n}\r\n";
 
 	buffer.clear();
-	if (output.saveBMP(buffer, palette))
+	if (output.saveBMP(buffer, outputPalette))
 	{
-		FTX::FileSystem->saveFile(*(path + "/" + categoryName + ".bmp"), buffer);
-		FTX::FileSystem->saveFile(*(path + "/" + categoryName + ".json"), (uint8*)json.accessData(), json.length());
+		FTX::FileSystem->saveFile(*(path + "/" + atlasOutputName + ".bmp"), buffer);
+		FTX::FileSystem->saveFile(*(path + "/" + atlasOutputName + ".json"), (uint8*)json.accessData(), json.length());
 	}
 }

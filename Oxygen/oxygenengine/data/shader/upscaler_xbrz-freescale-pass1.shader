@@ -1,7 +1,7 @@
 
 // Hyllian's xBRZ freescale multipass shader
 //   - Adapted for use in Oxygen Engine
-//  Copyright (C) 2018-2024 Eukaryot
+//  Copyright (C) 2018-2025 by Eukaryot
 //
 // This shader is derived from original "xbrz-freescale-pass1.glsl" from https://github.com/libretro/glsl-shaders/tree/master/xbrz/shaders/xbrz-freescale-multipass
 // Used under GNU General Public License v2, see additional license info below.
@@ -96,7 +96,7 @@ out vec4 FragColor;
 
 uniform vec2 GameResolution;
 uniform vec2 OutputSize;
-uniform sampler2D Texture;
+uniform sampler2D MainTexture;
 uniform sampler2D OrigTexture;
 
 #define SourceSize vec4(GameResolution, 1.0 / GameResolution)
@@ -149,7 +149,7 @@ void main()
 	vec3 F = P( 1., 0.);
 	vec3 H = P( 0., 1.);
 
-	vec4 info = floor(texture(Texture, coord) * 255.0 + 0.5);
+	vec4 info = floor(texture(MainTexture, coord) * 255.0 + 0.5);
 
 	// info Mapping: x|y|
 	//               w|z|

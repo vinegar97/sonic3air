@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -152,8 +152,8 @@ function void fn0319f4()
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
 			objA1.groundspeed = 0
-			objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 			objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+			objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 			objA1.state = char.state.ROLLING
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 			objA1.flags2a &= ~char.flag.ON_OBJECT

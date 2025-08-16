@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -37,12 +37,8 @@ public:
 	void openTitleScreen();
 	void openMainMenu();
 	void openOptionsMenuInGame();
-	void onExitOptions();
 	void onFadedOutOptions();
-	void onExitExtras();
-	void onExitMods();
 	void onGamePaused(bool canRestart);
-	void onGameResumed();
 	void restartTimeAttack();
 	void returnToMenu();
 
@@ -54,6 +50,7 @@ public:
 
 	inline GameView& getGameView() const { return *mGameView; }
 	inline GameMenuManager& getGameMenuManager() const  { return *mGameMenuManager; }
+	inline MenuBackground& getMenuBackground() const	{ return *mMenuBackground; }
 
 private:
 	void gotoPhase(int phaseNumber);
@@ -85,4 +82,6 @@ private:
 	ApplicationContextMenu* mApplicationContextMenu = nullptr;
 
 	GuiBase* mRemoveChild = nullptr;
+
+	Vec2i mRestoreGameResolution;
 };

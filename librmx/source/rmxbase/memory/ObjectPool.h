@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -64,7 +64,7 @@ public:
 		mFreeItems.clear();
 	}
 
-	inline bool empty() const
+	inline bool isEmpty() const
 	{
 		// Get total number of reserved objects
 		size_t totalNumberOfObjects = 0;

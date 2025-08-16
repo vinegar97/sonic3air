@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,6 +10,7 @@
 
 #include "sonic3air/menu/GameMenuBase.h"
 #include "sonic3air/menu/mods/ModResources.h"
+#include "sonic3air/menu/mods/ModsStartPage.h"
 
 class MenuBackground;
 class Mod;
@@ -58,6 +59,7 @@ private:
 
 private:
 	MenuBackground* mMenuBackground = nullptr;
+	ModsStartPage mModsStartPage;
 	GameMenuControlsDisplay mGameMenuControlsDisplay;
 
 	std::map<Mod*, ModResources> mModResources;
@@ -90,7 +92,6 @@ private:
 	InfoOverlay mInfoOverlay;
 
 	State mState = State::INACTIVE;
-	float mVisibility = 0.0f;
 	float mFadeInDelay = 0.0f;
 	uint32 mApplyingChangesFrameCounter = 0;
 	bool mInMovementMode = false;

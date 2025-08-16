@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -138,10 +138,10 @@ namespace rmx
 		}
 	}
 
-	void AudioManager::regularUpdate(float timeElapsed)
+	void AudioManager::regularUpdate(float deltaSeconds)
 	{
 		// Do the following cleanup only every 0.5 seconds
-		mTimeSinceLastUpdate += timeElapsed;
+		mTimeSinceLastUpdate += deltaSeconds;
 		if (mTimeSinceLastUpdate >= 0.5f)
 		{
 			mTimeSinceLastUpdate = 0.0f;
@@ -240,6 +240,7 @@ namespace rmx
 		instance.mPosition = roundToInt(playbackOptions.mPosition * (float)playbackOptions.mAudioBuffer->getFrequency());
 		instance.mLoop = playbackOptions.mLoop;
 		instance.mStreaming = playbackOptions.mStreaming;
+		instance.mPaused = playbackOptions.mStartPaused;
 
 		lockAudio();
 		audioMixer->addAudioInstance(instance);

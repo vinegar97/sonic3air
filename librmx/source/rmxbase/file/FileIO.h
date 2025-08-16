@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -27,6 +27,9 @@ namespace rmx
 
 	public:
 		static bool exists(std::wstring_view path);
+		static bool isFile(std::wstring_view path);
+		static bool isDirectory(std::wstring_view path);
+
 		static bool getFileSize(std::wstring_view filename, uint64& outSize);
 		static bool getFileTime(std::wstring_view filename, time_t& outTime);
 
@@ -42,8 +45,12 @@ namespace rmx
 		static void listFilesByMask(std::wstring_view filemask, bool recursive, std::vector<FileEntry>& outFileEntries);
 		static void listDirectories(std::wstring_view path, std::vector<std::wstring>& outDirectories);
 
+		static bool isDirectoryPath(std::wstring_view path);
 		static void normalizePath(std::wstring& path, bool isDirectory);
 		static std::wstring_view normalizePath(std::wstring_view path, std::wstring& tempBuffer, bool isDirectory);
+
+		static bool isValidFileName(std::wstring_view filename);
+		static void sanitizeFileName(std::wstring& filename);
 
 		static std::wstring getCurrentDirectory();
 		static void setCurrentDirectory(std::wstring_view path);

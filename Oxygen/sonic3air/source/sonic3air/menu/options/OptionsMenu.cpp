@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -17,16 +17,17 @@
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/ConfigurationImpl.h"
 #include "sonic3air/Game.h"
-#include "sonic3air/version.inc"
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/helper/Utils.h"
 #include "oxygen/platform/PlatformFunctions.h"
+#include "oxygen/simulation/GameRecorder.h"
 #include "oxygen/simulation/Simulation.h"
 
 
@@ -46,7 +47,7 @@ namespace
 		{
 			if (mHideInGame && enteredFromIngame)
 				return false;
-			if (mDependsOnSecret && !PlayerProgress::instance().isSecretUnlocked(mSecret))
+			if (mDependsOnSecret && !PlayerProgress::instance().mUnlocks.isSecretUnlocked(mSecret))
 				return false;
 			return true;
 		}
@@ -102,12 +103,12 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	{
 		ConfigurationImpl& config = ConfigurationImpl::instance();
 
-		setupOptionEntryInt(option::RELEASE_CHANNEL,			&config.mGameServer.mUpdateCheck.mReleaseChannel);
+		setupOptionEntryInt(option::RELEASE_CHANNEL,			&config.mGameServerImpl.mUpdateCheck.mReleaseChannel);
 
 		setupOptionEntryEnum8(option::FRAME_SYNC,				&config.mFrameSync);
 
-		setupOptionEntryBool(option::GHOST_SYNC,				&config.mGameServer.mGhostSync.mEnabled);
-		setupOptionEntryInt(option::GHOST_SYNC_RENDERING,		&config.mGameServer.mGhostSync.mGhostRendering);
+		setupOptionEntryBool(option::GHOST_SYNC,				&config.mGameServerImpl.mGhostSync.mEnabled);
+		setupOptionEntryInt(option::GHOST_SYNC_RENDERING,		&config.mGameServerImpl.mGhostSync.mGhostRendering);
 		setupOptionEntryBool(option::SHOW_CONTROLS_DISPLAY,		&config.mShowControlsDisplay);
 		setupOptionEntryInt(option::SCRIPT_OPTIMIZATION,		&config.mScriptOptimizationLevel);
 		setupOptionEntryInt(option::GAME_RECORDING_MODE,		&config.mGameRecorder.mRecordingMode);
@@ -130,6 +131,8 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntryPercent(option::VGAMEPAD_OPACITY,		&config.mVirtualGamepad.mOpacity);
 		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P1,	&config.mControllerRumbleIntensity[0]);
 		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P2,	&config.mControllerRumbleIntensity[1]);
+		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P3,	&config.mControllerRumbleIntensity[2]);
+		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P4,	&config.mControllerRumbleIntensity[3]);
 
 		setupOptionEntry(option::ROTATION,					SharedDatabase::Setting::SETTING_SMOOTH_ROTATION);
 		setupOptionEntry(option::SPEEDUP_AFTER_IMAGES,		SharedDatabase::Setting::SETTING_SPEEDUP_AFTERIMGS);
@@ -186,6 +189,16 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::SUPER_PEELOUT,				SharedDatabase::Setting::SETTING_SUPER_PEELOUT);
 		setupOptionEntry(option::DEBUG_MODE,				SharedDatabase::Setting::SETTING_DEBUG_MODE);
 		setupOptionEntry(option::TITLE_SCREEN,				SharedDatabase::Setting::SETTING_TITLE_SCREEN);
+		setupOptionEntry(option::HIDDEN_MONITOR_HINT,		SharedDatabase::Setting::SETTING_HIDDEN_MONITOR_HINT);
+		setupOptionEntry(option::FASTER_PUSH,				SharedDatabase::Setting::SETTING_FASTER_PUSH);
+		setupOptionEntry(option::LEVELRESULT_SCORE,			SharedDatabase::Setting::SETTING_LEVELRESULT_SCORE);
+		setupOptionEntry(option::PLAYER2_OFFSCREEN,			SharedDatabase::Setting::SETTING_PLAYER2_OFFSCREEN);
+		setupOptionEntry(option::AIZ_INTRO_KNUCKLES,		SharedDatabase::Setting::SETTING_AIZ_INTRO_KNUCKLES);
+		setupOptionEntry(option::LBZ_TUBETRANSPORT,			SharedDatabase::Setting::SETTING_LBZ_TUBETRANSPORT);
+		setupOptionEntry(option::MHZ_ELEVATOR,				SharedDatabase::Setting::SETTING_MHZ_ELEVATOR);
+		setupOptionEntry(option::FBZ_ENTERCYLINDER,			SharedDatabase::Setting::SETTING_FBZ_ENTERCYLINDER);
+		setupOptionEntry(option::FBZ_SCREWDOORS,			SharedDatabase::Setting::SETTING_FBZ_SCREWDOORS);
+		setupOptionEntry(option::SOZ_PYRAMID,				SharedDatabase::Setting::SETTING_SOZ_PYRAMID);	
 
 		setupOptionEntryBitmask(option::LEVELMUSIC_CNZ1,	SharedDatabase::Setting::SETTING_CNZ_PROTOTYPE_MUSIC);
 		setupOptionEntryBitmask(option::LEVELMUSIC_CNZ2,	SharedDatabase::Setting::SETTING_CNZ_PROTOTYPE_MUSIC);
@@ -252,10 +265,6 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 				mUnlockedSecretsEntries[k].push_back(mOptionEntries[unlockable].mGameMenuEntry);
 			}
 		}
-
-		// Gather gamepad assignment entries
-		mGamepadAssignmentEntries[0] = mOptionEntries[option::CONTROLLER_PLAYER_1].mGameMenuEntry;
-		mGamepadAssignmentEntries[1] = mOptionEntries[option::CONTROLLER_PLAYER_2].mGameMenuEntry;
 	}
 }
 
@@ -290,7 +299,7 @@ void OptionsMenu::onFadeIn()
 {
 	mState = State::APPEAR;
 
-	mMenuBackground->showPreview(false);
+	mMenuBackground->showPreview(false, false);
 	mMenuBackground->startTransition(MenuBackground::Target::LIGHT);
 
 	const ConfigurationImpl& config = ConfigurationImpl::instance();
@@ -317,7 +326,7 @@ void OptionsMenu::initialize()
 	if (nullptr == mControllerSetupMenu)
 	{
 		mControllerSetupMenu = new ControllerSetupMenu(*this);
-		addChild(mControllerSetupMenu);
+		addChild(*mControllerSetupMenu);
 	}
 
 	// Rebuild mods tab & mods option entries
@@ -368,6 +377,16 @@ void OptionsMenu::initialize()
 			entry.addOption(mSoundTestAudioDefinitions[index]->mKeyString, (uint32)index);
 		}
 		entry.sanitizeSelectedIndex();
+	}
+
+	// Show or hide 3 and 4 player input settings
+	static_assert(InputManager::NUM_PLAYERS == 4);
+	for (int playerIndex = 1; playerIndex < InputManager::NUM_PLAYERS; ++playerIndex)
+	{
+		const bool validPlayerIndex = (playerIndex < Configuration::instance().mNumPlayers);
+		mOptionEntries[option::CONTROLLER_PLAYER_1 + playerIndex].mGameMenuEntry->setVisible(validPlayerIndex);
+		mOptionEntries[option::CONTROLLER_RUMBLE_P1 + playerIndex].mGameMenuEntry->setVisible(validPlayerIndex);
+		mOptionEntries[option::CONTROLLER_AUTOASSIGN].mGameMenuEntry->getOptionByValue(playerIndex)->mVisible = validPlayerIndex;
 	}
 
 	// Fill gamepad lists
@@ -544,6 +563,8 @@ void OptionsMenu::update(float timeElapsed)
 
 							case option::CONTROLLER_PLAYER_1:
 							case option::CONTROLLER_PLAYER_2:
+							case option::CONTROLLER_PLAYER_3:
+							case option::CONTROLLER_PLAYER_4:
 							{
 								const InputManager::RealDevice* gamepad = InputManager::instance().getGamepadByJoystickInstanceId(selectedEntry.selected().mValue);
 								InputManager::instance().setPreferredGamepad((int)(selectedEntry.mData - option::CONTROLLER_PLAYER_1), gamepad);
@@ -560,7 +581,7 @@ void OptionsMenu::update(float timeElapsed)
 							case option::GAME_RECORDING_MODE:
 							{
 								mOptionEntries[selectedData].applyValue();
-								Configuration::instance().evaluateGameRecording();
+								Application::instance().getSimulation().getGameRecorder().updateFromConfig();
 								break;
 							}
 
@@ -573,7 +594,7 @@ void OptionsMenu::update(float timeElapsed)
 								{
 									mOptionEntries[selectedData].applyValue();
 
-									if (selectedData >= option::CONTROLLER_RUMBLE_P1 && selectedData <= option::CONTROLLER_RUMBLE_P2)
+									if (selectedData >= option::CONTROLLER_RUMBLE_P1 && selectedData <= option::CONTROLLER_RUMBLE_P4)
 									{
 										InputManager::instance().setControllerRumbleForPlayer(selectedData - option::CONTROLLER_RUMBLE_P1, 1.0f, 1.0f, 300);
 									}
@@ -724,16 +745,14 @@ void OptionsMenu::update(float timeElapsed)
 	// Fading in/out
 	if (mState == State::APPEAR)
 	{
-		mVisibility = saturate(mVisibility + timeElapsed * 6.0f);
-		if (mVisibility >= 1.0f)
+		if (updateFadeIn(timeElapsed * 6.0f))
 		{
 			mState = State::SHOW;
 		}
 	}
 	else if (mState > State::SHOW)
 	{
-		mVisibility = saturate(mVisibility - timeElapsed * 6.0f);
-		if (mVisibility <= 0.0f)
+		if (updateFadeOut(timeElapsed * 6.0f))
 		{
 			GameApp::instance().onFadedOutOptions();
 			mState = State::INACTIVE;
@@ -1263,9 +1282,9 @@ void OptionsMenu::refreshGamepadLists(bool forceUpdate)
 	if (mLastGamepadsChangeCounter != changeCounter || forceUpdate)
 	{
 		mLastGamepadsChangeCounter = changeCounter;
-		for (int playerIndex = 0; playerIndex < 2; ++playerIndex)
+		for (int playerIndex = 0; playerIndex < InputManager::NUM_PLAYERS; ++playerIndex)
 		{
-			GameMenuEntry& entry = *mGamepadAssignmentEntries[playerIndex];
+			GameMenuEntry& entry = *mOptionEntries[option::CONTROLLER_PLAYER_1 + playerIndex].mGameMenuEntry;
 			const int32 preferredValue = InputManager::instance().getPreferredGamepadByJoystickInstanceId(playerIndex);
 			const uint32 oldSelectedValue = (preferredValue >= 0) ? (uint32)preferredValue : entry.hasSelected() ? entry.selected().mValue : (uint32)-1;
 			entry.mOptions.resize(1);	// First entry is the "None" entry
@@ -1397,6 +1416,16 @@ void OptionsMenu::goBack()
 		Application::instance().getSimulation().triggerFullScriptsReload();
 	}
 
-	GameApp::instance().onExitOptions();
-	mState = mEnteredFromIngame ? State::FADE_TO_GAME : State::FADE_TO_MENU;
+	if (mEnteredFromIngame)
+	{
+		// Only start fading to black - see "GameApp::onFadedOutOptions" for the actual change of state after complete fade-out
+		GameApp::instance().getGameView().startFadingOut(0.1666f);
+		mState = State::FADE_TO_GAME;
+	}
+	else
+	{
+		mMenuBackground->openMainMenu();
+		mState = State::FADE_TO_MENU;
+	}
+
 }

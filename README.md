@@ -35,7 +35,10 @@ For information on how to build for different platforms, find the readme files i
 * Linux:   ["_cmake"](Oxygen/sonic3air/build/_cmake)
 * Android: ["_android"](Oxygen/sonic3air/build/_android)
 * Web:     ["_emscripten"](Oxygen/sonic3air/build/_emscripten)
-* Switch:  ["_make"](Oxygen/sonic3air/build/_make)
+* Switch:  ["_make" (unmaintained)](Oxygen/sonic3air/build/_make)
+
+Additional platform ports:
+* Vita: See https://github.com/v-atamanenko/sonic3air
 
 
 ## External dependencies
@@ -45,6 +48,7 @@ External libraries and code used in this project:
 * libogg & libvorbis - in ["framework/external/ogg-vorbis"](framework/external/ogg-vorbis)
 * zlib incl. minizip - in ["framework/external/zlib"](framework/external/zlib)
 * libcurl - in ["framework/external/curl"]("framework/external/curl")
+* Dear ImGui - in ["framework/external/imgui"]("framework/external/imgui")
 * jsoncpp - in ["librmx/source/rmxbase/jsoncpp"](librmx/source/rmxbase/jsoncpp)
 * GLEW - in ["librmx/source/rmxmedia/glew"](librmx/source/rmxmedia/glew)
 * Sound chip emulation related code from Genesis Plus GX - in ["Oxygen/oxygenengine/source/oxygen/simulation/sound"](Oxygen/oxygenengine/source/oxygen/simulation/sound)
@@ -62,6 +66,9 @@ Source code contributions by:
 * Heyjoeway
 * Carjem Generations
 * Ultracoolguy
+* gl33ntwine
+* Rinnegatamante
+* MDashK
 
 Remastered soundtrack by:
 * G Spindash
@@ -80,6 +87,9 @@ Game scripts & other contributions by:
 * Elsie The Pict
 * TheMushrunt
 * mrgrassman14
+
+Additional thanks:
+* All contributors of the Sonic 3 / Sonic & Knuckles Disassembly (https://github.com/sonicretro/skdisasm), which has proven itself a valuable source of information on S3&K code
 
 
 ## Want to contribute?

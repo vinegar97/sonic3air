@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -11,6 +11,7 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/Configuration.h"
+#include "oxygen/devmode/ImGuiIntegration.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/utils/RenderUtils.h"
 #include "oxygen/simulation/LogDisplay.h"
@@ -185,7 +186,7 @@ namespace
 		}
 		joystickName.lowerCase();
 		const uint64 nameHashes[2] = { rmx::getMurmur2_64(joystickName), controllerName.empty() ? 0 : rmx::getMurmur2_64(controllerName) };
-		static const uint64 WILDCARD_HASH = rmx::getMurmur2_64(String("*"));
+		constexpr uint64 WILDCARD_HASH = rmx::constMurmur2_64("*");
 
 		for (size_t k = 0; k < definitions.size(); ++k)
 		{
@@ -277,6 +278,8 @@ const char* InputManager::RealDevice::getName() const
 }
 
 
+
+const std::string InputManager::KEYBOARD_DEVICE_NAMES[NUM_PLAYERS] = { "Keyboard1", "Keyboard2", "Keyboard3", "Keyboard4" };
 
 InputManager::InputManager()
 {
@@ -550,7 +553,7 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 	if (mKeyboards.empty())
 	{
 		// First-time setup for keyboards
-		//  -> Though only one physical keyboard is supported, these are two "real devices", to allow for two players using one keyboard together
+		//  -> Though only one physical keyboard is supported, these are several "real devices", to allow for multiple players using one keyboard together
 		for (size_t i = 0; i < NUM_PLAYERS; ++i)
 		{
 			RealDevice& device = vectorAdd(mKeyboards);
@@ -559,8 +562,7 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 			device.mSDLGameController = nullptr;
 
 			using Button = InputConfig::DeviceDefinition::Button;
-			static_assert(NUM_PLAYERS == 2);
-			const std::string key = (i == 0) ? "Keyboard1" : "Keyboard2";
+			const std::string& key = KEYBOARD_DEVICE_NAMES[i];
 			InputConfig::DeviceDefinition* inputDeviceDefinition = getInputDeviceDefinitionByIdentifier(key);
 			if (nullptr == inputDeviceDefinition)
 			{
@@ -741,10 +743,11 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 void InputManager::updatePlayerGamepadAssignments()
 {
 	// Try to map real devices to players
-	std::vector<RealDevice*> devicesByPlayer[2];
+	RMX_ASSERT(mKeyboards.size() == NUM_PLAYERS, "Wrong number of keyboards");
+	std::vector<RealDevice*> devicesByPlayer[NUM_PLAYERS];
 	for (size_t i = 0; i < mKeyboards.size(); ++i)
 	{
-		devicesByPlayer[i % 2].push_back(&mKeyboards[i]);
+		devicesByPlayer[i].push_back(&mKeyboards[i]);
 		mKeyboards[i].mAssignedPlayer = (int)i;
 	}
 
@@ -752,7 +755,7 @@ void InputManager::updatePlayerGamepadAssignments()
 	{
 		gamepad.mAssignedPlayer = Configuration::instance().mAutoAssignGamepadPlayerIndex;
 	}
-	for (int playerIndex = 1; playerIndex >= 0; --playerIndex)	// Reverse order to make sure player 1 overwrites player 2
+	for (int playerIndex = NUM_PLAYERS - 1; playerIndex >= 0; --playerIndex)	// Reverse order to make sure player 1 overwrites player 2
 	{
 		RealDevice* gamepad = findGamepadBySDLJoystickInstanceId(mPlayers[playerIndex].mPreferredGamepad.mSDLJoystickInstanceId);
 		if (nullptr != gamepad)
@@ -807,13 +810,13 @@ const InputManager::RealDevice* InputManager::getGamepadByJoystickInstanceId(int
 
 int32 InputManager::getPreferredGamepadByJoystickInstanceId(int playerIndex) const
 {
-	RMX_ASSERT(playerIndex >= 0 && playerIndex < 2, "Invalid player index " << playerIndex);
+	RMX_ASSERT(playerIndex >= 0 && playerIndex < NUM_PLAYERS, "Invalid player index " << playerIndex);
 	return mPlayers[playerIndex].mPreferredGamepad.mSDLJoystickInstanceId;
 }
 
 void InputManager::setPreferredGamepad(int playerIndex, const RealDevice* gamepad)
 {
-	RMX_ASSERT(playerIndex >= 0 && playerIndex < 2, "Invalid player index " << playerIndex);
+	RMX_ASSERT(playerIndex >= 0 && playerIndex < NUM_PLAYERS, "Invalid player index " << playerIndex);
 	PreferredGamepad& preferredGamepad = mPlayers[playerIndex].mPreferredGamepad;
 	if (nullptr != gamepad)
 	{
@@ -832,9 +835,16 @@ InputConfig::DeviceDefinition* InputManager::getDeviceDefinition(const RealDevic
 {
 	if (device.mType == InputConfig::DeviceType::KEYBOARD)
 	{
-		static_assert(NUM_PLAYERS == 2);
-		const int keyboardIndex = (&device == &mKeyboards[1]) ? 1 : 0;
-		const std::string key = (keyboardIndex == 0) ? "Keyboard1" : "Keyboard2";
+		size_t keyboardIndex = 0;
+		for (size_t k = 1; k < NUM_PLAYERS; ++k)
+		{
+			if (&device == &mKeyboards[k])
+			{
+				keyboardIndex = k;
+				break;
+			}
+		}
+		const std::string& key = KEYBOARD_DEVICE_NAMES[keyboardIndex];
 		return getInputDeviceDefinitionByIdentifier(key);
 	}
 	else
@@ -922,7 +932,7 @@ void InputManager::setControllerLEDsForPlayer(int playerIndex, const Color& colo
 {
 #if SDL_VERSION_ATLEAST(2, 0, 14)
 	// TODO: Remove some of these exclusions where possible
-	#if !defined(PLATFORM_WEB) && !defined(PLATFORM_SWITCH) && !(defined(PLATFORM_WINDOWS) && defined(__GNUC__))
+	#if !defined(PLATFORM_WEB) && !defined(PLATFORM_SWITCH) && !defined(PLATFORM_VITA) && !(defined(PLATFORM_WINDOWS) && defined(__GNUC__))
 		for (size_t i = 0; i < mGamepads.size(); ++i)
 		{
 			if (mGamepads[i].mAssignedPlayer == playerIndex && nullptr != mGamepads[i].mSDLGameController)
@@ -936,7 +946,7 @@ void InputManager::setControllerLEDsForPlayer(int playerIndex, const Color& colo
 
 void InputManager::handleActiveModsChanged()
 {
-	static const uint64 FEATURE_NAME_HASH = rmx::getMurmur2_64("Controls_LR");
+	constexpr uint64 FEATURE_NAME_HASH = rmx::constMurmur2_64("Controls_LR");
 	mUsingControlsLR = ModManager::instance().anyActiveModUsesFeature(FEATURE_NAME_HASH);
 
 	if (TouchControlsOverlay::hasInstance())
@@ -996,7 +1006,10 @@ bool InputManager::isPressed(const ControlInput& input)
 			{
 				// Ignore key presses while Alt is down
 				if (!FTX::keyState(SDLK_LALT) && !FTX::keyState(SDLK_RALT))
-					return true;
+				{
+					if (!ImGuiIntegration::isCapturingKeyboard())
+						return true;
+				}
 			}
 			break;
 		}

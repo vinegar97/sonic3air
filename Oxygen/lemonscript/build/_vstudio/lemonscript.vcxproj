@@ -45,6 +45,7 @@
     <ClCompile Include="..\..\source\lemon\program\ModuleSerializer.cpp" />
     <ClCompile Include="..\..\source\lemon\program\Opcode.cpp" />
     <ClCompile Include="..\..\source\lemon\program\Program.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\SourceFileInfo.cpp" />
     <ClCompile Include="..\..\source\lemon\program\StringRef.cpp" />
     <ClCompile Include="..\..\source\lemon\runtime\BuiltInFunctions.cpp" />
     <ClCompile Include="..\..\source\lemon\runtime\ControlFlow.cpp" />
@@ -61,6 +62,8 @@
     <ClCompile Include="..\..\source\lemon\translator\Translator.cpp" />
     <ClCompile Include="..\..\source\lemon\utility\FlyweightString.cpp" />
     <ClCompile Include="..\..\source\lemon\utility\PragmaSplitter.cpp" />
+    <ClCompile Include="..\..\source\lemon\utility\StringFormatter.cpp" />
+    <ClCompile Include="..\..\source\lemon\utility\StringFormatterLegacy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\backend\FunctionCompiler.h" />
@@ -93,6 +96,7 @@
     <ClInclude Include="..\..\source\lemon\program\FunctionWrapper.h" />
     <ClInclude Include="..\..\source\lemon\program\GlobalsLookup.h" />
     <ClInclude Include="..\..\source\lemon\program\Module.h" />
+    <ClInclude Include="..\..\source\lemon\program\ModuleBindingsBuilder.h" />
     <ClInclude Include="..\..\source\lemon\program\ModuleSerializer.h" />
     <ClInclude Include="..\..\source\lemon\program\Opcode.h" />
     <ClInclude Include="..\..\source\lemon\program\OpcodeHelper.h" />
@@ -102,7 +106,6 @@
     <ClInclude Include="..\..\source\lemon\program\Variable.h" />
     <ClInclude Include="..\..\source\lemon\runtime\BuiltInFunctions.h" />
     <ClInclude Include="..\..\source\lemon\runtime\ControlFlow.h" />
-    <ClInclude Include="..\..\source\lemon\runtime\FastStringStream.h" />
     <ClInclude Include="..\..\source\lemon\runtime\OpcodeExecUtils.h" />
     <ClInclude Include="..\..\source\lemon\runtime\OpcodeProcessor.h" />
     <ClInclude Include="..\..\source\lemon\runtime\provider\DefaultOpcodeProvider.h" />
@@ -118,9 +121,12 @@
     <ClInclude Include="..\..\source\lemon\translator\SourceCodeWriter.h" />
     <ClInclude Include="..\..\source\lemon\translator\Translator.h" />
     <ClInclude Include="..\..\source\lemon\utility\AnyBaseValue.h" />
+    <ClInclude Include="..\..\source\lemon\utility\FastStringStream.h" />
     <ClInclude Include="..\..\source\lemon\utility\FlyweightString.h" />
     <ClInclude Include="..\..\source\lemon\utility\PragmaSplitter.h" />
     <ClInclude Include="..\..\source\lemon\utility\QuickDataHasher.h" />
+    <ClInclude Include="..\..\source\lemon\utility\StringFormatter.h" />
+    <ClInclude Include="..\..\source\lemon\utility\StringFormatterLegacy.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="lemonscript.natvis" />
@@ -135,64 +141,40 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="workspace.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="workspace.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="workspace.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+  <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="workspace.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup>
     <OutDir>$(ProjectDir)..\..\lib\$(BuildCode)\</OutDir>
     <IntDir>tmp\lemonscript_$(Configuration)_$(BuildCode)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IntDir>tmp\lemonscript_$(Configuration)_$(BuildCode)\</IntDir>
-    <OutDir>$(ProjectDir)..\..\lib\$(BuildCode)\</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(ProjectDir)..\..\lib\$(BuildCode)\</OutDir>
-    <IntDir>tmp\lemonscript_$(Configuration)_$(BuildCode)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>tmp\lemonscript_$(Configuration)_$(BuildCode)\</IntDir>
-    <OutDir>$(ProjectDir)..\..\lib\$(BuildCode)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

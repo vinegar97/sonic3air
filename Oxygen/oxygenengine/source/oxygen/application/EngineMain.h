@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -11,6 +11,7 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/drawing/Drawer.h"
 
+class ArgumentsReader;
 class AudioOutBase;
 class CodeExec;
 class Configuration;
@@ -66,6 +67,10 @@ public:
 	virtual bool useDeveloperFeatures() = 0;
 	virtual void onActiveModsChanged() = 0;
 
+	virtual void onStartNetplayGame(bool isHost) = 0;
+	virtual void onStopNetplayGame(bool isHost) = 0;
+	virtual void serializeGameSettings(VectorBinarySerializer& serializer) = 0;
+
 	virtual void onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer) = 0;
 	virtual void onGameRecordingHeaderSave(std::vector<uint8>& buffer) = 0;
 
@@ -81,10 +86,10 @@ public:
 	static void earlySetup();
 
 public:
-	EngineMain(EngineDelegateInterface& delegate_);
+	EngineMain(EngineDelegateInterface& delegate_, ArgumentsReader& arguments);
 	~EngineMain();
 
-	void execute(int argc, char** argv);
+	void execute();
 
 	void onActiveModsChanged();
 	bool reloadFilePackage(std::wstring_view packageName, bool forceReload);
@@ -104,7 +109,9 @@ private:
 	void shutdown();
 
 	void initDirectories();
-	bool initConfigAndSettings(const std::wstring& argumentProjectPath);
+	bool initConfigAndSettings();
+	void loadConfigJson();
+
 	bool initFileSystem();
 	bool loadFilePackages(bool forceReload);
 	bool loadFilePackageByIndex(size_t index, bool forceReload);
@@ -114,7 +121,7 @@ private:
 
 private:
 	EngineDelegateInterface& mDelegate;
-	std::vector<std::string> mArguments;
+	ArgumentsReader& mArguments;
 
 	struct Internal;
 	Internal& mInternal;

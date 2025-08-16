@@ -4,6 +4,8 @@
 
 set -eu
 
+cd `dirname $0`/..
+
 ref_major=$(sed -ne 's/^#define SDL_MAJOR_VERSION  *//p' include/SDL_version.h)
 ref_minor=$(sed -ne 's/^#define SDL_MINOR_VERSION  *//p' include/SDL_version.h)
 ref_micro=$(sed -ne 's/^#define SDL_PATCHLEVEL  *//p' include/SDL_version.h)
@@ -54,6 +56,17 @@ if [ "$ref_version" = "$version" ]; then
     ok "CMakeLists.txt $version"
 else
     not_ok "CMakeLists.txt $version disagrees with SDL_version.h $ref_version"
+fi
+
+major=$(sed -ne 's/.*SDL_MAJOR_VERSION = \([0-9]*\);/\1/p' android-project/app/src/main/java/org/libsdl/app/SDLActivity.java)
+minor=$(sed -ne 's/.*SDL_MINOR_VERSION = \([0-9]*\);/\1/p' android-project/app/src/main/java/org/libsdl/app/SDLActivity.java)
+micro=$(sed -ne 's/.*SDL_MICRO_VERSION = \([0-9]*\);/\1/p' android-project/app/src/main/java/org/libsdl/app/SDLActivity.java)
+version="${major}.${minor}.${micro}"
+
+if [ "$ref_version" = "$version" ]; then
+    ok "SDLActivity.java $version"
+else
+    not_ok "android-project/app/src/main/java/org/libsdl/app/SDLActivity.java $version disagrees with SDL_version.h $ref_version"
 fi
 
 major=$(sed -ne 's/^MAJOR_VERSION *= *//p' Makefile.os2)
@@ -128,6 +141,25 @@ else
     not_ok "Info-Framework.plist CFBundleVersion $version disagrees with SDL_version.h $ref_version"
 fi
 
+version=$(sed -Ene 's/Title SDL (.*)/\1/p' Xcode/SDL/pkg-support/SDL.info)
+
+if [ "$ref_version" = "$version" ]; then
+    ok "SDL.info Title $version"
+else
+    not_ok "SDL.info Title $version disagrees with SDL_version.h $ref_version"
+fi
+
+marketing=$(sed -Ene 's/.*MARKETING_VERSION = (.*);/\1/p' Xcode/SDL/SDL.xcodeproj/project.pbxproj)
+
+ref="$ref_version
+$ref_version"
+
+if [ "$ref" = "$marketing" ]; then
+    ok "project.pbxproj MARKETING_VERSION is consistent"
+else
+    not_ok "project.pbxproj MARKETING_VERSION is inconsistent, expected $ref, got $marketing"
+fi
+
 # For simplicity this assumes we'll never break ABI before SDL 3.
 dylib_compat=$(sed -Ene 's/.*DYLIB_COMPATIBILITY_VERSION = (.*);$/\1/p' Xcode/SDL/SDL.xcodeproj/project.pbxproj)
 
@@ -143,6 +175,8 @@ case "$ref_minor" in
 esac
 
 ref="${major}.${minor}.0
+${major}.${minor}.0
+${major}.${minor}.0
 ${major}.${minor}.0"
 
 if [ "$ref" = "$dylib_compat" ]; then
@@ -165,6 +199,8 @@ case "$ref_minor" in
 esac
 
 ref="${major}.${minor}.0
+${major}.${minor}.0
+${major}.${minor}.0
 ${major}.${minor}.0"
 
 if [ "$ref" = "$dylib_cur" ]; then

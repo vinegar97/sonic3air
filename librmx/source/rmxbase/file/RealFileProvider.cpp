@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -15,6 +15,16 @@ namespace rmx
 	bool RealFileProvider::exists(const std::wstring& path)
 	{
 		return FileIO::exists(path);
+	}
+
+	bool RealFileProvider::isFile(const std::wstring& path)
+	{
+		return FileIO::isFile(path);
+	}
+
+	bool RealFileProvider::isDirectory(const std::wstring& path)
+	{
+		return FileIO::isDirectory(path);
 	}
 
 	bool RealFileProvider::getFileSize(const std::wstring& filename, uint64& outFileSize)

@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -118,7 +118,9 @@ namespace rmx
 		const Json::Value& value = mJson[key];
 		if (value.isString())
 		{
-			output = *String(value.asString()).toWString();		// TODO: Is there an encoding for non-ASCII characters?
+			WString result;
+			result.fromUTF8(value.asString());
+			output = *result;
 			return true;
 		}
 		return false;
@@ -207,6 +209,9 @@ namespace rmx
 		{
 			for (const auto& element : value)
 			{
+				if (!element.isString())
+					return false;
+
 				output.push_back(element.asString());
 			}
 			return true;

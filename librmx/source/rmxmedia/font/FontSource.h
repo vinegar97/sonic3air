@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -20,7 +20,7 @@ public:
 		uint32 mUnicode = 0;
 		Bitmap mBitmap;
 		int mAdvance = 0;
-		Vec2f mIndent;
+		Vec2i mIndent;
 	};
 
 public:
@@ -59,7 +59,7 @@ private:
 class API_EXPORT FontSourceBitmap : public FontSource
 {
 public:
-	explicit FontSourceBitmap(const String& jsonFilename);
+	explicit FontSourceBitmap(const std::wstring& jsonFilename, bool showErrors = true);
 
 	bool isValid() const  { return mLoadingSucceeded; }
 

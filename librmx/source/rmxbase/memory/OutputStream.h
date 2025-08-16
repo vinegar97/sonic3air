@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -67,12 +67,13 @@ public:
 	MemOutputStream(int size);
 	~MemOutputStream();
 
-	void setPosition(int pos)	{ mCursor = mBuffer + pos; assert(mCursor <= mBufferEnd); }
-	int getPosition() const		{ return (int)(mCursor - mBuffer); }
-	int getCapacity() const		{ return (int)(mBufferEnd - mBuffer); }
-	uint8* getBuffer()			{ return mBuffer; }
+	inline void setPosition(int pos) override	{ mCursor = mBuffer + pos; assert(mCursor <= mBufferEnd); }
+	inline int getPosition() const override		{ return (int)(mCursor - mBuffer); }
+	int write(const void* ptr, int len) override;
 
-	int  write(const void* ptr, int len);
+	inline int getCapacity() const				{ return (int)(mBufferEnd - mBuffer); }
+	inline uint8* getBuffer()					{ return mBuffer; }
+
 	bool saveTo(OutputStream& stream);
 	bool saveToFile(const String& filename);
 
@@ -92,15 +93,15 @@ public:
 
 	void clear();
 
-	void setPosition(int pos);
-	int getPosition() const;
-	int getCapacity() const  { return std::numeric_limits<int>::max(); }
+	void setPosition(int pos) override;
+	int getPosition() const override;
+	int write(const void* ptr, int len) override;
 
-	int write(const void* ptr, int len);
+	inline int getCapacity() const  { return std::numeric_limits<int>::max(); }
 	bool saveTo(OutputStream& stream);
 
 protected:
-	void AccessPage(int pageIndex);
+	void accessPage(int pageIndex);
 
 protected:
 	std::vector<uint8*> mPages;

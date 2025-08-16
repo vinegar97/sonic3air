@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,7 +10,6 @@
 
 #include <rmxbase.h>
 
-class PaletteBitmap;
 class DrawerTexture;
 class Shader;
 
@@ -18,7 +17,7 @@ class Shader;
 class FileHelper
 {
 public:
-	static bool loadPaletteBitmap(PaletteBitmap& bitmap, const std::wstring& filename, bool showError = true);
+	static bool loadPaletteBitmap(PaletteBitmap& bitmap, const std::wstring& filename, std::vector<uint32>* outPalette = nullptr, bool showError = true);
 	static bool loadBitmap(Bitmap& bitmap, const std::wstring& filename, bool showError = true);
 	static bool loadTexture(DrawerTexture& texture, const std::wstring& filename, bool showError = true);
 

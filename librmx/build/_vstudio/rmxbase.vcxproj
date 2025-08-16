@@ -26,23 +26,23 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
@@ -208,12 +208,14 @@
     <ClInclude Include="..\..\source\rmxbase\bitmap\BitmapCodecs.h" />
     <ClInclude Include="..\..\source\rmxbase\bitmap\BitmapView.h" />
     <ClInclude Include="..\..\source\rmxbase\bitmap\Color.h" />
+    <ClInclude Include="..\..\source\rmxbase\bitmap\PaletteBitmap.h" />
     <ClInclude Include="..\..\source\rmxbase\data\CArray.h" />
     <ClInclude Include="..\..\source\rmxbase\data\GlobalObjectPtr.h" />
     <ClInclude Include="..\..\source\rmxbase\data\SingleInstance.h" />
     <ClInclude Include="..\..\source\rmxbase\data\SinglePtr.h" />
     <ClInclude Include="..\..\source\rmxbase\data\Singleton.h" />
     <ClInclude Include="..\..\source\rmxbase\data\SmartPtr.h" />
+    <ClInclude Include="..\..\source\rmxbase\data\WeakPtr.h" />
     <ClInclude Include="..\..\source\rmxbase\file\FileCrawler.h" />
     <ClInclude Include="..\..\source\rmxbase\file\FileHandle.h" />
     <ClInclude Include="..\..\source\rmxbase\file\FileIO.h" />
@@ -271,6 +273,8 @@
     <ClCompile Include="..\..\source\rmxbase\bitmap\BitmapCodecJPG.cpp" />
     <ClCompile Include="..\..\source\rmxbase\bitmap\BitmapCodecPNG.cpp" />
     <ClCompile Include="..\..\source\rmxbase\bitmap\Color.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\bitmap\PaletteBitmap.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\data\WeakPtr.cpp" />
     <ClCompile Include="..\..\source\rmxbase\file\FileCrawler.cpp" />
     <ClCompile Include="..\..\source\rmxbase\file\FileHandle.cpp" />
     <ClCompile Include="..\..\source\rmxbase\file\FileIO.cpp" />
@@ -307,6 +311,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\source\rmxbase\_jsoncpp\json_valueiterator.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="librmx.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

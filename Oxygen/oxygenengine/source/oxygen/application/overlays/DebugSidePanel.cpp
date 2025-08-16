@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -9,10 +9,10 @@
 #include "oxygen/pch.h"
 #include "oxygen/application/overlays/DebugSidePanel.h"
 #include "oxygen/application/overlays/DebugSidePanelCategory.h"
-#include "oxygen/application/mainview/GameView.h"
 #include "oxygen/application/Application.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/simulation/CodeExec.h"
@@ -123,7 +123,7 @@ void DebugSidePanel::keyboard(const rmx::KeyboardEvent& ev)
 {
 	GuiBase::keyboard(ev);
 
-	if (ev.state)
+	if (ev.state && !FTX::System->wasEventConsumed())
 	{
 		DebugSidePanelCategory& category = *mCategories[mActiveCategoryIndex];
 		switch (ev.key)
@@ -147,7 +147,7 @@ void DebugSidePanel::keyboard(const rmx::KeyboardEvent& ev)
 
 void DebugSidePanel::mouse(const rmx::MouseEvent& ev)
 {
-	if (ev.state && ev.button == rmx::MouseButton::Left)
+	if (ev.state && ev.button == rmx::MouseButton::Left && !FTX::System->wasEventConsumed())
 	{
 		if (mMouseOverTab > 0)
 		{
@@ -173,7 +173,7 @@ void DebugSidePanel::mouse(const rmx::MouseEvent& ev)
 
 void DebugSidePanel::update(float timeElapsed)
 {
-	if (FTX::mouseWheel() != 0)
+	if (FTX::mouseWheel() != 0 && !FTX::System->wasEventConsumed())
 	{
 		DebugSidePanelCategory& category = *mCategories[mActiveCategoryIndex];
 		category.mScrollPosition -= FTX::mouseWheel() * 75;
@@ -220,7 +220,7 @@ void DebugSidePanel::render()
 				lastType = mCategories[i]->mType;
 			}
 
-			const bool mouseInRect = FTX::mouseIn(r);
+			const bool mouseInRect = (FTX::mouseIn(r) && !FTX::System->wasEventConsumed());
 			if (mouseInRect)
 			{
 				drawer.drawRect(r, Color(1.0f, 1.0f, 0.0f, 0.5f));
@@ -233,7 +233,6 @@ void DebugSidePanel::render()
 			{
 				case DebugSidePanelCategory::Type::INTERNAL:	color = ((i == mActiveCategoryIndex) ? Color::YELLOW : Color(0.6f, 0.6f, 0.5f, 0.75f));	 break;
 				case DebugSidePanelCategory::Type::CUSTOM:		color = ((i == mActiveCategoryIndex) ? Color::GREEN : Color(0.5f, 0.7f, 0.5f, 0.75f));	 break;
-				case DebugSidePanelCategory::Type::GAME:		color = ((i == mActiveCategoryIndex) ? Color::GREEN : Color(0.5f, 0.7f, 0.5f, 0.75f));	 break;
 			}
 			drawer.printText(mSmallFont, r, buffer, 5, color);
 
@@ -261,15 +260,6 @@ void DebugSidePanel::render()
 			static_cast<CustomDebugSidePanelCategory&>(category).buildCategoryContent(mBuilder, drawer, mMouseOverKey);
 			break;
 		}
-
-		case DebugSidePanelCategory::Type::GAME:
-		{
-			if (category.mCallback)
-			{
-				category.mCallback(category, mBuilder, mMouseOverKey);
-			}
-			break;
-		}
 	}
 
 	// Reset changed key
@@ -288,7 +278,7 @@ void DebugSidePanel::render()
 				selectionRect.height = 12;
 
 				// Check if mouse cursor is inside
-				if (line.mKey != INVALID_KEY && FTX::mouseIn(selectionRect))
+				if (line.mKey != INVALID_KEY && FTX::mouseIn(selectionRect) && !FTX::System->wasEventConsumed())
 				{
 					mMouseOverKey = line.mKey;
 				}
@@ -300,7 +290,7 @@ void DebugSidePanel::render()
 	// Draw mouse-over highlight for width change
 	{
 		const Recti sensorRect(mainRect.x - 6, mainRect.y, 12, mainRect.height);
-		const bool hovered = FTX::mouseIn(sensorRect);
+		const bool hovered = FTX::mouseIn(sensorRect) && !FTX::System->wasEventConsumed();
 		if (hovered || mChangingSidePanelWidth)
 		{
 			drawer.drawRect(sensorRect, mChangingSidePanelWidth ? Color(0.1f, 0.1f, 0.1f) : Color(0.0f, 0.0f, 0.0));
@@ -375,14 +365,6 @@ void DebugSidePanel::render()
 	drawer.performRendering();
 }
 
-DebugSidePanelCategory& DebugSidePanel::createGameCategory(size_t identifier, const std::string& header, char shortCharacter, const std::function<void(DebugSidePanelCategory&,Builder&,uint64)>& callback)
-{
-	DebugSidePanelCategory& category = addCategory(identifier, header, shortCharacter);
-	category.mType = DebugSidePanelCategory::Type::GAME;
-	category.mCallback = callback;
-	return category;
-}
-
 bool DebugSidePanel::setupCustomCategory(std::string_view header, char shortCharacter)
 {
 	// Search for the category
@@ -406,15 +388,16 @@ bool DebugSidePanel::setupCustomCategory(std::string_view header, char shortChar
 
 		index = (int)mCategories.size();
 		mSetupCustomCategory = new CustomDebugSidePanelCategory();
-
 		mSetupCustomCategory->mHeader = header;
 		mSetupCustomCategory->mShortCharacter = shortCharacter;
+
 		mCategories.push_back(mSetupCustomCategory);
+		mCustomCategories.push_back(mSetupCustomCategory);
 	}
 
 	mSetupCustomCategory->onSetup();
 
-	return ((size_t)index == mActiveCategoryIndex);
+	return ((size_t)index == mActiveCategoryIndex) || mSetupCustomCategory->isVisibleInDevModeWindow();
 }
 
 bool DebugSidePanel::addOption(std::string_view text, bool defaultValue)
@@ -643,10 +626,9 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					#if 0
 						if (key == category.mChangedKey)
 						{
-							std::string scriptFilename;
-							uint32 lineNumber;
-							codeExec.getLemonScriptProgram().resolveLocation(*hit.mLocation.mFunction, (uint32)hit.mLocation.mProgramCounter, scriptFilename, lineNumber);
-							textLine->mCodeLocation = "\"" + scriptFilename + "\":" + std::to_string(lineNumber);
+							LemonScriptProgram::ResolvedLocation location;
+							codeExec.getLemonScriptProgram().resolveLocation(location, *hit.mLocation.mFunction, (uint32)*hit.mLocation.mProgramCounter);
+							textLine->mCodeLocation = "\"" + location.mScriptFilename + "\":" + std::to_string(location.mLineNumber);
 
 							// TODO: The script file name needs to contains the full file path for this to work, not just the file name itself
 							//  -> Maybe store a list of source files in the module?
@@ -968,7 +950,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					for (size_t i = 0; i < entry.mEntries.size(); ++i)
 					{
 						const DebugTracking::ScriptLogSingleEntry& singleEntry = entry.mEntries[i];
-						const uint64 key = (((uint64)entry.mEntries.size() << 16) + ((uint64)i << 32)) ^ rmx::getMurmur2_64(String(singleEntry.mValue));
+						const uint64 key = (((uint64)entry.mEntries.size() << 16) + ((uint64)i << 32)) ^ rmx::getMurmur2_64(singleEntry.mValue);
 						builder.addLine(singleEntry.mValue, color, 56, key);
 
 						if (category.mOpenKeys.count(key) != 0)

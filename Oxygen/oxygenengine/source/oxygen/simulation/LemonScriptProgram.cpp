@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -12,6 +12,7 @@
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/helper/Utils.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 #include <lemon/compiler/Compiler.h>
 #include <lemon/compiler/TokenHelper.h>
@@ -21,6 +22,14 @@
 #include <lemon/program/Program.h>
 #include <lemon/runtime/StandardLibrary.h>
 #include <lemon/utility/PragmaSplitter.h>
+
+
+struct ModuleAppendedInfo : public lemon::Module::AppendedInfo
+{
+	inline explicit ModuleAppendedInfo(const Mod* mod) : mMod(mod) {}
+
+	const Mod* mMod = nullptr;
+};
 
 
 struct LemonScriptProgram::Internal
@@ -106,54 +115,7 @@ bool LemonScriptProgram::hasValidProgram() const
 	return !mInternal.mProgram.getModules().empty();
 }
 
-bool LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename)
-{
-	try
-	{
-		// Compile script source
-		lemon::CompileOptions options;
-		//options.mOutputCombinedSource = L"combined_source.lemon";	// Just for debugging preprocessor issues
-		//options.mOutputTranslatedSource = L"output.cpp";			// For testing translation
-		lemon::Compiler compiler(module, globalsLookup, options);
-
-		const bool compileSuccess = compiler.loadScript(filename);
-		if (!compileSuccess && !compiler.getErrors().empty())
-		{
-			for (const lemon::Compiler::ErrorMessage& error : compiler.getErrors())
-			{
-				LogDisplay::instance().addLogError(String(0, "Compile error: %s (in '%s', line %d)", error.mMessage.c_str(), *WString(error.mFilename).toString(), error.mError.mLineNumber));
-			}
-
-			const lemon::Compiler::ErrorMessage& error = compiler.getErrors().front();
-			std::string text = error.mMessage + ".";	// Because error messages usually don't end with a dot
-			switch (error.mError.mCode)
-			{
-				case lemon::CompilerError::Code::SCRIPT_FEATURE_LEVEL_TOO_HIGH:
-				{
-					text += " It's possible the module requires a newer game version.";
-					break;
-				}
-				default:
-					break;
-			}
-			text = "Script compile error:\n" + text + "\n\n";
-			if (error.mFilename.empty())
-				text += "Caused in module " + module.getModuleName() + ".";
-			else
-				text += "Caused in file '" + WString(error.mFilename).toStdString() + "', line " + std::to_string(error.mError.mLineNumber) + ", of module '" + module.getModuleName() + "'.";
-			RMX_ERROR(text, );
-			return false;
-		}
-	}
-	catch (...)
-	{
-		return false;
-	}
-
-	return true;
-}
-
-LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std::string& filename, const LoadOptions& loadOptions)
+LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(std::string_view baseScriptFilename, const LoadOptions& loadOptions)
 {
 	// Select script mods to load
 	std::vector<const Mod*> modsToLoad;
@@ -181,118 +143,12 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 		}
 	}
 
-	Configuration& config = Configuration::instance();
-	lemon::GlobalsLookup globalsLookup = mInternal.mGlobalsLookupCoreOnly;	// Copy the definitions from the two core modules
-
-	// Clear program here already - in case compilation fails, it would be broken otherwise
-	mInternal.mProgram.clear();
-
-	// Load project's main script module, but only if a full reload is needed
-	if (mainScriptReloadNeeded)
+	// Loop to immediately retry script loading after compilation failed
+	while (true)
 	{
-		mInternal.mScriptModule.clear();
-		const uint32 coreModuleDependencyHash = mInternal.mLemonCoreModule.buildDependencyHash() + mInternal.mOxygenCoreModule.buildDependencyHash();
-
-		// Load scripts
-		std::vector<uint8> buffer;
-		bool scriptsLoaded = false;
-
-		if (EngineMain::getDelegate().useDeveloperFeatures())
-		{
-		#ifdef DEBUG
-			// Deserialize from cache (so that debug builds don't have to compile themselves, which is quite slow there)
-			if (!config.mForceCompileScripts && !config.mCompiledScriptSavePath.empty())
-			{
-				if (FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer))
-				{
-					VectorBinarySerializer serializer(true, buffer);
-					scriptsLoaded = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
-					RMX_CHECK(scriptsLoaded, "Failed to deserialize scripts, possibly because the compiled script file '" << WString(config.mCompiledScriptSavePath).toStdString() << "' is using an older format", );
-				}
-			}
-		#endif
-
-			// Compile scripts from the sources, if they're present
-			if (!scriptsLoaded)
-			{
-				if (FTX::FileSystem->exists(filename))
-				{
-					// Compile module
-					scriptsLoaded = loadScriptModule(mInternal.mScriptModule, globalsLookup, *String(filename).toWString());
-
-					// If there are no script functions at all, we consider that a failure
-					scriptsLoaded = scriptsLoaded && !mInternal.mScriptModule.getScriptFunctions().empty();
-					RMX_CHECK(scriptsLoaded, "Failed to compile scripts from source at '" << filename << "'", );
-
-					if (scriptsLoaded && !config.mCompiledScriptSavePath.empty())
-					{
-						// Save compiled scripts
-						buffer.clear();
-						VectorBinarySerializer serializer(false, buffer);
-						const bool success = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
-						RMX_CHECK(success, "Failed to serialize scripts", );
-						FTX::FileSystem->saveFile(config.mCompiledScriptSavePath, buffer);	// In order to use these scripts, they have to be manually moved to the "data" folder
-					}
-				}
-			}
-		}
-
-		// Deserialize from compiled scripts
-		if (!scriptsLoaded && !config.mForceCompileScripts)
-		{
-			bool loaded = FTX::FileSystem->readFile(L"data/scripts.bin", buffer);
-			if (!loaded && !config.mCompiledScriptSavePath.empty())
-				loaded = FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer);
-
-			if (loaded)
-			{
-				VectorBinarySerializer serializer(true, buffer);
-				scriptsLoaded = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
-				RMX_CHECK(scriptsLoaded, "Failed to load 'scripts.bin'", );
-			}
-		}
-
-		if (!scriptsLoaded)
-		{
-			// Failed to load scripts
-			return LoadScriptsResult::FAILED;
-		}
-	}
-
-	// Load mod script modules
-	// TODO: There might be mod script modules already loaded that should stay loaded, i.e. no actual reload is needed for these
-	{
-		for (lemon::Module* module : mInternal.mModModules)
-			delete module;
-		mInternal.mModModules.clear();
-
-		if (!modsToLoad.empty())
-		{
-			lemon::Module* previousModule = &mInternal.mScriptModule;
-			for (const Mod* mod : modsToLoad)
-			{
-				if (nullptr != previousModule)
-				{
-					globalsLookup.addDefinitionsFromModule(*previousModule);
-					previousModule = nullptr;
-				}
-
-				// Create and compile module
-				lemon::Module* module = new lemon::Module(mod->mUniqueID);
-				const std::wstring mainScriptFilename = mod->mFullPath + L"scripts/main.lemon";
-				const bool success = loadScriptModule(*module, globalsLookup, mainScriptFilename);
-				if (success)
-				{
-					mInternal.mModModules.push_back(module);
-					previousModule = module;
-				}
-				else
-				{
-					delete module;
-					break;
-				}
-			}
-		}
+		const LoadingResult loadingResult = loadAllScriptModules(loadOptions, mainScriptReloadNeeded ? baseScriptFilename : "", modsToLoad);
+		if (loadingResult != LoadingResult::FAILED_RETRY)
+			break;
 	}
 
 	// Build lemon script program from modules
@@ -303,6 +159,8 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 	{
 		mInternal.mProgram.addModule(*module);
 	}
+
+	Configuration& config = Configuration::instance();
 
 	// Set script optimization level
 	{
@@ -361,6 +219,302 @@ const LemonScriptProgram::Hook* LemonScriptProgram::checkForAddressHook(uint32 a
 size_t LemonScriptProgram::getNumAddressHooks() const
 {
 	return mInternal.mAddressHooks.size();
+}
+
+std::string_view LemonScriptProgram::getFunctionNameByHash(uint64 hash) const
+{
+	const auto& list = mInternal.mProgram.getFunctionsByName(hash);
+	return list.empty() ? std::string_view() : list[0]->getName().getString();
+}
+
+lemon::Variable* LemonScriptProgram::getGlobalVariableByHash(uint64 hash) const
+{
+	return mInternal.mProgram.getGlobalVariableByName(hash);
+}
+
+const Mod* LemonScriptProgram::getModByModule(const lemon::Module& module) const
+{
+	const ModuleAppendedInfo* appendedInfo = static_cast<ModuleAppendedInfo*>(module.getAppendedInfo());
+	return (nullptr != appendedInfo) ? appendedInfo->mMod : nullptr;
+}
+
+const std::vector<const lemon::Module*>& LemonScriptProgram::getModules() const
+{
+	return mInternal.mProgram.getModules();
+}
+
+void LemonScriptProgram::resolveLocation(ResolvedLocation& outResolvedLocation, uint32 functionId, uint32 programCounter) const
+{
+	const lemon::Function* function = mInternal.mProgram.getFunctionByID(functionId);
+	if (nullptr == function)
+	{
+		outResolvedLocation.mScriptFilename = *String(0, "<unknown function id %d>", functionId);
+	}
+	else
+	{
+		resolveLocation(outResolvedLocation, *function, programCounter);
+	}
+}
+
+void LemonScriptProgram::resolveLocation(ResolvedLocation& outResolvedLocation, const lemon::Function& function, uint32 programCounter)
+{
+	if (function.getType() == lemon::Function::Type::SCRIPT)
+	{
+		const lemon::ScriptFunction& scriptFunc = static_cast<const lemon::ScriptFunction&>(function);
+		if (programCounter < scriptFunc.mOpcodes.size())
+		{
+			outResolvedLocation.mSourceFileInfo = scriptFunc.mSourceFileInfo;
+			outResolvedLocation.mScriptFilename = *WString(scriptFunc.mSourceFileInfo->mFilename).toString();
+			outResolvedLocation.mLineNumber = scriptFunc.mOpcodes[programCounter].mLineNumber - scriptFunc.mSourceBaseLineOffset + 1;
+		}
+		else
+		{
+			outResolvedLocation.mScriptFilename = *String(0, "<invalid program counter %d in function '%.*s'>", programCounter, function.getName().getString().length(), function.getName().getString().data());
+		}
+	}
+	else
+	{
+		outResolvedLocation.mScriptFilename = *String(0, "<native function '%.*s'>", function.getName().getString().length(), function.getName().getString().data());
+	}
+}
+
+LemonScriptProgram::LoadingResult LemonScriptProgram::loadAllScriptModules(const LoadOptions& loadOptions, std::string_view baseScriptFilename, const std::vector<const Mod*>& modsToLoad)
+{
+	Configuration& config = Configuration::instance();
+	lemon::GlobalsLookup globalsLookup = mInternal.mGlobalsLookupCoreOnly;	// Copy the definitions from the two core modules
+
+	// Clear program here already - in case compilation fails, it would be broken otherwise
+	mInternal.mProgram.clear();
+
+	LoadingResult loadingResult = LoadingResult::SUCCESS;
+
+	// Load project's main script module, but only if a full reload is needed
+	if (!baseScriptFilename.empty())
+	{
+		mInternal.mScriptModule.clear();
+		const uint32 coreModuleDependencyHash = mInternal.mLemonCoreModule.buildDependencyHash() + mInternal.mOxygenCoreModule.buildDependencyHash();
+
+		// Load scripts
+		std::vector<uint8> buffer;
+		bool scriptsLoaded = false;
+
+		if (EngineMain::getDelegate().useDeveloperFeatures())
+		{
+		#ifdef DEBUG
+			// Deserialize from cache (so that debug builds don't have to compile themselves, which is quite slow there)
+			if (!config.mForceCompileScripts && !config.mCompiledScriptSavePath.empty())
+			{
+				if (FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer))
+				{
+					VectorBinarySerializer serializer(true, buffer);
+					scriptsLoaded = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
+					RMX_CHECK(scriptsLoaded, "Failed to deserialize scripts, possibly because the compiled script file '" << WString(config.mCompiledScriptSavePath).toStdString() << "' is using an older format", );
+				}
+			}
+		#endif
+
+			// Compile scripts from the sources, if they're present
+			if (!scriptsLoaded)
+			{
+				if (FTX::FileSystem->exists(baseScriptFilename))
+				{
+					// Compile module
+					loadingResult = loadScriptModule(mInternal.mScriptModule, globalsLookup, *String(baseScriptFilename).toWString());
+
+					// If there are no script functions at all, we consider that a failure
+					scriptsLoaded = (loadingResult == LoadingResult::SUCCESS) && !mInternal.mScriptModule.getScriptFunctions().empty();
+
+					if (scriptsLoaded)
+					{
+						if (!config.mCompiledScriptSavePath.empty())
+						{
+							// Save compiled scripts
+							buffer.clear();
+							VectorBinarySerializer serializer(false, buffer);
+							const bool success = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
+							RMX_CHECK(success, "Failed to serialize scripts", );
+							FTX::FileSystem->saveFile(config.mCompiledScriptSavePath, buffer);	// In order to use these scripts, they have to be manually moved to the "data" folder
+						}
+					}
+					else
+					{
+						mInternal.mScriptModule.clear();
+					}
+				}
+			}
+		}
+
+		// Deserialize from compiled scripts
+		if (!scriptsLoaded && !config.mForceCompileScripts)
+		{
+			bool loaded = FTX::FileSystem->readFile(L"data/scripts.bin", buffer);
+			if (!loaded && !config.mCompiledScriptSavePath.empty())
+				loaded = FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer);
+
+			if (loaded)
+			{
+				VectorBinarySerializer serializer(true, buffer);
+				scriptsLoaded = mInternal.mScriptModule.serialize(serializer, globalsLookup, coreModuleDependencyHash, loadOptions.mAppVersion);
+				RMX_CHECK(scriptsLoaded, "Failed to load 'scripts.bin'", );
+			}
+		}
+
+		if (scriptsLoaded)
+		{
+			// If base path was not set yet at this point, scripts were likely loaded from a serialization, and we need to take a guess where the original sources are located
+			if (mInternal.mScriptModule.getScriptBasePath().empty())
+			{
+				// TODO: Make this more generic, and especially less specific for S3AIR
+				const std::vector<std::wstring> candidatePaths = { L"./scripts/", L"./bonus/sonic3air_dev/scripts/" };
+				for (const std::wstring& candidate : candidatePaths)
+				{
+					if (FTX::FileSystem->exists(candidate + L"main.lemon"))
+					{
+						mInternal.mScriptModule.setScriptBasePath(candidate);
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			// Failed to load scripts
+			if (loadingResult == LoadingResult::SUCCESS)		// If loading result was not explicitly set, do that now
+				loadingResult = LoadingResult::FAILED_CONTINUE;
+			return loadingResult;
+		}
+	}
+
+	// Load mod script modules
+	// TODO: There might be mod script modules already loaded that should stay loaded, i.e. no actual reload is needed for these
+	{
+		for (lemon::Module* module : mInternal.mModModules)
+			delete module;
+		mInternal.mModModules.clear();
+
+		if (!modsToLoad.empty())
+		{
+			lemon::Module* previousModule = &mInternal.mScriptModule;
+			for (const Mod* mod : modsToLoad)
+			{
+				if (nullptr != previousModule)
+				{
+					globalsLookup.addDefinitionsFromModule(*previousModule);
+					previousModule = nullptr;
+				}
+
+				// Create and compile module
+				lemon::Module* module = new lemon::Module(mod->mUniqueID, new ModuleAppendedInfo(mod));
+				const std::wstring mainScriptFilename = mod->mFullPath + L"scripts/main.lemon";
+				loadingResult = loadScriptModule(*module, globalsLookup, mainScriptFilename);
+				if (loadingResult == LoadingResult::SUCCESS)
+				{
+					mInternal.mModModules.push_back(module);
+					previousModule = module;
+				}
+				else
+				{
+					delete module;
+					break;
+				}
+			}
+		}
+	}
+
+	return loadingResult;
+}
+
+LemonScriptProgram::LoadingResult LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename)
+{
+	// Compile script source
+	lemon::CompileOptions options;
+	//options.mOutputCombinedSource = L"combined_source.lemon";	// Just for debugging preprocessor issues
+	//options.mOutputTranslatedSource = L"output.cpp";			// For testing translation
+	lemon::Compiler compiler(module, globalsLookup, options);
+
+	try
+	{
+		const bool compileSuccess = compiler.loadScript(filename);
+		if (compileSuccess || compiler.getErrors().empty())
+			return LoadingResult::SUCCESS;
+	}
+	catch (...)
+	{
+		RMX_ERROR("Script compilation failed due to an unhandled exception", );
+	}
+
+	for (const lemon::Compiler::ErrorMessage& error : compiler.getErrors())
+	{
+		String errorMessage;
+		if (nullptr != error.mSourceFileInfo)
+			errorMessage.format("Script error in file '%s', line %d: %s", *WString(error.mSourceFileInfo->mFilename).toString(), error.mError.mLineNumber, error.mMessage.c_str());
+		else
+			errorMessage.format("Script error: %s", error.mMessage.c_str());
+		LogDisplay::instance().addLogError(errorMessage);
+	}
+
+	const lemon::Compiler::ErrorMessage& error = compiler.getErrors().front();
+	std::string text = error.mMessage + ".";	// Because error messages usually don't end with a dot
+	switch (error.mError.mCode)
+	{
+		case lemon::CompilerError::Code::SCRIPT_FEATURE_LEVEL_TOO_HIGH:
+		{
+			text += " It's possible the module requires a newer game version.";
+			break;
+		}
+		default:
+			break;
+	}
+	text = "Script compile error:\n" + text + "\n\n";
+	if (nullptr == error.mSourceFileInfo ||error.mSourceFileInfo->mFilename.empty())
+		text += "Caused in module " + module.getModuleName() + ".";
+	else
+		text += "Caused in file '" + WString(error.mSourceFileInfo->mFilename).toStdString() + "', line " + std::to_string(error.mError.mLineNumber) + ", of module '" + module.getModuleName() + "'.";
+
+	// Clear module to get rid of invalid content built during the compilation attempt
+	//  -> This is particularly relevant if the user choses to retry the script compilation
+	module.clear();
+
+	// Don't show an assert break message box again during debugging, because LEMON_DEBUG_BREAK already brought one up
+	if (!rmx::ErrorHandling::isDebuggerAttached())
+	{
+		// If dev mode is active, use a custom message box to allow for a retry of script loading
+		if (!Configuration::instance().mDevMode.mEnabled || nullptr != rmx::ErrorHandling::mMessageBoxImplementation)
+		{
+			const uint64 hash = 0xb69b7a0fd2ab6355;		// Just some random number instead of calculating an actual hash
+			if (!rmx::ErrorHandling::isIgnoringAssertsWithHash(hash))
+			{
+				text += "\n\n> Retry compilation right away?";
+
+				const PlatformFunctions::DialogButtons dialogButtons = PlatformFunctions::DialogButtons::YES_NO_CANCEL;
+				const PlatformFunctions::DialogResult result = PlatformFunctions::showDialogBox(rmx::ErrorSeverity::ERROR, dialogButtons, "Script compilation error", text);
+				switch (result)
+				{
+					case PlatformFunctions::DialogResult::OK:
+					{
+						// Retry loading (supposed after the user made some fixes before pressing the button)
+						return LoadingResult::FAILED_RETRY;
+					}
+
+					case PlatformFunctions::DialogResult::CANCEL:
+					{
+						// Suppress this message box from now on
+						rmx::ErrorHandling::setIgnoreAssertsWithHash(hash, true);
+						break;
+					}
+
+					default:
+						break;
+				}
+			}
+		}
+		else
+		{
+			RMX_ERROR(text, );
+		}
+	}
+
+	return LoadingResult::FAILED_CONTINUE;
 }
 
 void LemonScriptProgram::evaluateFunctionPragmas()
@@ -465,49 +619,4 @@ LemonScriptProgram::Hook& LemonScriptProgram::addHook(Hook::Type type, uint32 ad
 	hook->mType = type;
 	hook->mAddress = address;
 	return *hook;
-}
-
-std::string_view LemonScriptProgram::getFunctionNameByHash(uint64 hash) const
-{
-	const auto& list = mInternal.mProgram.getFunctionsByName(hash);
-	return list.empty() ? std::string_view() : list[0]->getName().getString();
-}
-
-lemon::Variable* LemonScriptProgram::getGlobalVariableByHash(uint64 hash) const
-{
-	return mInternal.mProgram.getGlobalVariableByName(hash);
-}
-
-void LemonScriptProgram::resolveLocation(uint32 functionId, uint32 programCounter, std::string& scriptFilename, uint32& lineNumber) const
-{
-	const lemon::Function* function = mInternal.mProgram.getFunctionByID(functionId);
-	if (nullptr == function)
-	{
-		scriptFilename = *String(0, "<unknown function id %d>", functionId);
-	}
-	else
-	{
-		resolveLocation(*function, programCounter, scriptFilename, lineNumber);
-	}
-}
-
-void LemonScriptProgram::resolveLocation(const lemon::Function& function, uint32 programCounter, std::string& scriptFilename, uint32& lineNumber)
-{
-	if (function.getType() == lemon::Function::Type::SCRIPT)
-	{
-		const lemon::ScriptFunction& scriptFunc = static_cast<const lemon::ScriptFunction&>(function);
-		if (programCounter < scriptFunc.mOpcodes.size())
-		{
-			scriptFilename = *WString(scriptFunc.mSourceFileInfo->mFilename).toString();
-			lineNumber = scriptFunc.mOpcodes[programCounter].mLineNumber - scriptFunc.mSourceBaseLineOffset + 1;
-		}
-		else
-		{
-			scriptFilename = *String(0, "<invalid program counter %d in function '%.*s'>", programCounter, function.getName().getString().length(), function.getName().getString().data());
-		}
-	}
-	else
-	{
-		scriptFilename = *String(0, "<native function '%.*s'>", function.getName().getString().length(), function.getName().getString().data());
-	}
 }

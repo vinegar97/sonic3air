@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -18,8 +18,7 @@ class InputRecorder
 public:
 	struct InputState
 	{
-		uint16 mInputFlags[2];    // For two gamepads
-		inline InputState() : mInputFlags { 0, 0 } {}
+		uint16 mInputFlags[InputManager::NUM_PLAYERS] = { 0 };
 	};
 
 public:
@@ -43,6 +42,9 @@ public:
 	bool loadRecording(const std::wstring& filename);
 	void saveRecording(std::vector<uint8>& buffer);
 	void saveRecording(const std::wstring& filename);
+
+private:
+	void serializeRecording(VectorBinarySerializer& serializer);
 
 private:
 	struct Frame

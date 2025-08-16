@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -139,11 +139,12 @@ class SpriteDrawCommand final : public DrawCommand
 friend class ObjectPoolBase<SpriteDrawCommand>;
 
 protected:
-	SpriteDrawCommand(Vec2i position, uint64 spriteKey, const Color& tintColor, Vec2f scale) : DrawCommand(Type::SPRITE), mPosition(position), mSpriteKey(spriteKey), mTintColor(tintColor), mScale(scale) {}
+	SpriteDrawCommand(Vec2i position, uint64 spriteKey, uint64 paletteKey, const Color& tintColor, Vec2f scale) : DrawCommand(Type::SPRITE), mPosition(position), mSpriteKey(spriteKey), mPaletteKey(paletteKey), mTintColor(tintColor), mScale(scale) {}
 
 public:
 	Vec2i mPosition;
 	uint64 mSpriteKey;
+	uint64 mPaletteKey;
 	Color mTintColor;
 	Vec2f mScale;
 };
@@ -319,7 +320,6 @@ public:
 	{
 		switch (drawCommand.getType())
 		{
-			case DrawCommand::Type::UNDEFINED:					break;	// This should never happen anyways
 			case DrawCommand::Type::SET_WINDOW_RENDER_TARGET:	mSetWindowRenderTargetDrawCommands.destroyObject(drawCommand.as<SetWindowRenderTargetDrawCommand>());  break;
 			case DrawCommand::Type::SET_RENDER_TARGET:			mSetRenderTargetDrawCommands.destroyObject(drawCommand.as<SetRenderTargetDrawCommand>());  break;
 			case DrawCommand::Type::RECT:						mRectDrawCommands.destroyObject(drawCommand.as<RectDrawCommand>());  break;
@@ -335,6 +335,8 @@ public:
 			case DrawCommand::Type::PRINT_TEXT_W:				mPrintTextWDrawCommands.destroyObject(drawCommand.as<PrintTextWDrawCommand>());  break;
 			case DrawCommand::Type::PUSH_SCISSOR:				mPushScissorDrawCommands.destroyObject(drawCommand.as<PushScissorDrawCommand>());  break;
 			case DrawCommand::Type::POP_SCISSOR:				mPopScissorDrawCommands.destroyObject(drawCommand.as<PopScissorDrawCommand>());  break;
+			default:
+				break;	// This should never happen anyways
 		}
 	}
 };

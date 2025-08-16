@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -228,7 +228,9 @@ namespace rmx
 		int sourceSamplePositionFraction = 0;
 		while (numOutputSamplesNeeded > 0)
 		{
+		#if !defined(PLATFORM_VITA)
 			RMX_ASSERT(audioInstance.mPosition <= audioBuffer.getLength(), "Audio instance position " << audioInstance.mPosition << " exceeding audio buffer length " << audioBuffer.getLength());
+		#endif
 			short* instanceData[2];
 			int numAvailableInputSamples = audioBuffer.getData(instanceData, audioInstance.mPosition);
 			if (numAvailableInputSamples <= 0)

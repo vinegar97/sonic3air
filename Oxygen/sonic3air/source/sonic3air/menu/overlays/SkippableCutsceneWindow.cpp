@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -38,7 +38,7 @@ void SkippableCutsceneWindow::render()
 {
 	Drawer& drawer = EngineMain::instance().getDrawer();
 
-	const Recti rect(roundToInt(mRect.width) - 140, 0, 140, 14);
+	const Recti rect(mRect.width - 140, 0, 140, 14);
 	const Color color(1.0f, 1.0f - std::fmod(mAnimationTimer * 2.0f, 1.0f) * 0.5f, 1.0f - std::fmod(mAnimationTimer * 2.0f, 1.0f), mVisibility);
 	drawer.printText(global::mOxyfontTiny, rect, "Fast forwarding cutscene", 5, color);
 }

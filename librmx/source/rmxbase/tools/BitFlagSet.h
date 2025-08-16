@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -134,6 +134,9 @@ public:
 		mFlags ^= static_cast<Storage>(flag);
 	}
 
+	inline Storage getValue() const  { return mFlags; }
+	inline Storage& accessValue()	 { return mFlags; }
+
 	inline bool operator==(const BitFlagSet& other) const
 	{
 		return (mFlags == other.mFlags);
@@ -149,6 +152,22 @@ public:
 		mFlags = other.mFlags;
 		return *this;
 	}
+
+	inline BitFlagSet operator|(const BitFlagSet& other) const	{ return BitFlagSet(mFlags | other.mFlags); }
+	inline BitFlagSet operator&(const BitFlagSet& other) const	{ return BitFlagSet(mFlags & other.mFlags); }
+	inline BitFlagSet operator^(const BitFlagSet& other) const	{ return BitFlagSet(mFlags ^ other.mFlags); }
+
+	inline BitFlagSet operator|(Enum flag) const  { return BitFlagSet(mFlags | static_cast<Storage>(flag)); }
+	inline BitFlagSet operator&(Enum flag) const  { return BitFlagSet(mFlags & static_cast<Storage>(flag)); }
+	inline BitFlagSet operator^(Enum flag) const  { return BitFlagSet(mFlags ^ static_cast<Storage>(flag)); }
+
+	inline void operator|=(const BitFlagSet& other)  { mFlags |= other.mFlags; }
+	inline void operator&=(const BitFlagSet& other)  { mFlags &= other.mFlags; }
+	inline void operator^=(const BitFlagSet& other)  { mFlags ^= other.mFlags; }
+
+	inline void operator|=(Enum flag)  { mFlags |= static_cast<Storage>(flag); }
+	inline void operator&=(Enum flag)  { mFlags &= static_cast<Storage>(flag); }
+	inline void operator^=(Enum flag)  { mFlags ^= static_cast<Storage>(flag); }
 
 private:
 	Storage mFlags = 0;   // Bitmask of the currently set flags, composed using bitwise OR

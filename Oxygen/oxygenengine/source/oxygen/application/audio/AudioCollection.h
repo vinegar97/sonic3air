@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -13,7 +13,7 @@
 class AudioSourceBase;
 
 
-class AudioCollection
+class AudioCollection : public SingleInstance<AudioCollection>
 {
 public:
 	enum class Package
@@ -96,7 +96,10 @@ public:
 	SourceRegistration* getSourceRegistration(uint64 keyId) const;
 	SourceRegistration* getSourceRegistration(uint64 keyId, Package preferredPackage) const;
 
+	inline uint32 getChangeCounter() const  { return mChangeCounter; }
+
 private:
 	std::map<uint64, AudioDefinition> mAudioDefinitions;
 	int mNumSourcesByPackageType[(size_t)Package::_NUM] = { 0 };
+	uint32 mChangeCounter = 0;
 };

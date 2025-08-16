@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -36,7 +36,7 @@ void RC4Encryption::encrypt(const void* source, void* dest, int length, const vo
 		j = (j + sbox[i]) & 0xff;
 		SWAP(sbox[i], sbox[j]);
 
-		int k = sbox[(sbox[i] + sbox[j]) & 0xff];
+		k = sbox[(sbox[i] + sbox[j]) & 0xff];
 		dst[m] = src[m] ^ k;
 	}
 }

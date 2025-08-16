@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -109,6 +109,15 @@ function void fn057f3e()
 		--objA0.countdown_value
 		if (objA0.countdown_value != 0)
 			return
+
+	#if STANDALONE
+		// Unload these weird collision objects (we don't need them any more), to make more place for the crumbling tower particles
+		for (u32 address = 0xffffb0de; address <= 0xffffca98; address += 0x4a)
+		{
+			if (u32[address] == 0x057b8e)
+				u32[address] = 0
+		}
+	#endif
 
 		if (allocDynamicObjectStd())
 		{
@@ -242,8 +251,8 @@ function void fn05806e()
 			u8[A2 + 0x04] = 0xff
 
 			u16[A1 + 0x1c] = 0x0800
-			objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 			objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+			objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 			objA1.state = char.state.ROLLING
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 			u8[A1 + 0x2e] = control_flag.DISABLE_UPDATE
@@ -561,7 +570,7 @@ function void fn0583a0()
 //# address-hook(0x0583a6) end(0x0583b8)
 function void fn0583a6()
 {
-	if (s8[A0 + 0x04] >= 0)
+	if (!(objA0.render_flags & render_flag.VISIBLE))
 	{
 		UnloadObject()
 		return
@@ -661,19 +670,17 @@ function void fn0583d2()
 //# address-hook(0x0584a2) end(0x0584d6)
 function void fn0584a2()
 {
-	D0.u16 = objA0.sprite_attributes
+	D0.s16 = objA0.sprite_attributes
 	if (D0.s16 < 0)
 	{
 		objA0.sprite_attributes = 0
-		++D0.u16
-		if (D0.u16 == 0)
+		if (D0.s16 == -1)
 		{
 			UnloadObject()
 			return
 		}
 
-		++D0.u16
-		objA0.animation.sprite = (D0.u16 == 0) ? 1 : 2
+		objA0.animation.sprite = (D0.u16 == -2) ? 1 : 2
 	}
 
 	objA0.update_address = 0x0584de
@@ -688,7 +695,7 @@ function void fn0584a2()
 //# address-hook(0x0584de) end(0x0584fc)
 function void fn0584de()
 {
-	if (s8[A0 + 0x04] >= 0)
+	if (!(objA0.render_flags & render_flag.VISIBLE))
 	{
 		UnloadObject()
 		return

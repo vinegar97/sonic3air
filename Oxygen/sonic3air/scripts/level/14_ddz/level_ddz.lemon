@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -336,7 +336,7 @@ function void fn081554()
 	objA0.position.x.u16 = camera.position.x.u16 - 0x20
 	objA0.position.y.u16 = camera.position.y.u16 + 0x20
 
-	copyMemory(0xfffffab0, 0x081602, 0x08)
+	copyMemory(0xfffffab0, 0x081602, 8)
 	level.vertical_wrap = 0
 	move_area.bottom.current = 0x0120
 	move_area.bottom.target = 0x0120

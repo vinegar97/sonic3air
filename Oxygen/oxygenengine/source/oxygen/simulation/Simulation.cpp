@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,7 +10,11 @@
 #include "oxygen/simulation/Simulation.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
+#include "oxygen/simulation/GameRecorder.h"
+#include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/SaveStateSerializer.h"
+#include "oxygen/simulation/SimulationState.h"
+#include "oxygen/simulation/analyse/ROMDataAnalyser.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/audio/AudioOutBase.h"
@@ -18,22 +22,20 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/helper/Logging.h"
+#include "oxygen/network/netplay/NetplayManager.h"
 #include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/rendering/parts/RenderParts.h"
-#include "oxygen/simulation/GameRecorder.h"
-#include "oxygen/simulation/LogDisplay.h"
-#include "oxygen/simulation/analyse/ROMDataAnalyser.h"
 
 
 namespace
 {
-	void recordKeyFrame(uint32 frameNumber, CodeExec& codeExec, GameRecorder& gameRecorder, const GameRecorder::InputData& inputData)
+	void recordKeyFrame(uint32 frameNumber, Simulation& simulation, GameRecorder& gameRecorder, const GameRecorder::InputData& inputData)
 	{
 		static std::vector<uint8> data;
 		data.reserve(0x128000);
 		data.clear();
 
-		SaveStateSerializer serializer(codeExec, RenderParts::instance());
+		SaveStateSerializer serializer(simulation, RenderParts::instance());
 		serializer.saveState(data);
 
 		gameRecorder.addKeyFrame(frameNumber, inputData, data);
@@ -43,6 +45,7 @@ namespace
 
 Simulation::Simulation() :
 	mCodeExec(*new CodeExec()),
+	mSimulationState(*new SimulationState()),
 	mGameRecorder(*new GameRecorder()),
 	mInputRecorder(*new InputRecorder())
 {
@@ -55,6 +58,7 @@ Simulation::Simulation() :
 Simulation::~Simulation()
 {
 	delete &mCodeExec;
+	delete &mSimulationState;
 	delete &mGameRecorder;
 	delete &mInputRecorder;
 	delete mROMDataAnalyser;
@@ -91,7 +95,7 @@ bool Simulation::startup()
 		mInputRecorder.initFromConfig();
 	}
 
-	if (config.mGameRecorder.mIsPlayback)
+	if (mGameRecorder.isPlaying())
 	{
 		// Try the long and short name
 		if (mGameRecorder.loadRecording(L"gamerecording.bin"))
@@ -147,6 +151,9 @@ void Simulation::resetIntoGame(const std::vector<std::pair<std::string, std::str
 	// Reset randomization
 	randomize();
 
+	// Reset simulation
+	mSimulationState.reset();
+
 	// Reset video & audio
 	VideoOut::instance().reset();
 	EngineMain::instance().getAudioOut().resetGame();
@@ -162,21 +169,13 @@ void Simulation::resetIntoGame(const std::vector<std::pair<std::string, std::str
 	}
 
 	// Apply mod settings
-	for (Mod* mod : ModManager::instance().getActiveMods())
-	{
-		for (Mod::SettingCategory& modSettingCategory : mod->mSettingCategories)
-		{
-			for (Mod::Setting& modSetting : modSettingCategory.mSettings)
-			{
-				mCodeExec.getLemonScriptRuntime().setGlobalVariableValue_int64(modSetting.mBinding, modSetting.mCurrentValue);
-			}
-		}
-	}
+	applyModSettingsToGlobals();
 
 	mFrameNumber = 0;
 	mCurrentTargetFrame = 0.0;
-	mNextSingleStep = false;
-	mSingleStepContinue = false;
+	mLastCorrectionFrame = 0;
+	mStepsLimit = -1;
+	mBreakConditions.clearAll();
 	mGameRecorder.clear();
 }
 
@@ -200,7 +199,7 @@ bool Simulation::loadState(const std::wstring& filename, bool showError)
 	EngineMain::instance().getAudioOut().reset();
 
 	SaveStateSerializer::StateType stateType;
-	SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
+	SaveStateSerializer serializer(*this, RenderParts::instance());
 
 	const bool success = serializer.loadState(filename, &stateType);
 	if (!success)
@@ -213,10 +212,16 @@ bool Simulation::loadState(const std::wstring& filename, bool showError)
 	mStateLoaded = filename;
 	mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
 
+	if (Configuration::instance().mDevMode.mApplyModSettingsAfterLoadState)
+	{
+		applyModSettingsToGlobals();
+	}
+
 	mFrameNumber = 0;
 	mCurrentTargetFrame = 0.0;
-	mNextSingleStep = false;
-	mSingleStepContinue = false;
+	mLastCorrectionFrame = 0;
+	mStepsLimit = -1;
+	mBreakConditions.clearAll();
 
 	mGameRecorder.clear();
 	return true;
@@ -224,7 +229,7 @@ bool Simulation::loadState(const std::wstring& filename, bool showError)
 
 void Simulation::saveState(const std::wstring& filename)
 {
-	SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
+	SaveStateSerializer serializer(*this, RenderParts::instance());
 	const bool success = serializer.saveState(filename);
 	RMX_CHECK(success, "Failed to save save state '" << WString(filename).toStdString() << "'", return);
 
@@ -258,8 +263,13 @@ void Simulation::update(float timeElapsed)
 	if (mRewindSteps >= 0)
 	{
 		setSpeed(0.0f);
-		if (mRewindSteps >= 1)
-			jumpToFrame(mFrameNumber - mRewindSteps);
+		while (mRewindSteps >= 1)
+		{
+			if (jumpToFrame(mFrameNumber - mRewindSteps))
+				mRewindSteps = 0;
+			else
+				--mRewindSteps;		// Try again with one step less
+		}
 		mRewindSteps = -1;
 	}
 
@@ -268,22 +278,21 @@ void Simulation::update(float timeElapsed)
 
 	// Do nothing as long as not enough time has passed
 	const double oldTargetFrame = mCurrentTargetFrame;
-	if (mSimulationSpeed <= 0.0f)
+	if (mStepsLimit < 0)
 	{
-		if (mNextSingleStep)
+		if (mSimulationSpeed > 0.0f)
 		{
-			mCurrentTargetFrame = roundToDouble(mCurrentTargetFrame + 1.0);
-			mNextSingleStep = mSingleStepContinue;
+			const float step = timeElapsed * mSimulationSpeed;
+			mCurrentTargetFrame += (double)step * (double)getSimulationFrequency();
 		}
 		else
 		{
 			mCurrentTargetFrame = roundToDouble(mCurrentTargetFrame);
 		}
 	}
-	else
+	else if (mStepsLimit > 0)
 	{
-		const float step = timeElapsed * mSimulationSpeed;
-		mCurrentTargetFrame += (double)step * (double)getSimulationFrequency();
+		mCurrentTargetFrame = roundToDouble(mCurrentTargetFrame + 1.0);
 	}
 
 	const bool useFrameInterpolation = (Configuration::instance().mFrameSync == Configuration::FrameSyncType::FRAME_INTERPOLATION);
@@ -311,7 +320,7 @@ void Simulation::update(float timeElapsed)
 		}
 
 		// Each second, a small correction to the accumulated time gets applied
-		if ((int)(mFrameNumber - mLastCorrectionFrame) >= (int)getSimulationFrequency())
+		if ((int)(mFrameNumber - mLastCorrectionFrame) >= (int)getSimulationFrequency() || mFrameNumber < mLastCorrectionFrame)
 		{
 			// The idea here is to bring the accumulated time towards the midpoint, where it's most stable against unintentional double frames or frame skips (which might happen otherwise)
 			//  -> This is most useful for 60 Hz displays with V-sync on, but should have a similar effect on e.g. 75 Hz, 90 Hz, 120 Hz
@@ -344,18 +353,19 @@ void Simulation::update(float timeElapsed)
 bool Simulation::generateFrame()
 {
 	ControlsIn& controlsIn = ControlsIn::instance();
-	const bool isGameRecorderPlayback = Configuration::instance().mGameRecorder.mIsPlayback;
-	const bool isGameRecorderRecording = Configuration::instance().mGameRecorder.mIsRecording;
 
 	const bool beginningNewFrame = mCodeExec.willBeginNewFrame();
 	const float tickLength = 1.0f / getSimulationFrequency();
 
 	bool completedCurrentFrame = false;
-	bool inputWasInjected = false;
 
 	// Steps to do when beginning a new frame
 	if (beginningNewFrame)
 	{
+		// Check if we can even begin a new frame
+		if (!NetplayManager::instance().canBeginNextFrame(mFrameNumber))
+			return false;
+
 		// Tell game instance
 		EngineMain::getDelegate().onPreFrameUpdate();
 
@@ -363,24 +373,29 @@ bool Simulation::generateFrame()
 		VideoOut::instance().preFrameUpdate();
 
 		// Game recorder: Save initial frame
-		if (isGameRecorderRecording && mGameRecorder.getRangeEnd() == 0)
+		if (mGameRecorder.isRecording() && mGameRecorder.getRangeEnd() == 0)
 		{
-			recordKeyFrame(0, mCodeExec, mGameRecorder, GameRecorder::InputData());
+			recordKeyFrame(0, *this, mGameRecorder, GameRecorder::InputData());
 		}
+
+		controlsIn.beginInputUpdate();
+
+		// Update netplay
+		NetplayManager::instance().onFrameUpdate(controlsIn, mFrameNumber);
 
 		// If game recorder has input data for the frame transition, then use that
 		//  -> This is particularly relevant for rewinds, namely for the small fast forwards from the previous keyframe
 		GameRecorder::PlaybackResult result;
 		if (mGameRecorder.getFrameData(mFrameNumber + 1, result))
 		{
-			if (isGameRecorderPlayback)
+			if (mGameRecorder.isPlaying())
 				LogDisplay::instance().setModeDisplay("Game recorder playback at frame: " + std::to_string(mFrameNumber + 1));
 
 			if (nullptr != result.mData && !Configuration::instance().mGameRecorder.mPlaybackIgnoreKeys)
 			{
 				// Load save state
 				SaveStateSerializer::StateType stateType;
-				SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
+				SaveStateSerializer serializer(*this, RenderParts::instance());
 
 				const bool success = serializer.loadState(*result.mData, &stateType);
 				if (success)
@@ -394,26 +409,22 @@ bool Simulation::generateFrame()
 				}
 			}
 
-			ControlsIn::instance().injectInput(0, result.mInput->mInputs[0]);
-			ControlsIn::instance().injectInput(1, result.mInput->mInputs[1]);
-			inputWasInjected = true;
+			controlsIn.injectInputs(result.mInput->mInputs);
+		}
+
+		// Input recorder playback
+		if (EngineMain::getDelegate().useDeveloperFeatures())
+		{
+			if (mInputRecorder.isPlaying())
+			{
+				const InputRecorder::InputState& inputState = mInputRecorder.updatePlayback(mFrameNumber);
+				controlsIn.injectInputs(inputState.mInputFlags);
+			}
 		}
 
 		// Update input state
 		{
-			if (EngineMain::getDelegate().useDeveloperFeatures())
-			{
-				// Input recorder playback
-				if (mInputRecorder.isPlaying())
-				{
-					const InputRecorder::InputState& inputState = mInputRecorder.updatePlayback(mFrameNumber);
-					controlsIn.injectInput(0, inputState.mInputFlags[0]);
-					controlsIn.injectInput(1, inputState.mInputFlags[1]);
-					inputWasInjected = true;
-				}
-			}
-
-			controlsIn.update(!inputWasInjected);
+			controlsIn.endInputUpdate();
 
 			EngineMain::getDelegate().onControlsUpdate();
 
@@ -436,36 +447,32 @@ bool Simulation::generateFrame()
 		// Tell video that we begin a new frame
 		VideoOut::instance().postFrameUpdate();
 
-		// Update audio
-		EngineMain::instance().getAudioOut().update(tickLength);
-
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
 			// Update input recording
 			if (mInputRecorder.isRecording())
 			{
 				InputRecorder::InputState inputState;
-				inputState.mInputFlags[0] = controlsIn.getInputPad(0);
-				inputState.mInputFlags[1] = controlsIn.getInputPad(1);
+				controlsIn.writeCurrentState(inputState.mInputFlags);
+
 				mInputRecorder.updateRecording(inputState);
 			}
 		}
 
 		// Update game recording
-		if (isGameRecorderRecording)
+		if (mGameRecorder.isRecording())
 		{
 			if (!mGameRecorder.hasFrameNumber(mFrameNumber + 1))
 			{
 				GameRecorder::InputData inputData;
-				inputData.mInputs[0] = controlsIn.getInputPad(0);
-				inputData.mInputs[1] = controlsIn.getInputPad(1);
+				controlsIn.writeCurrentState(inputData.mInputs);
 
 				// Keyframe every 3 seconds - except when dev mode is active, because rewinding requires more frequent keyframes
 				const int keyframeFrequency = EngineMain::getDelegate().useDeveloperFeatures() ? 10 : 180;
 				const int framesToKeep = EngineMain::getDelegate().useDeveloperFeatures() ? 3600 : 1800;
 				if (((mFrameNumber + 1) % keyframeFrequency) == 0)
 				{
-					recordKeyFrame(mFrameNumber + 1, mCodeExec, mGameRecorder, inputData);
+					recordKeyFrame(mFrameNumber + 1, *this, mGameRecorder, inputData);
 					mGameRecorder.discardOldFrames(framesToKeep);
 				}
 				else
@@ -474,20 +481,23 @@ bool Simulation::generateFrame()
 				}
 			}
 		}
-		else if (isGameRecorderPlayback && EngineMain::getDelegate().useDeveloperFeatures())
+		else if (mGameRecorder.isPlaying() && EngineMain::getDelegate().useDeveloperFeatures())
 		{
 			// Generate a keyframe every 10 frames, to allow for quick rewinds during game recording playback as well
 			const int keyframeFrequency = 10;
-			if (((mFrameNumber + 1) % keyframeFrequency) == 0 && !mGameRecorder.isKeyframe(mFrameNumber + 1))
+			if (((mFrameNumber + 1) % keyframeFrequency) == 0 && !mGameRecorder.isKeyframe(mFrameNumber + 1) && mGameRecorder.canAddFrame(mFrameNumber + 1))
 			{
 				GameRecorder::InputData inputData;
-				inputData.mInputs[0] = controlsIn.getInputPad(0);
-				inputData.mInputs[1] = controlsIn.getInputPad(1);
-				recordKeyFrame(mFrameNumber + 1, mCodeExec, mGameRecorder, inputData);
+				controlsIn.writeCurrentState(inputData.mInputs);
+
+				recordKeyFrame(mFrameNumber + 1, *this, mGameRecorder, inputData);
 			}
 		}
 
 		++mFrameNumber;
+
+		if (mStepsLimit > 0)
+			--mStepsLimit;
 	}
 
 	// Return false if frame got interrupted
@@ -498,12 +508,9 @@ bool Simulation::generateFrame()
 
 bool Simulation::jumpToFrame(uint32 frameNumber, bool clearRecordingAfterwards)
 {
-	const bool isGameRecorderPlayback = Configuration::instance().mGameRecorder.mIsPlayback;
-	const bool isGameRecorderRecording = Configuration::instance().mGameRecorder.mIsRecording;
-
-	if (isGameRecorderRecording || isGameRecorderPlayback)
+	if (mGameRecorder.isRecording() || mGameRecorder.isPlaying())
 	{
-		if (isGameRecorderPlayback)
+		if (mGameRecorder.isPlaying())
 			clearRecordingAfterwards = false;
 
 		// Go back until the most recent keyframe, in case the selected frame is not a keyframe itself
@@ -522,14 +529,13 @@ bool Simulation::jumpToFrame(uint32 frameNumber, bool clearRecordingAfterwards)
 		}
 
 		SaveStateSerializer::StateType stateType;
-		SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
+		SaveStateSerializer serializer(*this, RenderParts::instance());
 
 		const bool success = serializer.loadState(*result.mData, &stateType);
 		if (success)
 		{
 			// Inject inputs for this frame, so that previous input will be set correctly in the next frame
-			ControlsIn::instance().injectInput(0, result.mInput->mInputs[0]);
-			ControlsIn::instance().injectInput(1, result.mInput->mInputs[1]);
+			ControlsIn::instance().injectInputs(result.mInput->mInputs);
 
 			mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
 			mFrameNumber = keyframeNumber;
@@ -547,6 +553,14 @@ bool Simulation::jumpToFrame(uint32 frameNumber, bool clearRecordingAfterwards)
 	return false;
 }
 
+int Simulation::setRewind(int rewindSteps)
+{
+	mRewindSteps = rewindSteps;
+	if (mGameRecorder.isRecording())
+		mRewindSteps = std::min<int>(mFrameNumber - mGameRecorder.getRangeStart(), mRewindSteps);
+	return mRewindSteps;
+}
+
 float Simulation::getSimulationFrequency() const
 {
 	return (mSimulationFrequencyOverride > 0.0f) ? mSimulationFrequencyOverride : (float)Configuration::instance().mSimulationFrequency;
@@ -555,23 +569,30 @@ float Simulation::getSimulationFrequency() const
 void Simulation::setSpeed(float emulatorSpeed)
 {
 	mSimulationSpeed = emulatorSpeed;
-	mNextSingleStep = false;
-	mSingleStepContinue = false;
+	mStepsLimit = -1;
+	mBreakConditions.clearAll();
 }
 
-void Simulation::setNextSingleStep(bool singleStep, bool continueToDebugEvent)
+void Simulation::setNextSingleStep()
 {
-	mSimulationSpeed = 0.0f;
-	mNextSingleStep = singleStep;
-	mSingleStepContinue = continueToDebugEvent;
+	mStepsLimit = 1;
 }
 
-void Simulation::stopSingleStepContinue()
+void Simulation::removeStepsLimit()
 {
-	if (mSingleStepContinue)
+	mStepsLimit = -1;
+}
+
+void Simulation::setBreakCondition(BreakCondition breakCondition, bool enable)
+{
+	mBreakConditions.set(breakCondition, enable);
+}
+
+void Simulation::sendBreakSignal(BreakCondition breakCondition)
+{
+	if (mBreakConditions.isSet(breakCondition))
 	{
-		mNextSingleStep = false;
-		mSingleStepContinue = false;
+		mStepsLimit = 0;
 	}
 }
 
@@ -599,4 +620,19 @@ uint32 Simulation::saveGameRecording(WString* outFilename)
 		*outFilename = filename;
 
 	return mGameRecorder.getCurrentNumberOfFrames();
+}
+
+void Simulation::applyModSettingsToGlobals()
+{
+	// Apply mod settings
+	for (Mod* mod : ModManager::instance().getActiveMods())
+	{
+		for (Mod::SettingCategory& modSettingCategory : mod->mSettingCategories)
+		{
+			for (Mod::Setting& modSetting : modSettingCategory.mSettings)
+			{
+				mCodeExec.getLemonScriptRuntime().setGlobalVariableValue<int64>(modSetting.mBinding, modSetting.mCurrentValue);
+			}
+		}
+	}
 }

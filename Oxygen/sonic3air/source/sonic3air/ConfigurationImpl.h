@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -10,7 +10,10 @@
 
 #include "oxygen/application/Configuration.h"
 
+#include "sonic3air/data/GameSettings.h"
+
 class GameProfile;
+class JsonSerializer;
 
 
 class ConfigurationImpl : public ::Configuration
@@ -32,12 +35,13 @@ public:
 
 protected:
 	void preLoadInitialization() override;
-	bool loadConfigurationInternal(JsonHelper& jsonHelper) override;
-	bool loadSettingsInternal(JsonHelper& rootHelper, SettingsType settingsType) override;
-	void saveSettingsInternal(Json::Value& root, SettingsType settingsType) override;
+	bool loadConfigurationInternal(JsonSerializer& serializer) override;
+	bool loadSettingsInternal(JsonSerializer& serializer, SettingsType settingsType) override;
+	void saveSettingsInternal(JsonSerializer& serializer, SettingsType settingsType) override;
 
 private:
-	void loadSharedSettingsConfig(JsonHelper& rootHelper);
+	void serializeSettingsInternal(JsonSerializer& serializer);
+	void serializeSharedSettingsConfig(JsonSerializer& serializer);
 
 public:
 	// Audio
@@ -46,7 +50,11 @@ public:
 	int mActiveSoundtrack = 1;		// 0 = emulated, 1 = remastered
 
 	// Input
+#if !defined(PLATFORM_VITA)
 	int mGamepadVisualStyle = 0;
+#else
+	int mGamepadVisualStyle = 1;
+#endif
 
 	// Time Attack
 	int mInstantTimeAttackRestart = 0;
@@ -72,14 +80,15 @@ public:
 		bool mShowOffscreenGhosts = true;
 		int mGhostRendering = 3;
 	};
-	struct GameServer
+	struct GameServerImpl
 	{
-		std::string mServerHostName = "sonic3air.org";
-		int mServerPortUDP = 21094;		// Used by most platforms
-		int mServerPortTCP = 21095;		// Used only as a fallback for UDP
-		int mServerPortWSS = 21096;		// Used by the web version
 		UpdateCheck mUpdateCheck;
 		GhostSync mGhostSync;
 	};
-	GameServer mGameServer;
+	GameServerImpl mGameServerImpl;
+
+	// Game settings
+	GameSettings mLocalGameSettings;			// Loaded from local settings
+	GameSettings mAlternativeGameSettings;		// Used in netplay and game recording playback
+	GameSettings* mActiveGameSettings = nullptr;
 };

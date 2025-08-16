@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -36,9 +36,10 @@ public:
 	Vec3(const Vec3& source) : x(source.x), y(source.y), z(source.z) {}
 	Vec3(TYPE x_, TYPE y_, TYPE z_) : x(x_), y(y_), z(z_) {}
 
-	template<typename T> Vec3(const Vec3<T>& source)
+	template<typename T> explicit Vec3(const Vec3<T>& source)
 	{
-		FORi(data[i] = TYPE(source.data[i]));
+		for (int i = 0; i < 3; ++i)
+			data[i] = rmx::convertType<T, TYPE>(source.data[i]);
 	}
 
 	void clear()
@@ -96,17 +97,35 @@ public:
 		return sum;
 	}
 
-	TYPE distance(const Vec3& other) const
+	static float distance(const Vec3& source1, const Vec3& source2)
 	{
 		TYPE sum = 0;
-		FORi(sum += (data[i] - other.data[i]) * (data[i] - other.data[i]));
-		return sqrt(sum);
+		FORi(sum += (source1.data[i] - source2.data[i]) * (source1.data[i] - source2.data[i]));
+		return sqrtf((float)sum);
+	}
+
+	float distance(const Vec3& other) const
+	{
+		return distance(*this, other);
+	}
+
+	static TYPE sqrDist(const Vec3& source1, const Vec3& source2)
+	{
+		TYPE sum = 0;
+		FORi(sum += (source1.data[i] - source2.data[i]) * (source1.data[i] - source2.data[i]));
+		return sum;
 	}
 
 	TYPE sqrDist(const Vec3& other) const
 	{
+		return sqrDist(*this, other);
+	}
+
+	static TYPE dot(const Vec3& source1, const Vec3& source2)
+	{
+		// Dot product
 		TYPE sum = 0;
-		FORi(sum += (data[i] - other.data[i]) * (data[i] - other.data[i]));
+		FORi(sum += (source1.data[i] * source2.data[i]));
 		return sum;
 	}
 
@@ -118,26 +137,22 @@ public:
 		return sum;
 	}
 
-	void cross(const Vec3& source1, const Vec3& source2)
+	static Vec3 crossProduct(const Vec3& source1, const Vec3& source2)
 	{
 		// Cross product
+		Vec3 result(Uninitialized);
 		const TYPE* src1 = source1.data;
 		const TYPE* src2 = source2.data;
-		x = (src1[1] * src2[2] - src1[2] * src2[1]);
-		y = (src1[2] * src2[0] - src1[0] * src2[2]);
-		z = (src1[0] * src2[1] - src1[1] * src2[0]);
+		result.x = (src1[1] * src2[2] - src1[2] * src2[1]);
+		result.y = (src1[2] * src2[0] - src1[0] * src2[2]);
+		result.z = (src1[0] * src2[1] - src1[1] * src2[0]);
+		return result;
 	}
 
-	void cross(const Vec3& source0, const Vec3& source1, const Vec3& source2)
+	static Vec3 crossProduct(const Vec3& source0, const Vec3& source1, const Vec3& source2)
 	{
 		// Cross product for triangles
-		TYPE src1[3];
-		TYPE src2[3];
-		FORi(src1[i] = source1.data[i] - source0.data[i]);
-		FORi(src2[i] = source2.data[i] - source0.data[i]);
-		x = (src1[1] * src2[2] - src1[2] * src2[1]);
-		y = (src1[2] * src2[0] - src1[0] * src2[2]);
-		z = (src1[0] * src2[1] - src1[1] * src2[0]);
+		return crossProduct(source1 - source0, source2 - source1);
 	}
 
 	void mirror(const Vec3& axis)
@@ -199,14 +214,11 @@ public:
 		FORi(data[i] = tmp[i]);
 	}
 
-	void interpolate(const Vec3& other, TYPE factor)
+	static Vec3 interpolate(const Vec3& source1, const Vec3& source2, TYPE factor)
 	{
-		FORi(data[i] = data[i] * (1 - factor) + other.data[i] * factor);
-	}
-
-	void interpolate(const Vec3& source1, const Vec3& source2, TYPE factor)
-	{
-		FORi(data[i] = source1.data[i] * (1 - factor) + source2.data[i] * factor);
+		Vec3 result(Uninitialized);
+		FORi(result.data[i] = source1.data[i] * (1 - factor) + source2.data[i] * factor);
+		return result;
 	}
 
 	bool operator==(const Vec3& vec) const	{ FORi( if (data[i] != vec.data[i]) return false; ); return true;  }

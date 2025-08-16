@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -69,6 +69,17 @@ namespace lowlevel
 	};
 
 
+	struct TerminateConnectionPacket : public PacketBase
+	{
+		static const constexpr uint16 SIGNATURE = 0x7e75;
+		virtual uint16 getSignature() const override  { return SIGNATURE; }
+
+		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
+		{
+		}
+	};
+
+
 	struct ErrorPacket : public PacketBase
 	{
 		enum class ErrorCode : uint8
@@ -76,7 +87,7 @@ namespace lowlevel
 			// The errors marking with (*) are sent without an actual establishes connection - that means they do not include a proper local connection ID and just re-use the received remote connection ID
 			UNKNOWN					= 0,
 			CONNECTION_INVALID		= 1,	// (*) Received a packet with an unknown connection ID
-			UNSUPPORTED_VERSION		= 2,	// (*) Received a start connection packet that uses protocol versions that can't be supported
+			UNSUPPORTED_VERSION		= 2,	// (*) Received a start connection packet (or other) that uses protocol versions that can't be supported
 			TOO_MANY_CONNECTIONS	= 3,	// (*) Remote server / client has too many active connections already
 		};
 		ErrorCode mErrorCode = ErrorCode::UNKNOWN;

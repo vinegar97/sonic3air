@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,9 +8,10 @@
 
 #pragma once
 
+#include <rmxbase.h>
 
 class PatternManager;
-class PaletteBitmap;
+
 
 class PlaneManager
 {
@@ -66,7 +67,7 @@ public:
 	inline uint16 getPlaneAWSplit() const  { return mPlaneAWSplit; }
 	void setupPlaneW(bool use, uint16 splitY);
 
-	void dumpAsPaletteBitmap(PaletteBitmap& output, int planeIndex) const;
+	void dumpAsPaletteBitmap(PaletteBitmap& output, int planeIndex, bool highlightPrioPatterns = false) const;
 
 	inline bool isDefaultPlaneEnabled(uint8 index) const  { return !mDisabledDefaultPlane[index]; }
 	void setDefaultPlaneEnabled(uint8 index, bool enabled);

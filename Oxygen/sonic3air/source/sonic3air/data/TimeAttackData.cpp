@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -67,7 +67,7 @@ TimeAttackData::Table& TimeAttackData::loadTable(uint16 zoneAndAct, uint8 catego
 		{
 			const Json::Value file = rec["File"];
 			const Json::Value time = rec["Time"];
-			if (file.isString())
+			if (file.isString() && time.isString())
 			{
 				Entry& entry = vectorAdd(timeAttackTable->mEntries);
 				entry.mFilename = *String(file.asString()).toWString();

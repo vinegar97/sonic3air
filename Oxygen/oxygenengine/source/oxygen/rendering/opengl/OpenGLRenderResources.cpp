@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -12,6 +12,7 @@
 
 #include "oxygen/rendering/opengl/OpenGLRenderResources.h"
 #include "oxygen/rendering/parts/RenderParts.h"
+#include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 
 
 namespace
@@ -23,7 +24,7 @@ namespace
 		{
 			const int offset = firstPattern * 0x40;
 			const int size = (lastPattern - firstPattern + 1) * 0x40;
-			glBufferSubData(GL_TEXTURE_BUFFER, offset, size, bitmap.mData + offset);
+			glBufferSubData(GL_TEXTURE_BUFFER, offset, size, bitmap.getData() + offset);
 		}
 		else
 	#endif
@@ -32,39 +33,34 @@ namespace
 			if (lastPattern - firstPattern >= 0x700)
 			{
 				// Update the whole texture
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 0x40, 0x800, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, bitmap.mData);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 0x40, 0x800, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, bitmap.getData());
 			}
 			else
 			{
 				// Update only the changed lines
 				//  -> There's exactly one patterns per texture row
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, firstPattern, 0x40, (lastPattern - firstPattern + 1), GL_LUMINANCE, GL_UNSIGNED_BYTE, &bitmap.mData[firstPattern * 0x40]);
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, firstPattern, 0x40, (lastPattern - firstPattern + 1), GL_LUMINANCE, GL_UNSIGNED_BYTE, &bitmap[firstPattern * 0x40]);
 			}
 		}
 	}
 }
 
 
-OpenGLRenderResources::OpenGLRenderResources(RenderParts& renderParts) :
-	mRenderParts(renderParts)
+OpenGLRenderResources::OpenGLRenderResources(RenderParts& renderParts, OpenGLDrawerResources& drawerResources) :
+	mRenderParts(renderParts),
+	mDrawerResources(drawerResources)
 {
 	clearAllCaches();
 }
 
 void OpenGLRenderResources::initialize()
 {
-	// Palettes
-	{
-		mPaletteBitmap.create(256, Palette::NUM_COLORS / 256 * 2);
-		mPaletteTexture.setup(mPaletteBitmap.getSize(), rmx::OpenGLHelper::FORMAT_RGBA);
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
+	// Main palette
+	mMainPalette.mBitmap.create(mDrawerResources.getPaletteTextureSize());
 
 	// Patterns
-	{
-		mPatternCacheBitmap.create(0x40, 0x800);
-		mPatternCacheTexture.create(BufferTexture::PixelFormat::UINT_8, mPatternCacheBitmap.getSize());
-	}
+	mPatternCacheBitmap.create(0x40, 0x800);
+	mPatternCacheTexture.create(BufferTexture::PixelFormat::UINT_8, mPatternCacheBitmap.getSize());
 
 	// Planes & scrolling
 	{
@@ -90,50 +86,10 @@ void OpenGLRenderResources::refresh()
 
 	// Update palettes
 	{
-		Bitmap& bitmap = mPaletteBitmap;
 		PaletteManager& paletteManager = mRenderParts.getPaletteManager();
-		const uint32* palette0 = paletteManager.getPalette(0).getData();
-		const uint32* palette1 = paletteManager.getPalette(1).getData();
-
-		// First check if there were any changes since the last refresh at all
-		bool primaryPaletteChanged = false;
-		bool secondaryPaletteChanged = false;
+		if (mDrawerResources.updatePalette(mMainPalette, paletteManager.getMainPalette(0), paletteManager.getMainPalette(1)))
 		{
-			const uint64* changeFlags0 = paletteManager.getPalette(0).getChangeFlags();
-			const uint64* changeFlags1 = paletteManager.getPalette(1).getChangeFlags();
-			for (int k = 0; k < Palette::NUM_COLORS / 64; ++k)
-			{
-				// For all changed flags, copy over the respective data
-				if (changeFlags0[k] != 0)
-				{
-					memcpy(bitmap.getPixelPointer((k * 64) % 256, (k * 64) / 256), palette0 + k * 64, 64 * sizeof(uint32));
-					primaryPaletteChanged = true;
-				}
-				if (changeFlags1[k] != 0)
-				{
-					memcpy(bitmap.getPixelPointer((k * 64) % 256, (k * 64) / 256 + 2), palette1 + k * 64, 64 * sizeof(uint32));
-					secondaryPaletteChanged = true;
-				}
-			}
-		}
-
-		if (primaryPaletteChanged || secondaryPaletteChanged)
-		{
-			// Upload changes to the GPU
-			glBindTexture(GL_TEXTURE_2D, mPaletteTexture.getHandle());
-			if (secondaryPaletteChanged)
-			{
-				// Update everything
-				glTexImage2D(GL_TEXTURE_2D, 0, rmx::OpenGLHelper::FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, bitmap.getData());
-			}
-			else
-			{
-				// Update only the primary palette
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 2, GL_RGBA, GL_UNSIGNED_BYTE, bitmap.getData());
-			}
 			glBindTexture(GL_TEXTURE_2D, 0);
-
-			paletteManager.resetAllPaletteChangeFlags();
 		}
 	}
 
@@ -181,7 +137,7 @@ void OpenGLRenderResources::refresh()
 			for (int k = currentChanges.mFirst; k <= currentChanges.mLast; ++k)
 			{
 				const uint8* src = patternCache[k].mFlipVariation[0].mPixels;
-				uint8* dst = &bitmap.mData[k * 0x40];
+				uint8* dst = &bitmap[k * 0x40];
 				memcpy(dst, src, 0x40);
 			}
 
@@ -259,7 +215,32 @@ void OpenGLRenderResources::refresh()
 void OpenGLRenderResources::clearAllCaches()
 {
 	mAllPatternsDirty = true;
-	mRenderParts.getPaletteManager().setAllPaletteChangeFlags();
+
+	// Palettes
+	for (int k = 0; k < 2; ++k)
+		--mMainPalette.mChangeCounters[k];		// This should suffice to have out-dated change counters again
+}
+
+const OpenGLTexture& OpenGLRenderResources::getPaletteTexture(const PaletteBase* primaryPalette, const PaletteBase* secondaryPalette)
+{
+	if (nullptr == primaryPalette && nullptr == secondaryPalette)
+	{
+		return getMainPaletteTexture();
+	}
+	else
+	{
+		if (nullptr == primaryPalette)
+			primaryPalette = &mRenderParts.getPaletteManager().getMainPalette(0);
+		if (nullptr == secondaryPalette)
+			secondaryPalette = &mRenderParts.getPaletteManager().getMainPalette(1);
+		return mDrawerResources.getCustomPaletteTexture(*primaryPalette, *secondaryPalette);
+	}
+}
+
+const BufferTexture& OpenGLRenderResources::getPlanePatternsTexture(int planeIndex) const
+{
+	RMX_ASSERT(planeIndex >= 0 && planeIndex < 4, "Invalid plane index " << planeIndex);
+	return mPlanePatternsTexture[planeIndex];
 }
 
 const BufferTexture& OpenGLRenderResources::getHScrollOffsetsTexture(int scrollOffsetsIndex) const

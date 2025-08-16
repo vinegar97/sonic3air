@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -13,14 +13,33 @@
 #include "oxygen/rendering/opengl/OpenGLRenderer.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/application/Configuration.h"
+#include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
 #include "oxygen/helper/FileHelper.h"
+#include "oxygen/rendering/opengl/shaders/DebugDrawPlaneShader.h"
+#include "oxygen/rendering/opengl/shaders/PostFXBlurShader.h"
+#include "oxygen/rendering/opengl/shaders/RenderComponentSpriteShader.h"
+#include "oxygen/rendering/opengl/shaders/RenderPaletteSpriteShader.h"
+#include "oxygen/rendering/opengl/shaders/RenderPlaneShader.h"
+#include "oxygen/rendering/opengl/shaders/RenderVdpSpriteShader.h"
+#include "oxygen/rendering/opengl/shaders/SimpleCopyScreenShader.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectColoredShader.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectOverdrawShader.h"
+#include "oxygen/rendering/opengl/shaders/SimpleRectTexturedShader.h"
 #include "oxygen/simulation/LogDisplay.h"
 
 
 namespace
 {
+	OpenGLDrawerResources& getDrawerResources()
+	{
+		DrawerInterface* drawer = EngineMain::instance().getDrawer().getActiveDrawer();
+		RMX_ASSERT(nullptr != drawer, "Set active drawer set");
+		RMX_ASSERT(drawer->getType() == Drawer::Type::OPENGL, "Expected OpenGL drawer");
+		return static_cast<OpenGLDrawer*>(drawer)->getResources();
+	}
+
 	Vec4f calculateBlurKernel(float x)
 	{
 		// Calculate 3x3 blur kernel, represented by only 4 values A, B, C, D
@@ -44,7 +63,7 @@ namespace
 		const float C = x * y;
 		const float D = x * x;
 		return Vec4f(A, B, C, D);
-	};
+	}
 
 	const Vec4f& getBlurKernel(int blurValue)
 	{
@@ -61,17 +80,37 @@ namespace
 }
 
 
+struct OpenGLRenderer::Internal
+{
+	SimpleCopyScreenShader		mSimpleCopyScreenShader;
+	SimpleRectOverdrawShader	mSimpleRectOverdrawShader;
+	PostFXBlurShader			mPostFxBlurShader;
+	RenderPlaneShader			mRenderPlaneShader[RenderPlaneShader::_NUM_VARIATIONS][2];	// Using RenderPlaneShader::Variation enumeration, and alpha test off/on for second index
+	RenderVdpSpriteShader		mRenderVdpSpriteShader;
+	RenderPaletteSpriteShader	mRenderPaletteSpriteShader[2];		// Two variations: With or without alpha test
+	RenderComponentSpriteShader mRenderComponentSpriteShader[2];
+	DebugDrawPlaneShader		mDebugDrawPlaneShader;
+};
+
+
 OpenGLRenderer::OpenGLRenderer(RenderParts& renderParts, DrawerTexture& outputTexture) :
 	Renderer(RENDERER_TYPE_ID, renderParts, outputTexture),
-	mResources(renderParts)
+	mDrawerResources(getDrawerResources()),
+	mRenderResources(renderParts, mDrawerResources),
+	mInternal(*new Internal())
 {
+}
+
+OpenGLRenderer::~OpenGLRenderer()
+{
+	delete &mInternal;
 }
 
 void OpenGLRenderer::initialize()
 {
 	mGameResolution = Configuration::instance().mGameScreen;
 
-	mResources.initialize();
+	mRenderResources.initialize();
 
 	mGameScreenDepth.create(rmx::OpenGLHelper::FORMAT_DEPTH, mGameResolution.x, mGameResolution.y);
 
@@ -88,24 +127,27 @@ void OpenGLRenderer::initialize()
 	mProcessingBuffer.finishCreation();
 	mProcessingBuffer.unbind();
 
-	FileHelper::loadShader(mSimpleCopyScreenShader,   L"data/shader/simple_copy_screen.shader", "Standard");
-	FileHelper::loadShader(mSimpleRectOverdrawShader, L"data/shader/simple_rect_overdraw.shader", "Standard");
-	FileHelper::loadShader(mPostFxBlurShader,         L"data/shader/postfx_blur.shader", "Standard");
+	mInternal.mSimpleCopyScreenShader.initialize();
+	mInternal.mSimpleRectOverdrawShader.initialize();
+	mInternal.mPostFxBlurShader.initialize();
 
 	for (int i = 0; i < RenderPlaneShader::_NUM_VARIATIONS; ++i)
 	{
 		for (int k = 0; k < 2; ++k)
 		{
-			mRenderPlaneShader[i][k].initialize((RenderPlaneShader::Variation)i, k != 0);
+			mInternal.mRenderPlaneShader[i][k].initialize((RenderPlaneShader::Variation)i, k != 0);
 		}
 	}
-	mRenderVdpSpriteShader.initialize();
+	mInternal.mRenderVdpSpriteShader.initialize();
 	for (int k = 0; k < 2; ++k)
 	{
-		mRenderPaletteSpriteShader[k].initialize(k == 1);
-		mRenderComponentSpriteShader[k].initialize(k == 1);
+		mInternal.mRenderPaletteSpriteShader[k].initialize(k == 1);
+		mInternal.mRenderComponentSpriteShader[k].initialize(k == 1);
 	}
-	mDebugDrawPlaneShader.initialize();
+
+#if !defined(PLATFORM_VITA)
+	mInternal.mDebugDrawPlaneShader.initialize();
+#endif
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth(0.0f);		// Corresponds to -1.0f inside the depth range [-1.0f, 1.0f]
@@ -115,7 +157,8 @@ void OpenGLRenderer::initialize()
 void OpenGLRenderer::reset()
 {
 	clearFullscreenBuffers(mGameScreenBuffer, mProcessingBuffer);
-	mResources.clearAllCaches();
+	mRenderResources.clearAllCaches();
+	mDrawerResources.clearAllCaches();
 }
 
 void OpenGLRenderer::setGameResolution(const Vec2i& gameResolution)
@@ -139,6 +182,7 @@ void OpenGLRenderer::clearGameScreen()
 
 void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 {
+	startRendering();
 	internalRefresh();
 
 	// Start the actual rendering
@@ -157,7 +201,7 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 	}
 
 	// We'll use the same quad vertex data over and over again during rendering, so just bind it once
-	OpenGLDrawerResources::getSimpleQuadVAO().bind();
+	mDrawerResources.getSimpleQuadVAO().bind();
 
 	// Check if background blur needed
 	mIsRenderingToProcessingBuffer = false;
@@ -176,23 +220,18 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 	}
 
 	// Check if sprite masking needed
-	bool usingSpriteMask = false;
-	for (Geometry* geometry : geometries)
-	{
-		if (geometry->getType() == Geometry::Type::SPRITE && static_cast<const SpriteGeometry*>(geometry)->mSpriteInfo.getType() == RenderItem::Type::SPRITE_MASK)
-		{
-			usingSpriteMask = true;
-			break;
-		}
-	}
+	const bool usingSpriteMask = isUsingSpriteMask(geometries);
 
 	// Render geometries
 	mLastRenderedGeometryType = Geometry::Type::UNDEFINED;
-	mLastUsedPlaneShader = nullptr;
+	OpenGLShader::resetLastUsedShader();
 	{
 		uint16 lastRenderQueue = 0xffff;
 		for (size_t i = 0; i < geometries.size(); ++i)
 		{
+			if (!progressRendering())
+				break;
+
 			const uint16 renderQueue = geometries[i]->mRenderQueue;
 			if (usingSpriteMask && lastRenderQueue < 0x8000 && renderQueue >= 0x8000)
 			{
@@ -207,7 +246,7 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 
 	// Disable depth test for UI
 	glDisable(GL_DEPTH_TEST);
-	OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
+	mDrawerResources.setBlendMode(BlendMode::ALPHA);
 
 	// Unbind shader
 	glUseProgram(0);
@@ -231,7 +270,7 @@ void OpenGLRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 		glViewport_Recti(RenderUtils::getLetterBoxRect(rect, 2.0f));
 	}
 
-	mDebugDrawPlaneShader.draw(debugDrawMode, mRenderParts, mResources);
+	mInternal.mDebugDrawPlaneShader.draw(debugDrawMode, mRenderParts, mRenderResources);
 	glViewport_Recti(FTX::screenRect());
 }
 
@@ -242,14 +281,11 @@ void OpenGLRenderer::blurGameScreen()
 	glBindFramebuffer(GL_FRAMEBUFFER, mGameScreenBuffer.getHandle());
 	glViewport(0, 0, mGameResolution.x, mGameResolution.y);
 
-	Shader& shader = mPostFxBlurShader;
-	shader.bind();
-	shader.setTexture("Texture", mProcessingTexture.getHandle(), GL_TEXTURE_2D);
-	shader.setParam("TexelOffset", Vec2f(1.0f / mGameResolution.x, 1.0f / mGameResolution.y));
-	shader.setParam("Kernel", Vec4f(0.8f, 0.08f, 0.02f, 0.005f));	// That's a total of slightly more than one, so the image gets brighter over time
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	const Vec2f texelOffset(1.0f / mGameResolution.x, 1.0f / mGameResolution.y);
+	const Vec4f kernel(0.8f, 0.08f, 0.02f, 0.005f);		// That's a total of slightly more than one, so the image gets brighter over time
+	mInternal.mPostFxBlurShader.draw(mProcessingTexture.getHandle(), texelOffset, kernel);
 
-	shader.unbind();
+	glUseProgram(0);	// Unbind shader again
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -300,7 +336,7 @@ void OpenGLRenderer::clearFullscreenBuffers(Framebuffer& buffer1, Framebuffer& b
 
 void OpenGLRenderer::internalRefresh()
 {
-	mResources.refresh();
+	mRenderResources.refresh();
 }
 
 void OpenGLRenderer::renderGeometry(const Geometry& geometry)
@@ -329,23 +365,19 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				}
 			}
 
+			mDrawerResources.setBlendMode(BlendMode::OPAQUE);
+
 			// For backmost layer, ignore alpha completely
 			const bool useAlphaTest = (pg.mPlaneIndex != 0 || pg.mPriorityFlag);
-			OpenGLDrawerResources::setBlendMode(BlendMode::ONE_BIT);
+			mDrawerResources.setBlendMode(BlendMode::ONE_BIT);
 			ScrollOffsetsManager& som = mRenderParts.getScrollOffsetsManager();
 			const RenderPlaneShader::Variation variation = (pg.mPlaneIndex == PlaneManager::PLANE_W) ? RenderPlaneShader::PS_SIMPLE :
 															som.getHorizontalScrollNoRepeat(pg.mScrollOffsets) ? RenderPlaneShader::PS_NO_REPEAT :
 															som.getVerticalScrolling() ? RenderPlaneShader::PS_VERTICAL_SCROLLING : RenderPlaneShader::PS_HORIZONTAL_SCROLLING;
-			RenderPlaneShader& shader = mRenderPlaneShader[variation][useAlphaTest ? 1 : 0];
+			RenderPlaneShader& shader = mInternal.mRenderPlaneShader[variation][useAlphaTest ? 1 : 0];
 
-			if (mLastRenderedGeometryType != Geometry::Type::PLANE || mLastUsedPlaneShader != &shader)
-			{
-				shader.refresh(mGameResolution, mResources);
-				mLastRenderedGeometryType = Geometry::Type::PLANE;
-				mLastUsedPlaneShader = &shader;
-			}
-
-			shader.draw(pg, mRenderParts.getPaletteManager().mSplitPositionY, mRenderParts, mResources);
+			shader.draw(pg, mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mRenderParts, mRenderResources);
+			mLastRenderedGeometryType = Geometry::Type::PLANE;
 			break;
 		}
 
@@ -376,71 +408,54 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				case RenderItem::Type::VDP_SPRITE:
 				{
 					const renderitems::VdpSpriteInfo& spriteInfo = static_cast<const renderitems::VdpSpriteInfo&>(sg.mSpriteInfo);
-					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
-					RenderVdpSpriteShader& shader = mRenderVdpSpriteShader;
-					if (needsRefresh)
-					{
-						shader.refresh(mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
-					}
-					shader.draw(spriteInfo, mResources);
+					mDrawerResources.setBlendMode(spriteInfo.mBlendMode);
+
+					RenderVdpSpriteShader& shader = mInternal.mRenderVdpSpriteShader;
+					shader.draw(spriteInfo, mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mRenderResources);
 					break;
 				}
 
 				case RenderItem::Type::PALETTE_SPRITE:
 				{
 					const renderitems::PaletteSpriteInfo& spriteInfo = static_cast<const renderitems::PaletteSpriteInfo&>(sg.mSpriteInfo);
-					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
-					const bool useAlphaTest = (spriteInfo.mBlendMode != BlendMode::OPAQUE);
-					RenderPaletteSpriteShader& shader = mRenderPaletteSpriteShader[useAlphaTest ? 1 : 0];
-					if (needsRefresh || mLastUsedRenderPaletteSpriteShader != &shader)
-					{
-						shader.refresh(mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
-						mLastUsedRenderPaletteSpriteShader = &shader;
-					}
 					if (spriteInfo.mSize.x == 0 || spriteInfo.mSize.y == 0)
 					{
 						// Do not render sprites that you cannot see. Trying to render a sprite with no size
 						// breaks the depth buffer on macOS causing any sprites rendered afterward to not appear.
 						break;
 					}
-					shader.draw(spriteInfo, mResources);
+
+					mDrawerResources.setBlendMode(spriteInfo.mBlendMode);
+					const bool useAlphaTest = (spriteInfo.mBlendMode != BlendMode::OPAQUE);
+
+					RenderPaletteSpriteShader& shader = mInternal.mRenderPaletteSpriteShader[useAlphaTest ? 1 : 0];
+					shader.draw(spriteInfo, mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mRenderResources);
 					break;
 				}
 
 				case RenderItem::Type::COMPONENT_SPRITE:
 				{
 					const renderitems::ComponentSpriteInfo& spriteInfo = static_cast<const renderitems::ComponentSpriteInfo&>(sg.mSpriteInfo);
-					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
+					mDrawerResources.setBlendMode(spriteInfo.mBlendMode);
 					const bool useAlphaTest = (spriteInfo.mBlendMode != BlendMode::OPAQUE);
-					RenderComponentSpriteShader& shader = mRenderComponentSpriteShader[useAlphaTest ? 1 : 0];
-					if (needsRefresh || mLastUsedRenderComponentSpriteShader != &shader)
-					{
-						shader.refresh(mGameResolution);
-						mLastUsedRenderComponentSpriteShader = &shader;
-					}
-					shader.draw(spriteInfo, mResources);
+
+					RenderComponentSpriteShader& shader = mInternal.mRenderComponentSpriteShader[useAlphaTest ? 1 : 0];
+					shader.draw(spriteInfo, mGameResolution, mRenderResources);
 					break;
 				}
 
 				case RenderItem::Type::SPRITE_MASK:
 				{
 					const renderitems::SpriteMaskInfo& mask = static_cast<const renderitems::SpriteMaskInfo&>(sg.mSpriteInfo);
-					const Vec4f rectf((float)mask.mPosition.x / (float)mGameResolution.x,
-									  (float)mask.mPosition.y / (float)mGameResolution.y,
-									  (float)mask.mSize.x / (float)mGameResolution.x,
-									  (float)mask.mSize.y / (float)mGameResolution.y);
+					mDrawerResources.setBlendMode(BlendMode::OPAQUE);
 
-					OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);
-					Shader& shader = mSimpleRectOverdrawShader;
-					shader.bind();
-					shader.setParam("Rect", rectf);
-					shader.setTexture("Texture", mProcessingTexture.getHandle(), GL_TEXTURE_2D);
-					glDrawArrays(GL_TRIANGLES, 0, 6);
+					mInternal.mSimpleRectOverdrawShader.draw(mProcessingTexture.getHandle(), Recti(mask.mPosition, mask.mSize), mGameResolution);
 					break;
 				}
 
 				case RenderItem::Type::RECTANGLE:
 				case RenderItem::Type::TEXT:
+				case RenderItem::Type::VIEWPORT:
 				case RenderItem::Type::INVALID:
 					break;
 			}
@@ -458,18 +473,10 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				glDisable(GL_DEPTH_TEST);
 				mLastRenderedGeometryType = Geometry::Type::RECT;
 			}
-			OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
+			mDrawerResources.setBlendMode(BlendMode::ALPHA);
 
-			Vec4f transform;
-			transform.x = (float)rg.mRect.x / (float)mGameResolution.x * 2.0f - 1.0f;
-			transform.y = (float)rg.mRect.y / (float)mGameResolution.y * 2.0f - 1.0f;
-			transform.z = rg.mRect.width / (float)mGameResolution.x * 2.0f;
-			transform.w = rg.mRect.height / (float)mGameResolution.y * 2.0f;
-
-			Shader& shader = OpenGLDrawerResources::getSimpleRectColoredShader();
-			shader.bind();
-			shader.setParam("Color", Vec4f(rg.mColor.data));
-			shader.setParam("Transform", transform);
+			SimpleRectColoredShader& shader = mDrawerResources.getSimpleRectColoredShader();
+			shader.setup(rg.mRect, mGameResolution, rg.mColor);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			break;
 		}
@@ -488,20 +495,10 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				glDisable(GL_DEPTH_TEST);
 				mLastRenderedGeometryType = Geometry::Type::TEXTURED_RECT;
 			}
-			OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
+			mDrawerResources.setBlendMode(BlendMode::ALPHA);
 
-			Vec4f transform;
-			transform.x = (float)tg.mRect.x / (float)mGameResolution.x * 2.0f - 1.0f;
-			transform.y = (float)tg.mRect.y / (float)mGameResolution.y * 2.0f - 1.0f;
-			transform.z = tg.mRect.width / (float)mGameResolution.x * 2.0f;
-			transform.w = tg.mRect.height / (float)mGameResolution.y * 2.0f;
-
-			Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(true, true);
-			shader.bind();
-			shader.setParam("Transform", transform);
-			shader.setParam("TintColor", tg.mTintColor);
-			shader.setParam("AddedColor", tg.mAddedColor);
-			shader.setTexture("Texture", texture->getTextureHandle(), GL_TEXTURE_2D);
+			SimpleRectTexturedShader& shader = mDrawerResources.getSimpleRectTexturedShader(true, true);
+			shader.setup(tg.mRect, mGameResolution, texture->getTextureHandle(), tg.mTintColor, tg.mAddedColor);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			break;
 		}
@@ -512,15 +509,11 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 
 			mIsRenderingToProcessingBuffer = false;
 			glBindFramebuffer(GL_FRAMEBUFFER, mGameScreenBuffer.getHandle());
-			OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);
+			mDrawerResources.setBlendMode(BlendMode::OPAQUE);
 
-			Shader& shader = mPostFxBlurShader;
-			shader.bind();
-			shader.setTexture("Texture", mProcessingTexture.getHandle(), GL_TEXTURE_2D);
-			shader.setParam("TexelOffset", Vec2f(1.0f / mGameResolution.x, 1.0f / mGameResolution.y));
-			shader.setParam("Kernel", getBlurKernel(ebg.mBlurValue));
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-			shader.unbind();
+			const Vec2f texelOffset(1.0f / mGameResolution.x, 1.0f / mGameResolution.y);
+			const Vec4f kernel = getBlurKernel(ebg.mBlurValue);
+			mInternal.mPostFxBlurShader.draw(mProcessingTexture.getHandle(), texelOffset, kernel);
 
 			mLastRenderedGeometryType = Geometry::Type::UNDEFINED;
 			break;
@@ -549,12 +542,9 @@ void OpenGLRenderer::copyGameScreenToProcessingBuffer()
 	glBindFramebuffer(GL_FRAMEBUFFER, mProcessingBuffer.getHandle());
 	glViewport(0, 0, mGameResolution.x, mGameResolution.y);
 
-	Shader& shader = mSimpleCopyScreenShader;
-	shader.bind();
-	shader.setTexture("Texture", mGameScreenTexture.getImplementation<OpenGLDrawerTexture>()->getTextureHandle(), GL_TEXTURE_2D);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	mInternal.mSimpleCopyScreenShader.draw(mGameScreenTexture.getImplementation<OpenGLDrawerTexture>()->getTextureHandle());
 
-	shader.unbind();
+	glUseProgram(0);	// Unbind shader again
 	glBindFramebuffer(GL_FRAMEBUFFER, oldFramebufferHandle);
 }
 

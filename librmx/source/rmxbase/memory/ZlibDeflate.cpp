@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -71,7 +71,6 @@ bool ZlibDeflate::encode(std::vector<uint8>& output, const void* inputData, size
 		return false;
 
 	output.resize(inputSize + (inputSize + 999) / 1000 + 12);
-	size_t outputLeft = output.size();
 
 	stream.next_out = &output[0];
 	stream.avail_out = (uInt)output.size();

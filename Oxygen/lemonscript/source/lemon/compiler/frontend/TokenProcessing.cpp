@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,10 +8,12 @@
 
 #include "lemon/pch.h"
 #include "lemon/compiler/frontend/TokenProcessing.h"
+#include "lemon/compiler/Compiler.h"
 #include "lemon/compiler/TokenHelper.h"
 #include "lemon/compiler/TokenTypes.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/GlobalsLookup.h"
+#include "lemon/program/Module.h"
 #include "lemon/runtime/BuiltInFunctions.h"
 #include "lemon/runtime/OpcodeExecUtils.h"
 #include "lemon/runtime/Runtime.h"
@@ -89,19 +91,17 @@ namespace lemon
 			return false;
 		}
 
-		void fillCachedBuiltInFunctionSingle(TokenProcessing::CachedBuiltinFunction& outCached, const GlobalsLookup& globalsLookup, const BuiltInFunctions::FunctionName& functionName)
+		void fillCachedBuiltInFunction(TokenProcessing::CachedBuiltinFunction& outCached, bool allowMultiple, const GlobalsLookup& globalsLookup, const BuiltInFunctions::FunctionName& functionName)
 		{
-			const std::vector<Function*>& functions = globalsLookup.getFunctionsByName(functionName.mHash);
+			const std::vector<GlobalsLookup::FunctionReference>& functions = globalsLookup.getFunctionsByName(functionName.mHash);
 			RMX_ASSERT(!functions.empty(), "Unable to find built-in function '" << functionName.mName << "'");
-			RMX_ASSERT(functions.size() == 1, "Multiple definitions for built-in function '" << functionName.mName << "'");
-			outCached.mFunctions = functions;
-		}
+			RMX_ASSERT(allowMultiple || functions.size() == 1, "Multiple definitions for built-in function '" << functionName.mName << "'");
 
-		void fillCachedBuiltInFunctionMultiple(TokenProcessing::CachedBuiltinFunction& outCached, const GlobalsLookup& globalsLookup, const BuiltInFunctions::FunctionName& functionName)
-		{
-			const std::vector<Function*>& functions = globalsLookup.getFunctionsByName(functionName.mHash);
-			RMX_ASSERT(!functions.empty(), "Unable to find built-in function '" << functionName.mName << "'");
-			outCached.mFunctions = functions;
+			outCached.mFunctions.clear();
+			for (const GlobalsLookup::FunctionReference& ref : functions)
+			{
+				outCached.mFunctions.push_back(ref.mFunction);
+			}
 		}
 
 		template<typename T>
@@ -117,19 +117,20 @@ namespace lemon
 	}
 
 
-	TokenProcessing::TokenProcessing(GlobalsLookup& globalsLookup, const CompileOptions& compileOptions) :
+	TokenProcessing::TokenProcessing(GlobalsLookup& globalsLookup, Module& module, const CompileOptions& compileOptions) :
 		mGlobalsLookup(globalsLookup),
+		mModule(module),
 		mCompileOptions(compileOptions),
 		mTypeCasting(compileOptions)
 	{
-		fillCachedBuiltInFunctionMultiple(mBuiltinConstantArrayAccess,			globalsLookup, BuiltInFunctions::CONSTANT_ARRAY_ACCESS);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlus,				globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlusInt64,		globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlusInt64Inv,		globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64_INV);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorLess,				globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorLessOrEqual,		globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS_OR_EQUAL);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorGreater,			globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER);
-		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorGreaterOrEqual,	globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER_OR_EQUAL);
+		fillCachedBuiltInFunction(mBuiltinConstantArrayAccess,			true,  globalsLookup, BuiltInFunctions::CONSTANT_ARRAY_ACCESS);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorPlus,			false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorPlusInt64,		false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorPlusInt64Inv,	false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64_INV);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorLess,			false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorLessOrEqual,	false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS_OR_EQUAL);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorGreater,		false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER);
+		fillCachedBuiltInFunction(mBuiltinStringOperatorGreaterOrEqual,	false, globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER_OR_EQUAL);
 
 		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlus,           &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING);
 		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusInt64,      &PredefinedDataTypes::STRING, &PredefinedDataTypes::INT_64, &PredefinedDataTypes::STRING);
@@ -217,101 +218,10 @@ namespace lemon
 
 	void TokenProcessing::castCompileTimeConstant(ConstantToken& constantToken, const DataTypeDefinition* targetDataType)
 	{
-		const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).getCastHandling(constantToken.mDataType, targetDataType, false);
-		switch (castHandling.mResult)
-		{
-			case TypeCasting::CastHandling::Result::NO_CAST:
-			{
-				// No cast needed
-				break;
-			}
-
-			case TypeCasting::CastHandling::Result::BASE_CAST:
-			{
-				switch (castHandling.mBaseCastType)
-				{
-					// Cast down (signed or unsigned makes no difference here)
-					case BaseCastType::INT_16_TO_8:  constantToken.mValue.cast<uint16, uint8 >();  break;
-					case BaseCastType::INT_32_TO_8:  constantToken.mValue.cast<uint32, uint8 >();  break;
-					case BaseCastType::INT_64_TO_8:  constantToken.mValue.cast<uint64, uint8 >();  break;
-					case BaseCastType::INT_32_TO_16: constantToken.mValue.cast<uint32, uint16>();  break;
-					case BaseCastType::INT_64_TO_16: constantToken.mValue.cast<uint64, uint16>();  break;
-					case BaseCastType::INT_64_TO_32: constantToken.mValue.cast<uint64, uint32>();  break;
-
-					// Cast up (value is unsigned -> adding zeroes)
-					case BaseCastType::UINT_8_TO_16:  constantToken.mValue.cast<uint8,  uint16>();  break;
-					case BaseCastType::UINT_8_TO_32:  constantToken.mValue.cast<uint8,  uint32>();  break;
-					case BaseCastType::UINT_8_TO_64:  constantToken.mValue.cast<uint8,  uint64>();  break;
-					case BaseCastType::UINT_16_TO_32: constantToken.mValue.cast<uint16, uint32>();  break;
-					case BaseCastType::UINT_16_TO_64: constantToken.mValue.cast<uint16, uint64>();  break;
-					case BaseCastType::UINT_32_TO_64: constantToken.mValue.cast<uint32, uint64>();  break;
-
-					// Cast up (value is signed -> adding highest bit)
-					case BaseCastType::SINT_8_TO_16:  constantToken.mValue.cast<int8,  int16>();  break;
-					case BaseCastType::SINT_8_TO_32:  constantToken.mValue.cast<int8,  int32>();  break;
-					case BaseCastType::SINT_8_TO_64:  constantToken.mValue.cast<int8,  int64>();  break;
-					case BaseCastType::SINT_16_TO_32: constantToken.mValue.cast<int16, int32>();  break;
-					case BaseCastType::SINT_16_TO_64: constantToken.mValue.cast<int16, int64>();  break;
-					case BaseCastType::SINT_32_TO_64: constantToken.mValue.cast<int32, int64>();  break;
-
-					// Integer cast to float
-					case BaseCastType::UINT_8_TO_FLOAT:   constantToken.mValue.cast<uint8,  float>();  break;
-					case BaseCastType::UINT_16_TO_FLOAT:  constantToken.mValue.cast<uint16, float>();  break;
-					case BaseCastType::UINT_32_TO_FLOAT:  constantToken.mValue.cast<uint32, float>();  break;
-					case BaseCastType::UINT_64_TO_FLOAT:  constantToken.mValue.cast<uint64, float>();  break;
-					case BaseCastType::SINT_8_TO_FLOAT:   constantToken.mValue.cast<int8,   float>();  break;
-					case BaseCastType::SINT_16_TO_FLOAT:  constantToken.mValue.cast<int16,  float>();  break;
-					case BaseCastType::SINT_32_TO_FLOAT:  constantToken.mValue.cast<int32,  float>();  break;
-					case BaseCastType::SINT_64_TO_FLOAT:  constantToken.mValue.cast<int64,  float>();  break;
-
-					case BaseCastType::UINT_8_TO_DOUBLE:  constantToken.mValue.cast<uint8,  double>();  break;
-					case BaseCastType::UINT_16_TO_DOUBLE: constantToken.mValue.cast<uint16, double>();  break;
-					case BaseCastType::UINT_32_TO_DOUBLE: constantToken.mValue.cast<uint32, double>();  break;
-					case BaseCastType::UINT_64_TO_DOUBLE: constantToken.mValue.cast<uint64, double>();  break;
-					case BaseCastType::SINT_8_TO_DOUBLE:  constantToken.mValue.cast<int8,   double>();  break;
-					case BaseCastType::SINT_16_TO_DOUBLE: constantToken.mValue.cast<int16,  double>();  break;
-					case BaseCastType::SINT_32_TO_DOUBLE: constantToken.mValue.cast<int32,  double>();  break;
-					case BaseCastType::SINT_64_TO_DOUBLE: constantToken.mValue.cast<int64,  double>();  break;
-
-					// Float cast to integer
-					case BaseCastType::FLOAT_TO_UINT_8:   constantToken.mValue.cast<float, uint8 >();  break;
-					case BaseCastType::FLOAT_TO_UINT_16:  constantToken.mValue.cast<float, uint16>();  break;
-					case BaseCastType::FLOAT_TO_UINT_32:  constantToken.mValue.cast<float, uint32>();  break;
-					case BaseCastType::FLOAT_TO_UINT_64:  constantToken.mValue.cast<float, uint64>();  break;
-					case BaseCastType::FLOAT_TO_SINT_8:   constantToken.mValue.cast<float, int8  >();  break;
-					case BaseCastType::FLOAT_TO_SINT_16:  constantToken.mValue.cast<float, int16 >();  break;
-					case BaseCastType::FLOAT_TO_SINT_32:  constantToken.mValue.cast<float, int32 >();  break;
-					case BaseCastType::FLOAT_TO_SINT_64:  constantToken.mValue.cast<float, int64 >();  break;
-
-					case BaseCastType::DOUBLE_TO_UINT_8:  constantToken.mValue.cast<double, uint8 >();  break;
-					case BaseCastType::DOUBLE_TO_UINT_16: constantToken.mValue.cast<double, uint16>();  break;
-					case BaseCastType::DOUBLE_TO_UINT_32: constantToken.mValue.cast<double, uint32>();  break;
-					case BaseCastType::DOUBLE_TO_UINT_64: constantToken.mValue.cast<double, uint64>();  break;
-					case BaseCastType::DOUBLE_TO_SINT_8:  constantToken.mValue.cast<double, int8  >();  break;
-					case BaseCastType::DOUBLE_TO_SINT_16: constantToken.mValue.cast<double, int16 >();  break;
-					case BaseCastType::DOUBLE_TO_SINT_32: constantToken.mValue.cast<double, int32 >();  break;
-					case BaseCastType::DOUBLE_TO_SINT_64: constantToken.mValue.cast<double, int64 >();  break;
-
-					// Float cast
-					case BaseCastType::FLOAT_TO_DOUBLE:   constantToken.mValue.cast<float, double>();  break;
-					case BaseCastType::DOUBLE_TO_FLOAT:   constantToken.mValue.cast<double, float>();  break;
-
-					default:
-						throw std::runtime_error("Unrecognized cast type");
-				}
-				break;
-			}
-
-			case TypeCasting::CastHandling::Result::ANY_CAST:
-			{
-				// Anything to do here...?
-				break;
-			}
-
-			default:
-			case TypeCasting::CastHandling::Result::INVALID:
-				CHECK_ERROR(false, "Invalid cast of constants", mLineNumber);
-		}
+		AnyBaseValue value;
+		const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).castBaseValue(constantToken.mValue, constantToken.mDataType, value, targetDataType);
+		CHECK_ERROR(castHandling.mResult != TypeCasting::CastHandling::Result::INVALID, "Invalid cast of constants", mLineNumber);
+		constantToken.mValue = value;
 	}
 
 	void TokenProcessing::processDefines(TokenList& tokens)
@@ -484,6 +394,7 @@ namespace lemon
 		// Resolve occurrences of "addressof" that refer to functions
 		//  -> These need to be resolved before processing the child tokens, because the function name as a sole identifier would cause a syntax error
 		resolveAddressOfFunctions(tokens);
+		resolveMakeCallable(tokens);
 
 		// Go through the child token lists
 		for (size_t i = 0; i < tokens.size(); ++i)
@@ -507,8 +418,8 @@ namespace lemon
 					break;
 				}
 
-                default:
-                    break;
+				default:
+					break;
 			}
 		}
 
@@ -621,7 +532,7 @@ namespace lemon
 				const Function* function = nullptr;
 				const Variable* thisPointerVariable = nullptr;
 
-				const std::vector<Function*>* candidateFunctions = &mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
+				const std::vector<GlobalsLookup::FunctionReference>* candidateFunctions = &mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
 				if (!candidateFunctions->empty())
 				{
 					// Is it a global function
@@ -634,11 +545,11 @@ namespace lemon
 					isBaseCall = true;
 
 					const std::string_view baseName = identifierToken.mName.getString().substr(5);
-					const std::vector<Function*>& candidates = mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(baseName));
-					for (Function* candidate : candidates)
+					const std::vector<GlobalsLookup::FunctionReference>& candidates = mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(baseName));
+					for (const GlobalsLookup::FunctionReference& candidate : candidates)
 					{
 						// Base function signature must be the same as current function's
-						if (candidate->getSignatureHash() == mContext.mFunction->getSignatureHash() && candidate != mContext.mFunction)
+						if (candidate.mFunction->getSignatureHash() == mContext.mFunction->getSignatureHash() && candidate.mFunction != mContext.mFunction)
 						{
 							baseFunctionExists = true;
 							break;
@@ -785,18 +696,30 @@ namespace lemon
 					else
 					{
 						// Find best-fitting correct function overload
-						function = nullptr;
+						const GlobalsLookup::FunctionReference* bestFit = nullptr;
 						uint32 bestPriority = 0xff000000;
-						for (const Function* candidateFunction : *candidateFunctions)
+						for (const GlobalsLookup::FunctionReference& candidateFunction : *candidateFunctions)
 						{
-							const uint32 priority = mTypeCasting.getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
+							const uint32 priority = mTypeCasting.getPriorityOfSignature(parameterTypes, candidateFunction.mFunction->getParameters());
 							if (priority < bestPriority)
 							{
 								bestPriority = priority;
-								function = candidateFunction;
+								bestFit = &candidateFunction;
 							}
 						}
 						CHECK_ERROR(bestPriority < 0xff000000, "No appropriate function overload found calling '" << functionName << "', the number or types of parameters passed are wrong", mLineNumber);
+
+						if (nullptr != bestFit)
+						{
+							function = bestFit->mFunction;
+							if (bestFit->mIsDeprecated)
+							{
+								if (identifierToken.mName == function->getName())
+									ADD_WARNING(CompilerWarning::Code::DEPRECATED_FUNCTION, "Function '" << identifierToken.mName << "' is deprecated and might be removed in the future", mLineNumber)
+								else
+									ADD_WARNING(CompilerWarning::Code::DEPRECATED_FUNCTION_ALIAS, "Function name '" << identifierToken.mName << "' is deprecated, consider using the new name '" << function->getName() << "' instead", mLineNumber);
+							}
+						}
 					}
 				}
 
@@ -840,52 +763,87 @@ namespace lemon
 			{
 				// Check the identifier
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+
+				// Could be a constant array, or a variable with bracket operator
 				const ConstantArray* constantArray = nullptr;
-				if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT_ARRAY)
+				const Variable* variable = nullptr;
+				if (nullptr != identifierToken.mResolved)
 				{
-					constantArray = &identifierToken.mResolved->as<ConstantArray>();
+					if (identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT_ARRAY)
+					{
+						constantArray = &identifierToken.mResolved->as<ConstantArray>();
+					}
+					else if (identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::VARIABLE)
+					{
+						variable = &identifierToken.mResolved->as<Variable>();
+					}
 				}
-				else
+
+				if (nullptr == constantArray && nullptr == variable)
 				{
 					// Check for local constant array
 					constantArray = findInList(*mContext.mLocalConstantArrays, identifierToken.mName.getHash());
-					CHECK_ERROR(nullptr != constantArray, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
+					if (nullptr == constantArray)
+					{
+						// Check for local variables
+						variable = findInList(*mContext.mLocalVariables, identifierToken.mName.getHash());
+						CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
+					}
+				}
+
+				if (nullptr != variable)
+				{
+					// Check if variable's data type supports the bracket operator
+					const DataTypeDefinition* parameterType = variable->getDataType()->getBracketOperator().mParameterType;
+					CHECK_ERROR(nullptr != parameterType, "Variable " << variable->getName().getString() << " can't be followed by the brackets []", mLineNumber);
 				}
 
 				TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
 				CHECK_ERROR(content.size() == 1, "Expected exactly one token inside brackets", mLineNumber);
 				CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
 
-				const Function* matchingFunction = nullptr;
-				for (const Function* function : mBuiltinConstantArrayAccess.mFunctions)
+				if (nullptr != constantArray)
 				{
-					if (function->getReturnType() == constantArray->getElementDataType())
+					const Function* matchingFunction = nullptr;
+					for (const Function* function : mBuiltinConstantArrayAccess.mFunctions)
 					{
-						matchingFunction = function;
-						break;
+						if (function->getReturnType() == constantArray->getElementDataType())
+						{
+							matchingFunction = function;
+							break;
+						}
 					}
+					CHECK_ERROR(nullptr != matchingFunction, "Could not find fitting type implementation for constant array " << identifierToken.mName.getString(), mLineNumber);
+
+				#ifdef DEBUG
+					const Function::ParameterList& parameterList = matchingFunction->getParameters();
+					RMX_ASSERT(parameterList.size() == 2 && parameterList[0].mDataType == &PredefinedDataTypes::UINT_32 && parameterList[1].mDataType == &PredefinedDataTypes::UINT_32, "Function signature for constant array access does not fit");
+				#endif
+
+					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
+					token.mFunction = matchingFunction;
+					token.mParameters.resize(2);
+					ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
+					idToken.mValue.set(constantArray->getID());
+					idToken.mDataType = &PredefinedDataTypes::UINT_32;
+					token.mParameters[1] = content[0].as<StatementToken>();		// Array index
+					token.mDataType = matchingFunction->getReturnType();
+
+					assignStatementDataType(*token.mParameters[0], matchingFunction->getParameters()[0].mDataType);
+					assignStatementDataType(*token.mParameters[1], matchingFunction->getParameters()[1].mDataType);
 				}
-				if (nullptr == matchingFunction)
-					continue;
+				else
+				{
+					RMX_ASSERT(nullptr != variable, "Variable must be valid at this point");
 
-			#ifdef DEBUG
-				const Function::ParameterList& parameterList = matchingFunction->getParameters();
-				RMX_ASSERT(parameterList.size() == 2 && parameterList[0].mDataType == &PredefinedDataTypes::UINT_32 && parameterList[1].mDataType == &PredefinedDataTypes::UINT_32, "Function signature for constant array access does not fit");
-			#endif
+					BracketAccessToken& token = tokens.createReplaceAt<BracketAccessToken>(i);
+					token.mVariable = variable;
+					token.mParameter = content[0].as<StatementToken>();
+					token.mDataType = variable->getDataType()->getBracketOperator().mValueType;
 
-				FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
-				token.mFunction = matchingFunction;
-				token.mParameters.resize(2);
-				ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
-				idToken.mValue.set(constantArray->getID());
-				idToken.mDataType = &PredefinedDataTypes::UINT_32;
-				token.mParameters[1] = content[0].as<StatementToken>();		// Array index
-				token.mDataType = matchingFunction->getReturnType();
+				}
 
-				assignStatementDataType(*token.mParameters[0], matchingFunction->getParameters()[0].mDataType);
-				assignStatementDataType(*token.mParameters[1], matchingFunction->getParameters()[1].mDataType);
-
-				tokens.erase(i+1);
+				tokens.erase(i+1);	// Remove parenthesis token
 			}
 		}
 	}
@@ -1191,6 +1149,40 @@ namespace lemon
 		return false;
 	}
 
+	void TokenProcessing::resolveMakeCallable(TokenList& tokens)
+	{
+		for (size_t i = 0; i + 1 < tokens.size(); ++i)
+		{
+			if (isKeyword(tokens[i], Keyword::MAKECALLABLE))
+			{
+				CHECK_ERROR(isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS), "makeCallable must be followed by parentheses", mLineNumber);
+				const TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
+				CHECK_ERROR(content.size() == 1 && content[0].isA<IdentifierToken>(), "makeCallable parameter must be a function name", mLineNumber);
+				IdentifierToken& identifierToken = content[0].as<IdentifierToken>();
+
+				bool anyFound = false;
+				const GlobalsLookup::FunctionReference* function = mGlobalsLookup.getFunctionByNameAndSignature(identifierToken.mName.getHash(), Function::getVoidSignatureHash(), &anyFound);
+				if (nullptr == function)
+				{
+					if (anyFound)
+						CHECK_ERROR(false, "Function '" << identifierToken.mName.getString() << "' in makeCallable must have no parameters and no return value", mLineNumber)
+					else
+						CHECK_ERROR(false, "Function '" << identifierToken.mName.getString() << "' in makeCallable is unknown", mLineNumber);
+				}
+
+				// Check module for existing registration, and add there if not
+				const uint32 address = mModule.addOrFindCallableFunctionAddress(*function->mFunction);
+
+				// Replace makeCallable and the parenthesis with the callable address as a constant
+				ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
+				constantToken.mValue.set(address);
+				constantToken.mDataType = &PredefinedDataTypes::UINT_32;
+				tokens.erase(i+1);
+				break;
+			}
+		}
+	}
+
 	void TokenProcessing::resolveAddressOfFunctions(TokenList& tokens)
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
@@ -1202,33 +1194,30 @@ namespace lemon
 				if (content.size() == 1 && content[0].isA<IdentifierToken>())
 				{
 					IdentifierToken& identifierToken = content[0].as<IdentifierToken>();
-					const std::vector<Function*>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
-					if (!candidateFunctions.empty())
+					const std::vector<GlobalsLookup::FunctionReference>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
+					CHECK_ERROR(!candidateFunctions.empty(), "Unknown function '" << identifierToken.mName.getString() << "' in addressof", mLineNumber);
+
+					uint32 address = 0;
+					for (const GlobalsLookup::FunctionReference& function : candidateFunctions)
 					{
-						uint32 address = 0;
-						for (const Function* function : candidateFunctions)
+						if (function.mFunction->getType() == Function::Type::SCRIPT)
 						{
-							if (function->getType() == Function::Type::SCRIPT)
+							const std::vector<uint32>& addressHooks = static_cast<const ScriptFunction*>(function.mFunction)->getAddressHooks();
+							if (!addressHooks.empty())
 							{
-								const std::vector<uint32>& addressHooks = static_cast<const ScriptFunction*>(function)->getAddressHooks();
-								if (!addressHooks.empty())
-								{
-									address = addressHooks[0];
-									break;
-								}
+								address = addressHooks[0];
+								break;
 							}
 						}
-						CHECK_ERROR(address != 0, "No address hook found for function '" << identifierToken.mName.getString() << "'", mLineNumber);
-
-						// Replace addressof and the parenthesis with the actual address as a constant
-						ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
-						constantToken.mValue.set(address);
-						constantToken.mDataType = &PredefinedDataTypes::UINT_32;
-						tokens.erase(i+1);
-						break;
 					}
+					CHECK_ERROR(address != 0, "No address hook found for function '" << identifierToken.mName.getString() << "'", mLineNumber);
 
-					CHECK_ERROR(false, "Address of identifier '" << identifierToken.mName.getString() << "' could not be determined", mLineNumber);
+					// Replace addressof and the parenthesis with the actual address as a constant
+					ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
+					constantToken.mValue.set(address);
+					constantToken.mDataType = &PredefinedDataTypes::UINT_32;
+					tokens.erase(i+1);
+					break;
 				}
 			}
 		}

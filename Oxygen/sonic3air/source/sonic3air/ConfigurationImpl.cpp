@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -12,7 +12,7 @@
 #include "sonic3air/version.inc"
 
 #include "oxygen/application/GameProfile.h"
-#include "oxygen/helper/JsonHelper.h"
+#include "oxygen/helper/JsonSerializer.h"
 
 
 namespace
@@ -48,21 +48,22 @@ void ConfigurationImpl::fillDefaultGameProfile(GameProfile& gameProfile)
 ConfigurationImpl::ConfigurationImpl()
 {
 	// Setup defaults
-	mGameServer.mUpdateCheck.mReleaseChannel = getReleaseChannelValueForBuild();
+	mGameServerBase.mServerHostName = "sonic3air.org";
+	mGameServerImpl.mUpdateCheck.mReleaseChannel = getReleaseChannelValueForBuild();
+
+	mActiveGameSettings = &mLocalGameSettings;
 }
 
 void ConfigurationImpl::preLoadInitialization()
 {
 	SharedDatabase::initialize();
 
-#ifndef ENDUSER
 	mCompiledScriptSavePath = L"saves/scripts.bin";
-#endif
 }
 
-bool ConfigurationImpl::loadConfigurationInternal(JsonHelper& jsonHelper)
+bool ConfigurationImpl::loadConfigurationInternal(JsonSerializer& serializer)
 {
-	loadSharedSettingsConfig(jsonHelper);
+	serializeSharedSettingsConfig(serializer);
 
 	// Add special preprocessor define
 	//  -> Used to query whether it's the game build (i.e. not the Oxygen App), and to get its build number
@@ -71,197 +72,180 @@ bool ConfigurationImpl::loadConfigurationInternal(JsonHelper& jsonHelper)
 	// Setup the default game profile data accordingly
 	fillDefaultGameProfile(GameProfile::instance());
 
-#ifndef ENDUSER
-	// Explicitly set a (non-empty) project path, so that "oxygenproject.json" gets loaded
-	mProjectPath = L"./";
-#endif
-
 	return true;
 }
 
-bool ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsType settingsType)
+bool ConfigurationImpl::loadSettingsInternal(JsonSerializer& serializer, SettingsType settingsType)
 {
-	if (settingsType == SettingsType::STANDARD)
-	{
-		rootHelper.tryReadString("GameVersion", mGameVersionInSettings);
-		loadSharedSettingsConfig(rootHelper);
-	}
+	serializeSettingsInternal(serializer);
 
-	// Audio
-	rootHelper.tryReadFloat("Audio_MusicVolume", mMusicVolume);
-	rootHelper.tryReadFloat("Audio_SoundVolume", mSoundVolume);
-	rootHelper.tryReadInt("ActiveSoundtrack", mActiveSoundtrack);
+	if (mGameServerBase.mServerHostName == "sonic3air.org")
+		mGameServerBase.mServerHostName = "gameserver.sonic3air.org";
 
-	// Input
-	rootHelper.tryReadInt("GamepadVisualStyle", mGamepadVisualStyle);
-
-	// Game simulation
-	if (rootHelper.tryReadInt("SimulationFrequency", mSimulationFrequency))
-	{
-		mSimulationFrequency = clamp(mSimulationFrequency, 30, 240);
-	}
-
-	// Time Attack
-	rootHelper.tryReadInt("InstantTimeAttackRestart", mInstantTimeAttackRestart);
-
-	// Game settings
-	if (!mGameVersionInSettings.empty())
-	{
-		JsonHelper gameSettingsHelper(rootHelper.mJson["GameSettings"]);
-
-		if (!SharedDatabase::getSettings().empty())		// This is going to be empty when the macOS UI calls loadConfiguration externally, causing crash
-		{
-			const auto& settingsMap = SharedDatabase::getSettings();
-
-			// Load settings as uint32 values
-			for (auto& pair : settingsMap)
-			{
-				if (pair.second.mSerializationType != SharedDatabase::Setting::SerializationType::NONE)
-				{
-					int value = 0;
-					if (gameSettingsHelper.tryReadInt(pair.second.mIdentifier, value))
-					{
-						pair.second.mCurrentValue = (uint32)value;
-					}
-				}
-			}
-
-			// Make corrections where needed
-			if (mGameVersionInSettings < "22.12.17.0")
-			{
-				// Reset the SETTING_FIX_GLITCHES, after the default value changed
-				const SharedDatabase::Setting* setting = mapFind(settingsMap, (uint32)SharedDatabase::Setting::SETTING_FIX_GLITCHES);
-				if (nullptr != setting)
-					setting->mCurrentValue = 2;
-			}
-
-			const SharedDatabase::Setting* ghostsSetting = mapFind(settingsMap, (uint32)SharedDatabase::Setting::SETTING_TIME_ATTACK_GHOSTS);
-			if (nullptr != ghostsSetting)
-				ghostsSetting->mCurrentValue = (ghostsSetting->mCurrentValue >= 5) ? 5 : (ghostsSetting->mCurrentValue >= 3) ? 3 : (ghostsSetting->mCurrentValue >= 1) ? 1 : 0;
-		}
-
-		if (mGameVersionInSettings < "20.05.01.0")
-		{
-			// Enforce auto-detect once if user had an older version before
-			mAutoDetectRenderMethod = true;
-		}
-
-		if (mGameVersionInSettings < "22.08.27.0")
-		{
-			// Reset script optimization - its default was 3 before introducing -1 for auto
-			mScriptOptimizationLevel = -1;
-		}
-	}
 	return true;
 }
 
-void ConfigurationImpl::saveSettingsInternal(Json::Value& root, SettingsType settingsType)
+void ConfigurationImpl::saveSettingsInternal(JsonSerializer& serializer, SettingsType settingsType)
 {
 	if (settingsType != SettingsType::STANDARD)
 		return;
 
-	// Format info & metadata
-	root["GameVersion"] = BUILD_STRING;
-	root["GameExePath"] = WString(mExePath).toStdString();
-
-	// Audio
-	root["Audio_MusicVolume"] = mMusicVolume;
-	root["Audio_SoundVolume"] = mSoundVolume;
-	root["ActiveSoundtrack"] = mActiveSoundtrack;
-
-	// Input
-	root["GamepadVisualStyle"] = mGamepadVisualStyle;
-
-	// Game simulation
-	if (mSimulationFrequency != 60)
-		root["SimulationFrequency"] = mSimulationFrequency;
-	else
-		root.removeMember("SimulationFrequency");
-
-	// Time Attack
-	root["InstantTimeAttackRestart"] = mInstantTimeAttackRestart;
-
-	// Game settings
-	{
-		Json::Value gameSettingsJson;
-		const auto& settingsMap = SharedDatabase::getSettings();
-		for (auto& pair : settingsMap)
-		{
-			const SharedDatabase::Setting& setting = pair.second;
-			if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::NONE)
-				continue;
-			if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::HIDDEN && setting.mCurrentValue == setting.mDefaultValue)
-				continue;
-			gameSettingsJson[setting.mIdentifier] = setting.mCurrentValue;
-		}
-		root["GameSettings"] = gameSettingsJson;
-	}
-
-	// Game server
-	{
-		Json::Value gameServerJson;
-		{
-			gameServerJson["ServerAddress"] = mGameServer.mServerHostName;
-			gameServerJson["ServerPortUDP"] = mGameServer.mServerPortUDP;
-			gameServerJson["ServerPortTCP"] = mGameServer.mServerPortTCP;
-			gameServerJson["ServerPortWSS"] = mGameServer.mServerPortWSS;
-
-			Json::Value ghostSyncJson;
-			ghostSyncJson["Enabled"] = mGameServer.mGhostSync.mEnabled ? 1 : 0;
-			ghostSyncJson["ChannelName"] = mGameServer.mGhostSync.mChannelName;
-			ghostSyncJson["ShowOffscreenGhosts"] = mGameServer.mGhostSync.mShowOffscreenGhosts ? 1 : 0;
-			ghostSyncJson["GhostRendering"] = mGameServer.mGhostSync.mGhostRendering;
-			gameServerJson["GhostSync"] = ghostSyncJson;
-
-			Json::Value updateCheckJson;
-			updateCheckJson["ReleaseChannel"] = mGameServer.mUpdateCheck.mReleaseChannel;
-			gameServerJson["UpdateCheck"] = updateCheckJson;
-		}
-		root["GameServer"] = gameServerJson;
-	}
+	serializeSettingsInternal(serializer);
+	serializeSharedSettingsConfig(serializer);
 }
 
-void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
+void ConfigurationImpl::serializeSettingsInternal(JsonSerializer& serializer)
+{
+	// Format info & metadata
+	if (serializer.isReading())
+	{
+		serializer.serialize("GameVersion", mGameVersionInSettings);
+	}
+	else
+	{
+		std::string buildString = BUILD_STRING;
+		serializer.serialize("GameVersion", buildString);
+		serializer.serialize("GameExePath", mExePath);
+	}
+
+	// Audio
+	serializer.serialize("Audio_MusicVolume", mMusicVolume);
+	serializer.serialize("Audio_SoundVolume", mSoundVolume);
+	serializer.serialize("ActiveSoundtrack", mActiveSoundtrack);
+
+	// Input
+	serializer.serialize("GamepadVisualStyle", mGamepadVisualStyle);
+
+	// Game simulation
+	if (serializer.isReading())
+	{
+		if (serializer.serialize("SimulationFrequency", mSimulationFrequency))
+		{
+			mSimulationFrequency = clamp(mSimulationFrequency, 30, 240);
+		}
+	}
+	else
+	{
+		if (mSimulationFrequency != 60)
+		{
+			serializer.serialize("SimulationFrequency", mSimulationFrequency);
+		}
+	}
+
+	// Time Attack
+	serializer.serialize("InstantTimeAttackRestart", mInstantTimeAttackRestart);
+
+	// Game settings
+	if (serializer.isReading())
+	{
+		if (!mGameVersionInSettings.empty())
+		{
+			if (!SharedDatabase::getSettings().empty())		// This is going to be empty when the macOS UI calls loadConfiguration externally, causing crash
+			{
+				if (serializer.beginObject("GameSettings"))
+				{
+					const auto& settingsMap = SharedDatabase::getSettings();
+
+					// Load settings as uint32 values
+					for (auto& pair : settingsMap)
+					{
+						if (pair.second.mSerializationType != SharedDatabase::Setting::SerializationType::NONE)
+						{
+							int value = 0;
+							if (serializer.serialize(pair.second.mIdentifier.c_str(), value))
+							{
+								mLocalGameSettings.setValue(pair.first, (uint32)value);
+							}
+						}
+					}
+
+					// Make corrections where needed
+					if (mGameVersionInSettings < "22.12.17.0")
+					{
+						// Reset the SETTING_FIX_GLITCHES, after the default value changed
+						mLocalGameSettings.setValue((uint32)SharedDatabase::Setting::SETTING_FIX_GLITCHES, 2);
+					}
+
+					{
+						uint32& ghostSetting = mLocalGameSettings.accessValue((uint32)SharedDatabase::Setting::SETTING_TIME_ATTACK_GHOSTS);
+						ghostSetting = (ghostSetting >= 5) ? 5 : (ghostSetting >= 3) ? 3 : (ghostSetting >= 1) ? 1 : 0;
+					}
+
+					serializer.endObject();
+				}
+			}
+
+			if (mGameVersionInSettings < "20.05.01.0")
+			{
+				// Enforce auto-detect once if user had an older version before
+				mAutoDetectRenderMethod = true;
+			}
+
+			if (mGameVersionInSettings < "22.08.27.0")
+			{
+				// Reset script optimization - its default was 3 before introducing -1 for auto
+				mScriptOptimizationLevel = -1;
+			}
+		}
+	}
+	else
+	{
+		if (serializer.beginObject("GameSettings"))
+		{
+			const auto& settingsMap = SharedDatabase::getSettings();
+			for (auto& pair : settingsMap)
+			{
+				const SharedDatabase::Setting& setting = pair.second;
+				if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::NONE)
+					continue;
+
+				int value = mLocalGameSettings.getValue(pair.first);
+				if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::HIDDEN && value == setting.mDefaultValue)
+					continue;
+
+				serializer.serialize(setting.mIdentifier.c_str(), value);
+			}
+			serializer.endObject();
+		}
+	}
+
+	// All that is shared with config
+	serializeSharedSettingsConfig(serializer);
+}
+
+void ConfigurationImpl::serializeSharedSettingsConfig(JsonSerializer& serializer)
 {
 	// Dev mode
-	Json::Value devModeJson = rootHelper.mJson["DevMode"];
-	if (devModeJson.isObject())
+	if (serializer.isReading())		// These two properties are only supposed to be read, but not written if they don't exist already
 	{
-		JsonHelper devModeHelper(devModeJson);
-		devModeHelper.tryReadBool("EnforceDebugMode", mDevModeImpl.mEnforceDebugMode);
-		devModeHelper.tryReadBool("SkipExitConfirmation", mDevModeImpl.SkipExitConfirmation);
+		if (serializer.beginObject("DevMode"))
+		{
+			serializer.serialize("EnforceDebugMode", mDevModeImpl.mEnforceDebugMode);
+			serializer.serialize("SkipExitConfirmation", mDevModeImpl.SkipExitConfirmation);
+			serializer.endObject();
+		}
 	}
 
 	// Game server
+	if (serializer.beginObject("GameServer"))
 	{
-		const Json::Value& gameServerJson = rootHelper.mJson["GameServer"];
-		if (!gameServerJson.isNull())
+		// Update Check settings
+		if (serializer.beginObject("UpdateCheck"))
 		{
-			// General game server settings
-			JsonHelper gameServerHelper(gameServerJson);
-			gameServerHelper.tryReadString("ServerAddress", mGameServer.mServerHostName);
-			gameServerHelper.tryReadInt("ServerPortUDP", mGameServer.mServerPortUDP);
-			gameServerHelper.tryReadInt("ServerPortTCP", mGameServer.mServerPortTCP);
-			gameServerHelper.tryReadInt("ServerPortWSS", mGameServer.mServerPortWSS);
-
-			// Update Check settings
-			const Json::Value& updateCheckJson = gameServerHelper.mJson["UpdateCheck"];
-			if (!updateCheckJson.isNull())
-			{
-				JsonHelper jsonHelper(updateCheckJson);
-				jsonHelper.tryReadInt("UpdateChannel", mGameServer.mUpdateCheck.mReleaseChannel);
-			}
-
-			// Ghost Sync settings
-			const Json::Value& ghostSyncJson = gameServerHelper.mJson["GhostSync"];
-			if (!ghostSyncJson.isNull())
-			{
-				JsonHelper jsonHelper(ghostSyncJson);
-				jsonHelper.tryReadBool("Enabled", mGameServer.mGhostSync.mEnabled);
-				jsonHelper.tryReadString("ChannelName", mGameServer.mGhostSync.mChannelName);
-				jsonHelper.tryReadBool("ShowOffscreenGhosts", mGameServer.mGhostSync.mShowOffscreenGhosts);
-				jsonHelper.tryReadInt("GhostRendering", mGameServer.mGhostSync.mGhostRendering);
-			}
+			serializer.serialize("ReleaseChannel", mGameServerImpl.mUpdateCheck.mReleaseChannel);
+			serializer.endObject();
 		}
+
+		// Ghost Sync settings
+		if (serializer.beginObject("GhostSync"))
+		{
+			serializer.serialize("Enabled", mGameServerImpl.mGhostSync.mEnabled);
+			serializer.serialize("ChannelName", mGameServerImpl.mGhostSync.mChannelName);
+			serializer.serialize("ShowOffscreenGhosts", mGameServerImpl.mGhostSync.mShowOffscreenGhosts);
+			serializer.serialize("GhostRendering", mGameServerImpl.mGhostSync.mGhostRendering);
+			serializer.endObject();
+		}
+
+		serializer.endObject();
 	}
 }

@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -11,7 +11,6 @@
 #include <rmxbase.h>
 
 class EmulatorInterface;
-class PaletteBitmap;
 
 
 class BlueSpheresRendering
@@ -25,14 +24,22 @@ public:
 private:
 	bool loadLookupData();
 	void performLookupCalculations();
+	void buildSprite(const uint8* lookupDataBase, const String spriteIdentifier[2], int numPureGroundRows, Vec2i screenSize);
+
+private:
+	struct Lookup
+	{
+		std::vector<uint8> mData;
+		bool mIsCompressed = false;
+	};
 
 private:
 	bool mInitializedLookups = false;
-	std::vector<uint8> mStraightIntensityLookup[0x20];
-	std::vector<uint8> mRotationIntensityLookup[0x0f];
-	int mNonOpaquePixelIndent[224] = { 0 };				// Number of pixels from the left (or right) side until reaching the first fully opaque one, for each row
+	Lookup mStraightIntensityLookup[0x20];
+	Lookup mRotationIntensityLookup[0x0f];
+	int mNonOpaquePixelIndent[224] = { 0 };		// Number of pixels from the left (or right) side until reaching the first fully opaque one, for each row
 	int mNumPureSkyRows = 0;
 
 	Vec2i mLastScreenSize;
-	uint32 mLastSpriteCacheChangeCounter = 0;
+	uint32 mLastSpriteCollectionChangeCounter = 0;
 };

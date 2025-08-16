@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -82,7 +82,9 @@
 			case GL_INVALID_ENUM:					return "INVALID_ENUM";
 			case GL_INVALID_VALUE:					return "INVALID_VALUE";
 			case GL_OUT_OF_MEMORY:					return "OUT_OF_MEMORY";
+		#if !defined(PLATFORM_VITA)
 			case GL_INVALID_FRAMEBUFFER_OPERATION:	return "INVALID_FRAMEBUFFER_OPERATION";
+		#endif
 		}
 		return rmx::hexString((int)err, 4);
 	}

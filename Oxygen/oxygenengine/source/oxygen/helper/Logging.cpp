@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -34,13 +34,15 @@ namespace
 
 		Result showMessageBox(rmx::ErrorHandling::MessageBoxInterface::DialogType dialogType, rmx::ErrorSeverity errorSeverity, const std::string& message, const char* filename, int line) override
 		{
-		#if defined(DEBUG)
-			std::string name;
-			std::string ext;
-			rmx::FileIO::splitPath(filename, nullptr, &name, &ext);
-			std::string text = message + "\n[" + name + "." + ext + ", line " + std::to_string(line) + "]";
-		#else
 			std::string text = message;
+		#if defined(DEBUG)
+			if (nullptr != filename)
+			{
+				std::string name;
+				std::string ext;
+				rmx::FileIO::splitPath(filename, nullptr, &name, &ext);
+				text = message + "\n[" + name + "." + ext + ", line " + std::to_string(line) + "]";
+			}
 		#endif
 
 			// Check if it was caused inside a script function
@@ -69,9 +71,9 @@ namespace
 			PlatformFunctions::DialogButtons dialogButtons = PlatformFunctions::DialogButtons::OK_CANCEL;
 			switch (dialogType)
 			{
-				case rmx::ErrorHandling::MessageBoxInterface::DialogType::ACCEPT_ONLY:		dialogButtons = PlatformFunctions::DialogButtons::OK;			  break;
-				case rmx::ErrorHandling::MessageBoxInterface::DialogType::ACCEPT_OR_CANCEL:	dialogButtons = PlatformFunctions::DialogButtons::OK_CANCEL;	  break;
-				case rmx::ErrorHandling::MessageBoxInterface::DialogType::ALL_OPTIONS:		dialogButtons = PlatformFunctions::DialogButtons::YES_NO_CANCEL;  break;
+				case rmx::ErrorHandling::MessageBoxInterface::DialogType::OK:			 dialogButtons = PlatformFunctions::DialogButtons::OK;			  break;
+				case rmx::ErrorHandling::MessageBoxInterface::DialogType::OK_CANCEL:	 dialogButtons = PlatformFunctions::DialogButtons::OK_CANCEL;	  break;
+				case rmx::ErrorHandling::MessageBoxInterface::DialogType::YES_NO_CANCEL: dialogButtons = PlatformFunctions::DialogButtons::YES_NO_CANCEL; break;
 			}
 			const PlatformFunctions::DialogResult result = PlatformFunctions::showDialogBox(errorSeverity, dialogButtons, caption, text);
 			return (result == PlatformFunctions::DialogResult::CANCEL) ? Result::IGNORE : (result == PlatformFunctions::DialogResult::OK) ? Result::ACCEPT : Result::ABORT;

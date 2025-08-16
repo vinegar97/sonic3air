@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -27,9 +27,12 @@ namespace lemon
 		struct ErrorMessage
 		{
 			std::string mMessage;
-			std::wstring mFilename;
+			const SourceFileInfo* mSourceFileInfo = nullptr;
 			CompilerError mError;
 		};
+
+	public:
+		static inline Compiler* getActiveInstance()  { return mActiveInstance; }
 
 	public:
 		Compiler(Module& module, GlobalsLookup& globalsLookup, const CompileOptions& compileOptions);
@@ -37,14 +40,19 @@ namespace lemon
 
 		bool loadScript(const std::wstring& path);
 
-		bool loadCodeLines(std::vector<std::string_view>& outLines, const std::wstring& path);
-		bool compileLines(const std::vector<std::string_view>& lines);
+		void addWarning(CompilerWarning::Code warningCode, std::string_view warningMessage, uint32 lineNumber);
 
 		inline const std::vector<ErrorMessage>& getErrors() const  { return mErrors; }
 
 	private:
-		bool loadScriptInternal(const std::wstring& basepath, const std::wstring& filename, std::vector<std::string_view>& outLines, std::unordered_set<uint64>& includedPathHashes);
+		bool loadCodeLines(std::vector<std::string_view>& outLines, const std::wstring& path);
+		bool compileLines(const std::vector<std::string_view>& lines);
+
+		bool loadScriptInternal(const std::wstring& localPath, const std::wstring& filename, std::vector<std::string_view>& outLines, std::unordered_set<uint64>& includedPathHashes);
 		void runCompilerBackend(std::vector<FunctionNode*>& functionNodes);
+
+	private:
+		static inline Compiler* mActiveInstance = nullptr;
 
 	private:
 		Module& mModule;
@@ -55,9 +63,11 @@ namespace lemon
 		TokenProcessing mTokenProcessing;
 		Preprocessor mPreprocessor;
 
+		std::wstring mScriptBasePath;
+
 		struct ScriptFile
 		{
-			std::wstring mBasePath;
+			std::wstring mLocalPath;
 			std::wstring mFilename;
 			String mContent;
 			size_t mFirstLine = 0;

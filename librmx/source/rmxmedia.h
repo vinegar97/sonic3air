@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -39,8 +39,10 @@
 #include "rmxmedia/audiovideo/AudioMixer.h"
 #include "rmxmedia/threads/JobManager.h"
 #include "rmxmedia/framework/GuiBase.h"
+#include "rmxmedia/framework/InputContext.h"
 #include "rmxmedia/framework/AppFramework.h"
-#include "rmxmedia/framework/FTX_System.h"
+#include "rmxmedia/framework/SystemManager.h"
+#include "rmxmedia/framework/VideoManager.h"
 
 #ifdef RMX_WITH_OPENGL_SUPPORT
 	#include "rmxmedia/opengl/Texture.h"
@@ -64,12 +66,12 @@
 // Singletons
 namespace FTX
 {
-	extern SingletonPtr<rmx::JobManager>		JobManager;
-	extern SingletonPtr<rmx::FTX_SystemManager>	System;
-	extern SingletonPtr<rmx::FTX_VideoManager>	Video;
-	extern SingletonPtr<rmx::AudioManager>		Audio;
+	extern SingletonPtr<rmx::JobManager>	JobManager;
+	extern SingletonPtr<rmx::SystemManager>	System;
+	extern SingletonPtr<rmx::VideoManager>	Video;
+	extern SingletonPtr<rmx::AudioManager>	Audio;
 #ifdef RMX_WITH_OPENGL_SUPPORT
-	extern SingletonPtr<rmx::Painter>			Painter;
+	extern SingletonPtr<rmx::Painter>		Painter;
 #endif
 };
 

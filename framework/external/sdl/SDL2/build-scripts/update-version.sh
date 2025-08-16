@@ -30,6 +30,10 @@ echo "Updating version to '$NEWVERSION' ..."
 # !!! FIXME: This first one is a kinda scary search/replace that might fail later if another X.Y.Z version is added to the file.
 perl -w -pi -e 's/(\<string\>)\d+\.\d+\.\d+/${1}'$NEWVERSION'/;' Xcode/SDL/Info-Framework.plist
 
+perl -w -pi -e 's/(Title SDL )\d+\.\d+\.\d+/${1}'$NEWVERSION'/;' Xcode/SDL/pkg-support/SDL.info
+
+perl -w -pi -e 's/(MARKETING_VERSION\s*=\s*)\d+\.\d+\.\d+/${1}'$NEWVERSION'/;' Xcode/SDL/SDL.xcodeproj/project.pbxproj
+
 DYVER=`expr $MINOR \* 100 + 1`
 perl -w -pi -e 's/(DYLIB_CURRENT_VERSION\s*=\s*)\d+\.\d+\.\d+/${1}'$DYVER'.0.0/;' Xcode/SDL/SDL.xcodeproj/project.pbxproj
 
@@ -57,6 +61,10 @@ perl -w -pi -e 's/\A(SDL_MICRO_VERSION=)\d+/${1}'$PATCH'/;' configure.ac
 perl -w -pi -e 's/\A(set\(SDL_MAJOR_VERSION\s+)\d+/${1}'$MAJOR'/;' CMakeLists.txt
 perl -w -pi -e 's/\A(set\(SDL_MINOR_VERSION\s+)\d+/${1}'$MINOR'/;' CMakeLists.txt
 perl -w -pi -e 's/\A(set\(SDL_MICRO_VERSION\s+)\d+/${1}'$PATCH'/;' CMakeLists.txt
+
+perl -w -pi -e 's/\A(.* SDL_MAJOR_VERSION = )\d+/${1}'$MAJOR'/;' android-project/app/src/main/java/org/libsdl/app/SDLActivity.java
+perl -w -pi -e 's/\A(.* SDL_MINOR_VERSION = )\d+/${1}'$MINOR'/;' android-project/app/src/main/java/org/libsdl/app/SDLActivity.java
+perl -w -pi -e 's/\A(.* SDL_MICRO_VERSION = )\d+/${1}'$PATCH'/;' android-project/app/src/main/java/org/libsdl/app/SDLActivity.java
 
 perl -w -pi -e 's/\A(MAJOR_VERSION\s*=\s*)\d+/${1}'$MAJOR'/;' Makefile.os2
 perl -w -pi -e 's/\A(MINOR_VERSION\s*=\s*)\d+/${1}'$MINOR'/;' Makefile.os2

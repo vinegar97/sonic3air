@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -18,6 +18,9 @@ namespace rmx
 	{
 	public:
 		bool exists(const std::wstring& path) override;
+		bool isFile(const std::wstring& path) override;
+		bool isDirectory(const std::wstring& path) override;
+
 		bool getFileSize(const std::wstring& filename, uint64& outFileSize) override;
 		bool getFileTime(const std::wstring& filename, time_t& outFileTime) override;
 		bool readFile(const std::wstring& filename, std::vector<uint8>& outData) override;

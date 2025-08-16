@@ -1,6 +1,6 @@
 /*
 	This script file is part of the Sonic 3 A.I.R. script software distribution.
-	Copyright (C) 2017-2024 by Eukaryot
+	Copyright (C) 2017-2025 by Eukaryot
 
 	Published under the GNU GPLv3 open source software license, see license.txt
 	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -816,7 +816,7 @@ function void fn05622c()
 	A1 = 0xffff0000 + u16[A3 + 0x1c]
 	A5 = A1 + 0xab
 	A1 += 0x95
-	copyMemory((A1+=4)-4, (A5+=4)-4, 4)
+	copyMemory(A1, A5, 4)
 
 	A1 = 0xffff0000 + u16[A3 + 0x28]
 	A5 = A1 + 0xab

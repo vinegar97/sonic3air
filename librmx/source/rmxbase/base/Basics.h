@@ -1,6 +1,6 @@
 /*
 *	rmx Library
-*	Copyright (C) 2008-2024 by Eukaryot
+*	Copyright (C) 2008-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -103,6 +103,13 @@ FORCE_INLINE double roundToDouble(double value)	{ return floor(value + 0.5); }
 template<typename T> static T roundForInt(float value)  { return (T)value; }
 
 
+namespace rmx
+{
+	template<typename S, typename T> T convertType(S value)  { return (T)value; }
+	template<> int convertType(float value);
+}
+
+
 // Linear interpolation
 FORCE_INLINE float interpolate(float v0, float v1, float factor)		{ return v0 + (v1 - v0) * factor; }
 FORCE_INLINE double interpolate(double v0, double v1, double factor)	{ return v0 + (v1 - v0) * factor; }
@@ -168,10 +175,10 @@ FORCE_INLINE void strCpy(wchar_t* dst, int dstSize, const wchar_t* src)	{ wcscpy
 
 
 // Comparisons
-FORCE_INLINE int compare(int first, int second)		{ return (first < second) ? -1 : (first > second) ? +1 : 0; }
-FORCE_INLINE int compare(float first, float second)	{ return (first < second) ? -1 : (first > second) ? +1 : 0; }
-FORCE_INLINE int compare(void* first, void* second)	{ return (first < second) ? -1 : (first > second) ? +1 : 0; }
-FORCE_INLINE int compare(bool first, bool second)	{ return (first == second) ? 0 : second ? +1 : -1; }
+FORCE_INLINE int compare(int first, int second)					{ return (first < second) ? -1 : (first > second) ? +1 : 0; }
+FORCE_INLINE int compare(float first, float second)				{ return (first < second) ? -1 : (first > second) ? +1 : 0; }
+FORCE_INLINE int compare(const void* first, const void* second)	{ return (first < second) ? -1 : (first > second) ? +1 : 0; }
+FORCE_INLINE int compare(bool first, bool second)				{ return (first == second) ? 0 : second ? +1 : -1; }
 
 #define COMPARE_CASCADE(x) \
 { \

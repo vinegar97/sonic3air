@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -29,6 +29,11 @@ public:
 	uint16 mLowLevelSignature = 0;
 	NetConnection* mConnection = nullptr;
 
+#ifdef DEBUG
+	// Latency simulation
+	uint64 mDelayedDeliveryTime = 0;
+#endif
+
 public:
 	inline void initializeWithDump(Dump* dump)
 	{
@@ -38,13 +43,13 @@ public:
 		mReferenceCounter = 1;
 	}
 
-	inline void incReferenceCounter()
+	inline void incReferenceCounter() const
 	{
 		RMX_ASSERT(nullptr != mDump, "Reference counting is used for an instance already returned to the dump");
 		++mReferenceCounter;
 	}
 
-	inline void decReferenceCounter()
+	inline void decReferenceCounter() const
 	{
 		RMX_ASSERT(nullptr != mDump, "Reference counting is used for an instance already returned to the dump");
 		RMX_ASSERT(mReferenceCounter > 0, "Trying to remove a reference when counter already is at zero");
@@ -57,6 +62,6 @@ public:
 	}
 
 private:
-	Dump* mDump = nullptr;
-	int mReferenceCounter = 0;
+	mutable Dump* mDump = nullptr;
+	mutable int mReferenceCounter = 0;
 };

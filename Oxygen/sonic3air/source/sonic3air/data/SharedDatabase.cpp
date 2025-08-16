@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -8,18 +8,10 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/data/SharedDatabase.h"
+#include "sonic3air/ConfigurationImpl.h"
 
 #include "oxygen/application/Configuration.h"
-#include "oxygen/resources/SpriteCache.h"
-
-
-bool SharedDatabase::mIsInitialized = false;
-std::vector<SharedDatabase::Zone> SharedDatabase::mAllZones;
-std::vector<SharedDatabase::Zone> SharedDatabase::mAvailableZones;
-std::unordered_map<uint32, SharedDatabase::Setting> SharedDatabase::mSettings;
-std::vector<SharedDatabase::Achievement> SharedDatabase::mAchievements;
-std::map<uint32, SharedDatabase::Achievement*> SharedDatabase::mAchievementMap;
-std::vector<SharedDatabase::Secret> SharedDatabase::mSecrets;
+#include "oxygen/resources/SpriteCollection.h"
 
 
 void SharedDatabase::initialize()
@@ -148,7 +140,10 @@ uint64 SharedDatabase::setupCharacterSprite(EmulatorInterface& emulatorInterface
 	}
 	else
 	{
-		SpriteCache::ROMSpriteData romSpriteData;
+		if (animationSprite >= 0xfb)	// Filter out invalid sprite numbers that might lead to garbage and misbehavior
+			return 0;
+
+		SpriteCollection::ROMSpriteData romSpriteData;
 		switch (character)
 		{
 			default:
@@ -172,20 +167,20 @@ uint64 SharedDatabase::setupCharacterSprite(EmulatorInterface& emulatorInterface
 		}
 
 		romSpriteData.mAnimationSprite = (uint8)animationSprite;
-		romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::CHARACTER;
-		return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, romSpriteData, 0x00).mKey;
+		romSpriteData.mEncoding = SpriteCollection::ROMSpriteEncoding::CHARACTER;
+		return SpriteCollection::instance().setupSpriteFromROM(emulatorInterface, romSpriteData, 0x00).mKey;
 	}
 }
 
 uint64 SharedDatabase::setupTailsTailsSprite(EmulatorInterface& emulatorInterface, uint8 animationSprite)
 {
-	SpriteCache::ROMSpriteData romSpriteData;
+	SpriteCollection::ROMSpriteData romSpriteData;
 	romSpriteData.mPatternsBaseAddress = 0x336620;
 	romSpriteData.mTableAddress = 0x344d74;
 	romSpriteData.mMappingOffset = 0x344bb8;
 	romSpriteData.mAnimationSprite = animationSprite;
-	romSpriteData.mEncoding = SpriteCache::ROMSpriteEncoding::CHARACTER;
-	return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, romSpriteData, 0x00).mKey;
+	romSpriteData.mEncoding = SpriteCollection::ROMSpriteEncoding::CHARACTER;
+	return SpriteCollection::instance().setupSpriteFromROM(emulatorInterface, romSpriteData, 0x00).mKey;
 }
 
 uint8 SharedDatabase::getTailsTailsAnimationSprite(uint8 characterAnimationSprite, uint32 globalTime)
@@ -224,14 +219,7 @@ const SharedDatabase::Setting* SharedDatabase::getSetting(uint32 settingId)
 
 uint32 SharedDatabase::getSettingValue(uint32 settingId)
 {
-	const SharedDatabase::Setting* setting = getSetting(settingId);
-	if (nullptr != setting)
-	{
-		return setting->mCurrentValue;
-	}
-
-	// Use default value
-	return (settingId & 0xff);
+	return ConfigurationImpl::instance().mActiveGameSettings->getValue(settingId);
 }
 
 SharedDatabase::Achievement* SharedDatabase::getAchievement(uint32 achievementId)
@@ -268,7 +256,6 @@ SharedDatabase::Setting& SharedDatabase::addSetting(SharedDatabase::Setting::Typ
 	SharedDatabase::Setting& setting = mSettings[(uint32)id];
 	setting.mSettingId = id;
 	setting.mIdentifier = std::string(identifier).substr(9);
-	setting.mCurrentValue = ((uint32)id & 0xff);
 	setting.mDefaultValue = ((uint32)id & 0xff);
 	setting.mSerializationType = serializationType;
 	setting.mPurelyVisual = ((uint32)id & 0x80000000) != 0;
@@ -287,16 +274,27 @@ void SharedDatabase::setupSettings()
 	addSetting(IDPARAMS(Setting::SETTING_CANCEL_FLIGHT), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_SUPER_CANCEL), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_INSTA_SHIELD), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_LEVELRESULT_SCORE), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_HYPER_TAILS), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_SHIELD_TYPES), Setting::SerializationType::ALWAYS);
 
 	addSetting(IDPARAMS(Setting::SETTING_AIZ_BLIMPSEQUENCE), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_AIZ_INTRO_KNUCKLES), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_HCZ_WATERPIPE), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_LBZ_TUBETRANSPORT), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_LBZ_CUPELEVATOR), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_LBZ_BIGARMS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_MHZ_ELEVATOR), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_FBZ_ENTERCYLINDER), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_FBZ_SCREWDOORS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_FASTER_PUSH), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_SOZ_PYRAMID), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_LRZ2_BOSS), Setting::SerializationType::ALWAYS);
 
 	addSetting(IDPARAMS(Setting::SETTING_EXTENDED_HUD), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_SMOOTH_ROTATION), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_SPEEDUP_AFTERIMGS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_PLAYER2_OFFSCREEN), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_BS_VISUAL_STYLE), Setting::SerializationType::ALWAYS);
 
 	addSetting(IDPARAMS(Setting::SETTING_INFINITE_LIVES), Setting::SerializationType::ALWAYS);
@@ -310,6 +308,7 @@ void SharedDatabase::setupSettings()
 	addSetting(IDPARAMS(Setting::SETTING_BS_REPEAT_ON_FAIL), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_DISABLE_GHOST_SPAWN), Setting::SerializationType::ALWAYS);
 
+	addSetting(IDPARAMS(Setting::SETTING_HIDDEN_MONITOR_HINT), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_SUPERFAST_RUNANIM), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_MONITOR_STYLE), Setting::SerializationType::ALWAYS);
 	addSetting(IDPARAMS(Setting::SETTING_HYPER_DASH_CONTROLS), Setting::SerializationType::ALWAYS);

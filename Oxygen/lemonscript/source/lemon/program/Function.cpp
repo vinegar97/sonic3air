@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -159,11 +159,14 @@ namespace lemon
 		if (!pragmaSplitter.mEntries.empty())
 		{
 			bool hadAddressHook = false;
+			bool hadAlias = false;
 			for (const lemon::PragmaSplitter::Entry& entry : pragmaSplitter.mEntries)
 			{
 				if (entry.mArgument == "alias")
 				{
-					mAliasNames.push_back(entry.mValue);
+					// Add alias for this function
+					vectorAdd(mAliasNames).mName = entry.mValue;
+					hadAlias = true;
 				}
 				else if (entry.mArgument == "address-hook")
 				{
@@ -177,6 +180,19 @@ namespace lemon
 				{
 					// You can use "translated" to denote that some code was already put into script, but should not be an actual address hook
 					hadAddressHook = true;
+				}
+				else if (entry.mArgument == "deprecated")
+				{
+					if (hadAlias)
+					{
+						// Mark alias as deprecated
+						mAliasNames.back().mIsDeprecated = true;
+					}
+					else
+					{
+						// Mark function itself as deprecated
+						mFlags.set(Flag::DEPRECATED);
+					}
 				}
 			}
 

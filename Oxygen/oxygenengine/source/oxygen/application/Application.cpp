@@ -1,6 +1,6 @@
 /*
 *	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
-*	Copyright (C) 2017-2024 by Eukaryot
+*	Copyright (C) 2017-2025 by Eukaryot
 *
 *	Published under the GNU GPLv3 open source software license, see license.txt
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -13,9 +13,9 @@
 #include "oxygen/application/GameLoader.h"
 #include "oxygen/application/audio/AudioOutBase.h"
 #include "oxygen/application/audio/AudioPlayer.h"
+#include "oxygen/application/gameview/GameView.h"
 #include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/application/input/InputManager.h"
-#include "oxygen/application/mainview/GameView.h"
 #include "oxygen/application/menu/GameSetupScreen.h"
 #include "oxygen/application/menu/OxygenMenu.h"
 #include "oxygen/application/overlays/BackdropView.h"
@@ -23,15 +23,18 @@
 #include "oxygen/application/overlays/DebugLogView.h"
 #include "oxygen/application/overlays/DebugSidePanel.h"
 #include "oxygen/application/overlays/MemoryHexView.h"
-#include "oxygen/application/overlays/MemoryHexView.h"
 #include "oxygen/application/overlays/ProfilingView.h"
 #include "oxygen/application/overlays/SaveStateMenu.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/video/VideoOut.h"
+#include "oxygen/devmode/ImGuiIntegration.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/helper/Profiling.h"
+#include "oxygen/network/EngineServerClient.h"
 #include "oxygen/platform/PlatformFunctions.h"
+#include "oxygen/simulation/GameRecorder.h"
 #include "oxygen/simulation/LogDisplay.h"
+#include "oxygen/simulation/PersistentData.h"
 #include "oxygen/simulation/Simulation.h"
 
 
@@ -62,12 +65,13 @@ Application::Application() :
 
 Application::~Application()
 {
-	delete mGameApp;
-	delete mGameView;
+	EngineServerClient::instance().shutdownClient();
+
 	delete mGameLoader;
 	delete mSaveStateMenu;
 	delete mSimulation;
-	delete mTouchControlsOverlay;
+
+	Sockets::shutdownSockets();
 }
 
 void Application::initialize()
@@ -78,8 +82,8 @@ void Application::initialize()
 	{
 		RMX_LOG_INFO("Adding game view");
 		mGameView = new GameView(*mSimulation);
-		addChild(mGameView);
-		mBackdropView = createChild<BackdropView>();
+		addChild(*mGameView);
+		mBackdropView = &createChild<BackdropView>();
 	}
 
 	mWindowMode = (WindowMode)Configuration::instance().mWindowMode;
@@ -87,19 +91,19 @@ void Application::initialize()
 	if (EngineMain::getDelegate().useDeveloperFeatures())
 	{
 		RMX_LOG_INFO("Adding debug views");
-		mDebugSidePanel = createChild<DebugSidePanel>();
+		mDebugSidePanel = &createChild<DebugSidePanel>();
 		createChild<MemoryHexView>();
 		createChild<DebugLogView>();
 	}
 
-	//mOxygenMenu = mGameView->createChild<OxygenMenu>();
-	mProfilingView = createChild<ProfilingView>();
-	mCheatSheetOverlay = createChild<CheatSheetOverlay>();
+	//mOxygenMenu = &mGameView->createChild<OxygenMenu>();
+	mProfilingView = &createChild<ProfilingView>();
+	mCheatSheetOverlay = &createChild<CheatSheetOverlay>();
 
 	if (nullptr != mTouchControlsOverlay && nullptr == mTouchControlsOverlay->getParent())
 	{
 		mTouchControlsOverlay->buildTouchControls();
-		addChild(mTouchControlsOverlay);
+		addChild(*mTouchControlsOverlay);
 	}
 
 	// Font
@@ -114,10 +118,11 @@ void Application::deinitialize()
 	RMX_LOG_INFO("");
 	RMX_LOG_INFO("--- SHUTDOWN ---");
 
-	// Remove all children, as they must not get deleted automatically (which would be the case if they stay added as children)
-	while (!mChildren.empty())
+	// Destroy game app here already, instead of using the auto-deletion of children
+	if (nullptr != mGameApp)
 	{
-		removeChild(*mChildren.begin());
+		deleteChild(*mGameApp);
+		mGameApp = nullptr;
 	}
 
 	EngineMain::getDelegate().shutdownGame();
@@ -135,6 +140,8 @@ void Application::sdlEvent(const SDL_Event& ev)
 	GuiBase::sdlEvent(ev);
 
 	//RMX_LOG_INFO("SDL event: type = " << ev.type);
+
+	ImGuiIntegration::processSdlEvent(ev);
 
 	// Inform input manager as well
 	if (ev.type == SDL_KEYDOWN || ev.type == SDL_KEYUP)		// TODO: Also add joystick events?
@@ -203,7 +210,15 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 		return;
 	}
 
+	if (ImGuiIntegration::isCapturingKeyboard())
+	{
+		FTX::System->consumeCurrentEvent();
+	}
+
 	GuiBase::keyboard(ev);
+
+	if (FTX::System->wasEventConsumed())
+		return;
 
 	if (ev.state)
 	{
@@ -275,6 +290,12 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 						{
 							PlatformFunctions::openFileExternal(L"config.json");
 						}
+					#ifdef SUPPORT_IMGUI
+						else if (EngineMain::getDelegate().useDeveloperFeatures())
+						{
+							ImGuiIntegration::toggleMainWindow();
+						}
+					#endif
 						else
 						{
 							mCheatSheetOverlay->toggle();
@@ -309,7 +330,7 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 						{
 							if (!mSaveStateMenu->isActive() && mSimulation->isRunning())
 							{
-								addChild(mSaveStateMenu);
+								addChild(*mSaveStateMenu);
 								mSaveStateMenu->init(false);
 								mSimulation->setSpeed(0.0f);
 							}
@@ -325,7 +346,7 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 							// Load state menu
 							if (!mSaveStateMenu->isActive() && mSimulation->isRunning())
 							{
-								addChild(mSaveStateMenu);
+								addChild(*mSaveStateMenu);
 								mSaveStateMenu->init(true);
 								mSimulation->setSpeed(0.0f);
 							}
@@ -337,12 +358,13 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 					{
 						// Saving a screenshot to disk is meant to be developer-only, as the "getScreenshot" call can crash the application for some users
 						//  (Yes, I had this active for everyone in the early days of S3AIR)
-						if (EngineMain::getDelegate().useDeveloperFeatures())
+						if (EngineMain::getDelegate().useDeveloperFeatures() && nullptr != mGameView)
 						{
+							const std::string filename = "screenshot_" + rmx::getTimestampStringForFilename() + ".bmp";
 							Bitmap bitmap;
-							VideoOut::instance().getScreenshot(bitmap);
-							bitmap.save(L"screenshot.bmp");
-							LogDisplay::instance().setLogDisplay("Screenshot saved in 'screenshot.bmp'");
+							mGameView->getScreenshot(bitmap);
+							bitmap.save(String(filename).toStdWString());
+							LogDisplay::instance().setLogDisplay("Screenshot saved as \"" + filename + "\"");
 						}
 						break;
 					}
@@ -400,11 +422,26 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 	}
 }
 
+void Application::mouse(const rmx::MouseEvent& ev)
+{
+	if (ImGuiIntegration::isCapturingMouse())
+	{
+		FTX::System->consumeCurrentEvent();
+	}
+
+	GuiBase::mouse(ev);
+}
+
 void Application::update(float timeElapsed)
 {
 	if (mIsVeryFirstFrameForLogging)
 	{
 		RMX_LOG_INFO("Start of first application update call");
+	}
+
+	if (ImGuiIntegration::isCapturingMouse() || ImGuiIntegration::isCapturingKeyboard())
+	{
+		FTX::System->consumeCurrentEvent();
 	}
 
 	// Global slow motion for debugging menu transitions etc.
@@ -421,7 +458,7 @@ void Application::update(float timeElapsed)
 	#if defined(DEBUG)
 		if (nullptr == mGameSetupScreen)
 		{
-			mGameSetupScreen = mGameView->createChild<GameSetupScreen>();
+			mGameSetupScreen = &mGameView->createChild<GameSetupScreen>();
 		}
 	#endif
 
@@ -431,10 +468,16 @@ void Application::update(float timeElapsed)
 	{
 		if (nullptr != mGameSetupScreen)
 		{
-			mGameView->deleteChild(mGameSetupScreen);
+			mGameView->deleteChild(*mGameSetupScreen);
 			mGameSetupScreen = nullptr;
 		}
 	}
+
+	// Update engine server client and netplay
+	EngineServerClient::instance().updateClient(timeElapsed);
+
+	// Update drawer
+	EngineMain::instance().getDrawer().updateDrawer(timeElapsed);
 
 	// Update input
 	InputManager::instance().updateInput(timeElapsed);
@@ -475,11 +518,12 @@ void Application::update(float timeElapsed)
 	LogDisplay& logDisplay = LogDisplay::instance();
 	logDisplay.mLogDisplayTimeout = std::max(logDisplay.mLogDisplayTimeout - std::min(timeElapsed, 0.1f), 0.0f);
 
+	mGameView->earlyUpdate(timeElapsed);
 	GuiBase::update(timeElapsed);
 
 	if (nullptr != mRemoveChild)
 	{
-		removeChild(mRemoveChild);
+		removeChild(*mRemoveChild);
 		mRemoveChild = nullptr;
 	}
 
@@ -495,6 +539,9 @@ void Application::update(float timeElapsed)
 			SDL_ShowCursor(0);
 	}
 
+	// Update persistent data
+	PersistentData::instance().updatePersistentData();
+
 	if (mIsVeryFirstFrameForLogging)
 	{
 		RMX_LOG_INFO("End of first application render call");
@@ -509,6 +556,13 @@ void Application::render()
 	{
 		RMX_LOG_INFO("Start of first application render call");
 	}
+
+	if (ImGuiIntegration::isCapturingMouse())
+	{
+		FTX::System->consumeCurrentEvent();
+	}
+
+	ImGuiIntegration::startFrame();
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
 	drawer.setupRenderWindow(&EngineMain::instance().getSDLWindow());
@@ -551,15 +605,18 @@ void Application::render()
 
 		// TODO: The sprites are from S3AIR, but used in OxygenApp as well
 	#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
-		static const uint64 key = rmx::getMurmur2_64(std::string_view("auto_pause_text_tap"));
+		constexpr uint64 key = rmx::constMurmur2_64("auto_pause_text_tap");
 	#else
-		static const uint64 key = rmx::getMurmur2_64(std::string_view("auto_pause_text_key"));
+		constexpr uint64 key = rmx::constMurmur2_64("auto_pause_text_key");
 	#endif
-		const float scale = (float)(FTX::screenHeight() / 160);		// A bit larger than he usual upscaled pixel size
+		const float scale = (float)(FTX::screenHeight() / 160);		// A bit larger than the usual upscaled pixel size
 		drawer.drawSprite(FTX::screenSize() / 2, key, Color(0.3f, 1.0f, 1.0f), Vec2f(scale));
 	}
 
 	drawer.performRendering();
+
+	ImGuiIntegration::showDebugWindow();
+	ImGuiIntegration::endFrame();
 
 	// Needed only for precise profiling
 	//glFinish();
@@ -651,7 +708,7 @@ void Application::setWindowMode(WindowMode windowMode, bool force)
 		default:
 		case WindowMode::WINDOWED:
 		{
-			if (mWindowMode == WindowMode::EXCLUSIVE_FULLSCREEN)
+			if (mWindowMode >= WindowMode::FULLSCREEN_DESKTOP)
 			{
 				SDL_SetWindowFullscreen(window, 0);
 			}
@@ -662,11 +719,11 @@ void Application::setWindowMode(WindowMode windowMode, bool force)
 			break;
 		}
 
-		case WindowMode::BORDERLESS_FULLSCREEN:
+		case WindowMode::FULLSCREEN_BORDERLESS:
 		{
-			if (mWindowMode == WindowMode::EXCLUSIVE_FULLSCREEN)
+			if (mWindowMode >= WindowMode::FULLSCREEN_DESKTOP)
 			{
-				// Exit exclusive fullscreen first
+				// Exit fullscreen first
 				SDL_SetWindowFullscreen(window, 0);
 			}
 
@@ -692,9 +749,15 @@ void Application::setWindowMode(WindowMode windowMode, bool force)
 			break;
 		}
 
-		case WindowMode::EXCLUSIVE_FULLSCREEN:
+		case WindowMode::FULLSCREEN_DESKTOP:
 		{
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+			break;
+		}
+
+		case WindowMode::FULLSCREEN_EXCLUSIVE:
+		{
+			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 			break;
 		}
 	}
@@ -713,10 +776,10 @@ void Application::toggleFullscreen()
 	if (getWindowMode() == WindowMode::WINDOWED)
 	{
 	#if defined(PLATFORM_LINUX)
-		// Under Linux, the exclusive fullscreen works better, so that's the default
-		setWindowMode(WindowMode::EXCLUSIVE_FULLSCREEN);
+		// Under Linux, the fullscreen with desktop resolution works better, so that's the default
+		setWindowMode(WindowMode::FULLSCREEN_DESKTOP);
 	#else
-		setWindowMode(WindowMode::BORDERLESS_FULLSCREEN);
+		setWindowMode(WindowMode::FULLSCREEN_BORDERLESS);
 	#endif
 	}
 	else
@@ -732,7 +795,7 @@ void Application::enablePauseOnFocusLoss()
 
 void Application::triggerGameRecordingSave()
 {
-	if (Configuration::instance().mGameRecorder.mIsRecording)
+	if (mSimulation->getGameRecorder().isRecording())
 	{
 		WString filename;
 		const uint32 numFrames = mSimulation->saveGameRecording(&filename);
@@ -842,7 +905,7 @@ bool Application::updateLoading()
 
 				RMX_LOG_INFO("Adding game app instance");
 				mGameApp = &EngineMain::getDelegate().createGameApp();
-				addChild(mGameApp);
+				addChild(*mGameApp);
 				break;
 			}
 
